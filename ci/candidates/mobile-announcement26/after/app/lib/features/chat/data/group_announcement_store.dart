@@ -63,9 +63,13 @@ final class GroupAnnouncementStore {
     Future<bool?> Function(String)? readBool,
     Future<void> Function(String, bool)? writeBool,
     SharedPreferencesAsync Function()? preferences,
-  }) : _readBool = readBool,
-       _writeBool = writeBool,
-       _factory = preferences ?? SharedPreferencesAsync.new;
+  }) : this._(readBool, writeBool, preferences);
+
+  GroupAnnouncementStore._(
+    this._readBool,
+    this._writeBool,
+    SharedPreferencesAsync Function()? preferences,
+  ) : _factory = preferences ?? SharedPreferencesAsync.new;
 
   final Future<bool?> Function(String)? _readBool;
   final Future<void> Function(String, bool)? _writeBool;

@@ -53,7 +53,20 @@ jobs:
             ci-output/web-build-guard/*.json
             ci-output/web-build/*.log
             ci-output/web-build/*.json
+            ci-output/web-build/built-index.html
           if-no-files-found: warn
+          retention-days: 14
+      - name: Preserve bounded completed build when policy audit failed; unaccepted only
+        if: always() && steps.bundle.outcome != 'success' && hashFiles('ci-output/web-build/dist-candidate-manifest.json') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: web4301-unaccepted-dist-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-output/web-build/dist/
+            ci-output/web-build/dist-candidate-manifest.json
+            ci-output/web-build/dist-candidate-proof.json
+            ci-output/web-build/policy-proof.json
+          if-no-files-found: error
           retention-days: 14
       - name: Separate review bundle; never deploy
         if: always() && steps.bundle.outcome == 'success'

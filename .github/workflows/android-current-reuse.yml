@@ -1,0 +1,80 @@
+name: Android current354 immutable-core continuation
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [current354-immutable-core-reuse-v1]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: android-current-reuse-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  current-arm64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select one fresh private output
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/android-reuse-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "ANDROID_WORK=$RUNNER_TEMP/android-reuse-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current354" >> "$GITHUB_ENV"
+      - name: Exact source and cold20GiB guarded setup
+        run: python3 -B ci/android-native/current_reuse.py --cohort '${{ inputs.cohort }}' --stage setup --work "$ANDROID_WORK"
+      - name: Import original complete products and raw; actual Python artifact audits, no bind
+        env:
+          RESTORE_GITHUB_TOKEN: ${{ github.token }}
+        run: python3 -B ci/android-native/current_reuse.py --cohort '${{ inputs.cohort }}' --stage restore --work "$ANDROID_WORK"
+      - name: Two actual builtin classpath producers offline
+        run: sudo unshare --net -- bash ci/android-native/netns-reuse.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" preseal
+      - name: Actual current production finite3 source18 dependencies
+        run: python3 -B ci/android-native/current_reuse.py --cohort '${{ inputs.cohort }}' --stage gradle-setup --work "$ANDROID_WORK"
+      - name: Original seven gates and actual current354 APK compile offline
+        run: sudo unshare --net -- bash ci/android-native/netns-reuse.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" apk
+      - name: Bound exact official SDK archive evidence
+        id: sdk_source_budget
+        if: always()
+        run: python3 -B ci/android-native/sdk_platform_producer.py --archive-upload-admission "$ANDROID_WORK"
+      - name: Keep large official SDK source archives separately
+        if: always() && steps.sdk_source_budget.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current354-reuse-platform-sources-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-37.0.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-36.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-35.zip
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve compact current raw before products
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current354-reuse-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/reuse-activation.json
+            ${{ env.ANDROID_WORK }}/evidence/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Separate public QA products; never CA private keys
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current354-reuse-products-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/artifacts/core-current354-arm64.aar
+            ${{ env.ANDROID_WORK }}/artifacts/core-current354-arm64.build.json
+            ${{ env.ANDROID_WORK }}/artifacts/core-current354-arm64-sources.jar
+            ${{ env.ANDROID_WORK }}/artifacts/luobo-current354-auditable-arm64-debug.apk
+            ${{ env.ANDROID_WORK }}/artifacts/NOTICE-public-core.txt
+            ${{ env.ANDROID_WORK }}/artifacts/recovered-core-ca-public.pem
+            ${{ env.ANDROID_WORK }}/artifacts/job-ca-public.pem
+          retention-days: 14
+          if-no-files-found: warn

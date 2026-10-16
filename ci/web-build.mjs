@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, realpathSync, statfsSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { verifyFile, verifyLinuxBindings } from "./web-ci.mjs";
 
@@ -91,7 +92,7 @@ function verifySDK() {
   }
 }
 
-export function distManifest(directory, publicRows, csp) {
+function collectDist(directory, publicRows) {
   assert(realpathSync(directory) === path.resolve(directory) && lstatSync(directory).isDirectory(), "Canonical real dist root required");
   const rows = [], walk = (at) => {
     for (const entry of readdirSync(at, { withFileTypes: true })) {
@@ -107,13 +108,87 @@ export function distManifest(directory, publicRows, csp) {
   };
   walk(directory);
   assert(rows.length > 0 && rows.length <= 256 && rows.reduce((n, r) => n + r.bytes, 0) <= 128 * 1024 ** 2, "Dist collection cap exceeded");
-  const index = readFileSync(path.join(directory, "index.html"), "utf8");
-  assert(index.includes('http-equiv="Content-Security-Policy"') && index.includes(`content="${csp}"`), "Pinned production CSP missing from actual index");
   for (const source of publicRows) {
     const row = rows.find((r) => r.path === `dist/${source.path.slice("public/".length)}`);
     assert(row?.bytes === source.bytes && row?.sha256 === source.sha256, "Pinned public/WASM output changed or missing");
   }
   return rows.sort((a, b) => Buffer.compare(Buffer.from(a.path), Buffer.from(b.path)));
+}
+
+function htmlParser() {
+  const spec = json(descriptorPath).htmlParser;
+  const locked = json(path.join(web, "package-lock.json")).packages["node_modules/parse5"];
+  assert(locked.version === spec.version && locked.resolved === spec.resolved && locked.integrity === spec.integrity, "Independent existing npm parser lock must match");
+  const require = createRequire(path.join(web, "package.json"));
+  const root = realpathSync(path.join(web, "node_modules/parse5"));
+  assert(spec.version === "8.0.1" && json(path.join(root, "package.json")).version === spec.version, "Locked real HTML parser required");
+  for (const row of spec.files) verifyFile(root, row);
+  assert(require.resolve("parse5") === path.join(root, "dist/index.js"), "Parser must resolve from this job's installed package");
+  return { parse: require("parse5").parse, identity: { version: spec.version, integrity: spec.integrity, files: spec.files } };
+}
+
+function normalizedPolicy(value) {
+  assert(typeof value === "string" && Buffer.byteLength(value) <= 8192, "bounded-policy");
+  const rows = [], seen = new Set();
+  for (const directive of value.split(";")) {
+    const fields = directive.replace(/^[\t\n\f\r ]+|[\t\n\f\r ]+$/g, "").split(/[\t\n\f\r ]+/);
+    if (fields.length === 1 && fields[0] === "") continue;
+    const name = fields.shift().replace(/[A-Z]/g, (c) => c.toLowerCase());
+    assert(/^[a-z][a-z0-9-]*$/.test(name) && !seen.has(name), "duplicate-or-invalid-directive");
+    assert(new Set(fields).size === fields.length, "duplicate-source-token");
+    seen.add(name); rows.push([name, sorted(fields)]);
+  }
+  return rows.sort((a, b) => a[0].localeCompare(b[0], "en"));
+}
+
+export function policyProof(index, expected) {
+  const parser = htmlParser(), errors = [], policies = [];
+  const document = parser.parse(index, { onParseError: (e) => errors.push(e.code) });
+  const walk = (node) => {
+    if (node.tagName === "meta" && node.namespaceURI === "http://www.w3.org/1999/xhtml") {
+      const attrs = Object.fromEntries(node.attrs.map((a) => [a.name, a.value]));
+      if (attrs["http-equiv"]?.replace(/[A-Z]/g, (c) => c.toLowerCase()) === "content-security-policy")
+        policies.push({ inHead: node.parentNode?.tagName === "head", content: attrs.content });
+    }
+    for (const child of node.childNodes ?? []) walk(child);
+  };
+  walk(document);
+  const proof = { passed: false, reason: "policy-count-or-placement", policies: policies.length,
+    parser: parser.identity, HTMLParseErrorCodes: [...new Set(errors)], expected: normalizedPolicy(expected) };
+  if (policies.length !== 1 || !policies[0].inHead) return proof;
+  if (errors.includes("duplicate-attribute")) return { ...proof, reason: "duplicate-HTML-attribute" };
+  try { proof.actual = normalizedPolicy(policies[0].content); }
+  catch { return { ...proof, reason: "invalid-policy-syntax" }; }
+  proof.passed = JSON.stringify(proof.actual) === JSON.stringify(proof.expected);
+  proof.reason = proof.passed ? "exact-directive-source-semantics" : "policy-mismatch";
+  return proof;
+}
+
+export function retainBuildCandidate(directory, dist, publicRows, csp, identity) {
+  const files = collectDist(dist, publicRows);
+  writeJSON(path.join(directory, "dist-candidate-manifest.json"), files);
+  writeJSON(path.join(directory, "dist-candidate-proof.json"), { ...identity,
+    state: "built-bytes-policy-and-resource-not-accepted", files: files.length,
+    manifestSHA256: hash(readFileSync(path.join(directory, "dist-candidate-manifest.json"))), deployment: false });
+  const row = files.find((r) => r.path === "dist/index.html");
+  let proof = { passed: false, reason: "missing-or-oversize-index", index: row ?? null, indexCaptureCap: 256 * 1024 };
+  if (row && row.bytes <= 256 * 1024) {
+    const body = readFileSync(path.join(dist, "index.html"));
+    writeNew(path.join(directory, "built-index.html"), body);
+    proof = body.length === row.bytes && hash(body) === row.sha256
+      ? { ...policyProof(body.toString("utf8"), csp), index: row, capturedIndexSHA256: hash(body) }
+      : { ...proof, reason: "index-changed-after-collection", capturedIndexSHA256: hash(body) };
+  }
+  writeJSON(path.join(directory, "policy-proof.json"), proof);
+  return { files, proof };
+}
+
+export function distManifest(directory, publicRows, csp) {
+  const files = collectDist(directory, publicRows);
+  const row = files.find((r) => r.path === "dist/index.html");
+  assert(row && row.bytes <= 256 * 1024, "Bounded actual index required");
+  assert(policyProof(readFileSync(path.join(directory, "index.html"), "utf8"), csp).passed, "Pinned production CSP semantic mismatch");
+  return files;
 }
 
 function bundleWorker() {
@@ -130,7 +205,10 @@ function bundleWorker() {
   verifySourceTree(web, input.files, true); verifySDK();
   execute(buildPlan(process.execPath, "unused-in-worker", path.join(output, "dist"))[2]);
   verifySourceTree(web, input.files, true); verifySDK(); checkedInputs();
-  const files = distManifest(path.join(output, "dist"), input.files.filter((r) => r.path.startsWith("public/")), input.csp);
+  const candidate = retainBuildCandidate(output, path.join(output, "dist"), input.files.filter((r) => r.path.startsWith("public/")), input.csp,
+    { cohort, commit: prepared.commit, sourceFiles: 4301, sourceDigest });
+  assert(candidate.proof.passed, "Pinned production CSP semantic mismatch; bounded actual index/proof and candidate retained");
+  const files = candidate.files;
   writeJSON(path.join(output, "dist-manifest.json"), files);
   writeJSON(path.join(output, "dist-proof.json"), { cohort, commit: prepared.commit, sourceFiles: 4301, sourceDigest, files: files.length, bytes: files.reduce((n, r) => n + r.bytes, 0), filesDigest: rowsDigest(files), manifestSHA256: hash(readFileSync(path.join(output, "dist-manifest.json"))), opaqueWASMSameAsReviewedPublicSource: true, SDKSourceRebuilt: false, runtimeOrPreviewAcceptance: false, deployment: false, resourceGuardPassStillRequired: true });
   console.log("BUILD_CANDIDATE_READY; outer resource exit/status must also pass");

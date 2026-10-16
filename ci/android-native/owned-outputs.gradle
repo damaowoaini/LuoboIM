@@ -2,6 +2,9 @@
 import groovy.json.JsonOutput
 import java.nio.file.Files
 import java.nio.file.LinkOption
+import java.nio.file.StandardOpenOption
+import java.nio.channels.Channels
+import java.nio.channels.FileChannel
 import java.security.MessageDigest
 def props=gradle.startParameter.systemPropertiesArgs
 def raw=props['luoboProductionWork']
@@ -45,10 +48,12 @@ gradle.projectsEvaluated {
     directory.mkdirs()
     if (directory.canonicalFile!=directory) throw new GradleException('owned audit directory alias')
     def output=new File(directory,dispatch+'-'+rootKey+'.json')
-    if (!output.createNewFile()) throw new GradleException('output audit may not overwrite')
-    output.withOutputStream { stream ->
+    def channel=FileChannel.open(output.toPath(),StandardOpenOption.CREATE_NEW,
+        StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)
+    try {
+        def stream=Channels.newOutputStream(channel)
         stream.write((JsonOutput.prettyPrint(JsonOutput.toJson([dispatch:dispatch,root:gradle.rootProject.projectDir.path,
             JVM_user_home:home,JVM_tmp:tmp,Gradle_user_home:gradleHome,projects:rows,audit_only:true]))+'\n').getBytes('UTF-8'))
-        stream.flush();stream.getFD().sync()
-    }
+        stream.flush();channel.force(true)
+    } finally { channel.close() }
 }

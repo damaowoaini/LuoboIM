@@ -61,8 +61,8 @@ def validate_descriptor(cfg):
             or [r['path'] for r in cfg['base']['helper_pins']] != HELPERS
             or cfg['base']['source_digest'] != '113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c'
             or cfg['base']['portable_digest'] != '81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c'
-            or cfg['candidate']['source_digest'] != 'b92ea7b511681637e5a1ac509f1e3ed5037973b0b40c3f0f87be0a0f3c46ba1f'
-            or cfg['candidate']['portable_digest'] != 'e17d93580192e8a652ec98c4baebe525417897fa29114618010c0fb55840f0fd'
+            or cfg['candidate']['source_digest'] != 'eab40375c2cd26dc93eeabdb337d8e24884d0730f7f99c889671d5a40a8de06e'
+            or cfg['candidate']['portable_digest'] != 'b02a59af4d6e0c1d373100132e2e0cae418cb4303c8a739a68117c3534a2c5ac'
             or cfg['candidate']['payload_prefix'] != PAYLOAD
             or [r['path'] for r in cfg['base']['before6']] != PRODUCT
             or [r['path'] for r in selected] != SELECTED

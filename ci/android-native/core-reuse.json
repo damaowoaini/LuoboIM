@@ -1,0 +1,271 @@
+{
+  "borrowed_inputs": [
+    {
+      "bytes": 9781,
+      "path": "ci/apple-sdk-link/custody.py",
+      "sha256": "c242cbcc956b498b33a13dc18f87234212486616235b93de8443c63da7aac7f3"
+    },
+    {
+      "bytes": 19684,
+      "path": "ci/android-native/current_app.py",
+      "sha256": "f50f03b98766c7d5d5e0cab673b98e43dec8d33a1973c391989255c75c149ded"
+    },
+    {
+      "bytes": 100841,
+      "path": "ci/android-native/current-app-inputs.json",
+      "sha256": "5e76c6201c28762612de349a9be9a09f0701c1038bc386054c049967b6329f54"
+    },
+    {
+      "bytes": 8531,
+      "path": "ci/android-native/audit.py",
+      "sha256": "1edf23b5ce32258e3e37d7af615b672e764de8193540aaa7de8a6fc03888d974"
+    },
+    {
+      "bytes": 130088,
+      "path": "ci/android-native/bindings.json",
+      "sha256": "6833a16883a6ae43b91b7400ecd49af6f44dd0d85adcc1b4e98f45213302f4fd"
+    },
+    {
+      "bytes": 11876,
+      "path": "ci/android-native/support.py",
+      "sha256": "818ed812deab20b25d4e8352f7d31b637039c0a881c8fc0fa070bc2ce1ea8fbd"
+    },
+    {
+      "bytes": 42548,
+      "path": "ci/android-native/run.py",
+      "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
+    },
+    {
+      "bytes": 27167,
+      "path": "ci/android-native/observed_bind.py",
+      "sha256": "a2cea0e27be45e79697530257d93a9f525d70ec0a4fe3ee887c18acf120f762c"
+    },
+    {
+      "bytes": 9624,
+      "path": "ci/android-native/observed-cohort.json",
+      "sha256": "40f81d5ee611afa42e53280b84db15a8118af7e42f9487050463986a86db15a3"
+    },
+    {
+      "bytes": 8282,
+      "path": "ci/android-native/gradle_classpath_catalog.py",
+      "sha256": "d5607a481e4eff833ffc4d7b18923483383dad3032613d92f3d14df11c450c49"
+    },
+    {
+      "bytes": 7844,
+      "path": "ci/android-native/rich_consumer.py",
+      "sha256": "80d22ac2254e095ee04827f6360e4be0cb3b0e6f889df7120c0c0180d18ef919"
+    },
+    {
+      "bytes": 33367,
+      "path": "ci/android-native/resolve-observed.gradle",
+      "sha256": "06f9e8111406aa8a70c3f846bc54fdd485784639a43aa79f7eeebf76e39cd6f3"
+    },
+    {
+      "bytes": 63745,
+      "path": "ci/android-native/rich-catalog.json",
+      "sha256": "db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe"
+    },
+    {
+      "bytes": 33162,
+      "path": "ci/android-native/sdk_platform_producer.py",
+      "sha256": "97a97361e141b37d2f771711b12387a44bd6111395474b49b19b73ef33be6371"
+    }
+  ],
+  "cohort": "current354-immutable-core-reuse-v1",
+  "controller_inputs": [
+    {
+      "bytes": 4168,
+      "path": ".github/workflows/android-current-reuse.yml",
+      "sha256": "f2164a8ed2cc237eacc8b8f0f230d6ced2b3dbed9174ff38a2d9ff48c9ba3dd1"
+    },
+    {
+      "bytes": 3323,
+      "path": "ci/android-native/README-core-reuse.md",
+      "sha256": "02a9692af697bbbdf9d909672c5e57d8159baf510a1d43ddd3b82e6b6fec5a1c"
+    },
+    {
+      "bytes": 7362,
+      "path": "ci/android-native/current-app-cohort.json",
+      "sha256": "e072c33425230a6021c83a531e99a67e99ef69905114ffd345e6afc5dee1ab73"
+    },
+    {
+      "bytes": 10591,
+      "path": "ci/android-native/current_reuse.py",
+      "sha256": "a497e5ac8352fbdccdbbe3214b06b5e8ff9ecae597e9e313f63cf56084a24102"
+    },
+    {
+      "bytes": 509,
+      "path": "ci/android-native/netns-reuse.sh",
+      "sha256": "e7bc06513f78f4a5e5409f8fb72ac919570cff6abe031f50bc7fa7b3fa5c72e5"
+    },
+    {
+      "bytes": 3343,
+      "path": "ci/android-native/owned-outputs.gradle",
+      "sha256": "a27ab7ef35c6562e06eb61673a488c56f9c66fde695275eb84656df1fbf13631"
+    },
+    {
+      "bytes": 2611,
+      "path": "ci/android-native/test_current_reuse.py",
+      "sha256": "2d942e6995bb7d554c051f75f7fe8f1998b2b1cebae278443b8cb7cfe549a5e4"
+    }
+  ],
+  "current_context_sha256": "e072c33425230a6021c83a531e99a67e99ef69905114ffd345e6afc5dee1ab73",
+  "custody_source": "ci/apple-sdk-link/custody.py",
+  "original_binary_local_download": false,
+  "original_public_CA_sha256": "034f4cf67d58c7a7a3757fbd1ff225776d8bc73989248a13f9a9c96521dc660b",
+  "parent": {
+    "artifacts": [
+      {
+        "bytes": 897429,
+        "decoded_cap": 3935476,
+        "id": 12077301123,
+        "member_cap": 1048576,
+        "members_cap": 493,
+        "name": "android-current354-production-raw-38970232673-1",
+        "role": "raw",
+        "sha256": "35bc069f9e9fe068a52b53715901692c730c746b1d45fda42880587c511908a7"
+      },
+      {
+        "bytes": 7424427,
+        "decoded_cap": 134217728,
+        "id": 12076871588,
+        "member_cap": 67108864,
+        "members_cap": 16,
+        "name": "android-current354-production-products-38970232673-1",
+        "role": "products",
+        "sha256": "4610e4a762a35f53117818edb7e2a2afa2ee3c7999db83e226423fd912bff7a7"
+      }
+    ],
+    "head": "f348ae881a7462d0f53643c1c05a6d8d222c7a1c",
+    "job": 117206523122,
+    "run": 38970232673
+  },
+  "product_member_rule": "Expected exactly these5 successful-core files, excluding never-produced APK. This is an unverified-at-local expected member set; entire actual cloud ZIP/CRC/names and every body must pass before import.",
+  "product_pins": [
+    {
+      "path": "core-current354-arm64.aar",
+      "sha256": "ad22c77061990ee0ce5afc1021b1a12e88230fd109811a7f8490336f8f21432a"
+    },
+    {
+      "path": "core-current354-arm64.build.json",
+      "sha256": "d05c0f121f828cbeb74e65d0c9e9e668a0cfc517ddb898af2559c7433f799b0c"
+    },
+    {
+      "path": "core-current354-arm64-sources.jar",
+      "sha256": "3f9e7ffd4b4175317c91ff80478e021b9e46e835ee20aeb77666557405662087"
+    },
+    {
+      "path": "NOTICE-public-core.txt",
+      "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
+    },
+    {
+      "path": "job-ca-public.pem",
+      "sha256": "034f4cf67d58c7a7a3757fbd1ff225776d8bc73989248a13f9a9c96521dc660b"
+    }
+  ],
+  "raw_markers": [
+    {
+      "bytes": 361,
+      "path": "activation.json",
+      "sha256": "24c3e11b3170da03bc67c413c4630197f4374614ac002cf8a21591ab0579c959"
+    },
+    {
+      "bytes": 396,
+      "path": "evidence/current-source.json",
+      "sha256": "48e788931f476c27cdb2ebd74920d155a83662c4e4b78c9570a7662678cff0d4"
+    },
+    {
+      "bytes": 385,
+      "path": "evidence/setup-complete.json",
+      "sha256": "846fb0d2a460f3073220b69ba6aebb7dfa77bdfd9543438301194a40dc62e814"
+    },
+    {
+      "bytes": 385,
+      "path": "evidence/setup-final-resource.json",
+      "sha256": "846fb0d2a460f3073220b69ba6aebb7dfa77bdfd9543438301194a40dc62e814"
+    },
+    {
+      "bytes": 384,
+      "path": "evidence/core-complete.json",
+      "sha256": "dfb62aeb856fa75d5f5e9a4a4a33a4296d50ae5482270cabbc3b3191282bc813"
+    },
+    {
+      "bytes": 384,
+      "path": "evidence/core-final-resource.json",
+      "sha256": "dfb62aeb856fa75d5f5e9a4a4a33a4296d50ae5482270cabbc3b3191282bc813"
+    },
+    {
+      "bytes": 2669,
+      "path": "evidence/core-build.resource.json",
+      "sha256": "8b2487113e2fbf7a5d6cc1b6735bb6f1b26938ec180ac31d8f9f404fe77cebb5"
+    },
+    {
+      "bytes": 1532,
+      "path": "evidence/core-audit.json",
+      "sha256": "2988672a871cda5726d73b78b56be8874a77c1d4ea27675f6106cc393ddc218a"
+    },
+    {
+      "bytes": 503,
+      "path": "evidence/current-core-publication.json",
+      "sha256": "9a0c36654cd1eace7a5489a7584425b9ac9dca7d6e5ed8aa0bbab90827f8a657"
+    },
+    {
+      "bytes": 212,
+      "path": "evidence/job-CA.json",
+      "sha256": "b1f5bb305ff1bc4e2856c41943798efbf0408f632d5f4bcb35350f42e106b00a"
+    },
+    {
+      "bytes": 1501,
+      "path": "evidence/core-build-locks/go.mod",
+      "sha256": "e78896663bdd4aa2d5824cfc02edf665c55ac7b13af064d43f2cdb18d620b0cb"
+    },
+    {
+      "bytes": 18776,
+      "path": "evidence/core-build-locks/go.sum",
+      "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
+    },
+    {
+      "bytes": 7409,
+      "path": "evidence/core-build-locks/source-go.sum",
+      "sha256": "81035756f13f282d14ca4629a94535d3317df4b5e35022b6f11f5becd79c574d"
+    },
+    {
+      "bytes": 1501,
+      "path": "evidence/observed-core-final-locks/go.mod",
+      "sha256": "e78896663bdd4aa2d5824cfc02edf665c55ac7b13af064d43f2cdb18d620b0cb"
+    },
+    {
+      "bytes": 18776,
+      "path": "evidence/observed-core-final-locks/go.sum",
+      "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
+    },
+    {
+      "bytes": 7409,
+      "path": "evidence/observed-core-final-locks/source-go.sum",
+      "sha256": "81035756f13f282d14ca4629a94535d3317df4b5e35022b6f11f5becd79c574d"
+    },
+    {
+      "bytes": 1555,
+      "path": "evidence/locks/actual-generated-after-bind/go.mod",
+      "sha256": "1cae4f76d0718e68c379aee984798ccd831c1fe2ce53e567f3746853791f6637"
+    },
+    {
+      "bytes": 5786,
+      "path": "evidence/locks/actual-generated-after-bind/go.sum",
+      "sha256": "2d1f1f6e01774b803d9ae0ccdf037c85d1106cb4ad3a849315b31dfd379e7cdd"
+    },
+    {
+      "bytes": 637,
+      "path": "evidence/actual-generated-verify.resource.json",
+      "sha256": "889e80251b6abadcb302dade544551cb25b6385531ce45facf821ce20facde20"
+    },
+    {
+      "bytes": 658,
+      "path": "evidence/actual-generated-graph.resource.json",
+      "sha256": "aa3e49e72060d0d08f04b25baea1e7e4966492c211bb96083528ee33c0851c13"
+    }
+  ],
+  "schema": 1,
+  "source_digest": "769bea7065a7de175aff4a12ea95bf0d571bf8919b130c1fde0af0d052f10508",
+  "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e"
+}

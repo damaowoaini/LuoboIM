@@ -16,23 +16,28 @@
   "controllerInputs": [
     {
       "path": ".github/workflows/web-build-only.yml",
-      "bytes": 3378,
-      "sha256": "2e143e929965f301c231f247b5a37324d72238f5e1a9891e89b75ca545312569"
+      "bytes": 4114,
+      "sha256": "ffc230c420f994850c889de56f5a724da5dbbbf2ef68bef0926eeb110957a4fe"
     },
     {
       "path": "ci/README.web-build.md",
-      "bytes": 3402,
-      "sha256": "3201c6c85af994b544d40250d8eebf86ddd49446e7a9653b55b54e36b789eec1"
+      "bytes": 4928,
+      "sha256": "f8dc2a1995e6ffac3134d0f7f515954fba5543af65d12b29a80bbb9377cbbb98"
     },
     {
       "path": "ci/web-build.mjs",
-      "bytes": 13460,
-      "sha256": "62f2115d111162d12728bca2f139b4d46b01a04f837df185cc32538dd99a53d1"
+      "bytes": 18145,
+      "sha256": "6d2e4b9abf1db8c15f19d514bb7fb5331473d90584d5616e1eb2595b2fa5edcf"
     },
     {
       "path": "ci/web-build.test.mjs",
       "bytes": 3773,
       "sha256": "c4c9525f0ce2ae5bc207fdb27448b65c9b1d3ac54bb57ad5ecdfa98d27d43182"
+    },
+    {
+      "path": "ci/web-build.csp.test.mjs",
+      "bytes": 3597,
+      "sha256": "b69def6ae99079a1cc6e263fdde3971231608b559a6cc5a123afa54572755cba"
     }
   ],
   "borrowedInputs": [
@@ -21560,5 +21565,23 @@
       "sha256": "8b51040e3c72c6d53f5247f8c70522866cb763c8311dd42912dcb913eca9ee62"
     }
   ],
-  "scope": "build only; no tests/types/full regression/SDK bind/business/deployment"
+  "scope": "build only; no tests/types/full regression/SDK bind/business/deployment",
+  "cspAuditRevision": "html-parser-and-failed-dist-evidence-r1",
+  "htmlParser": {
+    "version": "8.0.1",
+    "resolved": "https://registry.npmjs.org/parse5/-/parse5-8.0.1.tgz",
+    "integrity": "sha512-z1e/HMG90obSGeidlli3hj7cbocou0/wa5HacvI3ASx34PecNjNQeaHNo5WIZpWofN9kgkqV1q5YvXe3F0FoPw==",
+    "files": [
+      {
+        "path": "package.json",
+        "bytes": 1323,
+        "sha256": "159187fd5c0c0c17456282f4cf7beab91eb46dfc717928522938c947007282b7"
+      },
+      {
+        "path": "dist/index.js",
+        "bytes": 1355,
+        "sha256": "b825162aced2e79be8d68d45efb1f89ec34ed4189467195a071a0d7b694a19d4"
+      }
+    ]
+  }
 }

@@ -1,7 +1,7 @@
 {
   "schema": "luobo.mobile.announcement26.isolated-cloud.v1",
   "cohort": "candidate359-announcement26",
-  "status": "prepared_only_no_cloud_or_local_analysis_tests",
+  "status": "prepared_only_r1_no_execution",
   "base": {
     "cohort": "current354",
     "source_members": 354,
@@ -70,20 +70,20 @@
   },
   "candidate": {
     "manifest": {
-      "path": "references/integration/mobile-group-announcement-format-v2-candidate-20261017/candidate-manifest.json",
-      "bytes": 12969,
-      "sha256": "9f5930adb06d0dcecb68557042ddad1608e37b8a558670c654a9e2ef50b54ac0"
+      "path": "references/integration/mobile-group-announcement-store-lint-r1-candidate-20261017/source-manifest.json",
+      "bytes": 6673,
+      "sha256": "c28c8a78b1400e1fafa403e16db82dcaa549e6a59ec5985097727b9aff69abd6"
     },
     "source_members": 359,
-    "source_digest": "b92ea7b511681637e5a1ac509f1e3ed5037973b0b40c3f0f87be0a0f3c46ba1f",
+    "source_digest": "eab40375c2cd26dc93eeabdb337d8e24884d0730f7f99c889671d5a40a8de06e",
     "portable_members": 411,
-    "portable_digest": "e17d93580192e8a652ec98c4baebe525417897fa29114618010c0fb55840f0fd",
+    "portable_digest": "b02a59af4d6e0c1d373100132e2e0cae418cb4303c8a739a68117c3534a2c5ac",
     "payload_prefix": "ci/candidates/mobile-announcement26/after",
     "selected11": [
       {
         "path": "app/lib/features/chat/data/group_announcement_store.dart",
-        "bytes": 4902,
-        "sha256": "2bb9b70829dfaaf27a52af038d572fb7af1670c6db33eb3a6da0a71a4be0b584",
+        "bytes": 5012,
+        "sha256": "b5da8994042e75f703e4cae3ac3f4a4e1b773fdb166b31a46323a15d0c7a6be4",
         "new": true,
         "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/chat/data/group_announcement_store.dart"
       },
@@ -157,7 +157,8 @@
         "new": true,
         "payload_path": "ci/candidates/mobile-announcement26/after/app/test/features/chat/group_announcement_workflow_test.dart"
       }
-    ]
+    ],
+    "source_revision": "store-constructor-lint-r1"
   },
   "target": {
     "analysis_paths": [
@@ -833,6 +834,23 @@
     },
     "current354_expected_full1280_not_executed": "No fresh full1280 acceptance exists; preserve earlier targeted union60 and all prior accepted boundaries. Full1304 is expected arithmetic only, this manual lane cannot execute it.",
     "required_scope": "Onlyselected11analysis thenexactnew24+directold2; noCard80,revoke58,full,searchreference,installation/native/device business operations",
-    "local_resource_note": "Current free below4GiB. Only direct formatter ran under1GiB continuous; no cold Flutter or source workspace has been materialized."
+    "local_resource_note": "Current free below4GiB. Only direct formatter ran under1GiB continuous; no cold Flutter or source workspace has been materialized.",
+    "first_cloud_failure": {
+      "run": "38972371464",
+      "job": "117213564044",
+      "analysis1_exit": 1,
+      "issues": "2 initializing-formal infos; product business not executed",
+      "analysis2to11_and_test26_actual": 0,
+      "raw_log": {
+        "path": "references/integration/mobile-announcement-cloud-run-38972371464/raw/announcement-analyze-1.log",
+        "bytes": 488,
+        "sha256": "616b632764c97b3cd673846a7c78e238947f4ee858bf00741529930bedac1e75"
+      },
+      "resources": {
+        "path": "references/integration/mobile-announcement-cloud-run-38972371464/raw/announcement-analyze-1.resource.json",
+        "bytes": 489,
+        "sha256": "28d6afd66bf83b42ca2bd332f53ed6c1e8544e3c907ec014eb37181ba548de28"
+      }
+    }
   }
 }

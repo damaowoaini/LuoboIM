@@ -36,9 +36,9 @@
       "sha256": "b7c1f4240b8c7fe1548875727d4a5b129cacd3e40074ee26a59fe4de8311ae2e"
     },
     {
-      "bytes": 3136,
+      "bytes": 3343,
       "path": "ci/android-native/owned-outputs.gradle",
-      "sha256": "601620c8638cc658d1e5a18266fae373cb7fe5c66119fc62da87024fa62c47d6"
+      "sha256": "a27ab7ef35c6562e06eb61673a488c56f9c66fde695275eb84656df1fbf13631"
     },
     {
       "bytes": 7128,
