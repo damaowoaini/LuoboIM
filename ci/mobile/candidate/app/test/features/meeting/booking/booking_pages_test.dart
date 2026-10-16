@@ -17,14 +17,14 @@ void main() {
   late BookingFixture f;
   setUp(() { f = BookingFixture(); });
   tearDown(() async => f.close());
-  Future<void> mount(WidgetTester tester, Widget child) async {
-    await tester.pumpWidget(ProviderScope(overrides: [bookingControllerProvider.overrideWith((_) async => f.controller)],
-      child: MaterialApp(home: child))); await tester.pump(); await flush(tester);
-  }
   Future<void> flush(WidgetTester tester) async {
     // The real journal query queues after the page's already-dispatched SQLite
     // observe, rather than a fixed sleep pretending to prove async completion.
     await tester.runAsync(() async { await f.repository.journal.pending(); }); await tester.pumpAndSettle();
+  }
+  Future<void> mount(WidgetTester tester, Widget child) async {
+    await tester.pumpWidget(ProviderScope(overrides: [bookingControllerProvider.overrideWith((_) async => f.controller)],
+      child: MaterialApp(home: child))); await tester.pump(); await flush(tester);
   }
   Future<void> close(WidgetTester tester) async {
     await tester.pumpWidget(const SizedBox.shrink()); await tester.runAsync(f.close);

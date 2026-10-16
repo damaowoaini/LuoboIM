@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v1",
-  "state": "source_prepared_no_cloud_or_local_compilation",
+  "state": "v2_fixture_source_prepared_local_route2_passed_cloud_target73_full621_pending",
   "digest_algorithm": "SHA256(UTF8(JSON(sorted by path rows {path,bytes,sha256}, sorted object keys, compact separators, ensure_ascii=false)))",
   "provenance": {
     "current230": {
@@ -27,6 +27,11 @@
       "local_evidence_name": "inputs.json",
       "bytes": 17408,
       "sha256": "930e51a633bfeafc165d725bb21cb111c8a99d3f263cc9de8f39aeb50ea8125d"
+    },
+    "booking_fixture_revision_v2": {
+      "local_evidence_name": "fixture-revision-v2/manifest.json",
+      "bytes": 3974,
+      "sha256": "4c303771c6d700021f32e1adb234074be444c06cc97aceb1f4325ee0020ce63b"
     }
   },
   "toolchain": {
@@ -1461,7 +1466,7 @@
   },
   "candidate249": {
     "members": 249,
-    "source_digest": "9c9fbb1cd47111bf089437358a7596829625abf96186dbfaae1fb2d923d56581",
+    "source_digest": "3c5da0fbfa62dd94c76368bbbb4d61e72893cbf52396935823f030de6f4cfafd",
     "expected_target_tests": 73,
     "expected_full_tests": 621,
     "before": {
@@ -1562,7 +1567,7 @@
       {
         "path": "app/test/features/meeting/booking/booking_pages_test.dart",
         "bytes": 23438,
-        "sha256": "646bb4caaf6ab6668f8e5a06d94fcb4deba06ec4d7a023f85f70ce0a0d9297d6"
+        "sha256": "567ddddcfb61a48daaa7720b2219acceee01cc7831f0b82ccac2bf6634ec5e93"
       },
       {
         "path": "app/test/features/meeting/booking/booking_pending_journal_test.dart",
@@ -1576,8 +1581,8 @@
       },
       {
         "path": "app/test/features/meeting/booking/booking_routes_test.dart",
-        "bytes": 2717,
-        "sha256": "97a69728f5bb45eb2c768c166ed2cd0ba0257dcb3a205347441d5ed0a37e10e7"
+        "bytes": 3659,
+        "sha256": "2ae65c33d92c0ad87537b4c0806e478b3df81facd3ed27f158a8a071085c4d9f"
       },
       {
         "path": "app/test/features/meeting/booking/booking_test_harness.dart",
@@ -1594,7 +1599,17 @@
       "test/features/meeting/booking",
       "test/features/chat/legacy_custom_summary_test.dart"
     ],
-    "not_applied_to_current": true
+    "not_applied_to_current": true,
+    "fixture_revision_v2": {
+      "parent_inputs_sha256": "6371fb146f9fae28797b3c0bfb816697ed10131a6d20e174e6f878425a7d2c21",
+      "parent_source_digest": "9c9fbb1cd47111bf089437358a7596829625abf96186dbfaae1fb2d923d56581",
+      "changed_test_paths": [
+        "app/test/features/meeting/booking/booking_pages_test.dart",
+        "app/test/features/meeting/booking/booking_routes_test.dart"
+      ],
+      "local_route_cases_passed": 2,
+      "cloud_target73_full621": "pending"
+    }
   },
   "portable_members": {
     "current230": 282,

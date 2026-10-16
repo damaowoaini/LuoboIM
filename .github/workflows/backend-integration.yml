@@ -2,7 +2,17 @@ name: Backend synthetic integration
 
 on:
   push:
+    paths:
+      - 'server/**'
+      - 'ci/backend-integration*'
+      - 'ci/secret_scan.py'
+      - '.github/workflows/backend-integration.yml'
   pull_request:
+    paths:
+      - 'server/**'
+      - 'ci/backend-integration*'
+      - 'ci/secret_scan.py'
+      - '.github/workflows/backend-integration.yml'
   workflow_dispatch:
 
 permissions:

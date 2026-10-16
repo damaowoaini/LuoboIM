@@ -1,5 +1,5 @@
 {
-  "state": "source_only_prepared_AST_and_bash_syntax_checked_zero_tests_zero_compile_zero_remote",
+  "state": "v2_fixture_source_prepared_route2_local_passed_current548_cloud_verified_candidate73_621_pending",
   "own_files": [
     {
       "path": ".github/workflows/mobile-ci.yml",
@@ -8,8 +8,8 @@
     },
     {
       "path": "ci/mobile-check.py",
-      "bytes": 12320,
-      "sha256": "be658a3fdbaf7be74b54b74063e5d999552bcc7e69ddc43ef207670b1732f8a5"
+      "bytes": 12682,
+      "sha256": "612a0ad84a42fc38b17d3d63c387aad2bf2842a2c6b5e477e96bfd323b307341"
     },
     {
       "path": "ci/mobile-netns.sh",
@@ -33,8 +33,8 @@
     },
     {
       "path": "ci/mobile/README.md",
-      "bytes": 5368,
-      "sha256": "16e83dc856b23270f4de344e5a1f17ede06038dd996cef38c3e647c248e6828e"
+      "bytes": 5817,
+      "sha256": "82da0ced7aa57602c4f282342ed1275ab26332cee6aef7b0eeed7316275c861a"
     },
     {
       "path": "ci/mobile/candidate/app/lib/app.dart",
@@ -119,7 +119,7 @@
     {
       "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pages_test.dart",
       "bytes": 23438,
-      "sha256": "646bb4caaf6ab6668f8e5a06d94fcb4deba06ec4d7a023f85f70ce0a0d9297d6"
+      "sha256": "567ddddcfb61a48daaa7720b2219acceee01cc7831f0b82ccac2bf6634ec5e93"
     },
     {
       "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pending_journal_test.dart",
@@ -133,8 +133,8 @@
     },
     {
       "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_routes_test.dart",
-      "bytes": 2717,
-      "sha256": "97a69728f5bb45eb2c768c166ed2cd0ba0257dcb3a205347441d5ed0a37e10e7"
+      "bytes": 3659,
+      "sha256": "2ae65c33d92c0ad87537b4c0806e478b3df81facd3ed27f158a8a071085c4d9f"
     },
     {
       "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_test_harness.dart",
@@ -148,11 +148,11 @@
     },
     {
       "path": "ci/mobile/inputs.json",
-      "bytes": 64006,
-      "sha256": "6371fb146f9fae28797b3c0bfb816697ed10131a6d20e174e6f878425a7d2c21"
+      "bytes": 64740,
+      "sha256": "531ba2aa3db1b0601cfa945db58b5b00b30edeba0b0dd12f28343dc99b6fbd0c"
     }
   ],
-  "aggregate_sha256": "48d5d7a86fa5ab6acd0ed478874f704226c7eacd448e32df332d10c111dfab53",
+  "aggregate_sha256": "cb7db41e9f54b1752c3e04391be3b0b99660b563df6698ae263943cca47a3178",
   "no_product_edits": true,
   "native_acceptance": false,
   "ci_followup": {
@@ -184,5 +184,14 @@
     ],
     "product_tests_executed_in_setup_failed_run": 0,
     "local_followup_validation": "bash-n and Python heredoc AST only; no local Flutter/compile/run"
+  },
+  "fixture_revision_v2": {
+    "manifest_sha256": "4c303771c6d700021f32e1adb234074be444c06cc97aceb1f4325ee0020ce63b",
+    "prior_receipt_sha256": "12a4381e4e6278741530b2144bd33219342f8b9c29703827e2c2076221c37fb0",
+    "parent_run38845582450_current548": "actualPASS plus fullanalyze0",
+    "parent_run38845582450_candidate249": "incomplete failure; no full621/analyze",
+    "current_v2": "2localMacroutePASS; Linux73/621 pending",
+    "CI_observability": "fixed phase start/end enum progress; no change to timeouts/resource gates/expected counts",
+    "supersedes_receipt_with_stale_initial_preparation_state_sha256": "5fe7ad78fe7187dd60c206758e812457240c4f442e6850228d8c1f5c1742396c"
   }
 }

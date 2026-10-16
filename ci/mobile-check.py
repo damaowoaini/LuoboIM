@@ -159,6 +159,7 @@ def guarded(command, work, guard, label, timeout=900):
     guard.sample()
     if guard.reason:
         raise ValueError('resource admission failed: ' + guard.reason)
+    print(json.dumps({'event': 'mobile_phase_start', 'phase': label}), flush=True)
     try:
         with log.open('x') as stream:
             child = subprocess.Popen(command, cwd=work / 'source/app', stdout=stream,
@@ -181,6 +182,10 @@ def guarded(command, work, guard, label, timeout=900):
                   'minimum_free_bytes': guard.minimum, 'peak_workspace_allocated_bytes': guard.peak,
                   'latched_failure': guard.reason, 'log_sha256': source.sha(log.read_bytes())}
         write_json(work / 'evidence' / (label + '.resource.json'), record)
+        print(json.dumps({'event': 'mobile_phase_end', 'phase': label,
+                          'child_exit_code': child.returncode,
+                          'latched_failure': guard.reason,
+                          'elapsed_seconds': record['elapsed_seconds']}), flush=True)
         if guard.reason or child.returncode != 0:
             raise ValueError('phase failed: ' + label)
         return log
