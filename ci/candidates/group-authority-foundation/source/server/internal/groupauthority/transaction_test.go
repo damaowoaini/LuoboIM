@@ -59,22 +59,39 @@ func TestGroupAuthorityDriverTransactionRetryAndUnknownCommitBudget(t *testing.T
 			if mt.Client.NumberSessionsInProgress() != 0 {
 				mt.Error("driver session leaked")
 			}
-			mt.AddMockResponses(mtest.CreateSuccessResponse())
-			end, cancel := context.WithTimeout(context.Background(), cleanupTimeout)
-			defer cancel()
-			if err := mt.Client.Disconnect(end); err != nil {
-				mt.Error("Mock client disconnect unconfirmed", err)
-			}
+			// mtest.RunOpts owns this Mock client's Disconnect. A second
+			// Disconnect would close its single deployment channel twice.
 		})
 		return store, session
 	}
 	work := func(mt *mtest.T, current context.Context) error {
+		wrapper, ok := mongo.SessionFromContext(current).(*observedAuthoritySession)
+		if !ok {
+			mt.Fatal("fixture raw session identity missing")
+		}
+		// The cached driver's sessionFromContext only accepts *sessionImpl.
+		// The wrapper intercepts lifecycle/commit calls; work uses the SAME
+		// underlying real session so the command actually belongs to this TX.
+		current = mongo.NewSessionContext(current, wrapper.Session)
 		deadline, ok := current.Deadline()
 		if !ok || time.Until(deadline) > mutationTimeout || time.Until(deadline) <= 0 {
 			mt.Fatal("transaction lost its internal deadline")
 		}
 		_, err := mt.DB.Collection("synthetic").UpdateOne(current, bson.M{"_id": "fixture"}, bson.M{"$inc": bson.M{"n": 1}})
-		return err
+		if err != nil {
+			return err
+		}
+		events := mt.GetAllStartedEvents()
+		if len(events) == 0 {
+			mt.Fatal("work command not observed")
+		}
+		command := events[len(events)-1]
+		automatic, hasAutomatic := command.Command.Lookup("autocommit").BooleanOK()
+		_, hasNumber := command.Command.Lookup("txnNumber").Int64OK()
+		if command.CommandName != "update" || !hasAutomatic || automatic || !hasNumber || command.Command.Lookup("lsid").Type == 0 {
+			mt.Fatal("work command is outside the actual driver transaction")
+		}
+		return nil
 	}
 	commands := func(mt *mtest.T, name string) []bson.Raw {
 		var rows []bson.Raw
@@ -89,6 +106,16 @@ func TestGroupAuthorityDriverTransactionRetryAndUnknownCommitBudget(t *testing.T
 		rows := commands(mt, "commitTransaction")
 		if len(rows) != want {
 			mt.Fatalf("commit commands=%d want=%d", len(rows), want)
+		}
+		writes := commands(mt, "update")
+		if len(writes) != 1 {
+			mt.Fatal("unknown commit replayed business update")
+		}
+		for _, row := range rows {
+			number, ok := row.Lookup("txnNumber").Int64OK()
+			if !ok || number != writes[0].Lookup("txnNumber").Int64() || !row.Lookup("lsid").Equal(writes[0].Lookup("lsid")) {
+				mt.Fatal("commit does not match the actual work transaction")
+			}
 		}
 		for _, row := range rows[1:] {
 			if row.Lookup("txnNumber").Int64() != rows[0].Lookup("txnNumber").Int64() || !row.Lookup("lsid").Equal(rows[0].Lookup("lsid")) {

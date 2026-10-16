@@ -37,8 +37,8 @@
     },
     {
       "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/mongo_integration_test.go",
-      "bytes": 19347,
-      "sha256": "fb18979f00a58fe2e81db3624bdd1ed5d163f52fa859216869946b5b9a0f4f52"
+      "bytes": 21136,
+      "sha256": "c3da81413361c3366d318454be13cea116e4e89ec8efcdd7fddbcdaeda6ed9c3"
     },
     {
       "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/recovery.go",
@@ -62,12 +62,12 @@
     },
     {
       "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/transaction_test.go",
-      "bytes": 7506,
-      "sha256": "e134a2964a288f03ed9205887a68c1e702236e640da0cc4a29e8f1fdf66704a3"
+      "bytes": 8708,
+      "sha256": "3b195e0cce39a6f6a0227977b4688b1844a25fab466da06fff5291bea00829c2"
     }
   ],
   "source_members": 12,
-  "source_digest": "44e5c6d1bcb11faa94d07110669ad150c8eb6bcb549653e368622e9ad364147f",
+  "source_digest": "2050853a1f3930b29d9a8c94e5cab6feef5317d7b853ed43e93ce4f6fc984312",
   "module_inputs": [
     {
       "path": "server/go.mod",
@@ -162,7 +162,8 @@
   "expected_before_is_reference_not_real_RPC": true,
   "runtime_or_RPC_adoption": false,
   "actual_tests_at_preparation": 0,
-  "source_revision": "v2-r1_test_wrapper_only",
-  "test_only_successor_manifest_sha256": "0f5bec657a26e5467145fdfaa684ff1053bbdf9f56fdbb61d457e70d7dc85f22",
-  "original_compile_failure_run": 38855907561
+  "source_revision": "v2-r2_test_raw_session_and_owned_mock_cleanup",
+  "test_only_successor_manifest_sha256": "09a0e55f41200f58af4b1668e44090d1288978054e753983632bb752830a50cd",
+  "original_compile_failure_run": 38855907561,
+  "prior_r1_failed_run": 38856322512
 }

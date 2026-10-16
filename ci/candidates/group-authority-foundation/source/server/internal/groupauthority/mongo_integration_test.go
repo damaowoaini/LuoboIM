@@ -437,7 +437,23 @@ func TestGroupAuthorityMongoAcknowledgedCommitLostAtBoundaryNeverReplaysWrite(t 
 			name = "cancel-remains-unconfirmed"
 		}
 		t.Run(name, func(t *testing.T) {
-			ctx, store, db := authorityMongo(t, nil)
+			var commandMu sync.Mutex
+			var workCommands, commitCommands []bson.Raw
+			monitor := &event.CommandMonitor{Started: func(_ context.Context, started *event.CommandStartedEvent) {
+				isWork := started.CommandName == "update" && started.Command.Lookup("update").StringValue() == "group_member"
+				if !isWork && started.CommandName != "commitTransaction" {
+					return
+				}
+				commandMu.Lock()
+				defer commandMu.Unlock()
+				raw := append(bson.Raw(nil), started.Command...)
+				if isWork {
+					workCommands = append(workCommands, raw)
+				} else {
+					commitCommands = append(commitCommands, raw)
+				}
+			}}
+			ctx, store, db := authorityMongo(t, monitor)
 			seedAuthority(t, ctx, db, "g")
 			current, cancel := context.WithCancel(ctx)
 			defer cancel()
@@ -451,6 +467,12 @@ func TestGroupAuthorityMongoAcknowledgedCommitLostAtBoundaryNeverReplaysWrite(t 
 			}
 			writes := 0
 			err = store.transactionSession(current, session, func(tx context.Context) error {
+				// Keep commit interception outside the driver's context slot;
+				// its concrete-session extractor must receive the same raw.
+				tx = mongo.NewSessionContext(tx, raw)
+				if err := strongSession(tx, db.Client()); err != nil {
+					return err
+				}
 				writes++
 				_, err := db.Collection("group_member").UpdateOne(tx, bson.M{"group_id": "g", "user_id": "member"}, bson.M{"$inc": bson.M{"probe_writes": int64(1)}})
 				return err
@@ -461,6 +483,24 @@ func TestGroupAuthorityMongoAcknowledgedCommitLostAtBoundaryNeverReplaysWrite(t 
 				}
 			} else if err != nil || session.commits != 2 {
 				t.Fatal("same commit recovery failed", err)
+			}
+			commandMu.Lock()
+			observedWorks := append([]bson.Raw(nil), workCommands...)
+			observedCommits := append([]bson.Raw(nil), commitCommands...)
+			commandMu.Unlock()
+			if len(observedWorks) != 1 || len(observedCommits) != session.commits {
+				t.Fatal("wire command count differs from one work/same commit retries")
+			}
+			automatic, hasAutomatic := observedWorks[0].Lookup("autocommit").BooleanOK()
+			number, hasNumber := observedWorks[0].Lookup("txnNumber").Int64OK()
+			if !hasAutomatic || automatic || !hasNumber || observedWorks[0].Lookup("lsid").Type == 0 {
+				t.Fatal("actual Mongo work is not in transaction")
+			}
+			for _, command := range observedCommits {
+				commitNumber, ok := command.Lookup("txnNumber").Int64OK()
+				if !ok || commitNumber != number || !command.Lookup("lsid").Equal(observedWorks[0].Lookup("lsid")) {
+					t.Fatal("actual commit does not bind work transaction")
+				}
 			}
 			var row struct {
 				Writes int64 `bson:"probe_writes"`
