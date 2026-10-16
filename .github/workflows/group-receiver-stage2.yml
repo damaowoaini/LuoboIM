@@ -1,0 +1,83 @@
+name: Group receiver stage2 candidate
+
+on:
+  push:
+    paths:
+      - 'ci/group-receiver/**'
+      - 'ci/candidates/group-receiver/**'
+      - 'ci/group-effects/**'
+      - 'ci/candidates/group-effects/**'
+      - 'ci/candidates/group-authority-foundation/**'
+      - 'ci/backend-integration.*'
+      - '.github/workflows/group-receiver-stage2.yml'
+  pull_request:
+    paths:
+      - 'ci/group-receiver/**'
+      - 'ci/candidates/group-receiver/**'
+      - 'ci/group-effects/**'
+      - 'ci/candidates/group-effects/**'
+      - 'ci/candidates/group-authority-foundation/**'
+      - 'ci/backend-integration.*'
+      - '.github/workflows/group-receiver-stage2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: group-receiver-stage2-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  receiver-mechanisms:
+    name: Stage2 / 63 tests, 44 subtests, no RPC adoption
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+      LUOBO_STORAGE_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+      LUOBO_RETENTION_TEST_REDIS: 'redis://127.0.0.1:36379/15'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety scan, reporter checks and pinned isolated source
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/group-receiver/test_run.py
+          python3 -B ci/group-receiver/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Prepare exact owned loopback fixture with continuous disk gate
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/group-receiver-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/group-receiver-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval 0.2 \
+            -- bash ci/backend-integration.sh prepare
+      - name: Isolated sequential race tests and nine-package vet
+        run: python3 -B ci/group-receiver/run.py
+      - name: Always collect and verify fixture residuals
+        if: always()
+        run: bash ci/backend-integration.sh collect
+      - name: Always remove only exact run owned containers
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve actual logs and cleanup evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: group-receiver-stage2-${{ github.run_id }}
+          path: ci-results/
+          if-no-files-found: warn
+          retention-days: 14
