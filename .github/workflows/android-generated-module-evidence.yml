@@ -7,7 +7,7 @@ on:
         description: 'Real Android ARM64 module projection; no binding/native build'
         type: choice
         required: true
-        options: [current257-generated-module-evidence-v1]
+        options: [current257-generated-module-evidence-v2]
 
 permissions:
   contents: read

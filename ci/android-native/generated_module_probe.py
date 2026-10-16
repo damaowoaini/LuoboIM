@@ -12,7 +12,7 @@ import sys
 import run as parent
 import support as s
 
-COHORT = 'current257-generated-module-evidence-v1'
+COHORT = 'current257-generated-module-evidence-v2'
 HELPERS = {
     'run.py': 'e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb',
     'support.py': '818ed812deab20b25d4e8352f7d31b637039c0a881c8fc0fa070bc2ce1ea8fbd',
@@ -30,6 +30,67 @@ MOBILE_COMMIT = '19777044486779222400e9ca16c4306f9c6dbfa9'
 FIXTURE = 'luobo_module_projection_test.go'
 FIXTURE_SHA = '8656e3104a902b78b48ff818c1c90b798a915ea6734a57e089347e9615e6422c'
 CORE_SUM = '8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f'
+TEMPLATE = 'projected-module-before.mod'
+TEMPLATE_SHA = '05e30d386898edc45e01458e5dcd79d166965d89cb4537a436ed5beeaba21088'
+ACQUIRED_SUM_SHA = '9d8d7d82e6702218bfe964f7005b3b858d44b41efca66c89d70d02aab5539d9f'
+REQUIRE_UPDATES = (
+    ('cloud.google.com/go/compute', 'v1.19.1', 'v1.20.1'),
+    ('github.com/google/go-cmp', 'v0.5.9', 'v0.6.0'),
+    ('github.com/stretchr/objx', 'v0.1.0', 'v0.5.0'),
+    ('golang.org/x/crypto', 'v0.16.0', 'v0.58.0'),
+    ('golang.org/x/net', 'v0.19.0', 'v0.61.0'),
+    ('golang.org/x/oauth2', 'v0.7.0', 'v0.8.0'),
+    ('golang.org/x/term', 'v0.15.0', 'v0.47.0'),
+    ('golang.org/x/xerrors', 'v0.0.0-20191204190536-9bdfabe68543',
+     'v0.0.0-20200804184101-5ec99f83aff1'),
+)
+
+
+def expected_projected_acquisition(before, core, protocol):
+    """Permit only the eight byte-exact require updates observed in real r1.
+
+    Normalize only two exact same-job absolute replace lines for comparison
+    with the reviewed97-require template. Never normalize the acquired body:
+    it must equal those same original bytes with exactly eight replacements.
+    """
+    template = (Path(__file__).resolve().parent / TEMPLATE).read_bytes()
+    if hashlib.sha256(template).hexdigest() != TEMPLATE_SHA:
+        raise ValueError('reviewed projection template differs')
+    normalized = before
+    for module, actual, placeholder in [
+        ('github.com/openimsdk/openim-sdk-core/v3', core, '/__LUOBO_JOB_CORE__'),
+        ('github.com/OpenIMSDK/protocol', protocol, '/__LUOBO_JOB_PROTOCOL__'),
+    ]:
+        path = str(actual)
+        if not Path(path).is_absolute() or any(c.isspace() or c in '\\"' for c in path):
+            raise ValueError('exact same-job absolute replace path required')
+        line = ('replace ' + module + ' => ' + path + '\n').encode()
+        if normalized.count(line) != 1:
+            raise ValueError('exact same-job replace line missing or duplicated')
+        normalized = normalized.replace(line, ('replace ' + module + ' => ' + placeholder + '\n').encode(), 1)
+    if normalized != template:
+        raise ValueError('original97-require projection differs from real r1')
+    expected = before
+    for module, old, new in REQUIRE_UPDATES:
+        source = ('\t' + module + ' ' + old + '\n').encode()
+        if expected.count(source) != 1:
+            raise ValueError('reviewed require source line missing or duplicated')
+        expected = expected.replace(source, ('\t' + module + ' ' + new + '\n').encode(), 1)
+    return expected
+
+
+def validate_projected_acquisition(before, after, core, protocol):
+    expected = expected_projected_acquisition(before, core, protocol)
+    if after != expected:
+        raise ValueError('acquired projection differs outside exact eight require updates')
+    return {'derived_from_run': 38868327056, 'artifact': 12031449311,
+            'artifact_sha256': '5518a685896048262824de8bd67ea8c4ae9836144ce0d4c38f963fbe9f039333',
+            'normalized_original_go_mod_sha256': TEMPLATE_SHA,
+            'before_go_mod_sha256': hashlib.sha256(before).hexdigest(),
+            'acquired_go_mod_sha256': hashlib.sha256(after).hexdigest(),
+            'require_count': 97, 'only_allowed_require_changes': REQUIRE_UPDATES,
+            'replace_paths_and_all_other_bytes_unchanged': True,
+            'full_bind_lock': False}
 
 
 def admit_phase(budget):
@@ -39,7 +100,7 @@ def admit_phase(budget):
 
 def metadata():
     here = Path(__file__).resolve().parent
-    for name, digest in {**HELPERS, FIXTURE: FIXTURE_SHA}.items():
+    for name, digest in {**HELPERS, FIXTURE: FIXTURE_SHA, TEMPLATE: TEMPLATE_SHA}.items():
         p = here / name
         if p.is_symlink() or not p.is_file() or s.sha(p) != digest:
             raise ValueError('exact reviewed source/helper required: ' + name)
@@ -213,6 +274,12 @@ def execute(work, inputs, tools, budget):
         step('projection-source-graph-after', graph_args, core, offline)
         generated = work / 'generated-module'
         initial = snapshot(work, generated, 'projected-original')
+        original_go_mod = (generated / 'go.mod').read_bytes()
+        # Reject an unknown original97 projection before generated-module
+        # network acquisition. This computes the exact allowed result only;
+        # it never writes either the observed or the expected module file.
+        expected_projected_acquisition(original_go_mod, core, work / 'source/server/pkg/protocol')
+        acquired_locks = None
         s.put(work / 'evidence/projection.json', (generated / 'projection.json').read_bytes())
         # No generated Go/Java files exist. This is metadata closure only, and
         # must never be installed as the lock for a real generated-source tidy.
@@ -227,12 +294,24 @@ def execute(work, inputs, tools, budget):
                 step(label, command, generated, process_env, diagnostic)
             finally:
                 after = snapshot(work, generated, label + '-after')
-            # Go's readonly mode protects go.mod, not every go.sum append.
-            # A pre-acquisition graph may record cached sums even on failure;
-            # retain both raw versions and continue to the real acquisition.
-            if after['go.mod'] != initial['go.mod'] or (label not in {
-                    'projected-acquire', 'projected-graph-before-offline'} and after != before):
-                raise ValueError('metadata observation changed unexpected projected lock bytes')
+            if label == 'projected-acquire':
+                proof = validate_projected_acquisition(original_go_mod,
+                    (generated / 'go.mod').read_bytes(), core, work / 'source/server/pkg/protocol')
+                if (after['go.sum'].get('sha256') != ACQUIRED_SUM_SHA
+                        or after['go.sum'].get('bytes') != 56413):
+                    raise ValueError('acquired metadata sum differs from real r1; raw retained')
+                acquired_locks = after
+                s.write_json(work / 'evidence/reviewed-projected-acquisition.json', {
+                    **proof, 'acquired_locks': acquired_locks,
+                    'original_projected_locks': initial,
+                    'not_installed_as_native_dependency_lock': True})
+            elif label == 'projected-graph-before-offline':
+                # readonly may append cached go.sum entries, but never permits
+                # any pre-acquisition modification of the original go.mod.
+                if after['go.mod'] != initial['go.mod']:
+                    raise ValueError('pre-acquisition observation changed original projection')
+            elif acquired_locks is None or before != acquired_locks or after != acquired_locks:
+                raise ValueError('post-acquisition readonly observation changed acquired locks')
         official_sources(job, mobile, 'after')
         source_status(job, mobile, env, 'mobile-final', added=True)
         s.write_json(work / 'evidence/projector-source-difference.json', {
