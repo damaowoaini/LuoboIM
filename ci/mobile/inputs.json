@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v7",
-  "state": "current292_chat_cid_route_fixture_r2_pending_cloud",
+  "state": "current292_clear_menu_fixture_r3_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -38,7 +38,8 @@
     "owned_confirmation_fixture_manifest_sha256": "0bea1f0b326815098bcd5021cdb57c758a6e58ee2ab436a7935a3ba6c2583e18",
     "group_creation_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
     "chat_cid_page_key_r1_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
-    "chat_cid_page_key_fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd"
+    "chat_cid_page_key_fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd",
+    "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -317,7 +318,7 @@
     "current292": 344
   },
   "portable_digests": {
-    "current292": "4d9db11a88184abd30c1e00b89dfbe0dee631ed9448a0bd123728a8fe47906f5"
+    "current292": "fd107538a56276af605e7c712e451b78015497f43561b7065880abedab12d3a1"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -583,6 +584,17 @@
       "product_causal_evidence": "Prior failed group expansion retry and actualproductionrouter first case passed;exact2groupreads+3ownedcompleted/newCIDcontroller/metadata/history assertions completed. Not full854 acceptance.",
       "cleanup": "58fixture instances each6markersordered;0hitTest/overflowwarnings",
       "accepted": false
+    },
+    "current292_fixture_r2_actual_full_failure": {
+      "commit": "b6510c439d5f0cbdcce85869f695285e30f8e933",
+      "run": 38886359953,
+      "job": 116924951994,
+      "ZIP_sha256": "a03a0f619fe4a77647e9d24847192fff37f84a4e950bb32cb873581d34566c8c",
+      "agent_verification_sha256": "df3c2848f25ecc8b0e7c7a1cefabf4c563236786fc7fee470e1ddb029b1b3da7",
+      "root_failure_review_sha256": "c26ad90133de6548eb7e3814590660e5872fc4fa5d4bb679fc89041de086fe19",
+      "actual": "target166PASS/17hidden/truefooter;full853PASS1oldclearfixtureERROR/113hidden/falsefooter;all29+3passboth;analysisnotstarted",
+      "cause": "oldtesttapclearcenter396,634.5outside800x600;actualsettingshasSingleChildScrollView;confirm0matchedaftermissedtap",
+      "not_claimed": "CIDrevocationassertionsafterfailedconfirmdidnotruninfull;notall854PASS"
     }
   },
   "reference_entry": {
@@ -590,7 +602,7 @@
     "default_enabled": false,
     "working_cohort": "current292",
     "members": 292,
-    "reference_source_digest": "fead30ccdd2301d70e85d469fb0e9578e6510439ebae4898d226a73c2e19ec43",
+    "reference_source_digest": "9bde9a3c3518d445b79ce2fcd40a0b494d26c4704e934334d123abce71f212de",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -654,7 +666,7 @@
   },
   "current292": {
     "members": 292,
-    "source_digest": "32c72f4dc15f21a48b269813d0cefb7f20329eee16f1c5441f2970d1d15f6d86",
+    "source_digest": "524af72fc57424854b4b426526fb292b6a465bfeb385e526742496abbb31c126",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1703,8 +1715,8 @@
       },
       {
         "path": "app/test/features/chat/privacy_followup_actions_test.dart",
-        "bytes": 14953,
-        "sha256": "92db539a41a5120b94cd9c79a3e0aaabbddb86c392af830edd5e64a39d8858a3"
+        "bytes": 15653,
+        "sha256": "8e754b8918c8a7d9570835c73a7e5fcc137c34f3014dde100068ff382e2e9bd4"
       },
       {
         "path": "app/test/features/chat/privacy_followup_memory_test.dart",

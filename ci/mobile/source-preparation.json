@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v7",
-  "state": "current292_chat_cid_route_fixture_r2_pending_cloud",
+  "state": "current292_clear_menu_fixture_r3_pending_cloud",
   "accepted_parent287": {
     "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
     "actual_run": 38878571484,
@@ -31,8 +31,8 @@
     "accepted": false
   },
   "candidate_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
-  "source292_digest": "32c72f4dc15f21a48b269813d0cefb7f20329eee16f1c5441f2970d1d15f6d86",
-  "portable344_digest": "4d9db11a88184abd30c1e00b89dfbe0dee631ed9448a0bd123728a8fe47906f5",
+  "source292_digest": "524af72fc57424854b4b426526fb292b6a465bfeb385e526742496abbb31c126",
+  "portable344_digest": "fd107538a56276af605e7c712e451b78015497f43561b7065880abedab12d3a1",
   "delta": {
     "existing": 3,
     "new": 1,
@@ -78,5 +78,19 @@
   },
   "fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd",
   "fixture_r2_scope": "Only2test/fixture files:exactCID+currentRoute incoming finder;realanimation/sourceTransitionRoute.completed;preserve3names/all47expect and allold822+29. Equivalentbraces around multiline manualrouter assignment;not anactualanalysisFAIL claim. Product andrunner unchanged.",
-  "actual_r2_Dart_tests": 0
+  "actual_r2_Dart_tests": 0,
+  "current292_fixture_r2_actual_failure": {
+    "commit": "b6510c439d5f0cbdcce85869f695285e30f8e933",
+    "run": 38886359953,
+    "job": 116924951994,
+    "ZIP_sha256": "a03a0f619fe4a77647e9d24847192fff37f84a4e950bb32cb873581d34566c8c",
+    "agent_verification_sha256": "df3c2848f25ecc8b0e7c7a1cefabf4c563236786fc7fee470e1ddb029b1b3da7",
+    "root_failure_review_sha256": "c26ad90133de6548eb7e3814590660e5872fc4fa5d4bb679fc89041de086fe19",
+    "actual": "target166PASS/17hidden/truefooter;full853PASS1oldclearfixtureERROR/113hidden/falsefooter;all29+3passboth;analysisnotstarted",
+    "cause": "oldtesttapclearcenter396,634.5outside800x600;actualsettingshasSingleChildScrollView;confirm0matchedaftermissedtap",
+    "not_claimed": "CIDrevocationassertionsafterfailedconfirmdidnotruninfull;notall854PASS"
+  },
+  "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd",
+  "clear_menu_r3_scope": "Onlyoldclearvariantactualscroll/hitTest/owned-sheet-completedbarrier;14expectpreserved3added;no product/runner/name/resourcechange",
+  "actual_r3_Dart_tests": 0
 }

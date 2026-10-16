@@ -391,6 +391,7 @@ void main() {
             ),
           );
           await tester.pumpAndSettle();
+          var clearSheetCompleted = false;
           if (operation == 'delete') {
             await tester.longPress(find.text('private-followup-body'));
             await tester.pumpAndSettle();
@@ -398,9 +399,21 @@ void main() {
           } else {
             await tester.tap(find.byTooltip('聊天设置'));
             await tester.pumpAndSettle();
+            // The settings sheet is scrollable; its last action is not always
+            // inside the viewport after another real entry has been added.
+            final clear = find.text('清空聊天记录');
+            await tester.ensureVisible(clear);
+            await tester.pumpAndSettle();
+            final sheet = ModalRoute.of(tester.element(clear))!;
+            expect(sheet.isCurrent, isTrue);
+            expect(clear.hitTestable(), findsOneWidget);
+            unawaited(sheet.completed.then<void>((_) { clearSheetCompleted = true; }));
             await tester.tap(find.text('清空聊天记录'));
           }
           await tester.pumpAndSettle();
+          if (operation == 'clear') {
+            expect(clearSheetCompleted, isTrue);
+          }
           expect(find.text('确认'), findsOneWidget);
           await tester.runAsync(
             () => ChatRepository(
