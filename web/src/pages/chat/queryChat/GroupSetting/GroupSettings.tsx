@@ -3,7 +3,7 @@ import { Button, Divider, Popover, Upload } from "antd";
 import clsx from "clsx";
 import { t } from "i18next";
 import { GroupStatus, MessageReceiveOptType } from "open-im-sdk-wasm";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useCopyToClipboard } from "react-use";
 import { v4 as uuidV4 } from "uuid";
 
@@ -53,6 +53,7 @@ const GroupSettings = ({
 
   const {
     currentGroupInfo,
+    captureGroupInfoEdit,
     updateGroupInfo,
     updateGroupMuteAll,
     updateNickNameInGroup,
@@ -63,8 +64,18 @@ const GroupSettings = ({
   } = useGroupSettings({ closeOverlay, isActive });
 
   const [_, copyToClipboard] = useCopyToClipboard();
+  const avatarUploadTurn = useRef(0);
+  const avatarMetadataPending = useRef(false);
+  const avatarMounted = useRef(true);
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  useEffect(() => { avatarMounted.current = true; return () => { avatarMounted.current = false; }; }, []);
 
   const customUpload = async ({ file }: { file: File }) => {
+    const intent = captureGroupInfoEdit(); if (!intent) return;
+    if (avatarMetadataPending.current) {
+      feedbackToast({ error: new Error(t("errCode.operationTooFrequent")) }); return;
+    }
+    const turn = ++avatarUploadTurn.current;
     try {
       const {
         data: { url },
@@ -74,9 +85,18 @@ const GroupSettings = ({
         uuid: uuidV4(),
         file,
       });
-      await updateGroupInfo({ faceURL: url });
+      // Upload has already started; leaving only prevents the later group edit.
+      if (turn !== avatarUploadTurn.current || !intent.current()) return;
+      avatarMetadataPending.current = true; setAvatarSaving(true);
+      try { await updateGroupInfo({ faceURL: url }); }
+      finally {
+        avatarMetadataPending.current = false;
+        // Internal pending state must settle even after close/reopen, without
+        // projecting old content or closing a newer Drawer.
+        if (avatarMounted.current) setAvatarSaving(false);
+      }
     } catch (error) {
-      feedbackToast({ error: t("toast.updateAvatarFailed") });
+      if (turn === avatarUploadTurn.current && intent.viewCurrent()) feedbackToast({ error: t("toast.updateAvatarFailed") });
     }
   };
 
@@ -102,8 +122,9 @@ const GroupSettings = ({
         <div className="flex items-center">
           <Upload
             accept="image/*"
-            className={clsx({ "disabled-upload": isNomal })}
-            openFileDialogOnClick={hasPermissions}
+            className={clsx({ "disabled-upload": isNomal || avatarSaving })}
+            disabled={avatarSaving}
+            openFileDialogOnClick={hasPermissions && !avatarSaving}
             showUploadList={false}
             customRequest={customUpload as any}
           >

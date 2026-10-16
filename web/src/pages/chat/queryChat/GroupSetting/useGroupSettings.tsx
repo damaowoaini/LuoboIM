@@ -25,78 +25,67 @@ export function useGroupSettings({ closeOverlay, isActive }: { closeOverlay: () 
   const busy = useRef(new Set<string>());
   const viewCurrent = () => Boolean(mounted.current && (!isActive || isActive()) && scope?.current() && actor &&
     useUserStore.getState().selfInfo.userID === actor);
-  const captureAction = (kind: "mute" | "quit" | "dismiss" | "permission") => {
+  const captureAction = (kind: "mute" | "quit" | "dismiss" | "permission" | "info" | "verification" | "nickname") => {
     const groupID = currentGroupInfo?.groupID, status = currentGroupInfo?.status;
-    if (!groupID || scope?.target.kind !== "group" || scope.target.id !== groupID) return;
+    if (!actor || !groupID || scope?.target.kind !== "group" || scope.target.id !== groupID) return;
     const current = () => {
       const state = useConversationStore.getState(), self = state.currentMemberInGroup, group = state.currentGroupInfo;
       if (!viewCurrent() || group?.groupID !== groupID || ![0, 1, 3].includes(group.status) ||
           self?.groupID !== groupID || self.userID !== actor || ![20, 60, 100].includes(self.roleLevel)) return false;
       if (kind === "quit") return self.roleLevel !== 100;
       if (kind === "dismiss") return self.roleLevel === 100;
-      if (kind === "permission") return self.roleLevel === 60 || self.roleLevel === 100;
+      if (kind === "nickname") return true;
+      if (kind === "permission" || kind === "info" || kind === "verification") return self.roleLevel === 60 || self.roleLevel === 100;
       return (self.roleLevel === 60 || self.roleLevel === 100) && group.status === status;
     };
     if (!current()) return;
-    return { groupID, status, current, viewCurrent };
+    return { groupID, status, actor, current, viewCurrent };
   };
-  const perform = async (intent: NonNullable<ReturnType<typeof captureAction>>, operation: () => Promise<unknown>) => {
-    if (!intent.current() || busy.current.has(intent.groupID)) return false;
+  const directEditBusy = () => feedbackToast({ error: new Error(t("errCode.operationTooFrequent")) });
+  const perform = async (intent: NonNullable<ReturnType<typeof captureAction>>, operation: () => Promise<unknown>, errorMessage?: string, onBusy?: () => void) => {
+    if (!intent.current()) return false;
+    if (busy.current.has(intent.groupID)) { onBusy?.(); return false; }
     busy.current.add(intent.groupID);
     try {
       if (!intent.current()) return false;
       await operation(); return intent.viewCurrent();
     } catch (error) {
-      if (intent.viewCurrent()) feedbackToast({ error }); return false;
+      if (intent.viewCurrent()) feedbackToast({ error, ...(errorMessage ? { msg: errorMessage } : {}) }); return false;
     } finally { busy.current.delete(intent.groupID); }
   };
-
-
+  const captureGroupInfoEdit = useCallback(() => captureAction("info"), [scope, actor, isActive, currentGroupInfo?.groupID]);
   const updateGroupInfo = useCallback(
     async (value: Partial<GroupItem>) => {
-      if (!currentGroupInfo) return;
-      try {
-        await IMSDK.setGroupInfo({
+      const intent = captureGroupInfoEdit(); if (!intent) return;
+      await perform(intent, () => IMSDK.setGroupInfo({
           ...value,
-          groupID: currentGroupInfo.groupID,
-        });
-      } catch (error) {
-        feedbackToast({ error, msg: t("toast.updateGroupInfoFailed") });
-      }
+          groupID: intent.groupID,
+        }), t("toast.updateGroupInfoFailed"), directEditBusy);
     },
-    [currentGroupInfo?.groupID],
+    [captureGroupInfoEdit],
   );
 
   const updateNickNameInGroup = useCallback(
     async (value: string) => {
-      if (!currentGroupInfo) return;
-      try {
-        await IMSDK.setGroupMemberInfo({
-          groupID: currentGroupInfo.groupID,
-          userID: selfUserID,
+      const intent = captureAction("nickname"); if (!intent) return;
+      await perform(intent, () => IMSDK.setGroupMemberInfo({
+          groupID: intent.groupID,
+          userID: intent.actor,
           nickname: value,
-        });
-      } catch (error) {
-        feedbackToast({ error });
-      }
+        }), undefined, directEditBusy);
     },
-    [selfUserID, currentGroupInfo?.groupID],
+    [scope, actor, isActive, selfUserID, currentGroupInfo?.groupID],
   );
 
   const updateGroupVerification = useCallback(
     async (verification: GroupVerificationType) => {
-      if (!currentGroupInfo) return;
-
-      try {
-        await IMSDK.setGroupInfo({
-          groupID: currentGroupInfo?.groupID,
+      const intent = captureAction("verification"); if (!intent) return;
+      await perform(intent, () => IMSDK.setGroupInfo({
+          groupID: intent.groupID,
           needVerification: verification,
-        });
-      } catch (error) {
-        feedbackToast({ error, msg: t("toast.updateGroupVerificationFailed") });
-      }
+        }), t("toast.updateGroupVerificationFailed"), directEditBusy);
     },
-    [currentGroupInfo?.groupID],
+    [scope, actor, isActive, currentGroupInfo?.groupID],
   );
 
   const updateGroupMuteAll = useCallback(async () => {
@@ -173,6 +162,7 @@ export function useGroupSettings({ closeOverlay, isActive }: { closeOverlay: () 
 
   return {
     currentGroupInfo,
+    captureGroupInfoEdit,
     updateGroupInfo,
     updateGroupMuteAll,
     updateNickNameInGroup,

@@ -109,9 +109,23 @@ export function verifyInputs() {
   const inputs = json(inputPath);
   for (const entry of inputs.requiredInputs) verifyFile(repo, entry);
   for (const entry of inputs.candidate.files) verifyFile(repo, entry);
-  // The copied before overlay must really be the product baseline, never a
-  // silently adopted after. Critical real caller dependencies are also pinned.
-  for (const entry of inputs.candidate.beforeCurrent) verifyFile(repo, entry);
+  // The product now contains the exact reviewed after. The historical before
+  // stays pinned to the separately tested ed88107 baseline, never current src.
+  assert(inputs.candidate.productAdopted === true && !inputs.candidate.beforeCurrent, "Explicit adopted-current/baseline schema required");
+  const baseline = inputs.candidate.baselineProvenance;
+  assert(baseline?.commitPrefix === "ed88107" && baseline.workflowRunID === 38845582472 && baseline.productBefore.length === 2, "Missing tested baseline provenance");
+  for (const entry of baseline.productBefore) {
+    assert(entry.path.startsWith("web/src/"), "Unsafe historical product path");
+    verifyFile(repo, { ...entry, path: `ci/candidates/web-direct-edit/before/src/${entry.path.slice("web/src/".length)}` });
+  }
+  assert(inputs.candidate.currentAfter.length === 2 && inputs.candidate.adoptedTests.length === 3, "Incomplete product adoption pins");
+  for (const entry of inputs.candidate.currentAfter) {
+    assert(entry.path.startsWith("web/src/"), "Unsafe adopted product path");
+    verifyFile(repo, entry);
+    verifyFile(repo, { ...entry, path: `ci/candidates/web-direct-edit/after/src/${entry.path.slice("web/src/".length)}` });
+  }
+  for (const entry of inputs.candidate.adoptedTests) verifyFile(repo, entry);
+  // Caller and SDK pins did not change during adoption.
   for (const entry of inputs.candidate.realCallers) verifyFile(repo, entry);
   return { inputs, linuxBindings: verifyLinuxBindings(json(path.join(web, "package-lock.json"))) };
 }

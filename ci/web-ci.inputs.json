@@ -1,7 +1,7 @@
 {
-  "version": 1,
+  "version": 2,
   "node": "24.21.0",
-  "fullMinimumTests": 625,
+  "fullMinimumTests": 658,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -109,18 +109,6 @@
         "sha256": "42ff26914e3ee4d1353ae34dec437d79e6a8e83928693345fda1f7934b491b2d"
       }
     ],
-    "beforeCurrent": [
-      {
-        "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
-        "bytes": 9772,
-        "sha256": "5c4004db31924ded0ee6a90136b6cc5fa52324bba6544bcd3cedb6619a0c1090"
-      },
-      {
-        "path": "web/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
-        "bytes": 7085,
-        "sha256": "b06f89c3660312e787c9f6e0f330b0486c6ce0e408e6f788ea2568ee949738fc"
-      }
-    ],
     "realCallers": [
       {
         "path": "web/src/pages/chat/queryChat/GroupSetting/index.tsx",
@@ -215,6 +203,63 @@
       "keeps the actual verification selector's AllNot=2 payload"
     ],
     "portableConfigOriginSHA256": "99ad575e12b798f7e01ca3df0376c2802664d0d4ae1fd283d56f14f6bc0ef8a6",
-    "productAdopted": false
+    "productAdopted": true,
+    "baselineProvenance": {
+      "commitPrefix": "ed88107",
+      "workflowRunID": 38845582472,
+      "workflowRunURL": "https://github.com/damaowoaini/LuoboIM/actions/runs/38845582472",
+      "actualBefore": {
+        "passed": 9,
+        "assertionFailed": 24,
+        "total": 33
+      },
+      "actualAfter": {
+        "passed": 33,
+        "total": 33
+      },
+      "productBefore": [
+        {
+          "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+          "bytes": 9772,
+          "sha256": "5c4004db31924ded0ee6a90136b6cc5fa52324bba6544bcd3cedb6619a0c1090"
+        },
+        {
+          "path": "web/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+          "bytes": 7085,
+          "sha256": "b06f89c3660312e787c9f6e0f330b0486c6ce0e408e6f788ea2568ee949738fc"
+        }
+      ],
+      "meaning": "Historical current source at tested commit. Verify these bytes against frozen ci/candidates before overlay, not adopted current product."
+    },
+    "currentAfter": [
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 10990,
+        "sha256": "df14a8fea08ee14ac5de248c5d400bb36e4506770b9fa0c3665fa3e12670a8b1"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 7600,
+        "sha256": "9b2a3cc5e1e511b3fe1913b3254d53d4b48ec8a128bb3b9623e17731c2d4fa00"
+      }
+    ],
+    "adoptedTests": [
+      {
+        "path": "web/src/core/groupDirectEditScope/directEditHooks.test.ts",
+        "bytes": 6836,
+        "sha256": "38c890b08fe5d78eb0b277d153a81ae9d7f434ae9413a4198af4a270aebf32e0"
+      },
+      {
+        "path": "web/src/core/groupDirectEditScope/directEditHost.test.ts",
+        "bytes": 9854,
+        "sha256": "1276d83d7480c131e5247856707f247deede48873b60e3846cbec9aa35c47b43"
+      },
+      {
+        "path": "web/src/core/groupDirectEditScope/fixture.ts",
+        "bytes": 9531,
+        "sha256": "42ff26914e3ee4d1353ae34dec437d79e6a8e83928693345fda1f7934b491b2d"
+      }
+    ],
+    "adoptionMeaning": "Exact two frozen after production files adopted; three tests use per-file fixture-first imports only. No global setup, no runtime dist switch."
   }
 }
