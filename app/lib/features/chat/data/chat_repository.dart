@@ -23,6 +23,55 @@ import 'message_mapper.dart';
 import 'group_mention_authority.dart';
 import 'retained_merge_codec.dart';
 
+enum ChatRevokeKind { acknowledged, notDispatched, unconfirmed, busy }
+
+final class ChatRevokeResult {
+  const ChatRevokeResult(this.kind, [this.failure]);
+  final ChatRevokeKind kind;
+  final AppFailure? failure;
+}
+
+/// Opaque, original-view permission. No message body or credential is retained.
+final class ChatRevokeIntent {
+  ChatRevokeIntent._(
+    this._repository,
+    this.messageId,
+    this.senderId,
+    this.groupId,
+    this.peerId,
+    this._contentType,
+    this._sessionType,
+    this._access,
+    this._checkSource,
+    this._checkAuthority,
+  );
+  final ChatRepository _repository;
+  final String messageId, senderId;
+  final String? groupId, peerId;
+  final int _contentType, _sessionType;
+  final MessageHistoryAccess _access;
+  final void Function() _checkSource, _checkAuthority;
+  bool _dispatched = false, _acknowledged = false, _unsupported = false;
+  bool get acknowledged => _acknowledged;
+  bool get unsupported => _unsupported;
+  bool get unconfirmed =>
+      _dispatched && !_acknowledged ||
+      _repository.current &&
+          _repository._revokeReceipts.unknown.contains((
+            _repository.conversationId,
+            messageId,
+          ));
+}
+
+final class _RevokeReceipts {
+  _RevokeReceipts(this.generation);
+  final int generation;
+  // Only current-generation CID/message identifiers, never a UI closure,
+  // session credential, original text, or an instruction to replay a write.
+  final pending = <(String, String)>{};
+  final unknown = <(String, String)>{};
+}
+
 final class ChatRepository {
   ChatRepository({
     required this.gateway,
@@ -46,6 +95,19 @@ final class ChatRepository {
       session.isInteractiveCurrent(generation, interactiveRevision);
   final DateTime Function() now;
   final String _userId;
+  static final _revokeOwners = Expando<_RevokeReceipts>();
+  _RevokeReceipts get _revokeReceipts {
+    if (!current) {
+      throw const AppFailure(FailureKind.cancelled);
+    }
+    var value = _revokeOwners[gateway];
+    if (value == null || value.generation != generation) {
+      value = _RevokeReceipts(generation);
+      _revokeOwners[gateway] = value;
+    }
+    return value;
+  }
+
   final Map<String, Message> _raw = {};
   final Map<String, String> _preparedQuoteSources = {};
   // A late native snapshot cannot undo a removal already observed in this
@@ -1395,6 +1457,282 @@ final class ChatRepository {
           draftText: text,
         );
       }, access: access);
+
+  bool canRevokeSource(ChatMessage item) {
+    final raw = _raw[item.id];
+    return item.delivery == MessageDelivery.sent &&
+        canView(item) &&
+        item.kind != ChatMessageKind.system &&
+        item.kind != ChatMessageKind.typing &&
+        raw != null &&
+        raw.status == MessageStatus.succeeded &&
+        !isLegacyCallSummary(raw);
+  }
+
+  ChatRevokeIntent captureRevoke(
+    ChatMessage item, {
+    required Conversation conversation,
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+    required void Function() checkAuthority,
+  }) {
+    access.check();
+    checkSource();
+    final raw = _raw[item.id];
+    final contentType = raw?.contentType, sessionType = raw?.sessionType;
+    if (conversation.id != conversationId ||
+        access.conversationId != conversationId ||
+        item.id.isEmpty ||
+        item.senderId.isEmpty ||
+        !canRevokeSource(item) ||
+        raw?.clientMsgID != item.id ||
+        raw?.sendID != item.senderId ||
+        contentType == null ||
+        sessionType == null ||
+        item.kind == ChatMessageKind.system ||
+        item.kind == ChatMessageKind.typing ||
+        (conversation.isGroup && conversation.groupId?.isNotEmpty != true)) {
+      throw const AppFailure(FailureKind.dataChanged);
+    }
+    return ChatRevokeIntent._(
+      this,
+      item.id,
+      item.senderId,
+      conversation.isGroup ? conversation.groupId : null,
+      conversation.isGroup ? null : conversation.userId,
+      contentType,
+      sessionType,
+      access,
+      checkSource,
+      checkAuthority,
+    );
+  }
+
+  void _checkRevoke(ChatRevokeIntent intent, {bool authority = true}) {
+    if (!identical(intent._repository, this)) {
+      throw const AppFailure(FailureKind.invalidInput);
+    }
+    intent._access.check();
+    intent._checkSource();
+    if (!current ||
+        isRemoved(intent.messageId) ||
+        !gateway.privacyLedger.lookup(intent.messageId).canViewAt(now())) {
+      throw const AppFailure(FailureKind.cancelled);
+    }
+    if (authority) {
+      intent._checkAuthority();
+    }
+  }
+
+  void checkRevoke(ChatRevokeIntent intent, {bool authority = true}) =>
+      _checkRevoke(intent, authority: authority);
+
+  Future<Message?> _revokeTarget(
+    IMManager manager,
+    ChatRevokeIntent intent, {
+    bool allowMissing = false,
+  }) async {
+    _checkRevoke(intent, authority: !allowMissing);
+    final found = await manager.messageManager.findMessageList(
+      searchParams: [
+        SearchParams(
+          conversationID: conversationId,
+          clientMsgIDList: [intent.messageId],
+        ),
+      ],
+    );
+    _checkRevoke(intent, authority: !allowMissing);
+    final groups = [...?found.findResultItems, ...?found.searchResultItems];
+    if (groups.any((item) => item.conversationID != conversationId) ||
+        groups.length > 1) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    final messages = groups.isEmpty
+        ? <Message>[]
+        : groups.single.messageList ?? <Message>[];
+    if (messages.isEmpty && allowMissing) {
+      return null;
+    }
+    if (messages.length != 1 ||
+        messages.single.clientMsgID != intent.messageId ||
+        messages.single.sendID != intent.senderId) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    final message = messages.single;
+    if (message.sessionType != intent._sessionType ||
+        (message.groupID ?? '') != (intent.groupId ?? '')) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    if (message.status == MessageStatus.deleted && allowMissing) {
+      return null;
+    }
+    if (message.status != MessageStatus.succeeded ||
+        message.contentType != intent._contentType ||
+        message.contentType! >= 1000 ||
+        message.contentType == MessageType.typing ||
+        isLegacyCallSummary(message)) {
+      throw const AppFailure(FailureKind.dataChanged);
+    }
+    final privacy = gateway.privacyLedger.observe(
+      conversationId,
+      message.toJson(),
+      now: now(),
+    );
+    if (!privacy.canViewAt(now())) {
+      throw const AppFailure(FailureKind.cancelled);
+    }
+    return message;
+  }
+
+  Future<void> _revokeAuthority(
+    IMManager manager,
+    ChatRevokeIntent intent,
+  ) async {
+    _checkRevoke(intent);
+    final values = await manager.conversationManager.getMultipleConversation(
+      conversationIDList: [conversationId],
+    );
+    _checkRevoke(intent);
+    if (values.length != 1 ||
+        values.single.conversationID != conversationId ||
+        (values.single.groupID ?? '') != (intent.groupId ?? '') ||
+        (values.single.userID ?? '') != (intent.peerId ?? '')) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    final conversation = values.single;
+    final target = await _revokeTarget(manager, intent);
+    if (target == null || target.sessionType != conversation.conversationType) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    if (intent.groupId == null) {
+      if (conversation.conversationType != ConversationType.single ||
+          intent.senderId != _userId ||
+          intent.peerId?.isNotEmpty != true ||
+          target.recvID != intent.peerId) {
+        throw const AppFailure(FailureKind.permissionDenied);
+      }
+      return;
+    }
+    // v3 server RevokeMsg accepts SuperGroupChatType. Do not infer that the
+    // deprecated type2 supports moderation; its existing self API is retained.
+    if (conversation.conversationType != ConversationType.superGroup &&
+        !(intent.senderId == _userId && conversation.conversationType == 2)) {
+      intent._unsupported = true;
+      throw const AppFailure(FailureKind.configuration);
+    }
+    if (conversation.isNotInGroup == true) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
+    _checkRevoke(intent);
+    final groups = await manager.groupManager.getGroupsInfo(
+      groupIDList: [intent.groupId!],
+    );
+    _checkRevoke(intent);
+    if (groups.length != 1 ||
+        groups.single.groupID != intent.groupId ||
+        !const {0, 1}.contains(groups.single.status)) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
+    final joined = await manager.groupManager.isJoinedGroup(
+      groupID: intent.groupId!,
+    );
+    _checkRevoke(intent);
+    if (!joined) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
+    final ids = {_userId, intent.senderId};
+    final members = await manager.groupManager.getGroupMembersInfo(
+      groupID: intent.groupId!,
+      userIDList: ids.toList(),
+    );
+    _checkRevoke(intent);
+    if (members.length != ids.length ||
+        members.any(
+          (member) =>
+              member.groupID != intent.groupId ||
+              !ids.contains(member.userID) ||
+              !const {20, 60, 100}.contains(member.roleLevel),
+        ) ||
+        members.map((member) => member.userID).toSet().length != ids.length) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    final actor = members.singleWhere((member) => member.userID == _userId);
+    final sender = members.singleWhere(
+      (member) => member.userID == intent.senderId,
+    );
+    if (intent.senderId != _userId &&
+        !(actor.roleLevel == GroupRoleLevel.owner &&
+                sender.roleLevel != GroupRoleLevel.owner ||
+            actor.roleLevel == GroupRoleLevel.admin &&
+                sender.roleLevel == GroupRoleLevel.member)) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
+  }
+
+  Future<void> inspectRevoke(ChatRevokeIntent intent) =>
+      _run((manager, _) async {
+        _checkRevoke(intent, authority: !intent.unconfirmed);
+        if (intent.unconfirmed) {
+          await _revokeTarget(manager, intent, allowMissing: true);
+        } else {
+          await _revokeAuthority(manager, intent);
+        }
+      }, access: intent._access);
+
+  /// Read only: absence/deletion is not proof that this revoke committed.
+  Future<bool> reviewRevoke(ChatRevokeIntent intent) =>
+      _run((manager, _) async {
+        _checkRevoke(intent, authority: false);
+        return await _revokeTarget(manager, intent, allowMissing: true) != null;
+      }, access: intent._access);
+
+  Future<ChatRevokeResult> executeRevoke(ChatRevokeIntent intent) async {
+    _checkRevoke(intent);
+    final receipts = _revokeReceipts, key = (conversationId, intent.messageId);
+    if (intent._dispatched || receipts.unknown.contains(key)) {
+      return const ChatRevokeResult(ChatRevokeKind.unconfirmed);
+    }
+    if (!receipts.pending.add(key)) {
+      return const ChatRevokeResult(ChatRevokeKind.busy);
+    }
+    try {
+      await _run((manager, _) async {
+        // Gateway readiness, metadata and both role reads cannot renew this
+        // original view/cut. This final check is inside the native operation.
+        _checkRevoke(intent);
+        await _revokeAuthority(manager, intent);
+        _checkRevoke(intent);
+        intent._dispatched = true;
+        await manager.messageManager.revokeMessage(
+          conversationID: conversationId,
+          clientMsgID: intent.messageId,
+        );
+        intent._acknowledged = true;
+        receipts.unknown.remove(key);
+        intent._access.check();
+        intent._checkSource();
+        forgetMessages([intent.messageId]);
+      }, access: intent._access);
+      return const ChatRevokeResult(ChatRevokeKind.acknowledged);
+    } catch (error) {
+      if (intent._acknowledged) {
+        // Already-started success is not cancelled by a later view change.
+        return const ChatRevokeResult(ChatRevokeKind.acknowledged);
+      }
+      final failure = error is AppFailure
+          ? error
+          : const AppFailure(FailureKind.unknown);
+      if (intent._dispatched) {
+        // RevokeMsg may persist before notification/after-callback errors.
+        // No error code alone, including1002, proves that it did not commit.
+        receipts.unknown.add(key);
+        return ChatRevokeResult(ChatRevokeKind.unconfirmed, failure);
+      }
+      return ChatRevokeResult(ChatRevokeKind.notDispatched, failure);
+    } finally {
+      receipts.pending.remove(key);
+    }
+  }
 
   Future<void> revoke(String id) => _run((manager, access) async {
     if (_raw[id]?.sendID != _userId) {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current351 focused80/full1222."""
+"""Pure Python CI gate checks, separate from current354 focused58/full1280."""
 import copy
 import importlib.util
 import json
@@ -134,13 +134,13 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical_cohorts_cannot_alias331(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344'):
+    def test_historical_cohorts_cannot_alias354(self):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344', 'current351'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current351'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current354'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -382,23 +382,23 @@ class CardInventoryTests(unittest.TestCase):
 
 
 class ValidationModeTests(unittest.TestCase):
-    def test_focused_runs_only_new80_and_selected17_analysis(self):
+    def test_focused_runs_only_new58_and_selected6_analysis(self):
         plan = check.source.descriptor()
-        phase = check.validation_plan(plan, 'chat-card-80')
-        self.assertEqual((phase['expected'], phase['names_key']), (80, 'new_chat_card80'))
-        self.assertEqual(phase['test_paths'], plan['chat_card']['test_paths'])
-        self.assertEqual(phase['analysis_paths'], plan['chat_card']['analysis_paths'])
-        self.assertEqual((len(phase['test_paths']), len(phase['analysis_paths'])), (3, 17))
+        phase = check.validation_plan(plan, 'group-revoke-58')
+        self.assertEqual((phase['expected'], phase['names_key']), (58, 'new_group_revoke58'))
+        self.assertEqual(phase['test_paths'], plan['group_revoke']['test_paths'])
+        self.assertEqual(phase['analysis_paths'], plan['group_revoke']['analysis_paths'])
+        self.assertEqual((len(phase['test_paths']), len(phase['analysis_paths'])), (2, 6))
 
-    def test_full_has_only_full1222_without_a_repeated540_prerequisite(self):
+    def test_full_has_only_full1280_without_a_repeated_historical540_prerequisite(self):
         phase = check.validation_plan(check.source.descriptor(), 'full-regression', True)
-        self.assertEqual(phase, {'test_label': 'full1222', 'expected': 1222,
-                                'test_paths': [], 'names_key': 'current_full1222',
+        self.assertEqual(phase, {'test_label': 'full1280', 'expected': 1280,
+                                'test_paths': [], 'names_key': 'current_full1280',
                                 'analysis_paths': None})
 
     def test_reference_or_unknown_mode_cannot_dispatch_under_focused_default(self):
         plan = check.source.descriptor()
-        for mode, reference in [('chat-card-80', True), ('target540', False), ('chat-card-80', 1)]:
+        for mode, reference in [('group-revoke-58', True), ('target540', False), ('chat-card-80', False), ('group-revoke-58', 1)]:
             with self.subTest(mode=mode, reference=reference):
                 with self.assertRaises(ValueError):
                     check.validation_plan(plan, mode, reference)
@@ -435,6 +435,81 @@ class CardCleanupTests(unittest.TestCase):
             with self.subTest(body=body):
                 with self.assertRaises(ValueError):
                     check.card_cleanup_summary('\n'.join(map(json.dumps, body)), contract)
+
+
+
+class GroupRevokeInventoryTests(unittest.TestCase):
+    def test_same_count_new58_cannot_replace_a_required_parent_or_group_case(self):
+        plan = check.source.descriptor()
+        names = json.loads(check.source.regular(check.source.REPO / plan['required_test_names']['path']))
+        for key in ('parent_full1222', 'new_group_revoke58', 'current_full1280'):
+            with self.subTest(key=key):
+                changed = copy.deepcopy(names)
+                changed[key][0]['name'] = 'forged same-count replacement'
+                body = json.dumps(changed).encode()
+                altered = copy.deepcopy(plan)
+                altered['required_test_names'].update(bytes=len(body), sha256=check.source.sha(body))
+                with mock.patch.object(check.source, 'regular', return_value=body):
+                    with self.assertRaises(ValueError): check.source.required_names(altered)
+
+    def test_new_source_pin_and_historical_card_lineage_fail_closed(self):
+        original = check.source.descriptor()
+        changes = [lambda p: p['group_revoke']['selected_files'][0].update(sha256='0' * 64),
+                   lambda p: p['chat_card']['current_source_lineage']['replacements'][0]['before'].update(sha256='0' * 64),
+                   lambda p: p['chat_card']['current_source_lineage']['replacements'][0]['after'].update(sha256='0' * 64)]
+        for change in changes:
+            plan = copy.deepcopy(original); change(plan)
+            with self.assertRaises(ValueError):
+                check.source.group_revoke_contract(plan)
+                check.source.card_contract(plan)
+        plan = copy.deepcopy(original)
+        before = plan['chat_card']['current_source_lineage']['replacements'][0]['before']
+        before['sha256'] = '0' * 64
+        next(r for r in plan['chat_card']['selected_files'] if r['path'] == before['path'])['sha256'] = '0' * 64
+        with self.assertRaises(ValueError): check.source.card_contract(plan)
+
+
+class GroupRevokeCleanupTests(unittest.TestCase):
+    def test_each_group_test_needs_its_own_ordered_shutdown(self):
+        contract = {'widget_names': ['owned dialog'], 'repository_names': ['owned repository'],
+                    'widget_markers': ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end'],
+                    'repository_markers': ['sdk.begin', 'sdk.end', 'storage.begin', 'storage.end']}
+        events = []
+        for identity, group, prefix, markers in [(1, 'widget_names', 'group_revoke_cleanup ', 'widget_markers'),
+                                                 (2, 'repository_names', 'group_revoke_repository_cleanup ', 'repository_markers')]:
+            events.append({'type': 'testStart', 'test': {'id': identity, 'name': contract[group][0]}})
+            events += [{'type': 'print', 'testID': identity, 'message': prefix + marker} for marker in contract[markers]]
+        result = check.group_revoke_cleanup_summary('\n'.join(map(json.dumps, events)), contract)
+        self.assertEqual((result['widget_names'], result['repository_names']), (1, 1))
+        foreign = copy.deepcopy(events); foreign[-1]['testID'] = 99
+        wrong = copy.deepcopy(events); wrong[0]['test']['name'] = 'foreign successful case'
+        for altered in (events[:-1], events + [events[-1]], foreign, wrong):
+            with self.assertRaises(ValueError):
+                check.group_revoke_cleanup_summary('\n'.join(map(json.dumps, altered)), contract)
+
+
+class RealHomeTests(unittest.TestCase):
+    def test_real_account_home_is_not_task_home_and_invalid_home_is_rejected(self):
+        import os
+        import tempfile
+        from types import SimpleNamespace
+        actual_home = os.environ.get('HOME')
+        with tempfile.TemporaryDirectory() as root:
+            home = Path(root).resolve() / 'account'; home.mkdir()
+            task = Path(root).resolve() / 'work'; task.mkdir()
+            account = SimpleNamespace(pw_uid=home.stat().st_uid, pw_dir=str(home))
+            with mock.patch.object(check.pwd, 'getpwnam', return_value=account):
+                self.assertEqual(check.run_user_home('runner'), str(home))
+                self.assertNotEqual(check.run_user_home('runner'), str(task / 'home'))
+            for value in (SimpleNamespace(pw_uid=0, pw_dir=str(home)),
+                          SimpleNamespace(pw_uid=os.getuid(), pw_dir='relative/home'),
+                          SimpleNamespace(pw_uid=os.getuid() + 1, pw_dir=str(home)),
+                          SimpleNamespace(pw_uid=os.getuid(), pw_dir=str(home / '..' / 'account'))):
+                with mock.patch.object(check.pwd, 'getpwnam', return_value=value):
+                    with self.assertRaises(ValueError): check.run_user_home('runner')
+        self.assertEqual(os.environ.get('HOME'), actual_home)
+        self.assertIn('HOME="$real_user_home"', (check.REPO / 'ci/mobile-netns.sh').read_text())
+        self.assertNotIn('export HOME=', (check.REPO / 'ci/mobile-setup.sh').read_text())
 
 
 if __name__ == '__main__':

@@ -5,8 +5,16 @@ set -euo pipefail
 cohort=$1
 work=$2
 repo=$(cd -- "$(dirname -- "$0")/.." && pwd -P)
-[[ "$cohort" == current351 ]]
+[[ "$cohort" == current354 ]]
 [[ "$work" == /* && ! -e "$work" && ! -L "$work" ]]
+real_user_home=$(python3 - "$repo" "$(id -un)" <<'PYHOME'
+import importlib.util,pathlib,sys
+spec=importlib.util.spec_from_file_location('mobile_check',pathlib.Path(sys.argv[1])/'ci/mobile-check.py')
+check=importlib.util.module_from_spec(spec);spec.loader.exec_module(check)
+print(check.run_user_home(sys.argv[2]))
+PYHOME
+)
+[[ "${HOME:-}" == "$real_user_home" ]]
 umask 077
 mkdir -- "$work"
 mkdir -- "$work/evidence" "$work/home" "$work/tmp" "$work/pub-cache" "$work/config"
@@ -63,7 +71,7 @@ if p['tag'] not in tags: raise SystemExit('local semantic release tag is missing
 if (sdk/'bin/internal/engine.version').read_text().strip()!=p['engine_revision']:
  raise SystemExit('pinned engine mismatch')
 PY
-export HOME="$work/home" PUB_CACHE="$work/pub-cache" TMPDIR="$work/tmp"
+export PUB_CACHE="$work/pub-cache" TMPDIR="$work/tmp"
 export XDG_CONFIG_HOME="$work/config" XDG_CACHE_HOME="$work/config/cache"
 export FLUTTER_SUPPRESS_ANALYTICS=true DART_SUPPRESS_ANALYTICS=true CI=true
 flutter="$work/flutter/bin/flutter"

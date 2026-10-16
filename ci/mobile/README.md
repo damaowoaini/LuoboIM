@@ -1,39 +1,30 @@
-# Mobile351 Card108 CI
+# Mobile354 group revoke CI
 
-Portable403 = authored App351 + SDK51 + migration1. This is an explicit successor
-to344/396; old target460/full1142 were aggregate expectations, not accepted full
-runs. Root accepted new80 plus directly affected old5 as85 unique targeted cases,
-with17 effective changed-file analyses clean. The raw first failures and narrow
-retries remain in source-preparation provenance. Device/services remain pending.
+Portable406 = App354 + SDK51 + migration1. Adopt the immutable V3 six files
+atomically with this CI successor. Current main/public App351 is not changed by
+this preparation. The original Card17 pins stay historical; explicit three-file
+before351→V3 lineage permits only those current chat replacements.
 
-The workflow stays manual-only. Default `chat-card-80` runs only three new test
-files80 (exact successful names), then only17 selected Dart files with fatal infos.
-No old5, target540, full1222, optional reference or native is dispatched in this mode.
-`full-regression` runs full1222 and whole-app strict analysis once; it does not first
-run540. All old1142 plus exact80 names are required. Descriptor target540 is an
-expected inventory only. No540/1222 run was performed while preparing these files.
+Manual default `group-revoke-58` runs the two new test files (exact40 repository
+plus18 widget successful names), then six selected strict analyses. It does not
+rerun old2/Card80/target540. Focused cleanup requires each test's own four ordered
+markers. UI tap/overflow warnings fail. New58 and full1280 are unrun CI expectations.
+Accepted targeted evidence is the local first59 plus cloud5 union60, not fresh60.
 
-The optional historical search entry2 is allowed only with explicit full mode and
-reference flag. It is the full351 compile context with only the original4 pinned
-before-files; exactly1 missing-entry assertion must fail and1 old filter must pass.
-It is not the historical257 full suite. Source is restored and reverified after it.
+`full-regression` runs full1280 once followed by whole strict analysis, with all
+old1222+new58 names, old Card/call-record/NextUnread and new moderation cleanup.
+There is no540 or58 prerequisite. Use it only at final acceptance. Optional search
+reference remains full+explicit only:354 compile context with4 original replacements,
+entry2 exactly1 real assertion failure+1 filter positive; not historical full257.
 
-Focused cleanup requires41 actual widget and32 repository four-stage sequences,
-bound to each successful test name/ID;7 parser/model cases claim no SDK cleanup.
-Full mode additionally keeps the unchanged call-record/parent creation/safe-exit
-and NextUnread cleanup contracts. Completion footer/hidden/error/name multiplicity,
-source checks before/after phases, PG termination and final failure-wins resource
-checks remain. Network namespace has no host fixtures or external route.
+Historical target540/Card80/full1222 arrays keep their original identities. The
+old isolated target5 workflow explicitly checks out50ff7d3d705c52775bf37840e6bef10fa2a55ae0;
+its351 helperpins and six payload bytes remain unchanged. It never uses354 helpers.
 
-No dependency changes:178 locked identities,4 official WebView archive identities,
-SDK51+migration1 and native7 snapshot are unchanged. The historical field
-`portable396_includes_native=false` remains evidence about its original snapshot;
-native7 is also outside403. No old generated kernels/hooks/stamps are CI inputs.
-Cold4GiB/continuous1GiB/.2s/768MiB and existing900s phase timeout are unchanged.
-The public authored-source inventory has zero auxiliary exceptions; local-only
-`app/tool/check.sh` is not uploaded or exempted. No secrets/deployment is added.
-
-Preparation executed no CI unit test, materialization, Flutter, full suite or cloud
-run. Proposed targeted Python checks: DescriptorTests4 plus new CardInventory2,
-ValidationMode3 and CardCleanup2; the remaining old controls need not be repeated
-locally merely for the cohort label. Root reviews and executes any controls once.
+Setup preserves actual HOME and rejects mismatch; netns derives the non-root user's
+canonical owned HOME. XDG/TMP/pubcache remain fresh task paths. No credentials are
+forwarded. Other resource/network/toolchain/178lock/SDK/native/inventory gates stay
+unchanged. `app/tool/check.sh` remains private-only, with zero public exceptions.
+Child exit/resource evidence does not prove independent PG absence. Device/service
+acceptance is separate. No CI checks, readonly CLI, materialization, Flutter or cloud
+run occurred in this preparation. Proposed narrow Python controls are in the plan.

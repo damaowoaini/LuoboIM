@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -99,6 +100,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
   int _emojiIntent = 0;
   int _locationIntent = 0;
   int _cardIntent = 0;
+  int _revokeIntent = 0;
+  ModalRoute<dynamic>? _revokeRoute;
+  final _revokeChanges = ValueNotifier<int>(0);
+  bool _revokeChangeQueued = false;
   final _cardChanges = ValueNotifier<int>(0);
   ModalRoute<dynamic>? _cardPickerRoute;
   final _locationChanges = ValueNotifier<int>(0);
@@ -240,6 +245,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
+    if (!_foreground) _retireRevoke();
     if (!_foreground) ++_cardIntent;
     if (!_foreground && !_locationPickerOpen) {
       ++_locationIntent;
@@ -444,6 +450,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
       ++_emojiIntent;
       ++_locationIntent;
       ++_cardIntent;
+      _retireRevoke();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           ++_locationChanges.value;
@@ -465,6 +472,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
     ++_cardIntent;
     _cardChanges.dispose();
     ++_emojiIntent;
+    ++_revokeIntent;
+    _revokeChanges.dispose();
     if (_emojiPickerResumed case final resumed?) {
       if (!resumed.isCompleted) {
         resumed.complete();
@@ -534,6 +543,11 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   Widget build(BuildContext context) {
     _routeVisible = ModalRoute.of(context)?.isCurrent ?? true;
+    if (!_routeVisible &&
+        _revokeRoute != null &&
+        !(_revokeRoute!.isActive && _revokeRoute!.isCurrent)) {
+      _retireRevoke();
+    }
     if (!_routeVisible) _readSignature = '';
     _scheduleVisibleReads();
     return PopScope<Object?>(
@@ -1896,9 +1910,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
                   if (retainable) 'reply': '引用回复',
                   if (item.canForward && retainable) 'forward': '转发到聊天',
                   if (!expired &&
-                      item.mine &&
+                      repository.canRevokeSource(item) &&
+                      (item.mine || controller.conversation?.isGroup == true) &&
                       item.delivery == MessageDelivery.sent)
-                    'revoke': '撤回消息',
+                    'revoke': item.mine ? '撤回消息' : '群管理撤回',
                   if (!expired &&
                       item.delivery == MessageDelivery.failed &&
                       !controller.isUnconfirmedLocation(item.id) &&
@@ -2056,12 +2071,114 @@ class _ChatPageState extends ConsumerState<ChatPage>
           }
         }
       case 'revoke':
-        await controller.revoke(item);
+        await _openRevoke(
+          item,
+          lease,
+          emojiTicket,
+          emojiOrigin,
+          emojiNavigator,
+        );
       case 'delete':
         if (await _confirm('删除消息？', '将删除你账号中的此条消息，此操作无法撤销。')) {
           if (!_acceptsPortal(lease)) return;
           await controller.delete(item);
         }
+    }
+  }
+
+  void _retireRevoke() {
+    // Permission retires synchronously; only the UI signal may wait for build.
+    ++_revokeIntent;
+    if (!mounted) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      if (_revokeChangeQueued) return;
+      _revokeChangeQueued = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _revokeChangeQueued = false;
+        if (mounted) _revokeChanges.value = _revokeIntent;
+      });
+    } else {
+      _revokeChanges.value = _revokeIntent;
+    }
+  }
+
+  Future<void> _openRevoke(
+    ChatMessage item,
+    MessageHistoryAccess access,
+    int menuTicket,
+    ModalRoute<dynamic>? origin,
+    NavigatorState navigator,
+  ) async {
+    if (!mounted ||
+        !_foreground ||
+        menuTicket != _emojiIntent ||
+        origin?.isCurrent != true ||
+        !navigator.mounted) {
+      return;
+    }
+    final ticket = ++_revokeIntent, cid = widget.conversationId;
+    var opened = false;
+    late final DialogRoute<bool> route;
+    late final ChatRevokeIntent intent;
+    bool current() {
+      if (!mounted ||
+          !_foreground ||
+          !controller.usable ||
+          ticket != _revokeIntent ||
+          widget.conversationId != cid ||
+          controller.repository.conversationId != cid ||
+          origin?.isActive != true ||
+          !navigator.mounted ||
+          !identical(origin?.navigator, navigator)) {
+        return false;
+      }
+      if (opened &&
+          (!route.isActive ||
+              !route.isCurrent ||
+              !identical(route.navigator, navigator))) {
+        return false;
+      }
+      if (!opened && origin?.isCurrent != true) {
+        return false;
+      }
+      try {
+        access.check();
+        return true;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    route = DialogRoute<bool>(
+      context: context,
+      builder: (_) => _GroupRevokeDialog(
+        controller: controller,
+        intent: intent,
+        isCurrent: current,
+        ticketChanges: _revokeChanges,
+        onCovered: () {
+          if (ticket == _revokeIntent) _retireRevoke();
+        },
+      ),
+    );
+    try {
+      intent = controller.captureRevoke(
+        item,
+        access: access,
+        isCurrent: current,
+      );
+      _revokeRoute = route;
+      opened = true;
+      await navigator.push(route);
+      await route.completed;
+    } on AppFailure catch (error) {
+      if (mounted && origin?.isCurrent == true && ticket == _revokeIntent) {
+        _notice(error.message);
+      }
+    } finally {
+      if (identical(_revokeRoute, route)) _revokeRoute = null;
+      if (ticket == _revokeIntent) _retireRevoke();
     }
   }
 
@@ -2469,4 +2586,229 @@ class _ChatPageState extends ConsumerState<ChatPage>
       : size < 1024 * 1024
       ? '${(size / 1024).toStringAsFixed(1)} KB'
       : '${(size / (1024 * 1024)).toStringAsFixed(1)} MB';
+}
+
+/// The confirmation owns exactly its DialogRoute. Foreign coverage retires it
+/// monotonically; it never finds ancestors from a retained button callback.
+class _GroupRevokeDialog extends StatefulWidget {
+  const _GroupRevokeDialog({
+    required this.controller,
+    required this.intent,
+    required this.isCurrent,
+    required this.ticketChanges,
+    required this.onCovered,
+  });
+  final ChatController controller;
+  final ChatRevokeIntent intent;
+  final bool Function() isCurrent;
+  final Listenable ticketChanges;
+  final VoidCallback onCovered;
+  @override
+  State<_GroupRevokeDialog> createState() => _GroupRevokeDialogState();
+}
+
+class _GroupRevokeDialogState extends State<_GroupRevokeDialog> {
+  ModalRoute<dynamic>? _route;
+  NavigatorState? _navigator;
+  bool _retired = false, _loading = true, _saving = false, _ready = false;
+  bool _inspecting = false;
+  String? _error, _review;
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_changed);
+    widget.ticketChanges.addListener(_changed);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_inspect());
+    });
+  }
+
+  bool get _viewCurrent => mounted && !_retired && widget.isCurrent();
+  bool get _sourceCurrent =>
+      _viewCurrent &&
+      widget.controller.revokeCurrent(
+        widget.intent,
+        authority: !widget.intent.unconfirmed,
+      );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _route ??= ModalRoute.of(context);
+    _navigator ??= Navigator.of(context);
+    if (!_retired && _route?.isActive == true && _route?.isCurrent == false) {
+      _retired = true;
+      widget.onCovered();
+    }
+  }
+
+  void _changed() {
+    if (!mounted) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+    } else {
+      setState(() {});
+    }
+  }
+
+  Future<void> _inspect() async {
+    if (!_sourceCurrent || _saving || _inspecting) return;
+    _inspecting = true;
+    setState(() {
+      _loading = true;
+      _ready = false;
+      _error = null;
+    });
+    try {
+      await widget.controller.repository.inspectRevoke(widget.intent);
+      if (_sourceCurrent) _ready = !widget.intent.unconfirmed;
+    } catch (error) {
+      if (_viewCurrent) {
+        _error = widget.intent.unsupported
+            ? '当前服务暂不支持这类群会话的管理撤回'
+            : error is AppFailure
+            ? error.message
+            : '无法核对撤回权限，请重试';
+      }
+    } finally {
+      _inspecting = false;
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _finish(bool value) {
+    final route = _route, navigator = _navigator;
+    if (route?.isActive == true &&
+        route?.isCurrent == true &&
+        navigator?.mounted == true &&
+        identical(route?.navigator, navigator) &&
+        (!value || _viewCurrent)) {
+      navigator!.pop(value);
+    }
+  }
+
+  Future<void> _submit() async {
+    if (_saving || _loading || !_ready || !_sourceCurrent) return;
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      final result = await widget.controller.executeRevoke(
+        widget.intent,
+        isCurrent: () => _viewCurrent,
+      );
+      if (!_viewCurrent) return;
+      switch (result.kind) {
+        case ChatRevokeKind.acknowledged:
+          _finish(true);
+        case ChatRevokeKind.unconfirmed:
+          _ready = false;
+          _review = '撤回结果未确认，请先核对原消息，不会自动重复撤回。';
+        case ChatRevokeKind.notDispatched:
+          _ready = false;
+          _error = result.failure?.message ?? '未发起撤回，请重新核对';
+        case ChatRevokeKind.busy:
+          _error = '这条消息正在处理，请稍后核对';
+      }
+    } catch (error) {
+      if (_viewCurrent) {
+        _error = error is AppFailure ? error.message : '无法发起撤回';
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _reviewOnly() async {
+    if (_loading || _saving || !_sourceCurrent) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final present = await widget.controller.repository.reviewRevoke(
+        widget.intent,
+      );
+      if (_viewCurrent) {
+        _review = present
+            ? '原消息仍可见，撤回结果尚未确认，请稍后再核对。'
+            : '原消息已不可见；这不能单独确认撤回结果，请返回会话核对。';
+      }
+    } catch (error) {
+      if (_viewCurrent) {
+        _error = error is AppFailure ? error.message : '暂时无法核对原消息';
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_changed);
+    widget.ticketChanges.removeListener(_changed);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final current = _sourceCurrent;
+    final unknown = current && widget.intent.unconfirmed;
+    final style = TextButton.styleFrom(
+      minimumSize: const Size(44, 44),
+      visualDensity: VisualDensity.standard,
+      tapTargetSize: MaterialTapTargetSize.padded,
+    );
+    return PopScope(
+      canPop: !_saving || !_viewCurrent,
+      child: AlertDialog(
+        scrollable: true,
+        title: const Text('撤回这条消息？'),
+        content: !current
+            ? const Text('会话或消息已变化，请关闭后重新核对。')
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('撤回将对聊天参与者生效。群管理权限会在提交前再次核对。'),
+                  if (_loading || _saving)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 12),
+                      child: LinearProgressIndicator(),
+                    ),
+                  if (unknown) Text(_review ?? '撤回结果未确认，请先核对原消息。'),
+                  if (_error != null) Text(_error!),
+                ],
+              ),
+        actions: [
+          TextButton(
+            style: style,
+            onPressed: _saving && _viewCurrent ? null : () => _finish(false),
+            child: const Text('关闭'),
+          ),
+          if (current && unknown)
+            TextButton(
+              style: style,
+              onPressed: _loading || _saving ? null : _reviewOnly,
+              child: const Text('只读核对'),
+            )
+          else if (current && !_ready && !_loading && !_saving)
+            TextButton(
+              style: style,
+              onPressed: _inspect,
+              child: const Text('重新核对'),
+            )
+          else if (current)
+            TextButton(
+              style: style,
+              onPressed: _ready && !_loading && !_saving ? _submit : null,
+              child: Text(_saving ? '撤回中…' : '确认撤回'),
+            ),
+        ],
+      ),
+    );
+  }
 }

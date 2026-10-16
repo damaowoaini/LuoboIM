@@ -11,6 +11,8 @@ import hashlib
 import importlib.util
 import json
 import os
+import pwd
+import re
 from pathlib import Path
 import signal
 import socket
@@ -26,6 +28,18 @@ spec.loader.exec_module(source)
 FLOOR = 1024 ** 3
 INITIAL = 4 * FLOOR
 CAP = 768 * 1024 ** 2
+
+
+
+def run_user_home(run_as):
+    """Resolve the real non-root account HOME, never an owned-workspace substitute."""
+    account = pwd.getpwnam(run_as)
+    home = Path(account.pw_dir)
+    if (not run_as or run_as == 'root' or account.pw_uid == 0
+            or not home.is_absolute() or home.resolve() != home
+            or home.is_symlink() or not home.is_dir() or home.stat().st_uid != account.pw_uid):
+        raise ValueError('canonical non-root account HOME required')
+    return str(home)
 
 
 def write_json(path, value):
@@ -312,7 +326,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full351 tree; restore exact after4 even if the reference fails."""
+    """Separate full354 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -383,8 +397,8 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after351_and_primary_source_reverified',
-                    'source_digest': plan['current351']['source_digest'],
+                   {'state': 'after354_and_primary_source_reverified',
+                    'source_digest': plan['current354']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
 
 
@@ -489,17 +503,17 @@ def next_unread_cleanup_summary(text, contract):
 
 
 def validation_plan(plan, mode, reference=False):
-    if mode not in ('chat-card-80', 'full-regression') or type(reference) is not bool:
+    if mode not in ('group-revoke-58', 'full-regression') or type(reference) is not bool:
         raise ValueError('unsupported validation mode/reference')
     if reference and mode != 'full-regression':
         raise ValueError('reference entry requires explicit full-regression mode')
-    card = source.card_contract(plan)
-    if mode == 'chat-card-80':
-        return {'test_label': 'chat-card80', 'expected': 80,
-                'test_paths': list(card['test_paths']), 'names_key': 'new_chat_card80',
-                'analysis_paths': list(card['analysis_paths'])}
-    return {'test_label': 'full1222', 'expected': plan['current351']['expected_full_tests'],
-            'test_paths': [], 'names_key': 'current_full1222', 'analysis_paths': None}
+    group = source.group_revoke_contract(plan)
+    if mode == 'group-revoke-58':
+        return {'test_label': 'group-revoke58', 'expected': 58,
+                'test_paths': list(group['test_paths']), 'names_key': 'new_group_revoke58',
+                'analysis_paths': list(group['analysis_paths'])}
+    return {'test_label': 'full1280', 'expected': plan['current354']['expected_full_tests'],
+            'test_paths': [], 'names_key': 'current_full1280', 'analysis_paths': None}
 
 
 def card_cleanup_summary(text, contract):
@@ -543,7 +557,47 @@ def card_cleanup_summary(text, contract):
                 model_cases_without_SDK_claim=len(contract['model_names']))
 
 
-def run(work, cohort, reference=False, validation_mode='chat-card-80'):
+def group_revoke_cleanup_summary(text, contract):
+    starts, sequences = {}, {}
+    prefixes = {'group_revoke_cleanup ': ('widget_names', 'widget_markers'),
+                'group_revoke_repository_cleanup ': ('repository_names', 'repository_markers')}
+    for line in text.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if event.get('type') == 'testStart':
+            identity = event['test']['id']
+            if identity in starts:
+                raise ValueError('group revoke cleanup duplicate test start')
+            starts[identity] = event['test'].get('name')
+        if event.get('type') != 'print' or not isinstance(event.get('message'), str):
+            continue
+        for prefix, (group, markers) in prefixes.items():
+            if event['message'].startswith(prefix):
+                identity = event.get('testID')
+                if identity not in starts or starts[identity] not in contract[group]:
+                    raise ValueError('group revoke cleanup unknown or foreign test')
+                sequences.setdefault((group, identity), []).append(event['message'][len(prefix):])
+    counts = {}
+    for group, markers in prefixes.values():
+        actual = []
+        for (kind, identity), sequence in sequences.items():
+            if kind != group:
+                continue
+            name = starts[identity]
+            if name in actual or sequence != contract[markers]:
+                raise ValueError('group revoke cleanup missing/duplicate/out-of-order shutdown tail')
+            actual.append(name)
+        if set(actual) != set(contract[group]):
+            raise ValueError('group revoke cleanup missing owned SDK shutdown sequence')
+        counts[group] = len(actual)
+    return dict(counts, exact_owned_four_marker_sequences=True)
+
+
+def run(work, cohort, reference=False, validation_mode='group-revoke-58'):
     # Invalid mode/reference combinations fail before namespace or child work.
     validation_plan(source.descriptor(), validation_mode, reference)
     prove_namespace()
@@ -567,10 +621,20 @@ def run(work, cohort, reference=False, validation_mode='chat-card-80'):
         text = log.read_text()
         counts['tests'] = machine_summary(text, expected)
         counts['successful_names'] = required_name_summary(text, expected, required[phase['names_key']])
-        card = source.card_contract(plan, required)
-        counts['card_cleanup'] = card_cleanup_summary(text, card)
-        write_json(work / 'evidence' / (label + '.card-cleanup.json'), counts['card_cleanup'])
+        group = source.group_revoke_contract(plan, required)
+        counts['group_revoke_cleanup'] = group_revoke_cleanup_summary(text, group)
+        write_json(work / 'evidence' / (label + '.group-revoke-cleanup.json'), counts['group_revoke_cleanup'])
+        for line in text.splitlines():
+            try:
+                event = json.loads(line)
+            except ValueError:
+                continue
+            if (isinstance(event, dict) and event.get('type') == 'print'
+                    and re.search(r'RenderFlex.*overflow|was not hit-testable|Warning: A call to tester\.(?:tap|longPress)', str(event.get('message', '')))):
+                raise ValueError('UI warnings retained; group revoke not accepted')
         if validation_mode == 'full-regression':
+            counts['card_cleanup'] = card_cleanup_summary(text, source.card_contract(plan, required))
+            write_json(work / 'evidence' / (label + '.card-cleanup.json'), counts['card_cleanup'])
             counts['parent_cleanup'] = call_records_cleanup_summary(text, source.cleanup_contract(plan, required))
             counts['parent_next_unread_cleanup'] = next_unread_cleanup_summary(text, source.next_unread_contract(plan, required))
             write_json(work / 'evidence/full.cleanup.json', counts['parent_cleanup'])
@@ -585,7 +649,7 @@ def run(work, cohort, reference=False, validation_mode='chat-card-80'):
             dart = str(work / 'flutter/bin/cache/dart-sdk/bin/dart')
             for index, path in enumerate(phase['analysis_paths'], 1):
                 guarded([dart, 'analyze', '--fatal-infos', path], work, guard,
-                        'analyze-card-' + str(index).zfill(2))
+                        'analyze-group-revoke-' + str(index).zfill(2))
                 verify(work, cohort)
             counts['selected_analysis_files'] = len(phase['analysis_paths'])
         verify(work, cohort)
@@ -621,10 +685,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current351',), required=True)
+    p.add_argument('--cohort', choices=('current354',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full351 variant; exactly one entry assertion fails and one old filter passes')
-    p.add_argument('--validation-mode', choices=('chat-card-80', 'full-regression'), default='chat-card-80')
+                   help='explicit full354 variant; exactly one entry assertion fails and one old filter passes')
+    p.add_argument('--validation-mode', choices=('group-revoke-58', 'full-regression'), default='group-revoke-58')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')

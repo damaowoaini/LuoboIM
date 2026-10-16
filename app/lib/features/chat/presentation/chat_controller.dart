@@ -22,6 +22,13 @@ final class ChatController extends ChangeNotifier {
       if (event.kind == ImEventKind.conversationsChanged) {
         repository.invalidateSavedEmojiProofs();
       }
+      if (event.kind == ImEventKind.groupsChanged &&
+          conversation?.isGroup == true &&
+          (event.resourceIds.isEmpty ||
+              event.resourceIds.contains(conversation?.groupId))) {
+        ++_revokePolicyRevision;
+        if (!_disposed) notifyListeners();
+      }
       if (event.kind == ImEventKind.historyInvalidated ||
           event.kind == ImEventKind.conversationHistoryInvalidated &&
               event.resourceIds.contains(repository.conversationId)) {
@@ -109,6 +116,7 @@ final class ChatController extends ChangeNotifier {
   bool _disposed = false;
   int _lastMinSeq = 0;
   int _timeline = 0;
+  int _revokePolicyRevision = 0;
   bool _historyNeedsReview = false;
   String? _lastReadId;
   final Map<String, int> progress = {};
@@ -713,6 +721,62 @@ final class ChatController extends ChangeNotifier {
       if (!_disposed) notifyListeners();
     });
     await _draftTail;
+  }
+
+  ChatRevokeIntent captureRevoke(
+    ChatMessage item, {
+    required MessageHistoryAccess access,
+    required bool Function() isCurrent,
+  }) {
+    final original = conversation, policy = _revokePolicyRevision;
+    if (original == null) {
+      throw const AppFailure(FailureKind.cancelled);
+    }
+    void source() {
+      if (!usable ||
+          !isCurrent() ||
+          conversation?.id != original.id ||
+          conversation?.isGroup != original.isGroup ||
+          (conversation?.groupId ?? '') != (original.groupId ?? '') ||
+          (!original.isGroup &&
+              (conversation?.userId ?? '') != (original.userId ?? ''))) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+    }
+
+    return repository.captureRevoke(
+      item,
+      conversation: original,
+      access: access,
+      checkSource: source,
+      checkAuthority: () {
+        if (original.isGroup && policy != _revokePolicyRevision) {
+          throw const AppFailure(FailureKind.cancelled);
+        }
+      },
+    );
+  }
+
+  bool revokeCurrent(ChatRevokeIntent intent, {bool authority = true}) {
+    try {
+      repository.checkRevoke(intent, authority: authority);
+      return true;
+    } on AppFailure {
+      return false;
+    }
+  }
+
+  Future<ChatRevokeResult> executeRevoke(
+    ChatRevokeIntent intent, {
+    required bool Function() isCurrent,
+  }) async {
+    final result = await repository.executeRevoke(intent);
+    if (usable && isCurrent() && result.kind == ChatRevokeKind.acknowledged) {
+      _forget([intent.messageId]);
+      await refresh();
+      if (!_disposed && isCurrent()) notifyListeners();
+    }
+    return result;
   }
 
   Future<void> revoke(ChatMessage item) async {

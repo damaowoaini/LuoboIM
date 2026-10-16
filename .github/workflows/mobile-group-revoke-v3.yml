@@ -1,4 +1,4 @@
-name: Mobile group revoke V3 isolated target5
+name: Historical50ff Mobile group revoke V3 isolated target5
 
 on:
   workflow_dispatch:
@@ -20,6 +20,8 @@ jobs:
       - name: Checkout without stored credentials
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # Historical351 helper pins are intentionally frozen; never alias them to354.
+          ref: 50ff7d3d705c52775bf37840e6bef10fa2a55ae0
           persist-credentials: false
       - name: Linux tester runtime libraries
         run: |

@@ -1,54 +1,45 @@
 {
-  "schema": "luobo.mobile351.card.preparation.v1",
-  "state": "refs_only_CI_draft_source_AST_read_no_CI_tests_or_materialization",
+  "schema": "luobo.mobile354.group-revoke.preparation.v1",
+  "state": "source_only_frozen_no_CI_controls_or_readonly_or_materialization_or_cloud_execution",
   "parent": {
-    "cohort": "current344",
-    "source_members": 344,
-    "portable_members": 396,
-    "aggregate_target460_full1142": "unrun expectations; accepted independent targeted evidence retained"
+    "cohort": "current351",
+    "ref": "50ff7d3d705c52775bf37840e6bef10fa2a55ae0",
+    "inputs": {
+      "path": "ci/mobile/inputs.json",
+      "bytes": 166634,
+      "sha256": "f09379c90e329ab507e5457da942c7e9447648507cfeeb44a09dc81f19c1b55a"
+    },
+    "source_digest": "fc2644ca9333596900be65f95fe0250f2d2106bb8429bc8f2f595c501bb2aba6",
+    "portable_digest": "3e87bd5ae01e2b9ee24b483981585820ab1b1e9745ba7cad66a42c0f8bb40ed9"
   },
-  "source351_digest": "fc2644ca9333596900be65f95fe0250f2d2106bb8429bc8f2f595c501bb2aba6",
-  "portable403_digest": "3e87bd5ae01e2b9ee24b483981585820ab1b1e9745ba7cad66a42c0f8bb40ed9",
-  "reference351_digest": "63a31dba01782006ab4cdc11f31c195a8f501148ad3498b0b2af1835079ed9bb",
   "product_manifest": {
-    "path": "references/integration/mobile-chat-card-profile-r7-candidate-20261017/candidate-manifest.json",
-    "bytes": 18041,
-    "sha256": "48005edcb663313a229d9f0bd1bdee467e5f60443a462323a92f8824b7cbc9ba"
+    "path": "references/integration/mobile-group-message-revoke-v3-candidate-20261017/candidate-manifest.json",
+    "bytes": 7232,
+    "sha256": "88f56b2c18547415c3001e3693d0f42095b1c7b0d74005a3b4799906565cf60e"
   },
-  "effective_vector": {
-    "path": "references/integration/mobile351-card-ci-candidate-20261017/effective-source-vector.json",
-    "bytes": 76255,
-    "sha256": "9f93606dd9d80415fad7b32fdf3f76f222816b66e8ef688641496529060baec8"
+  "selected6_source": "Use immutable V3 after bytes; no product change in this CI candidate.",
+  "source354_digest": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
+  "portable406_digest": "81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c",
+  "reference354_digest": "3c7c332f5ad7381dc7099ec98885bb82ab96b6224328976f81e9747650c0317d",
+  "accepted_cloud_target5": {
+    "path": "references/integration/mobile-group-revoke-cloud-run-38966287079/root-acceptance.json",
+    "bytes": 5081,
+    "sha256": "18833a9cfc0078478ba8b29e9a8de63a73fce00470f3b95abc02a8e762893032"
   },
-  "actual_targeted85": {
-    "path": ".qa/card-r4-1/r7-target1-and-unique85-result.json",
-    "bytes": 36257,
-    "sha256": "80b39e564a6eecc652e71de944a4c62dfc4c232fd20bf3609c00fda95909b942"
-  },
-  "Root_targeted_acceptance": {
-    "path": "references/integration/mobile-chat-card-profile-r7-candidate-20261017/root-targeted-acceptance.json",
-    "bytes": 3022,
-    "sha256": "67817c917f2e6cdb049f06526198e2dba327d520b8a6f4b1f2c8d1b73135b221"
-  },
-  "actual_scope": {
-    "new_unique80_PASS": 80,
-    "direct_old5_PASS": 5,
-    "effective_changed_file_analysis0": 17,
-    "whole_suite_repeats": 0,
-    "native_device_service_acceptance": false
+  "coverage": "60 unique targeted cases across local first59 and V3 cloud5, not a fresh60 run; new58 plus directly affected old2. Native/service not accepted.",
+  "historical_aggregates": "target540/card80/full1222 metadata and old frozen pins retain current351/50ff provenance. New 3chat lineage is explicit.",
+  "manual_modes": {
+    "default": "group-revoke-58",
+    "focused": "only2 new test files58, then6 selected analyses; not run during this preparation",
+    "full": "one full1280 then whole strict analysis, only at final acceptance; no540/58 prerequisite",
+    "reference": "full+explicit reference only; full354 context4 original replacements, exactly entry2 assertion1fail/filter1pass"
   },
   "expected_unrun": {
-    "focused_manual": 80,
-    "descriptor_target": 540,
-    "full": 1222
+    "focused": 58,
+    "full": 1280
   },
-  "manual_modes": {
-    "default": "chat-card-80",
-    "focused": "only3 new test files80 then17 selected analyses; old5 reused locally, not rerun here",
-    "full": "full1222 then whole analysis; no target540 prerequisite",
-    "reference": "only explicitly full+reference; exact4 historical replacement files and1 assertion failure+1 positive, not historical full"
-  },
-  "unchanged": "178 lock packages/4 official WebView archives, SDK51+migration1, native7 historical snapshot outside portable403; scene8/device/GPS not accepted; manual-only actions, netns/4GiB cold/1GiB continuous/.2/768MiB/900s phase/complete event/name/cleanup gates",
-  "public_inventory": "strict authored inventory; local app/tool/check.sh remains private-only and is never copied or excepted in public verification",
-  "CI_controls": "new7+changed Descriptor4 proposed only; old remaining controls reused; no Python unit run in this preparation"
+  "unchanged": "178 dependency identities/archive hashes, SDK51+migration1, native snapshot, toolchain, strict inventory zero exceptions, netns/4GiB cold/1GiB continuous/.2/768MiB/900s, event/footer/names/source/final failure wins gates.",
+  "HOME": "Only new formal setup and netns keep canonical real account HOME; XDG/TMP/PUB_CACHE remain owned. Historical50ff workflow remains explicit old source.",
+  "PG_evidence_limit": "Existing guard child exit and resource evidence retained; no new independent process-group-absence claim.",
+  "actual_new_checks": 0
 }
