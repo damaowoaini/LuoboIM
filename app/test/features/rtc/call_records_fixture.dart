@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show debugPrintSynchronously;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -185,7 +186,7 @@ final class CallRecordsFixture {
     Object? failure;
     StackTrace? failureStack;
     final elapsed = Stopwatch()..start();
-    print('call_records_async $phase.begin');
+    debugPrintSynchronously('call_records_async $phase.begin');
     await tester.runAsync(() async {
       unawaited(Future<T>.sync(operation).then<void>((value) {
         result = value; completed = true;
@@ -199,32 +200,32 @@ final class CallRecordsFixture {
     }
     elapsed.stop();
     if (!completed) {
-      print('call_records_async $phase.timeout');
+      debugPrintSynchronously('call_records_async $phase.timeout');
       throw TimeoutException('Bounded call-record fixture phase: $phase', const Duration(seconds: 20));
     }
     final error = failure;
     if (error != null) {
-      print('call_records_async $phase.error');
+      debugPrintSynchronously('call_records_async $phase.error');
       Error.throwWithStackTrace(error, failureStack ?? StackTrace.current);
     }
-    print('call_records_async $phase.end');
+    debugPrintSynchronously('call_records_async $phase.end');
     return result;
   }
 
   Future<void> close() async {
     if (!_providerOwnsRtc) rtc.dispose();
     try {
-      print('call_records_cleanup recorder.begin');
+      debugPrintSynchronously('call_records_cleanup recorder.begin');
       await history.close().timeout(const Duration(seconds: 10));
-      print('call_records_cleanup recorder.end');
+      debugPrintSynchronously('call_records_cleanup recorder.end');
     } finally {
       history.dispose();
-      print('call_records_cleanup sdk.begin');
+      debugPrintSynchronously('call_records_cleanup sdk.begin');
       await sdk.dispose();
-      print('call_records_cleanup sdk.end');
+      debugPrintSynchronously('call_records_cleanup sdk.end');
       for (final transport in transports) { await transport.dispose(); }
       await directory.delete(recursive: true);
-      print('call_records_cleanup storage.end');
+      debugPrintSynchronously('call_records_cleanup storage.end');
     }
   }
 }

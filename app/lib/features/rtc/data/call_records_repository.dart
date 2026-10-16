@@ -39,8 +39,9 @@ Future<Database> initializeCallRecordsDatabase(DatabaseFactory factory,
 /// Permanently owns one database. Writer events already frozen by the recorder
 /// may drain after logout. UI reads/deletes instead retain their caller's lease.
 final class CallRecordsRepository {
-  CallRecordsRepository({required this.accountKey,
-    CallRecordsDatabaseOpener open = openCallRecordsDatabase}) : _open = open;
+  CallRecordsRepository({required String accountKey,
+    CallRecordsDatabaseOpener open = openCallRecordsDatabase}) : this._(accountKey, open);
+  CallRecordsRepository._(this.accountKey, this._open);
   final String accountKey;
   final CallRecordsDatabaseOpener _open;
   Future<Database>? _database;
@@ -106,7 +107,9 @@ final class CallRecordsRepository {
       if (old.isNotEmpty) {
         final previous = old.single;
         if (previous['terminal'] == 1 ||
-            (previous['event_revision'] as int) >= revision) return;
+            (previous['event_revision'] as int) >= revision) {
+          return;
+        }
         // A restored invitation in a new owner binding does not erase durable
         // accepted/connected facts or change its original admission order.
         data['admitted_at'] = previous['admitted_at'];

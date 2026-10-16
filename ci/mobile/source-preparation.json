@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v9",
-  "state": "current304_call_records_page_r4_pending_cloud",
+  "state": "current304_call_records_lint_r5_pending_cloud",
   "accepted_parent294": {
     "commit": "a2e59b08b125dd67e05c8cdf877235daf1933431",
     "run": 38893402709,
@@ -9,12 +9,12 @@
     "actual": "184/872/strictanalyze0;new18+old854 exact;76sixmarker+safeexit6each;0warnings",
     "root_acceptance_sha256": "80c0a46710fde0adbe61ad77dcb6598a59f01a9a07d011003736371a55ad6e05"
   },
-  "source304_digest": "93c52fce3f0e03cbc1bc2e86803c15624f44db8d141987f910983f342e6457e2",
-  "portable356_digest": "67d6a6d924998209024186dd4b214ff01b74873f870bcbe345c50ae86de95ed9",
+  "source304_digest": "0c7f1c676d45f1cf5eda8ddc04db070ac58fe275de2022ba0b639bed0153fdd8",
+  "portable356_digest": "db14c253f5bd2e3db582079c05128a4e21af9443c03a337e3610cbfee58de7bb",
   "candidate_manifest": {
-    "path": "references/integration/mobile-call-records-r4-page-candidate/candidate-manifest.json",
-    "bytes": 2498,
-    "sha256": "02c8d8831cc4325fee4173a10eb6ee58fc1369bde5159bbc6ef856d41fbdb764"
+    "path": "references/integration/mobile-call-records-r5-lint-candidate/candidate-manifest.json",
+    "bytes": 7787,
+    "sha256": "8c14f0e0b0c8f860eac1074eeb7d527317db46f935399cc79b56ba1f1e69e5b6"
   },
   "current_delta": {
     "selected": 14,
@@ -41,7 +41,7 @@
     "state": "preparedonly;future actualraw/testIDs required"
   },
   "gates": "9protectedAST exact,old28helper assertions preserved,4newcleanup helper tests prepared;officialtoolchain/174locks/SDK51/migration1/resources/netns/fullcompletion unchanged",
-  "reference": "Original optional search defaultoff/same4 replacements/strict1assertFAIL1oldfilterPASS/restoration; new source304digest 45e01cf8f7f1bc2dc7f4497e7e6a75440dbc856e837e371a6a48f970aee72c24. No extra referencephase.",
+  "reference": "Original optional search defaultoff/same4 replacements/strict1assertFAIL1oldfilterPASS/restoration; new source304digest 9d58f575aeeba73ec5c538eb599b107dd4188fce7b716aa57e1da79e5ea8760b. No extra referencephase.",
   "check_sh": "Strict public authored inventory has zeroexceptions;701B known localhelper remains localonly,notcopied/required/uploaded.",
   "old_history_preparation": {
     "schema": "luobo.mobile.source-preparation.v8",
@@ -263,5 +263,29 @@
     "all50_names222_expects": "exact unchanged",
     "actual_Dart_execution": 0,
     "two_fix_scope": "captured owned route+navigator in original sheet finish;explicit44x44/density/taptarget"
+  },
+  "actual_parent_R4": {
+    "run": 38903862919,
+    "job": 116982452406,
+    "commit": "20a217a4304c3be3b6f4e81bba8427bbb8554985",
+    "review": {
+      "path": "references/integration/cloud-mobile-ci/run-38903862919-agent/verification.json",
+      "bytes": 8067,
+      "sha256": "bb596a08b9dba8e2438ec322f9bcd2957a0106df4d1571a545f6b1945259eb9a"
+    },
+    "artifact_sha256": "5893969e58688f157adcc23a4749851ae6714d322e54fd9deaa1fbf8350ee1a0",
+    "actual": "target234/full922 allPASS;old872+new50 exact;22/118hiddenPASS;truefooters0error0skip/warnings;all35recorders14unmounts76creation/safe6both exact;strictanalysis22infochild1",
+    "info_counts": {
+      "prefer_initializing_formals": 1,
+      "braces": 10,
+      "avoid_print": 11
+    }
+  },
+  "current_revision_R5": {
+    "selected_prod": 3,
+    "selected_test_fixture": 4,
+    "all50_names222expects_and11markers": "exact unchanged",
+    "actual_Dart_execution": 0,
+    "equivalent_lint": "constructor redirect1,braces10,synchronous debugPrintSynchronously11; no lint ignore/analysis gate change"
   }
 }

@@ -78,9 +78,13 @@ final class CallHistoryRecorder extends ChangeNotifier {
     final snapshot = session.state;
     final credentials = snapshot.credentials;
     if (snapshot.phase != SessionPhase.online || credentials == null ||
-        !session.acceptsEvent(snapshot.generation)) return;
+        !session.acceptsEvent(snapshot.generation)) {
+      return;
+    }
     if (_owner?.matches(credentials, snapshot.generation) == true &&
-        _owner!.current) return;
+        _owner!.current) {
+      return;
+    }
     seal();
     final binding = _CallHistoryBinding(credentials, snapshot.generation, session,
       _repositories(credentials.accountKey), (binding) {
@@ -116,7 +120,9 @@ final class CallHistoryRecorder extends ChangeNotifier {
   CallHistoryTicket? attempt(ImCallInvitation invitation, String selfId, String title) {
     final binding = _owner;
     if (_closed || binding == null || !binding.current ||
-        invitation.groupId.isNotEmpty) return null;
+        invitation.groupId.isNotEmpty) {
+      return null;
+    }
     try {
       if (selfId != binding.userId) {
         throw const AppFailure(FailureKind.cancelled);

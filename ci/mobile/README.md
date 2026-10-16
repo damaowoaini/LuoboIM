@@ -1,3 +1,35 @@
+# Current304 call-records equivalent strict-analysis R5 (prepared, not run)
+
+R4 run38903862919 completed target234 and full922 with all visible cases passing,
+22/118 hidden successes, unique truefooters and0error/skip/hitTest/overflowwarnings.
+All accepted872 plus new50 successful names match exactly. Both phases completed
+35recorders(33normal/2intentionalclosefailure),14ownedunmounts,76parentcreation
+and safeexit6 in exact order. Overall run failed only strictanalysis22infos:
+1initializingformal,10braces,11avoid_print. Keep original18-member ZIP/raw.
+
+R5 changes3production+4test/fixture files by equivalent lint fixes only. Public
+CallRecordsRepository accountKey:/open: names/defaults remain; it redirects to
+a private initializing-formal constructor so field visibility and opener API do
+not change.10if statements gain braces with original conditions/body/order.11
+print calls become explicitly imported foundation debugPrintSynchronously, whose
+pinned implementation directly calls print(message) at default wrapWidth=null.
+Every marker string/expression/order stays exact and synchronous; no throttled
+debugPrint, await, marker deletion, lint ignore or analysis-gate relaxation.
+
+Original50 names/222 expect expressions and all runner/requiredname/35cleanup/
+76parent/safeexit contracts remain. Only4 of135 parent test/fixture source rows
+change by those equivalent fixes; other131 exact. No new test count or altered
+product behavior. Required normal sequence stays32Python,strict304/356,official
+lockedsetup,target234,full922,strictanalysis0 with exact names/resources/cleanup.
+174locks/SDK51/migration1/network/process/floor/budget are unchanged. Only3CI
+metadata paths bind new304/356 and recompute defaultoff originalsearchreference.
+
+This draft has0localDart/DB/Flutter and0main/public apply/dispatch/rerun/cancel.
+Accepted294/872/strict0 remains history until a complete successor passes strict
+analysis. NextUnread remains unadopted and must rebase any final accepted parent.
+
+## Preserved R4 and earlier documentation
+
 # Current304 call-records page R4 (prepared, not run)
 
 R3 run38902412585 naturally failed: actual target234 fully completed232PASS and

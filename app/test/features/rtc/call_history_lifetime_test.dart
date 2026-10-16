@@ -46,8 +46,10 @@ void main() {
     try {
       final oldKey = f.sdk.session.state.credentials!.accountKey;
       f.overrideOpen = (key) {
-        if (key != oldKey) return initializeCallRecordsDatabase(databaseFactoryFfi,
-          '${f.directory.path}/$key.db', key);
+        if (key != oldKey) {
+          return initializeCallRecordsDatabase(databaseFactoryFfi,
+            '${f.directory.path}/$key.db', key);
+        }
         if (!entered.isCompleted) entered.complete();
         return gate.future;
       };

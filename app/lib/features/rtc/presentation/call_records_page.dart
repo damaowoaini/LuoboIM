@@ -39,10 +39,12 @@ class _CallRecordsPageState extends ConsumerState<CallRecordsPage> {
   }
 
   void _changed() {
-    if (mounted) setState(() {
-      ++_recordVersion;
-      if (_ready) _dirty = true;
-    });
+    if (mounted) {
+      setState(() {
+        ++_recordVersion;
+        if (_ready) _dirty = true;
+      });
+    }
   }
   bool get _ownerCurrent => mounted && (access?.current ?? false);
   bool _current(int view) => _ownerCurrent && view == _view &&
@@ -99,7 +101,9 @@ class _CallRecordsPageState extends ConsumerState<CallRecordsPage> {
             if (!navigator.mounted || sheetRoute?.isActive != true ||
                 sheetRoute?.isCurrent != true ||
                 !identical(sheetRoute?.navigator, navigator) ||
-                (result != null && (!_ownerCurrent || view != _view))) return;
+                (result != null && (!_ownerCurrent || view != _view))) {
+              return;
+            }
             navigator.pop(result);
           }
           return _CallHistoryOverlay(
@@ -134,7 +138,9 @@ class _CallRecordsPageState extends ConsumerState<CallRecordsPage> {
       final actual = await owner.repository.exact(row.id, current: () => _current(view));
       if (!_current(view)) return;
       if (actual == null || actual.claim != row.claim || actual.sequence != row.sequence ||
-          actual.peerId != row.peerId) throw const AppFailure(FailureKind.dataChanged);
+          actual.peerId != row.peerId) {
+        throw const AppFailure(FailureKind.dataChanged);
+      }
       if (deleting && choice == 'delete') {
         await owner.repository.delete(actual, current: () => _current(view));
         if (_current(view)) {
@@ -153,7 +159,9 @@ class _CallRecordsPageState extends ConsumerState<CallRecordsPage> {
         // await. Navigation/permission failure never causes automatic redial.
         final dialing = rtc.dial(inviteeIds: [actual.peerId], video: choice == 'video', title: actual.name);
         if (mounted && _current(view) && rtc.busy &&
-            rtc.call?.inviteeIds.singleOrNull == actual.peerId) context.push('/rtc');
+            rtc.call?.inviteeIds.singleOrNull == actual.peerId) {
+          context.push('/rtc');
+        }
         await dialing;
       }
     } on AppFailure catch (error) {

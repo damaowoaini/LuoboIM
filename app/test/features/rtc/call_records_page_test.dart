@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show debugPrintSynchronously;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imapp/features/conversation/presentation/conversations_page.dart';
@@ -14,9 +15,9 @@ import 'call_records_fixture.dart';
 
 Future<void> finish(WidgetTester tester, CallRecordsFixture f) async {
   try { await f.actual(tester, f.close); } finally {
-    print('call_records_cleanup unmount.begin');
+    debugPrintSynchronously('call_records_cleanup unmount.begin');
     await tester.pumpWidget(const SizedBox()); await tester.pump();
-    print('call_records_cleanup unmount.end');
+    debugPrintSynchronously('call_records_cleanup unmount.end');
   }
 }
 Future<void> seed(CallRecordsFixture f) async {

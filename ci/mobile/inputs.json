@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v9",
-  "state": "current304_call_records_page_r4_pending_cloud",
+  "state": "current304_call_records_lint_r5_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -46,7 +46,8 @@
     "call_records_r1_manifest_sha256": "4f4a31bc0120bf13da2e802adbf7c29189624b4e0d2b372787e1fd88d5837aad",
     "call_records_fixture_R2_manifest_sha256": "f06cfefea9e397d4fe304be39ac8976a6edb7c8e3c7c8318d24a92ab080019b7",
     "call_records_async_fixture_R3_manifest_sha256": "83c5625443dd9649fceb890c8205c95e1452246d73e3f4c6e7ab2f634678b3d6",
-    "call_records_page_R4_manifest_sha256": "02c8d8831cc4325fee4173a10eb6ee58fc1369bde5159bbc6ef856d41fbdb764"
+    "call_records_page_R4_manifest_sha256": "02c8d8831cc4325fee4173a10eb6ee58fc1369bde5159bbc6ef856d41fbdb764",
+    "call_records_lint_R5_manifest_sha256": "8c14f0e0b0c8f860eac1074eeb7d527317db46f935399cc79b56ba1f1e69e5b6"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -325,7 +326,7 @@
     "current304": 356
   },
   "portable_digests": {
-    "current304": "67d6a6d924998209024186dd4b214ff01b74873f870bcbe345c50ae86de95ed9"
+    "current304": "db14c253f5bd2e3db582079c05128a4e21af9443c03a337e3610cbfee58de7bb"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -692,6 +693,23 @@
         "retained delete callback ancestor lookup from deactivated builder context",
         "actual deletion IconButton height40 below44"
       ]
+    },
+    "call_records_page_R4_testsPASS_analysis22infoFAIL": {
+      "run": 38903862919,
+      "job": 116982452406,
+      "commit": "20a217a4304c3be3b6f4e81bba8427bbb8554985",
+      "review": {
+        "path": "references/integration/cloud-mobile-ci/run-38903862919-agent/verification.json",
+        "bytes": 8067,
+        "sha256": "bb596a08b9dba8e2438ec322f9bcd2957a0106df4d1571a545f6b1945259eb9a"
+      },
+      "artifact_sha256": "5893969e58688f157adcc23a4749851ae6714d322e54fd9deaa1fbf8350ee1a0",
+      "actual": "target234/full922 allPASS;old872+new50 exact;22/118hiddenPASS;truefooters0error0skip/warnings;all35recorders14unmounts76creation/safe6both exact;strictanalysis22infochild1",
+      "info_counts": {
+        "prefer_initializing_formals": 1,
+        "braces": 10,
+        "avoid_print": 11
+      }
     }
   },
   "reference_entry": {
@@ -699,7 +717,7 @@
     "default_enabled": false,
     "working_cohort": "current304",
     "members": 304,
-    "reference_source_digest": "45e01cf8f7f1bc2dc7f4497e7e6a75440dbc856e837e371a6a48f970aee72c24",
+    "reference_source_digest": "9d58f575aeeba73ec5c538eb599b107dd4188fce7b716aa57e1da79e5ea8760b",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -765,7 +783,7 @@
   },
   "current304": {
     "members": 304,
-    "source_digest": "93c52fce3f0e03cbc1bc2e86803c15624f44db8d141987f910983f342e6457e2",
+    "source_digest": "0c7f1c676d45f1cf5eda8ddc04db070ac58fe275de2022ba0b639bed0153fdd8",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1489,8 +1507,8 @@
       },
       {
         "path": "app/lib/features/rtc/data/call_records_repository.dart",
-        "bytes": 9273,
-        "sha256": "cf3ed0eb05d18018fd4c14886b8531db13ee3dac16b22580fd185576c33c284b"
+        "bytes": 9365,
+        "sha256": "3775af28c76a4b86f92a1b0aacf8862caacc1a9a329bce04422f4283b2d76e1b"
       },
       {
         "path": "app/lib/features/rtc/data/im_rtc_transport.dart",
@@ -1509,8 +1527,8 @@
       },
       {
         "path": "app/lib/features/rtc/domain/call_history_recorder.dart",
-        "bytes": 11108,
-        "sha256": "177f74b9d4f09cd279ba269d0d1ed9b105d53d68971a953f3655f924661301cb"
+        "bytes": 11150,
+        "sha256": "7e0bf30a58a7f1c3343e4023fdd94ea046ffdee6e285cd2c92d439e9f5b4a993"
       },
       {
         "path": "app/lib/features/rtc/domain/call_record.dart",
@@ -1529,8 +1547,8 @@
       },
       {
         "path": "app/lib/features/rtc/presentation/call_records_page.dart",
-        "bytes": 13187,
-        "sha256": "0cb809de352b7ca854e60a62247bb90dda92418017b5f8249f64540ad0a97302"
+        "bytes": 13277,
+        "sha256": "907e04e77d81c01976e448e95df54e79b3ff5e71992a3b47392e799a07d081d6"
       },
       {
         "path": "app/lib/features/rtc/presentation/call_records_providers.dart",
@@ -2204,23 +2222,23 @@
       },
       {
         "path": "app/test/features/rtc/call_history_lifetime_test.dart",
-        "bytes": 5165,
-        "sha256": "072807a5981169271b55a40546dd8322320b82acea529a4858623b5dbb2543a5"
+        "bytes": 5189,
+        "sha256": "b2fb8d76055edb84e9c417338b213546ad40ebaf6a3a88acaf9ccb7e7777ab81"
       },
       {
         "path": "app/test/features/rtc/call_history_pipeline_test.dart",
-        "bytes": 15607,
-        "sha256": "7ee50266ac155417a380054b04e9aed62e0ed8fc4bf720fa237c76614bbe663f"
+        "bytes": 15631,
+        "sha256": "c1ab3e9c6bb2387ea38931082d99e34a0b7869fec5df6a28c38f3169ea89a773"
       },
       {
         "path": "app/test/features/rtc/call_records_fixture.dart",
-        "bytes": 11696,
-        "sha256": "416044845963a4c8f3fc5254802f6c7e94af0c4ab69ae4ac0cdc7f60e99aa083"
+        "bytes": 11929,
+        "sha256": "89183b7863c023218aa89049d1f31bfe7ae10b626619aebb18f3bbde87275ef5"
       },
       {
         "path": "app/test/features/rtc/call_records_page_test.dart",
-        "bytes": 17221,
-        "sha256": "081e71d872fe9a4f6a8a20188d3122c4212ec618083ac6cae0a58a4dd7265559"
+        "bytes": 17328,
+        "sha256": "0c6de879fa4149ffb6ca4151754d409037e47f0ffa637f4c23c9188b0303baa4"
       },
       {
         "path": "app/test/features/rtc/call_records_repository_test.dart",
