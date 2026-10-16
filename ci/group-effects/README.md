@@ -19,3 +19,7 @@ reused. Preparation and Go commands retain resource logs with a 1 GiB free-space
 floor and 0.2 s sampling; source, module cache and build cache are owned by the
 job, with a 16 GiB allocation cap. The source copy requires 4 GiB free initially.
 No local Go, database, native build, or package download is part of adoption.
+
+The command capture keeps actual JSON stdout separate from dependency download
+diagnostics on stderr. Both original streams and the guard receipt are retained;
+the strict completion parser still rejects malformed JSON or missing test cases.

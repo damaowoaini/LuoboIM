@@ -1,6 +1,8 @@
-import copy
 import importlib.util
 from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 
 spec = importlib.util.spec_from_file_location('effect_run', Path(__file__).with_name('run.py'))
@@ -50,6 +52,18 @@ class ReporterTests(unittest.TestCase):
     def test_missing_required_inventory_rejected(self):
         with self.assertRaises(ValueError):
             runner.audit(events(), 0, PACKAGE, ['TestOne', 'TestMissingMongo'], 1)
+
+    def test_capture_preserves_distinct_streams_and_child_failure(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            out, err = Path(temporary) / 'out', Path(temporary) / 'err'
+            args = [sys.executable, '-B', str(Path(__file__).with_name('capture.py')),
+                    '--stdout', str(out), '--stderr', str(err), '--', sys.executable, '-c',
+                    'import sys;sys.stdout.write("actual stdout");sys.stderr.write("actual stderr");sys.exit(7)']
+            p = subprocess.run(args, capture_output=True, check=False)
+            self.assertEqual(p.returncode, 7)
+            self.assertEqual(out.read_text(), 'actual stdout')
+            self.assertEqual(err.read_text(), 'actual stderr')
+            self.assertEqual(p.stdout, b'')
 
 
 if __name__ == '__main__':

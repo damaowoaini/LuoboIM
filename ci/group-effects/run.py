@@ -168,11 +168,16 @@ def run():
         folder = output / label
         folder.mkdir()
         def command(args, phase, timeout):
-            log, receipt = folder / (phase + '.log'), folder / (phase + '.resource.json')
+            log = folder / (phase + '.log')
+            stderr = folder / (phase + '.stderr.log')
+            receipt = folder / (phase + '.resource.json')
+            capture = [sys.executable, '-B', str(REPO / 'ci/group-effects/capture.py'),
+                       '--stdout', str(log), '--stderr', str(stderr), '--'] + args
             args = [sys.executable, '-B', str(REPO / 'ci/group-effects/resource_guard.py'),
-                    '--cwd', str(work / 'server'), '--log', str(log), '--record', str(receipt),
+                    '--cwd', str(work / 'server'), '--log', str(folder / (phase + '.guard.log')),
+                    '--record', str(receipt),
                     '--min-free-mib', '1024', '--timeout', str(timeout), '--poll-interval', '0.2',
-                    '--allocated-root', str(work), '--max-allocated-mib', '16384', '--'] + args
+                    '--allocated-root', str(work), '--max-allocated-mib', '16384', '--'] + capture
             p = subprocess.run(args, check=False, timeout=timeout + 30)
             resource = json.loads(regular(receipt))
             if p.returncode != 0 or resource['status'] != 'passed' or resource['exit_code'] != 0:

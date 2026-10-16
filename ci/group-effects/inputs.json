@@ -4781,14 +4781,9 @@
   ],
   "controller_inputs": [
     {
-      "path": "ci/backend-integration.sh",
-      "bytes": 9933,
-      "sha256": "96c8025bd7437a3bb6665a31cdfc478514f1e727311e9e0223bc7a32b6655dc4"
-    },
-    {
-      "path": "ci/backend-integration.py",
-      "bytes": 12005,
-      "sha256": "a600a1aeac0a2a82a9b8ef2d586239986158534fb62fc6fd25b1466d3de83650"
+      "path": ".github/workflows/group-effects.yml",
+      "bytes": 2613,
+      "sha256": "67a9b4abf114a6eb5a4f354a8b0dca4eb0221ddb5d07d3b5c791852585847413"
     },
     {
       "path": "ci/backend-integration.json",
@@ -4796,9 +4791,14 @@
       "sha256": "5fd13ececf0593114090e17ed012b0f3e0dcfb0447a6191de897505d8aebd5f2"
     },
     {
-      "path": "ci/secret_scan.py",
-      "bytes": 6600,
-      "sha256": "86b539008eb65f4b81840ea20f13587ca3e87c3cf5796a039ae5d9af4fcd91da"
+      "path": "ci/backend-integration.py",
+      "bytes": 12005,
+      "sha256": "a600a1aeac0a2a82a9b8ef2d586239986158534fb62fc6fd25b1466d3de83650"
+    },
+    {
+      "path": "ci/backend-integration.sh",
+      "bytes": 9933,
+      "sha256": "96c8025bd7437a3bb6665a31cdfc478514f1e727311e9e0223bc7a32b6655dc4"
     },
     {
       "path": "ci/group-authority-foundation.inputs.json",
@@ -4806,14 +4806,14 @@
       "sha256": "0bd28743a3fb82bbf191fa0d13b4309ef033d2d46863ce2ffb5d45a4298616c4"
     },
     {
-      "path": ".github/workflows/group-effects.yml",
-      "bytes": 2613,
-      "sha256": "67a9b4abf114a6eb5a4f354a8b0dca4eb0221ddb5d07d3b5c791852585847413"
+      "path": "ci/group-effects/README.md",
+      "bytes": 1596,
+      "sha256": "cb54b3e7368f441fed5744a3695e932c6fa156d36b48fb2e38aa2df4f104ed98"
     },
     {
-      "path": "ci/group-effects/README.md",
-      "bytes": 1354,
-      "sha256": "52fc6d4ec15f720a96a62dc519f93ea9c0825ba1c4893465b370cae587476590"
+      "path": "ci/group-effects/capture.py",
+      "bytes": 805,
+      "sha256": "d8f7dd31925857d5042e3c89a07a0bc127d1371e6063b4b186b8200d9f93c199"
     },
     {
       "path": "ci/group-effects/resource_guard.py",
@@ -4822,13 +4822,18 @@
     },
     {
       "path": "ci/group-effects/run.py",
-      "bytes": 10532,
-      "sha256": "796a931b8a87eaafa7898292055050139d5b9db097862c32b09f83281ebc5727"
+      "bytes": 10820,
+      "sha256": "4a8b715460bdd6f9759f67f3f77451e7c1c6263d7f22282312da37578d9ecac0"
     },
     {
       "path": "ci/group-effects/test_run.py",
-      "bytes": 2066,
-      "sha256": "c77cf0b6bc9748a1771959ea3c4827677055084ec9e488406487fbeeab87c9bf"
+      "bytes": 2882,
+      "sha256": "75f810773d204aec92fbf259ac03c8180be31543aa0ac53bdce5c3c8f80bae05"
+    },
+    {
+      "path": "ci/secret_scan.py",
+      "bytes": 6600,
+      "sha256": "86b539008eb65f4b81840ea20f13587ca3e87c3cf5796a039ae5d9af4fcd91da"
     }
   ],
   "source_vector_sha256": "6841b4024bf7f0d04cdd7b2b38fa61c687423df75a3ccda6679e4adc4d660b18",
