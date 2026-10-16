@@ -101,7 +101,9 @@
         "TestMongoGroupMemberExactSearchPreservesEffectiveNicknameContract",
         "TestMongoGroupMemberSearchIndexSetupIsRepeatableAndAdditive",
         "TestMongoGroupMemberExactSearchUsesEqualityIndexesOnSyntheticGroup",
-        "TestObjectAliasPersistsOwnerAndHash"
+        "TestObjectAliasPersistsOwnerAndHash",
+        "TestObjectMetadataSameOwnerConcurrentUpsertAndForeignCAS",
+        "TestObjectMetadataUnknownLegacyOwnerRemainsReadOnly"
       ]
     },
     {

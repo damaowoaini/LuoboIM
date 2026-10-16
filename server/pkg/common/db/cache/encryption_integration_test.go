@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
@@ -24,11 +25,27 @@ func TestRedisEncryptionVersionAllocationPreservesHistoryUnderConcurrency(t *tes
 		t.Fatal("only task-private Redis is allowed")
 	}
 	client := redis.NewClient(&redis.Options{Network: "unix", Addr: socket, DB: 15})
-	defer client.Close()
+	// Register Close first: test cleanups run LIFO, after function defers. The
+	// exact fixture key must be removed while this client is still usable.
+	t.Cleanup(func() {
+		if err := client.Close(); err != nil {
+			t.Error("isolated encryption fixture Redis close failed")
+		}
+	})
 	ctx := context.Background()
 	conversation := "luobo_encryption_test_" + uuid.NewString()
 	key := EncryptionKeyPrefix + conversation
-	t.Cleanup(func() { client.Del(ctx, key) })
+	t.Cleanup(func() {
+		cleanup, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		if err := client.Del(cleanup, key).Err(); err != nil {
+			t.Error("exact encryption fixture key deletion failed")
+			return
+		}
+		if remaining, err := client.Exists(cleanup, key).Result(); err != nil || remaining != 0 {
+			t.Error("exact encryption fixture key absence unconfirmed")
+		}
+	})
 	old := "old-legacy-key-must-stay-unchanged"
 	if err := client.HSet(ctx, key, "1", old, MaxVersionKeyField, "1").Err(); err != nil {
 		t.Fatal(err)
