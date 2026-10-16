@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v7",
-  "state": "current292_chat_cid_page_key_pending_cloud",
+  "state": "current292_chat_cid_route_fixture_r2_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -37,7 +37,8 @@
     "create_group_avatar_analysis_r5_manifest_sha256": "ed5e62c2a994f946875817f5ee0352f44a97edb9851a73834edc87171bf989d9",
     "owned_confirmation_fixture_manifest_sha256": "0bea1f0b326815098bcd5021cdb57c758a6e58ee2ab436a7935a3ba6c2583e18",
     "group_creation_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
-    "chat_cid_page_key_r1_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689"
+    "chat_cid_page_key_r1_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
+    "chat_cid_page_key_fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -316,7 +317,7 @@
     "current292": 344
   },
   "portable_digests": {
-    "current292": "7a35bb7ec45d998fa1f64e5e5526f33275cb459d0841b4eebd8cfff870908929"
+    "current292": "4d9db11a88184abd30c1e00b89dfbe0dee631ed9448a0bd123728a8fe47906f5"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -565,6 +566,23 @@
       "actual": "target163:162PASS1bounded-conditionERROR;16hiddenPASS;allnamescompleted;old134PASS,new28/1;0skip;falsefooter;full851/analyze notstarted",
       "confirmed_source": "go_router defaultpatternpagekey preserves associatedpageless routes; ChatPage latefinalcontroller firstCID. New composition must also preserve imperativepush state.pageKey.",
       "accepted": false
+    },
+    "current292_chat_cid_first_failure": {
+      "commit": "e66daa13011a8affa94b151c4020dcb2868d2990",
+      "run": 38884973381,
+      "job": 116920393682,
+      "source292_digest": "9a5f121c46bff5131cc8aaf00f299f70385d32fb6e5f9ab4c943d4200fb3fbb4",
+      "portable344_digest": "7a35bb7ec45d998fa1f64e5e5526f33275cb459d0841b4eebd8cfff870908929",
+      "artifact_zip_sha256": "b5c6106668b9a4b963181fc335dd6ad27c389a9c52ec23e0fe76f95d9e56b3a2",
+      "agent_verification_sha256": "879bd98dc2a8cd60e73336ea5e77442a6a02cbefc94c9d281fec450b508c9372",
+      "actual": "target166:164PASS2fixtureFinderERROR/17hiddenPASS0skipfalsefooter;old134+29PASS,newproductionfirstPASS;full854/analyze notstarted",
+      "errors": [
+        "chat_cid_route_test118 Too many elements during go transition",
+        "chat_cid_route_test172 Too many elements during repeatedpush transition"
+      ],
+      "product_causal_evidence": "Prior failed group expansion retry and actualproductionrouter first case passed;exact2groupreads+3ownedcompleted/newCIDcontroller/metadata/history assertions completed. Not full854 acceptance.",
+      "cleanup": "58fixture instances each6markersordered;0hitTest/overflowwarnings",
+      "accepted": false
     }
   },
   "reference_entry": {
@@ -572,7 +590,7 @@
     "default_enabled": false,
     "working_cohort": "current292",
     "members": 292,
-    "reference_source_digest": "b366ccecea58aa3f787caf3843736415df35e23099a50e5f7fae62027c1052af",
+    "reference_source_digest": "fead30ccdd2301d70e85d469fb0e9578e6510439ebae4898d226a73c2e19ec43",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -636,7 +654,7 @@
   },
   "current292": {
     "members": 292,
-    "source_digest": "9a5f121c46bff5131cc8aaf00f299f70385d32fb6e5f9ab4c943d4200fb3fbb4",
+    "source_digest": "32c72f4dc15f21a48b269813d0cefb7f20329eee16f1c5441f2970d1d15f6d86",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1810,8 +1828,8 @@
       },
       {
         "path": "app/test/features/group/chat_cid_route_test.dart",
-        "bytes": 11175,
-        "sha256": "82a601ada84e2c10c1adf98ed09176487f07675a788e74da98b29d75c2eddf0a"
+        "bytes": 12401,
+        "sha256": "5d8783dc99ca61734b5ff60f6756df6a4ae9f01246bbc1297be94176b8d53d2b"
       },
       {
         "path": "app/test/features/group/create_group_entry_test.dart",
@@ -1855,8 +1873,8 @@
       },
       {
         "path": "app/test/features/group/group_creation_entry_fixture.dart",
-        "bytes": 7300,
-        "sha256": "49a0e8646784399ba84dc813f916eca30196d7334fa33bc60068c45168b2b523"
+        "bytes": 7316,
+        "sha256": "358ff6f02b3952286ca61e8aa95cbcd3177b28148b0b0187a32f2c7ee0903576"
       },
       {
         "path": "app/test/features/group/group_creation_entry_test.dart",

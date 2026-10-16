@@ -14,6 +14,15 @@ import 'package:imapp/features/search/domain/global_search.dart';
 import '../../core/im/sdk_harness.dart';
 import 'group_creation_entry_fixture.dart';
 
+// During a Navigator transition both the outgoing and incoming ChatPage can
+// be onstage. Select only the exact CID on its current route; do not guess by
+// element ordering or treat an outgoing page as the incoming controller.
+Finder currentChat(String cid) => find.byElementPredicate((element) {
+  final widget = element.widget;
+  if (widget is! ChatPage || widget.conversationId != cid) return false;
+  return ModalRoute.of(element)?.isCurrent == true;
+});
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -112,7 +121,16 @@ void main() {
         messageId: 'anchor-message', isCurrent: () => selectionCurrent);
       final router = f.creation.router!;
       expect(router, same(f.creation.container.read(routerProvider)));
+      final sourcePage = currentChat('origin-cid');
+      await f.creation.readyRoute(tester, sourcePage);
+      final sourceRoute = ModalRoute.of(tester.element(sourcePage))!;
+      var sourceCompleted = false;
+      unawaited(sourceRoute.completed.then<void>((_) { sourceCompleted = true; }));
       router.go('/chat/anchor-cid?message=anchor-message&source=global', extra: selection);
+      final incoming = currentChat('anchor-cid');
+      await f.until(tester, () => incoming.evaluate().length == 1);
+      await f.creation.readyRoute(tester, incoming);
+      await f.until(tester, () => sourceCompleted);
       await f.until(tester, () => find.text('正在查看来源消息').evaluate().isNotEmpty &&
         find.text('原消息定位正文').evaluate().isNotEmpty);
       final before = tester.state<State<ChatPage>>(find.byType(ChatPage));
@@ -168,9 +186,13 @@ void main() {
       for (final cid in ['origin-cid', 'second-cid', 'origin-cid']) {
         final previous = visited.last;
         unawaited(router.push<void>('/chat/$cid'));
-        await f.until(tester, () => find.byType(ChatPage).evaluate().isNotEmpty &&
-          !identical(tester.state<State<ChatPage>>(find.byType(ChatPage)), previous));
-        await f.creation.readyRoute(tester, find.byType(ChatPage));
+        final incoming = currentChat(cid);
+        await f.until(tester, () => incoming.evaluate().length == 1 &&
+          !identical(tester.state<State<ChatPage>>(incoming), previous));
+        await f.creation.readyRoute(tester, incoming);
+        // Covered pages remain mounted by design. Ordinary single finders are
+        // valid only after this incoming route's actual entrance completes.
+        await f.until(tester, () => find.byType(ChatPage).evaluate().length == 1);
         await f.until(tester, () => tester.widget<TextField>(find.byType(TextField)).controller != null);
         final current = tester.state<State<ChatPage>>(find.byType(ChatPage));
         final route = ModalRoute.of(tester.element(find.byType(ChatPage)))!;

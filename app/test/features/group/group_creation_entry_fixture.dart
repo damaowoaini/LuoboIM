@@ -75,7 +75,8 @@ final class GroupEntryFixture {
     final theme = await captureTheme(tester);
     _providerOwnsRouter = productionRouter;
     if (productionRouter) creation.base.sdk.runtime.phase = AppPhase.online;
-    if (!productionRouter) creation.router = GoRouter(initialLocation: value == CreationSurface.chat ? '/chat/origin-cid' : '/', routes: [
+    if (!productionRouter) {
+      creation.router = GoRouter(initialLocation: value == CreationSurface.chat ? '/chat/origin-cid' : '/', routes: [
       GoRoute(path: '/', builder: (_, _) => value == CreationSurface.contacts
         ? const ContactsPage() : const ConversationsPage()),
       // Same CID-owned page contract as the actual routerProvider. The
@@ -89,7 +90,8 @@ final class GroupEntryFixture {
       }),
       GoRoute(path: '/contacts/groups', builder: (_, _) => const Scaffold(body: Text('group-list'))),
       GoRoute(path: '/blank', builder: (_, _) => const Scaffold(body: Text('blank-route'))),
-    ]);
+      ]);
+    }
     await tester.pumpWidget(ProviderScope(overrides: [
       imGatewayProvider.overrideWithValue(creation.base.sdk.gateway),
       appRuntimeProvider.overrideWith((_) => creation.base.sdk.runtime),

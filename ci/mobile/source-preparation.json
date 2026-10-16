@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v7",
-  "state": "current292_chat_cid_page_key_source_only_pending_cloud",
+  "state": "current292_chat_cid_route_fixture_r2_pending_cloud",
   "accepted_parent287": {
     "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
     "actual_run": 38878571484,
@@ -31,8 +31,8 @@
     "accepted": false
   },
   "candidate_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
-  "source292_digest": "9a5f121c46bff5131cc8aaf00f299f70385d32fb6e5f9ab4c943d4200fb3fbb4",
-  "portable344_digest": "7a35bb7ec45d998fa1f64e5e5526f33275cb459d0841b4eebd8cfff870908929",
+  "source292_digest": "32c72f4dc15f21a48b269813d0cefb7f20329eee16f1c5441f2970d1d15f6d86",
+  "portable344_digest": "4d9db11a88184abd30c1e00b89dfbe0dee631ed9448a0bd123728a8fe47906f5",
   "delta": {
     "existing": 3,
     "new": 1,
@@ -58,5 +58,25 @@
   "identity_contract": "Page key=(state.pageKey.value,exactCID) preserves uniqueimperativepush; CID changes get freshpage+ownedpagelessretirement; sameCIDquery/metadata retains page/anchor/draft.",
   "dependency_and_gates": "SDK51+migration1/174lockeddependencies/lock/pubspec/Flutter/SQLite unchanged. 4GiBinitial/1GiB .2s/768MiB/900s/netns/9AST failureandcompletion logic unchanged.",
   "public_inventory": "Zeroexceptions;knownlocal app/tool/check.sh remains local-onlyabsentpublic.",
-  "native_service_acceptance": false
+  "native_service_acceptance": false,
+  "current292_actual_failure": {
+    "commit": "e66daa13011a8affa94b151c4020dcb2868d2990",
+    "run": 38884973381,
+    "job": 116920393682,
+    "source292_digest": "9a5f121c46bff5131cc8aaf00f299f70385d32fb6e5f9ab4c943d4200fb3fbb4",
+    "portable344_digest": "7a35bb7ec45d998fa1f64e5e5526f33275cb459d0841b4eebd8cfff870908929",
+    "artifact_zip_sha256": "b5c6106668b9a4b963181fc335dd6ad27c389a9c52ec23e0fe76f95d9e56b3a2",
+    "agent_verification_sha256": "879bd98dc2a8cd60e73336ea5e77442a6a02cbefc94c9d281fec450b508c9372",
+    "actual": "target166:164PASS2fixtureFinderERROR/17hiddenPASS0skipfalsefooter;old134+29PASS,newproductionfirstPASS;full854/analyze notstarted",
+    "errors": [
+      "chat_cid_route_test118 Too many elements during go transition",
+      "chat_cid_route_test172 Too many elements during repeatedpush transition"
+    ],
+    "product_causal_evidence": "Prior failed group expansion retry and actualproductionrouter first case passed;exact2groupreads+3ownedcompleted/newCIDcontroller/metadata/history assertions completed. Not full854 acceptance.",
+    "cleanup": "58fixture instances each6markersordered;0hitTest/overflowwarnings",
+    "accepted": false
+  },
+  "fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd",
+  "fixture_r2_scope": "Only2test/fixture files:exactCID+currentRoute incoming finder;realanimation/sourceTransitionRoute.completed;preserve3names/all47expect and allold822+29. Equivalentbraces around multiline manualrouter assignment;not anactualanalysisFAIL claim. Product andrunner unchanged.",
+  "actual_r2_Dart_tests": 0
 }
