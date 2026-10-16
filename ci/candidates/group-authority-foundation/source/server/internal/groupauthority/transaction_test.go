@@ -14,6 +14,7 @@ import (
 // This wrapper observes the real pinned driver session, not a replacement
 // transaction implementation. The actual command Mock below owns no socket.
 type observedAuthoritySession struct {
+	mongo.Session
 	mongo.XSession
 	aborts        int
 	ends          int
@@ -26,14 +27,14 @@ func (s *observedAuthoritySession) AbortTransaction(ctx context.Context) error {
 	if deadline, ok := ctx.Deadline(); ok {
 		s.abortDeadline = time.Until(deadline)
 	}
-	return s.XSession.AbortTransaction(ctx)
+	return s.Session.AbortTransaction(ctx)
 }
 func (s *observedAuthoritySession) EndSession(ctx context.Context) {
 	s.ends++
 	if deadline, ok := ctx.Deadline(); ok {
 		s.endDeadline = time.Until(deadline)
 	}
-	s.XSession.EndSession(ctx)
+	s.Session.EndSession(ctx)
 }
 
 func TestGroupAuthorityDriverTransactionRetryAndUnknownCommitBudget(t *testing.T) {
@@ -53,7 +54,7 @@ func TestGroupAuthorityDriverTransactionRetryAndUnknownCommitBudget(t *testing.T
 		if err != nil {
 			mt.Fatal(err)
 		}
-		session := &observedAuthoritySession{XSession: raw.(mongo.XSession)}
+		session := &observedAuthoritySession{Session: raw, XSession: raw.(mongo.XSession)}
 		mt.Cleanup(func() {
 			if mt.Client.NumberSessionsInProgress() != 0 {
 				mt.Error("driver session leaked")

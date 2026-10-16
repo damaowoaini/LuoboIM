@@ -37,8 +37,8 @@
     },
     {
       "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/mongo_integration_test.go",
-      "bytes": 19320,
-      "sha256": "ab4ea458c3c3c3e5d5cbf5fb8d6f0534686917dbd2c012b55d5a4aa7d2ca5c20"
+      "bytes": 19347,
+      "sha256": "fb18979f00a58fe2e81db3624bdd1ed5d163f52fa859216869946b5b9a0f4f52"
     },
     {
       "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/recovery.go",
@@ -62,12 +62,12 @@
     },
     {
       "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/transaction_test.go",
-      "bytes": 7479,
-      "sha256": "126f4d00af88d62e40dc003e197da0a8c92b20f4b40f1f60c7f4c31ae002f97d"
+      "bytes": 7506,
+      "sha256": "e134a2964a288f03ed9205887a68c1e702236e640da0cc4a29e8f1fdf66704a3"
     }
   ],
   "source_members": 12,
-  "source_digest": "c2d9264429de36734d98fa84febb145f2250e8a0cbfc9c1c1cfe4b9da6b7314c",
+  "source_digest": "44e5c6d1bcb11faa94d07110669ad150c8eb6bcb549653e368622e9ad364147f",
   "module_inputs": [
     {
       "path": "server/go.mod",
@@ -161,5 +161,8 @@
   ],
   "expected_before_is_reference_not_real_RPC": true,
   "runtime_or_RPC_adoption": false,
-  "actual_tests_at_preparation": 0
+  "actual_tests_at_preparation": 0,
+  "source_revision": "v2-r1_test_wrapper_only",
+  "test_only_successor_manifest_sha256": "0f5bec657a26e5467145fdfaa684ff1053bbdf9f56fdbb61d457e70d7dc85f22",
+  "original_compile_failure_run": 38855907561
 }

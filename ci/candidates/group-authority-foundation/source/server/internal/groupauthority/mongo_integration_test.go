@@ -407,6 +407,7 @@ func TestGroupAuthorityMongoWholeGroupScopeUsesOnlyActualMembers(t *testing.T) {
 // once at this private driver-session boundary. This is controlled lost-ACK
 // recovery testing, not a claim to have dropped actual network packets.
 type lostAuthorityCommitACK struct {
+	mongo.Session
 	mongo.XSession
 	commits int
 	aborts  int
@@ -415,7 +416,7 @@ type lostAuthorityCommitACK struct {
 
 func (s *lostAuthorityCommitACK) CommitTransaction(ctx context.Context) error {
 	s.commits++
-	err := s.XSession.CommitTransaction(ctx)
+	err := s.Session.CommitTransaction(ctx)
 	if err == nil && s.commits == 1 {
 		if s.cancel != nil {
 			s.cancel()
@@ -426,7 +427,7 @@ func (s *lostAuthorityCommitACK) CommitTransaction(ctx context.Context) error {
 }
 func (s *lostAuthorityCommitACK) AbortTransaction(ctx context.Context) error {
 	s.aborts++
-	return s.XSession.AbortTransaction(ctx)
+	return s.Session.AbortTransaction(ctx)
 }
 
 func TestGroupAuthorityMongoAcknowledgedCommitLostAtBoundaryNeverReplaysWrite(t *testing.T) {
@@ -444,7 +445,7 @@ func TestGroupAuthorityMongoAcknowledgedCommitLostAtBoundaryNeverReplaysWrite(t 
 			if err != nil {
 				t.Fatal(err)
 			}
-			session := &lostAuthorityCommitACK{XSession: raw.(mongo.XSession)}
+			session := &lostAuthorityCommitACK{Session: raw, XSession: raw.(mongo.XSession)}
 			if cancelAfterCommit {
 				session.cancel = cancel
 			}
