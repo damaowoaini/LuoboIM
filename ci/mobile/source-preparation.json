@@ -1,17 +1,17 @@
 {
   "schema": "luobo.mobile.source-preparation.v11",
-  "state": "current310_booking_capability_R4_parent_prepared_pending_cloud",
-  "source310_digest": "a346e7204c0418a821bee7d8bcd02313cea1df4bc506d5f39a07dbe87464501e",
-  "portable362_digest": "948cc2098d5af06fa9c4a910e7db1f1affb91280ae70fd58545edabfa206664e",
+  "state": "current310_booking_capability_fixture_r1_pending_cloud",
+  "source310_digest": "82d6003e35ea82bb6af5c9f65e8e136496e5b4c57ae4310dfd3e13932bdd8e17",
+  "portable362_digest": "ddc5b027387872be6452c53cdb77f4703a7bc82e9e2e0cb2bbc044a47496534e",
   "capability_candidate": {
     "path": "references/integration/meeting-booking-capability-v1-candidate/candidate-manifest.json",
     "bytes": 5535,
     "sha256": "8748f020710df3f5382dcf5d5cebb972238e3771f40174523c1c749870e1a330"
   },
   "effective_vector": {
-    "path": "references/integration/mobile310-booking-capability-r4-parent-ci-candidate/effective-source-vector.json",
-    "bytes": 58300,
-    "sha256": "b13eb446a986f39123c16bf765bc9db7ce14c588a0247eccaa10de5dcd80d4c2"
+    "path": "references/integration/mobile310-booking-capability-fixture-r1-candidate/effective-source-vector.json",
+    "bytes": 58281,
+    "sha256": "2484ea857f3258fd0729cfe1663054fdc0debbcbbf6bd948c679e40bd448be3b"
   },
   "expected_not_actual": {
     "target281": 281,
@@ -514,5 +514,25 @@
     "path": "references/integration/mobile310-booking-capability-ci-candidate/ci-adoption-manifest.json",
     "bytes": 8184,
     "sha256": "489b3c5187dad1de06ee8429f5ea18071a885bf0c9279af6442ed75c1ab402c5"
+  },
+  "fixture_r1": {
+    "manifest": {
+      "path": "references/integration/mobile310-booking-capability-fixture-r1-candidate/candidate-manifest.json",
+      "bytes": 2491,
+      "sha256": "ff547063f8da9c770331bf6fbbdf671e73f969e175c72e3835759f3f79263c14"
+    },
+    "scope": "localnonnullable awaitedreturn; original8names/allassertions unchanged;production0",
+    "actual_Dart_tests": 0
+  },
+  "actual_first310": {
+    "commit": "527ba5266137917328d7f51b5f372c4b7dbf1c1f",
+    "run": 38913502807,
+    "job": 117014972642,
+    "agent": {
+      "path": "references/integration/cloud-mobile-ci/run-38913502807-agent/verification.json",
+      "bytes": 6722,
+      "sha256": "ce74d3b2fbfc8eaca633411bceea5938fd622d63828c8fa71a1f7888b41100fc"
+    },
+    "actual": "273parentPASS+1visibleloaderERROR/26hiddenPASS/300startdonefalsefooter;8newunrun;full963/analyze notstarted"
   }
 }

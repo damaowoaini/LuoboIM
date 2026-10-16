@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v11",
-  "state": "current310_booking_capability_R4_parent_prepared_pending_cloud",
+  "state": "current310_booking_capability_fixture_r1_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -94,6 +94,11 @@
         "bytes": 126110,
         "sha256": "4e1ddd0ff227ca421010fb00f937414bd3d130ca100fb0dddec6490d215e34a5"
       }
+    },
+    "booking_capability_fixture_r1": {
+      "path": "references/integration/mobile310-booking-capability-fixture-r1-candidate/candidate-manifest.json",
+      "bytes": 2491,
+      "sha256": "ff547063f8da9c770331bf6fbbdf671e73f969e175c72e3835759f3f79263c14"
     }
   },
   "toolchain": {
@@ -373,7 +378,7 @@
     "current310": 362
   },
   "portable_digests": {
-    "current310": "948cc2098d5af06fa9c4a910e7db1f1affb91280ae70fd58545edabfa206664e"
+    "current310": "ddc5b027387872be6452c53cdb77f4703a7bc82e9e2e0cb2bbc044a47496534e"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -799,6 +804,17 @@
       "actual": "273PASS+26hidden/full955PASS+121hidden/strictanalyze0;allrequiredname multisets/cleanup exact;0errors0skip0warning;3resource child0/nogate",
       "public_HEAD_context": "3bf70123f0a8a05eb63f952f75486a3f1a96b9d6",
       "non_mobile_HEAD_change": "Only native8 changed after accepted mobile commit; all13 mobile/CI before and full309/SDK51 checked in bothtrees."
+    },
+    "current310_first_loader_failure": {
+      "commit": "527ba5266137917328d7f51b5f372c4b7dbf1c1f",
+      "run": 38913502807,
+      "job": 117014972642,
+      "agent": {
+        "path": "references/integration/cloud-mobile-ci/run-38913502807-agent/verification.json",
+        "bytes": 6722,
+        "sha256": "ce74d3b2fbfc8eaca633411bceea5938fd622d63828c8fa71a1f7888b41100fc"
+      },
+      "actual": "273parentPASS+1visibleloaderERROR/26hiddenPASS/300startdonefalsefooter;8newunrun;full963/analyze notstarted"
     }
   },
   "reference_entry": {
@@ -806,7 +822,7 @@
     "default_enabled": false,
     "working_cohort": "current310",
     "members": 310,
-    "reference_source_digest": "9569162a8fc1d672a32850672a3e6e3a1e0dbaab036f3c3c4e87bca66f5d0341",
+    "reference_source_digest": "42e9deed9d11b7da42cb37f87acf5ceb881ca8691b2b6d41840ad1563a326e0f",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -1382,7 +1398,7 @@
   },
   "current310": {
     "members": 310,
-    "source_digest": "a346e7204c0418a821bee7d8bcd02313cea1df4bc506d5f39a07dbe87464501e",
+    "source_digest": "82d6003e35ea82bb6af5c9f65e8e136496e5b4c57ae4310dfd3e13932bdd8e17",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -2676,8 +2692,8 @@
       },
       {
         "path": "app/test/features/meeting/booking/booking_capability_discovery_test.dart",
-        "bytes": 9638,
-        "sha256": "b8affa2a5679b9ea76e31d4bc18cffeeb7d560c4f9a8d2a6b6b44132bd48749a"
+        "bytes": 9674,
+        "sha256": "e5d142433ec684f0f94110c40689d44ffd3a639541eb7f02c39822d8d691c073"
       },
       {
         "path": "app/test/features/meeting/booking/booking_controller_test.dart",

@@ -100,7 +100,9 @@ final class _DiscoveryFixture {
     ]);
     container = scope;
     scope.listen(bookingControllerProvider, (_, _) {});
-    return controller = await scope.read(bookingControllerProvider.future);
+    final ready = await scope.read(bookingControllerProvider.future);
+    controller = ready;
+    return ready;
   }
   int calls(String action) => requests.where((r) => r.uri.path.endsWith('/$action')).length;
   Future<void> close() async {
