@@ -25,3 +25,10 @@ R2 b6510c4/run38886359953 completed target166PASS(17hidden), full853PASS/1oldcle
 R3 changes only that old clear branch: use the product's existing scrollable settings sheet, ensureVisible and settle, assert the owned route is current and the text hitTestable, keep its exact original real tap, then observe the actual sheet TransitionRoute.completed after the existing settling step. All14 original expect expressions and all names remain, with3 added interaction assertions. No fixedsleep/timeout change/warn suppression/first-or-last page guess/product change.
 
 Only this1 test plus3 metadata vectors change. All292/344 identities are explicit by digest. Mandatory target166/full854/analyze0, successful old822+29+3 name multisets,28Python gates, originalcontroller9 functions, workflow/setup/netns/SDK51/migration/174dependencies/locks/resource/completion remain unchanged. New r3Dart results are0; originalsearch1FAIL1PASS remains defaultoff and groupbefore2 preparedonly.
+
+
+## Group-entry strict-analysis r4 (not yet run)
+
+R3 run38887695138 completed actual target166 and full854 with unique true footers,0error/skip,old822+29+3 success-name multisets exact,0hitTest/overflowwarnings; all58 creation fixtures completed their six cleanup markers and safe-exit six stages in both phases. Overall workflow FAILED only strictanalysis3infos in group_creation_action.dart (braces, explicit postawait mounted, null-aware collection element). Preserve the16-member original ZIP/raw/resource and accepted287 parent; tests passing is not complete current292 acceptance or native/device acceptance.
+
+R4 changes only that production file by equivalent braces, explicit mounted plus ALL original owner/view/current guards before Navigator, and language-supported [?selectedPeer]. No test/assertion/name, SDK, lock, dependency, CI controller, completion/resource/network gate changes. Input292/portable344 digests bind the exact one-file delta. Mandatory target166→full854→strictanalyze0 and exact accepted822+29+3 names remain. New R4 actualDart results0; original search reference remains defaultoff1assertFAIL1PASS and groupbefore2 preparedonly.

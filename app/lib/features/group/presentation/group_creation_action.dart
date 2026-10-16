@@ -86,7 +86,9 @@ class _GroupCreationActionState extends ConsumerState<GroupCreationAction> {
     final selectedPeer = peer;
     final verification = widget.checkVerification;
     if (selectedPeer != null && (selectedPeer.id.isEmpty ||
-        selectedPeer.id == contacts.access.credentials.userId)) return;
+        selectedPeer.id == contacts.access.credentials.userId)) {
+      return;
+    }
     setState(() => busy = true);
     try {
       if (verification) {
@@ -113,12 +115,12 @@ class _GroupCreationActionState extends ConsumerState<GroupCreationAction> {
           return;
         }
       }
-      if (!current()) return;
+      if (!mounted || !current()) return;
       await Navigator.of(context).push<void>(MaterialPageRoute(
         builder: (_) => SelectContactsPage(
           title: '创建群聊',
           createGroup: true,
-          initialMembers: [if (selectedPeer != null) selectedPeer],
+          initialMembers: [?selectedPeer],
           expectedOwner: contacts,
           expectedGroups: group,
         ),

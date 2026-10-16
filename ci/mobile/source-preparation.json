@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v7",
-  "state": "current292_clear_menu_fixture_r3_pending_cloud",
+  "state": "current292_group_entry_analysis_r4_pending_cloud",
   "accepted_parent287": {
     "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
     "actual_run": 38878571484,
@@ -31,8 +31,8 @@
     "accepted": false
   },
   "candidate_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
-  "source292_digest": "524af72fc57424854b4b426526fb292b6a465bfeb385e526742496abbb31c126",
-  "portable344_digest": "fd107538a56276af605e7c712e451b78015497f43561b7065880abedab12d3a1",
+  "source292_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
+  "portable344_digest": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08",
   "delta": {
     "existing": 3,
     "new": 1,
@@ -92,5 +92,26 @@
   },
   "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd",
   "clear_menu_r3_scope": "Onlyoldclearvariantactualscroll/hitTest/owned-sheet-completedbarrier;14expectpreserved3added;no product/runner/name/resourcechange",
-  "actual_r3_Dart_tests": 0
+  "actual_r3_Dart_tests": 0,
+  "current292_clear_menu_r3_actual": {
+    "commit": "1a9ec3a33cf5a264d4d0e2e266dafac4bebe1e6e",
+    "run": 38887695138,
+    "job": 116929353370,
+    "artifactID": 12040872287,
+    "ZIP_bytes": 96848,
+    "ZIP_sha256": "a363eecf26318313311ef886633a9b6f32ae7c961a75bdb7087b39e4c4a85f23",
+    "verification_sha256": "7a25dc4b12671bf1f7722c078fd7da1c60e8b8f6907e1a4c7cf08fdff3c80094",
+    "source292_digest": "524af72fc57424854b4b426526fb292b6a465bfeb385e526742496abbb31c126",
+    "portable344_digest": "fd107538a56276af605e7c712e451b78015497f43561b7065880abedab12d3a1",
+    "actual": "166PASS17hidden/full854PASS113hidden;truefooters0errors0skip;old822+29+3 exact;0hitTest/overflow;58six-marker cleanups+safeexit6 each;analyze3info/child1",
+    "analysis_issues": [
+      "group_creation_action.dart89 braces",
+      "group_creation_action.dart117 explicitmounted",
+      "group_creation_action.dart121 nullawareelement"
+    ],
+    "accepted_workflow": false
+  },
+  "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257",
+  "analysis_r4_scope": "Onlyexistinggroup_creation_action:equivalentbraces;explicitmounted&&originalcurrentbeforeNavigator;[?selectedPeer].Zerochangesalltests/names/runner/locks/resources/network.",
+  "actual_analysis_r4_Dart_tests": 0
 }

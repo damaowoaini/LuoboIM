@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v7",
-  "state": "current292_clear_menu_fixture_r3_pending_cloud",
+  "state": "current292_group_entry_analysis_r4_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -39,7 +39,8 @@
     "group_creation_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
     "chat_cid_page_key_r1_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
     "chat_cid_page_key_fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd",
-    "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd"
+    "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd",
+    "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -318,7 +319,7 @@
     "current292": 344
   },
   "portable_digests": {
-    "current292": "fd107538a56276af605e7c712e451b78015497f43561b7065880abedab12d3a1"
+    "current292": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -595,6 +596,24 @@
       "actual": "target166PASS/17hidden/truefooter;full853PASS1oldclearfixtureERROR/113hidden/falsefooter;all29+3passboth;analysisnotstarted",
       "cause": "oldtesttapclearcenter396,634.5outside800x600;actualsettingshasSingleChildScrollView;confirm0matchedaftermissedtap",
       "not_claimed": "CIDrevocationassertionsafterfailedconfirmdidnotruninfull;notall854PASS"
+    },
+    "current292_clear_menu_r3_testsPASS_analysis3infoFAIL": {
+      "commit": "1a9ec3a33cf5a264d4d0e2e266dafac4bebe1e6e",
+      "run": 38887695138,
+      "job": 116929353370,
+      "artifactID": 12040872287,
+      "ZIP_bytes": 96848,
+      "ZIP_sha256": "a363eecf26318313311ef886633a9b6f32ae7c961a75bdb7087b39e4c4a85f23",
+      "verification_sha256": "7a25dc4b12671bf1f7722c078fd7da1c60e8b8f6907e1a4c7cf08fdff3c80094",
+      "source292_digest": "524af72fc57424854b4b426526fb292b6a465bfeb385e526742496abbb31c126",
+      "portable344_digest": "fd107538a56276af605e7c712e451b78015497f43561b7065880abedab12d3a1",
+      "actual": "166PASS17hidden/full854PASS113hidden;truefooters0errors0skip;old822+29+3 exact;0hitTest/overflow;58six-marker cleanups+safeexit6 each;analyze3info/child1",
+      "analysis_issues": [
+        "group_creation_action.dart89 braces",
+        "group_creation_action.dart117 explicitmounted",
+        "group_creation_action.dart121 nullawareelement"
+      ],
+      "accepted_workflow": false
     }
   },
   "reference_entry": {
@@ -602,7 +621,7 @@
     "default_enabled": false,
     "working_cohort": "current292",
     "members": 292,
-    "reference_source_digest": "9bde9a3c3518d445b79ce2fcd40a0b494d26c4704e934334d123abce71f212de",
+    "reference_source_digest": "74307fdd20e4796615959aa29b2059ac10df5d9b64e7358d87186fa6ed751abb",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -666,7 +685,7 @@
   },
   "current292": {
     "members": 292,
-    "source_digest": "524af72fc57424854b4b426526fb292b6a465bfeb385e526742496abbb31c126",
+    "source_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1130,8 +1149,8 @@
       },
       {
         "path": "app/lib/features/group/presentation/group_creation_action.dart",
-        "bytes": 6394,
-        "sha256": "05007bb618dd89ee568d899e78a9533fb9e03a2d79f3b3e1754386ab3ea094a8"
+        "bytes": 6395,
+        "sha256": "ca3f9b2c30acff22af627fde321e6d2a063c056698556077d2b250f5909a3b68"
       },
       {
         "path": "app/lib/features/group/presentation/group_members_page.dart",
