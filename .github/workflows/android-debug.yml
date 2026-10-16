@@ -1,4 +1,4 @@
-name: Android auditable current257 debug
+name: Android auditable current257 acquired-lock debug
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
         description: 'Explicit frozen source identity; no latest/current aliases'
         required: true
         type: choice
-        options: [current257-auditable-arm64-debug-jobca-v1]
+        options: [current257-auditable-arm64-acquired-lock-v1]
 
 permissions:
   contents: read

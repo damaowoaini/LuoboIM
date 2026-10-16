@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 import stat
 
-COHORT = "current257-auditable-arm64-debug-jobca-v1"
+COHORT = "current257-auditable-arm64-acquired-lock-v1"
 
 
 def digest(rows):

@@ -1,25 +1,28 @@
 # Frozen current257 auditable Android debug
 
 独立 manual-only workflow `android-debug.yml` 固定 cohort
-`current257-auditable-arm64-debug-jobca-v1`，从公开314ac556取420个固定正文，
-叠加6个已审core工具，实际426输入。即使主树已到269，也不读取269假称257；
-269必须另封明确cohort/438输入和已验commit。旧505/548/375/383入口不改。
+`current257-auditable-arm64-acquired-lock-v1`，从公开314ac556取420个固定正文，
+叠加7个明确controller输入，实际427输入。相对历史426仅替换builder并新增
+18776B的acquired-go.sum。历史426/原source810与旧证据不改；后续269必须另封
+明确cohort和完整向量，不能静默借新App源。
 
-默认只读：`python3 -B ci/android-native/run.py --cohort current257-auditable-arm64-debug-jobca-v1`。
-它只核元数据和6个core工具，不联网/物化/读取mutable App。
+默认只读：`python3 -B ci/android-native/run.py --cohort current257-auditable-arm64-acquired-lock-v1`。
+它只核元数据和7个core输入，不联网/物化/读取mutable App。
 
 四个单次claim阶段：
 
 1. setup（联网）：固定源码和官方工具，原锁pub/Go依赖，job新CA；仅prepare-only
-   重放Go patch用于预热依赖。CA私钥生成后立即删除，绝不上传。
+   重放Go patch用于预热依赖。原source go.mod/810先验通过；获取后go.mod必须
+   不变、go.sum精确8eb9。raw acquisition锁与graph保留。CA私钥立即删除，绝不上传。
 2. core（离线netns）：原builder在另一个新目录重放公开core固定commit+补丁；
-   默认/tag TLS测试、gomobile ARM64 bind、新API/回调、AAR/ELF核验。
+   原GoMod/810先验通过后，显式debug-QA flag原子植入受审8eb9；默认/tag TLS
+   测试及gomobile ARM64 bind均-mod=readonly且前后锁一致，再做API/回调/AAR/ELF核验。
 3. gradle-setup（联网）：校验官方repo与实际Maven下载URL/每文件SHA，拒dynamic；
    生成本job验证元数据。这是首次实际取得的来源证据，不冒称预先hermetic锁。
 4. apk（离线netns）：7负门禁、strict dependency verification、实际wrapper29/
    native桥和`lib/main.dart`编译；ARM64 split APK、ZIP/包/签名/zipalign/逐ELF核验。
 
-仅setup联网，离线stage只开自有loopback，无宿主fixture/业务服务/设备。执行器
+setup及gradle-setup是联网获取阶段，离线stage只开自有loopback，无宿主fixture/业务服务/设备。执行器
 把GOPROXY=off带入原builder，因此两次TLS测试和bind都不能补下载。
 `gomobile init`含gobind@latest，故明确不调用，只安装固定module版本两个工具。
 Android/Dart不注入CA资源或私defines。core保72bb的显式debug局部jobCA标签，
@@ -49,4 +52,4 @@ setForServiceListener仍是完整Enterprise二进制ABI缺口。
 原生产4ABI/iOS/真实Android16KiB/媒体/设备/生物识别/物理删除/发布签名仍未证明。
 本次仅源准备与Python单位源码，没有本轮native结果或远端操作。
 
-本runner依原锁pub源码补独立dependency-additions：jni1.1.0需API35与CMake3.22.1；flutter_webrtc1.6.2+hotfix.4声明JitPack audioswitch固定039a35a… commit。只允许此模块/commit，不放开其它JitPack来源；未改原426/toolchain.json。
+本runner依原锁pub源码补独立dependency-additions：jni1.1.0需API35与CMake3.22.1；flutter_webrtc1.6.2+hotfix.4声明JitPack audioswitch固定039a35a… commit。只允许此模块/commit，不放开其它JitPack来源；新cohort继续逐字沿用历史toolchain.json，原source锁SHA未改。

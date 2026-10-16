@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Synthetic Python-only guards; no Go/Flutter/Gradle/network/device execution."""
 import json
+import base64
+import hashlib
+import importlib.util
 import os
 from pathlib import Path
 import struct
@@ -17,6 +20,88 @@ import verify_inputs
 
 
 class Tools(unittest.TestCase):
+    def dependency_fixture(self, temporary):
+        module_path = run.REPO / run.CORE_TOOLS / 'build_candidate.py'
+        spec = importlib.util.spec_from_file_location('reviewed_builder', module_path)
+        builder = importlib.util.module_from_spec(spec); spec.loader.exec_module(builder)
+        root = Path(temporary).resolve(); work = root / 'fresh'; work.mkdir()
+        old = ('example.invalid/original v1.0.0 h1:' + base64.b64encode(b'a' * 32).decode() + '\n').encode()
+        new = old + ('example.invalid/added v1.0.0 h1:' + base64.b64encode(b'b' * 32).decode() + '\n').encode()
+        (work / 'go.sum').write_bytes(old)
+        (work / 'go.mod').write_bytes(b'module synthetic.invalid/core\n')
+        reviewed = root / 'acquired-go.sum'; reviewed.write_bytes(new)
+        return builder, work, reviewed, old, new
+
+    def test_acquired_lock_preserves_source_and_installs_exact_additive_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            builder, work, reviewed, old, new = self.dependency_fixture(temporary)
+            module = (work / 'go.mod').read_bytes()
+            proof = builder.install_acquired_go_sum(work, reviewed, hashlib.sha256(new).hexdigest(), hashlib.sha256(old).hexdigest())
+            self.assertEqual((work / 'go.sum').read_bytes(), new)
+            self.assertEqual((work / 'source-go.sum').read_bytes(), old)
+            self.assertEqual((work / 'go.mod').read_bytes(), module)
+            self.assertEqual(proof['added_checksums'], 1)
+            self.assertEqual(json.loads((work / 'acquired-dependency-lock.json').read_text()), proof)
+
+    def test_acquired_lock_requires_both_exact_source_and_acquired_hash(self):
+        for which in ['source', 'acquired']:
+            with self.subTest(which=which), tempfile.TemporaryDirectory() as temporary:
+                builder, work, reviewed, old, new = self.dependency_fixture(temporary)
+                source_sha = '0' * 64 if which == 'source' else hashlib.sha256(old).hexdigest()
+                acquired_sha = '0' * 64 if which == 'acquired' else hashlib.sha256(new).hexdigest()
+                with self.assertRaisesRegex(ValueError, 'SHA mismatch'):
+                    builder.install_acquired_go_sum(work, reviewed, acquired_sha, source_sha)
+                self.assertEqual((work / 'go.sum').read_bytes(), old)
+                self.assertFalse((work / 'source-go.sum').exists())
+
+    def test_acquired_lock_refuses_removed_changed_and_duplicate_source_keys(self):
+        for which in ['removed', 'changed', 'duplicate']:
+            with self.subTest(which=which), tempfile.TemporaryDirectory() as temporary:
+                builder, work, reviewed, old, new = self.dependency_fixture(temporary)
+                bad = new[len(old):] if which == 'removed' else old.replace(base64.b64encode(b'a' * 32), base64.b64encode(b'c' * 32)) if which == 'changed' else old + old
+                reviewed.write_bytes(bad)
+                with self.assertRaises(ValueError):
+                    builder.install_acquired_go_sum(work, reviewed, hashlib.sha256(bad).hexdigest(), hashlib.sha256(old).hexdigest())
+                self.assertEqual((work / 'go.sum').read_bytes(), old)
+
+    def test_acquired_lock_refuses_links_and_nonowned_work(self):
+        for which in ['symlink', 'hardlink', 'nonowned']:
+            with self.subTest(which=which), tempfile.TemporaryDirectory() as temporary:
+                builder, work, reviewed, old, new = self.dependency_fixture(temporary)
+                if which == 'symlink':
+                    original = reviewed.with_name('original'); reviewed.rename(original); reviewed.symlink_to(original)
+                elif which == 'hardlink':
+                    os.link(reviewed, reviewed.with_name('second-link'))
+                if which == 'nonowned':
+                    with mock.patch.object(builder.os, 'getuid', return_value=os.getuid() + 1), self.assertRaisesRegex(ValueError, 'owned'):
+                        builder.install_acquired_go_sum(work, reviewed, hashlib.sha256(new).hexdigest(), hashlib.sha256(old).hexdigest())
+                else:
+                    with self.assertRaises(ValueError):
+                        builder.install_acquired_go_sum(work, reviewed, hashlib.sha256(new).hexdigest(), hashlib.sha256(old).hexdigest())
+                self.assertEqual((work / 'go.sum').read_bytes(), old)
+
+    def test_acquired_lock_refuses_existing_backup_without_overwriting_it(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            builder, work, reviewed, old, new = self.dependency_fixture(temporary)
+            backup = work / 'source-go.sum'; backup.write_bytes(b'prior evidence')
+            with self.assertRaises(FileExistsError):
+                builder.install_acquired_go_sum(work, reviewed, hashlib.sha256(new).hexdigest(), hashlib.sha256(old).hexdigest())
+            self.assertEqual(backup.read_bytes(), b'prior evidence')
+            self.assertEqual((work / 'go.sum').read_bytes(), old)
+
+    def test_acquired_lock_detects_source_tamper_before_atomic_replacement(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            builder, work, reviewed, old, new = self.dependency_fixture(temporary)
+            original_open = builder.os.open
+            def interleave(path, flags, *args, **kwargs):
+                if Path(path).name == '.acquired-go.sum.tmp':
+                    (work / 'go.sum').write_bytes(b'changed by synthetic concurrent owner')
+                return original_open(path, flags, *args, **kwargs)
+            with mock.patch.object(builder.os, 'open', side_effect=interleave), self.assertRaisesRegex(ValueError, 'changed before'):
+                builder.install_acquired_go_sum(work, reviewed, hashlib.sha256(new).hexdigest(), hashlib.sha256(old).hexdigest())
+            self.assertEqual((work / 'go.sum').read_bytes(), b'changed by synthetic concurrent owner')
+            self.assertEqual((work / 'source-go.sum').read_bytes(), old)
+
     def local_work(self, tmp):
         work = Path(tmp).resolve() / 'job'
         (work / 'source/app/android').mkdir(mode=0o700, parents=True)
@@ -89,7 +174,7 @@ class Tools(unittest.TestCase):
     def test_exact_metadata_does_not_read_mutable_App(self):
         registry, inputs, tools = run.metadata()
         self.assertEqual(registry['source_ref'], '314ac556fdc4be7f98dbd74370201922c71e67c5')
-        self.assertEqual(len(inputs['files']), 426)
+        self.assertEqual(len(inputs['files']), 427)
         self.assertEqual(inputs['accepted_business']['members'], 257)
         self.assertEqual(tools['flutter']['tag'], '3.47.7')
 

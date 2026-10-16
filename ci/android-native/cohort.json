@@ -1,12 +1,30 @@
 {
   "schema": "luobo.cloud-android.explicit-cohort.v1",
-  "cohort": "current257-auditable-arm64-debug-jobca-v1",
+  "cohort": "current257-auditable-arm64-acquired-lock-v1",
   "source_ref": "314ac556fdc4be7f98dbd74370201922c71e67c5",
   "source_repository": "https://github.com/damaowoaini/LuoboIM.git",
-  "source_digest": "b50ac428dc2caa3fce6649ae5d1ec2be67b0d2fa2e5d47eb3d32c519cf3d1dd5",
-  "inputs_sha256": "42b5c73301041a7800f4b1645b0ab11ec51565e6358722bb4c6ae01878078653",
+  "source_digest": "b6509003feeea06571ae42882884d1006dcd11ad2d8bf93dd38eabfbd9578f3e",
+  "inputs_sha256": "1852fa0318522f8ca6cf41468880a7153022ae64f31369eddd9af0abadeb4364",
   "toolchain_sha256": "13cdeeb22b003d24714525c7de483446d8e0e0eed23200c4f54df1badd2251bd",
   "bindings_sha256": "6833a16883a6ae43b91b7400ecd49af6f44dd0d85adcc1b4e98f45213302f4fd",
-  "future_cohort_policy": "No aliases.269/438 requires a new explicitly reviewed registry/commit/input vector and workflow option after Rootacceptance; current257 remains immutable historicalQA.",
-  "dependency_additions_sha256": "1f11a3a67e28e19a6c4114421947923b44015bb4a8df2d356b96bcde796f054e"
+  "future_cohort_policy": "Explicit derived427 source cohort; historical426 remains unchanged. No269 alias or native/device acceptance.",
+  "dependency_additions_sha256": "1f11a3a67e28e19a6c4114421947923b44015bb4a8df2d356b96bcde796f054e",
+  "acquired_go_sum": {
+    "path": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
+    "bytes": 18776,
+    "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f",
+    "source_go_sum_sha256": "81035756f13f282d14ca4629a94535d3317df4b5e35022b6f11f5becd79c574d",
+    "source_go_mod_sha256_before_local_replace": "ffeead4028cab91144bdb7460ff8b39da351ca0ef2fcafc84926d3f17666e450",
+    "provenance": {
+      "run": 38863114953,
+      "artifact_id": 12029409588,
+      "artifact_sha256": "beabdd8764a2cf61e60c8e42f6c0506c7cd35f1e9c932d35e4971c89f3794c3b",
+      "actual_after": "lock-07-final/go.sum",
+      "added_lines": 123,
+      "removed_or_changed_source_checksums": 0,
+      "module_graph_records": 98,
+      "version_and_sum_graph_equal_prior_r2": true,
+      "actual_gate_result": "failure; this derived candidate requires Root review and new native run"
+    }
+  }
 }

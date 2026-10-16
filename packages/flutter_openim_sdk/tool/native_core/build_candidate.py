@@ -6,11 +6,13 @@ Supply the local audited protocol directory and an empty task-only work folder.
 The manifest pins source/patches; artifact hashes are recorded after each build.
 """
 import argparse
+import base64
 import hashlib
 import io
 import json
 import os
 import re
+import stat
 from pathlib import Path
 import subprocess
 import tarfile
@@ -25,6 +27,71 @@ ANDROID_ABIS = {
     "android/386": "x86",
     "android/amd64": "x86_64",
 }
+
+def install_acquired_go_sum(work, reviewed, digest, source_digest):
+    """Install only an exact, additive reviewed lock before any compilation."""
+    work, reviewed = Path(work), Path(reviewed)
+    if (work.absolute().resolve() != work.absolute() or not work.is_dir()
+            or work.stat().st_uid != os.getuid()):
+        raise ValueError('canonical owned candidate work required')
+    target = work / 'go.sum'
+    def read(path):
+        if path.absolute().resolve() != path.absolute():
+            raise ValueError('canonical non-symlink dependency lock required')
+        with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as f:
+            info = os.fstat(f.fileno())
+            if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1
+                    or info.st_uid != os.getuid() or info.st_size > 262144):
+                raise ValueError('bounded owned regular single-link dependency lock required')
+            body = f.read(262145)
+        if len(body) > 262144:
+            raise ValueError('dependency lock exceeds bound')
+        return body, info
+    def sums(body):
+        out = {}
+        for line in body.decode('utf-8').splitlines():
+            fields = line.split()
+            if len(fields) != 3 or not fields[2].startswith('h1:'):
+                raise ValueError('invalid dependency checksum line')
+            key = tuple(fields[:2])
+            if key in out or len(base64.b64decode(fields[2][3:], validate=True)) != 32:
+                raise ValueError('duplicate or invalid dependency checksum')
+            out[key] = fields[2]
+        return out
+    def write(path, body, mode=0o600):
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, mode)
+        with os.fdopen(fd, 'wb') as f:
+            f.write(body); f.flush(); os.fsync(f.fileno())
+    def sync():
+        fd = os.open(work, os.O_RDONLY | os.O_DIRECTORY)
+        try: os.fsync(fd)
+        finally: os.close(fd)
+    before, original = read(target)
+    after, _ = read(reviewed)
+    if (not re.fullmatch('[0-9a-f]{64}', digest)
+            or hashlib.sha256(before).hexdigest() != source_digest
+            or hashlib.sha256(after).hexdigest() != digest):
+        raise ValueError('source or acquired dependency lock SHA mismatch')
+    old, new = sums(before), sums(after)
+    if not old or any(new.get(k) != value for k, value in old.items()):
+        raise ValueError('acquired lock removed or changed a source checksum')
+    proof = {'source_go_sum_sha256': source_digest, 'acquired_go_sum_sha256': digest,
+             'source_bytes': len(before), 'acquired_bytes': len(after),
+             'added_checksums': len(new) - len(old), 'old_checksums_preserved': True}
+    write(work / 'source-go.sum', before)
+    write(work / 'acquired-dependency-lock.json', (json.dumps(proof, indent=2) + '\n').encode())
+    temporary = work / '.acquired-go.sum.tmp'
+    write(temporary, after, stat.S_IMODE(original.st_mode))
+    sync()
+    current, info = read(target)
+    if (current != before or (info.st_dev, info.st_ino, info.st_mtime_ns, info.st_ctime_ns)
+            != (original.st_dev, original.st_ino, original.st_mtime_ns, original.st_ctime_ns)):
+        raise ValueError('source lock changed before acquired lock installation')
+    os.replace(temporary, target); sync()
+    if read(target)[0] != after:
+        raise ValueError('acquired dependency lock installation failed verification')
+    return proof
+
 
 def run(argv, cwd=None, env=None):
     return subprocess.run(list(map(str, argv)), cwd=cwd, env=env, check=True)
@@ -76,6 +143,8 @@ def main():
         help="Explicit research ABI set; preserving production coverage requires all four targets.",
     )
     parser.add_argument("--prepare-only", action="store_true")
+    parser.add_argument("--acquired-go-sum", type=Path)
+    parser.add_argument("--acquired-go-sum-sha256")
     args = parser.parse_args()
     work = args.work.resolve()
     if work.is_relative_to(PLUGIN_ROOT):
@@ -91,6 +160,11 @@ def main():
     if len(args.android_targets) != len(set(args.android_targets)):
         parser.error("Android targets must be unique")
     qa = args.qa_fixture_ca is not None or args.qa_fixture_ca_sha256 is not None
+    acquired = args.acquired_go_sum is not None or args.acquired_go_sum_sha256 is not None
+    if acquired and (not qa or args.prepare_only or args.acquired_go_sum is None or args.acquired_go_sum_sha256 is None):
+        parser.error("acquired lock requires both flags and explicit debug-QA build, never prepare-only")
+    if acquired and args.acquired_go_sum.absolute() != HERE / "acquired-go.sum":
+        parser.error("acquired lock must be the reviewed input beside this builder")
     if qa and (args.qa_fixture_ca is None or args.qa_fixture_ca_sha256 is None):
         parser.error("QA trust requires both --qa-fixture-ca and --qa-fixture-ca-sha256")
     qa_certificate = None
@@ -168,18 +242,37 @@ def main():
         return
     if any(value is None for value in [args.output, args.mobile_tools, args.android_sdk, args.ndk, args.java_home]):
         raise SystemExit("Android build requires output/mobile-tools/android-sdk/ndk/java-home")
+    acquired_proof = None
+    if acquired:
+        source_sum = next(x['sha256'] for x in manifest['modified_files'] if x['path'] == 'go.sum')
+        acquired_proof = install_acquired_go_sum(work, args.acquired_go_sum, args.acquired_go_sum_sha256, source_sum)
+    module_before = (work / 'go.mod').read_bytes()
+    def check_locks():
+        if acquired and ((work / 'go.mod').read_bytes() != module_before
+                         or hashlib.sha256((work / 'go.sum').read_bytes()).hexdigest() != args.acquired_go_sum_sha256):
+            raise SystemExit('readonly build changed reviewed dependency locks')
     environment = dict(os.environ)
     environment.update({"ANDROID_HOME": str(args.android_sdk.resolve()), "ANDROID_NDK_HOME": str(args.ndk.resolve()), "JAVA_HOME": str(args.java_home.resolve()), "CGO_LDFLAGS": "-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"})
     environment["PATH"] = str(args.go.resolve().parent) + os.pathsep + str(args.mobile_tools.resolve()) + os.pathsep + environment.get("PATH", "")
+    if acquired:
+        flags = environment.get('GOFLAGS', '').split()
+        if any(flag.startswith('-mod=') and flag != '-mod=readonly' for flag in flags):
+            raise SystemExit('conflicting Go module mode in acquired QA build')
+        environment['GOFLAGS'] = ' '.join(flags + ([] if '-mod=readonly' in flags else ['-mod=readonly']))
+        environment['GOWORK'] = 'off'
+    check_locks()
     if qa:
         # Validate the actually embedded public CA, both TLS protocol controls
         # and the default-build trust stub before starting a native build.
-        run([args.go, "test", "./pkg/fixturetls", "-count=1"], cwd=work)
-        run([args.go, "test", "-tags=" + qa_manifest["build_tag"], "./pkg/fixturetls", "-count=1"], cwd=work)
+        run([args.go, "test", "./pkg/fixturetls", "-count=1"], cwd=work, env=environment if acquired else None)
+        check_locks()
+        run([args.go, "test", "-tags=" + qa_manifest["build_tag"], "./pkg/fixturetls", "-count=1"], cwd=work, env=environment if acquired else None)
+        check_locks()
     output = args.output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     build_tags = ["-tags=" + qa_manifest["build_tag"]] if qa else []
     run([(args.mobile_tools / "gomobile").resolve(), "bind", *build_tags, "-target=" + ",".join(args.android_targets), "-androidapi=24", "-trimpath", "-ldflags=-s -w", "-o", output, "./open_im_sdk", "./open_im_sdk_callback"], cwd=work, env=environment)
+    check_locks()
     libraries = []
     with zipfile.ZipFile(output) as aar:
         for name in sorted(aar.namelist()):
@@ -189,7 +282,7 @@ def main():
     expected = {ANDROID_ABIS[target] for target in args.android_targets}
     if {entry["abi"] for entry in libraries} != expected or len(libraries) != len(expected):
         raise SystemExit("generated AAR ABI set differs from requested targets")
-    output.with_suffix(".build.json").write_text(json.dumps({"base_commit": BASE, "patch_sha256": manifest["patch_sha256"], "qa_overlay_sha256": qa_manifest["overlay_sha256"] if qa else None, "qa_ca_sha256": args.qa_fixture_ca_sha256 if qa else None, "build_tags": build_tags, "only_debug_QA": qa, "artifact_sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "artifact_bytes": output.stat().st_size, "android_targets": args.android_targets, "libraries": libraries, "matches_original_abi_coverage": expected == set(ANDROID_ABIS.values()), "go": "1.27.2", "mobile": "v0.0.0-20261011034528-197770444867", "android_api": 24, "production_replacement": False, "runtime_validation": "pending for this generated artifact; ABI inventory and ELF checks are not runtime proof"}, indent=2) + "\n")
+    output.with_suffix(".build.json").write_text(json.dumps({"acquired_dependency_lock": acquired_proof, "readonly_dependency_mode": acquired, "dependency_go_mod_sha256": hashlib.sha256(module_before).hexdigest(), "base_commit": BASE, "patch_sha256": manifest["patch_sha256"], "qa_overlay_sha256": qa_manifest["overlay_sha256"] if qa else None, "qa_ca_sha256": args.qa_fixture_ca_sha256 if qa else None, "build_tags": build_tags, "only_debug_QA": qa, "artifact_sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "artifact_bytes": output.stat().st_size, "android_targets": args.android_targets, "libraries": libraries, "matches_original_abi_coverage": expected == set(ANDROID_ABIS.values()), "go": "1.27.2", "mobile": "v0.0.0-20261011034528-197770444867", "android_api": 24, "production_replacement": False, "runtime_validation": "pending for this generated artifact; ABI inventory and ELF checks are not runtime proof"}, indent=2) + "\n")
     print("ISOLATED_CANDIDATE_AAR_BUILT")
 
 if __name__ == "__main__":

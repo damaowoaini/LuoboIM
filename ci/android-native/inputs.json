@@ -1,6 +1,6 @@
 {
   "schema": "luobo.cloud-android.source-inputs.v1",
-  "cohort": "current257-auditable-arm64-debug-jobca-v1",
+  "cohort": "current257-auditable-arm64-acquired-lock-v1",
   "state": "source_preparation_only_no_new_native_build",
   "accepted_business": {
     "members": 257,
@@ -9,8 +9,8 @@
     "accepted_cloud_run": 38854472595,
     "accepted_full_tests": 688
   },
-  "members": 426,
-  "source_digest": "b50ac428dc2caa3fce6649ae5d1ec2be67b0d2fa2e5d47eb3d32c519cf3d1dd5",
+  "members": 427,
+  "source_digest": "b6509003feeea06571ae42882884d1006dcd11ad2d8bf93dd38eabfbd9578f3e",
   "digest_algorithm": "SHA256(UTF8(json.dumps(sorted(rows,key=path), ensure_ascii=False,sort_keys=True,separators=(comma,colon)))); rows contain only path/bytes/sha256",
   "files": [
     {
@@ -1859,9 +1859,14 @@
       "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
     },
     {
+      "path": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
+      "bytes": 18776,
+      "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
+    },
+    {
       "path": "packages/flutter_openim_sdk/tool/native_core/build_candidate.py",
-      "bytes": 11503,
-      "sha256": "a816f7f0d35558a429c2de23bd11bb6d72789b5fbbb7080ed93baa56aec913b1"
+      "bytes": 16877,
+      "sha256": "44d5d7d713e1f3e536db405318998ff618beb1ce6e25030269ba3557f373c32c"
     },
     {
       "path": "packages/flutter_openim_sdk/tool/native_core/candidate-source-manifest.json",

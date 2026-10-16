@@ -11,4 +11,4 @@ ip link set lo up
 [[ $(ip -o link show | wc -l) == 1 ]]
 [[ -z $(ip -4 route show default) && -z $(ip -6 route show default) ]]
 exec runuser -u "$owner" -- python3 -B "$repo/ci/android-native/run.py" \
-  --cohort current257-auditable-arm64-debug-jobca-v1 --stage "$stage" --work "$work"
+  --cohort current257-auditable-arm64-acquired-lock-v1 --stage "$stage" --work "$work"

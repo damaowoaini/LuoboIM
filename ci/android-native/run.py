@@ -25,7 +25,7 @@ import verify_inputs
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-COHORT = 'current257-auditable-arm64-debug-jobca-v1'
+COHORT = 'current257-auditable-arm64-acquired-lock-v1'
 SOURCE_REF = '314ac556fdc4be7f98dbd74370201922c71e67c5'
 SOURCE_REPO = 'https://github.com/damaowoaini/LuoboIM.git'
 CORE_REF = '7b156fc5557878ad6e6a07e572694af5699c6624'
@@ -111,11 +111,11 @@ def metadata():
         if s.sha(HERE / (key + '.json')) != registry[field]:
             raise ValueError('frozen controller metadata differs: ' + key)
     inputs = json.loads((HERE / 'inputs.json').read_text())
-    if (inputs['members'] != 426 or inputs['cohort'] != COHORT
+    if (inputs['members'] != 427 or inputs['cohort'] != COHORT
             or inputs['source_digest'] != registry['source_digest']
             or verify_inputs.digest(inputs['files']) != registry['source_digest']
-            or len({x['path'] for x in inputs['files']}) != 426):
-        raise ValueError('exact426 historical source manifest required')
+            or len({x['path'] for x in inputs['files']}) != 427):
+        raise ValueError('exact427 historical source manifest required')
     for item in inputs['files']:
         if item['path'].startswith(CORE_TOOLS + '/'):
             p = REPO / item['path']
@@ -123,6 +123,12 @@ def metadata():
                 raise ValueError('audited core payload differs')
     tools = json.loads((HERE / 'toolchain.json').read_text())
     tools['cloud_dependency_additions'] = json.loads((HERE / 'dependency-additions.json').read_text())
+    acquired = registry['acquired_go_sum']
+    if (acquired['path'] != CORE_TOOLS + '/acquired-go.sum' or acquired['bytes'] != 18776
+            or acquired['sha256'] != '8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f'
+            or acquired['source_go_sum_sha256'] != tools['locks']['patched_core_go_sum']['sha256']):
+        raise ValueError('exact reviewed acquired lock contract required')
+    tools['acquired_go_sum'] = acquired
     return registry, inputs, tools
 
 
@@ -193,6 +199,21 @@ class Job:
     def verify(self):
         return verify_inputs.verify(self.w / 'source', self.inputs)
 
+    def capture_core_locks(self, directory, label):
+        if not (directory / 'go.sum').exists():
+            return None
+        rows = {}
+        for name in ['go.mod', 'go.sum', 'source-go.sum', 'acquired-dependency-lock.json']:
+            path = directory / name
+            if path.exists():
+                if path.is_symlink() or path.stat().st_nlink != 1 or path.stat().st_size > 262144:
+                    raise ValueError('bounded single-link lock evidence required')
+                body = path.read_bytes()
+                s.put(self.w / 'evidence' / label / name, body)
+                rows[name] = {'bytes': len(body), 'sha256': hashlib.sha256(body).hexdigest()}
+        s.write_json(self.w / 'evidence' / label / 'locks.json', rows)
+        return rows
+
     def git(self, path, repository, revision, env, label):
         s.mkdir(path)
         self.cmd(['git', 'init', '--quiet', path], self.w, env, label + '-init')
@@ -254,7 +275,9 @@ class Job:
                 s.put(self.w / 'source' / x['path'], (REPO / x['path']).read_bytes())
         self.verify()
         s.write_json(self.w / 'evidence/source.json', {'source_repository': SOURCE_REPO, 'source_ref': SOURCE_REF,
-            'source_archive_sha256': s.sha(archive), 'members': 426, 'source_digest': self.inputs['source_digest'],
+            'source_archive_sha256': s.sha(archive), 'members': 427, 'source_digest': self.inputs['source_digest'],
+            'Git_base_members': len(wanted), 'explicit_controller_core_members': 427 - len(wanted),
+            'derived_acquired_lock_cohort': COHORT,
             'business257_not_live_source_alias': True, 'controller_workflow_commit': os.environ.get('GITHUB_SHA'),
             'Root_accepted_Dart_full688': True, 'new_native_acceptance': False})
 
@@ -354,6 +377,9 @@ class Job:
             'Python': sys.version, 'openssl_version_log_sha256': s.sha(w / 'evidence/openssl-version.log')})
         self.git(w / 'core-upstream', CORE_REPO, CORE_REF, e, 'core-upstream')
         self.cmd(self.builder(w / 'core-prefetch', prepare=True), w, e, 'core-prepare')
+        source_locks = self.capture_core_locks(w / 'core-prefetch', 'core-source-locks')
+        if not source_locks or source_locks['go.sum']['sha256'] != t['locks']['patched_core_go_sum']['sha256']:
+            raise ValueError('original source go.sum must first match frozen810 lock')
         go = w / 'go/bin/go'
         m = self.cmd([go, 'mod', 'download', '-json', 'golang.org/x/mobile@' + t['mobile']['version']], w / 'core-prefetch', e, 'mobile-module')
         module = json.loads(m.read_text())
@@ -365,8 +391,11 @@ class Job:
         self.cmd([go, 'mod', 'download', 'all'], w / 'core-prefetch', e, 'go-dependencies', 1200)
         self.cmd([go, 'mod', 'verify'], w / 'core-prefetch', e, 'go-verify')
         self.cmd([go, 'list', '-m', '-json', 'all'], w / 'core-prefetch', e, 'go-module-graph')
-        if s.sha(w / 'core-prefetch/go.sum') != t['locks']['patched_core_go_sum']['sha256']:
-            raise ValueError('reviewed core go.sum changed during acquisition')
+        acquired_locks = self.capture_core_locks(w / 'core-prefetch', 'core-acquired-locks')
+        if (acquired_locks['go.mod'] != source_locks['go.mod']
+                or acquired_locks['go.sum']['sha256'] != t['acquired_go_sum']['sha256']
+                or acquired_locks['go.sum']['bytes'] != t['acquired_go_sum']['bytes']):
+            raise ValueError('acquisition must match exact independently reviewed acquired lock and original go.mod')
         s.write_json(w / 'evidence/mobile-tools.json', {'version': t['mobile']['version'], 'commit': t['mobile']['commit'],
             'gomobile_sha256': s.sha(w / 'mobile-tools/gomobile'), 'gobind_sha256': s.sha(w / 'mobile-tools/gobind'),
             'gomobile_init_or_floating_latest': False})
@@ -398,18 +427,28 @@ class Job:
             '--qa-fixture-ca-sha256', s.sha(w / 'job-private/job-ca.pem'), '--android-targets', 'android/arm64']
         if prepare:
             return command + ['--prepare-only']
-        return command + ['--output', w / 'artifacts/core-current257-arm64.aar', '--mobile-tools', w / 'mobile-tools',
+        return command + ['--acquired-go-sum', w / 'source' / self.tools['acquired_go_sum']['path'],
+            '--acquired-go-sum-sha256', self.tools['acquired_go_sum']['sha256'],
+            '--output', w / 'artifacts/core-current257-arm64.aar', '--mobile-tools', w / 'mobile-tools',
             '--android-sdk', w / 'android', '--ndk', w / 'android/ndk/28.2.13676358', '--java-home', w / 'jdk']
 
     def build_core(self):
         netns()
         self.verify()
         e = environment(self.w, True)
-        self.cmd(self.builder(self.w / 'core-build'), self.w, e, 'core-build', 1800)
-        if s.sha(self.w / 'core-build/go.sum') != self.tools['locks']['patched_core_go_sum']['sha256']:
-            raise ValueError('reviewed core go.sum changed during offline build')
+        try:
+            self.cmd(self.builder(self.w / 'core-build'), self.w, e, 'core-build', 1800)
+        finally:
+            final_locks = self.capture_core_locks(self.w / 'core-build', 'core-build-locks')
+        if (not final_locks or final_locks['go.sum']['sha256'] != self.tools['acquired_go_sum']['sha256']
+                or s.sha(self.w / 'core-build/go.mod') != s.sha(self.w / 'core-prefetch/go.mod')):
+            raise ValueError('readonly native build changed acquired dependency locks')
         aar = self.w / 'artifacts/core-current257-arm64.aar'
         meta = json.loads(aar.with_suffix('.build.json').read_text())
+        if (meta.get('readonly_dependency_mode') is not True
+                or meta.get('acquired_dependency_lock', {}).get('acquired_go_sum_sha256') != self.tools['acquired_go_sum']['sha256']
+                or meta.get('acquired_dependency_lock', {}).get('source_go_sum_sha256') != self.tools['locks']['patched_core_go_sum']['sha256']):
+            raise ValueError('new acquired-lock provenance required')
         proof = audit.core(aar, meta, s.sha(self.w / 'job-private/job-ca.pem'))
         contract = json.loads((HERE / 'bindings.json').read_text())
         proof['binding_API'] = audit.bindings(aar.with_name(aar.stem + '-sources.jar'), contract)
@@ -495,7 +534,7 @@ class Job:
             return self.cmd(args, directory, environment_, label, timeout)
         proof = audit.apk(final, w, execute, e, self.tools, aar)
         proof.update({'negative_gates': 7, 'all29_actual_wrapper_sources_compiled_by_real_app': True,
-                      'source_members': 426, 'source_digest': self.inputs['source_digest'], 'entry': 'lib/main.dart',
+                      'source_members': 427, 'source_digest': self.inputs['source_digest'], 'entry': 'lib/main.dart',
                       'business_defines_or_old_CA_or_device_operations': False})
         s.write_json(w / 'evidence/APK-audit.json', proof)
         self.verify()
@@ -600,7 +639,7 @@ def main():
     registry, inputs, tools = metadata()
     if args.stage == 'readonly':
         print(json.dumps({'state': 'frozen257_metadata_verified_no_materialization', 'cohort': COHORT,
-                          'members': 426, 'source_ref': SOURCE_REF, 'live_App_reads': 0}))
+                          'members': 427, 'source_ref': SOURCE_REF, 'live_App_reads': 0}))
         return
     if not args.work or sys.platform != 'linux' or os.geteuid() == 0:
         p.error('cloud Linux ordinary-user stage and explicit fresh work required')
