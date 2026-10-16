@@ -1,0 +1,75 @@
+name: Group ordinary isolated source1064
+
+on:
+  push:
+    paths:
+      - 'ci/group-ordinary/**'
+      - 'ci/candidates/group-ordinary/**'
+      - '.github/workflows/group-ordinary-source.yml'
+  pull_request:
+    paths:
+      - 'ci/group-ordinary/**'
+      - 'ci/candidates/group-ordinary/**'
+      - '.github/workflows/group-ordinary-source.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: group-ordinary-source-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  source-regressions:
+    name: Full23 packages / source only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+      LUOBO_STORAGE_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+      LUOBO_RETENTION_TEST_REDIS: 'redis://127.0.0.1:36379/15'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety and exact isolated source checks
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/group-ordinary/test_run.py
+          python3 -B ci/group-ordinary/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Prepare exact owned ephemeral fixture
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/group-ordinary-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/group-ordinary-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval 0.2 \
+            -- bash ci/backend-integration.sh prepare
+      - name: Compile, all full-package race tests and all23 vet
+        run: python3 -B ci/group-ordinary/run.py
+      - name: Always collect exact fixture residuals
+        if: always()
+        run: bash ci/backend-integration.sh collect
+      - name: Always remove only exact run owned containers
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve all actual evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: group-ordinary-source-${{ github.run_id }}
+          path: ci-results/
+          if-no-files-found: warn
+          retention-days: 14
