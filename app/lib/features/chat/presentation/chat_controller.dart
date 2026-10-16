@@ -11,6 +11,7 @@ import '../domain/chat_message.dart';
 import '../domain/chat_mention.dart';
 import '../domain/saved_emoji.dart';
 import '../domain/location_pick.dart';
+import '../domain/chat_card.dart';
 
 final class ChatController extends ChangeNotifier {
   ChatController(this.repository) {
@@ -120,6 +121,11 @@ final class ChatController extends ChangeNotifier {
       _unconfirmedLocations.containsKey(intentId);
   bool isUnconfirmedLocation(String messageId) =>
       _unconfirmedLocations.containsValue(messageId);
+  final Map<String, String> _unconfirmedCards = {};
+  bool isCardIntentUnconfirmed(String intent) =>
+      _unconfirmedCards.containsKey(intent);
+  bool isUnconfirmedCard(String messageId) =>
+      _unconfirmedCards.containsValue(messageId);
   Future<void> _draftTail = Future.value();
 
   bool get usable => _valid && !_disposed && repository.current;
@@ -192,6 +198,7 @@ final class ChatController extends ChangeNotifier {
       if (item.delivery == MessageDelivery.sent) {
         _unconfirmedFaces.removeWhere((_, id) => id == item.id);
         _unconfirmedLocations.removeWhere((_, id) => id == item.id);
+        _unconfirmedCards.removeWhere((_, id) => id == item.id);
       }
       if (!_sending.contains(item.id) && !repository.isRemoved(item.id)) {
         merged[item.id] = item;
@@ -513,8 +520,90 @@ final class ChatController extends ChangeNotifier {
     }
   }
 
+  Future<CardSendResult> sendCard(
+    String selectedUserId, {
+    required String intentId,
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+  }) async {
+    final intent = intentId;
+    if (!usable || preparing || isCardIntentUnconfirmed(intent)) {
+      return const CardSendResult(CardSendKind.notDispatched);
+    }
+    final timeline = _timeline;
+    var dispatched = false;
+    String? messageId;
+    bool current() {
+      try {
+        access.check();
+        checkSource();
+        return usable && timeline == _timeline;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    preparing = true;
+    failure = null;
+    notifyListeners();
+    try {
+      access.check();
+      checkSource();
+      final message = await repository.prepareCard(
+        selectedUserId,
+        access: access,
+        checkSource: checkSource,
+      );
+      messageId = message.id;
+      if (!current()) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+      _merge([message]);
+      final sent = await repository.send(
+        message.id,
+        access: access,
+        checkSource: checkSource,
+        onDispatched: () => dispatched = true,
+      );
+      if (current()) {
+        _merge([sent]);
+      }
+      return CardSendResult(CardSendKind.sent, message.id);
+    } catch (error) {
+      if (dispatched && messageId != null) {
+        _unconfirmedCards[intent] = messageId;
+      }
+      if (current()) {
+        failure = _failure(error);
+        if (messageId != null) {
+          messages = List.unmodifiable(
+            messages.map(
+              (item) => item.id == messageId
+                  ? item.withDelivery(MessageDelivery.failed)
+                  : item,
+            ),
+          );
+        }
+      }
+      return CardSendResult(
+        dispatched ? CardSendKind.unconfirmed : CardSendKind.notDispatched,
+        messageId,
+      );
+    } finally {
+      if (!_disposed) {
+        preparing = false;
+        notifyListeners();
+      }
+    }
+  }
+
   Future<void> resend(String id) async {
-    if (!usable || isUnconfirmedLocation(id) || !_sending.add(id)) return;
+    if (!usable ||
+        isUnconfirmedLocation(id) ||
+        isUnconfirmedCard(id) ||
+        !_sending.add(id)) {
+      return;
+    }
     final timeline = _timeline;
     messages = List.unmodifiable(
       messages.map(

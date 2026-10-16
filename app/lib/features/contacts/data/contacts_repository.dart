@@ -14,10 +14,21 @@ final class ContactsRepository {
   final SessionAccess access;
   final TenantApi api;
 
-  Future<T> _sdk<T>(Future<T> Function(IMManager manager) operation) async {
+  Future<T> _sdk<T>(
+    Future<T> Function(IMManager manager) operation, {
+    void Function()? checkSource,
+  }) async {
     access.check();
-    final result = await gateway.runForSession(access.generation, operation);
+    checkSource?.call();
+    final result = await gateway.runForSession(access.generation, (manager) {
+      // runForSession may await SDK readiness. Check the original source in
+      // the actual operation closure too, immediately before any SDK call.
+      access.check();
+      checkSource?.call();
+      return operation(manager);
+    });
     access.check();
+    checkSource?.call();
     return result;
   }
 
@@ -48,12 +59,14 @@ final class ContactsRepository {
         .toList(),
   );
 
-  Future<Contact> profile(String id) async {
+  Future<Contact> profile(String id, {void Function()? checkSource}) async {
+    checkSource?.call();
     final target = _lookupValue(id);
     final contact = await _sdk((manager) async {
       final users = await manager.userManager.getUsersInfo(
         userIDList: [target],
       );
+      checkSource?.call();
       if (users.length != 1) {
         throw const AppFailure(FailureKind.invalidResponse);
       }
@@ -65,8 +78,9 @@ final class ContactsRepository {
         throw const AppFailure(FailureKind.invalidResponse);
       }
       return mapContact(user);
-    });
-    final full = await _businessById(target);
+    }, checkSource: checkSource);
+    checkSource?.call();
+    final full = await _businessById(target, checkSource: checkSource);
     final policy = full['allowAddFriend'];
     // 0 is a known legacy deny value; absence or an unknown policy means the
     // dependency is unavailable, never permission to show mutation actions.
@@ -74,6 +88,7 @@ final class ContactsRepository {
       throw const AppFailure(FailureKind.invalidResponse);
     }
     access.check();
+    checkSource?.call();
     return Contact(
       id: contact.id,
       name: contact.name,
@@ -95,12 +110,14 @@ final class ContactsRepository {
     return value;
   }
 
-  Future<Map> _businessById(String id) async {
+  Future<Map> _businessById(String id, {void Function()? checkSource}) async {
     access.check();
+    checkSource?.call();
     final raw = await api.chat.post('user/find/full', {
       'userIDs': [id],
     });
     access.check();
+    checkSource?.call();
     if (raw is! Map || raw['users'] is! List) {
       throw const AppFailure(FailureKind.invalidResponse);
     }
@@ -284,39 +301,52 @@ final class ContactsRepository {
     return unique;
   });
 
-  Future<void> requestFriend(String id, String reason) async {
+  Future<void> requestFriend(
+    String id,
+    String reason, {
+    void Function()? checkSource,
+  }) async {
     access.check();
+    checkSource?.call();
     final target = _lookupValue(id);
     if (target == access.credentials.userId) {
       throw const AppFailure(FailureKind.invalidInput);
     }
-    final current = await profile(target);
+    final current = await profile(target, checkSource: checkSource);
     access.check();
+    checkSource?.call();
     if (!current.canRequestFriend || current.blocked || current.friend) {
       throw const AppFailure(FailureKind.permissionDenied);
     }
     await _sdk(
       (manager) =>
           manager.friendshipManager.addFriend(userID: target, reason: reason),
+      checkSource: checkSource,
     );
   }
 
-  Future<void> remark(String id, String value) => _sdk((manager) async {
+  Future<void> remark(
+    String id,
+    String value, {
+    void Function()? checkSource,
+  }) => _sdk((manager) async {
     await manager.friendshipManager.setFriendRemark(userID: id, remark: value);
-  });
-  Future<void> block(String id, bool value) => _sdk((manager) async {
-    if (id == access.credentials.userId) {
-      throw const AppFailure(FailureKind.invalidInput);
-    }
-    if (value) {
-      await manager.friendshipManager.addBlacklist(userID: id);
-    } else {
-      await manager.friendshipManager.removeBlacklist(userID: id);
-    }
-  });
-  Future<void> deleteFriend(String id) => _sdk((manager) async {
-    await manager.friendshipManager.deleteFriend(userID: id);
-  });
+  }, checkSource: checkSource);
+  Future<void> block(String id, bool value, {void Function()? checkSource}) =>
+      _sdk((manager) async {
+        if (id == access.credentials.userId) {
+          throw const AppFailure(FailureKind.invalidInput);
+        }
+        if (value) {
+          await manager.friendshipManager.addBlacklist(userID: id);
+        } else {
+          await manager.friendshipManager.removeBlacklist(userID: id);
+        }
+      }, checkSource: checkSource);
+  Future<void> deleteFriend(String id, {void Function()? checkSource}) =>
+      _sdk((manager) async {
+        await manager.friendshipManager.deleteFriend(userID: id);
+      }, checkSource: checkSource);
   Future<void> handle(
     ContactRequest request, {
     required bool accept,
@@ -370,12 +400,22 @@ final class ContactsRepository {
       }
     }
   });
-  Future<String> conversation(String id) => _sdk(
-    (manager) async => (await manager.conversationManager.getOneConversation(
-      sourceID: id,
-      sessionType: 1,
-    )).conversationID,
-  );
+  Future<String> conversation(String id, {void Function()? checkSource}) =>
+      _sdk((manager) async {
+        final result = await manager.conversationManager.getOneConversation(
+          sourceID: id,
+          sessionType: ConversationType.single,
+        );
+        access.check();
+        checkSource?.call();
+        if (result.conversationType != ConversationType.single ||
+            result.userID != id ||
+            (result.groupID?.isNotEmpty ?? false) ||
+            result.conversationID.isEmpty) {
+          throw const AppFailure(FailureKind.invalidResponse);
+        }
+        return result.conversationID;
+      }, checkSource: checkSource);
 }
 
 Contact mapContact(FullUserInfo user) => Contact(

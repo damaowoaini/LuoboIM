@@ -1,29 +1,39 @@
-# Mobile344 Location109 send CI source
+# Mobile351 Card108 CI
 
-Explicit successor to336, bound to final StageB R4 selected14 and nativeR1 source7.
-Linux portable396 = App344 + SDK51 + migration1. Native7 is independently pinned
-and verified as a public-source snapshot; it adds no native binaries to portable396.
+Portable403 = authored App351 + SDK51 + migration1. This is an explicit successor
+to344/396; old target460/full1142 were aggregate expectations, not accepted full
+runs. Root accepted new80 plus directly affected old5 as85 unique targeted cases,
+with17 effective changed-file analyses clean. The raw first failures and narrow
+retries remain in source-preparation provenance. Device/services remain pending.
 
-Root accepted38 unique targeted cases:15 prior PASS reused + only23 failed cases
-rechecked PASS, with12 unique changed-file analyses clean. Original422/1104 name
-composition stays intact; expected target460/full1142 have not run. CI affected
-checks are DescriptorTests4 + LocationSendInventoryTests2 + LocationSourceCouplingTests2,
-followed by read-only exact-source verification after Root prepares the adoption.
-Old reporter/cleanup/control results are reused; no old complete suite rerun here.
+The workflow stays manual-only. Default `chat-card-80` runs only three new test
+files80 (exact successful names), then only17 selected Dart files with fatal infos.
+No old5, target540, full1222, optional reference or native is dispatched in this mode.
+`full-regression` runs full1222 and whole-app strict analysis once; it does not first
+run540. All old1142 plus exact80 names are required. Descriptor target540 is an
+expected inventory only. No540/1222 run was performed while preparing these files.
 
-V1 actual178-package offline resolution and R1 classification-only proof preserve
-all4 official archive identities. Fresh setup enforces the lockfile and records4
-exact hosted hash receipts, without old generated stamps/cache. Hash metadata is
-not an independent archive-body rehash or a native dependency-graph acceptance.
+The optional historical search entry2 is allowed only with explicit full mode and
+reference flag. It is the full351 compile context with only the original4 pinned
+before-files; exactly1 missing-entry assertion must fail and1 old filter must pass.
+It is not the historical257 full suite. Source is restored and reverified after it.
 
-Workflow remains manual-only with existing complete reporter, network namespace,
-4GiB initial/1GiB continuous/.2s checks and768MiB cap. After all known issues and
-targeted checks are clean, Root may run the final full regression once. This
-proposal executes no tests/analyze/native, downloads, adoption, push or dispatch.
-Optional search reference retains full344 context/only4 original before-files and
-the exact1 missing-entry failure +1 positive contract; it is disabled by default.
+Focused cleanup requires41 actual widget and32 repository four-stage sequences,
+bound to each successful test name/ID;7 parser/model cases claim no SDK cleanup.
+Full mode additionally keeps the unchanged call-record/parent creation/safe-exit
+and NextUnread cleanup contracts. Completion footer/hidden/error/name multiplicity,
+source checks before/after phases, PG termination and final failure-wins resource
+checks remain. Network namespace has no host fixtures or external route.
 
-Native R1 Kotlin compile/Swift parse/typecheck passed separately. Scene8, real
-permissions/GPS/map/device/currentAPK/iOS runtime remain unaccepted. Android's
-current344 source successor is a separate refs-only proposal with source_ref=null;
-it must refuse activation and is not part of these9 CI payloads.
+No dependency changes:178 locked identities,4 official WebView archive identities,
+SDK51+migration1 and native7 snapshot are unchanged. The historical field
+`portable396_includes_native=false` remains evidence about its original snapshot;
+native7 is also outside403. No old generated kernels/hooks/stamps are CI inputs.
+Cold4GiB/continuous1GiB/.2s/768MiB and existing900s phase timeout are unchanged.
+The public authored-source inventory has zero auxiliary exceptions; local-only
+`app/tool/check.sh` is not uploaded or exempted. No secrets/deployment is added.
+
+Preparation executed no CI unit test, materialization, Flutter, full suite or cloud
+run. Proposed targeted Python checks: DescriptorTests4 plus new CardInventory2,
+ValidationMode3 and CardCleanup2; the remaining old controls need not be repeated
+locally merely for the cohort label. Root reviews and executes any controls once.

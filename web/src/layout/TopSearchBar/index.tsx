@@ -63,10 +63,13 @@ const TopSearchBar = () => {
 
   useEffect(() => {
     const userCardHandler = (params: OpenUserCardParams) => {
+      if (params.sourceCurrent && !params.sourceCurrent()) return;
       setUserCardState({ ...params });
       userCardRef.current?.openOverlay();
     };
     const chooseModalHandler = (params: ChooseModalState) => {
+      if (params.sourceCanShare && !params.sourceCanShare()) return;
+      if (params.sourceCurrent && !params.sourceCurrent()) return;
       if (params.type === "FORWARD_MESSAGE" &&
           (!params.sourceConversationID || params.sourceOwner !== messageOwner())) return;
       setChooseModalState({ ...params, sendOrigin: captureSendOrigin(

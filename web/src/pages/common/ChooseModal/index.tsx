@@ -54,6 +54,8 @@ export interface ChooseModalState {
   sendOrigin?: SendOrigin;
   sourceConversationID?: string;
   sourceOwner?: string;
+  sourceCurrent?: () => boolean;
+  sourceCanShare?: () => boolean;
 }
 
 interface IChooseModalProps {
@@ -91,7 +93,7 @@ const onlyOneTypes = ["TRANSFER_IN_GROUP", "SELECT_CARD"];
 const onlyMemberTypes = ["KICK_FORM_GROUP", "TRANSFER_IN_GROUP", "RTC_INVITE"];
 
 const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalProps> = (
-  { state: { type, extraData, sendOrigin, sourceConversationID, sourceOwner } },
+  { state: { type, extraData, sendOrigin, sourceConversationID, sourceOwner, sourceCurrent, sourceCanShare } },
   ref,
 ) => {
   const chooseBoxRef = useRef<ChooseBoxHandle>(null);
@@ -104,9 +106,9 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
   const { sendMessage } = useSendMessage();
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
   const mounted=useRef(true),inFlight=useRef(false);
-  const context=useRef({open:isOverlayOpen,type,extraData,sendOrigin,turn:0,owner:messageOwner(),access:captureMessageAccess()});
-  if(context.current.open!==isOverlayOpen||context.current.type!==type||context.current.extraData!==extraData||context.current.sendOrigin!==sendOrigin)
-    context.current={open:isOverlayOpen,type,extraData,sendOrigin,turn:context.current.turn+1,owner:messageOwner(),access:captureMessageAccess()};
+  const context=useRef({open:isOverlayOpen,type,extraData,sendOrigin,sourceCurrent,sourceCanShare,turn:0,owner:messageOwner(),access:captureMessageAccess()});
+  if(context.current.open!==isOverlayOpen||context.current.type!==type||context.current.extraData!==extraData||context.current.sendOrigin!==sendOrigin||context.current.sourceCurrent!==sourceCurrent||context.current.sourceCanShare!==sourceCanShare)
+    context.current={open:isOverlayOpen,type,extraData,sendOrigin,sourceCurrent,sourceCanShare,turn:context.current.turn+1,owner:messageOwner(),access:captureMessageAccess()};
   useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
   const requestClose=()=>{if(!inFlight.current)closeOverlay();};
 
@@ -138,16 +140,17 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
       return message.warning(t("toast.inputGroupName"));
 
     const sendsMessage = ["SELECT_CARD", "FORWARD_MESSAGE", "SHARE_CARD", "MEETING_INVITE"].includes(type);
-    if (sendsMessage && !sendOrigin?.current()) return;
+    if (sendsMessage && (!sendOrigin?.current() || (sourceCurrent && !sourceCurrent()) || (sourceCanShare && !sourceCanShare()))) return;
     if (type === "FORWARD_MESSAGE" && (!sourceConversationID || sourceConversationID !== sendOrigin?.sourceCID || sourceOwner !== sendOrigin?.ownerKey)) return;
     // Capture every explicit recipient before the first permission/file await.
     // Selection is independent of the active view, but bound to this modal's
     // original owner/history and original immutable recipient namespace.
+    const sourcePermitsSend = () => (!sourceCurrent || sourceCurrent()) && (!sourceCanShare || sourceCanShare());
     const selected = choosedList.map(item => {
       const target = selectedSendTarget(item);
-      return target ? { target, intent: sendOrigin?.selectedIntent(target) } : undefined;
+      return target ? { target, intent: sendOrigin?.selectedIntent(target, sourcePermitsSend) } : undefined;
     });
-    const cardIntent = type === "SELECT_CARD" ? sendOrigin?.currentIntent() : undefined;
+    const cardIntent = type === "SELECT_CARD" ? sendOrigin?.currentIntent(sourcePermitsSend) : undefined;
     if (type === "SELECT_CARD" && !cardIntent) return;
     const retention = type === "FORWARD_MESSAGE" ? captureMessageRetention(
       Array.isArray((extraData as MergerMsgParams)?.messageList) ? (extraData as MergerMsgParams).messageList : extraData,
@@ -155,7 +158,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
     ) : undefined;
     if (retention && !retention.current()) { message.warning("阅后即焚、已过期或未能核验的消息不能转发"); return; }
     const generation=sessionCoordinator.generation,turn=context.current.turn;
-    const current=()=>mounted.current&&context.current.open&&context.current.turn===turn&&generation===sessionCoordinator.generation&&context.current.owner===messageOwner()&&context.current.access.current()&&(!retention||retention.current())&&(!sendsMessage||!!sendOrigin?.current());
+    const current=()=>mounted.current&&context.current.open&&context.current.turn===turn&&generation===sessionCoordinator.generation&&context.current.owner===messageOwner()&&context.current.access.current()&&(!retention||retention.current())&&sourcePermitsSend()&&context.current.sourceCurrent===sourceCurrent&&context.current.sourceCanShare===sourceCanShare&&(!sendsMessage||!!sendOrigin?.current());
     if (sendsMessage && type !== "SELECT_CARD" && selected.some(item => !item?.intent)) return;
     let deliveryConfirmed = true;
     inFlight.current=true;setLoading(true);

@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v16",
-  "state": "current344_StageB_R4_source_frozen_targeted38_passed_CI8_and_combined460_1142_unrun",
+  "schema": "luobo.mobile.portable-ci-inputs.v17",
+  "state": "source351_card_targeted80accepted_full1222_unrun",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -528,10 +528,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current344": 396
+    "current351": 403
   },
   "portable_digests": {
-    "current344": "89d3c7389b2f39c64e35da8e3e98914b3c1f16fc7e7ce3baaffeed8fb4c44a1a"
+    "current351": "3e87bd5ae01e2b9ee24b483981585820ab1b1e9745ba7cad66a42c0f8bb40ed9"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -1009,14 +1009,21 @@
       "source_digest": "6b7333baaf7cb4b87498601f2fd42f3dbcbf56d6703fd950ca4fd9ba6fd797a1",
       "portable_digest": "d42209b1279e63ffe396f3d07a8345ab837173f2aa4cef987f24ca8acbcf3486",
       "target422_full1104": "expected composition unrun; actual36 targeted acceptance retained"
+    },
+    "current344_card_parent": {
+      "source_members": 344,
+      "source_digest": "c59948d1274203162e2a2873dbd6c8e57769beaf5d8b02d72e29fbc729d753ab",
+      "portable_members": 396,
+      "portable_digest": "89d3c7389b2f39c64e35da8e3e98914b3c1f16fc7e7ce3baaffeed8fb4c44a1a",
+      "target460_full1142": "unexecuted aggregate expectations; individual accepted targeted receipts remain authoritative"
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current344",
-    "members": 344,
-    "reference_source_digest": "7d4c91c2b3407e07c84ab5d2f84ee65179b1e12a01720e74db6afc178f2c2c8e",
+    "working_cohort": "current351",
+    "members": 351,
+    "reference_source_digest": "63a31dba01782006ab4cdc11f31c195a8f501148ad3498b0b2af1835079ed9bb",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -1129,8 +1136,8 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 1461750,
-    "sha256": "33e654f39c39163c35a9f4057e0437c72c66122c7a6284cad146676a249ac9c0"
+    "bytes": 1751622,
+    "sha256": "3dcaf7ece4587bb1bdfcf291fe10112be84607d4ed9834dc6d247128b747ffbf"
   },
   "call_records_cleanup": {
     "named_fixtures": [
@@ -1642,9 +1649,110 @@
     "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
     "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
   },
-  "current344": {
-    "members": 344,
-    "source_digest": "c59948d1274203162e2a2873dbd6c8e57769beaf5d8b02d72e29fbc729d753ab",
+  "webview_dependencies": {
+    "state": "V1actual178offline_success_R1classification_only_no_reresolution",
+    "locked_packages": 178,
+    "old174_package_identity_blocks_preserved": true,
+    "files": [
+      {
+        "name": "webview_flutter",
+        "version": "4.14.1",
+        "archive_sha256": "d53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter-4.14.1.tar.gz",
+        "dependency": "direct main",
+        "lock_block_sha256": "d8aa746cb1b38e99a49f8c245dedfad01d44e807545ec27c6b4691c099cd7dfd"
+      },
+      {
+        "name": "webview_flutter_android",
+        "version": "4.12.0",
+        "archive_sha256": "ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter_android-4.12.0.tar.gz",
+        "dependency": "direct main",
+        "lock_block_sha256": "923c3bd68d0a69502144cf873a7c40d06f3773e38f8af645bc89fe46b0d576ab"
+      },
+      {
+        "name": "webview_flutter_platform_interface",
+        "version": "2.15.1",
+        "archive_sha256": "1221c1b12f5278791042f2ec2841743784cf25c5a644e23d6680e5d718824f04",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter_platform_interface-2.15.1.tar.gz",
+        "dependency": "direct dev",
+        "lock_block_sha256": "7f1d1c926540773e6e36f893c57d47aacfbdc7c1c0927b77631696c067ff03e7"
+      },
+      {
+        "name": "webview_flutter_wkwebview",
+        "version": "3.25.1",
+        "archive_sha256": "82648217f537573e1ca9ae9952d3eacedca6ab5aee69dc84445fc763766dcea2",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter_wkwebview-3.25.1.tar.gz",
+        "dependency": "transitive",
+        "lock_block_sha256": "1a4119d3c7d0141b158904b074c01638d33cde30b25755ad2633ca37424033d9"
+      }
+    ],
+    "V1_actual_receipt": {
+      "path": "references/integration/mobile-chat-location-send-candidate/dependency-resolution-result.json",
+      "bytes": 3905,
+      "sha256": "27f554d387e586bda3d7887b3c53430ea3faf1691bd37e844a21d6a65a7a0fe0"
+    },
+    "R1_classification_receipt": {
+      "path": "references/integration/mobile-chat-location-send-r1-candidate/lock-classification-proof.json",
+      "bytes": 1528,
+      "sha256": "b4caa1a18c922de6f78a4a6993bfac6e858fec8456b99c93ef5ec53af989efee"
+    },
+    "new_setup_gate": "fresh enforce-lockfile plus4 exact hosted-hash receipts; not independent archive body rehash"
+  },
+  "native_source_snapshot": {
+    "members": 7,
+    "files": [
+      {
+        "path": "app/android/app/src/main/AndroidManifest.xml",
+        "bytes": 3343,
+        "sha256": "5a4b4585cfa73575ed82c4e3e32fb9062036c96d0009a674e72ba21d9de78aa6"
+      },
+      {
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/LocationOnceBridge.kt",
+        "bytes": 10666,
+        "sha256": "f10fa7b56779bbb5d347f063fa961b462172ca6e916ce32b26556e4eeb3d1c07"
+      },
+      {
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/MainActivity.kt",
+        "bytes": 2135,
+        "sha256": "2ff99269679e8d63ba96af433db370623a5f0e654978a77bfd97b5b81c7ba1d1"
+      },
+      {
+        "path": "app/ios/Runner.xcodeproj/project.pbxproj",
+        "bytes": 32985,
+        "sha256": "cb6ee3082bba34b3946415b92f7b7006167d0535b3efbeae5424d69d25b8324c"
+      },
+      {
+        "path": "app/ios/Runner/AppDelegate.swift",
+        "bytes": 849,
+        "sha256": "f0595cf79a3efaca51b85895cacc6b9f01f13438fee6f5a3c201f796bb71cb7c"
+      },
+      {
+        "path": "app/ios/Runner/Info.plist",
+        "bytes": 2916,
+        "sha256": "94e2ab712ea1e6882d4c5b77adcc25ec552956dc300bb60e82d6b181780df152"
+      },
+      {
+        "path": "app/ios/Runner/LocationOnceBridge.swift",
+        "bytes": 13055,
+        "sha256": "13de6890dad64e4a12c17d02f3ac32dbd3e9cb11dde8caff12f5ec35ab413ee8"
+      }
+    ],
+    "digest": "7cca8d5e6005c3ff3f6c3a6f2524bd8b523226bc0dbbacaa8c7b1dc28206a426",
+    "R1_manifest_sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894",
+    "Root_type_API_acceptance": {
+      "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/root-type-api-acceptance.json",
+      "bytes": 616,
+      "sha256": "ed85b0c8456de99f36f4ef1038e9c5e3ecdd834432acb1c68ae3568c1556bdc9"
+    },
+    "Kotlin_compile_Swift_parse_typecheck_passed": true,
+    "scene8_device_GPS_accepted": false,
+    "portable396_includes_native": false,
+    "contract": "verify7 public source bodies separately; Linux396 has no native binaries; type/API not device acceptance"
+  },
+  "current351": {
+    "members": 351,
+    "source_digest": "fc2644ca9333596900be65f95fe0250f2d2106bb8429bc8f2f595c501bb2aba6",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1773,8 +1881,8 @@
       },
       {
         "path": "app/lib/design/components/feedback.dart",
-        "bytes": 4349,
-        "sha256": "6ab1e314e9789452b9570be4887fc3c514c5850a57a1e0b5c16cbf8208395005"
+        "bytes": 5379,
+        "sha256": "c9705bde73b2dec9ad208c7ef905fe90ad2c6c3feb5dbd9fe6063bbc963ffd41"
       },
       {
         "path": "app/lib/design/tokens.dart",
@@ -1813,8 +1921,8 @@
       },
       {
         "path": "app/lib/features/chat/data/chat_repository.dart",
-        "bytes": 47510,
-        "sha256": "1a08a9b776a6dbe028646fd4404c69e91a75c019e9fd461c8d760ab4aeeee6a9"
+        "bytes": 50484,
+        "sha256": "4c1dfa2d10ca21f2d6ac302dacc5aeb1c9b897f9923c2ef5a4219165d1e2efdb"
       },
       {
         "path": "app/lib/features/chat/data/group_mention_authority.dart",
@@ -1823,8 +1931,8 @@
       },
       {
         "path": "app/lib/features/chat/data/message_mapper.dart",
-        "bytes": 13004,
-        "sha256": "ecf9d166d8931f9826dc48fe04c9d023eede69c97b93f571ac34460f90966102"
+        "bytes": 13443,
+        "sha256": "1199183a036b040c14e92f708c2fafe852bc83d9a9b3f5e2f9af0404251119cc"
       },
       {
         "path": "app/lib/features/chat/data/native_location_once.dart",
@@ -1847,6 +1955,11 @@
         "sha256": "fecf039001dfa8c0f33b148e0db4c26ba9234edcd8a49a3c6880a2d9261ecab4"
       },
       {
+        "path": "app/lib/features/chat/domain/chat_card.dart",
+        "bytes": 2104,
+        "sha256": "b06391da2496e745cbf5c842b16ef076b6d418af8f1e4657d2b95444bb91b372"
+      },
+      {
         "path": "app/lib/features/chat/domain/chat_location.dart",
         "bytes": 4005,
         "sha256": "6b1eddf79c2dfd83ceb12ffbec5d96f23359f960d99318d5af4f7f170ba3f5e4"
@@ -1858,8 +1971,8 @@
       },
       {
         "path": "app/lib/features/chat/domain/chat_message.dart",
-        "bytes": 4957,
-        "sha256": "59a53068ac25b8ba7fd6aadc76be0eb4494c2c6ec8b1f877363d6f421b5ff587"
+        "bytes": 5053,
+        "sha256": "078e179505789b7b94adc34e7bb86da2524ebcb360a485bddad38adcb842d3c6"
       },
       {
         "path": "app/lib/features/chat/domain/chat_search.dart",
@@ -1907,14 +2020,24 @@
         "sha256": "a2ae51280d38ee6ec62354d21a7c0d0643da34ec91065da8f4fec84ccf2edab4"
       },
       {
+        "path": "app/lib/features/chat/presentation/chat_card_picker_page.dart",
+        "bytes": 14774,
+        "sha256": "22051912b973b503d66baf9fabf13c2ced87e2994184eb918b005315ba73c165"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_card_view.dart",
+        "bytes": 7884,
+        "sha256": "235575755def6c78083b4ef60f6e3314d97a0c37bb87960de465e7c5e4e3807e"
+      },
+      {
         "path": "app/lib/features/chat/presentation/chat_content_access.dart",
         "bytes": 1698,
         "sha256": "306862cf2a4aacb5e0133c50beeda7d10b85076bd686e4026922784770fcf9b0"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_controller.dart",
-        "bytes": 20536,
-        "sha256": "ecba4ae12f65179967805712f24bbaaa93f9deaace2f071a74b29545e9ca2390"
+        "bytes": 22967,
+        "sha256": "d8a9e14bc26a25eb86c88dbffc95a04e7ff5463e7629021571f3e8274a1297c9"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_font_size_page.dart",
@@ -1938,8 +2061,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_media_actions.dart",
-        "bytes": 16479,
-        "sha256": "95419ae798cb3dbb4f9051df8c9bb3d59057a70e1fb7b7fef03657b7125bbee0"
+        "bytes": 16685,
+        "sha256": "324e991eafbeec1e03fd42263f4fe06ca90e979e14c1198f055b95534e0e6edb"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_merged_messages_page.dart",
@@ -1948,8 +2071,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 81628,
-        "sha256": "08c37cced79623b04aab08a835398085c0579a844388ed27f755f949bad0f430"
+        "bytes": 87839,
+        "sha256": "08869981fe618ef7661fb120b96de5f017c6439c9dac32f2ff3fcc269526fb4b"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
@@ -2023,8 +2146,8 @@
       },
       {
         "path": "app/lib/features/contacts/data/contacts_repository.dart",
-        "bytes": 13291,
-        "sha256": "682ffa0e686ceecd0972487a08ce9c4f9f33bf33dc55cf2d80a69f9fad3bfd93"
+        "bytes": 14770,
+        "sha256": "8c561c087370f2958e7f8aeb94f2c1ed6df7e40d66d14cef67352836bcc1acac"
       },
       {
         "path": "app/lib/features/contacts/domain/contact.dart",
@@ -2058,8 +2181,8 @@
       },
       {
         "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
-        "bytes": 13984,
-        "sha256": "b4d21b839ec328ffaaeca4d1fa90f1898ab260b8565fc573e03237b56a5145aa"
+        "bytes": 35748,
+        "sha256": "0ff0d3400e866dbb7d5ddb3ea4f5733313af9873c9d6985c3a77d20b83f2ce18"
       },
       {
         "path": "app/lib/features/conversation/data/conversation_repository.dart",
@@ -2158,8 +2281,8 @@
       },
       {
         "path": "app/lib/features/group/data/group_repository.dart",
-        "bytes": 17655,
-        "sha256": "afcb9442c5602a931d7e9759bbe21321d5c8ec135635fe8f3c2d0f4ec6e79102"
+        "bytes": 18412,
+        "sha256": "80d74efba7edff2eac89171757b0cf345d63c60ef4347af07ebb5725cb0e3207"
       },
       {
         "path": "app/lib/features/group/domain/group.dart",
@@ -2715,6 +2838,26 @@
         "path": "app/test/features/chat/chat_business_test.dart",
         "bytes": 8983,
         "sha256": "21f894cfe063c80bfa613d17457519c4d09e54d58cb242048a16d8d24b4d7805"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_fixture.dart",
+        "bytes": 15167,
+        "sha256": "fa6be455bb3c6168adf5ef5870cf4d606fe6820d302710a9e1acf11564dfd3f5"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_model_test.dart",
+        "bytes": 4700,
+        "sha256": "cee206de82e97b07fa801b0d7821e460797d2a7c3c61a5bb3cb122e32374daf6"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_repository_test.dart",
+        "bytes": 17602,
+        "sha256": "4597c4916442d00748770e279c5c4e46295cee0f785e615b79fb74bb78045559"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_workflow_test.dart",
+        "bytes": 41713,
+        "sha256": "9efb93f4acaa6516eb1a630d3d81df68b9c69f2b1569b81cc4e5869aeefeef55"
       },
       {
         "path": "app/test/features/chat/chat_favorite_test.dart",
@@ -3367,8 +3510,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 460,
-    "expected_full_tests": 1142,
+    "expected_target_tests": 540,
+    "expected_full_tests": 1222,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -3404,108 +3547,222 @@
       "test/features/chat/location_pick_test.dart",
       "test/features/chat/location_send_repository_test.dart",
       "test/features/chat/location_send_workflow_test.dart",
-      "test/features/chat/location_map_host_test.dart"
+      "test/features/chat/location_map_host_test.dart",
+      "test/features/chat/chat_card_model_test.dart",
+      "test/features/chat/chat_card_repository_test.dart",
+      "test/features/chat/chat_card_workflow_test.dart"
     ]
   },
-  "webview_dependencies": {
-    "state": "V1actual178offline_success_R1classification_only_no_reresolution",
-    "locked_packages": 178,
-    "old174_package_identity_blocks_preserved": true,
-    "files": [
+  "chat_card": {
+    "test_paths": [
+      "test/features/chat/chat_card_model_test.dart",
+      "test/features/chat/chat_card_repository_test.dart",
+      "test/features/chat/chat_card_workflow_test.dart"
+    ],
+    "analysis_paths": [
+      "lib/design/components/feedback.dart",
+      "lib/features/chat/data/chat_repository.dart",
+      "lib/features/chat/data/message_mapper.dart",
+      "lib/features/chat/domain/chat_card.dart",
+      "lib/features/chat/domain/chat_message.dart",
+      "lib/features/chat/presentation/chat_card_picker_page.dart",
+      "lib/features/chat/presentation/chat_card_view.dart",
+      "lib/features/chat/presentation/chat_controller.dart",
+      "lib/features/chat/presentation/chat_media_actions.dart",
+      "lib/features/chat/presentation/chat_page.dart",
+      "lib/features/contacts/data/contacts_repository.dart",
+      "lib/features/contacts/presentation/user_profile_page.dart",
+      "lib/features/group/data/group_repository.dart",
+      "test/features/chat/chat_card_fixture.dart",
+      "test/features/chat/chat_card_model_test.dart",
+      "test/features/chat/chat_card_repository_test.dart",
+      "test/features/chat/chat_card_workflow_test.dart"
+    ],
+    "expected_focused_tests": 80,
+    "selected_files": [
       {
-        "name": "webview_flutter",
-        "version": "4.14.1",
-        "archive_sha256": "d53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111",
-        "archive_url": "https://pub.dev/api/archives/webview_flutter-4.14.1.tar.gz",
-        "dependency": "direct main",
-        "lock_block_sha256": "d8aa746cb1b38e99a49f8c245dedfad01d44e807545ec27c6b4691c099cd7dfd"
+        "path": "app/lib/design/components/feedback.dart",
+        "bytes": 5379,
+        "sha256": "c9705bde73b2dec9ad208c7ef905fe90ad2c6c3feb5dbd9fe6063bbc963ffd41"
       },
       {
-        "name": "webview_flutter_android",
-        "version": "4.12.0",
-        "archive_sha256": "ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688",
-        "archive_url": "https://pub.dev/api/archives/webview_flutter_android-4.12.0.tar.gz",
-        "dependency": "direct main",
-        "lock_block_sha256": "923c3bd68d0a69502144cf873a7c40d06f3773e38f8af645bc89fe46b0d576ab"
+        "path": "app/lib/features/chat/data/chat_repository.dart",
+        "bytes": 50484,
+        "sha256": "4c1dfa2d10ca21f2d6ac302dacc5aeb1c9b897f9923c2ef5a4219165d1e2efdb"
       },
       {
-        "name": "webview_flutter_platform_interface",
-        "version": "2.15.1",
-        "archive_sha256": "1221c1b12f5278791042f2ec2841743784cf25c5a644e23d6680e5d718824f04",
-        "archive_url": "https://pub.dev/api/archives/webview_flutter_platform_interface-2.15.1.tar.gz",
-        "dependency": "direct dev",
-        "lock_block_sha256": "7f1d1c926540773e6e36f893c57d47aacfbdc7c1c0927b77631696c067ff03e7"
+        "path": "app/lib/features/chat/data/message_mapper.dart",
+        "bytes": 13443,
+        "sha256": "1199183a036b040c14e92f708c2fafe852bc83d9a9b3f5e2f9af0404251119cc"
       },
       {
-        "name": "webview_flutter_wkwebview",
-        "version": "3.25.1",
-        "archive_sha256": "82648217f537573e1ca9ae9952d3eacedca6ab5aee69dc84445fc763766dcea2",
-        "archive_url": "https://pub.dev/api/archives/webview_flutter_wkwebview-3.25.1.tar.gz",
-        "dependency": "transitive",
-        "lock_block_sha256": "1a4119d3c7d0141b158904b074c01638d33cde30b25755ad2633ca37424033d9"
+        "path": "app/lib/features/chat/domain/chat_card.dart",
+        "bytes": 2104,
+        "sha256": "b06391da2496e745cbf5c842b16ef076b6d418af8f1e4657d2b95444bb91b372"
+      },
+      {
+        "path": "app/lib/features/chat/domain/chat_message.dart",
+        "bytes": 5053,
+        "sha256": "078e179505789b7b94adc34e7bb86da2524ebcb360a485bddad38adcb842d3c6"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_card_picker_page.dart",
+        "bytes": 14774,
+        "sha256": "22051912b973b503d66baf9fabf13c2ced87e2994184eb918b005315ba73c165"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_card_view.dart",
+        "bytes": 7884,
+        "sha256": "235575755def6c78083b4ef60f6e3314d97a0c37bb87960de465e7c5e4e3807e"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_controller.dart",
+        "bytes": 22967,
+        "sha256": "d8a9e14bc26a25eb86c88dbffc95a04e7ff5463e7629021571f3e8274a1297c9"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_media_actions.dart",
+        "bytes": 16685,
+        "sha256": "324e991eafbeec1e03fd42263f4fe06ca90e979e14c1198f055b95534e0e6edb"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 87839,
+        "sha256": "08869981fe618ef7661fb120b96de5f017c6439c9dac32f2ff3fcc269526fb4b"
+      },
+      {
+        "path": "app/lib/features/contacts/data/contacts_repository.dart",
+        "bytes": 14770,
+        "sha256": "8c561c087370f2958e7f8aeb94f2c1ed6df7e40d66d14cef67352836bcc1acac"
+      },
+      {
+        "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
+        "bytes": 35748,
+        "sha256": "0ff0d3400e866dbb7d5ddb3ea4f5733313af9873c9d6985c3a77d20b83f2ce18"
+      },
+      {
+        "path": "app/lib/features/group/data/group_repository.dart",
+        "bytes": 18412,
+        "sha256": "80d74efba7edff2eac89171757b0cf345d63c60ef4347af07ebb5725cb0e3207"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_fixture.dart",
+        "bytes": 15167,
+        "sha256": "fa6be455bb3c6168adf5ef5870cf4d606fe6820d302710a9e1acf11564dfd3f5"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_model_test.dart",
+        "bytes": 4700,
+        "sha256": "cee206de82e97b07fa801b0d7821e460797d2a7c3c61a5bb3cb122e32374daf6"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_repository_test.dart",
+        "bytes": 17602,
+        "sha256": "4597c4916442d00748770e279c5c4e46295cee0f785e615b79fb74bb78045559"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_workflow_test.dart",
+        "bytes": 41713,
+        "sha256": "9efb93f4acaa6516eb1a630d3d81df68b9c69f2b1569b81cc4e5869aeefeef55"
       }
     ],
-    "V1_actual_receipt": {
-      "path": "references/integration/mobile-chat-location-send-candidate/dependency-resolution-result.json",
-      "bytes": 3905,
-      "sha256": "27f554d387e586bda3d7887b3c53430ea3faf1691bd37e844a21d6a65a7a0fe0"
-    },
-    "R1_classification_receipt": {
-      "path": "references/integration/mobile-chat-location-send-r1-candidate/lock-classification-proof.json",
-      "bytes": 1528,
-      "sha256": "b4caa1a18c922de6f78a4a6993bfac6e858fec8456b99c93ef5ec53af989efee"
-    },
-    "new_setup_gate": "fresh enforce-lockfile plus4 exact hosted-hash receipts; not independent archive body rehash"
-  },
-  "native_source_snapshot": {
-    "members": 7,
-    "files": [
-      {
-        "path": "app/android/app/src/main/AndroidManifest.xml",
-        "bytes": 3343,
-        "sha256": "5a4b4585cfa73575ed82c4e3e32fb9062036c96d0009a674e72ba21d9de78aa6"
-      },
-      {
-        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/LocationOnceBridge.kt",
-        "bytes": 10666,
-        "sha256": "f10fa7b56779bbb5d347f063fa961b462172ca6e916ce32b26556e4eeb3d1c07"
-      },
-      {
-        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/MainActivity.kt",
-        "bytes": 2135,
-        "sha256": "2ff99269679e8d63ba96af433db370623a5f0e654978a77bfd97b5b81c7ba1d1"
-      },
-      {
-        "path": "app/ios/Runner.xcodeproj/project.pbxproj",
-        "bytes": 32985,
-        "sha256": "cb6ee3082bba34b3946415b92f7b7006167d0535b3efbeae5424d69d25b8324c"
-      },
-      {
-        "path": "app/ios/Runner/AppDelegate.swift",
-        "bytes": 849,
-        "sha256": "f0595cf79a3efaca51b85895cacc6b9f01f13438fee6f5a3c201f796bb71cb7c"
-      },
-      {
-        "path": "app/ios/Runner/Info.plist",
-        "bytes": 2916,
-        "sha256": "94e2ab712ea1e6882d4c5b77adcc25ec552956dc300bb60e82d6b181780df152"
-      },
-      {
-        "path": "app/ios/Runner/LocationOnceBridge.swift",
-        "bytes": 13055,
-        "sha256": "13de6890dad64e4a12c17d02f3ac32dbd3e9cb11dde8caff12f5ec35ab413ee8"
-      }
+    "model_names": [
+      "standard108 maps a typed exact UID hint and discards received faceURL and ex actions",
+      "card delivery and local media clones preserve the original typed identity",
+      "same display names retain distinct card UIDs and empty names show the complete UID",
+      "bounded card parser rejects ambiguous or unsafe identities and labels",
+      "URL-looking card names and exact UIDs remain literal text identity hints",
+      "malformed native card never leaks an untrusted nickname through previews",
+      "nested merger preserves each standard108 identity without treating ex as a child message"
     ],
-    "digest": "7cca8d5e6005c3ff3f6c3a6f2524bd8b523226bc0dbbacaa8c7b1dc28206a426",
-    "R1_manifest_sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894",
-    "Root_type_API_acceptance": {
-      "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/root-type-api-acceptance.json",
-      "bytes": 616,
-      "sha256": "ed85b0c8456de99f36f4ef1038e9c5e3ecdd834432acb1c68ae3568c1556bdc9"
-    },
-    "Kotlin_compile_Swift_parse_typecheck_passed": true,
-    "scene8_device_GPS_accepted": false,
-    "portable396_includes_native": false,
-    "contract": "verify7 public source bodies separately; Linux396 has no native binaries; type/API not device acceptance"
+    "repository_names": [
+      "real SDK Card108 single sends exact confirmed friend and original recipient",
+      "real SDK Card108 group sends exact confirmed friend and original recipient",
+      "actual complete friend reread rejects removed selection before native card creation",
+      "actual complete friend reread rejects duplicate selection before native card creation",
+      "actual complete friend reread rejects blacklisted selection before native card creation",
+      "actual complete friend reread rejects blocked duplicate selection before native card creation",
+      "actual complete friend reread rejects nested mismatch selection before native card creation",
+      "actual complete friend reread rejects no longer friend selection before native card creation",
+      "invalid actual native Card108 identity is rejected before send",
+      "a cleared original cut cannot borrow a new lease for card preparation",
+      "retirement during real friend reread prevents both local create and SDK send",
+      "retirement during actual native create prevents the subsequent remote send",
+      "synchronous card admission and unknown ACK lock only the original intent and bubble",
+      "source retirement during exact SDK profile prevents the business lookup and friend mutation",
+      "source retirement during authoritative business policy prevents final addFriend dispatch",
+      "actual gateway operation entry checks the source again before any native contact lookup",
+      "actual contact conversation rejects type response before returning a navigation target",
+      "actual contact conversation rejects user response before returning a navigation target",
+      "actual contact conversation rejects group response before returning a navigation target",
+      "actual contact conversation rejects empty CID response before returning a navigation target",
+      "actual contact conversation accepts only the exact ordinary single target",
+      "actual group profile rejects duplicate group instead of lending a management role",
+      "actual group profile rejects foreign group instead of lending a management role",
+      "actual group profile rejects duplicate self instead of lending a management role",
+      "actual group profile rejects foreign self group instead of lending a management role",
+      "actual group profile rejects foreign self actor instead of lending a management role",
+      "actual group profile rejects missing self instead of lending a management role",
+      "actual group profile rejects unknown role instead of lending a management role",
+      "actual group profile preserves exact role 20 in the original group",
+      "actual group profile preserves exact role 60 in the original group",
+      "actual group profile preserves exact role 100 in the original group",
+      "actual group profile outside the group preserves read-only metadata without a self lookup"
+    ],
+    "widget_names": [
+      "ordinary contact profile without a message source keeps its normal friend request and dialog behavior",
+      "actual attachment card entry searches the complete friend list beyond forty and confirms exact identities",
+      "same nickname friend selection and cancellation preserve the original picker without creating a message",
+      "friend read errors remain errors and explicit retry is mutually exclusive and read only",
+      "same CID metadata refresh preserves the current friend query and selected identity",
+      "open card confirmation withdraws sensitive names after original owner changes",
+      "open card confirmation withdraws sensitive names after original issuer changes",
+      "open card confirmation withdraws sensitive names after original tenant changes",
+      "foreign coverage and ABA cannot revive the original retained card confirmation",
+      "same ChatPage State CID ABA cannot renew the old card confirmation or history cut",
+      "original conversation clear retires the actual picker confirmation before native create",
+      "late native card creation after picker exit cannot send or pop the chat",
+      "latest no longer joined group state rejects a retained card confirmation before any SDK create",
+      "already dispatched card ACK after foreign coverage cannot pop that route or replay",
+      "unknown card ACK blocks the original bubble but a new explicit picker can send a new card",
+      "received card renders no network image and explicit profile lookup uses the exact SDK and business UID",
+      "malformed received card has no profile action or received faceURL request",
+      "wrong authoritative profile ID is rejected and explicit retry can query the original identity",
+      "late authoritative profile after account switch withdraws all old card content",
+      "actual merged child card detail stays valid under its own route and withdraws after original CID clear",
+      "an open received card detail withdraws after original revoke without granting a new profile lease",
+      "an open received card detail withdraws after original expire without granting a new profile lease",
+      "foreign route ABA permanently retires an already open card detail and its retained retry",
+      "360px large text card selection confirmation and received detail remain usable without overflow",
+      "URL-looking received labels remain plain text and never become a URL request or link action",
+      "real source-bound UserProfilePage permits an explicitly confirmed current-policy friend request",
+      "cached ordinary profile policy cannot authorize the new card source without fresh exact hydration",
+      "clear during the requestFriend inner profile await prevents the real final addFriend dispatch",
+      "foreign coverage of the owned friend-reason dialog retires its retained submit without a new action",
+      "owned profile dialog withdraws its old identity and reason after owner rotation",
+      "owned profile dialog withdraws its old identity and reason after issuer rotation",
+      "owned profile dialog withdraws its old identity and reason after tenant rotation",
+      "authoritative group hideMemberProfiles blocks a received card without trusting payload group claims",
+      "latest original group preventMemberFriends denies a retained card application after fresh policy read",
+      "clear during the real group profile await prevents subsequent group SDK reads and stale card content",
+      "verified card starts its exact user conversation through the real production router",
+      "late exact conversation resolution after source clear cannot navigate away from the current profile route",
+      "actual private profile respects original ID clipboard retention permission",
+      "actual normal profile respects original ID clipboard retention permission",
+      "actual cleared profile respects original ID clipboard retention permission",
+      "actual ordinary contact profile respects original ID clipboard retention permission"
+    ],
+    "widget_markers": [
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ],
+    "repository_markers": [
+      "sdk.begin",
+      "sdk.end",
+      "storage.begin",
+      "storage.end"
+    ]
   }
 }

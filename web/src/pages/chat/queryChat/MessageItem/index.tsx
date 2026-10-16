@@ -1,3 +1,4 @@
+import type { MessageCardSource } from "@/core/messageCard";
 import { useMessagePrivacy } from "@/hooks/useMessagePrivacy";
 import { useInViewport, useRequest } from "ahooks";
 import { Checkbox, Popover } from "antd";
@@ -40,7 +41,7 @@ export interface IMessageItemProps {
   conversationID?: string;
   messageUpdateFlag?: string;
   showAlbum?: (clientMsgID: string) => void;
-  showMergeModal?: (data: MergeElem) => void;
+  showMergeModal?: (data: MergeElem, source: MessageCardSource) => void;
   updateAppendCount?: () => void;
 }
 

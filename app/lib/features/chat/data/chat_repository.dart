@@ -16,6 +16,7 @@ import '../domain/chat_mention.dart';
 import '../domain/chat_snapshot.dart';
 import '../domain/saved_emoji.dart';
 import '../domain/location_pick.dart';
+import '../domain/chat_card.dart';
 import '../domain/chat_search.dart';
 import '../domain/message_privacy.dart';
 import 'message_mapper.dart';
@@ -53,6 +54,8 @@ final class ChatRepository {
   final Map<String, SavedEmoji> _preparedFaces = {};
   final Map<String, ({String? userId, String? groupId, bool group})>
   _preparedLocations = {};
+  final Map<String, ({String? userId, String? groupId, bool group})>
+  _preparedCards = {};
   int _emojiPolicyRevision = 0;
   void invalidateSavedEmojiProofs() {
     ++_emojiPolicyRevision;
@@ -76,6 +79,7 @@ final class ChatRepository {
     _raw.clear();
     _preparedFaces.clear();
     _preparedLocations.clear();
+    _preparedCards.clear();
     _preparedQuoteSources.clear();
     _staged.clear();
   }
@@ -701,6 +705,66 @@ final class ChatRepository {
     return _map(message).withDelivery(MessageDelivery.sending);
   }, access: access);
 
+  Future<ChatMessage> prepareCard(
+    String selectedUserId, {
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+  }) => _run((manager, lease) async {
+    lease.check();
+    checkSource();
+    if (_conversation?.canSend != true) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
+    final original = _conversation!;
+    // Selection is an identity hint. Re-read the complete current friend list
+    // after confirmation, before creating a new standard card message.
+    final friends = await manager.friendshipManager.getFriendList();
+    lease.check();
+    checkSource();
+    final matches = friends.where((v) => v.userID == selectedUserId).toList();
+    if (matches.length != 1) {
+      throw const AppFailure(FailureKind.dataChanged);
+    }
+    final person = matches.single;
+    if (person.friendInfo?.userID != selectedUserId ||
+        person.blackInfo != null ||
+        (person.publicInfo != null &&
+            person.publicInfo!.userID != selectedUserId)) {
+      throw const AppFailure(FailureKind.dataChanged);
+    }
+    final card = ChatCard.parse(userId: person.userID, name: person.nickname);
+    if (card == null || _conversation?.canSend != true) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    // The sender's local friend remark and avatar/ex metadata are not card
+    // payload. Only the freshly read public nickname and exact UID go out.
+    final message = await manager.messageManager.createCardMessage(
+      userID: card.userId,
+      nickname: card.name,
+    );
+    lease.check();
+    checkSource();
+    if (_conversation?.canSend != true ||
+        _conversation?.userId != original.userId ||
+        _conversation?.groupId != original.groupId ||
+        _conversation?.isGroup != original.isGroup ||
+        message.contentType != MessageType.card ||
+        message.clientMsgID?.isNotEmpty != true ||
+        message.cardElem?.userID != card.userId ||
+        message.cardElem?.nickname != card.name ||
+        (message.cardElem?.faceURL ?? '').isNotEmpty ||
+        (message.cardElem?.ex ?? '').isNotEmpty) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    _raw[message.clientMsgID!] = message;
+    _preparedCards[message.clientMsgID!] = (
+      userId: original.userId,
+      groupId: original.groupId,
+      group: original.isGroup,
+    );
+    return _map(message).withDelivery(MessageDelivery.sending);
+  }, access: access);
+
   Future<ChatMessage> send(
     String id, {
     MessageHistoryAccess? access,
@@ -719,6 +783,13 @@ final class ChatRepository {
         (conversation.userId != locationTarget.userId ||
             conversation.groupId != locationTarget.groupId ||
             conversation.isGroup != locationTarget.group)) {
+      throw const AppFailure(FailureKind.cancelled);
+    }
+    final cardTarget = _preparedCards[id];
+    if (cardTarget != null &&
+        (conversation.userId != cardTarget.userId ||
+            conversation.groupId != cardTarget.groupId ||
+            conversation.isGroup != cardTarget.group)) {
       throw const AppFailure(FailureKind.cancelled);
     }
     final face = _preparedFaces[id];
@@ -996,6 +1067,7 @@ final class ChatRepository {
       gateway.privacyLedger.forget([id]);
       _raw.remove(id);
       _preparedLocations.remove(id);
+      _preparedCards.remove(id);
       _staged.remove(id);
       _visibleReadQueue.remove(id);
       _groupReadMarked.remove(id);
@@ -1392,6 +1464,7 @@ final class ChatRepository {
     _raw.clear();
     _preparedFaces.clear();
     _preparedLocations.clear();
+    _preparedCards.clear();
     _preparedQuoteSources.clear();
     _staged.clear();
     _conversation = null;

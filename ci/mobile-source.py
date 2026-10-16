@@ -2,8 +2,8 @@
 """Verify minimal pinned source; optionally copy it to a new CI-only tree.
 
 No local task archive, mutable reference directory, native SDK binary or old
-generated cache is an input. Current344 must already be adopted in the checkout.
-The optional reference is full344 with exactly four pinned historical search baseline files.
+generated cache is an input. Current351 must already be adopted in the checkout.
+The optional reference is full351 with exactly four pinned historical search baseline files.
 """
 import argparse
 import hashlib
@@ -17,6 +17,8 @@ REPO = Path(__file__).resolve().parent.parent
 INPUTS = REPO / 'ci/mobile/inputs.json'
 FLOOR = 1024 ** 3
 INITIAL = 4 * FLOOR
+CARD_TEST_PATHS = ['test/features/chat/chat_card_model_test.dart', 'test/features/chat/chat_card_repository_test.dart', 'test/features/chat/chat_card_workflow_test.dart']
+CARD_ANALYSIS_PATHS = ['lib/design/components/feedback.dart', 'lib/features/chat/data/chat_repository.dart', 'lib/features/chat/data/message_mapper.dart', 'lib/features/chat/domain/chat_card.dart', 'lib/features/chat/domain/chat_message.dart', 'lib/features/chat/presentation/chat_card_picker_page.dart', 'lib/features/chat/presentation/chat_card_view.dart', 'lib/features/chat/presentation/chat_controller.dart', 'lib/features/chat/presentation/chat_media_actions.dart', 'lib/features/chat/presentation/chat_page.dart', 'lib/features/contacts/data/contacts_repository.dart', 'lib/features/contacts/presentation/user_profile_page.dart', 'lib/features/group/data/group_repository.dart', 'test/features/chat/chat_card_fixture.dart', 'test/features/chat/chat_card_model_test.dart', 'test/features/chat/chat_card_repository_test.dart', 'test/features/chat/chat_card_workflow_test.dart']
 WEBVIEW = {
     'webview_flutter': ('4.14.1', 'd53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111', 'direct main'),
     'webview_flutter_android': ('4.12.0', 'ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688', 'direct main'),
@@ -106,17 +108,17 @@ def native_source_contract(plan):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v16'
-            or plan['current344']['members'] != 344
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v17'
+            or plan['current351']['members'] != 351
             or plan['sdk_portable']['members'] != 51
-            or plan['portable_members'] != {'current344': 396}
-            or plan['current344']['expected_target_tests'] != 460
-            or plan['current344']['expected_full_tests'] != 1142
-            or plan['current344']['target_paths'] != ['test/features/qr', 'test/features/search', 'test/features/group/create_group_entry_test.dart', 'test/features/group/create_group_repository_test.dart', 'test/features/group/create_group_workflow_test.dart', 'test/features/group/group_creation_entry_test.dart', 'test/features/group/group_creation_entry_workflow_test.dart', 'test/features/group/chat_cid_route_test.dart', 'test/features/conversation/contact_shortcuts_test.dart', 'test/features/rtc/call_records_repository_test.dart', 'test/features/rtc/call_history_pipeline_test.dart', 'test/features/rtc/call_records_page_test.dart', 'test/features/rtc/call_history_lifetime_test.dart', 'test/features/conversation/next_unread_repository_test.dart', 'test/features/conversation/next_unread_controller_test.dart', 'test/features/conversation/next_unread_page_test.dart', 'test/features/meeting/meeting_routes_test.dart', 'test/features/meeting/booking/booking_capability_discovery_test.dart', 'test/features/chat/chat_reading_preferences_test.dart', 'test/features/chat/chat_font_size_page_test.dart', 'test/features/chat/chat_font_entry_test.dart', 'test/features/chat/chat_background_store_test.dart', 'test/features/chat/chat_background_page_test.dart', 'test/features/chat/chat_background_entry_test.dart', 'test/features/chat/chat_background_recovery_test.dart', 'test/features/chat/saved_emoji_entry_test.dart', 'test/features/chat/saved_emoji_repository_test.dart', 'test/features/chat/saved_emoji_store_test.dart', 'test/features/chat/saved_emoji_workflow_test.dart', 'test/features/chat/chat_location_test.dart', 'test/features/chat/chat_location_workflow_test.dart', 'test/features/chat/location_pick_test.dart', 'test/features/chat/location_send_repository_test.dart', 'test/features/chat/location_send_workflow_test.dart', 'test/features/chat/location_map_host_test.dart']
-            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336'))):
-        raise ValueError('current344 schema v16 inventory differs; no historical aliases')
+            or plan['portable_members'] != {'current351': 403}
+            or plan['current351']['expected_target_tests'] != 540
+            or plan['current351']['expected_full_tests'] != 1222
+            or plan['current351']['target_paths'] != ['test/features/qr', 'test/features/search', 'test/features/group/create_group_entry_test.dart', 'test/features/group/create_group_repository_test.dart', 'test/features/group/create_group_workflow_test.dart', 'test/features/group/group_creation_entry_test.dart', 'test/features/group/group_creation_entry_workflow_test.dart', 'test/features/group/chat_cid_route_test.dart', 'test/features/conversation/contact_shortcuts_test.dart', 'test/features/rtc/call_records_repository_test.dart', 'test/features/rtc/call_history_pipeline_test.dart', 'test/features/rtc/call_records_page_test.dart', 'test/features/rtc/call_history_lifetime_test.dart', 'test/features/conversation/next_unread_repository_test.dart', 'test/features/conversation/next_unread_controller_test.dart', 'test/features/conversation/next_unread_page_test.dart', 'test/features/meeting/meeting_routes_test.dart', 'test/features/meeting/booking/booking_capability_discovery_test.dart', 'test/features/chat/chat_reading_preferences_test.dart', 'test/features/chat/chat_font_size_page_test.dart', 'test/features/chat/chat_font_entry_test.dart', 'test/features/chat/chat_background_store_test.dart', 'test/features/chat/chat_background_page_test.dart', 'test/features/chat/chat_background_entry_test.dart', 'test/features/chat/chat_background_recovery_test.dart', 'test/features/chat/saved_emoji_entry_test.dart', 'test/features/chat/saved_emoji_repository_test.dart', 'test/features/chat/saved_emoji_store_test.dart', 'test/features/chat/saved_emoji_workflow_test.dart', 'test/features/chat/chat_location_test.dart', 'test/features/chat/chat_location_workflow_test.dart', 'test/features/chat/location_pick_test.dart', 'test/features/chat/location_send_repository_test.dart', 'test/features/chat/location_send_workflow_test.dart', 'test/features/chat/location_map_host_test.dart', 'test/features/chat/chat_card_model_test.dart', 'test/features/chat/chat_card_repository_test.dart', 'test/features/chat/chat_card_workflow_test.dart']
+            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344'))):
+        raise ValueError('current351 schema v17 inventory differs; no historical aliases')
     reference = plan['reference_entry']
-    if (reference['working_cohort'] != 'current344' or reference['members'] != 344
+    if (reference['working_cohort'] != 'current351' or reference['members'] != 351
             or reference['default_enabled'] is not False
             or len(reference['replacement_files']) != 4
             or len({row['path'] for row in reference['replacement_files']}) != 4
@@ -124,23 +126,24 @@ def descriptor():
             or reference['expected_visible_tests'] != 2
             or reference['expected_assertion_failures'] != 1
             or reference['expected_passed'] != 1 or reference['expected_child_exit'] != 1):
-        raise ValueError('reference entry must be the explicit two-test full344 variant')
+        raise ValueError('reference entry must be the explicit two-test full351 variant')
     native_source_contract(plan)
+    card_contract(plan)
     return plan
 
 
 def load_sources(cohort):
-    if cohort != 'current344':
-        raise ValueError('schema v16 supports current344 only; historical cohorts are not aliases')
+    if cohort != 'current351':
+        raise ValueError('schema v17 supports current351 only; historical cohorts are not aliases')
     plan = descriptor()
     selected = {}
-    for row in plan['current344']['files']:
+    for row in plan['current351']['files']:
         name = row['path']
         if name in selected or not name.startswith('app/'):
             raise ValueError('duplicate or out-of-scope current source')
         selected[name] = check(regular(REPO / safe_name(name)), row)
-    if len(selected) != 344 or source_digest(selected) != plan['current344']['source_digest']:
-        raise ValueError('current344 aggregate differs')
+    if len(selected) != 351 or source_digest(selected) != plan['current351']['source_digest']:
+        raise ValueError('current351 aggregate differs')
     actual = set()
     for prefix in ('app/lib', 'app/test', 'app/tool'):
         for directory, dirs, names in os.walk(REPO / prefix, followlinks=False):
@@ -173,7 +176,7 @@ def load_sources(cohort):
 
 
 def reference_sources(plan, files):
-    """Full396 portable closure; only the four named App source bodies differ."""
+    """Full403 portable closure; only the four named App source bodies differ."""
     result = dict(files)
     baseline = plan['reference_entry']
     for row in baseline['replacement_files']:
@@ -182,8 +185,8 @@ def reference_sources(plan, files):
             raise ValueError('reference replacement outside original production files')
         result[name] = check(regular(REPO / baseline['baseline_prefix'] / name), row)
     authored = {name: body for name, body in result.items() if name.startswith('app/')}
-    if len(authored) != 344 or source_digest(authored) != baseline['reference_source_digest']:
-        raise ValueError('reference is not the exact full344 variant')
+    if len(authored) != 351 or source_digest(authored) != baseline['reference_source_digest']:
+        raise ValueError('reference is not the exact full351 variant')
     return result
 
 
@@ -193,7 +196,7 @@ def required_names(plan):
     if item['path'] != 'ci/mobile/required-test-names.json':
         raise ValueError('required test names path differs')
     value = json.loads(check(regular(REPO / safe_name(item['path'])), item))
-    if value['schema'] != 'luobo.mobile.required-successful-names.v12' or value['cohort'] != 'current344':
+    if value['schema'] != 'luobo.mobile.required-successful-names.v13' or value['cohort'] != 'current351':
         raise ValueError('required test names identity differs')
     for key, expected in [('parent_full922', 922), ('new_next_unread29', 29),
                           ('parent_target281', 281), ('parent_target303', 303), ('parent_target345', 345), ('parent_target386', 386), ('current_target422', 422), ('new_location_receive36', 36), ('parent_full1068', 1068), ('new_saved_emoji41', 41), ('parent_full1027', 1027),
@@ -203,7 +206,9 @@ def required_names(plan):
                           ('parent_full955', 955), ('parent_target273', 273),
                           ('new_booking_capability8', 8), ('parent_target422', 422),
                           ('parent_full1104', 1104), ('new_location_send38', 38),
-                          ('current_target460', 460)]:
+                          ('current_target460', 460), ('parent_target460', 460),
+                          ('parent_full1142', 1142), ('new_chat_card80', 80),
+                          ('current_target540', 540)]:
         entries = value[key]
         if (not isinstance(entries, list) or len({r['name'] for r in entries}) != len(entries)
                 or any(not isinstance(r['name'], str) or not r['name']
@@ -239,6 +244,14 @@ def required_names(plan):
     if (not {row['name'] for row in value['new_meeting_entry4']} <= meeting_names
             or not meeting_names <= {row['name'] for row in value['current_full1104']}):
         raise ValueError('meeting route names do not preserve parent plus new cases')
+    if (value['parent_target460'] != value['current_target460']
+            or value['parent_full1142'] != sorted(value['current_full1142'], key=lambda r: r['name'])
+            or value['current_target540'] != sorted(value['parent_target460'] + value['new_chat_card80'], key=lambda r: r['name'])):
+        raise ValueError('card names do not preserve exact parent names')
+    value['current_full1222'] = value['parent_full1142'] + value['new_chat_card80']
+    if len({r['name'] for r in value['current_full1222']}) != 1222:
+        raise ValueError('card names overlap parent names')
+    card_contract(plan, value)
     cleanup_contract(plan, value)
     next_unread_contract(plan, value)
     return value
@@ -282,6 +295,27 @@ def next_unread_contract(plan, names):
     return contract
 
 
+def card_contract(plan, names=None):
+    contract = plan['chat_card']
+    selected = contract['selected_files']
+    inventory = {r['path']: r for r in plan['current351']['files']}
+    if (contract['test_paths'] != CARD_TEST_PATHS or contract['analysis_paths'] != CARD_ANALYSIS_PATHS
+            or type(contract['expected_focused_tests']) is not int or contract['expected_focused_tests'] != 80
+            or len(selected) != 17 or len({r['path'] for r in selected}) != 17
+            or {r['path'] for r in selected} != {'app/' + p for p in CARD_ANALYSIS_PATHS}
+            or any(r != inventory.get(r['path']) for r in selected)
+            or contract['widget_markers'] != ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end']
+            or contract['repository_markers'] != ['sdk.begin', 'sdk.end', 'storage.begin', 'storage.end']):
+        raise ValueError('card source/analysis/cleanup inventory differs')
+    groups = [contract['model_names'], contract['repository_names'], contract['widget_names']]
+    union = [n for group in groups for n in group]
+    if (list(map(len, groups)) != [7, 32, 41] or len(set(union)) != 80
+            or any(not isinstance(n, str) or not n for n in union)
+            or (names is not None and sorted(union) != sorted(r['name'] for r in names['new_chat_card80']))):
+        raise ValueError('card exact successful names/cleanup ownership differs')
+    return contract
+
+
 def materialize(output, cohort):
     # Initial admission precedes reading the full source inventory.
     if (not output.is_absolute() or output.resolve() != output or output.exists()
@@ -310,7 +344,7 @@ def materialize(output, cohort):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cohort', choices=('current344',), required=True)
+    p.add_argument('--cohort', choices=('current351',), required=True)
     p.add_argument('--output', type=Path, help='explicit fresh output; omitted means readonly')
     args = p.parse_args()
     if args.output:

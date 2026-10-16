@@ -312,7 +312,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full344 tree; restore exact after4 even if the reference fails."""
+    """Separate full351 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -383,8 +383,8 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after344_and_primary_source_reverified',
-                    'source_digest': plan['current344']['source_digest'],
+                   {'state': 'after351_and_primary_source_reverified',
+                    'source_digest': plan['current351']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
 
 
@@ -488,7 +488,64 @@ def next_unread_cleanup_summary(text, contract):
             'no_own_SQLite_or_marker_claim_for_other18': True}
 
 
-def run(work, cohort, reference=False):
+def validation_plan(plan, mode, reference=False):
+    if mode not in ('chat-card-80', 'full-regression') or type(reference) is not bool:
+        raise ValueError('unsupported validation mode/reference')
+    if reference and mode != 'full-regression':
+        raise ValueError('reference entry requires explicit full-regression mode')
+    card = source.card_contract(plan)
+    if mode == 'chat-card-80':
+        return {'test_label': 'chat-card80', 'expected': 80,
+                'test_paths': list(card['test_paths']), 'names_key': 'new_chat_card80',
+                'analysis_paths': list(card['analysis_paths'])}
+    return {'test_label': 'full1222', 'expected': plan['current351']['expected_full_tests'],
+            'test_paths': [], 'names_key': 'current_full1222', 'analysis_paths': None}
+
+
+def card_cleanup_summary(text, contract):
+    starts, sequences = {}, {}
+    prefixes = {'chat_card_cleanup ': ('widget_names', 'widget_markers'),
+                'chat_card_repository_cleanup ': ('repository_names', 'repository_markers')}
+    for line in text.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if event.get('type') == 'testStart':
+            identity = event['test']['id']
+            if identity in starts:
+                raise ValueError('card cleanup duplicate test start')
+            starts[identity] = event['test'].get('name')
+        if event.get('type') != 'print' or not isinstance(event.get('message'), str):
+            continue
+        for prefix, (group, markers) in prefixes.items():
+            if event['message'].startswith(prefix):
+                identity = event.get('testID')
+                if identity not in starts or starts[identity] not in contract[group]:
+                    raise ValueError('card cleanup unknown or foreign test')
+                sequences.setdefault((group, identity), []).append(event['message'][len(prefix):])
+    counts = {}
+    for group, markers in prefixes.values():
+        actual = []
+        for (kind, identity), sequence in sequences.items():
+            if kind != group:
+                continue
+            name = starts[identity]
+            if name in actual or sequence != contract[markers]:
+                raise ValueError('card cleanup missing/duplicate/out-of-order shutdown tail')
+            actual.append(name)
+        if set(actual) != set(contract[group]):
+            raise ValueError('card cleanup missing owned SDK shutdown sequence')
+        counts[group] = len(actual)
+    return dict(counts, exact_owned_four_marker_sequences=True,
+                model_cases_without_SDK_claim=len(contract['model_names']))
+
+
+def run(work, cohort, reference=False, validation_mode='chat-card-80'):
+    # Invalid mode/reference combinations fail before namespace or child work.
+    validation_plan(source.descriptor(), validation_mode, reference)
     prove_namespace()
     plan, digest = verify(work, cohort)
     guard = Guard(work)
@@ -503,42 +560,38 @@ def run(work, cohort, reference=False):
         if reference:
             counts['reference_entry'] = run_reference_entry(work, cohort, plan, tests, guard)
         verify(work, cohort)
-        target_expected = plan['current344']['expected_target_tests']
-        target_label = 'target' + str(target_expected)
-        log = guarded(tests + plan['current344']['target_paths'], work, guard, target_label)
-        counts['target'] = machine_summary(log.read_text(), target_expected)
         required = source.required_names(plan)
-        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target460'])
-        cleanup = source.cleanup_contract(plan, required)
-        counts['target_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
-        next_cleanup = source.next_unread_contract(plan, required)
-        counts['target_next_unread_cleanup'] = next_unread_cleanup_summary(log.read_text(), next_cleanup)
-        write_json(work / 'evidence' / (target_label + '.next-unread-cleanup.json'), counts['target_next_unread_cleanup'])
-        write_json(work / 'evidence' / (target_label + '.cleanup.json'), counts['target_cleanup'])
-        write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
+        phase = validation_plan(plan, validation_mode, reference)
+        expected, label = phase['expected'], phase['test_label']
+        log = guarded(tests + phase['test_paths'], work, guard, label)
+        text = log.read_text()
+        counts['tests'] = machine_summary(text, expected)
+        counts['successful_names'] = required_name_summary(text, expected, required[phase['names_key']])
+        card = source.card_contract(plan, required)
+        counts['card_cleanup'] = card_cleanup_summary(text, card)
+        write_json(work / 'evidence' / (label + '.card-cleanup.json'), counts['card_cleanup'])
+        if validation_mode == 'full-regression':
+            counts['parent_cleanup'] = call_records_cleanup_summary(text, source.cleanup_contract(plan, required))
+            counts['parent_next_unread_cleanup'] = next_unread_cleanup_summary(text, source.next_unread_contract(plan, required))
+            write_json(work / 'evidence/full.cleanup.json', counts['parent_cleanup'])
+            write_json(work / 'evidence/full.next-unread-cleanup.json', counts['parent_next_unread_cleanup'])
+        write_json(work / 'evidence' / (label + '.summary.json'), counts)
         verify(work, cohort)
-        expected = plan['current344']['expected_full_tests']
-        log = guarded(tests, work, guard, 'full' + str(expected))
-        counts['full'] = machine_summary(log.read_text(), expected)
-        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full1142'])
-        counts['full_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
-        counts['full_next_unread_cleanup'] = next_unread_cleanup_summary(log.read_text(), next_cleanup)
-        write_json(work / 'evidence/full.next-unread-cleanup.json', counts['full_next_unread_cleanup'])
-        counts['parent922_names_preserved'] = True
-        counts['new_next_unread29_exact'] = True
-        write_json(work / 'evidence/full.cleanup.json', counts['full_cleanup'])
-        counts['parent872_preserved'] = True
-        counts['new_call_records50_exact'] = True
-        counts['parent822_plus29_plus3_preserved'] = True
-        counts['new_shortcuts18_exact'] = True
-        write_json(work / 'evidence/full.summary.json', counts['full'])
-        verify(work, cohort)
-        guarded([flutter, 'analyze', '--no-pub', '--fatal-infos', '--fatal-warnings'],
-                work, guard, 'analyze')
+        if phase['analysis_paths'] is None:
+            guarded([flutter, 'analyze', '--no-pub', '--fatal-infos', '--fatal-warnings'],
+                    work, guard, 'analyze')
+            counts['whole_app_analysis'] = True
+        else:
+            dart = str(work / 'flutter/bin/cache/dart-sdk/bin/dart')
+            for index, path in enumerate(phase['analysis_paths'], 1):
+                guarded([dart, 'analyze', '--fatal-infos', path], work, guard,
+                        'analyze-card-' + str(index).zfill(2))
+                verify(work, cohort)
+            counts['selected_analysis_files'] = len(phase['analysis_paths'])
         verify(work, cohort)
         passed = {'state': 'completed_current_source_unit_widget_analysis',
                   'cohort': cohort, 'authored_source_digest': digest,
-                  'counts': counts, 'native_or_service_acceptance': False,
+                  'validation_mode': validation_mode, 'counts': counts, 'native_or_service_acceptance': False,
                   'network': 'fresh network namespace; synthetic in-process loopback only'}
         write_json(work / 'evidence/validation-passed.json', passed)
         guard.sample()  # Receipt write/fsync remains under the continuous poll.
@@ -568,9 +621,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current344',), required=True)
+    p.add_argument('--cohort', choices=('current351',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full344 variant; exactly one entry assertion fails and one old filter passes')
+                   help='explicit full351 variant; exactly one entry assertion fails and one old filter passes')
+    p.add_argument('--validation-mode', choices=('chat-card-80', 'full-regression'), default='chat-card-80')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')
@@ -578,7 +632,7 @@ def main():
         _, digest = verify(a.work, a.cohort)
         print(json.dumps({'state': 'verified', 'cohort': a.cohort, 'source_digest': digest}))
     else:
-        run(a.work, a.cohort, reference=a.reference_before_entry)
+        run(a.work, a.cohort, reference=a.reference_before_entry, validation_mode=a.validation_mode)
 
 
 if __name__ == '__main__':

@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Called by `sudo unshare --net`; this namespace contains no host fixture.
 set -euo pipefail
-[[ ( $# == 4 || $# == 5 ) && $EUID == 0 ]] || exit 2
+[[ ( $# == 5 || $# == 6 ) && $EUID == 0 ]] || exit 2
 run_as=$1
 repo=$2
 work=$3
 cohort=$4
+validation_mode=$5
+[[ "$validation_mode" == chat-card-80 || "$validation_mode" == full-regression ]]
 reference_args=()
-if [[ $# == 5 ]]; then
-  [[ $5 == reference-before-entry ]] || exit 2
+if [[ $# == 6 ]]; then
+  [[ $6 == reference-before-entry && "$validation_mode" == full-regression ]] || exit 2
   reference_args=(--reference-before-entry)
 fi
 [[ "$run_as" != root && "$repo" == /* && "$work" == /* ]]
@@ -24,4 +26,4 @@ exec runuser -u "$run_as" -- env -i \
   XDG_CONFIG_HOME="$work/config" XDG_CACHE_HOME="$work/config/cache" \
   FLUTTER_ROOT="$work/flutter" FLUTTER_SUPPRESS_ANALYTICS=true \
   DART_SUPPRESS_ANALYTICS=true CI=true TERM=dumb \
-  python3 "$repo/ci/mobile-check.py" run --cohort "$cohort" --work "$work" "${reference_args[@]}"
+  python3 "$repo/ci/mobile-check.py" run --cohort "$cohort" --work "$work" --validation-mode "$validation_mode" "${reference_args[@]}"

@@ -1,3 +1,4 @@
+import type { MessageCardSource } from "@/core/messageCard";
 import { useLatest, useRequest } from "ahooks";
 import { Layout, Spin } from "antd";
 import clsx from "clsx";
@@ -24,6 +25,7 @@ const ChatContent = ({ isNotificationSession }: { isNotificationSession: boolean
   const [lockScroll, setLockScroll] = useState(true);
   const scrollDivRef = useRef<HTMLDivElement>(null);
   const [mergeData, setMergeData] = useState<MergeElem | null>(null);
+  const [mergeSource, setMergeSource] = useState<MessageCardSource>();
   const mergePreviewRef = useRef<OverlayVisibleHandle>(null);
   const mediaPreviewRef = useRef<{ showAlbum: (clientMsgID: string) => void }>(null);
   const unreadSliderRef = useRef<UnreadMessageSliderHandle>(null);
@@ -148,7 +150,9 @@ const ChatContent = ({ isNotificationSession }: { isNotificationSession: boolean
     getMoreMessagesReverse();
   };
 
-  const showMergeModal = useCallback((data: MergeElem) => {
+  const showMergeModal = useCallback((data: MergeElem, source: MessageCardSource) => {
+    if (!source.current()) return;
+    setMergeSource(source);
     setMergeData(data);
     mergePreviewRef.current?.openOverlay();
   }, []);
@@ -222,7 +226,7 @@ const ChatContent = ({ isNotificationSession }: { isNotificationSession: boolean
         ref={mediaPreviewRef}
         conversationID={conversationID ?? ""}
       />
-      <MergePreviewModal ref={mergePreviewRef} mergeData={mergeData!} />
+      <MergePreviewModal ref={mergePreviewRef} mergeData={mergeData!} source={mergeSource} />
     </Layout.Content>
   );
 };

@@ -1,7 +1,7 @@
 {
   "version": 3,
   "node": "24.21.0",
-  "fullMinimumTests": 689,
+  "fullMinimumTests": 731,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -613,5 +613,342 @@
     "currentSourceDigest": "b7ddd15456d06038db09b09ff40d00953487ebb55982893d4fc5c3bd2a301358",
     "sourceAdoptedCloudPending": true,
     "historicalCallersBaselinePreserved": true
+  },
+  "chatCardAdoption": {
+    "originManifestSHA256": "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a",
+    "before": [
+      {
+        "bytes": 10805,
+        "sha256": "5f8b5fdf05dd32205355b9685c090ced59bd877279fde1fe7a0f3c485d44ede2",
+        "path": "web/src/layout/TopSearchBar/index.tsx"
+      },
+      {
+        "bytes": 7484,
+        "sha256": "3f1076a4a40f44435f034a2565349371cd670e489ef02260768b711657bbb845",
+        "path": "web/src/pages/chat/queryChat/ChatContent.tsx"
+      },
+      {
+        "bytes": 1016,
+        "sha256": "524317bd7fe491214f6337a17f0b90ac13eb4df0c062f203b1707a1fd0475863",
+        "path": "web/src/pages/chat/queryChat/MessageItem/CardMessageRenderer.tsx"
+      },
+      {
+        "bytes": 1197,
+        "sha256": "6c20f0469e13b48060d49f72125d234aae1968061be0ccffeab5e6d7bdbb8ff8",
+        "path": "web/src/pages/chat/queryChat/MessageItem/MergeMessageRenderer.tsx"
+      },
+      {
+        "bytes": 5935,
+        "sha256": "b50e655933e085ae583da07e9516cb48d8bf5ada6bd4ca3569a098499044a6e3",
+        "path": "web/src/pages/chat/queryChat/MessageItem/QuoteMessageRenderer.tsx"
+      },
+      {
+        "bytes": 12022,
+        "sha256": "e5a44ce820b38c3ff889de3843cf5ac5989fb0988de3debe64eb4627607c17b0",
+        "path": "web/src/pages/chat/queryChat/MessageItem/index.tsx"
+      },
+      {
+        "bytes": 17863,
+        "sha256": "8c84fefc325aa9def40bbcec9eb9a63cf50d29816c20ba842aedcfbe92bd087e",
+        "path": "web/src/pages/common/ChooseModal/index.tsx"
+      },
+      {
+        "bytes": 1842,
+        "sha256": "a2966391aed3cfc457118046e257c8cde17231b64063e6b9a7df76a5aac8fe6a",
+        "path": "web/src/pages/common/MergePreviewModal.tsx"
+      },
+      {
+        "bytes": 3496,
+        "sha256": "1d588f80b2152f3657b8256344a11598ecbdbcf5081772f06795dbc3bc66f7df",
+        "path": "web/src/pages/common/UserCardModal/CardActionRow.tsx"
+      },
+      {
+        "bytes": 17619,
+        "sha256": "d9df6eb3e3930c72f137178206de75a99e1ca0037e54975f1c5555e0c50cb85a",
+        "path": "web/src/pages/common/UserCardModal/index.tsx"
+      },
+      {
+        "bytes": 13190,
+        "sha256": "fd0a86cfdf4212a3f6c09c2fc9e796cec51cf345de884a42a54e6d2d0835de35",
+        "path": "web/src/store/conversation.ts"
+      },
+      {
+        "bytes": 7872,
+        "sha256": "75bbaeb6142e920bb2a25d4a22cc4705f00f5eed730961573f44d8c67766eb46",
+        "path": "web/src/store/type.d.ts"
+      },
+      {
+        "bytes": 1286,
+        "sha256": "c2f1252e10d5582b835e03fed3f05e5dafa92aaf70da5b3cdc066b40de67545d",
+        "path": "web/src/utils/events.ts"
+      }
+    ],
+    "currentAfter": [
+      {
+        "bytes": 7384,
+        "sha256": "a38d0d2f9802881aec9c1d61afa5f1aae1b07de0f746662a6c5ab0f6b987bbde",
+        "path": "web/src/components/ReceivedMessageCard.tsx"
+      },
+      {
+        "bytes": 1921,
+        "sha256": "1db68cef19ae6949de1684a203b4389dff5f2ca2f80277c35adbc31d9edc58f0",
+        "path": "web/src/core/messageCard.ts"
+      },
+      {
+        "bytes": 11008,
+        "sha256": "d89402b7308609e2be60f581ae5710fd2bc54e89fc04fca135bbc25c9673dbd5",
+        "path": "web/src/layout/TopSearchBar/index.tsx"
+      },
+      {
+        "bytes": 7727,
+        "sha256": "6da63eb7e943d0f16acdf6ee21a04b0dcb22cf54652fb76bacbdbfaf22d8a2cb",
+        "path": "web/src/pages/chat/queryChat/ChatContent.tsx"
+      },
+      {
+        "bytes": 338,
+        "sha256": "5c107b4952b328fdc14d527e3b630605a9dad4ab1b7c3d372b757fac929fad51",
+        "path": "web/src/pages/chat/queryChat/MessageItem/CardMessageRenderer.tsx"
+      },
+      {
+        "bytes": 1777,
+        "sha256": "6c77d7d6cbde0134c9c5c8f96ed19dceebb84ea4c32df6f811c3dde5885d5706",
+        "path": "web/src/pages/chat/queryChat/MessageItem/MergeMessageRenderer.tsx"
+      },
+      {
+        "bytes": 6029,
+        "sha256": "9aa5186064278447b61babe0f136623089b8701e230bb6a1fe9f0825439f4070",
+        "path": "web/src/pages/chat/queryChat/MessageItem/QuoteMessageRenderer.tsx"
+      },
+      {
+        "bytes": 12110,
+        "sha256": "f6ff9fd4c6b0c3334ececd31450ad01d449560427c754245c687946bf10fd372",
+        "path": "web/src/pages/chat/queryChat/MessageItem/index.tsx"
+      },
+      {
+        "bytes": 18464,
+        "sha256": "9d856011a50f95c81b3f841224a79f26c77c923128e70861c24794d65b335b44",
+        "path": "web/src/pages/common/ChooseModal/index.tsx"
+      },
+      {
+        "bytes": 3362,
+        "sha256": "f53c1c18296083e8702a0cafa6259c8bc99bdd98af0b3f91b6927684640d649e",
+        "path": "web/src/pages/common/MergePreviewModal.tsx"
+      },
+      {
+        "bytes": 4337,
+        "sha256": "a9c6e7e6f67f60f1df462c435f5d9ed385b37d00fcb21cdb7f18fc418771f739",
+        "path": "web/src/pages/common/UserCardModal/CardActionRow.tsx"
+      },
+      {
+        "bytes": 18758,
+        "sha256": "844a5c70a6ffe37e06ae01ed544a1fbf60a203ac65a189ba5971bfda94292a8d",
+        "path": "web/src/pages/common/UserCardModal/index.tsx"
+      },
+      {
+        "bytes": 14307,
+        "sha256": "2ba973ea871393cb298d965381f22cbf4b6912263498275a06d6363a18517821",
+        "path": "web/src/store/conversation.ts"
+      },
+      {
+        "bytes": 8002,
+        "sha256": "a775c31d8a112fdf554d9dfab3dd2a00955af77f75eb23c4b3ba764c1dd51b17",
+        "path": "web/src/store/type.d.ts"
+      },
+      {
+        "bytes": 1411,
+        "sha256": "5ddf09cd5fed9ff6cd5ceaa5a008444237f3c6440f96076eb385cf98ac44393f",
+        "path": "web/src/utils/events.ts"
+      }
+    ],
+    "adoptedTests": [
+      {
+        "path": "web/src/core/messageCard/cardShareSource.test.tsx",
+        "bytes": 13433,
+        "sha256": "e411aefe7fff8e2606d521c4c62a88c138e3376b83b23196d2a3784936256bd0"
+      },
+      {
+        "path": "web/src/core/messageCard/messageCard.test.ts",
+        "bytes": 1995,
+        "sha256": "1b9f723047cdf73302846344171a031f1e82ec74ac9f0a7342db1a06d4439b8a"
+      },
+      {
+        "path": "web/src/core/messageCard/receivedCardComponents.test.tsx",
+        "bytes": 24585,
+        "sha256": "37171b09b9c0b55aab776c3bc6edd87babc29593a85e1755315c77379a9ef949"
+      },
+      {
+        "path": "web/src/core/messageCard/shareHarness.ts",
+        "bytes": 7074,
+        "sha256": "45a8fe1d112b628f8e2f5b3d7895e2478b043ed5384317520a39b35b5ebd3a5f"
+      }
+    ],
+    "testPaths": [
+      "src/core/messageCard/messageCard.test.ts",
+      "src/core/messageCard/receivedCardComponents.test.tsx",
+      "src/core/messageCard/cardShareSource.test.tsx"
+    ],
+    "tests": 37,
+    "requiredNames": [
+      "accepts exact opaque IDs, trims a display name and discards URL/ex fields",
+      "rejects malformed shapes and invalid exact IDs without coercion",
+      "rejects control, bidi and non-lossless Unicode while preserving plain URL-like text",
+      "counts nickname Unicode scalars while enforcing optional field and total UTF8 limits",
+      "ordinary renderer never constructs an image or desktop download from received faceURL",
+      "actual search row uses the same safe renderer, preserving exact ID",
+      "quoted card discards the URL and rejects malformed cardElem without formatter crash",
+      "invalid cards show only a safe placeholder with no clickable target",
+      "renders URL-like nickname as inert text in ordinary and quoted cards",
+      "retained source callback rejects account/issuer ABA, without needing a rerender",
+      "retained source callback rejects navigation A to B to A and original-history clear",
+      "rejects a retained identity after CID props change, message mutation or unmount",
+      "expires a private card at its original read time without retaining a click grant",
+      "actual merge renderer sends a fixed original CID and retention source to its host",
+      "merge close/reopen invalidates an old child card while a fresh open remains readable",
+      "explicit valid click hydrates exact SDK and business identity, never received faceURL",
+      "does not continue late SDK hydration after original history was cleared",
+      "automatically closes an already hydrated panel when the source row unmounts",
+      "drops a stale business response and closes on a navigation ABA",
+      "preserves normal non-message exact-ID profile behavior without a source callback",
+      "reads a live private card profile but cannot emit a share or create a new card",
+      "retention includes original root and inherited merge sources, without revoking view",
+      "restricted group profile is not hydrated, including a spoofed payload groupID",
+      "known group source passes its original groupID and prevents friend application",
+      "does not borrow foreign group metadata and becomes readable after the existing source resolves",
+      "a late permission change closes the opened panel and invalidates its retained source",
+      "synchronous actual-store policy A-B-A permanently revokes an open picker, and a new explicit card operation works",
+      "actual-store role, status and self-membership ABA revoke old callbacks but value-equal refresh preserves a new one",
+      "a denied retention capability stops card creation even while view remains current",
+      "retention is rechecked inside the real sender after its last target lookup",
+      "share, unfriend and call have native keyboard buttons with 44px targets and original actions",
+      "actual read-only navigation scope permits a notification card without a send capability",
+      "CardActionRow passes the message source independently of the profile it closes",
+      "a current message source permits legitimate explicit cross-chat sharing",
+      "does not dispatch when the source is invalidated during card construction",
+      "the actual final send hook rechecks the source after target resolution awaits",
+      "history clear stops the source-backed share and ordinary no-source shares retain behavior"
+    ],
+    "acceptedFullNames": [
+      "bounded OpenIM 108 identity hint accepts exact opaque IDs, trims a display name and discards URL/ex fields",
+      "bounded OpenIM 108 identity hint rejects malformed shapes and invalid exact IDs without coercion",
+      "bounded OpenIM 108 identity hint rejects control, bidi and non-lossless Unicode while preserving plain URL-like text",
+      "bounded OpenIM 108 identity hint counts nickname Unicode scalars while enforcing optional field and total UTF8 limits",
+      "received cards and original-message provenance ordinary renderer never constructs an image or desktop download from received faceURL",
+      "received cards and original-message provenance actual search row uses the same safe renderer, preserving exact ID",
+      "received cards and original-message provenance quoted card discards the URL and rejects malformed cardElem without formatter crash",
+      "received cards and original-message provenance invalid cards show only a safe placeholder with no clickable target",
+      "received cards and original-message provenance renders URL-like nickname as inert text in ordinary and quoted cards",
+      "received cards and original-message provenance retained source callback rejects account/issuer ABA, without needing a rerender",
+      "received cards and original-message provenance retained source callback rejects navigation A to B to A and original-history clear",
+      "received cards and original-message provenance rejects a retained identity after CID props change, message mutation or unmount",
+      "received cards and original-message provenance expires a private card at its original read time without retaining a click grant",
+      "received cards and original-message provenance actual merge renderer sends a fixed original CID and retention source to its host",
+      "received cards and original-message provenance merge close/reopen invalidates an old child card while a fresh open remains readable",
+      "actual exact-ID profile resolver keeps message provenance explicit valid click hydrates exact SDK and business identity, never received faceURL",
+      "actual exact-ID profile resolver keeps message provenance does not continue late SDK hydration after original history was cleared",
+      "actual exact-ID profile resolver keeps message provenance automatically closes an already hydrated panel when the source row unmounts",
+      "actual exact-ID profile resolver keeps message provenance drops a stale business response and closes on a navigation ABA",
+      "actual exact-ID profile resolver keeps message provenance preserves normal non-message exact-ID profile behavior without a source callback",
+      "view and retention remain distinct for private card sources reads a live private card profile but cannot emit a share or create a new card",
+      "view and retention remain distinct for private card sources retention includes original root and inherited merge sources, without revoking view",
+      "original group policy for received cards restricted group profile is not hydrated, including a spoofed payload groupID",
+      "original group policy for received cards known group source passes its original groupID and prevents friend application",
+      "original group policy for received cards does not borrow foreign group metadata and becomes readable after the existing source resolves",
+      "original group policy for received cards a late permission change closes the opened panel and invalidates its retained source",
+      "message-derived card sharing keeps its original source synchronous actual-store policy A-B-A permanently revokes an open picker, and a new explicit card operation works",
+      "message-derived card sharing keeps its original source actual-store role, status and self-membership ABA revoke old callbacks but value-equal refresh preserves a new one",
+      "message-derived card sharing keeps its original source a denied retention capability stops card creation even while view remains current",
+      "message-derived card sharing keeps its original source retention is rechecked inside the real sender after its last target lookup",
+      "message-derived card sharing keeps its original source share, unfriend and call have native keyboard buttons with 44px targets and original actions",
+      "message-derived card sharing keeps its original source actual read-only navigation scope permits a notification card without a send capability",
+      "message-derived card sharing keeps its original source CardActionRow passes the message source independently of the profile it closes",
+      "message-derived card sharing keeps its original source a current message source permits legitimate explicit cross-chat sharing",
+      "message-derived card sharing keeps its original source does not dispatch when the source is invalidated during card construction",
+      "message-derived card sharing keeps its original source the actual final send hook rechecks the source after target resolution awaits",
+      "message-derived card sharing keeps its original source history clear stops the source-backed share and ordinary no-source shares retain behavior"
+    ],
+    "priorFullPassed": 689,
+    "expectedFullTests": 726,
+    "expectedFullState": "pending_unrun_after_adoption",
+    "previousWebSource": {
+      "files": 4290,
+      "digest": "b7ddd15456d06038db09b09ff40d00953487ebb55982893d4fc5c3bd2a301358",
+      "acceptedRun": 38859146920,
+      "meaning": "Immutable historical689 baseline; no current726 execution claim"
+    },
+    "selectedSourceMeaning": "Current15 product and4 test/fixture exact pins; historical direct/editor descriptors remain predecessors resolved explicitly through this adoption. No separate product overlay or source-root redirect.",
+    "localAccepted": {
+      "newUnique": 37,
+      "directAffectedOld": 24,
+      "webNoEmit": 0,
+      "desktopNoEmit": 0,
+      "agentReceiptSHA256": "3cad7ae6b368963eff509945f55956e60584d0cdb250f67f30563465e08d4019",
+      "rootReceiptSHA256": "f2298181c29515b54765743aa6ad78c856370ed97d1e196988fac3c540bdb4dd",
+      "meaning": "Prior refs61 and migration37/CI4/dualtypes/readonly accepted historically. New copy5, affected types/CI and complete731 are pending.",
+      "migration37Passed": 37,
+      "migrationCI4Passed": 4,
+      "migrationRootReceiptSHA256": "ed3b14f698eb6ae8fcd290f0697d84f551a793cd222396c3ff145323ed6ddbaa"
+    },
+    "migration": "Three test/fixture files byte-exact; cardShareSource only adds erased RecordedEmit alias and5 as-casts. Removing those type nodes recovers exact passed37 source; original names/assertions/object references and all15 product bodies remain.",
+    "config": {
+      "path": "web/vitest.config.mts",
+      "bytes": 430,
+      "sha256": "8b51040e3c72c6d53f5247f8c70522866cb763c8311dd42912dcb913eca9ee62"
+    },
+    "typeInputs": [
+      {
+        "path": "web/tsconfig.json",
+        "bytes": 758,
+        "sha256": "d2c545c69816fe22cfdf11f25a3a7a01ce3e99f69a93e0a6a2e25bab47a3c92d"
+      },
+      {
+        "path": "web/tsconfig.desktop.json",
+        "bytes": 158,
+        "sha256": "3897e9726f17e81d163e1d38c72f2237f510d7defbdba160d65210bbf51a355f"
+      }
+    ],
+    "copyRetention": {
+      "sourceParentManifestSHA256": "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a",
+      "before": [
+        {
+          "path": "web/src/pages/common/UserCardModal/index.tsx",
+          "bytes": 18758,
+          "sha256": "844a5c70a6ffe37e06ae01ed544a1fbf60a203ac65a189ba5971bfda94292a8d"
+        }
+      ],
+      "after": [
+        {
+          "path": "web/src/pages/common/UserCardModal/index.tsx",
+          "bytes": 20139,
+          "sha256": "e134d11f0c46b27e0b0bde76cda840c86ec3a777187ad38452373a34cb8aa46c"
+        }
+      ],
+      "newTests": 5,
+      "expectedFullTests": 731,
+      "testPaths": [
+        "src/core/messageCard/profileCopy.test.tsx"
+      ],
+      "adoptedTest": {
+        "path": "web/src/core/messageCard/profileCopy.test.tsx",
+        "bytes": 9900,
+        "sha256": "715809a9e31c9761ddfbba8363e964d6dbc226fbdddc61aa6f20d23677502753"
+      },
+      "requiredNames": [
+        "keeps ordinary contact copying as a labelled 44px native keyboard button with header room",
+        "keeps a private source readable and its view actions usable while disabling copy and text selection",
+        "rechecks late retention denial at dispatch before the existing refresh makes the button disabled",
+        "rejects an enabled source button synchronously when the original history is cleared",
+        "rejects an old owner's enabled button before session notifications close the panel"
+      ],
+      "state": "new_copy5_and_affected_types_CI_unrun",
+      "scope": "One profile source successor only; original d64015 and migrated37 remain historical identities, resolved through exact before/after chain. View/relationship actions remain independent of retention. Native copy button and no-retention selection feedback do not prevent screenshots or manual transcription.",
+      "expectedAuditFullNames": [
+        "profile ID copying preserves original-message retention > keeps ordinary contact copying as a labelled 44px native keyboard button with header room",
+        "profile ID copying preserves original-message retention > keeps a private source readable and its view actions usable while disabling copy and text selection",
+        "profile ID copying preserves original-message retention > rechecks late retention denial at dispatch before the existing refresh makes the button disabled",
+        "profile ID copying preserves original-message retention > rejects an enabled source button synchronously when the original history is cleared",
+        "profile ID copying preserves original-message retention > rejects an old owner's enabled button before session notifications close the panel"
+      ],
+      "nameContract": "requiredNames matches audit.tests[].name (short); expectedAuditFullNames records audit.tests[].fullName for later evidence review only. New5 unrun."
+    }
   }
 }

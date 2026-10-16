@@ -82,17 +82,32 @@ export const useConversationStore = create<ConversationStore>()((set, get) => {
     } };
   };
   return {
-    captureConversationSendScope: () => {
-      const target = conversationSendTarget(get().currentConversation);
+    // A read ticket covers every conversation kind, including notification
+    // cards. It conveys no send or relationship permission.
+    captureConversationViewScope: () => {
+      const conversation = get().currentConversation;
+      const conversationID = conversation?.conversationID;
+      const groupID = isGroupSession(conversation?.conversationType) ? conversation?.groupID : undefined;
+      if (isGroupSession(conversation?.conversationType) && !groupID) return;
       const owner = sessionCoordinator.current;
-      if (!target || !owner || viewedOwner !== owner) return;
+      if (typeof conversationID !== "string" || !conversationID || !owner || viewedOwner !== owner) return;
       const epoch = navigationEpoch, generation = sessionCoordinator.generation;
       const actor = owner.userID, issuer = owner.issuer, tenant = owner.tenant.serverID;
+      return Object.freeze({ conversationID, groupID, current: () => navigationEpoch === epoch &&
+        viewedOwner === owner && sessionCoordinator.current === owner && sessionCoordinator.generation === generation &&
+        owner.userID === actor && owner.issuer === issuer && owner.tenant.serverID === tenant &&
+        get().currentConversation?.conversationID === conversationID &&
+        get().currentConversation?.conversationType === conversation?.conversationType &&
+        (isGroupSession(get().currentConversation?.conversationType) ? get().currentConversation?.groupID : undefined) === groupID });
+    },
+    captureConversationSendScope: () => {
+      const target = conversationSendTarget(get().currentConversation);
+      const view = get().captureConversationViewScope();
+      const actor = sessionCoordinator.current?.userID;
+      if (!target || !view || view.conversationID !== target.conversationID || !actor) return;
       const current = () => {
         const now = conversationSendTarget(get().currentConversation);
-        return navigationEpoch === epoch && viewedOwner === owner && sessionCoordinator.current === owner &&
-          sessionCoordinator.generation === generation && owner.userID === actor && owner.issuer === issuer &&
-          owner.tenant.serverID === tenant && !!now && now.conversationID === target.conversationID && sameSendTarget(now, target);
+        return view.current() && !!now && now.conversationID === target.conversationID && sameSendTarget(now, target);
       };
       return Object.freeze({ target, current, canSend: () => current() && (target.kind === "user" ||
         knownGroupSendAllowed(get().currentGroupInfo, get().currentMemberInGroup, target.id, actor)) });

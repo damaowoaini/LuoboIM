@@ -46,6 +46,9 @@ interface IUserCardModalProps {
   isSelf?: boolean;
   notAdd?: boolean;
   cardInfo?: CardInfo;
+  sourceCurrent?: () => boolean;
+  sourceCanShare?: () => boolean;
+  sourceSubscribe?: (listener: () => void) => () => void;
 }
 
 export type CardInfo = Partial<BusinessUserInfo & FriendUserItem>;
@@ -59,13 +62,14 @@ const UserCardModal: ForwardRefRenderFunction<
   OverlayVisibleHandle,
   IUserCardModalProps
 > = (props, ref) => {
-  const { userID, groupID, isSelf, notAdd } = props;
+  const { userID, groupID, isSelf, notAdd, sourceCurrent, sourceCanShare, sourceSubscribe } = props;
 
   const editInfoRef = useRef<OverlayVisibleHandle>(null);
   const [cardInfo, setCardInfo] = useState<CardInfo>();
   const [isFetching, setIsFetching] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [ready, setReady] = useState<{ current: () => boolean }>();
+  const [, setRetentionStatus] = useState<boolean>();
   const requestEpoch = useRef(0);
   const [isSendRequest, setIsSendRequest] = useState(false);
   const [userFields, setUserFields] = useState<FieldRow[]>([]);
@@ -83,8 +87,8 @@ const UserCardModal: ForwardRefRenderFunction<
   const target = isSelf ? selfInfo.userID : userID ?? props.cardInfo?.userID;
   const owner = sessionCoordinator.current;
   const generation = sessionCoordinator.generation;
-  const live = useRef({ target, groupID, isSelf, owner, generation, open: isOverlayOpen });
-  live.current = { target, groupID, isSelf, owner, generation, open: isOverlayOpen };
+  const live = useRef({ target, groupID, isSelf, owner, generation, sourceCurrent, sourceCanShare, open: isOverlayOpen });
+  live.current = { target, groupID, isSelf, owner, generation, sourceCurrent, sourceCanShare, open: isOverlayOpen };
   const closeOverlay = useCallback(() => {
     ++requestEpoch.current;
     live.current.open = false;
@@ -95,15 +99,34 @@ const UserCardModal: ForwardRefRenderFunction<
     const snapshot = live.current;
     const epoch = ++requestEpoch.current;
     return { current: () => Boolean(snapshot.owner && snapshot.open && live.current.open &&
-      epoch === requestEpoch.current && live.current.target === snapshot.target &&
+      epoch === requestEpoch.current && live.current.sourceCurrent === snapshot.sourceCurrent &&
+      (!snapshot.sourceCurrent || snapshot.sourceCurrent()) && live.current.target === snapshot.target &&
       live.current.groupID === snapshot.groupID && live.current.isSelf === snapshot.isSelf &&
       sessionCoordinator.current === snapshot.owner && sessionCoordinator.generation === snapshot.generation) };
   };
   const actionCurrent = () => Boolean(ready?.current());
+  const retentionCurrent = () => !live.current.sourceCanShare || live.current.sourceCanShare();
+  const copyCurrent = () => actionCurrent() && retentionCurrent() && Boolean(cardInfo?.userID);
+  const retentionRestricted = Boolean(sourceCanShare && !sourceCanShare());
   const { toSpecifiedConversation } = useConversationToggle();
   const [_, copyToClipboard] = useCopyToClipboard();
 
   useEffect(() => sessionCoordinator.onChange(closeOverlay), [closeOverlay]);
+  // Optional message provenance stays live through hydration AND an open panel.
+  // Normal contact/search/self cards have no source callback and keep their behavior.
+  useEffect(() => {
+    if (!isOverlayOpen || (!sourceCurrent && !sourceCanShare)) return;
+    const check = () => {
+      if (sourceCurrent && !sourceCurrent()) closeOverlay();
+      // Rendering feedback only. The copy dispatch always checks the live capability.
+      else setRetentionStatus(retentionCurrent());
+    };
+    check();
+    const unsubscribe = sourceSubscribe?.(check);
+    const timer = setInterval(check, 250);
+    document.addEventListener("visibilitychange", check);
+    return () => { unsubscribe?.(); clearInterval(timer); document.removeEventListener("visibilitychange", check); };
+  }, [isOverlayOpen, sourceCurrent, sourceCanShare, sourceSubscribe, closeOverlay]);
   useEffect(() => {
     if (!isOverlayOpen) { resetState(); return; }
     const friendAddedHandler = ({ data }: WSEvent<FriendUserItem>) => {
@@ -115,7 +138,7 @@ const UserCardModal: ForwardRefRenderFunction<
       ++requestEpoch.current;
       IMSDK.off(CbEvents.OnFriendAdded, friendAddedHandler);
     };
-  }, [isOverlayOpen, target, groupID, isSelf, owner, generation]);
+  }, [isOverlayOpen, target, groupID, isSelf, owner, generation, sourceCurrent]);
 
   const refreshSelfInfo = useCallback(() => {
     if (!isSelf || !actionCurrent()) return;
@@ -291,7 +314,7 @@ const UserCardModal: ForwardRefRenderFunction<
     <DraggableModalWrap
       title={null}
       footer={null}
-      open={isOverlayOpen}
+      open={isOverlayOpen && (!sourceCurrent || sourceCurrent())}
       closable={false}
       width={332}
       centered
@@ -317,7 +340,8 @@ const UserCardModal: ForwardRefRenderFunction<
         ) : isSendRequest && actionCurrent() ? (
           <SendRequest cardInfo={cardInfo!} backToCard={backToCard} isCurrent={actionCurrent} />
         ) : (
-          <div className="flex max-h-[520px] min-h-[484px] flex-col overflow-hidden bg-[url(@/assets/images/common/card_bg.png)] bg-[length:332px_134px] bg-no-repeat px-5.5">
+          <div className={`flex max-h-[520px] min-h-[484px] flex-col overflow-hidden bg-[url(@/assets/images/common/card_bg.png)] bg-[length:332px_134px] bg-no-repeat px-5.5 ${retentionRestricted ? "select-none" : ""}`}
+            style={retentionRestricted ? { userSelect: "none", WebkitUserSelect: "none" } : undefined}>
             <div className="h-[104px] min-h-[104px] w-full cursor-move" />
             <div className="ignore-drag flex flex-1 flex-col overflow-hidden">
               <div className="flex items-center">
@@ -326,10 +350,10 @@ const UserCardModal: ForwardRefRenderFunction<
                   src={cardInfo?.faceURL}
                   text={cardInfo?.nickname}
                 />
-                <div className="ml-3 flex h-[60px] flex-1 flex-col justify-around overflow-hidden">
+                <div className="ml-3 flex min-h-[80px] flex-1 flex-col justify-around overflow-hidden">
                   <div className="flex w-fit max-w-[80%] items-baseline">
                     <div
-                      className="flex-1 select-text truncate text-base font-medium text-white"
+                      className={`flex-1 ${retentionRestricted ? "select-none" : "select-text"} truncate text-base font-medium text-white`}
                       title={cardInfo?.nickname}
                     >
                       {cardInfo?.nickname}
@@ -337,22 +361,28 @@ const UserCardModal: ForwardRefRenderFunction<
                     {/* <div className="ml-3 text-xs text-white">{t("placeholder.online")}</div> */}
                   </div>
                   <div className="flex items-center">
-                    <div
-                      className="mr-3 cursor-pointer text-xs text-[var(--sub-text)]"
+                    <button
+                      type="button"
+                      aria-label={`${t("placeholder.copy")} ID: ${cardInfo?.userID ?? ""}`}
+                      className="mr-3 min-w-0 flex-1 truncate rounded-md text-left text-xs text-[var(--sub-text)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:opacity-40"
+                      style={{ minWidth: 44, minHeight: 44 }}
+                      disabled={!copyCurrent()}
                       onClick={() => {
-                        if (!actionCurrent()) return;
-                        copyToClipboard(cardInfo?.userID ?? "");
+                        if (!copyCurrent()) return;
+                        copyToClipboard(cardInfo!.userID!);
                         feedbackToast({ msg: t("toast.copySuccess") });
                       }}
                     >
                       {cardInfo?.userID}
-                    </div>
+                    </button>
                     {actionCurrent() && <CardActionRow
                       cardInfo={cardInfo}
                       isFriend={isFriend}
                       isSelf={isSelf}
                       closeOverlay={closeOverlay}
                       isCurrent={actionCurrent}
+                      sourceCurrent={sourceCurrent}
+                      sourceCanShare={sourceCanShare}
                     />}
                   </div>
                 </div>
@@ -362,6 +392,7 @@ const UserCardModal: ForwardRefRenderFunction<
                   <UserCardDataGroup
                     title={t("placeholder.groupInfo")}
                     fieldRows={gorupMemberFields}
+                    selectable={!retentionRestricted}
                   />
                 )}
                 <UserCardDataGroup
@@ -370,6 +401,7 @@ const UserCardModal: ForwardRefRenderFunction<
                   fieldRows={userFields}
                   updateCardRemark={updateCardRemark}
                   isCurrent={actionCurrent}
+                  selectable={!retentionRestricted}
                 />
                 
                 {/* 只有高级用户才能看到登录日志 */}
@@ -449,6 +481,7 @@ interface IUserCardDataGroupProps {
   fieldRows: FieldRow[];
   updateCardRemark?: (remark: string) => void;
   isCurrent?: () => boolean;
+  selectable?: boolean;
 }
 
 type FieldRow = {
@@ -463,6 +496,7 @@ const UserCardDataGroup: FC<IUserCardDataGroupProps> = ({
   fieldRows,
   updateCardRemark,
   isCurrent = () => false,
+  selectable = true,
 }) => {
   const tryUpdateRemark = async (remark: string) => {
     if (!isCurrent()) return false;
@@ -487,7 +521,7 @@ const UserCardDataGroup: FC<IUserCardDataGroupProps> = ({
           {fieldRow.editable ? (
             <EditableContent
               className="!ml-0"
-              textClassName="font-medium"
+              textClassName={`font-medium ${selectable ? "" : "select-none"}`}
               value={fieldRow.value}
               editable={true}
               onChange={tryUpdateRemark}
@@ -495,7 +529,7 @@ const UserCardDataGroup: FC<IUserCardDataGroupProps> = ({
               captureEdit={() => ({ current: isCurrent })}
             />
           ) : (
-            <div className="flex-1 select-text truncate">{fieldRow.value}</div>
+            <div className={`flex-1 ${selectable ? "select-text" : "select-none"} truncate`}>{fieldRow.value}</div>
           )}
         </div>
       ))}

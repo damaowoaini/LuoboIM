@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current344 target460/full1142."""
+"""Pure Python CI gate checks, separate from current351 focused80/full1222."""
 import copy
 import importlib.util
 import json
@@ -135,12 +135,12 @@ class DescriptorTests(unittest.TestCase):
             with self.assertRaises(ValueError): check.source.descriptor()
 
     def test_historical_cohorts_cannot_alias331(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336'):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current344'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current351'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -360,6 +360,81 @@ class NextUnreadCleanupTests(unittest.TestCase):
             with self.subTest(extra=extra):
                 with self.assertRaises(ValueError):
                     check.next_unread_cleanup_summary('\n'.join(map(json.dumps, events + [extra])), contract)
+
+
+class CardInventoryTests(unittest.TestCase):
+    def test_same_count_focused_replacement_cannot_drop_a_card_case(self):
+        plan = check.source.descriptor()
+        names = json.loads(check.source.regular(check.source.REPO / plan['required_test_names']['path']))
+        original = names['new_chat_card80'][0]['name']
+        next(r for r in names['current_target540'] if r['name'] == original)['name'] = 'forged same-count card replacement'
+        body = json.dumps(names).encode()
+        plan['required_test_names'].update(bytes=len(body), sha256=check.source.sha(body))
+        with mock.patch.object(check.source, 'regular', return_value=body):
+            with self.assertRaisesRegex(ValueError, 'card names do not preserve'):
+                check.source.required_names(plan)
+
+    def test_analysis_file_must_match_the_current_authored_source_pin(self):
+        plan = copy.deepcopy(check.source.descriptor())
+        plan['chat_card']['selected_files'][0]['sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'card source/analysis/cleanup inventory'):
+            check.source.card_contract(plan)
+
+
+class ValidationModeTests(unittest.TestCase):
+    def test_focused_runs_only_new80_and_selected17_analysis(self):
+        plan = check.source.descriptor()
+        phase = check.validation_plan(plan, 'chat-card-80')
+        self.assertEqual((phase['expected'], phase['names_key']), (80, 'new_chat_card80'))
+        self.assertEqual(phase['test_paths'], plan['chat_card']['test_paths'])
+        self.assertEqual(phase['analysis_paths'], plan['chat_card']['analysis_paths'])
+        self.assertEqual((len(phase['test_paths']), len(phase['analysis_paths'])), (3, 17))
+
+    def test_full_has_only_full1222_without_a_repeated540_prerequisite(self):
+        phase = check.validation_plan(check.source.descriptor(), 'full-regression', True)
+        self.assertEqual(phase, {'test_label': 'full1222', 'expected': 1222,
+                                'test_paths': [], 'names_key': 'current_full1222',
+                                'analysis_paths': None})
+
+    def test_reference_or_unknown_mode_cannot_dispatch_under_focused_default(self):
+        plan = check.source.descriptor()
+        for mode, reference in [('chat-card-80', True), ('target540', False), ('chat-card-80', 1)]:
+            with self.subTest(mode=mode, reference=reference):
+                with self.assertRaises(ValueError):
+                    check.validation_plan(plan, mode, reference)
+
+
+class CardCleanupTests(unittest.TestCase):
+    def fixture(self):
+        contract = {'widget_names': ['actual widget'], 'repository_names': ['actual repository'],
+                    'model_names': ['pure model'],
+                    'widget_markers': ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end'],
+                    'repository_markers': ['sdk.begin', 'sdk.end', 'storage.begin', 'storage.end']}
+        events = []
+        for identity, group, prefix, markers in [(1, 'widget_names', 'chat_card_cleanup ', 'widget_markers'),
+                                                 (2, 'repository_names', 'chat_card_repository_cleanup ', 'repository_markers')]:
+            events.append({'type': 'testStart', 'test': {'id': identity, 'name': contract[group][0]}})
+            events += [{'type': 'print', 'testID': identity, 'message': prefix + marker}
+                       for marker in contract[markers]]
+        return contract, events
+
+    def test_widget_and_repository_require_their_own_exact_shutdown_tail(self):
+        contract, events = self.fixture()
+        result = check.card_cleanup_summary('\n'.join(map(json.dumps, events)), contract)
+        self.assertEqual((result['widget_names'], result['repository_names'],
+                          result['model_cases_without_SDK_claim']), (1, 1, 1))
+
+    def test_missing_foreign_or_duplicate_cleanup_cannot_borrow_another_test(self):
+        contract, events = self.fixture()
+        foreign = copy.deepcopy(events)
+        foreign[-1]['testID'] = 99
+        duplicate = events + [events[-1]]
+        wrong_name = copy.deepcopy(events)
+        wrong_name[0]['test']['name'] = 'unrelated successful case'
+        for body in [events[:-1], foreign, duplicate, wrong_name]:
+            with self.subTest(body=body):
+                with self.assertRaises(ValueError):
+                    check.card_cleanup_summary('\n'.join(map(json.dumps, body)), contract)
 
 
 if __name__ == '__main__':

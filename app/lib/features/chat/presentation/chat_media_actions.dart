@@ -17,9 +17,11 @@ class ChatMediaActions extends StatefulWidget {
     super.key,
     required this.controller,
     this.onLocation,
+    this.onCard,
   });
   final ChatController controller;
   final Future<void> Function()? onLocation;
+  final Future<void> Function()? onCard;
   @override
   State<ChatMediaActions> createState() => _ChatMediaActionsState();
 }
@@ -103,7 +105,9 @@ class _ChatMediaActionsState extends State<ChatMediaActions>
         origin?.isCurrent != true) {
       return;
     }
-    final location = widget.onLocation, controller = widget.controller;
+    final location = widget.onLocation,
+        card = widget.onCard,
+        controller = widget.controller;
     _choosing = _openingChoice = true;
     final choice = await showModalBottomSheet<String>(
       context: context,
@@ -128,6 +132,7 @@ class _ChatMediaActionsState extends State<ChatMediaActions>
                     'files': '选择文件',
                     'voice': '语音消息',
                     if (location != null) 'location': '位置',
+                    if (card != null) 'card': '好友名片',
                   }.entries)
                     ListTile(
                       title: Text(entry.value),
@@ -140,7 +145,7 @@ class _ChatMediaActionsState extends State<ChatMediaActions>
         );
       },
     );
-    if (choice == 'location') {
+    if (choice == 'location' || choice == 'card') {
       // The sheet Future completes on pop, before its exit animation. Wait
       // for this exact owned route, never popUntil or choose an arbitrary page.
       final menu = _choiceRoute;
@@ -157,7 +162,7 @@ class _ChatMediaActionsState extends State<ChatMediaActions>
           !identical(origin?.navigator, navigator)) {
         return;
       }
-      await location?.call();
+      await (choice == 'card' ? card : location)?.call();
       return;
     }
     _choosing = false;

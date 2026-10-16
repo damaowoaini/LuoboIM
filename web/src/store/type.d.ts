@@ -63,6 +63,7 @@ export type RevokeMessageData = {
 };
 
 export interface ConversationStore {
+  captureConversationViewScope: () => Readonly<{ conversationID: string; groupID?: string; current: () => boolean }> | undefined;
   captureConversationSendScope: () => import("@/core/messageSendIntent").ConversationSendScope | undefined;
   conversationList: ConversationItem[];
   currentConversation?: ConversationItem;

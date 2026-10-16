@@ -4,6 +4,7 @@ import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 
 import '../domain/chat_message.dart';
 import '../domain/chat_location.dart';
+import '../domain/chat_card.dart';
 import '../domain/chat_mention.dart';
 import '../domain/message_privacy.dart';
 
@@ -145,7 +146,8 @@ String _preview(Message item, _LegacyCustom? custom) {
     MessageType.voice => '[语音]',
     MessageType.video => '[视频]',
     MessageType.file => '[文件] ${item.fileElem?.fileName ?? ''}',
-    MessageType.card => '[名片] ${item.cardElem?.nickname ?? ''}',
+    MessageType.card =>
+      '[名片] ${ChatCard.parse(userId: item.cardElem?.userID, name: item.cardElem?.nickname, faceUrl: item.cardElem?.faceURL, extra: item.cardElem?.ex)?.name ?? '资料暂不可用'}',
     MessageType.location => '[位置]',
     MessageType.merger => '[聊天记录]',
     MessageType.customFace => '[表情]',
@@ -339,6 +341,14 @@ ChatMessage _mapMessage(
             latitude: item.locationElem?.latitude,
             longitude: item.locationElem?.longitude,
             description: item.locationElem?.description,
+          )
+        : null,
+    card: kind == ChatMessageKind.card
+        ? ChatCard.parse(
+            userId: item.cardElem?.userID,
+            name: item.cardElem?.nickname,
+            faceUrl: item.cardElem?.faceURL,
+            extra: item.cardElem?.ex,
           )
         : null,
     media: secureMediaUri(media),

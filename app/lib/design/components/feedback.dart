@@ -40,24 +40,35 @@ Future<bool> confirmAction(
   String title,
   String text, {
   String action = '确定',
+  bool Function()? isCurrent,
+  Widget Function(Widget child)? guard,
 }) async =>
     await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        scrollable: true,
-        title: Text(title),
-        content: Text(text),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(action),
-          ),
-        ],
-      ),
+      builder: (context) {
+        final route = ModalRoute.of(context)!,
+            navigator = Navigator.of(context);
+        void finish(bool value) {
+          if (route.isActive &&
+              route.isCurrent &&
+              navigator.mounted &&
+              identical(route.navigator, navigator) &&
+              (!value || isCurrent?.call() != false)) {
+            navigator.pop(value);
+          }
+        }
+
+        final dialog = AlertDialog(
+          scrollable: true,
+          title: Text(title),
+          content: Text(text),
+          actions: [
+            TextButton(onPressed: () => finish(false), child: const Text('取消')),
+            TextButton(onPressed: () => finish(true), child: Text(action)),
+          ],
+        );
+        return guard?.call(dialog) ?? dialog;
+      },
     ) ??
     false;
 
@@ -70,6 +81,7 @@ Future<String?> promptText(
   int lines = 1,
   Future<void> Function(String)? save,
   bool trim = true,
+  bool Function()? isCurrent,
   Widget Function(Widget child)? guard,
 }) => showDialog<String>(
   context: context,
@@ -82,6 +94,7 @@ Future<String?> promptText(
       lines: lines,
       save: save,
       trim: trim,
+      isCurrent: isCurrent,
     );
     return guard?.call(dialog) ?? dialog;
   },
@@ -96,11 +109,13 @@ class _InputDialog extends StatefulWidget {
     required this.lines,
     this.save,
     this.trim = true,
+    this.isCurrent,
   });
   final String title, value, hint;
   final int maxLength, lines;
   final Future<void> Function(String)? save;
   final bool trim;
+  final bool Function()? isCurrent;
   @override
   State<_InputDialog> createState() => _InputDialogState();
 }
@@ -109,11 +124,31 @@ class _InputDialogState extends State<_InputDialog> {
   late final controller = TextEditingController(text: widget.value);
   bool saving = false;
   String? failure;
+  ModalRoute<dynamic>? _route;
+  NavigatorState? _navigator;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _route ??= ModalRoute.of(context);
+    _navigator ??= Navigator.of(context);
+  }
+
+  bool get _current =>
+      mounted &&
+      widget.isCurrent?.call() != false &&
+      _route?.isActive == true &&
+      _route?.isCurrent == true &&
+      _navigator?.mounted == true &&
+      identical(_route?.navigator, _navigator);
+  void _finish([String? value]) {
+    if (_current) _navigator!.pop(value);
+  }
+
   Future<void> submit() async {
-    if (saving) return;
+    if (saving || !_current) return;
     final value = widget.trim ? controller.text.trim() : controller.text;
     if (widget.save == null) {
-      Navigator.pop(context, value);
+      _finish(value);
       return;
     }
     setState(() {
@@ -122,7 +157,7 @@ class _InputDialogState extends State<_InputDialog> {
     });
     try {
       await widget.save!(value);
-      if (mounted) Navigator.pop(context, value);
+      _finish(value);
     } catch (error) {
       if (mounted) {
         setState(
@@ -160,10 +195,7 @@ class _InputDialogState extends State<_InputDialog> {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: saving ? null : () => Navigator.pop(context),
-          child: const Text('取消'),
-        ),
+        TextButton(onPressed: saving ? null : _finish, child: const Text('取消')),
         TextButton(
           onPressed: saving ? null : submit,
           child: Text(saving ? '保存中…' : '确定'),

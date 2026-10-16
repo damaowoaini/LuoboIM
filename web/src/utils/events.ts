@@ -34,6 +34,9 @@ export type OpenUserCardParams = {
   groupID?: string;
   isSelf?: boolean;
   notAdd?: boolean;
+  sourceCurrent?: () => boolean;
+  sourceCanShare?: () => boolean;
+  sourceSubscribe?: (listener: () => void) => () => void;
 };
 
 const emitter = mitt<EmitterEvents>();

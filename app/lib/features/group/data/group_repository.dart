@@ -37,43 +37,67 @@ final class GroupRepository {
   static const maximumCreationNameLength = 128;
   final OpenImGateway gateway;
   final SessionAccess access;
-  Future<T> _sdk<T>(Future<T> Function(IMManager manager) operation) async {
+  Future<T> _sdk<T>(
+    Future<T> Function(IMManager manager) operation, {
+    void Function()? checkSource,
+  }) async {
     access.check();
-    final value = await gateway.runForSession(access.generation, operation);
+    checkSource?.call();
+    final value = await gateway.runForSession(access.generation, (manager) {
+      access.check();
+      checkSource?.call();
+      return operation(manager);
+    });
     access.check();
+    checkSource?.call();
     return value;
   }
 
-  Future<GroupProfile> profile(String id) => _sdk((manager) async {
-    final groups = await manager.groupManager.getGroupsInfo(groupIDList: [id]);
-    access.check();
-    final group = groups.where((group) => group.groupID == id).firstOrNull;
-    if (group == null) throw const AppFailure(FailureKind.invalidResponse);
-    final joined = await manager.groupManager.isJoinedGroup(groupID: id);
-    access.check();
-    GroupMember? me;
-    if (joined) {
-      final users = await manager.groupManager.getGroupMembersInfo(
-        groupID: id,
-        userIDList: [access.credentials.userId],
-      );
-      access.check();
-      final user = users
-          .where((user) => user.userID == access.credentials.userId)
-          .firstOrNull;
-      if (user != null) me = mapGroupMember(user);
-    }
-    return GroupProfile(
-      summary: mapGroup(group),
-      joined: joined,
-      me: me,
-      announcement: group.notification ?? '',
-      introduction: group.introduction ?? '',
-      verification: group.needVerification ?? 0,
-      hideMemberProfiles: group.lookMemberInfo == 1,
-      preventMemberFriends: group.applyMemberFriend == 1,
-    );
-  });
+  Future<GroupProfile> profile(String id, {void Function()? checkSource}) =>
+      _sdk((manager) async {
+        final groups = await manager.groupManager.getGroupsInfo(
+          groupIDList: [id],
+        );
+        access.check();
+        checkSource?.call();
+        if (groups.length != 1 || groups.single.groupID != id) {
+          throw const AppFailure(FailureKind.invalidResponse);
+        }
+        final group = groups.single;
+        final joined = await manager.groupManager.isJoinedGroup(groupID: id);
+        access.check();
+        checkSource?.call();
+        GroupMember? me;
+        if (joined) {
+          final users = await manager.groupManager.getGroupMembersInfo(
+            groupID: id,
+            userIDList: [access.credentials.userId],
+          );
+          access.check();
+          checkSource?.call();
+          if (users.length != 1 ||
+              users.single.userID != access.credentials.userId ||
+              users.single.groupID != id ||
+              ![
+                GroupRoleLevel.member,
+                GroupRoleLevel.admin,
+                GroupRoleLevel.owner,
+              ].contains(users.single.roleLevel)) {
+            throw const AppFailure(FailureKind.invalidResponse);
+          }
+          me = mapGroupMember(users.single);
+        }
+        return GroupProfile(
+          summary: mapGroup(group),
+          joined: joined,
+          me: me,
+          announcement: group.notification ?? '',
+          introduction: group.introduction ?? '',
+          verification: group.needVerification ?? 0,
+          hideMemberProfiles: group.lookMemberInfo == 1,
+          preventMemberFriends: group.applyMemberFriend == 1,
+        );
+      }, checkSource: checkSource);
 
   Future<List<GroupMember>> members(
     String id, {

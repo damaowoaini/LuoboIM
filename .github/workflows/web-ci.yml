@@ -3,6 +3,15 @@ name: Web CI
 # Run full regression once after the known issues are fixed and targeted checks pass.
 on:
   workflow_dispatch:
+    inputs:
+      cohort:
+        description: 'Focused card wiring, or the final combined regression'
+        type: choice
+        options:
+          - chat-card-42
+          - full-regression
+        default: chat-card-42
+        required: true
 
 permissions:
   contents: read
@@ -33,8 +42,10 @@ jobs:
           mkdir -p ci-output/helpers
           node --test --test-reporter=spec --test-reporter-destination=ci-output/helpers/unit.log --test-reporter=junit --test-reporter-destination=ci-output/helpers/unit.junit.xml ci/web-ci.test.mjs
 
-      - name: Locked install, tests, types, bundle, and isolated candidate
-        run: node ci/web-ci.mjs
+      - name: Run the explicit manual Web cohort
+        env:
+          WEB_CI_COHORT: ${{ inputs.cohort }}
+        run: node ci/web-ci.mjs "$WEB_CI_COHORT"
 
       # Upload reports separately and first: a failed bundle upload must not
       # prevent the test diagnostics artifact from already being retained.

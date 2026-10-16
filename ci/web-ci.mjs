@@ -38,7 +38,7 @@ export function verifyLinuxBindings(lock) {
   return checked;
 }
 
-export function validateReport(report, audit, exit, { minimum, exact, before = false, positiveNames = [] }) {
+export function validateReport(report, audit, exit, { minimum, exact, before = false, positiveNames = [], requiredNames = [] }) {
   const tests = audit.tests;
   assert(Array.isArray(tests) && Array.isArray(report.testResults), "Missing complete test reports");
   assert(["passed", "failed"].includes(audit.reason), "Interrupted/incomplete test run");
@@ -56,7 +56,32 @@ export function validateReport(report, audit, exit, { minimum, exact, before = f
     assert(failed.every((test) => test.errors.length > 0 && test.errors.every((error) => error.name === "AssertionError")), "Before has non-assertion errors (fixture/runtime failure)");
     for (const name of positiveNames) assert(tests.filter((test) => test.name === name && test.state === "passed").length === 1, `Before positive control did not pass: ${name}`);
   } else assert(exit === 0 && report.success === true && failed.length === 0, "Required suite failed");
+  for (const name of requiredNames) assert(tests.filter((test) => test.name === name && test.state === "passed").length === 1, `Required test absent, duplicated, or failed: ${name}`);
   return { total: tests.length, passed: tests.length - failed.length, failed: failed.length, meaning: before ? "expected_before_assertions_diagnostic_not_product_pass" : "required_suite_passed" };
+}
+
+export function webCohort(value = "full-regression") {
+  assert(["chat-card-42", "full-regression"].includes(value), "Explicit chat-card-42 or full-regression cohort required");
+  return value;
+}
+
+export function currentChatCardInput(previous, card) {
+  assert(card?.originManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a", "Reviewed chat-card lineage required");
+  const current = card.currentAfter.find((entry) => entry.path === previous.path);
+  if (!current) return previous;
+  const before = card.before.find((entry) => entry.path === previous.path);
+  assert(before?.bytes === previous.bytes && before?.sha256 === previous.sha256, "Chat-card predecessor differs");
+  return currentCardCopyInput(current, card.copyRetention);
+}
+
+export function currentCardCopyInput(previous, copy) {
+  const target = "web/src/pages/common/UserCardModal/index.tsx";
+  assert(copy?.sourceParentManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a" && copy.before?.length === 1 && copy.after?.length === 1, "Explicit copy-retention lineage required");
+  const before = copy.before[0], after = copy.after[0];
+  assert(before.path === target && before.bytes === 18758 && before.sha256 === "844a5c70a6ffe37e06ae01ed544a1fbf60a203ac65a189ba5971bfda94292a8d" && after.path === target, "Exact original card profile predecessor required");
+  if (previous.path !== target) return previous;
+  assert(previous.bytes === before.bytes && previous.sha256 === before.sha256, "Copy-retention predecessor differs");
+  return after;
 }
 
 function childEnv(extra = {}) {
@@ -116,6 +141,23 @@ export function verifyStyleCaller(previous, now, style) {
 
 export function verifyInputs() {
   const inputs = json(inputPath), direct = inputs.candidate, edit = inputs.editableContentAdoption;
+  const card = inputs.chatCardAdoption;
+  const copy = card?.copyRetention;
+  assert(card?.originManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a" && card.before.length === 13 && card.currentAfter.length === 15 && card.adoptedTests.length === 4, "Complete chat-card source/test lineage required");
+  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === 731, "Explicit pending 689+37+5 regression cohort required");
+  assert(card.requiredNames.length === 37 && new Set(card.requiredNames).size === 37, "Complete unique chat-card names required");
+  assert(copy.requiredNames.length === 5 && new Set([...card.requiredNames, ...copy.requiredNames]).size === 42, "Complete unique copy-retention names required");
+  const cardTestPaths = ["src/core/messageCard/messageCard.test.ts", "src/core/messageCard/receivedCardComponents.test.tsx", "src/core/messageCard/cardShareSource.test.tsx"];
+  assert(JSON.stringify(card.testPaths) === JSON.stringify(cardTestPaths), "Exact normal-source card test paths required");
+  assert(JSON.stringify(copy.testPaths) === JSON.stringify(["src/core/messageCard/profileCopy.test.tsx"]) && copy.adoptedTest.path === "web/src/core/messageCard/profileCopy.test.tsx", "Exact new copy-retention test path required");
+  verifyFile(repo, copy.adoptedTest);
+  assert(card.config.path === "web/vitest.config.mts" && card.typeInputs.length === 2, "Normal Web test/type configuration required");
+  for (const entry of [card.config, ...card.typeInputs]) verifyFile(repo, entry);
+  assert(new Set(card.currentAfter.map((entry) => entry.path)).size === 15 && new Set(card.before.map((entry) => entry.path)).size === 13, "Duplicate chat-card source identity");
+  assert(card.before.every((entry) => card.currentAfter.some((after) => after.path === entry.path)), "Missing chat-card source successor");
+  for (const entry of card.currentAfter) { assert(entry.path.startsWith("web/src/"), "Unsafe chat-card source path"); verifyFile(repo, currentCardCopyInput(entry, copy)); }
+  assert(card.adoptedTests.every((entry) => entry.path.startsWith("web/src/core/messageCard/")), "Unsafe adopted card test path");
+  for (const entry of card.adoptedTests) verifyFile(repo, entry);
   const same = (a, b) => a?.path === b?.path && a?.bytes === b?.bytes && a?.sha256 === b?.sha256;
   for (const entry of inputs.requiredInputs) verifyFile(repo, entry);
   for (const entry of direct.files) verifyFile(repo, entry);
@@ -144,7 +186,7 @@ export function verifyInputs() {
   }
   for (const entry of edit.currentAfter) {
     assert(entry.path.startsWith("web/src/"), "Unsafe editor successor path");
-    verifyFile(repo, entry);
+    verifyFile(repo, currentChatCardInput(entry, card));
     verifyFile(repo, { ...entry, path: `ci/candidates/web-editable-save/after/src/${entry.path.slice("web/src/".length)}` });
   }
   for (const entry of edit.adoptedTests) {
@@ -172,7 +214,7 @@ export function verifyInputs() {
     else if (previous.path === "web/src/pages/chat/queryChat/ChatHeader/index.tsx") verifyStyleCaller(previous, now, inputs.mobileStyleAdoption);
     else assert(same(previous, now), "Unrelated caller/SDK pin changed");
   }
-  for (const entry of direct.realCallers) verifyFile(repo, entry);
+  for (const entry of direct.realCallers) verifyFile(repo, currentChatCardInput(entry, card));
   const style = inputs.mobileStyleAdoption;
   assert(style.fullMinimumTests === 689 && inputs.fullMinimumTests >= style.fullMinimumTests && style.newTests === 6 && style.requiredInputs.length === 3, "Complete mobile style regression context required");
   verifyFile(repo, style.frozenBefore);
@@ -182,7 +224,8 @@ export function verifyInputs() {
 
 async function main() {
   if (process.argv[2] === "verify-inputs") { const verified = verifyInputs(); console.log(JSON.stringify({ verified: true, candidateFiles: verified.inputs.candidate.files.length, linuxBindings: verified.linuxBindings })); return; }
-  assert(process.argv.length === 2, "Use no arguments, or verify-inputs");
+  assert(process.argv.length === 2 || process.argv.length === 3, "Use one fixed cohort, no arguments, or verify-inputs");
+  const cohort = webCohort(process.argv[2]);
   assert(process.version === "v24.21.0", `Pinned Node 24.21.0 required, got ${process.version}`);
   assert(!existsSync(output), "Fresh ci-output/web required; old evidence will not be overwritten");
   mkdirSync(output, { recursive: true }); mkdirSync(path.join(output, "tmp"));
@@ -206,9 +249,14 @@ async function main() {
       return validateReport(json(`${file}.json`), json(`${file}.audit.json`), result.exit, options);
     };
     const inputs = json(inputPath);
-    await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests }));
+    const card = inputs.chatCardAdoption, copy = card.copyRetention;
+    const cardNames = [...card.requiredNames, ...copy.requiredNames];
+    if (cohort === "chat-card-42") await phase("chat-card-42", () => runTests("chat-card-42",
+      { exact: card.tests + copy.newTests, requiredNames: cardNames }, [...card.testPaths, ...copy.testPaths]));
+    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: cardNames }));
     await phase("types-web-strict", async () => checkedProcess(await execute("types-web-strict", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"])));
     await phase("types-desktop-original", async () => checkedProcess(await execute("types-desktop-original", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.desktop.json"])));
+    if (cohort === "full-regression") {
     // Independent of the test/type outcomes: a successful preview bundle can be
     // downloaded for review even when another check failed. It is never deployed.
     await phase("web-build", async () => {
@@ -230,9 +278,10 @@ async function main() {
       if (stage === "before") assert(result.passed === 7 && result.failed === 18, "Editor baseline outcome changed");
       return result;
     });
+    }
     await phase("post-input-integrity", async () => verifyInputs());
   }
-  const result = { commit: process.env.GITHUB_SHA ?? null, node: process.version, success: stages.every((stage) => stage.passed) && Boolean(prepared), stages };
+  const result = { commit: process.env.GITHUB_SHA ?? null, node: process.version, cohort, success: stages.every((stage) => stage.passed) && Boolean(prepared), stages };
   writeFileSync(path.join(output, "summary.json"), JSON.stringify(result, null, 2) + "\n", { flag: "wx" });
   writeFileSync(path.join(output, "stages.junit.xml"), `<?xml version="1.0"?><testsuite name="web-ci-stages" tests="${stages.length}" failures="${stages.filter((stage) => !stage.passed).length}">${stages.map((stage) => `<testcase name="${xml(stage.name)}">${stage.passed ? "" : `<failure message="${xml(stage.error)}"/>`}</testcase>`).join("")}</testsuite>\n`, { flag: "wx" });
   if (!result.success) process.exitCode = 1;

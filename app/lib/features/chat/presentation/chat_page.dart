@@ -29,6 +29,7 @@ import '../domain/chat_mention.dart';
 import '../../group/data/group_repository.dart';
 import '../../group/presentation/group_creation_action.dart';
 import '../../contacts/domain/contact.dart';
+import '../../contacts/contacts_providers.dart';
 import 'chat_controller.dart';
 import 'mention_text_controller.dart';
 import 'group_mention_picker.dart';
@@ -39,6 +40,8 @@ import 'chat_batch_widgets.dart';
 import 'chat_content_access.dart';
 import 'chat_location_view.dart';
 import 'chat_location_picker_page.dart';
+import 'chat_card_picker_page.dart';
+import 'chat_card_view.dart';
 import 'chat_merged_messages_page.dart';
 import 'chat_call_picker.dart';
 import 'message_media.dart';
@@ -95,6 +98,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
   int _fontRead = 0, _fontIntent = 0;
   int _emojiIntent = 0;
   int _locationIntent = 0;
+  int _cardIntent = 0;
+  final _cardChanges = ValueNotifier<int>(0);
+  ModalRoute<dynamic>? _cardPickerRoute;
   final _locationChanges = ValueNotifier<int>(0);
   bool _locationPickerOpen = false;
   ModalRoute<dynamic>? _locationPickerRoute;
@@ -234,6 +240,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
+    if (!_foreground) ++_cardIntent;
     if (!_foreground && !_locationPickerOpen) {
       ++_locationIntent;
     }
@@ -436,9 +443,11 @@ class _ChatPageState extends ConsumerState<ChatPage>
       // permanently; never paint/read/admit a new CID through the old owner.
       ++_emojiIntent;
       ++_locationIntent;
+      ++_cardIntent;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           ++_locationChanges.value;
+          ++_cardChanges.value;
         }
       });
       _backgroundRetired = true;
@@ -453,6 +462,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
     WidgetsBinding.instance.removeObserver(this);
     ++_locationIntent;
     _locationChanges.dispose();
+    ++_cardIntent;
+    _cardChanges.dispose();
     ++_emojiIntent;
     if (_emojiPickerResumed case final resumed?) {
       if (!resumed.isCompleted) {
@@ -827,7 +838,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
                           minimumSize: const Size(44, 44),
                           padding: const EdgeInsets.symmetric(horizontal: 6),
                         ),
-                        onPressed: controller.isUnconfirmedLocation(item.id)
+                        onPressed:
+                            controller.isUnconfirmedLocation(item.id) ||
+                                controller.isUnconfirmedCard(item.id)
                             ? _retry
                             : () => controller.resend(item.id),
                         icon: const Icon(
@@ -836,7 +849,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
                           size: 16,
                         ),
                         label: Text(
-                          controller.isUnconfirmedLocation(item.id)
+                          controller.isUnconfirmedLocation(item.id) ||
+                                  controller.isUnconfirmedCard(item.id)
                               ? '发送未确认，刷新核对'
                               : '发送失败，重试',
                           style: const TextStyle(
@@ -915,6 +929,52 @@ class _ChatPageState extends ConsumerState<ChatPage>
     bool Function()? portalCurrent,
   }) {
     switch (item.kind) {
+      case ChatMessageKind.card:
+        final contacts = ref.watch(contactsRepositoryProvider);
+        final fromGroup = controller.conversation?.isGroup == true;
+        final sourceGroupId = fromGroup
+            ? controller.conversation?.groupId
+            : null;
+        final sourceGroups = sourceGroupId == null
+            ? null
+            : ref.watch(groupRepositoryProvider);
+        return ChatCardView(
+          key: ValueKey((
+            controller.repository.conversationId,
+            (portal ?? item).id,
+            item.id,
+            'card',
+          )),
+          card: item.card,
+          contacts: contacts,
+          sourceGroupId: sourceGroupId,
+          sourceGroups: sourceGroups,
+          contactsCurrent: () =>
+              mounted &&
+              identical(ref.read(contactsRepositoryProvider), contacts) &&
+              (controller.conversation?.isGroup == true) == fromGroup &&
+              (!fromGroup || sourceGroupId?.isNotEmpty == true) &&
+              (controller.conversation?.isGroup == true
+                      ? controller.conversation?.groupId
+                      : null) ==
+                  sourceGroupId &&
+              (sourceGroupId == null ||
+                  identical(ref.read(groupRepositoryProvider), sourceGroups)),
+          changes: controller,
+          captureAccess: (routeCurrent) => ChatContentAccess(
+            repository: controller.repository,
+            root: portal ?? item,
+            child: item,
+            // The exact source card owns its detail, including inside a
+            // merged-message route. A generic portalCurrent AND here would
+            // reject our own detail as soon as it covers that source route.
+            isRouteCurrent: () =>
+                mounted &&
+                _foreground &&
+                controller.repository.conversationId == widget.conversationId &&
+                routeCurrent(),
+          ),
+        );
       case ChatMessageKind.location:
         return ChatLocationView(
           key: ValueKey((
@@ -1365,6 +1425,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
                   ChatMediaActions(
                     controller: controller,
                     onLocation: _locationAction(),
+                    onCard: _cardAction(),
                   ),
                   if (controller.conversation?.isGroup == true)
                     IconButton(
@@ -1573,6 +1634,113 @@ class _ChatPageState extends ConsumerState<ChatPage>
     };
   }
 
+  Future<void> Function() _cardAction() {
+    final repository = controller.repository,
+        session = controller.repository.session;
+    final contacts = ref.watch(contactsRepositoryProvider);
+    final providerSession = ref.watch(appRuntimeProvider).session;
+    final providerGateway = ref.watch(imGatewayProvider);
+    if (!identical(providerSession, session) ||
+        !identical(providerGateway, repository.gateway)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ++_cardChanges.value;
+        }
+      });
+    }
+    final owner = session.state.credentials,
+        generation = session.state.generation;
+    final issuer = owner?.issuer, tenant = owner?.tenantId;
+    final cid = widget.conversationId, rendered = _cardIntent;
+    final target = controller.conversation;
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    MessageHistoryAccess? cut;
+    try {
+      cut = repository.gateway.historyAccess(
+        repository.generation,
+        conversationId: cid,
+      );
+    } on AppFailure {
+      // The attachment entry may render before the SDK is admitted.
+    }
+    bool ownerCurrent() =>
+        mounted &&
+        controller.usable &&
+        owner != null &&
+        identical(ref.read(appRuntimeProvider).session, session) &&
+        identical(ref.read(imGatewayProvider), repository.gateway) &&
+        identical(session.state.credentials, owner) &&
+        session.state.generation == generation &&
+        owner.issuer == issuer &&
+        owner.tenantId == tenant &&
+        widget.conversationId == cid &&
+        repository.conversationId == cid &&
+        target?.id == cid &&
+        controller.conversation?.userId == target?.userId &&
+        controller.conversation?.groupId == target?.groupId &&
+        controller.conversation?.isGroup == target?.isGroup &&
+        origin?.isActive == true &&
+        navigator.mounted &&
+        identical(origin?.navigator, navigator);
+    return () async {
+      if (!ownerCurrent() ||
+          !_foreground ||
+          rendered != _cardIntent ||
+          origin?.isCurrent != true ||
+          cut == null) {
+        return;
+      }
+      final ticket = ++_cardIntent, access = cut;
+      bool current() {
+        if (!ownerCurrent() ||
+            !_foreground ||
+            !identical(ref.read(contactsRepositoryProvider), contacts) ||
+            ticket != _cardIntent ||
+            !(origin?.isCurrent == true ||
+                _cardPickerRoute?.isActive == true)) {
+          return false;
+        }
+        try {
+          access.check();
+          return true;
+        } on AppFailure {
+          return false;
+        }
+      }
+
+      if (contacts == null) {
+        if (current()) _notice('联系人服务暂不可用，请稍后重试');
+        return;
+      }
+      if (!current() ||
+          controller.conversation?.canSend != true ||
+          !contacts.access.isCurrent ||
+          !identical(contacts.access.credentials, owner) ||
+          contacts.access.generation != generation) {
+        return;
+      }
+      focus.unfocus();
+      final route = MaterialPageRoute<void>(
+        builder: (_) => ChatCardPickerPage(
+          controller: controller,
+          access: access,
+          sourceCurrent: current,
+          sourceChanges: _cardChanges,
+          contacts: contacts,
+        ),
+      );
+      _cardPickerRoute = route;
+      try {
+        await navigator.push(route);
+      } finally {
+        if (identical(_cardPickerRoute, route)) {
+          _cardPickerRoute = null;
+          ++_cardIntent;
+        }
+      }
+    };
+  }
+
   Future<void> _emoji() async {
     if (!mounted || !controller.usable) {
       return;
@@ -1733,7 +1901,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
                     'revoke': '撤回消息',
                   if (!expired &&
                       item.delivery == MessageDelivery.failed &&
-                      !controller.isUnconfirmedLocation(item.id))
+                      !controller.isUnconfirmedLocation(item.id) &&
+                      !controller.isUnconfirmedCard(item.id))
                     'retry': '重新发送',
                   if (item.delivery == MessageDelivery.sent && retainable)
                     'favorite': '收藏',

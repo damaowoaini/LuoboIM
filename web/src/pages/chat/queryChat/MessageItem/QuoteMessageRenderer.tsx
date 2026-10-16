@@ -9,7 +9,8 @@ import file_icon from "@/assets/images/messageItem/file_icon.png";
 import location from "@/assets/images/messageItem/location.png";
 import play_icon from "@/assets/images/messageItem/play_video.png";
 import CacheImage from "@/components/CacheImage";
-import OIMAvatar from "@/components/OIMAvatar";
+import ReceivedMessageCard from "@/components/ReceivedMessageCard";
+import { parseReceivedCard } from "@/core/messageCard";
 import Twemoji from "@/components/Twemoji";
 import { useMessageFileDownloadState } from "@/hooks/useMessageFileDownloadState";
 import { ExMessageItem } from "@/store";
@@ -44,6 +45,9 @@ const QuoteMessageRenderer: FC<IMessageItemProps> = ({ message, conversationID }
   const isRevokedMessage = quoteMessage.contentType === MessageType.RevokeMessage;
 
   const getMessageContent = () => {
+    if (isCardMessage) {
+      return escapeHtml(parseReceivedCard(quoteMessage.cardElem)?.label ?? "名片无效");
+    }
     if (isMediaMessage) {
       return "";
     }
@@ -76,7 +80,7 @@ const QuoteMessageRenderer: FC<IMessageItemProps> = ({ message, conversationID }
         <div className={clsx({ "pl-1.5": !isMediaMessage })}>
           {isFileMessage && <img width={26} src={file_icon} alt="file" />}
           {isLocationMessage && <img width={14} src={location} alt="location" />}
-          {isCardMessage && <CardExtra message={quoteMessage} />}
+          {isCardMessage && <ReceivedMessageCard message={quoteMessage} rootMessage={message} conversationID={conversationID} compact />}
           {isMediaMessage && <MediaExtra message={quoteMessage} />}
         </div>
       )}
@@ -85,14 +89,6 @@ const QuoteMessageRenderer: FC<IMessageItemProps> = ({ message, conversationID }
 };
 
 export default QuoteMessageRenderer;
-
-const CardExtra: FC<{ message: ExMessageItem }> = ({ message }) => (
-  <OIMAvatar
-    src={message.cardElem.faceURL}
-    size={26}
-    text={message.cardElem.nickname}
-  />
-);
 
 const previewInPlayer = (path: string) => {
   emitter.emit("OPEN_VIDEO_PLAYER", `file://${path}`);
