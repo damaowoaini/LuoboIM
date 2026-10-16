@@ -12,7 +12,7 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"net/url"
+	neturl "net/url"
 	"path"
 	"strconv"
 	"strings"
@@ -58,7 +58,7 @@ func freezeKafkaCallbackEndpoint(database,epoch,logical,command,base,secret,expe
 		return frozenKafkaCallbackEndpoint{},nil
 	}
 	if database=="" || secret=="" || len(secret)>4096 || expected==""{return frozenKafkaCallbackEndpoint{},messagedelivery.ErrInvalid}
-	u,err:=url.Parse(base)
+	u,err:=neturl.Parse(base)
 	if err!=nil || u.Host=="" || u.Hostname()=="" || u.User!=nil || u.RawQuery!="" || u.ForceQuery || u.Fragment!="" || u.Opaque!="" || u.RawPath!="" || u.Scheme!="https" && u.Scheme!="http"{return frozenKafkaCallbackEndpoint{},messagedelivery.ErrInvalid}
 	clean:=strings.TrimRight(u.Path,"/")
 	if clean!="" && path.Clean(clean)!=clean{return frozenKafkaCallbackEndpoint{},messagedelivery.ErrInvalid}

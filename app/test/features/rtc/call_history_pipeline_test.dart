@@ -71,14 +71,19 @@ void main() {
   });
 
   testWidgets('actual incoming ring timer freezes a known missed outcome rather than a cold-start guess', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start, phase: 'timer.start');
     try {
-      f.transport.events.add(RtcSignal(ImSignalAction.invited, historyInvitation()));
-      await tester.pump(const Duration(seconds: 31));
-      final rows = await tester.runAsync(() => f.rows(filter: CallRecordsFilter.missed));
+      await f.actual(tester, () async {
+        f.transport.events.add(RtcSignal(ImSignalAction.invited,
+          historyInvitation(initiated: DateTime.now().subtract(const Duration(seconds: 29)))));
+        expect(f.rtc.phase, RtcPhase.incoming);
+        await f.phase(RtcPhase.ended); // Actual remaining production timer, bounded5s; no fixed sleep.
+      }, phase: 'timer.ended');
+      final rows = await f.actual(tester, () => f.rows(filter: CallRecordsFilter.missed), phase: 'timer.rows');
       expect(rows, hasLength(1)); expect(rows!.single.cause, CallEndCause.timer);
       expect(rows.single.reason, RtcEndReason.timedOut);
-    } finally { await tester.runAsync(f.close); }
+      expect(f.transport.endActions, [RtcEndAction.reject]);
+    } finally { await f.actual(tester, f.close, phase: 'timer.close'); }
   });
 
   test('manual incoming decline is explicit and is never classified as missed', () async {

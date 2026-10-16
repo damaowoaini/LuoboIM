@@ -1886,8 +1886,8 @@
     },
     {
       "path": "server/internal/push/durable_kafka_callback.go",
-      "bytes": 11162,
-      "sha256": "3b56deb58667323340c1c40c32d342dc1cd5b1649d0af6485baa5b1d0de6349b"
+      "bytes": 11172,
+      "sha256": "85820843bb438ca1498a76fe0738d26d974dbccf89c036cc8b37861737f225a6"
     },
     {
       "path": "server/internal/push/durable_kafka_callback_test.go",
@@ -6402,7 +6402,7 @@
     "server/tools/yamlfmt/yamlfmt_test.go": 420
   },
   "effective_count": 1064,
-  "effective_digest": "0cfbb13e4e04b67ffcf9eae687c1f4e268b0b81b917af277ab8806f7c83307c1",
+  "effective_digest": "75f990c1ab3fa599c7ca8c0b0f63fc548d94ae381a4f3f7a372af03820753920",
   "delta": [
     {
       "target": "server/internal/api/admin_preview.go",
@@ -6617,8 +6617,8 @@
     {
       "target": "server/internal/push/durable_kafka_callback.go",
       "beforeSHA256": null,
-      "sha256": "3b56deb58667323340c1c40c32d342dc1cd5b1649d0af6485baa5b1d0de6349b",
-      "bytes": 11162
+      "sha256": "85820843bb438ca1498a76fe0738d26d974dbccf89c036cc8b37861737f225a6",
+      "bytes": 11172
     },
     {
       "target": "server/internal/push/durable_kafka_callback_test.go",
@@ -7740,8 +7740,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/push/durable_kafka_callback.go",
       "target": "server/internal/push/durable_kafka_callback.go",
-      "bytes": 11162,
-      "sha256": "3b56deb58667323340c1c40c32d342dc1cd5b1649d0af6485baa5b1d0de6349b",
+      "bytes": 11172,
+      "sha256": "85820843bb438ca1498a76fe0738d26d974dbccf89c036cc8b37861737f225a6",
       "beforeSHA256": null,
       "mode": "0o644"
     },

@@ -245,6 +245,18 @@ def cloud_environment():
     os.environ.update(inherited)
 
 
+
+def compile_packages(packages, command):
+    # Keep every healthy child compiler result. Resource/monitor/timeout failure
+    # still raises immediately inside command: continuing then is unsafe.
+    codes = {}
+    for package in packages:
+        _, code = command(package, ['go', 'test', '-mod=readonly', '-p=1', '-race', '-json',
+                          '-run', '^$', './' + package], 'compile', 900)
+        codes[package] = code
+    return codes
+
+
 def run():
     cloud_environment()  # Missing/foreign fixture is a controller rejection, not a Go skip.
     c, bodies = verify()
@@ -306,11 +318,13 @@ def run():
         return stdout, resource['exit_code']
 
     packages = list(c['packages'])
-    for package in packages:
-        _, code = command(package, ['go', 'test', '-mod=readonly', '-p=1', '-race', '-json',
-                          '-run', '^$', './' + package], 'compile', 900)
-        if code != 0:
-            raise ValueError('compile failed; no test-pass claim')
+    compile_codes = compile_packages(packages, command)
+    write(output / 'compile-summary.json', {
+        'state':'all_compilers_finished' if all(code == 0 for code in compile_codes.values()) else 'compile_failures_no_tests_or_vet',
+        'scope':SCOPE, 'exit_codes':compile_codes,
+        'tests_started':False, 'vet_started':False})
+    if any(code != 0 for code in compile_codes.values()):
+        raise ValueError('compile failed; complete raw diagnostics retained; no tests or vet')
     summaries = {}
     for package, spec in c['packages'].items():
         log, code = command(package, ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1',

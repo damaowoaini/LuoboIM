@@ -13,7 +13,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'call_records_fixture.dart';
 
 Future<void> finish(WidgetTester tester, CallRecordsFixture f) async {
-  try { await tester.runAsync(f.close); } finally {
+  try { await f.actual(tester, f.close); } finally {
     print('call_records_cleanup unmount.begin');
     await tester.pumpWidget(const SizedBox()); await tester.pump();
     print('call_records_cleanup unmount.end');
@@ -31,7 +31,7 @@ Future<void> waitRow(WidgetTester tester, CallRecordsFixture f) =>
 Future<void> tapOwned(WidgetTester tester, CallRecordsFixture f, Finder target) async {
   await tester.ensureVisible(target); await tester.pump();
   expect(target.hitTestable(), findsOneWidget);
-  await tester.runAsync(() => tester.tap(target.hitTestable()));
+  await f.actual(tester, () => tester.tap(target.hitTestable()));
   await f.frame(tester);
 }
 Future<void> openRedial(WidgetTester tester, CallRecordsFixture f) async {
@@ -43,7 +43,7 @@ Future<void> openRedial(WidgetTester tester, CallRecordsFixture f) async {
 
 void main() {
   testWidgets('production inbox more menu reaches actual durable call history and back retains the inbox', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
       await f.mount(tester, inbox: true);
       await f.ready(tester, find.byType(ConversationsPage));
@@ -66,9 +66,9 @@ void main() {
   });
 
   testWidgets('all and missed tabs render distinct actual coordinator outcomes with stable peer identity', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() async {
+      await f.actual(tester, () async {
         await seed(f);
         final call = historyInvitation(room: 'missed');
         f.transport.events.add(RtcSignal(ImSignalAction.invited, call));
@@ -88,7 +88,7 @@ void main() {
   });
 
   testWidgets('storage read error is not presented as empty and only explicit retry recovers', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
       var fail = true;
       f.overrideOpen = (key) {
@@ -107,11 +107,11 @@ void main() {
   });
 
   testWidgets('new durable RTC events mark a loaded snapshot stale and explicit refresh reads the new record', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
       await f.mount(tester);
       await f.until(tester, () => find.text('暂无通话记录').evaluate().isNotEmpty);
-      await tester.runAsync(() async {
+      await f.actual(tester, () async {
         final call = historyInvitation(room: 'arrived');
         f.transport.events.add(RtcSignal(ImSignalAction.invited, call));
         f.transport.events.add(RtcSignal(ImSignalAction.cancelled, call));
@@ -128,9 +128,9 @@ void main() {
   });
 
   testWidgets('cancelled delete preserves its row while confirmed delete is durable and never hangs up a call', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() => seed(f)); await f.mount(tester); await waitRow(tester, f);
+      await f.actual(tester, () => seed(f)); await f.mount(tester); await waitRow(tester, f);
       await tapOwned(tester, f, find.byTooltip('删除 同名好友 的通话记录'));
       await f.until(tester, () => find.text('删除记录').evaluate().isNotEmpty);
       await f.ready(tester, find.text('删除记录'));
@@ -143,7 +143,7 @@ void main() {
       final deleting = ModalRoute.of(tester.element(find.text('删除记录')))!;
       await tapOwned(tester, f, find.text('删除记录')); await f.removed(tester, deleting);
       await f.until(tester, () => find.text('暂无通话记录').evaluate().isNotEmpty);
-      expect(await tester.runAsync(() => f.rows()), isEmpty);
+      expect(await f.actual(tester, () => f.rows()), isEmpty);
       expect(f.transport.endActions, isEmpty); expect(f.transport.joins, 0);
       expect(tester.takeException(), isNull);
     } finally { await finish(tester, f); }
@@ -151,9 +151,9 @@ void main() {
 
   for (final video in [false, true]) {
     testWidgets('real history ${video ? 'video' : 'audio'} redial dispatches the exact stored peer through RtcCoordinator once', (tester) async {
-      final f = CallRecordsFixture(); await tester.runAsync(f.start);
+      final f = CallRecordsFixture(); await f.actual(tester, f.start);
       try {
-        await tester.runAsync(() => seed(f)); await f.mount(tester); await waitRow(tester, f);
+        await f.actual(tester, () => seed(f)); await f.mount(tester); await waitRow(tester, f);
         await openRedial(tester, f);
         final route = ModalRoute.of(tester.element(find.text('语音通话')))!;
         await tapOwned(tester, f, find.text(video ? '视频通话' : '语音通话'));
@@ -168,9 +168,9 @@ void main() {
   }
 
   testWidgets('busy changes while the owned redial sheet is open stop a second native call', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() => seed(f)); await f.mount(tester); await waitRow(tester, f);
+      await f.actual(tester, () => seed(f)); await f.mount(tester); await waitRow(tester, f);
       await openRedial(tester, f);
       f.transport.events.add(RtcSignal(ImSignalAction.invited, historyInvitation(room: 'current-other-call')));
       await tapOwned(tester, f, find.text('视频通话'));
@@ -181,9 +181,9 @@ void main() {
   });
 
   testWidgets('a saved old row callback after foreign route ABA cannot renew its view ticket while a new click works', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() => seed(f)); await f.mount(tester); await waitRow(tester, f);
+      await f.actual(tester, () => seed(f)); await f.mount(tester); await waitRow(tester, f);
       final old = tester.widget<ListTile>(find.byType(ListTile)).onTap!;
       await f.coverAndReturn(tester, find.byType(CallRecordsPage));
       old(); await f.frame(tester);
@@ -196,9 +196,9 @@ void main() {
   });
 
   testWidgets('foreign coverage of an owned redial sheet retires its sensitive content and does not revive the old choice', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() => seed(f)); await f.mount(tester); await waitRow(tester, f);
+      await f.actual(tester, () => seed(f)); await f.mount(tester); await waitRow(tester, f);
       await openRedial(tester, f);
       final old = tester.widget<FilledButton>(find.widgetWithText(FilledButton, '语音通话')).onPressed!;
       await f.coverAndReturn(tester, find.text('语音通话'));
@@ -214,31 +214,31 @@ void main() {
   });
 
   testWidgets('owner replacement removes old confirmation details and its retained delete callback cannot affect either owner', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() => seed(f)); final oldOwner = f.sdk.session.state.credentials!;
+      await f.actual(tester, () => seed(f)); final oldOwner = f.sdk.session.state.credentials!;
       await f.mount(tester); await waitRow(tester, f);
       await tapOwned(tester, f, find.byTooltip('删除 同名好友 的通话记录'));
       await f.until(tester, () => find.text('删除记录').evaluate().isNotEmpty);
       await f.ready(tester, find.text('删除记录'));
       final old = tester.widget<FilledButton>(find.widgetWithText(FilledButton, '删除记录')).onPressed!;
-      await tester.runAsync(() => f.sdk.signInOther(user: 'other'));
+      await f.actual(tester, () => f.sdk.signInOther(user: 'other'));
       await f.frame(tester); old(); await f.frame(tester);
       expect(find.text('ID：bob'), findsNothing);
       final oldDB = CallRecordsRepository(accountKey: oldOwner.accountKey, open: f.open);
       try {
-        final original = await tester.runAsync(() => oldDB.list(filter: CallRecordsFilter.all, current: () => true));
+        final original = await f.actual(tester, () => oldDB.list(filter: CallRecordsFilter.all, current: () => true));
         expect(original!.items, hasLength(1));
-      } finally { await tester.runAsync(oldDB.close); }
-      expect(await tester.runAsync(() => f.rows()), isEmpty);
+      } finally { await f.actual(tester, oldDB.close); }
+      expect(await f.actual(tester, () => f.rows()), isEmpty);
       expect(f.transport.joins, 0); expect(tester.takeException(), isNull);
     } finally { await finish(tester, f); }
   });
 
   testWidgets('deleting an active record does not hang up and its later real terminal event cannot resurrect it', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() async { await f.connectedOutgoing(); await f.history.flush(); });
+      await f.actual(tester, () async { await f.connectedOutgoing(); await f.history.flush(); });
       final call = f.rtc.call!; await f.mount(tester); await waitRow(tester, f);
       await tapOwned(tester, f, find.byTooltip('删除 同名好友 的通话记录'));
       await f.until(tester, () => find.text('删除记录').evaluate().isNotEmpty);
@@ -246,24 +246,24 @@ void main() {
       await tapOwned(tester, f, find.text('删除记录'));
       await f.until(tester, () => find.text('暂无通话记录').evaluate().isNotEmpty);
       expect(f.rtc.busy, isTrue); expect(f.transport.endActions, isEmpty);
-      await tester.runAsync(() async {
+      await f.actual(tester, () async {
         f.transport.events.add(RtcSignal(ImSignalAction.hungUp, call)); await f.history.flush();
       });
-      expect(await tester.runAsync(() => f.rows()), isEmpty);
+      expect(await f.actual(tester, () => f.rows()), isEmpty);
       expect(f.transport.endActions, isEmpty); expect(tester.takeException(), isNull);
     } finally { await finish(tester, f); }
   });
 
   testWidgets('leaving during a delayed initial SQLite open cannot publish old rows or errors into the inbox', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     final entered = Completer<void>(); final reply = Completer<Database>();
     try {
       f.overrideOpen = (_) { if (!entered.isCompleted) entered.complete(); return reply.future; };
       await f.mount(tester);
-      await tester.runAsync(() => entered.future.timeout(const Duration(seconds: 5)));
+      await f.actual(tester, () => entered.future.timeout(const Duration(seconds: 5)));
       f.router.go('/home'); await f.frame(tester);
       await f.ready(tester, find.byType(ConversationsPage));
-      await tester.runAsync(() async { reply.completeError(StateError('owned late open failure')); });
+      await f.actual(tester, () async { reply.completeError(StateError('owned late open failure')); });
       await f.frame(tester);
       expect(find.byType(CallRecordsPage), findsNothing);
       expect(find.text('无法读取或保存本地资料，请重试'), findsNothing);
@@ -275,9 +275,9 @@ void main() {
   });
 
   testWidgets('call history and owned actions remain scrollable and accessible at 320 by 568 with large text', (tester) async {
-    final f = CallRecordsFixture(); await tester.runAsync(f.start);
+    final f = CallRecordsFixture(); await f.actual(tester, f.start);
     try {
-      await tester.runAsync(() => seed(f)); await f.mount(tester, width: 320, height: 568);
+      await f.actual(tester, () => seed(f)); await f.mount(tester, width: 320, height: 568);
       await waitRow(tester, f);
       expect(find.textContaining('ID：bob'), findsOneWidget);
       final remove = find.byTooltip('删除 同名好友 的通话记录');

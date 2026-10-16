@@ -175,6 +175,42 @@ final class CallRecordsFixture {
     await ready(tester, find.text('foreign-history-route'));
     navigator.pop(); await removed(tester, route);
   }
+  /// Start the real operation, return from runAsync, then pump both domains
+  /// until that exact future completes. Never await a fake-owned SQLite tail
+  /// while holding WidgetTester.runAsync's real-async admission lock.
+  Future<T?> actual<T>(WidgetTester tester, Future<T> Function() operation,
+      {String phase = 'operation'}) async {
+    var completed = false;
+    T? result;
+    Object? failure;
+    StackTrace? failureStack;
+    final elapsed = Stopwatch()..start();
+    print('call_records_async $phase.begin');
+    await tester.runAsync(() async {
+      unawaited(Future<T>.sync(operation).then<void>((value) {
+        result = value; completed = true;
+      }, onError: (Object error, StackTrace stack) {
+        failure = error; failureStack = stack; completed = true;
+      }));
+      // Return immediately; the owned operation's future is observed above.
+    });
+    while (!completed && elapsed.elapsed < const Duration(seconds: 20)) {
+      await frame(tester); // Real I/O yield, then fake frame/microtasks, sequentially.
+    }
+    elapsed.stop();
+    if (!completed) {
+      print('call_records_async $phase.timeout');
+      throw TimeoutException('Bounded call-record fixture phase: $phase', const Duration(seconds: 20));
+    }
+    final error = failure;
+    if (error != null) {
+      print('call_records_async $phase.error');
+      Error.throwWithStackTrace(error, failureStack ?? StackTrace.current);
+    }
+    print('call_records_async $phase.end');
+    return result;
+  }
+
   Future<void> close() async {
     if (!_providerOwnsRtc) rtc.dispose();
     try {

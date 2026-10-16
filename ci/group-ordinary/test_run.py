@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Six pure controller gates; no Go, Docker, DB or source1064 materialization."""
+"""Seven pure controller gates; no Go, Docker, DB or source1064 materialization."""
 import hashlib
 import importlib.util
 import json
@@ -112,6 +112,32 @@ class ControllerTests(unittest.TestCase):
         ):
             with self.subTest(status=resource['status']), self.assertRaises(ValueError):
                 SUBJECT.require_resource(resource, code)
+
+
+
+    def test_compile_collects_all_23_healthy_child_results_but_not_guard_errors(self):
+        packages = ['synthetic/' + str(index) for index in range(23)]
+        calls = []
+        def command(package, args, phase, timeout):
+            calls.append(package)
+            self.assertEqual(phase, 'compile')
+            self.assertEqual(timeout, 900)
+            self.assertEqual(args[-1], './' + package)
+            self.assertEqual(args[:-1], ['go', 'test', '-mod=readonly', '-p=1', '-race', '-json', '-run', '^$'])
+            return None, 1 if package == packages[8] else 0
+        codes = SUBJECT.compile_packages(packages, command)
+        self.assertEqual(calls, packages)
+        self.assertEqual(codes[packages[8]], 1)
+        self.assertEqual(sum(code == 0 for code in codes.values()), 22)
+        calls.clear()
+        def monitor_error(package, args, phase, timeout):
+            calls.append(package)
+            if package == packages[3]:
+                raise ValueError('synthetic monitor incomplete')
+            return None, 0
+        with self.assertRaises(ValueError):
+            SUBJECT.compile_packages(packages, monitor_error)
+        self.assertEqual(calls, packages[:4])
 
 
 if __name__ == '__main__':

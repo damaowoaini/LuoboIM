@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v9",
-  "state": "current304_call_records_fixture_r2_pending_cloud",
+  "state": "current304_call_records_async_fixture_r3_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -43,7 +43,9 @@
     "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257",
     "inbox_contact_shortcuts_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f",
     "inbox_contact_shortcuts_r1_manifest_sha256": "f1aa575372ec3b4686d7c966ce969f96257b5d43874d80b15acc0aac1068c63c",
-    "call_records_r1_manifest_sha256": "4f4a31bc0120bf13da2e802adbf7c29189624b4e0d2b372787e1fd88d5837aad"
+    "call_records_r1_manifest_sha256": "4f4a31bc0120bf13da2e802adbf7c29189624b4e0d2b372787e1fd88d5837aad",
+    "call_records_fixture_R2_manifest_sha256": "f06cfefea9e397d4fe304be39ac8976a6edb7c8e3c7c8318d24a92ab080019b7",
+    "call_records_async_fixture_R3_manifest_sha256": "83c5625443dd9649fceb890c8205c95e1452246d73e3f4c6e7ab2f634678b3d6"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -322,7 +324,7 @@
     "current304": 356
   },
   "portable_digests": {
-    "current304": "3c840692c2502ed2bfce7adc1599b877a882cf445fb6b8b0a37a226ce02997c6"
+    "current304": "d113b9775dc7790038e4f3272df33c1d46665336d93349931e096638900a9119"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -656,6 +658,23 @@
         "unexecuted_new35": true
       },
       "full_and_analyze": "not started"
+    },
+    "call_records_fixture_R2_failure": {
+      "run": 38899133951,
+      "job": 116966759676,
+      "commit": "117afec4f5f2bbf9d4c4ec058309a9f19924cbac",
+      "root_review": {
+        "path": "references/integration/cloud-mobile-ci/run-38899133951-agent/root-failure-review.json",
+        "bytes": 14013,
+        "sha256": "9b4d9ccdb740c100626d7539dd8575d61332e70230cd41160213010054ba0a0f"
+      },
+      "agent_review": {
+        "path": "references/integration/cloud-mobile-ci/run-38899133951-agent/verification.json",
+        "bytes": 6137,
+        "sha256": "3c39f58447c02c7f0fa710df4b69a9a66a42dfa6173aa312e4c0b3d86eb96b4e"
+      },
+      "actual": "218PASS+4ERROR;21hiddenPASS;244start/243done;missingdonefooter;new34PASS/4ERROR/12unstarted;old184exact;900.149phasetimeout child0;full/analyze notstarted",
+      "cause_boundary": "timer/queue scheduling diagnoses are source-backed hypotheses, not R3 runtime proof; four actual outcomes remain separately preserved"
     }
   },
   "reference_entry": {
@@ -663,7 +682,7 @@
     "default_enabled": false,
     "working_cohort": "current304",
     "members": 304,
-    "reference_source_digest": "5699ff9109cbc0e3deab1d8cedfa74a4ee6b6bd91a0024737c74d6eb985694ac",
+    "reference_source_digest": "6215d217dfbb187988329be51b690ec28241f4f44684284ca06cfaf80a1a4405",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -729,7 +748,7 @@
   },
   "current304": {
     "members": 304,
-    "source_digest": "c295fccc7d523d46860c849d0d763df507381e03850fa2ed130993dc5a9af630",
+    "source_digest": "4e54cc05977e210c706dceccb46c31ce426f4ca6fe603de069491937637fe709",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -2173,18 +2192,18 @@
       },
       {
         "path": "app/test/features/rtc/call_history_pipeline_test.dart",
-        "bytes": 15233,
-        "sha256": "7f8ec1849885aa488114a8129b18191b40fbbc1820ebdadd56b7ef833be462ae"
+        "bytes": 15607,
+        "sha256": "7ee50266ac155417a380054b04e9aed62e0ed8fc4bf720fa237c76614bbe663f"
       },
       {
         "path": "app/test/features/rtc/call_records_fixture.dart",
-        "bytes": 10193,
-        "sha256": "fd74969d9dea1026ab025636b433f36d0219a149a1c7f7d0b791cc3f7d643c57"
+        "bytes": 11696,
+        "sha256": "416044845963a4c8f3fc5254802f6c7e94af0c4ab69ae4ac0cdc7f60e99aa083"
       },
       {
         "path": "app/test/features/rtc/call_records_page_test.dart",
-        "bytes": 17187,
-        "sha256": "87a7b37b670eb7d82077e5abea9f67f0dc5cc1df6ee4b62696058a4eb6e2a601"
+        "bytes": 17221,
+        "sha256": "081e71d872fe9a4f6a8a20188d3122c4212ec618083ac6cae0a58a4dd7265559"
       },
       {
         "path": "app/test/features/rtc/call_records_repository_test.dart",

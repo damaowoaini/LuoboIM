@@ -1,3 +1,42 @@
+# Current304 call-records async fixture R3 (prepared, not run)
+
+Parent R2 run38899133951 failed naturally. Exact raw shows old184 successful plus
+new34 successful,4 errors and12 not started (218 visible successes,21 hidden
+successes,244 starts/243 done, no done footer). The 900.149s phase timeout wins
+over child0. Full922/analyze never started. Preserve all four distinct actual
+outcomes: timer missed rows[] assertion, first page close10s timeout, later page
+body600s timeout, then reentrant runAsync. Root independently verified original
+ZIP/API/each byte/names/resources/cleanup in root-failure-review.json.
+
+This revision changes only3 test/fixture files. actual<T> starts and observes the
+real operation then returns runAsync before the existing sequential frame bridge
+yields real I/O and pumps fake microtasks. Its bounded20s incomplete/error throws
+with the original stack; inner close10s,phase5s,phase900s stay unchanged. Page
+operations are a mechanical adapter replacement; reversing that replacement
+restores its entire original file. The ring case uses the same lawful30s real
+invitation at now-29s and requires incoming then actual ended before reading the
+real durable missed record and reject action. No fixed sleep, fake terminal,
+product Timer/recorder/repository change or manual account binding. These are
+source-backed scheduling hypotheses, not an accepted runtime diagnosis.
+
+All50 names and original220 expect calls stay; two incoming/reject observations
+make222. Lifetime3/repository15/sharedSdkHarness/all9 production files are exact.
+Normal cloud remains unchanged32 Python gates, strict304/356, official setup and
+enforced lock, target234=old184+50, full922=old872+50, strict analyze0. Names with
+multiplicity, hidden/error/footer/latchedresource checks,35 recorder fixtures
+(33 normal/2 expectedfailure),14 owned unmounts,76 parent creation sequences and
+safeexit6 remain strict. An unfinished or timed-out Future cannot count PASS.
+
+Only3 CI metadata paths bind the explicit new304/356 and recomputed optional
+search-reference digest; no workflow/runner/list/cleanup gate or SDK51,174locks,
+migration1/official tools/network/resource changes. Local-only app/tool/check.sh
+is not uploaded or required; public inventory has zero exceptions. Parent294
+184/872/strict0 remains accepted history. R3 has0 localDart/DB/Flutter and0 cloud
+execution. NextUnread source stays separate and must rebase any future parent;
+no current/public adoption or dispatch is performed by this draft.
+
+## Preserved R2 and earlier documentation
+
 # Current304 call-records fixture R2 (pending cloud)
 
 The first current304 run38898318098 completed naturally: original184 and new
