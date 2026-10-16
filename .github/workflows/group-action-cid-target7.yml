@@ -1,4 +1,4 @@
-name: Group action CID targeted seven
+name: Group action CID reader codec failed two
 
 # Affected checks only. Existing pure13 and full29 lanes remain unchanged.
 on:
@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   target7:
-    name: CID R3 / exact seven tops and five subs
+    name: CID reader codec / exact failed two tops and two subs
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -71,7 +71,7 @@ jobs:
             --record "$GITHUB_WORKSPACE/ci-results/group-action-cid-mysql-prepare.resource.json" \
             --min-free-mib 1024 --timeout 600 --poll-interval .2 \
             -- python3 -B ci/group-ordinary/mysql_fixture.py prepare
-      - name: Only three packages and exact seven tops five subs under guards
+      - name: Only two packages and exact failed two tops two subs under guards
         run: python3 -B ci/group-action-cid/run.py
       - name: Always collect owned private SQL residuals
         if: always()

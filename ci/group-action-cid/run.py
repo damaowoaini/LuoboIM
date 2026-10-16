@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manual target7 only; owned hosted fixture, not the full29 or runtime lane."""
+"""Manual failed2 codec recheck only; reuse prior5/3, not full29 or runtime."""
 import argparse
 from collections import Counter
 import hashlib
@@ -15,25 +15,11 @@ import time
 
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
-SCOPE = 'group_action_cid_source1165_target7_only_not_runtime'
+SCOPE = 'group_action_cid_source1165_reader_codec_failed2_only_not_runtime'
 PREFIX = 'github.com/openimsdk/open-im-server/v3/'
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
-TARGETS = {
-    'internal/deliveryprofile': {
-        'tops': ['TestOwnedCutFrozenHeadShapeCannotOverflow', 'TestOwnedCutNotificationCIDMatchesOpenIMProtocol'],
-        'subs': []},
-    'internal/messagedelivery': {
-        'tops': ['TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut',
-                 'TestOwnedCutRetentionUsesOriginalHeadOrAcceptedSequenceAndClearRevokes',
-                 'TestOwnedCutSharedAllocatorCASRetriesWholeSnapshot',
-                 'TestOwnedLegacyQuarantineDoesNotBlockKnownProfilesAndRedactionIsNotDelivery'],
-        'subs': ['TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/missing',
-                 'TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/negative',
-                 'TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/overflow']},
-    'internal/rpc/group': {
-        'tops': ['TestOwnedRoleRPCReceiverRiskSQLSignedCallbackUnknownRestartAndReceiptFirst'],
-        'subs': ['TestOwnedRoleRPCReceiverRiskSQLSignedCallbackUnknownRestartAndReceiptFirst/silent',
-                 'TestOwnedRoleRPCReceiverRiskSQLSignedCallbackUnknownRestartAndReceiptFirst/stored-n']}}
+TARGETS = {'internal/messagedelivery': {'tops': ['TestOwnedLegacyQuarantineDoesNotBlockKnownProfilesAndRedactionIsNotDelivery'], 'subs': []}, 'internal/rpc/group': {'tops': ['TestOwnedRoleRPCReceiverRiskSQLSignedCallbackUnknownRestartAndReceiptFirst'], 'subs': ['TestOwnedRoleRPCReceiverRiskSQLSignedCallbackUnknownRestartAndReceiptFirst/silent', 'TestOwnedRoleRPCReceiverRiskSQLSignedCallbackUnknownRestartAndReceiptFirst/stored-n']}}
+REUSED_PRIOR_TARGETS = {'runID': 38950791915, 'head': '549545d197ffca840099498665e11b9efae2c717', 'artifactSHA256': '0d2c987f0a4b528c58b62309158887c43f2e2938dbc184cdaafb11c973efee20', 'sourceDigest': '6022efebf769a172af9f4abd89f218b886616bb48361b48cb3115364f1f39fbd', 'rootReviewSHA256': '09ee987fb54b4f4ccf5d8d3c4827167bff2aba6798b46b8424548d4bbc537848', 'topPASS': 5, 'subPASS': 3, 'targets': {'internal/deliveryprofile': {'tops': ['TestOwnedCutFrozenHeadShapeCannotOverflow', 'TestOwnedCutNotificationCIDMatchesOpenIMProtocol'], 'subs': []}, 'internal/messagedelivery': {'tops': ['TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut', 'TestOwnedCutRetentionUsesOriginalHeadOrAcceptedSequenceAndClearRevokes', 'TestOwnedCutSharedAllocatorCASRetriesWholeSnapshot'], 'subs': ['TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/missing', 'TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/negative', 'TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/overflow']}}, 'sourceChanges': 'Only two groupeffects readers changed. All original CID tests and four CID overlay bodies unchanged.', 'claim': 'Historical partial-run successes, not rerun or whole target7 acceptance.'}
 
 
 def sha(raw):
@@ -78,7 +64,7 @@ def apply_overlay(c, previous):
         if (target not in previous or not target.startswith('server/') or not target.endswith('.go')
                 or target in seen or row['path'] != 'ci/candidates/group-action-cid/source/' + target
                 or row['mode'] != '0o644' or row['beforeSHA256'] != sha(previous[target])):
-            raise ValueError('four existing CID sources require exact parent')
+            raise ValueError('six existing CID sources require exact parent')
         path = REPO / row['path']
         if stat.S_IMODE(path.stat().st_mode) != 0o644:
             raise ValueError('overlay mode differs')
@@ -94,11 +80,12 @@ def apply_overlay(c, previous):
 def verify():
     c = json.loads(regular(INPUTS))
     if (c['schema'] != 1 or c['scope'] != SCOPE or c['parentCount'] != 1165
-            or c['effectiveCount'] != 1165 or len(c['overlay']) != 4
+            or c['effectiveCount'] != 1165 or len(c['overlay']) != 6
             or c['parentRunner']['path'] != 'ci/group-action-receiver/run.py'
             or c['parentInputs']['path'] != 'ci/group-action-receiver/inputs.json'
-            or c['targets'] != TARGETS):
-        raise ValueError('exact target7 source contract required')
+            or c['targets'] != TARGETS or c['reusePriorCIDTargets'] != REUSED_PRIOR_TARGETS
+            or c['expected'] != {'topPASS': 2, 'subPASS': 2, 'skip': 0, 'fail': 0, 'packages': 2, 'vet': False, 'fullRegression': False}):
+        raise ValueError('exact failed2 codec source contract required')
     for row in c['dependencies']:
         pinned(row)
     pinned(c['parentRunner'])
@@ -111,7 +98,7 @@ def verify():
         raise ValueError('old1165 source parent differs')
     bodies = apply_overlay(c, before)
     if len(bodies) != 1165 or rows(bodies) != c['effectiveSource'] or digest(rows(bodies)) != c['effectiveDigest']:
-        raise ValueError('CID R3 source composition differs')
+        raise ValueError('CID reader codec successor source composition differs')
     for package, expected in TARGETS.items():
         present = []
         for path, raw in bodies.items():
@@ -312,7 +299,7 @@ def run():
     for target, body in bodies.items():
         actual = regular(work / target)
         if actual != body or stat.S_IMODE((work / target).stat().st_mode) != c['sourceModes'][target]:
-            raise ValueError('source/mode changed during target7')
+            raise ValueError('source/mode changed during failed2 recheck')
         post[target] = actual
     if regular(work / 'server/config/config.yaml') != template:
         raise ValueError('generated public config changed')
@@ -320,11 +307,12 @@ def run():
     write(output / 'source-post.json', {'effectiveCount': len(post), 'effectiveDigest': digest(rows(post)),
           'allSourceBodiesAndModesExact': True, 'locksAfter': rows({p: post[p] for p in expected_locks}),
           'generatedPublicConfigSHA256': sha(template)})
-    accepted = not errors and sum(x['topPASS'] for x in outcomes.values()) == 7 and sum(x['subPASS'] for x in outcomes.values()) == 5
-    write(output / 'summary.json', {'state': 'target7_tests_passed' if accepted else 'failed_or_incomplete', 'scope': SCOPE,
+    accepted = not errors and sum(x['topPASS'] for x in outcomes.values()) == 2 and sum(x['subPASS'] for x in outcomes.values()) == 2
+    write(output / 'summary.json', {'state': 'failed2_codec_recheck_passed' if accepted else 'failed_or_incomplete', 'scope': SCOPE,
           'packages': outcomes, 'wholeRegression': False, 'vetRun': False, 'runtimeSwitch': False,
           'fixtureCollectAndCleanup': 'mandatory subsequent workflow steps; this summary alone is not overall acceptance',
           'sourceDigest': c['effectiveDigest'], 'unchangedOldPure12Reused': True,
+          'newExecutedExpected': {'topPASS': 2, 'subPASS': 2}, 'priorCIDTargetsReused': REUSED_PRIOR_TARGETS,
           'networkBoundary': 'cleanenv and fixed owned loopback fixture; not the empty pure13 network namespace'})
     return 0 if accepted else 1
 
@@ -336,7 +324,7 @@ if __name__ == '__main__':
     try:
         if args.verify:
             verify()
-            print('Exact CID R3 source1165/target7 verified; no Go/fixture execution.')
+            print('Exact CID reader codec source1165/failed2 verified; no Go/fixture execution.')
         else:
             raise SystemExit(run())
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError, json.JSONDecodeError):

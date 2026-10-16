@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "group_action_cid_source1165_target7_only_not_runtime",
+  "scope": "group_action_cid_source1165_reader_codec_failed2_only_not_runtime",
   "parentRunner": {
     "path": "ci/group-action-receiver/run.py",
     "bytes": 14662,
@@ -14,7 +14,7 @@
   "parentCount": 1165,
   "parentDigest": "46b08d7afba12638b1a5ee25d3ddc99e4ea598b577aceb7b51c7acb54b99780f",
   "effectiveCount": 1165,
-  "effectiveDigest": "6022efebf769a172af9f4abd89f218b886616bb48361b48cb3115364f1f39fbd",
+  "effectiveDigest": "1c15130e028787ab8b4ebf9d36746c7038e9fbbdad171b97d71a335c73a8eb2b",
   "effectiveSource": [
     {
       "path": "server/.dockerignore",
@@ -1503,13 +1503,13 @@
     },
     {
       "path": "server/internal/groupeffects/owned_legacy.go",
-      "bytes": 9030,
-      "sha256": "9b77487f56932c6e207459a6f5ee6cd4c42b40d72694b6a3c42538538463b99f"
+      "bytes": 9178,
+      "sha256": "c9cf3f6f1498eadb95f99e39fdbff24f624ba3f75e71c06ec27fe1c58aa41b32"
     },
     {
       "path": "server/internal/groupeffects/owned_notification_delivery.go",
-      "bytes": 7779,
-      "sha256": "4728d1231aba19e5920959a453643ce7eaa00ff8b16bf31d4a0a095b98870a8c"
+      "bytes": 7891,
+      "sha256": "4a28a4f3cfb032939c960909f587e11489143f5db9aa7d53bf39c0fcef749101"
     },
     {
       "path": "server/internal/groupeffects/owned_profile_readiness.go",
@@ -7041,28 +7041,30 @@
       "mode": "0o644",
       "target": "server/internal/rpc/group/owned_receiver_integration_test.go",
       "beforeSHA256": "23ec9b35050e4fa07381be2c488ceadfb6b611aa0981c58af6e2de970d4837e4"
+    },
+    {
+      "path": "ci/candidates/group-action-cid/source/server/internal/groupeffects/owned_legacy.go",
+      "bytes": 9178,
+      "sha256": "c9cf3f6f1498eadb95f99e39fdbff24f624ba3f75e71c06ec27fe1c58aa41b32",
+      "mode": "0o644",
+      "target": "server/internal/groupeffects/owned_legacy.go",
+      "beforeSHA256": "9b77487f56932c6e207459a6f5ee6cd4c42b40d72694b6a3c42538538463b99f"
+    },
+    {
+      "path": "ci/candidates/group-action-cid/source/server/internal/groupeffects/owned_notification_delivery.go",
+      "bytes": 7891,
+      "sha256": "4a28a4f3cfb032939c960909f587e11489143f5db9aa7d53bf39c0fcef749101",
+      "mode": "0o644",
+      "target": "server/internal/groupeffects/owned_notification_delivery.go",
+      "beforeSHA256": "4728d1231aba19e5920959a453643ce7eaa00ff8b16bf31d4a0a095b98870a8c"
     }
   ],
   "targets": {
-    "internal/deliveryprofile": {
-      "tops": [
-        "TestOwnedCutFrozenHeadShapeCannotOverflow",
-        "TestOwnedCutNotificationCIDMatchesOpenIMProtocol"
-      ],
-      "subs": []
-    },
     "internal/messagedelivery": {
       "tops": [
-        "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut",
-        "TestOwnedCutRetentionUsesOriginalHeadOrAcceptedSequenceAndClearRevokes",
-        "TestOwnedCutSharedAllocatorCASRetriesWholeSnapshot",
         "TestOwnedLegacyQuarantineDoesNotBlockKnownProfilesAndRedactionIsNotDelivery"
       ],
-      "subs": [
-        "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/missing",
-        "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/negative",
-        "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/overflow"
-      ]
+      "subs": []
     },
     "internal/rpc/group": {
       "tops": [
@@ -7107,29 +7109,61 @@
     },
     {
       "path": "ci/group-action-cid/run.py",
-      "bytes": 18370,
-      "sha256": "502659af98b4338f6dfc4b15a6e69dd015801a47b6f7345dee6786ed2ffdbc50"
+      "bytes": 19222,
+      "sha256": "5178b259f17a39b7d4ebd97698212476e3b1b0a1241d372a7350923d9da544c4"
     },
     {
       "path": "ci/group-action-cid/test_run.py",
-      "bytes": 7376,
-      "sha256": "9231d7f8b98534b0ab239713fed3d652c4c425ec419ba7ed0ce9aa75e518be69"
+      "bytes": 7375,
+      "sha256": "525dd192fa72ed9d7c8393aaa38eac7b747750a3ac1bc7c5532b6e2c9b01679c"
     },
     {
       "path": ".github/workflows/group-action-cid-target7.yml",
-      "bytes": 4593,
-      "sha256": "23df52530b550b896e39536da9244c01eaf47d3e4a26a834cd214b86cb855d61"
+      "bytes": 4618,
+      "sha256": "0a313e206c47c5544f675fb09bc4adbe17541257e79597e848bfecde96d9a4c7"
     }
   ],
   "expected": {
-    "topPASS": 7,
-    "subPASS": 5,
+    "topPASS": 2,
+    "subPASS": 2,
     "skip": 0,
     "fail": 0,
-    "packages": 3,
+    "packages": 2,
     "vet": false,
     "fullRegression": false
   },
   "reuseOldPure12": true,
-  "notDeployable": "seed/new+oldgroup migration/persisted n_ reader and StartTransfer fence unchanged"
+  "notDeployable": "seed/new+oldgroup migration/persisted n_ reader and StartTransfer fence unchanged",
+  "reusePriorCIDTargets": {
+    "runID": 38950791915,
+    "head": "549545d197ffca840099498665e11b9efae2c717",
+    "artifactSHA256": "0d2c987f0a4b528c58b62309158887c43f2e2938dbc184cdaafb11c973efee20",
+    "sourceDigest": "6022efebf769a172af9f4abd89f218b886616bb48361b48cb3115364f1f39fbd",
+    "rootReviewSHA256": "09ee987fb54b4f4ccf5d8d3c4827167bff2aba6798b46b8424548d4bbc537848",
+    "topPASS": 5,
+    "subPASS": 3,
+    "targets": {
+      "internal/deliveryprofile": {
+        "tops": [
+          "TestOwnedCutFrozenHeadShapeCannotOverflow",
+          "TestOwnedCutNotificationCIDMatchesOpenIMProtocol"
+        ],
+        "subs": []
+      },
+      "internal/messagedelivery": {
+        "tops": [
+          "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut",
+          "TestOwnedCutRetentionUsesOriginalHeadOrAcceptedSequenceAndClearRevokes",
+          "TestOwnedCutSharedAllocatorCASRetriesWholeSnapshot"
+        ],
+        "subs": [
+          "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/missing",
+          "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/negative",
+          "TestOwnedCutHeadOverflowMissingSeedAndMalformedCounterRefuseWithoutCut/overflow"
+        ]
+      }
+    },
+    "sourceChanges": "Only two groupeffects readers changed. All original CID tests and four CID overlay bodies unchanged.",
+    "claim": "Historical partial-run successes, not rerun or whole target7 acceptance."
+  }
 }

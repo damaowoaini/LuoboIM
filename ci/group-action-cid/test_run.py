@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-SPEC = importlib.util.spec_from_file_location('cid_target7_controller', Path(__file__).with_name('run.py'))
+SPEC = importlib.util.spec_from_file_location('cid_failed2_controller', Path(__file__).with_name('run.py'))
 SUBJECT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SUBJECT)
 
@@ -31,8 +31,8 @@ class ControllerTests(unittest.TestCase):
         expected = {'tops': ['TestOne'], 'subs': ['TestOne/first', 'TestOne/second']}
         raw = events(expected)
         self.assertEqual(SUBJECT.audit(raw, 0, 'internal/synthetic', expected)['subPASS'], 2)
-        self.assertEqual(sum(len(v['tops']) for v in SUBJECT.TARGETS.values()), 7)
-        self.assertEqual(sum(len(v['subs']) for v in SUBJECT.TARGETS.values()), 5)
+        self.assertEqual(sum(len(v['tops']) for v in SUBJECT.TARGETS.values()), 2)
+        self.assertEqual(sum(len(v['subs']) for v in SUBJECT.TARGETS.values()), 2)
         for bad, code in [(raw[:2] + raw[3:], 0), (raw[:2] + [raw[2]] + raw[2:], 0),
                           (raw, 1), ([raw[0], raw[-1]], 0),
                           (raw + [{'Package': raw[0]['Package'], 'Action': 'output'}], 0)]:
@@ -96,13 +96,13 @@ class ControllerTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SUBJECT.private_fixture_sha(linked, linked)
 
-    def test_four_source_overlay_and_custody(self):
+    def test_six_source_overlay_and_custody(self):
         previous_repo = SUBJECT.REPO
         try:
             with tempfile.TemporaryDirectory() as temporary:
                 SUBJECT.REPO = Path(temporary).resolve()
                 before, after, overlays = {}, {}, []
-                for n in range(4):
+                for n in range(6):
                     target = 'server/internal/source%d.go' % n
                     path = 'ci/candidates/group-action-cid/source/' + target
                     original, updated = b'package old\n', b'package changed\n'

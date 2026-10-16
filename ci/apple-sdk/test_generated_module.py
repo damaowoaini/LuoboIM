@@ -208,5 +208,63 @@ class GeneratedClosure(unittest.TestCase):
                 self.assertTrue((evidence/'after/src-arm64/go.sum').is_file())
 
 
+class ActualCatalogue(unittest.TestCase):
+    def test_actual_union_requires_exact_core_lock_and_keeps_warm610(self):
+        with tempfile.TemporaryDirectory() as value:
+            root = Path(value).resolve(); core, _ = core_fixture(root)
+            warm = module.catalogue()[3]; locked = (core/'go.sum').read_bytes()
+            approved = module.actual_catalogue(core)
+            self.assertEqual(len(warm), 610); self.assertEqual(len(approved), 632)
+            self.assertEqual({k: approved[k] for k in warm}, warm)
+            for key, expected in [
+                (('cloud.google.com/go/compute', 'v1.19.1/go.mod'), 'h1:6ylj3a05WF8leseCdIf77NK0g1ey+nj5IKd5/kvShxE='),
+                (('golang.org/x/oauth2', 'v0.7.0/go.mod'), 'h1:hPLQkd9LyjfXTiRohC/41GhcFqxisoUQ99sCUOHO9x4='),
+            ]:
+                self.assertNotIn(key, warm); self.assertEqual(approved[key], expected)
+            cache = root/'owned-cache'; cache.mkdir()
+            with self.assertRaisesRegex(ValueError, 'outside independent cache catalogue'):
+                module.cache_gomod(cache, 'cloud.google.com/go/compute', 'v1.19.1')
+            # Union admission still requires the real bounded, independently hashed cache file.
+            with self.assertRaises(FileNotFoundError):
+                module.cache_gomod(cache, 'cloud.google.com/go/compute', 'v1.19.1', approved)
+            for bad in [locked+b'unknown.invalid/module v1.0.0 h1:'+b'A'*43+b'=\n', locked.replace(b'h1:', b'h2:', 1)]:
+                (core/'go.sum').write_bytes(bad)
+                with self.assertRaisesRegex(ValueError, 'original core8eb9'):
+                    module.actual_catalogue(core)
+            (core/'go.sum').unlink(); source = root/'other.sum'; source.write_bytes(locked)
+            (core/'go.sum').symlink_to(source)
+            with self.assertRaises(ValueError): module.actual_catalogue(core)
+            (core/'go.sum').unlink(); (core/'go.sum').write_bytes(locked)
+            self.assertEqual(module.catalogue()[3], warm)
+
+    def test_actual_graph_routes_verified_union_and_rejects_unknown_or_changed_core(self):
+        with tempfile.TemporaryDirectory() as value:
+            root = Path(value).resolve(); core, protocol = core_fixture(root); cache = root/'owned-cache'
+            cwd = root/'actual'; mod, sums, _ = actual_locks(core, protocol)
+            mod = mod.replace(b'cloud.google.com/go/compute v1.20.1', b'cloud.google.com/go/compute v1.19.1')
+            required = {module.CORE: module.CORE_GENERATED_VERSION, module.PROTOCOL: 'v0.0.40',
+                        'cloud.google.com/go/compute': 'v1.19.1', 'golang.org/x/oauth2': 'v0.7.0'}
+            text = graph(cwd, core, protocol, required, omit_hashes=True); calls = []
+            def cache_boundary(actual_cache, path, version, approved):
+                self.assertEqual(actual_cache, cache); self.assertEqual(len(approved), 632)
+                self.assertEqual(approved, module.actual_catalogue(core))
+                calls.append((path, version))
+                return {'scope': 'union-routing-only; existing real-cache control retained', 'path': path, 'version': version}
+            with patch.object(module, 'cache_gomod', side_effect=cache_boundary):
+                proof = module.validate_generated(mod, sums, text, cwd, core, protocol, cache)
+                self.assertEqual(calls, [('cloud.google.com/go/compute', 'v1.19.1'), ('golang.org/x/oauth2', 'v0.7.0')])
+                self.assertEqual(proof['actual_catalogue_rows'], 632)
+                self.assertEqual(proof['independent_core_catalogue_sha256'], module.CORE_SUM)
+                with self.assertRaises(ValueError):
+                    module.validate_generated(mod, sums, text.replace('v0.7.0', 'v0.7.1'), cwd, core, protocol, cache)
+            original = (core/'go.sum').read_bytes()
+            def changed_core(*_args):
+                (core/'go.sum').write_bytes(original+b'\n')
+                return {'scope': 'mutation injection only'}
+            with patch.object(module, 'cache_gomod', side_effect=changed_core), self.assertRaisesRegex(ValueError, 'core lock changed'):
+                module.validate_generated(mod, sums, text, cwd, core, protocol, cache)
+            (core/'go.sum').write_bytes(original)
+
+
 if __name__ == '__main__':
     unittest.main()

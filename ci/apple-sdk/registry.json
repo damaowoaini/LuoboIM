@@ -48,8 +48,8 @@
     },
     {
       "path": "generated_module.py",
-      "bytes": 14874,
-      "sha256": "e1c4c66fabdc5647683cb78f372d95cf8544890a744489ba18d90aba6082383f"
+      "bytes": 16017,
+      "sha256": "7c3c81af778d4985e01b173deff34f51c7564020867645f670ef5a4cb4868193"
     },
     {
       "bytes": 6828,
@@ -88,8 +88,8 @@
     },
     {
       "path": "test_generated_module.py",
-      "bytes": 14451,
-      "sha256": "a99ea523ef0bb7f9fe96a54847a7d03be558b719ae7a4a9a71a38c6919a9fc0f"
+      "bytes": 18713,
+      "sha256": "338e1985186ddf40f0fc2933fbc2b7163c29cd38144719f9b4a509fe28fdcff7"
     },
     {
       "bytes": 5719,
@@ -113,5 +113,5 @@
   ],
   "schema": "luobo.apple-sdk.cloud-registry.v1",
   "underlying_SDK_cohort": "auditable-sdk-apple-arm64-v1",
-  "controller_revision": "R6-R3_foreign_escaped_module_cache_fixture"
+  "controller_revision": "R7_actual_core208_plus_warm610_independent_union"
 }

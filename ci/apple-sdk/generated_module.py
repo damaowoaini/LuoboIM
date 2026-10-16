@@ -67,8 +67,9 @@ def go_mod_h1(body):
     return 'h1:'+base64.b64encode(hashlib.sha256(line).digest()).decode('ascii')
 
 
-def cache_gomod(cache, path, version):
-    expected = catalogue()[3].get((path, version+'/go.mod'))
+def cache_gomod(cache, path, version, approved=None):
+    approved = catalogue()[3] if approved is None else approved
+    expected = approved.get((path, version+'/go.mod'))
     if expected is None:
         raise ValueError('module identity outside independent cache catalogue')
     cache = Path(cache)
@@ -113,6 +114,24 @@ def sum_rows(body):
             raise ValueError('module checksum syntax or duplicate')
         result[fields[0], fields[1]] = fields[2]
     return result
+
+
+def actual_catalogue(core):
+    """Actual bind only: union two independently fixed locks, never actual tidy/cache."""
+    body = read(Path(core)/'go.sum', owned=True)
+    if digest(body) != CORE_SUM:
+        raise ValueError('actual catalogue requires original core8eb9')
+    core_rows = sum_rows(body)
+    if len(core_rows) != 208:
+        raise ValueError('finite original core inventory differs')
+    approved = dict(catalogue()[3])
+    for key, value in core_rows.items():
+        if key in approved and approved[key] != value:
+            raise ValueError('independent catalogue hash conflict')
+        approved[key] = value
+    if len(approved) != 632:
+        raise ValueError('finite actual union inventory differs')
+    return approved
 
 
 def expected_projected_acquisition(before, core, protocol):
@@ -161,7 +180,7 @@ def validate_acquired(before, after, sums, core, protocol):
 
 def validate_generated(module, sums, graph, cwd, core, protocol, cache):
     """Actual tidy may prune; every surviving identity/hash must have independent provenance."""
-    approved = catalogue()[3]; actual = sum_rows(sums)
+    approved = actual_catalogue(core); actual = sum_rows(sums)
     if not actual or any(approved.get(k) != h for k, h in actual.items()):
         raise ValueError('actual module checksum outside finite provenance')
     local = {CORE: (str(core), CORE_GENERATED_VERSION), PROTOCOL: (str(protocol), 'v0.0.40')}
@@ -189,15 +208,18 @@ def validate_generated(module, sums, graph, cwd, core, protocol, cache):
     if (in_require or lines.count('module gobind') != 1 or lines.count('go 1.27') != 1
             or set(replaces) != set(local) or required.get(CORE) != CORE_GENERATED_VERSION):
         raise ValueError('actual module identity incomplete')
-    selected = validate_graph(graph, cwd, core, protocol, required, cache)
+    selected = validate_graph(graph, cwd, core, protocol, required, cache, approved)
+    if digest(read(Path(core)/'go.sum', owned=True)) != CORE_SUM:
+        raise ValueError('actual catalogue core lock changed during validation')
     return {'state': 'passed_finite_actual_tidy_provenance', 'sum_rows': len(actual),
             **selected, 'module_sha256': digest(module), 'sum_sha256': digest(sums),
             'graph_sha256': digest(graph.encode()), 'independent_catalogue_sha256': SUM_SHA,
+            'independent_core_catalogue_sha256': CORE_SUM, 'actual_catalogue_rows': len(approved),
             'metadata_is_not_full_bind_lock': True}
 
 
-def validate_graph(graph, cwd, core, protocol, required, cache):
-    approved = catalogue()[3]
+def validate_graph(graph, cwd, core, protocol, required, cache, approved=None):
+    approved = catalogue()[3] if approved is None else approved
     local = {CORE: (str(core), CORE_GENERATED_VERSION), PROTOCOL: (str(protocol), 'v0.0.40')}
     decoder = json.JSONDecoder(); text = graph; seen = {}; main = 0; cache_mods = []
     while text.strip():
@@ -227,7 +249,7 @@ def validate_graph(graph, cwd, core, protocol, required, cache):
                 raise ValueError('module graph identity or hash outside finite provenance')
             # Optional Go JSON fields are not evidence of an unchecked hash.
             # Read only the controller-bound cache path, never value['GoMod'].
-            cache_mods.append(cache_gomod(cache, p, v))
+            cache_mods.append(cache_gomod(cache, p, v, approved))
     if main != 1 or any(seen.get(p) != v for p, v in required.items()):
         raise ValueError('actual module selected graph incomplete')
     return {'selected_modules': len(seen), 'cache_mods': cache_mods}
