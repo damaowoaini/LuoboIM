@@ -1,0 +1,45 @@
+name: Current257 Go lock evidence only
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: 'Go lock evidence only; never authorizes native build'
+        type: choice
+        required: true
+        options: [current257-go-lock-evidence-v2]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: go-lock-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  go-lock-evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GO_LOCK_COHORT: ${{ inputs.cohort }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select a new private diagnostic root
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/go-lock-private-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "GO_LOCK_WORK=$RUNNER_TEMP/go-lock-private-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current257" >> "$GITHUB_ENV"
+      - name: Collect actual locks with original failclosed checksum gate
+        run: |
+          python3 -B ci/android-native/test_go_lock_probe.py
+          python3 -B ci/android-native/go_lock_probe.py --cohort "$GO_LOCK_COHORT" --execute --work "$GO_LOCK_WORK"
+      - name: Retain raw locks and every command resource
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: current257-go-lock-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.GO_LOCK_WORK }}/evidence/
+          retention-days: 14
+          if-no-files-found: warn
