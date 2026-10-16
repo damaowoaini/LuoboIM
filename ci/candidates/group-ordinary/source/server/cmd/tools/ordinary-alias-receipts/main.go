@@ -75,7 +75,7 @@ func execute(parent context.Context,args []string,open aliasBackendFactory)(outc
  expectedDB:=flags.String("expected-database","","explicit database binding")
  branch:=flags.String("branch","","original branch UUID")
  user:=flags.String("recipient","","original recipient; output is hash only")
- 
+
  decision:=flags.String("confirm","","empty means read-only inspect")
  expectedPath:=flags.String("expected-receipt","","exact saved original inspect summary")
  expectedSHA:=flags.String("expected-receipt-sha","","saved summary SHA")

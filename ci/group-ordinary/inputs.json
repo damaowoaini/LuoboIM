@@ -296,8 +296,8 @@
     },
     {
       "path": "server/cmd/tools/ordinary-alias-receipts/main.go",
-      "bytes": 9719,
-      "sha256": "b65278199dd5c06e10636e283b526c89c31ee32fe3d4ea72c2a7ff03a32ad24f"
+      "bytes": 9718,
+      "sha256": "b3cb8f703f1bb9b5fa546731cec699f11455219f58bf2a699b0372de070d3d0a"
     },
     {
       "path": "server/cmd/tools/ordinary-alias-receipts/main_test.go",
@@ -6612,7 +6612,7 @@
     "server/tools/yamlfmt/yamlfmt_test.go": 420
   },
   "effective_count": 1099,
-  "effective_digest": "5b99f6aca45e6efb03832d9f2499a9399816816839143ea58fbe9b4986ca3071",
+  "effective_digest": "ff2f83a5d7633bbb9a4c7621a5d3b202fc3b264fdfdd9072c915ac8d381dd027",
   "delta": [
     {
       "target": "server/cmd/tools/ordinary-alias-receipts/backend.go",
@@ -6635,8 +6635,8 @@
     {
       "target": "server/cmd/tools/ordinary-alias-receipts/main.go",
       "beforeSHA256": null,
-      "sha256": "b65278199dd5c06e10636e283b526c89c31ee32fe3d4ea72c2a7ff03a32ad24f",
-      "bytes": 9719
+      "sha256": "b3cb8f703f1bb9b5fa546731cec699f11455219f58bf2a699b0372de070d3d0a",
+      "bytes": 9718
     },
     {
       "target": "server/cmd/tools/ordinary-alias-receipts/main_test.go",
@@ -8005,8 +8005,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-alias-receipts/main.go",
       "target": "server/cmd/tools/ordinary-alias-receipts/main.go",
-      "bytes": 9719,
-      "sha256": "b65278199dd5c06e10636e283b526c89c31ee32fe3d4ea72c2a7ff03a32ad24f",
+      "bytes": 9718,
+      "sha256": "b3cb8f703f1bb9b5fa546731cec699f11455219f58bf2a699b0372de070d3d0a",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -9537,7 +9537,7 @@
       "afterSHA256": "fd12b9f83bf3144efc3380fead01325fa4e0eb20f3fe1b95dfb3ace64f60dd94"
     }
   ],
-  "physical_before_effective_digest": "38487d972a94d0ba4f15a277f219cd93c214dff403a803a942d64c35511381a9",
+  "physical_before_effective_digest": "6189436588f0213efc979f9d8ee186407125d0f620f541a413ac778a48d750c1",
   "physical_before_contract": {
     "onlyProductRestore": [
       "kafka_alias_vendor.go",
