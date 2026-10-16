@@ -1,0 +1,527 @@
+diff --git a/internal/interaction/ws_default.go b/internal/interaction/ws_default.go
+--- a/internal/interaction/ws_default.go
++++ b/internal/interaction/ws_default.go
+@@ -21,6 +21,7 @@
+ 	"time"
+ 
+ 	"github.com/gorilla/websocket"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/fixturetls"
+ )
+ 
+ type Default struct {
+@@ -71,7 +72,16 @@
+ }
+ 
+ func (d *Default) Dial(urlStr string, requestHeader http.Header) (*http.Response, error) {
+-	conn, httpResp, err := websocket.DefaultDialer.Dial(urlStr, requestHeader)
++	config, err := fixturetls.ConfigForURL(urlStr)
++	if err != nil {
++		return nil, err
++	}
++	dialer := *websocket.DefaultDialer
++	if config != nil {
++		dialer.TLSClientConfig = config
++		dialer.Proxy = nil
++	}
++	conn, httpResp, err := dialer.Dial(urlStr, requestHeader)
+ 	if err == nil {
+ 		d.conn = conn
+ 	}
+diff --git a/internal/util/post.go b/internal/util/post.go
+--- a/internal/util/post.go
++++ b/internal/util/post.go
+@@ -20,6 +20,7 @@
+ 	"encoding/json"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/fixturetls"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
+ 	"io"
+ 	"net/http"
+@@ -68,7 +69,11 @@
+ 	request.Header.Set("Content-Type", "application/json")
+ 	request.Header.Set("operationID", info.OperationID())
+ 	request.Header.Set("token", info.Token())
+-	response, err := apiClient.Do(request)
++	client, err := fixturetls.ClientForURL(apiClient, base.String())
++	if err != nil {
++		return sdkerrs.ErrNetwork.Wrap("API TLS configuration rejected")
++	}
++	response, err := client.Do(request)
+ 	if err != nil {
+ 		return sdkerrs.ErrNetwork.Wrap("API transport failed")
+ 	}
+diff --git a/pkg/fixturetls/config.go b/pkg/fixturetls/config.go
+new file mode 100644
+--- /dev/null
++++ b/pkg/fixturetls/config.go
+@@ -0,0 +1,87 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++// Package fixturetls contains only the explicitly compiled QA trust boundary.
++// It never changes system roots, environment variables, or global transports.
++package fixturetls
++
++import (
++	"crypto/sha256"
++	"crypto/tls"
++	"crypto/x509"
++	"encoding/hex"
++	"encoding/pem"
++	"errors"
++	"net/http"
++	"net/url"
++	"path"
++	"strings"
++	"time"
++)
++
++func allowed(raw string) bool {
++	u, err := url.Parse(raw)
++	if err != nil || u.Host != "10.0.2.2:34443" || u.User != nil || u.Fragment != "" || u.RawPath != "" {
++		return false
++	}
++	if strings.TrimSuffix(u.Path, "/") != path.Clean(u.Path) {
++		return false
++	}
++	if u.Scheme == "https" {
++		return (u.Path == "/api" || strings.HasPrefix(u.Path, "/api/")) && u.RawQuery == "" && !u.ForceQuery
++	}
++	// The SDK adds its normal authenticated WebSocket query after initSDK.
++	return u.Scheme == "wss" && u.Path == "/msg_gateway"
++}
++
++func configFromPEM(raw string, ca []byte, expectedSHA string) (*tls.Config, error) {
++	if !allowed(raw) {
++		return nil, nil
++	}
++	sum := sha256.Sum256(ca)
++	if len(ca) == 0 || len(ca) > 32768 || hex.EncodeToString(sum[:]) != expectedSHA {
++		return nil, errors.New("QA CA checksum mismatch")
++	}
++	block, rest := pem.Decode(ca)
++	if block == nil || block.Type != "CERTIFICATE" || len(strings.TrimSpace(string(rest))) != 0 {
++		return nil, errors.New("QA CA must contain exactly one certificate")
++	}
++	certificate, err := x509.ParseCertificate(block.Bytes)
++	if err != nil || !certificate.IsCA || !certificate.BasicConstraintsValid || certificate.KeyUsage&x509.KeyUsageCertSign == 0 {
++		return nil, errors.New("QA CA is invalid")
++	}
++	now := time.Now()
++	if now.Before(certificate.NotBefore) || now.After(certificate.NotAfter) {
++		return nil, errors.New("QA CA validity period rejected")
++	}
++	roots, err := x509.SystemCertPool()
++	if err != nil {
++		return nil, errors.New("standard system roots unavailable")
++	}
++	roots.AddCert(certificate)
++	return &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12}, nil
++}
++
++// ClientForURL returns the original client unless a compiled QA override applies.
++// Its copy has a private transport, direct fixture routing and no redirects.
++func ClientForURL(client *http.Client, raw string) (*http.Client, error) {
++	config, err := ConfigForURL(raw)
++	if err != nil || config == nil {
++		return client, err
++	}
++	base := client.Transport
++	if base == nil {
++		base = http.DefaultTransport
++	}
++	transport, ok := base.(*http.Transport)
++	if !ok {
++		return nil, errors.New("QA transport cannot be cloned")
++	}
++	copy := *client
++	privateTransport := transport.Clone()
++	privateTransport.TLSClientConfig = config
++	privateTransport.Proxy = nil
++	copy.Transport = privateTransport
++	copy.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
++	return &copy, nil
++}
+diff --git a/pkg/fixturetls/config_debug.go b/pkg/fixturetls/config_debug.go
+new file mode 100644
+--- /dev/null
++++ b/pkg/fixturetls/config_debug.go
+@@ -0,0 +1,14 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++//go:build luobo_fixture_ca_debug
++
++package fixturetls
++
++import "crypto/tls"
++
++// The isolated build helper generates the pinned public certificate constants.
++// Without that generated file the QA build intentionally does not compile.
++func ConfigForURL(raw string) (*tls.Config, error) {
++	return configFromPEM(raw, []byte(fixtureCAPEM), fixtureCASHA256)
++}
+diff --git a/pkg/fixturetls/config_debug_test.go b/pkg/fixturetls/config_debug_test.go
+new file mode 100644
+--- /dev/null
++++ b/pkg/fixturetls/config_debug_test.go
+@@ -0,0 +1,39 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++//go:build luobo_fixture_ca_debug
++
++package fixturetls
++
++import (
++	"crypto/tls"
++	"net/http"
++	"testing"
++)
++
++func TestCompiledQAClientIsPrivateAndCannotRedirect(t *testing.T) {
++	originalConfig := &tls.Config{MinVersion: tls.VersionTLS13}
++	baseTransport := &http.Transport{TLSClientConfig: originalConfig}
++	client := &http.Client{Transport: baseTransport}
++	copy, err := ClientForURL(client, "https://10.0.2.2:34443/api/test")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if copy == client || copy.Transport == baseTransport {
++		t.Fatal("QA changed a shared client or transport")
++	}
++	if baseTransport.TLSClientConfig != originalConfig || originalConfig.RootCAs != nil || originalConfig.InsecureSkipVerify || originalConfig.MinVersion != tls.VersionTLS13 {
++		t.Fatal("original transport trust changed")
++	}
++	transport := copy.Transport.(*http.Transport)
++	if transport.TLSClientConfig == nil || transport.TLSClientConfig.InsecureSkipVerify || transport.Proxy != nil {
++		t.Fatal("invalid private QA transport")
++	}
++	if copy.CheckRedirect(nil, nil) != http.ErrUseLastResponse {
++		t.Fatal("QA client may follow redirect")
++	}
++	other, err := ClientForURL(client, "https://other.fixture.test:34443/api/test")
++	if err != nil || other != client {
++		t.Fatal("QA trust applied to a different origin")
++	}
++}
+diff --git a/pkg/fixturetls/config_default.go b/pkg/fixturetls/config_default.go
+new file mode 100644
+--- /dev/null
++++ b/pkg/fixturetls/config_default.go
+@@ -0,0 +1,11 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++//go:build !luobo_fixture_ca_debug
++
++package fixturetls
++
++import "crypto/tls"
++
++// ConfigForURL preserves standard trust in a build without the explicit QA tag.
++func ConfigForURL(string) (*tls.Config, error) { return nil, nil }
+diff --git a/pkg/fixturetls/config_default_test.go b/pkg/fixturetls/config_default_test.go
+new file mode 100644
+--- /dev/null
++++ b/pkg/fixturetls/config_default_test.go
+@@ -0,0 +1,25 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++//go:build !luobo_fixture_ca_debug
++
++package fixturetls
++
++import (
++	"net/http"
++	"testing"
++)
++
++func TestDefaultBuildDoesNotOverrideAnyTrust(t *testing.T) {
++	client := &http.Client{}
++	for _, raw := range []string{"https://10.0.2.2:34443/api/test", "wss://10.0.2.2:34443/msg_gateway", "https://public.example/api/test"} {
++		config, err := ConfigForURL(raw)
++		if err != nil || config != nil {
++			t.Fatal("default build added fixture trust")
++		}
++		copy, err := ClientForURL(client, raw)
++		if err != nil || copy != client {
++			t.Fatal("default build altered the caller's HTTP client")
++		}
++	}
++}
+diff --git a/pkg/fixturetls/config_test.go b/pkg/fixturetls/config_test.go
+new file mode 100644
+--- /dev/null
++++ b/pkg/fixturetls/config_test.go
+@@ -0,0 +1,196 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++package fixturetls
++
++import (
++	"context"
++	"crypto/ecdsa"
++	"crypto/elliptic"
++	"crypto/rand"
++	"crypto/sha256"
++	"crypto/tls"
++	"crypto/x509"
++	"crypto/x509/pkix"
++	"encoding/hex"
++	"encoding/pem"
++	"io"
++	"log"
++	"math/big"
++	"net"
++	"net/http"
++	"net/http/httptest"
++	"testing"
++	"time"
++
++	"github.com/gorilla/websocket"
++)
++
++type syntheticPKI struct {
++	caPEM  []byte
++	caHash string
++	leaf   tls.Certificate
++}
++
++func makePKI(t *testing.T, wrongIP, expired bool) syntheticPKI {
++	t.Helper()
++	caKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
++	if err != nil {
++		t.Fatal(err)
++	}
++	now := time.Now()
++	ca := &x509.Certificate{SerialNumber: big.NewInt(1), Subject: pkix.Name{CommonName: "synthetic QA test CA"}, IsCA: true, BasicConstraintsValid: true, KeyUsage: x509.KeyUsageCertSign, NotBefore: now.Add(-24 * time.Hour), NotAfter: now.Add(24 * time.Hour)}
++	caDER, err := x509.CreateCertificate(rand.Reader, ca, ca, &caKey.PublicKey, caKey)
++	if err != nil {
++		t.Fatal(err)
++	}
++	caPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: caDER})
++	leafKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
++	if err != nil {
++		t.Fatal(err)
++	}
++	ip := net.ParseIP("10.0.2.2")
++	if wrongIP {
++		ip = net.ParseIP("127.0.0.1")
++	}
++	leaf := &x509.Certificate{SerialNumber: big.NewInt(2), Subject: pkix.Name{CommonName: "synthetic server"}, KeyUsage: x509.KeyUsageDigitalSignature, ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}, IPAddresses: []net.IP{ip}, NotBefore: now.Add(-2 * time.Hour), NotAfter: now.Add(time.Hour)}
++	if expired {
++		leaf.NotAfter = now.Add(-time.Hour)
++	}
++	leafDER, err := x509.CreateCertificate(rand.Reader, leaf, ca, &leafKey.PublicKey, caKey)
++	if err != nil {
++		t.Fatal(err)
++	}
++	keyDER, err := x509.MarshalECPrivateKey(leafKey)
++	if err != nil {
++		t.Fatal(err)
++	}
++	keyPair, err := tls.X509KeyPair(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: leafDER}), pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: keyDER}))
++	if err != nil {
++		t.Fatal(err)
++	}
++	sum := sha256.Sum256(caPEM)
++	return syntheticPKI{caPEM, hex.EncodeToString(sum[:]), keyPair}
++}
++
++func syntheticServer(t *testing.T, pki syntheticPKI, handler http.Handler) *httptest.Server {
++	t.Helper()
++	server := httptest.NewUnstartedServer(handler)
++	server.Config.ErrorLog = log.New(io.Discard, "", 0)
++	server.TLS = &tls.Config{Certificates: []tls.Certificate{pki.leaf}, MinVersion: tls.VersionTLS12}
++	server.StartTLS()
++	t.Cleanup(server.Close)
++	return server
++}
++
++func dialLocal(server *httptest.Server) func(context.Context, string, string) (net.Conn, error) {
++	return func(ctx context.Context, _, _ string) (net.Conn, error) {
++		return (&net.Dialer{}).DialContext(ctx, "tcp", server.Listener.Addr().String())
++	}
++}
++
++func TestScopedCertificateIsActuallyVerifiedForHTTPAndWSS(t *testing.T) {
++	for _, sample := range []struct {
++		name                                    string
++		wrongIP, expired, wrongCA, noCustomRoot bool
++	}{
++		{name: "matching CA and IP"}, {name: "no custom root", noCustomRoot: true}, {name: "wrong CA", wrongCA: true}, {name: "wrong SAN", wrongIP: true}, {name: "expired certificate", expired: true},
++	} {
++		t.Run(sample.name, func(t *testing.T) {
++			pki := makePKI(t, sample.wrongIP, sample.expired)
++			trust := pki
++			if sample.wrongCA {
++				trust = makePKI(t, false, false)
++			}
++			server := syntheticServer(t, pki, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++				if r.URL.Path == "/msg_gateway" {
++					conn, err := (&websocket.Upgrader{}).Upgrade(w, r, nil)
++					if err != nil {
++						return
++					}
++					defer conn.Close()
++					_ = conn.SetReadDeadline(time.Now().Add(3 * time.Second))
++					kind, payload, err := conn.ReadMessage()
++					if err == nil {
++						_ = conn.WriteMessage(kind, payload)
++					}
++					return
++				}
++				_, _ = io.WriteString(w, "synthetic-ok")
++			}))
++			config, err := configFromPEM("https://10.0.2.2:34443/api/probe", trust.caPEM, trust.caHash)
++			if err != nil || config == nil {
++				t.Fatalf("prepare config: %v", err)
++			}
++			if sample.noCustomRoot {
++				config = &tls.Config{MinVersion: tls.VersionTLS12}
++			}
++			if config.InsecureSkipVerify || config.ServerName != "" {
++				t.Fatal("normal hostname and chain verification must be preserved")
++			}
++			client := &http.Client{Timeout: 3 * time.Second, Transport: &http.Transport{TLSClientConfig: config, DialContext: dialLocal(server)}}
++			response, httpErr := client.Get("https://10.0.2.2:34443/api/probe")
++			if response != nil {
++				defer response.Body.Close()
++			}
++			wsConfig, err := configFromPEM("wss://10.0.2.2:34443/msg_gateway?token=synthetic", trust.caPEM, trust.caHash)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if sample.noCustomRoot {
++				wsConfig = &tls.Config{MinVersion: tls.VersionTLS12}
++			}
++			dialer := websocket.Dialer{TLSClientConfig: wsConfig, NetDialContext: dialLocal(server), HandshakeTimeout: 3 * time.Second}
++			conn, _, wsErr := dialer.Dial("wss://10.0.2.2:34443/msg_gateway?token=synthetic", nil)
++			valid := !sample.wrongIP && !sample.expired && !sample.wrongCA && !sample.noCustomRoot
++			if !valid {
++				if httpErr == nil || wsErr == nil {
++					t.Fatal("invalid certificate must fail HTTP and WebSocket")
++				}
++				return
++			}
++			if httpErr != nil || wsErr != nil {
++				t.Fatalf("valid chain rejected; HTTP:%v WSS:%v", httpErr, wsErr)
++			}
++			defer conn.Close()
++			body, err := io.ReadAll(response.Body)
++			if err != nil || string(body) != "synthetic-ok" {
++				t.Fatal("HTTP fixture body mismatch")
++			}
++			if err = conn.WriteMessage(websocket.TextMessage, []byte("bounded-frame")); err != nil {
++				t.Fatal(err)
++			}
++			_ = conn.SetReadDeadline(time.Now().Add(3 * time.Second))
++			_, payload, err := conn.ReadMessage()
++			if err != nil || string(payload) != "bounded-frame" {
++				t.Fatal("WebSocket fixture frame mismatch")
++			}
++		})
++	}
++}
++
++func TestNonFixtureOriginsNeverReceiveExtraRoot(t *testing.T) {
++	pki := makePKI(t, false, false)
++	for _, raw := range []string{"http://10.0.2.2:34443/api/test", "https://10.0.2.2/api/test", "https://10.0.2.2:34444/api/test", "https://other.fixture.test:34443/api/test", "https://user@10.0.2.2:34443/api/test", "https://10.0.2.2:34443/api/test?token=synthetic", "https://10.0.2.2:34443/object/item", "wss://10.0.2.2:34443/other", "https://10.0.2.2:34443/api/test#fragment", "https://10.0.2.2:34443/api/../admin", "https://10.0.2.2:34443/api//user", "https://10.0.2.2:34443/api/./user", "https://10.0.2.2:34443/api/test?"} {
++		config, err := configFromPEM(raw, pki.caPEM, pki.caHash)
++		if err != nil || config != nil {
++			t.Fatalf("extra trust escaped fixture origin/path: %q", raw)
++		}
++	}
++}
++
++func TestInvalidPinOrPEMIsFailClosed(t *testing.T) {
++	pki := makePKI(t, false, false)
++	invalidPEM := []byte("not PEM")
++	invalidSum := sha256.Sum256(invalidPEM)
++	twoPEM := append(append([]byte{}, pki.caPEM...), pki.caPEM...)
++	twoSum := sha256.Sum256(twoPEM)
++	for _, input := range []struct {
++		ca   []byte
++		hash string
++	}{{pki.caPEM, "wrong"}, {invalidPEM, hex.EncodeToString(invalidSum[:])}, {twoPEM, hex.EncodeToString(twoSum[:])}} {
++		if _, err := configFromPEM("https://10.0.2.2:34443/api/test", input.ca, input.hash); err == nil {
++			t.Fatal("invalid fixture CA accepted")
++		}
++	}
++}
+diff --git a/pkg/network/http_client.go b/pkg/network/http_client.go
+--- a/pkg/network/http_client.go
++++ b/pkg/network/http_client.go
+@@ -20,6 +20,7 @@
+ 	"errors"
+ 	"net"
+ 
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/fixturetls"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 	"io/ioutil"
+ 	"net/http"
+@@ -27,7 +28,10 @@
+ )
+ 
+ func get(url string) (response []byte, err error) {
+-	client := http.Client{Timeout: 5 * time.Second}
++	client, err := fixturetls.ClientForURL(&http.Client{Timeout: 5 * time.Second}, url)
++	if err != nil {
++		return nil, err
++	}
+ 	resp, err := client.Get(url)
+ 	if err != nil {
+ 		return nil, err
+@@ -85,7 +89,10 @@
+ 		IdleConnTimeout:       60 * time.Second,
+ 		TLSHandshakeTimeout:   10 * time.Second,
+ 	}
+-	client := &http.Client{Timeout: 60 * time.Second, Transport: tp}
++	client, err := fixturetls.ClientForURL(&http.Client{Timeout: 60 * time.Second, Transport: tp}, url)
++	if err != nil {
++		return nil, err
++	}
+ 	resp, err := client.Do(req)
+ 	if err != nil {
+ 		return nil, utils.Wrap(err, "client.Do failed, url")
+diff --git a/pkg/network/new_http.go b/pkg/network/new_http.go
+--- a/pkg/network/new_http.go
++++ b/pkg/network/new_http.go
+@@ -18,6 +18,7 @@
+ 	"bytes"
+ 	"encoding/json"
+ 	"errors"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/fixturetls"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 	"io/ioutil"
+ 	"net/http"
+@@ -122,7 +123,11 @@
+ 		return nil, c.Error
+ 	}
+ 
+-	resp, err := c.httpClient.Do(c.httpRequest)
++	client, err := fixturetls.ClientForURL(c.httpClient, c.httpRequest.URL.String())
++	if err != nil {
++		return nil, err
++	}
++	resp, err := client.Do(c.httpRequest)
+ 	if err != nil {
+ 		return nil, utils.Wrap(err, "client.Do failed, url")
+ 	}
+@@ -144,7 +149,11 @@
+ 		return c.Error
+ 	}
+ 
+-	resp, err := c.httpClient.Do(c.httpRequest)
++	client, err := fixturetls.ClientForURL(c.httpClient, c.httpRequest.URL.String())
++	if err != nil {
++		return err
++	}
++	resp, err := client.Do(c.httpRequest)
+ 	if err != nil {
+ 		return utils.Wrap(err, "client.Do failed, url")
+ 	}

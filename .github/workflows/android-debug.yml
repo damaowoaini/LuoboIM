@@ -1,0 +1,56 @@
+name: Android auditable current257 debug
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: 'Explicit frozen source identity; no latest/current aliases'
+        required: true
+        type: choice
+        options: [current257-auditable-arm64-debug-jobca-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-native-${{ github.workflow }}-${{ github.ref }}-${{ inputs.cohort }}
+  cancel-in-progress: false
+
+jobs:
+  arm64-debug:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ANDROID_COHORT: ${{ inputs.cohort }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Select a new private output parent
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/android-native-private-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "ANDROID_WORK=$RUNNER_TEMP/android-native-private-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current257" >> "$GITHUB_ENV"
+      - name: Verify controller and synthetic guard contracts
+        run: |
+          python3 -B ci/android-native/run.py --cohort "$ANDROID_COHORT" --stage admission --work "$ANDROID_WORK"
+          python3 -B ci/android-native/test_tools.py
+          python3 -B ci/android-native/run.py --cohort "$ANDROID_COHORT" --stage readonly
+      - name: Prepare frozen257, official toolchains and Go dependencies
+        run: python3 -B ci/android-native/run.py --cohort "$ANDROID_COHORT" --stage setup --work "$ANDROID_WORK"
+      - name: Rebuild public-source ARM64 core without external network
+        run: sudo unshare --net -- bash ci/android-native/netns.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" core
+      - name: Resolve and record actual Java and Android dependencies
+        run: python3 -B ci/android-native/run.py --cohort "$ANDROID_COHORT" --stage gradle-setup --work "$ANDROID_WORK"
+      - name: Negative gates, real wrapper and Debug APK without external network
+        run: sudo unshare --net -- bash ci/android-native/netns.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" apk
+      - name: Preserve exact evidence and new debug artifacts
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: android-current257-arm64-debug-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/evidence/
+            ${{ env.ANDROID_WORK }}/artifacts/
+          if-no-files-found: warn
+          retention-days: 14

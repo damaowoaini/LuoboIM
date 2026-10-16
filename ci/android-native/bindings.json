@@ -1,0 +1,3336 @@
+{
+  "schema": "luobo.cloud-android.active-binding-audit.v1",
+  "state": "readonly_source_and_historical_generated_signature_comparison_no_new_compilation",
+  "active_wrapper_files": 29,
+  "active_Open_im_sdk_distinct_methods": 153,
+  "historical_static_native_methods": 169,
+  "missing_active_methods_in_reviewed_patched_Go": [],
+  "missing_active_methods_in_historical_generated_Java": [],
+  "methods": [
+    {
+      "method": "acceptFriendApplication",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 104
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "AcceptFriendApplication",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 61
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void acceptFriendApplication(open_im_sdk_callback.Base callback, String operationID, String userIDHandleMsg);"
+    },
+    {
+      "method": "acceptGroupApplication",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 132
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "AcceptGroupApplication",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 119
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void acceptGroupApplication(open_im_sdk_callback.Base callback, String operationID, String groupID, String fromUserID, String handleMsg);"
+    },
+    {
+      "method": "addBlack",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 64
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "AddBlack",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 69
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void addBlack(open_im_sdk_callback.Base callback, String operationID, String blackUserID, String ex);"
+    },
+    {
+      "method": "addFriend",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 27
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "AddFriend",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 39
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void addFriend(open_im_sdk_callback.Base callback, String operationID, String userIDReqMsg);"
+    },
+    {
+      "method": "changeGroupMemberMute",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 171
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "ChangeGroupMemberMute",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 43
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void changeGroupMemberMute(open_im_sdk_callback.Base callback, String operationID, String groupID, String userID, long mutedSeconds);"
+    },
+    {
+      "method": "changeGroupMute",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 162
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "ChangeGroupMute",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 39
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void changeGroupMute(open_im_sdk_callback.Base callback, String operationID, String groupID, boolean isMute);"
+    },
+    {
+      "method": "checkFriend",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 88
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CheckFriend",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 35
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void checkFriend(open_im_sdk_callback.Base callback, String operationID, String userIDList);"
+    },
+    {
+      "method": "clearConversationAndDeleteAllMsg",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 128
+        },
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 353
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "ClearConversationAndDeleteAllMsg",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 218
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void clearConversationAndDeleteAllMsg(open_im_sdk_callback.Base callback, String operationID, String conversationID);"
+    },
+    {
+      "method": "createAdvancedQuoteMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 335
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateAdvancedQuoteMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 106
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createAdvancedQuoteMessage(String operationID, String text, String message, String messageEntityList);"
+    },
+    {
+      "method": "createAdvancedTextMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 326
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateAdvancedTextMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 87
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createAdvancedTextMessage(String operationID, String text, String messageEntityList);"
+    },
+    {
+      "method": "createCardMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 310
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateCardMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 109
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createCardMessage(String operationID, String cardInfo);"
+    },
+    {
+      "method": "createCustomMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 293
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateCustomMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 100
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createCustomMessage(String operationID, String data, String extension, String description);"
+    },
+    {
+      "method": "createFaceMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 317
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateFaceMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 153
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createFaceMessage(String operationID, long index, String data);"
+    },
+    {
+      "method": "createFileMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 252
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateFileMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 147
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createFileMessage(String operationID, String filePath, String fileName);"
+    },
+    {
+      "method": "createFileMessageByURL",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 444
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateFileMessageByURL",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 144
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createFileMessageByURL(String operationID, String fileBaseInfo);"
+    },
+    {
+      "method": "createFileMessageFromFullPath",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 260
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateFileMessageFromFullPath",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 122
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createFileMessageFromFullPath(String operationID, String fileFullPath, String fileName);"
+    },
+    {
+      "method": "createForwardMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 278
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateForwardMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 156
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createForwardMessage(String operationID, String m);"
+    },
+    {
+      "method": "createGroup",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 66
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateGroup",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 23
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void createGroup(open_im_sdk_callback.Base callback, String operationID, String groupReqInfo);"
+    },
+    {
+      "method": "createImageMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 202
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateImageMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 125
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createImageMessage(String operationID, String imagePath);"
+    },
+    {
+      "method": "createImageMessageByURL",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 420
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateImageMessageByURL",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 128
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createImageMessageByURL(String operationID, String sourcePath, String sourcePicture, String bigPicture, String snapshotPicture);"
+    },
+    {
+      "method": "createImageMessageFromFullPath",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 209
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateImageMessageFromFullPath",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 116
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createImageMessageFromFullPath(String operationID, String imageFullPath);"
+    },
+    {
+      "method": "createLocationMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 284
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateLocationMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 97
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createLocationMessage(String operationID, String description, double longitude, double latitude);"
+    },
+    {
+      "method": "createMergerMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 268
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateMergerMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 150
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createMergerMessage(String operationID, String messageList, String title, String summaryList);"
+    },
+    {
+      "method": "createQuoteMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 302
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateQuoteMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 103
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createQuoteMessage(String operationID, String text, String message);"
+    },
+    {
+      "method": "createSoundMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 216
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateSoundMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 135
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createSoundMessage(String operationID, String soundPath, long duration);"
+    },
+    {
+      "method": "createSoundMessageByURL",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 430
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateSoundMessageByURL",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 132
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createSoundMessageByURL(String operationID, String soundBaseInfo);"
+    },
+    {
+      "method": "createSoundMessageFromFullPath",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 224
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateSoundMessageFromFullPath",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 119
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createSoundMessageFromFullPath(String operationID, String soundPath, long duration);"
+    },
+    {
+      "method": "createTextAtMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 191
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateTextAtMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 90
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createTextAtMessage(String operationID, String text, String atUserList, String atUsersInfo, String message);"
+    },
+    {
+      "method": "createTextMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 184
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateTextMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 93
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createTextMessage(String operationID, String text);"
+    },
+    {
+      "method": "createVideoMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 232
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateVideoMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 141
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createVideoMessage(String operationID, String videoPath, String videoType, long duration, String snapshotPath);"
+    },
+    {
+      "method": "createVideoMessageByURL",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 437
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateVideoMessageByURL",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 138
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createVideoMessageByURL(String operationID, String videoBaseInfo);"
+    },
+    {
+      "method": "createVideoMessageFromFullPath",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 242
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "CreateVideoMessageFromFullPath",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 113
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String createVideoMessageFromFullPath(String operationID, String videoFullPath, String videoType, long duration, String snapshotFullPath);"
+    },
+    {
+      "method": "deleteAllMsgFromLocal",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 131
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "DeleteAllMsgFromLocal",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 214
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void deleteAllMsgFromLocal(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "deleteAllMsgFromLocalAndSvr",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 138
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "DeleteAllMsgFromLocalAndSvr",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 210
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void deleteAllMsgFromLocalAndSvr(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "deleteConversationAndDeleteAllMsg",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 136
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "DeleteConversationAndDeleteAllMsg",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 222
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void deleteConversationAndDeleteAllMsg(open_im_sdk_callback.Base callback, String operationID, String conversationID);"
+    },
+    {
+      "method": "deleteFriend",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 96
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "DeleteFriend",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 49
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void deleteFriend(open_im_sdk_callback.Base callback, String operationID, String friendUserID);"
+    },
+    {
+      "method": "deleteMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 122
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "DeleteMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 202
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void deleteMessage(open_im_sdk_callback.Base callback, String operationID, String conversationID, String clientMsgID);"
+    },
+    {
+      "method": "deleteMessageFromLocalStorage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 113
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "DeleteMessageFromLocalStorage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 198
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void deleteMessageFromLocalStorage(open_im_sdk_callback.Base callback, String operationID, String conversationID, String clientMsgID);"
+    },
+    {
+      "method": "dismissGroup",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 154
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "DismissGroup",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 35
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void dismissGroup(open_im_sdk_callback.Base callback, String operationID, String groupID);"
+    },
+    {
+      "method": "findMessageList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 378
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "FindMessageList",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 169
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void findMessageList(open_im_sdk_callback.Base callback, String operationID, String findMessageOptions);"
+    },
+    {
+      "method": "getAdvancedHistoryMessageList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 362
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetAdvancedHistoryMessageList",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 173
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getAdvancedHistoryMessageList(open_im_sdk_callback.Base callback, String operationID, String getMessageOptions);"
+    },
+    {
+      "method": "getAdvancedHistoryMessageListReverse",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 370
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetAdvancedHistoryMessageListReverse",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 177
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getAdvancedHistoryMessageListReverse(open_im_sdk_callback.Base callback, String operationID, String getMessageOptions);"
+    },
+    {
+      "method": "getAllConversationList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 20
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetAllConversationList",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 21
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getAllConversationList(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getAtAllTag",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 155
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetAtAllTag",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 83
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String getAtAllTag(String operationID);"
+    },
+    {
+      "method": "getBlackList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 73
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetBlackList",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 73
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getBlackList(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getConversationIDBySessionType",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 95
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetConversationIDBySessionType",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 159
+        }
+      ],
+      "historical_generated_Java_signature": "public static native String getConversationIDBySessionType(String operationID, String sourceID, long sessionType);"
+    },
+    {
+      "method": "getConversationListSplit",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 27
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetConversationListSplit",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 25
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getConversationListSplit(open_im_sdk_callback.Base callback, String operationID, long offset, long count);"
+    },
+    {
+      "method": "getConversationRecvMessageOpt",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 111
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetConversationRecvMessageOpt",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 52
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getConversationRecvMessageOpt(open_im_sdk_callback.Base callback, String operationID, String conversationIDList);"
+    },
+    {
+      "method": "getFriendApplicationListAsApplicant",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 42
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetFriendApplicationListAsApplicant",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 57
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getFriendApplicationListAsApplicant(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getFriendApplicationListAsRecipient",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 35
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetFriendApplicationListAsRecipient",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 53
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getFriendApplicationListAsRecipient(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getFriendList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 49
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetFriendList",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 23
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getFriendList(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getGroupApplicationListAsApplicant",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 125
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetGroupApplicationListAsApplicant",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 115
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getGroupApplicationListAsApplicant(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getGroupApplicationListAsRecipient",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 118
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetGroupApplicationListAsRecipient",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 111
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getGroupApplicationListAsRecipient(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getGroupMemberList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 47
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetGroupMemberList",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 83
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getGroupMemberList(open_im_sdk_callback.Base callback, String operationID, String groupID, int filter, int offset, int count);"
+    },
+    {
+      "method": "getGroupMemberListByJoinTimeFilter",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 206
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetGroupMemberListByJoinTimeFilter",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 91
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getGroupMemberListByJoinTimeFilter(open_im_sdk_callback.Base callback, String operationID, String groupID, int offset, int count, long joinTimeBegin, long joinTimeEnd, String filterUserIDList);"
+    },
+    {
+      "method": "getGroupMemberOwnerAndAdmin",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 242
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetGroupMemberOwnerAndAdmin",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 87
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getGroupMemberOwnerAndAdmin(open_im_sdk_callback.Base callback, String operationID, String groupID);"
+    },
+    {
+      "method": "getGroupMessageReaderList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 407
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetGroupMessageReaderList",
+          "path": "open_im_sdk/enterprise_group_read.go",
+          "source_sha256": "eee46a697731d728f44989b22cf84f953100d14195db477d4277e8fedc27b85b",
+          "line": 8
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getGroupMessageReaderList(open_im_sdk_callback.Base callback, String operationID, String conversationID, String clientMsgID, int filter, int offset, int count);"
+    },
+    {
+      "method": "getJoinedGroupList",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 59
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetJoinedGroupList",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 55
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getJoinedGroupList(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getLoginStatus",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 47
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetLoginStatus",
+          "path": "open_im_sdk/init_login.go",
+          "source_sha256": "223db8d3159ed8098273a7f3e2a7068680fc56f1fa4c159cc6fb83c65a2af98e",
+          "line": 95
+        }
+      ],
+      "historical_generated_Java_signature": "public static native long getLoginStatus(String operationID);"
+    },
+    {
+      "method": "getMultipleConversation",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 45
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetMultipleConversation",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 33
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getMultipleConversation(open_im_sdk_callback.Base callback, String operationID, String conversationIDList);"
+    },
+    {
+      "method": "getOneConversation",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 36
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetOneConversation",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 29
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getOneConversation(open_im_sdk_callback.Base callback, String operationID, int sessionType, String sourceID);"
+    },
+    {
+      "method": "getSelfUserInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 32
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetSelfUserInfo",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 44
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getSelfUserInfo(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getSignalingInvitationInfoStartApp",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 127
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetSignalingInvitationInfoStartApp",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 191
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getSignalingInvitationInfoStartApp(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getSpecifiedFriendsInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 19
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetSpecifiedFriendsInfo",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 19
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getSpecifiedFriendsInfo(open_im_sdk_callback.Base callback, String operationID, String userIDList);"
+    },
+    {
+      "method": "getSpecifiedGroupMembersInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 38
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetSpecifiedGroupMembersInfo",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 95
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getSpecifiedGroupMembersInfo(open_im_sdk_callback.Base callback, String operationID, String groupID, String userIDList);"
+    },
+    {
+      "method": "getSpecifiedGroupsInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 82
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetSpecifiedGroupsInfo",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 59
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getSpecifiedGroupsInfo(open_im_sdk_callback.Base callback, String operationID, String groupIDList);"
+    },
+    {
+      "method": "getSubscribeUsersStatus",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 52
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetSubscribeUsersStatus",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 64
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getSubscribeUsersStatus(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getTotalUnreadMsgCount",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 88
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetTotalUnreadMsgCount",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 80
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getTotalUnreadMsgCount(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "getUserStatus",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 59
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetUserStatus",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 69
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getUserStatus(open_im_sdk_callback.Base callback, String operationID, String userIDs);"
+    },
+    {
+      "method": "getUsersInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 18
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetUsersInfo",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 21
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getUsersInfo(open_im_sdk_callback.Base callback, String operationID, String userIDs);"
+    },
+    {
+      "method": "getUsersInfoWithCache",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 66
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "GetUsersInfoWithCache",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 25
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void getUsersInfoWithCache(open_im_sdk_callback.Base callback, String operationID, String userIDs, String groupID);"
+    },
+    {
+      "method": "hideAllConversations",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 194
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "HideAllConversations",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 206
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void hideAllConversations(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "hideConversation",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 72
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "HideConversation",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 47
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void hideConversation(open_im_sdk_callback.Base callback, String operationID, String conversationID);"
+    },
+    {
+      "method": "initSDK",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 16
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "InitSDK",
+          "path": "open_im_sdk/init_login.go",
+          "source_sha256": "223db8d3159ed8098273a7f3e2a7068680fc56f1fa4c159cc6fb83c65a2af98e",
+          "line": 43
+        }
+      ],
+      "historical_generated_Java_signature": "public static native boolean initSDK(open_im_sdk_callback.OnConnListener listener, String operationID, String config);"
+    },
+    {
+      "method": "insertGroupMessageToLocalStorage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 155
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "InsertGroupMessageToLocalStorage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 230
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void insertGroupMessageToLocalStorage(open_im_sdk_callback.Base callback, String operationID, String message, String groupID, String sendID);"
+    },
+    {
+      "method": "insertSingleMessageToLocalStorage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 145
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "InsertSingleMessageToLocalStorage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 226
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void insertSingleMessageToLocalStorage(open_im_sdk_callback.Base callback, String operationID, String message, String recvID, String sendID);"
+    },
+    {
+      "method": "inviteUserToGroup",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 18
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "InviteUserToGroup",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 107
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void inviteUserToGroup(open_im_sdk_callback.Base callback, String operationID, String groupID, String reason, String userIDList);"
+    },
+    {
+      "method": "isJoinGroup",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 263
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "IsJoinGroup",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 135
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void isJoinGroup(open_im_sdk_callback.Base callback, String operationID, String groupID);"
+    },
+    {
+      "method": "joinGroup",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 90
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "JoinGroup",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 27
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void joinGroup(open_im_sdk_callback.Base callback, String operationID, String groupID, String reqMsg, int joinSource, String ex);"
+    },
+    {
+      "method": "kickGroupMember",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 28
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "KickGroupMember",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 99
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void kickGroupMember(open_im_sdk_callback.Base callback, String operationID, String groupID, String reason, String userIDList);"
+    },
+    {
+      "method": "login",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 31
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "Login",
+          "path": "open_im_sdk/init_login.go",
+          "source_sha256": "223db8d3159ed8098273a7f3e2a7068680fc56f1fa4c159cc6fb83c65a2af98e",
+          "line": 80
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void login(open_im_sdk_callback.Base callback, String operationID, String userID, String token);"
+    },
+    {
+      "method": "logout",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 40
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "Logout",
+          "path": "open_im_sdk/init_login.go",
+          "source_sha256": "223db8d3159ed8098273a7f3e2a7068680fc56f1fa4c159cc6fb83c65a2af98e",
+          "line": 84
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void logout(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "markConversationMessageAsRead",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 80
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "MarkConversationMessageAsRead",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 190
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void markConversationMessageAsRead(open_im_sdk_callback.Base callback, String operationID, String conversationID);"
+    },
+    {
+      "method": "markMessagesAsReadByMsgID",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 165
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "MarkMessagesAsReadByMsgID",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 194
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void markMessagesAsReadByMsgID(open_im_sdk_callback.Base callback, String operationID, String conversationID, String clientMsgIDs);"
+    },
+    {
+      "method": "networkStatusChanged",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/ConnectivityListener.java",
+          "line": 36
+        },
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 86
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "NetworkStatusChanged",
+          "path": "open_im_sdk/init_login.go",
+          "source_sha256": "223db8d3159ed8098273a7f3e2a7068680fc56f1fa4c159cc6fb83c65a2af98e",
+          "line": 91
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void networkStatusChanged(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "pinConversation",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 63
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "PinConversation",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 64
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void pinConversation(open_im_sdk_callback.Base callback, String operationID, String conversationID, boolean isPinned);"
+    },
+    {
+      "method": "quitGroup",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 101
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "QuitGroup",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 31
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void quitGroup(open_im_sdk_callback.Base callback, String operationID, String groupID);"
+    },
+    {
+      "method": "refuseFriendApplication",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 112
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "RefuseFriendApplication",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 65
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void refuseFriendApplication(open_im_sdk_callback.Base callback, String operationID, String userIDHandleMsg);"
+    },
+    {
+      "method": "refuseGroupApplication",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 143
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "RefuseGroupApplication",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 123
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void refuseGroupApplication(open_im_sdk_callback.Base callback, String operationID, String groupID, String fromUserID, String handleMsg);"
+    },
+    {
+      "method": "removeBlack",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 80
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "RemoveBlack",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 77
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void removeBlack(open_im_sdk_callback.Base callback, String operationID, String removeUserID);"
+    },
+    {
+      "method": "resetConversationGroupAtType",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 147
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "ResetConversationGroupAtType",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 60
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void resetConversationGroupAtType(open_im_sdk_callback.Base callback, String operationID, String conversationID);"
+    },
+    {
+      "method": "revokeMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 104
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "RevokeMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 181
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void revokeMessage(open_im_sdk_callback.Base callback, String operationID, String conversationID, String clientMsgID);"
+    },
+    {
+      "method": "searchConversation",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 201
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SearchConversation",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 241
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void searchConversation(open_im_sdk_callback.Base callback, String operationID, String searchParam);"
+    },
+    {
+      "method": "searchFriends",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 120
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SearchFriends",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 31
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void searchFriends(open_im_sdk_callback.Base callback, String operationID, String searchParam);"
+    },
+    {
+      "method": "searchGroupMembers",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 249
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SearchGroupMembers",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 131
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void searchGroupMembers(open_im_sdk_callback.Base callback, String operationID, String searchParam);"
+    },
+    {
+      "method": "searchGroups",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 190
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SearchGroups",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 63
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void searchGroups(open_im_sdk_callback.Base callback, String operationID, String searchParam);"
+    },
+    {
+      "method": "searchLocalMessages",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 344
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SearchLocalMessages",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 234
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void searchLocalMessages(open_im_sdk_callback.Base callback, String operationID, String searchParam);"
+    },
+    {
+      "method": "sendGroupMessageReadReceipt",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 398
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SendGroupMessageReadReceipt",
+          "path": "open_im_sdk/enterprise_group_read.go",
+          "source_sha256": "eee46a697731d728f44989b22cf84f953100d14195db477d4277e8fedc27b85b",
+          "line": 11
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void sendGroupMessageReadReceipt(open_im_sdk_callback.Base callback, String operationID, String conversationID, String clientMsgIDs);"
+    },
+    {
+      "method": "sendMessage",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 93
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SendMessage",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 162
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void sendMessage(open_im_sdk_callback.SendMsgCallBack callback, String operationID, String message, String recvID, String groupID, String offlinePushInfo);"
+    },
+    {
+      "method": "sendMessageNotOss",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 387
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SendMessageNotOss",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 165
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void sendMessageNotOss(open_im_sdk_callback.SendMsgCallBack callback, String operationID, String message, String recvID, String groupID, String offlinePushInfo);"
+    },
+    {
+      "method": "setAdvancedMsgListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 87
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetAdvancedMsgListener",
+          "path": "open_im_sdk/listener.go",
+          "source_sha256": "85a5a6d11fccfee5ac0e614ab4f649ee6caf6882d005624f89b86a62f0826794",
+          "line": 29
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setAdvancedMsgListener(open_im_sdk_callback.OnAdvancedMsgListener listener);"
+    },
+    {
+      "method": "setAppBackgroundStatus",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/VisibilityListener.java",
+          "line": 38
+        },
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/VisibilityListener.java",
+          "line": 45
+        },
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 77
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetAppBackgroundStatus",
+          "path": "open_im_sdk/init_login.go",
+          "source_sha256": "223db8d3159ed8098273a7f3e2a7068680fc56f1fa4c159cc6fb83c65a2af98e",
+          "line": 88
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setAppBackgroundStatus(open_im_sdk_callback.Base callback, String operationID, boolean isBackground);"
+    },
+    {
+      "method": "setAppBadge",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 470
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetAppBadge",
+          "path": "open_im_sdk/third.go",
+          "source_sha256": "72ce1bdb8d8644be8370d5c435b283f4d3ed30738129fe2d548a99d1b19c7bb0",
+          "line": 26
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setAppBadge(open_im_sdk_callback.Base callback, String operationID, int appUnreadCount);"
+    },
+    {
+      "method": "setConversationBurnDuration",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 167
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationBurnDuration",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 72
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationBurnDuration(open_im_sdk_callback.Base callback, String operationID, String conversationID, int duration);"
+    },
+    {
+      "method": "setConversationDraft",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 54
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationDraft",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 56
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationDraft(open_im_sdk_callback.Base callback, String operationID, String conversationID, String draftText);"
+    },
+    {
+      "method": "setConversationEx",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 209
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationEx",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 44
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationEx(open_im_sdk_callback.Base callback, String operationID, String conversationID, String ex);"
+    },
+    {
+      "method": "setConversationIsMsgDestruct",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 176
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationIsMsgDestruct",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 41
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationIsMsgDestruct(open_im_sdk_callback.Base callback, String operationID, String conversationID, boolean isMsgDestruct);"
+    },
+    {
+      "method": "setConversationListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 13
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationListener",
+          "path": "open_im_sdk/listener.go",
+          "source_sha256": "85a5a6d11fccfee5ac0e614ab4f649ee6caf6882d005624f89b86a62f0826794",
+          "line": 25
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationListener(open_im_sdk_callback.OnConversationListener listener);"
+    },
+    {
+      "method": "setConversationMsgDestructTime",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 185
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationMsgDestructTime",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 37
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationMsgDestructTime(open_im_sdk_callback.Base callback, String operationID, String conversationID, long msgDestructTime);"
+    },
+    {
+      "method": "setConversationPrivateChat",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 119
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationPrivateChat",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 68
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationPrivateChat(open_im_sdk_callback.Base callback, String operationID, String conversationID, boolean isPrivate);"
+    },
+    {
+      "method": "setConversationRecvMessageOpt",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 102
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetConversationRecvMessageOpt",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 76
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setConversationRecvMessageOpt(open_im_sdk_callback.Base callback, String operationID, String conversationID, long opt);"
+    },
+    {
+      "method": "setCustomBusinessListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 450
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetCustomBusinessListener",
+          "path": "open_im_sdk/listener.go",
+          "source_sha256": "85a5a6d11fccfee5ac0e614ab4f649ee6caf6882d005624f89b86a62f0826794",
+          "line": 46
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setCustomBusinessListener(open_im_sdk_callback.OnCustomBusinessListener listener);"
+    },
+    {
+      "method": "setFriendListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 13
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetFriendListener",
+          "path": "open_im_sdk/listener.go",
+          "source_sha256": "85a5a6d11fccfee5ac0e614ab4f649ee6caf6882d005624f89b86a62f0826794",
+          "line": 42
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setFriendListener(open_im_sdk_callback.OnFriendshipListener listener);"
+    },
+    {
+      "method": "setFriendRemark",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 56
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetFriendRemark",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 43
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setFriendRemark(open_im_sdk_callback.Base callback, String operationID, String userIDRemark);"
+    },
+    {
+      "method": "setFriendsEx",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "line": 128
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetFriendsEx",
+          "path": "open_im_sdk/friend.go",
+          "source_sha256": "1c53dce2e5babb69cff3a4e96f0a0d0621f32b87740bccd8eb60e08529d1cbc3",
+          "line": 80
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setFriendsEx(open_im_sdk_callback.Base callback, String operationID, String friendIDs, String ex);"
+    },
+    {
+      "method": "setGlobalRecvMessageOpt",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "line": 159
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGlobalRecvMessageOpt",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 39
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGlobalRecvMessageOpt(open_im_sdk_callback.Base callback, String operationID, long opt);"
+    },
+    {
+      "method": "setGroupApplyMemberFriend",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 234
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupApplyMemberFriend",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 79
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupApplyMemberFriend(open_im_sdk_callback.Base callback, String operationID, String groupID, int rule);"
+    },
+    {
+      "method": "setGroupInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 74
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupInfo",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 67
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupInfo(open_im_sdk_callback.Base callback, String operationID, String groupInfo);"
+    },
+    {
+      "method": "setGroupListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 12
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupListener",
+          "path": "open_im_sdk/listener.go",
+          "source_sha256": "85a5a6d11fccfee5ac0e614ab4f649ee6caf6882d005624f89b86a62f0826794",
+          "line": 21
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupListener(open_im_sdk_callback.OnGroupListener listener);"
+    },
+    {
+      "method": "setGroupLookMemberInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 226
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupLookMemberInfo",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 75
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupLookMemberInfo(open_im_sdk_callback.Base callback, String operationID, String groupID, int rule);"
+    },
+    {
+      "method": "setGroupMemberInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 256
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupMemberInfo",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 51
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupMemberInfo(open_im_sdk_callback.Base callback, String operationID, String groupMemberInfo);"
+    },
+    {
+      "method": "setGroupMemberNickname",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 181
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupMemberNickname",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 127
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupMemberNickname(open_im_sdk_callback.Base callback, String operationID, String groupID, String userID, String groupMemberNickname);"
+    },
+    {
+      "method": "setGroupMemberRoleLevel",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 197
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupMemberRoleLevel",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 47
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupMemberRoleLevel(open_im_sdk_callback.Base callback, String operationID, String groupID, String userID, long roleLevel);"
+    },
+    {
+      "method": "setGroupVerification",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 218
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetGroupVerification",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 71
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setGroupVerification(open_im_sdk_callback.Base callback, String operationID, String groupID, int verification);"
+    },
+    {
+      "method": "setMessageKvInfoListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 456
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetMessageKvInfoListener",
+          "path": "open_im_sdk/listener.go",
+          "source_sha256": "85a5a6d11fccfee5ac0e614ab4f649ee6caf6882d005624f89b86a62f0826794",
+          "line": 50
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setMessageKvInfoListener(open_im_sdk_callback.OnMessageKvInfoListener listener);"
+    },
+    {
+      "method": "setMessageLocalEx",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 462
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetMessageLocalEx",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 237
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setMessageLocalEx(open_im_sdk_callback.Base callback, String operationID, String conversationID, String clientMsgID, String localEx);"
+    },
+    {
+      "method": "setSelfInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 25
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetSelfInfo",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 35
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setSelfInfo(open_im_sdk_callback.Base callback, String operationID, String userInfo);"
+    },
+    {
+      "method": "setSelfInfoEx",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 74
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetSelfInfoEx",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 30
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setSelfInfoEx(open_im_sdk_callback.Base callback, String operationID, String userInfo);"
+    },
+    {
+      "method": "setSignalingListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 12
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetSignalingListener",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 22
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setSignalingListener(open_im_sdk_callback.OnSignalingListener listener);"
+    },
+    {
+      "method": "setUserListener",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 12
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SetUserListener",
+          "path": "open_im_sdk/listener.go",
+          "source_sha256": "85a5a6d11fccfee5ac0e614ab4f649ee6caf6882d005624f89b86a62f0826794",
+          "line": 37
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void setUserListener(open_im_sdk_callback.OnUserListener listener);"
+    },
+    {
+      "method": "signalingAccept",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 32
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingAccept",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 39
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingAccept(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingCancel",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 46
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingCancel",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 45
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingCancel(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingCloseRoom",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 112
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingCloseRoom",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 206
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingCloseRoom(open_im_sdk_callback.Base callback, String operationID, String room);"
+    },
+    {
+      "method": "signalingCreateMeeting",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 81
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingCreateMeeting",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 194
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingCreateMeeting(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingGetMeetings",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 106
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingGetMeetings",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 203
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingGetMeetings(open_im_sdk_callback.Base callback, String operationID);"
+    },
+    {
+      "method": "signalingGetRoomByGroupID",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 60
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingGetRoomByGroupID",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 188
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingGetRoomByGroupID(open_im_sdk_callback.Base callback, String operationID, String group);"
+    },
+    {
+      "method": "signalingGetTokenByRoomID",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 67
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingGetTokenByRoomID",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 51
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingGetTokenByRoomID(open_im_sdk_callback.Base callback, String operationID, String room);"
+    },
+    {
+      "method": "signalingHungUp",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 53
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingHungUp",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 48
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingHungUp(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingInvite",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 18
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingInvite",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 33
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingInvite(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingInviteInGroup",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 25
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingInviteInGroup",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 36
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingInviteInGroup(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingJoinMeeting",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 88
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingJoinMeeting",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 197
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingJoinMeeting(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingOperateStream",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 95
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingOperateStream",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 209
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingOperateStream(open_im_sdk_callback.Base callback, String operationID, String stream, String room, String user, boolean mute, boolean muteAll);"
+    },
+    {
+      "method": "signalingReject",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 39
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingReject",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 42
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingReject(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "signalingSendCustomSignal",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 119
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingSendCustomSignal",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 212
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingSendCustomSignal(open_im_sdk_callback.Base callback, String operationID, String custom, String room);"
+    },
+    {
+      "method": "signalingUpdateMeetingInfo",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "line": 74
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SignalingUpdateMeetingInfo",
+          "path": "open_im_sdk/enterprise_rtc_compat.go",
+          "source_sha256": "8f19619150efca4e17ea66d8cf41e57cb81c71cb95db9f0d40368c02bfbb7af4",
+          "line": 200
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void signalingUpdateMeetingInfo(open_im_sdk_callback.Base callback, String operationID, String info);"
+    },
+    {
+      "method": "subscribeUsersStatus",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 38
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "SubscribeUsersStatus",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 54
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void subscribeUsersStatus(open_im_sdk_callback.Base callback, String operationID, String userIDs);"
+    },
+    {
+      "method": "transferGroupOwner",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "line": 109
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "TransferGroupOwner",
+          "path": "open_im_sdk/group.go",
+          "source_sha256": "313e580ea8977003138cc1c371e5264361beb97d3b3e5400484d984c6fbc3774",
+          "line": 103
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void transferGroupOwner(open_im_sdk_callback.Base callback, String operationID, String groupID, String newOwnerUserID);"
+    },
+    {
+      "method": "typingStatusUpdate",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "line": 174
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "TypingStatusUpdate",
+          "path": "open_im_sdk/conversation_msg.go",
+          "source_sha256": "27064fc1caad90e6184a0dddbd81274eff09c347eaba60446f9e570a348d9e86",
+          "line": 185
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void typingStatusUpdate(open_im_sdk_callback.Base callback, String operationID, String recvID, String msgTip);"
+    },
+    {
+      "method": "unInitSDK",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 25
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "UnInitSDK",
+          "path": "open_im_sdk/init_login.go",
+          "source_sha256": "223db8d3159ed8098273a7f3e2a7068680fc56f1fa4c159cc6fb83c65a2af98e",
+          "line": 71
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void unInitSDK(String operationID);"
+    },
+    {
+      "method": "unsubscribeUsersStatus",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "line": 45
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "UnsubscribeUsersStatus",
+          "path": "open_im_sdk/user.go",
+          "source_sha256": "0d6875593e1ad78e13a171bb35517b36688e9b102063665a9b426bc26b296f8f",
+          "line": 59
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void unsubscribeUsersStatus(open_im_sdk_callback.Base callback, String operationID, String userIDs);"
+    },
+    {
+      "method": "updateFcmToken",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 60
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "UpdateFcmToken",
+          "path": "open_im_sdk/third.go",
+          "source_sha256": "72ce1bdb8d8644be8370d5c435b283f4d3ed30738129fe2d548a99d1b19c7bb0",
+          "line": 22
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void updateFcmToken(open_im_sdk_callback.Base callback, String operationID, String fcmToken, long expireTime);"
+    },
+    {
+      "method": "uploadFile",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 51
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "UploadFile",
+          "path": "open_im_sdk/file.go",
+          "source_sha256": "4d99b38c06827fdaa37ddfb268b71dcb6c7fb2f4d6de8f74e6c5cdaab8063d6d",
+          "line": 22
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void uploadFile(open_im_sdk_callback.Base callback, String operationID, String req, open_im_sdk_callback.UploadFileCallback progress);"
+    },
+    {
+      "method": "uploadLogs",
+      "calls": [
+        {
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "line": 69
+        }
+      ],
+      "reviewed_Go_exports": [
+        {
+          "go_export": "UploadLogs",
+          "path": "open_im_sdk/third.go",
+          "source_sha256": "72ce1bdb8d8644be8370d5c435b283f4d3ed30738129fe2d548a99d1b19c7bb0",
+          "line": 30
+        }
+      ],
+      "historical_generated_Java_signature": "public static native void uploadLogs(open_im_sdk_callback.Base callback, String operationID, open_im_sdk_callback.UploadLogProgress progress);"
+    }
+  ],
+  "callback_implementation_sites": [
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/ConnectivityListener.java",
+      "interface": "Base",
+      "historical_methods": [
+        {
+          "name": "onError",
+          "historical_signature": "public void onError(int errCode, String errMsg);"
+        },
+        {
+          "name": "onSuccess",
+          "historical_signature": "public void onSuccess(String data);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/VisibilityListener.java",
+      "interface": "Base",
+      "historical_methods": [
+        {
+          "name": "onError",
+          "historical_signature": "public void onError(int errCode, String errMsg);"
+        },
+        {
+          "name": "onSuccess",
+          "historical_signature": "public void onSuccess(String data);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnAdvancedMsgListener.java",
+      "interface": "OnAdvancedMsgListener",
+      "historical_methods": [
+        {
+          "name": "onMsgDeleted",
+          "historical_signature": "public void onMsgDeleted(String message);"
+        },
+        {
+          "name": "onNewRecvMessageRevoked",
+          "historical_signature": "public void onNewRecvMessageRevoked(String messageRevoked);"
+        },
+        {
+          "name": "onRecvC2CReadReceipt",
+          "historical_signature": "public void onRecvC2CReadReceipt(String msgReceiptList);"
+        },
+        {
+          "name": "onRecvGroupReadReceipt",
+          "historical_signature": "public void onRecvGroupReadReceipt(String groupMsgReceiptList);"
+        },
+        {
+          "name": "onRecvMessageExtensionsAdded",
+          "historical_signature": "public void onRecvMessageExtensionsAdded(String msgID, String reactionExtensionList);"
+        },
+        {
+          "name": "onRecvMessageExtensionsChanged",
+          "historical_signature": "public void onRecvMessageExtensionsChanged(String msgID, String reactionExtensionList);"
+        },
+        {
+          "name": "onRecvMessageExtensionsDeleted",
+          "historical_signature": "public void onRecvMessageExtensionsDeleted(String msgID, String reactionExtensionKeyList);"
+        },
+        {
+          "name": "onRecvNewMessage",
+          "historical_signature": "public void onRecvNewMessage(String message);"
+        },
+        {
+          "name": "onRecvOfflineNewMessage",
+          "historical_signature": "public void onRecvOfflineNewMessage(String message);"
+        },
+        {
+          "name": "onRecvOnlineOnlyMessage",
+          "historical_signature": "public void onRecvOnlineOnlyMessage(String message);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnBaseListener.java",
+      "interface": "Base",
+      "historical_methods": [
+        {
+          "name": "onError",
+          "historical_signature": "public void onError(int errCode, String errMsg);"
+        },
+        {
+          "name": "onSuccess",
+          "historical_signature": "public void onSuccess(String data);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnConnListener.java",
+      "interface": "OnConnListener",
+      "historical_methods": [
+        {
+          "name": "onConnectFailed",
+          "historical_signature": "public void onConnectFailed(int errCode, String errMsg);"
+        },
+        {
+          "name": "onConnectSuccess",
+          "historical_signature": "public void onConnectSuccess();"
+        },
+        {
+          "name": "onConnecting",
+          "historical_signature": "public void onConnecting();"
+        },
+        {
+          "name": "onKickedOffline",
+          "historical_signature": "public void onKickedOffline();"
+        },
+        {
+          "name": "onUserTokenExpired",
+          "historical_signature": "public void onUserTokenExpired();"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnConversationListener.java",
+      "interface": "OnConversationListener",
+      "historical_methods": [
+        {
+          "name": "onConversationChanged",
+          "historical_signature": "public void onConversationChanged(String conversationList);"
+        },
+        {
+          "name": "onConversationUserInputStatusChanged",
+          "historical_signature": "public void onConversationUserInputStatusChanged(String change);"
+        },
+        {
+          "name": "onNewConversation",
+          "historical_signature": "public void onNewConversation(String conversationList);"
+        },
+        {
+          "name": "onSyncServerFailed",
+          "historical_signature": "public void onSyncServerFailed();"
+        },
+        {
+          "name": "onSyncServerFinish",
+          "historical_signature": "public void onSyncServerFinish();"
+        },
+        {
+          "name": "onSyncServerStart",
+          "historical_signature": "public void onSyncServerStart();"
+        },
+        {
+          "name": "onTotalUnreadMessageCountChanged",
+          "historical_signature": "public void onTotalUnreadMessageCountChanged(int totalUnreadCount);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnCustomBusinessListener.java",
+      "interface": "OnCustomBusinessListener",
+      "historical_methods": [
+        {
+          "name": "onRecvCustomBusinessMessage",
+          "historical_signature": "public void onRecvCustomBusinessMessage(String businessMessage);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnFriendshipListener.java",
+      "interface": "OnFriendshipListener",
+      "historical_methods": [
+        {
+          "name": "onBlackAdded",
+          "historical_signature": "public void onBlackAdded(String blackInfo);"
+        },
+        {
+          "name": "onBlackDeleted",
+          "historical_signature": "public void onBlackDeleted(String blackInfo);"
+        },
+        {
+          "name": "onFriendAdded",
+          "historical_signature": "public void onFriendAdded(String friendInfo);"
+        },
+        {
+          "name": "onFriendApplicationAccepted",
+          "historical_signature": "public void onFriendApplicationAccepted(String friendApplication);"
+        },
+        {
+          "name": "onFriendApplicationAdded",
+          "historical_signature": "public void onFriendApplicationAdded(String friendApplication);"
+        },
+        {
+          "name": "onFriendApplicationDeleted",
+          "historical_signature": "public void onFriendApplicationDeleted(String friendApplication);"
+        },
+        {
+          "name": "onFriendApplicationRejected",
+          "historical_signature": "public void onFriendApplicationRejected(String friendApplication);"
+        },
+        {
+          "name": "onFriendDeleted",
+          "historical_signature": "public void onFriendDeleted(String friendInfo);"
+        },
+        {
+          "name": "onFriendInfoChanged",
+          "historical_signature": "public void onFriendInfoChanged(String friendInfo);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnGroupListener.java",
+      "interface": "OnGroupListener",
+      "historical_methods": [
+        {
+          "name": "onGroupApplicationAccepted",
+          "historical_signature": "public void onGroupApplicationAccepted(String groupApplication);"
+        },
+        {
+          "name": "onGroupApplicationAdded",
+          "historical_signature": "public void onGroupApplicationAdded(String groupApplication);"
+        },
+        {
+          "name": "onGroupApplicationDeleted",
+          "historical_signature": "public void onGroupApplicationDeleted(String groupApplication);"
+        },
+        {
+          "name": "onGroupApplicationRejected",
+          "historical_signature": "public void onGroupApplicationRejected(String groupApplication);"
+        },
+        {
+          "name": "onGroupDismissed",
+          "historical_signature": "public void onGroupDismissed(String groupInfo);"
+        },
+        {
+          "name": "onGroupInfoChanged",
+          "historical_signature": "public void onGroupInfoChanged(String groupInfo);"
+        },
+        {
+          "name": "onGroupMemberAdded",
+          "historical_signature": "public void onGroupMemberAdded(String groupMemberInfo);"
+        },
+        {
+          "name": "onGroupMemberDeleted",
+          "historical_signature": "public void onGroupMemberDeleted(String groupMemberInfo);"
+        },
+        {
+          "name": "onGroupMemberInfoChanged",
+          "historical_signature": "public void onGroupMemberInfoChanged(String groupMemberInfo);"
+        },
+        {
+          "name": "onJoinedGroupAdded",
+          "historical_signature": "public void onJoinedGroupAdded(String groupInfo);"
+        },
+        {
+          "name": "onJoinedGroupDeleted",
+          "historical_signature": "public void onJoinedGroupDeleted(String groupInfo);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnMessageKvInfoListener.java",
+      "interface": "OnMessageKvInfoListener",
+      "historical_methods": [
+        {
+          "name": "onMessageKvInfoChanged",
+          "historical_signature": "public void onMessageKvInfoChanged(String messageChangedList);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnMsgSendListener.java",
+      "interface": "SendMsgCallBack",
+      "historical_methods": [
+        {
+          "name": "onError",
+          "historical_signature": "public void onError(int errCode, String errMsg);"
+        },
+        {
+          "name": "onProgress",
+          "historical_signature": "public void onProgress(long progress);"
+        },
+        {
+          "name": "onSuccess",
+          "historical_signature": "public void onSuccess(String data);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnSignalingListener.java",
+      "interface": "OnSignalingListener",
+      "historical_methods": [
+        {
+          "name": "onHangUp",
+          "historical_signature": "public void onHangUp(String hangUpCallback);"
+        },
+        {
+          "name": "onInvitationCancelled",
+          "historical_signature": "public void onInvitationCancelled(String invitationCancelledCallback);"
+        },
+        {
+          "name": "onInvitationTimeout",
+          "historical_signature": "public void onInvitationTimeout(String invitationTimeoutCallback);"
+        },
+        {
+          "name": "onInviteeAccepted",
+          "historical_signature": "public void onInviteeAccepted(String inviteeAcceptedCallback);"
+        },
+        {
+          "name": "onInviteeAcceptedByOtherDevice",
+          "historical_signature": "public void onInviteeAcceptedByOtherDevice(String inviteeAcceptedCallback);"
+        },
+        {
+          "name": "onInviteeRejected",
+          "historical_signature": "public void onInviteeRejected(String inviteeRejectedCallback);"
+        },
+        {
+          "name": "onInviteeRejectedByOtherDevice",
+          "historical_signature": "public void onInviteeRejectedByOtherDevice(String inviteeRejectedCallback);"
+        },
+        {
+          "name": "onReceiveCustomSignal",
+          "historical_signature": "public void onReceiveCustomSignal(String event);"
+        },
+        {
+          "name": "onReceiveNewInvitation",
+          "historical_signature": "public void onReceiveNewInvitation(String receiveNewInvitationCallback);"
+        },
+        {
+          "name": "onRoomParticipantConnected",
+          "historical_signature": "public void onRoomParticipantConnected(String onRoomParticipantConnectedCallback);"
+        },
+        {
+          "name": "onRoomParticipantDisconnected",
+          "historical_signature": "public void onRoomParticipantDisconnected(String onRoomParticipantDisconnectedCallback);"
+        },
+        {
+          "name": "onStreamChange",
+          "historical_signature": "public void onStreamChange(String event);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUploadFileListener.java",
+      "interface": "UploadFileCallback",
+      "historical_methods": [
+        {
+          "name": "complete",
+          "historical_signature": "public void complete(long size, String url, long typ);"
+        },
+        {
+          "name": "hashPartComplete",
+          "historical_signature": "public void hashPartComplete(String partsHash, String fileHash);"
+        },
+        {
+          "name": "hashPartProgress",
+          "historical_signature": "public void hashPartProgress(long index, long size, String partHash);"
+        },
+        {
+          "name": "open",
+          "historical_signature": "public void open(long size);"
+        },
+        {
+          "name": "partSize",
+          "historical_signature": "public void partSize(long partSize, long num);"
+        },
+        {
+          "name": "uploadComplete",
+          "historical_signature": "public void uploadComplete(long fileSize, long streamSize, long storageSize);"
+        },
+        {
+          "name": "uploadID",
+          "historical_signature": "public void uploadID(String uploadID);"
+        },
+        {
+          "name": "uploadPartComplete",
+          "historical_signature": "public void uploadPartComplete(long index, long partSize, String partHash);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUploadLogsListener.java",
+      "interface": "UploadLogProgress",
+      "historical_methods": [
+        {
+          "name": "onProgress",
+          "historical_signature": "public void onProgress(long current, long size);"
+        }
+      ]
+    },
+    {
+      "wrapper": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUserListener.java",
+      "interface": "OnUserListener",
+      "historical_methods": [
+        {
+          "name": "onSelfInfoUpdated",
+          "historical_signature": "public void onSelfInfoUpdated(String userInfo);"
+        },
+        {
+          "name": "onUserStatusChanged",
+          "historical_signature": "public void onUserStatusChanged(String userOnlineStatus);"
+        }
+      ]
+    }
+  ],
+  "callback_source": {
+    "path": "open_im_sdk_callback/callback_client.go",
+    "sha256": "fae26acb3fadc2348e4abf7c2d8a28e7f7bfc3325d8e5320fb9c959673695359"
+  },
+  "wrapper_files": [
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/FlutterOpenimSdkPlugin.java",
+      "bytes": 5854,
+      "sha256": "7894ac65ab19c13cee9906da637cb4572765790c891633dc705cf90e3bf9ea47"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/LocalVideoTools.java",
+      "bytes": 3847,
+      "sha256": "e56dbdc075df4ca44640c8f93e83b7f30677489fd2c6c509f88b79e441324dea"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/Connectivity.java",
+      "bytes": 3066,
+      "sha256": "34b9e6361461f3e5fa4f5a12aa3c8191c7bcf6428ba46c97951a07bc09de544d"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/ConnectivityListener.java",
+      "bytes": 3373,
+      "sha256": "1fa11192358eb1aa2c6410bd7a1c2a8a66c7383087f160305fb84f9c6758fccd"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/VisibilityListener.java",
+      "bytes": 1909,
+      "sha256": "1ff9655b889aae324f11ae53d0508ac3f4d851330bd8698723d83ec3b3225e3a"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnAdvancedMsgListener.java",
+      "bytes": 3427,
+      "sha256": "c55d9a656e0db0ae6a3768b8800d38903838b2ae13fd402a0ca0fca9c17ecbf0"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnBaseListener.java",
+      "bytes": 707,
+      "sha256": "42a48ee67a126a06b5f6c1da888c26fe2bb33a3c534d00705688702f654cc0c1"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnConnListener.java",
+      "bytes": 862,
+      "sha256": "1cc012ea5615bee2fcf7abd7305fccb7347dad36eef766aa655457712fcf49ab"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnConversationListener.java",
+      "bytes": 1275,
+      "sha256": "9870f9b9180fc0a99383715e0bb0503f8535ff1675861d682de563418738bd24"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnCustomBusinessListener.java",
+      "bytes": 367,
+      "sha256": "69dd92ffb7d5f6345aea17c01bb76b4296cb5a041f29fd3c89afbd98ed7b7159"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnFriendshipListener.java",
+      "bytes": 1492,
+      "sha256": "cca66e797db094c59a9ae7779ce8c1e93a9718e4512fd1b800ff893804c94a55"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnGroupListener.java",
+      "bytes": 1795,
+      "sha256": "30a7695f9cbf034aab8dac5b91e0af5c4e93bd75d91dc45e002ef3eac8d295c3"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnListenerForService.java",
+      "bytes": 1029,
+      "sha256": "882d3cb65fba79af9a5d150abbf0c29bc5c92d071d8b315949c29c109bc2d16f"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnMessageKvInfoListener.java",
+      "bytes": 431,
+      "sha256": "2aabe12ad6b831ebca83d47bbef72c35f428a2d1b7acb1146be9aa1f1866188d"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnMsgSendListener.java",
+      "bytes": 1283,
+      "sha256": "7e0f0df12dc27a551004be2be324bf8c77c955d7d6555393c154082024ef85ed"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnSignalingListener.java",
+      "bytes": 1995,
+      "sha256": "f5834aa7da214842a976693597a3217d8e1c7df675c82ee12d4757aa9c2ab914"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUploadFileListener.java",
+      "bytes": 3752,
+      "sha256": "03f2fbc92b47fa45f4c6a411d590ac73c184a260cf04533f632ce7100e7427a5"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUploadLogsListener.java",
+      "bytes": 825,
+      "sha256": "d0090d5e14e1aa57b7a9522752032fed8ae7ce04a0171883fcd74b40c04e8cb0"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUserListener.java",
+      "bytes": 459,
+      "sha256": "1eacdf518dccc640725ea24edb798162c8670544d6d93aa5dae2370441b87034"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/BaseManager.java",
+      "bytes": 747,
+      "sha256": "b7d432d46d7640fc07ddb57a9d8ea9624ada1ba5a927b537f427ba8da48eff8d"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+      "bytes": 8565,
+      "sha256": "d3a3fcf576eec2fb1f6116c70a1cd8e3c394c5b9fe165c002091f8e3a853a7c6"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+      "bytes": 4882,
+      "sha256": "e700f3d6151cba2b1e01da31c76b1f1d901c6e5483d7775d1189496bab6b60cd"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+      "bytes": 10430,
+      "sha256": "99741eec783961c93482432603cde146315cf0b7ffed9271f12abb44b5bbed86"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+      "bytes": 3735,
+      "sha256": "4a3922c21d4abea3e70441f512dbed5ec831838d86a009df5b41e1ec9714bb54"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+      "bytes": 21723,
+      "sha256": "6c96a896aaf34adebe10874d77e925d2c86f07e5c6e0ed0db9a176a7e76cacae"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+      "bytes": 5465,
+      "sha256": "dd43c022d62e1922d09f2f6dff8e378a61cd8614d41af1724a67f7656c24c788"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+      "bytes": 3082,
+      "sha256": "7beaced6b4450d3fc0174a1ec5c58fa07fea597ee99c4072992993e881935c98"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/util/CommonUtil.java",
+      "bytes": 1950,
+      "sha256": "f6b8e402ba431b42902c1e0323d7d87290c9e2a8b554e6ef1cbdef48ab119c27"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/util/JsonUtil.java",
+      "bytes": 556,
+      "sha256": "1c097fa8e65194a7f0226d92822f29e0a0acc1fda70fc4491ad36401638ccf2e"
+    }
+  ],
+  "historical_evidence_only": {
+    "artifact_filename": "auditable-facade-qa-personal-meeting-2a79c958-arm64-sources.jar",
+    "sha256": "3f9e7ffd4b4175317c91ff80478e021b9e46e835ee20aeb77666557405662087",
+    "export_or_upload": false,
+    "new_cloud_compile_proof": false
+  },
+  "known_full_enterprise_ABI_gap": "setForServiceListener is absent from public reconstruction but all corresponding wrapper statements/classes are commented out. No active API missing; full binary ABI parity is not established.",
+  "future_required": "Compare newly generated AAR Java/API inventory and compile all29 actual wrapper sources against it in the real app Gradle build; no stubs or fallback Enterprise binary."
+}

@@ -1,0 +1,196 @@
+#!/usr/bin/env python3
+"""Build the isolated compatibility candidate from pinned Apache-2.0 source.
+
+This never writes the production plugin's android/libs or iOS Frameworks.
+Supply the local audited protocol directory and an empty task-only work folder.
+The manifest pins source/patches; artifact hashes are recorded after each build.
+"""
+import argparse
+import hashlib
+import io
+import json
+import os
+import re
+from pathlib import Path
+import subprocess
+import tarfile
+import zipfile
+
+HERE = Path(__file__).resolve().parent
+PLUGIN_ROOT = HERE.parents[1]
+BASE = "7b156fc5557878ad6e6a07e572694af5699c6624"
+ANDROID_ABIS = {
+    "android/arm": "armeabi-v7a",
+    "android/arm64": "arm64-v8a",
+    "android/386": "x86",
+    "android/amd64": "x86_64",
+}
+
+def run(argv, cwd=None, env=None):
+    return subprocess.run(list(map(str, argv)), cwd=cwd, env=env, check=True)
+
+
+def verify_protocol(protocol, entries):
+    if not (protocol / "go.mod").is_file():
+        raise SystemExit("audited server protocol module is missing")
+    expected = {entry["path"] for entry in entries}
+    if len(expected) != len(entries):
+        raise SystemExit("duplicate reviewed protocol input")
+    for entry in entries:
+        path = protocol / entry["path"]
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != entry["sha256"]:
+            raise SystemExit("protocol differs from reviewed manifest: " + entry["path"])
+    # go/build/build.go fileListForExt also admits native objects and SWIG /
+    # Cgo inputs. They must not bypass the reviewed protocol input inventory.
+    source_suffixes = {
+        ".go", ".proto", ".c", ".cc", ".cpp", ".cxx", ".m", ".mm",
+        ".h", ".hh", ".hpp", ".hxx", ".f", ".F", ".for", ".f90",
+        ".s", ".S", ".sx", ".swig", ".swigcxx", ".syso",
+    }
+    actual = {
+        str(path.relative_to(protocol)) for path in protocol.rglob("*")
+        if path.is_file() and (path.suffix in source_suffixes or path.name in {"go.mod", "go.sum"})
+    }
+    if actual != expected:
+        raise SystemExit("protocol source inventory differs from the reviewed manifest")
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--upstream", required=True, type=Path)
+    parser.add_argument("--protocol", required=True, type=Path)
+    parser.add_argument("--work", required=True, type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--go", type=Path, default=Path("go"))
+    parser.add_argument("--mobile-tools", type=Path)
+    parser.add_argument("--android-sdk", type=Path)
+    parser.add_argument("--ndk", type=Path)
+    parser.add_argument("--java-home", type=Path)
+    parser.add_argument(
+        "--qa-fixture-ca", type=Path,
+        help="Explicit isolated debug QA only: append this public pinned CA for the exact local API/WSS fixture.",
+    )
+    parser.add_argument("--qa-fixture-ca-sha256")
+    parser.add_argument(
+        "--android-targets", nargs="+", choices=ANDROID_ABIS,
+        default=["android/arm64"],
+        help="Explicit research ABI set; preserving production coverage requires all four targets.",
+    )
+    parser.add_argument("--prepare-only", action="store_true")
+    args = parser.parse_args()
+    work = args.work.resolve()
+    if work.is_relative_to(PLUGIN_ROOT):
+        parser.error("candidate work must stay outside the production SDK package")
+    if args.output is not None:
+        output = args.output.resolve()
+        if output.is_relative_to(PLUGIN_ROOT):
+            parser.error("candidate output must never overwrite the production SDK package")
+        if output.suffix != ".aar":
+            parser.error("candidate Android output must have an .aar extension")
+        if output.exists() or output.with_suffix(".build.json").exists():
+            parser.error("candidate output and build manifest must be new paths; existing evidence is never overwritten")
+    if len(args.android_targets) != len(set(args.android_targets)):
+        parser.error("Android targets must be unique")
+    qa = args.qa_fixture_ca is not None or args.qa_fixture_ca_sha256 is not None
+    if qa and (args.qa_fixture_ca is None or args.qa_fixture_ca_sha256 is None):
+        parser.error("QA trust requires both --qa-fixture-ca and --qa-fixture-ca-sha256")
+    qa_certificate = None
+    if qa:
+        if not re.fullmatch(r"[0-9a-f]{64}", args.qa_fixture_ca_sha256):
+            parser.error("QA CA SHA256 must be lowercase hexadecimal")
+        with args.qa_fixture_ca.open("rb") as certificate_file:
+            qa_certificate = certificate_file.read(32769)
+        if len(qa_certificate) > 32768 or not re.fullmatch(
+            rb"\s*-----BEGIN CERTIFICATE-----\s+[A-Za-z0-9+/=\r\n]+-----END CERTIFICATE-----\s*",
+            qa_certificate,
+        ):
+            parser.error("QA CA must contain exactly one public PEM certificate")
+        if hashlib.sha256(qa_certificate).hexdigest() != args.qa_fixture_ca_sha256:
+            parser.error("QA CA checksum mismatch")
+    manifest = json.loads((HERE / "candidate-source-manifest.json").read_text())
+    patch = HERE / manifest["patch"]
+    if hashlib.sha256(patch.read_bytes()).hexdigest() != manifest["patch_sha256"]:
+        raise SystemExit("candidate patch checksum mismatch")
+    commit = subprocess.check_output(["git", "-C", str(args.upstream), "rev-parse", BASE + "^{commit}"], text=True).strip()
+    if commit != BASE:
+        raise SystemExit("unexpected upstream revision")
+    verify_protocol(args.protocol, manifest["protocol"]["files"])
+    work = args.work.resolve()
+    if work.exists() and any(work.iterdir()):
+        raise SystemExit("work directory must be empty; existing files are never overwritten")
+    work.mkdir(parents=True, exist_ok=True)
+    archive = subprocess.check_output(["git", "-C", str(args.upstream), "archive", BASE])
+    with tarfile.open(fileobj=io.BytesIO(archive)) as bundle:
+        for member in bundle.getmembers():
+            target = (work / member.name).resolve()
+            if not target.is_relative_to(work) or member.issym() or member.islnk():
+                raise SystemExit("unsafe upstream archive member")
+        bundle.extractall(work)
+    run(["git", "apply", "--check", patch], cwd=work)
+    run(["git", "apply", patch], cwd=work)
+    for entry in manifest["modified_files"]:
+        actual = hashlib.sha256((work / entry["path"]).read_bytes()).hexdigest()
+        if actual != entry["sha256"]:
+            raise SystemExit("prepared source differs from reviewed manifest: " + entry["path"])
+    qa_manifest = None
+    if qa:
+        qa_manifest = json.loads((HERE / "qa-fixture-source-manifest.json").read_text())
+        if qa_manifest["requires_base_patch_sha256"] != manifest["patch_sha256"]:
+            raise SystemExit("QA overlay does not match reviewed base patch")
+        qa_patch = HERE / qa_manifest["overlay"]
+        if hashlib.sha256(qa_patch.read_bytes()).hexdigest() != qa_manifest["overlay_sha256"]:
+            raise SystemExit("QA overlay checksum mismatch")
+        run(["git", "apply", "--check", qa_patch], cwd=work)
+        run(["git", "apply", qa_patch], cwd=work)
+        for entry in qa_manifest["modified_files"]:
+            if hashlib.sha256((work / entry["path"]).read_bytes()).hexdigest() != entry["sha256"]:
+                raise SystemExit("QA prepared source differs from reviewed manifest: " + entry["path"])
+        generated = work / qa_manifest["generated_file"]
+        generated.write_text(
+            "// Generated explicit QA certificate; do not publish this artifact.\n"
+            "//go:build luobo_fixture_ca_debug\n\npackage fixturetls\n\n"
+            + "const fixtureCAPEM = " + json.dumps(qa_certificate.decode("ascii")) + "\n"
+            + "const fixtureCASHA256 = " + json.dumps(args.qa_fixture_ca_sha256) + "\n"
+        )
+        (work / "qa-source.json").write_text(json.dumps({
+            "overlay_sha256": qa_manifest["overlay_sha256"],
+            "ca_sha256": args.qa_fixture_ca_sha256,
+            "generated_source_sha256": hashlib.sha256(generated.read_bytes()).hexdigest(),
+            "build_tag": qa_manifest["build_tag"],
+            "only_debug_QA": True,
+            "production_replacement": False,
+        }, indent=2) + "\n")
+    version = subprocess.check_output([str(args.go), "version"], text=True)
+    if "go1.27.2 " not in version:
+        raise SystemExit("this candidate was validated with Go 1.27.2")
+    run([args.go, "mod", "edit", "-replace=github.com/OpenIMSDK/protocol=" + str(args.protocol.resolve())], cwd=work)
+    if args.prepare_only:
+        print("CANDIDATE_SOURCE_PREPARED")
+        return
+    if any(value is None for value in [args.output, args.mobile_tools, args.android_sdk, args.ndk, args.java_home]):
+        raise SystemExit("Android build requires output/mobile-tools/android-sdk/ndk/java-home")
+    environment = dict(os.environ)
+    environment.update({"ANDROID_HOME": str(args.android_sdk.resolve()), "ANDROID_NDK_HOME": str(args.ndk.resolve()), "JAVA_HOME": str(args.java_home.resolve()), "CGO_LDFLAGS": "-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"})
+    environment["PATH"] = str(args.go.resolve().parent) + os.pathsep + str(args.mobile_tools.resolve()) + os.pathsep + environment.get("PATH", "")
+    if qa:
+        # Validate the actually embedded public CA, both TLS protocol controls
+        # and the default-build trust stub before starting a native build.
+        run([args.go, "test", "./pkg/fixturetls", "-count=1"], cwd=work)
+        run([args.go, "test", "-tags=" + qa_manifest["build_tag"], "./pkg/fixturetls", "-count=1"], cwd=work)
+    output = args.output.resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    build_tags = ["-tags=" + qa_manifest["build_tag"]] if qa else []
+    run([(args.mobile_tools / "gomobile").resolve(), "bind", *build_tags, "-target=" + ",".join(args.android_targets), "-androidapi=24", "-trimpath", "-ldflags=-s -w", "-o", output, "./open_im_sdk", "./open_im_sdk_callback"], cwd=work, env=environment)
+    libraries = []
+    with zipfile.ZipFile(output) as aar:
+        for name in sorted(aar.namelist()):
+            if name.startswith("jni/") and name.endswith("/libgojni.so"):
+                content = aar.read(name)
+                libraries.append({"abi": name.split("/")[1], "bytes": len(content), "sha256": hashlib.sha256(content).hexdigest()})
+    expected = {ANDROID_ABIS[target] for target in args.android_targets}
+    if {entry["abi"] for entry in libraries} != expected or len(libraries) != len(expected):
+        raise SystemExit("generated AAR ABI set differs from requested targets")
+    output.with_suffix(".build.json").write_text(json.dumps({"base_commit": BASE, "patch_sha256": manifest["patch_sha256"], "qa_overlay_sha256": qa_manifest["overlay_sha256"] if qa else None, "qa_ca_sha256": args.qa_fixture_ca_sha256 if qa else None, "build_tags": build_tags, "only_debug_QA": qa, "artifact_sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "artifact_bytes": output.stat().st_size, "android_targets": args.android_targets, "libraries": libraries, "matches_original_abi_coverage": expected == set(ANDROID_ABIS.values()), "go": "1.27.2", "mobile": "v0.0.0-20261011034528-197770444867", "android_api": 24, "production_replacement": False, "runtime_validation": "pending for this generated artifact; ABI inventory and ELF checks are not runtime proof"}, indent=2) + "\n")
+    print("ISOLATED_CANDIDATE_AAR_BUILT")
+
+if __name__ == "__main__":
+    main()

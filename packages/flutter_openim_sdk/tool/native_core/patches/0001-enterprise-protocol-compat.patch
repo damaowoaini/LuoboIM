@@ -1,0 +1,3624 @@
+diff --git a/cmd/facade_wire_fixture/main.go b/cmd/facade_wire_fixture/main.go
+new file mode 100644
+index 0000000..e289685
+--- /dev/null
++++ b/cmd/facade_wire_fixture/main.go
+@@ -0,0 +1,221 @@
++// Standalone loopback-only synthetic JNI protocol fixture. No real credentials.
++package main
++
++import (
++	"bytes"
++	"compress/gzip"
++	"encoding/gob"
++	"encoding/json"
++	"fmt"
++	"github.com/OpenIMSDK/protocol/rtc"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/gorilla/websocket"
++	"google.golang.org/protobuf/proto"
++	"io"
++	"net/http"
++	"os"
++	"sync"
++	"time"
++)
++
++type envelope struct {
++	ReqIdentifier        int32
++	MsgIncr, OperationID string
++	ErrCode              int
++	ErrMsg               string
++	Data                 []byte
++}
++
++var mu sync.Mutex
++var seen = map[string]bool{}
++
++func record(s string) {
++	mu.Lock()
++	defer mu.Unlock()
++	seen[s] = true
++	data, _ := json.MarshalIndent(map[string]any{"synthetic_only": true, "operations": seen}, "", "  ")
++	os.WriteFile("../facade-wire-result.json", data, 0600)
++	fmt.Println("SYNTHETIC_OPERATION", s)
++}
++func main() {
++	up := websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}
++	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
++		if !websocket.IsWebSocketUpgrade(r) {
++			var req map[string]any
++			json.NewDecoder(r.Body).Decode(&req)
++			var data any = map[string]any{}
++			status := 0
++			if r.Header.Get("token") != "fixture-no-real-credentials" {
++				status = 10001
++			}
++			switch r.URL.Path {
++			case "/user/update_user_info_ex":
++				user, _ := req["userInfo"].(map[string]any)
++				if user["userID"] != "luobo_schema_fixture" {
++					status = 10001
++				}
++				record("self-info")
++			case "/signal/signal_get_room_by_group_id":
++				data = map[string]any{"roomID": "fixture-room", "participantIDs": []string{"luobo_schema_fixture"}}
++				record("room")
++			case "/signal/get_signal_invitation_info_start_app":
++				data = map[string]any{"invitation": map[string]any{"roomID": "fixture-room"}}
++				if req["userID"] != "luobo_schema_fixture" {
++					status = 10001
++				}
++				record("restore")
++			case "/signal/signal_get_meetings":
++				data = map[string]any{"meetingList": []any{map[string]any{"roomID": "fixture-room"}}}
++				if req["userID"] != "luobo_schema_fixture" {
++					status = 10001
++				}
++				record("meetings")
++			case "/signal/signal_create_meeting", "/signal/signal_join_meeting":
++				participant, _ := req["participant"].(map[string]any)
++				user, _ := participant["userInfo"].(map[string]any)
++				if user["userID"] != "luobo_schema_fixture" {
++					status = 10001
++				}
++				data = map[string]any{"roomID": "fixture-room", "token": "synthetic-media-token", "liveURL": "wss://synthetic.invalid"}
++				record(r.URL.Path)
++			case "/signal/signal_operate_stream":
++				if req["userID"] != "target-peer" || req["mute"] != true {
++					status = 10001
++				}
++				record("stream-target")
++			case "/signal/signal_send_custom_signal":
++				if req["customInfo"] != "synthetic-custom" || req["roomID"] != "fixture-room" {
++					status = 10001
++				}
++				record("custom-order")
++			case "/signal/signal_close_room", "/signal/signal_update_meeting_info":
++				record(r.URL.Path)
++			case "/msg/get_group_message_has_read":
++				if req["type"] != float64(0) {
++					status = 10001
++				}
++				data = map[string]any{"reads": []any{map[string]any{"userID": "fixture-peer", "readTime": 123}}}
++				record("group-readers")
++			case "/group/get_group_members_info":
++				data = map[string]any{"members": []any{map[string]any{"groupID": "fixture-group", "userID": "fixture-peer", "nickname": "Synthetic Peer"}}}
++			case "/msg/mark_group_message_read":
++				m, _ := req["clientMsgs"].(map[string]any)
++				if req["userID"] != "luobo_schema_fixture" || m["fixture-group-message"] != "fixture-peer" {
++					status = 10001
++				}
++				record("group-mark")
++			}
++			json.NewEncoder(w).Encode(map[string]any{"errCode": status, "data": data})
++			return
++		}
++		c, e := up.Upgrade(w, r, nil)
++		if e != nil {
++			return
++		}
++		defer c.Close()
++		compressed := r.URL.Query().Get("compression") == "gzip"
++		var write sync.Mutex
++		send := func(m envelope) {
++			var b bytes.Buffer
++			gob.NewEncoder(&b).Encode(m)
++			data := b.Bytes()
++			if compressed {
++				var z bytes.Buffer
++				g := gzip.NewWriter(&z)
++				g.Write(data)
++				g.Close()
++				data = z.Bytes()
++			}
++			write.Lock()
++			defer write.Unlock()
++			c.WriteMessage(websocket.BinaryMessage, data)
++		}
++		go func() {
++			time.Sleep(time.Second)
++			inv := &rtc.InvitationInfo{InviterUserID: "fixture-peer", InviteeUserIDList: []string{"luobo_schema_fixture"}, RoomID: "fixture-room", Timeout: 30, MediaType: "audio", PlatformID: 2, SessionType: 1, InitiateTime: time.Now().Unix()}
++			messages := []proto.Message{&rtc.SignalReq{Payload: &rtc.SignalReq_Invite{Invite: &rtc.SignalInviteReq{UserID: "fixture-peer", Invitation: inv}}}, &rtc.SignalOnRoomParticipantConnectedReq{Invitation: inv}, &rtc.SignalOnRoomParticipantDisconnectedReq{Invitation: inv}, &rtc.SignalOnStreamChangeReq{RoomID: "fixture-room", StreamType: "audio", Mute: true}, &rtc.SignalSendCustomSignalReq{RoomID: "fixture-room", CustomInfo: "fixture"}}
++			for i, p := range messages {
++				content, _ := proto.Marshal(p)
++				msg := &sdkws.MsgData{SendID: "fixture-peer", RecvID: "luobo_schema_fixture", ClientMsgID: fmt.Sprintf("rtc-facade-%d", i), SessionType: 1, MsgFrom: 200, ContentType: int32(1601 + i), Content: content, SendTime: time.Now().UnixMilli(), CreateTime: time.Now().UnixMilli(), Options: map[string]bool{}}
++				push := &sdkws.PushMessages{NotificationMsgs: map[string]*sdkws.PullMsgs{"sn_fixture-peer_luobo_schema_fixture": {Msgs: []*sdkws.MsgData{msg}}}}
++				data, _ := proto.Marshal(push)
++				send(envelope{ReqIdentifier: 2001, OperationID: "synthetic-push", Data: data})
++				time.Sleep(100 * time.Millisecond)
++			}
++		}()
++		for {
++			_, data, e := c.ReadMessage()
++			if e != nil {
++				return
++			}
++			if compressed {
++				g, e := gzip.NewReader(bytes.NewReader(data))
++				if e != nil {
++					return
++				}
++				data, e = io.ReadAll(g)
++				g.Close()
++				if e != nil {
++					return
++				}
++			}
++			var req envelope
++			if gob.NewDecoder(bytes.NewReader(data)).Decode(&req) != nil {
++				return
++			}
++			resp := envelope{ReqIdentifier: req.ReqIdentifier, MsgIncr: req.MsgIncr, OperationID: req.OperationID}
++			if req.ReqIdentifier == 1004 {
++				var signal rtc.SignalReq
++				if proto.Unmarshal(req.Data, &signal) != nil {
++					return
++				}
++				var result rtc.SignalResp
++				actor := ""
++				name := ""
++				switch p := signal.Payload.(type) {
++				case *rtc.SignalReq_Invite:
++					actor = p.Invite.UserID
++					name = "invite"
++					if p.Invite.Invitation.InviterUserID != "luobo_schema_fixture" || p.Invite.Invitation.PlatformID != 2 {
++						resp.ErrCode = 10001
++					}
++					result.Payload = &rtc.SignalResp_Invite{Invite: &rtc.SignalInviteResp{RoomID: "fixture-room", Token: "synthetic-media-token", LiveURL: "wss://synthetic.invalid"}}
++				case *rtc.SignalReq_InviteInGroup:
++					actor = p.InviteInGroup.UserID
++					name = "inviteInGroup"
++					result.Payload = &rtc.SignalResp_InviteInGroup{InviteInGroup: &rtc.SignalInviteInGroupResp{RoomID: "fixture-room", Token: "synthetic-media-token", LiveURL: "wss://synthetic.invalid"}}
++				case *rtc.SignalReq_Accept:
++					actor = p.Accept.UserID
++					name = "accept"
++					if p.Accept.OpUserPlatformID != 2 {
++						resp.ErrCode = 10001
++					}
++					result.Payload = &rtc.SignalResp_Accept{Accept: &rtc.SignalAcceptResp{RoomID: "fixture-room", Token: "synthetic-media-token", LiveURL: "wss://synthetic.invalid"}}
++				case *rtc.SignalReq_Reject:
++					actor = p.Reject.UserID
++					name = "reject"
++				case *rtc.SignalReq_Cancel:
++					actor = p.Cancel.UserID
++					name = "cancel"
++				case *rtc.SignalReq_HungUp:
++					actor = p.HungUp.UserID
++					name = "hangup"
++				case *rtc.SignalReq_GetTokenByRoomID:
++					actor = p.GetTokenByRoomID.UserID
++					name = "token"
++					result.Payload = &rtc.SignalResp_GetTokenByRoomID{GetTokenByRoomID: &rtc.SignalGetTokenByRoomIDResp{Token: "synthetic-media-token", LiveURL: "wss://synthetic.invalid"}}
++				}
++				if actor != "luobo_schema_fixture" {
++					resp.ErrCode = 10001
++				}
++				resp.Data, _ = proto.Marshal(&rtc.SignalMessageAssembleResp{SignalResp: &result})
++				record("ws-" + name)
++			}
++			send(resp)
++		}
++	})
++	fmt.Println("FACADE_FIXTURE_LISTENING 18770")
++	if err := http.ListenAndServe("127.0.0.1:18770", nil); err != nil {
++		panic(err)
++	}
++}
+diff --git a/go.mod b/go.mod
+index b6a4d80..dcbfea0 100644
+--- a/go.mod
++++ b/go.mod
+@@ -1,6 +1,6 @@
+ module github.com/openimsdk/openim-sdk-core/v3
+ 
+-go 1.18
++go 1.26.0
+ 
+ require (
+ 	github.com/golang/protobuf v1.5.3
+@@ -20,7 +20,7 @@ require (
+ 	github.com/OpenIMSDK/tools v0.0.24
+ 	github.com/google/go-cmp v0.5.9
+ 	github.com/patrickmn/go-cache v2.1.0+incompatible
+-	golang.org/x/image v0.14.0
++	golang.org/x/image v0.47.0
+ 	gorm.io/gorm v1.23.8
+ )
+ 
+@@ -34,8 +34,11 @@ require (
+ 	go.uber.org/atomic v1.7.0 // indirect
+ 	go.uber.org/multierr v1.6.0 // indirect
+ 	go.uber.org/zap v1.24.0 // indirect
+-	golang.org/x/sys v0.15.0 // indirect
+-	golang.org/x/text v0.14.0 // indirect
++	golang.org/x/mobile v0.0.0-20261011034528-197770444867 // indirect
++	golang.org/x/sys v0.49.0 // indirect
++	golang.org/x/text v0.43.0 // indirect
+ 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230717213848-3f92550aa753 // indirect
+ 	google.golang.org/grpc v1.56.2 // indirect
+ )
++
++replace github.com/OpenIMSDK/protocol => /Users/chuzu/Documents/projects/LuoboIM/Newchat-openim/server/pkg/protocol
+diff --git a/go.sum b/go.sum
+index ba5d03f..80f2fec 100644
+--- a/go.sum
++++ b/go.sum
+@@ -52,12 +52,20 @@ go.uber.org/zap v1.24.0 h1:FiJd5l1UOLj0wCgbSE0rwwXHzEdAZS6hiiSnxJN/D60=
+ go.uber.org/zap v1.24.0/go.mod h1:2kMP+WWQ8aoFoedH3T2sq6iJ2yDWpHbP0f6MQbS9Gkg=
+ golang.org/x/image v0.14.0 h1:tNgSxAFe3jC4uYqvZdTr84SZoM1KfwdC9SKIFrLjFn4=
+ golang.org/x/image v0.14.0/go.mod h1:HUYqC05R2ZcZ3ejNQsIHQDQiwWM4JBqmm6MKANTp4LE=
++golang.org/x/image v0.47.0 h1:za/8gVz++PPZqmZJBNSISICN5Rrj5zixP/8K++fgmqo=
++golang.org/x/image v0.47.0/go.mod h1:IkN5o4A7vq55vXN8FWjjnhg9Rs2GOtffqsSi9mWAKYE=
++golang.org/x/mobile v0.0.0-20261011034528-197770444867 h1:rav73cdd7OQUPgt1aIFbZQTiPNnjfueKXvfOiLCY0Ss=
++golang.org/x/mobile v0.0.0-20261011034528-197770444867/go.mod h1:HR/iBzuQmVTl/us733QPwrqHp43a8m9ZLgyKXD3ST6U=
+ golang.org/x/net v0.19.0 h1:zTwKpTd2XuCqf8huc7Fo2iSy+4RHPd10s4KzeTnVr1c=
+ golang.org/x/net v0.19.0/go.mod h1:CfAk/cbD4CthTvqiEl8NpboMuiuOYsAr/7NOjZJtv1U=
+ golang.org/x/sys v0.15.0 h1:h48lPFYpsTvQJZF4EKyI4aLHaev3CxivZmv7yZig9pc=
+ golang.org/x/sys v0.15.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
++golang.org/x/sys v0.49.0 h1:XbzkgYJHdqh/8m2Uu0W/dQv8nktxx4BFHp1M0gROTXA=
++golang.org/x/sys v0.49.0/go.mod h1:hNLxWAXmnKAxqDtdwIYC4bM9oQPEecfsnNMuSxOs3og=
+ golang.org/x/text v0.14.0 h1:ScX5w1eTa3QqT8oi6+ziP7dTV1S2+ALU0bI+0zXKWiQ=
+ golang.org/x/text v0.14.0/go.mod h1:18ZOQIKpY8NJVqYksKHtTdi31H5itFRjB5/qKTNYzSU=
++golang.org/x/text v0.43.0 h1:1QivrlhwAsnMOcqgOdl9my7s9OyZl8O5/UGUTJVXoWc=
++golang.org/x/text v0.43.0/go.mod h1:hbSIYA/amXcRXTFSZqh8tWHEoqRvvbKPJ2uz/KU+a+s=
+ golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+ google.golang.org/genproto/googleapis/rpc v0.0.0-20230717213848-3f92550aa753 h1:XUODHrpzJEUeWmVo/jfNTLj0YyVveOo28oE6vkFbkO4=
+ google.golang.org/genproto/googleapis/rpc v0.0.0-20230717213848-3f92550aa753/go.mod h1:TUfxEVdsvPg18p6AslUXFoLdpED4oBnGwyqk3dV1XzM=
+diff --git a/internal/business/business.go b/internal/business/business.go
+index 614f6a7..4c5e3e7 100644
+--- a/internal/business/business.go
++++ b/internal/business/business.go
+@@ -23,7 +23,7 @@ import (
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ type Business struct {
+diff --git a/internal/conversation_msg/conversation.go b/internal/conversation_msg/conversation.go
+index ffc8003..ac60ca0 100644
+--- a/internal/conversation_msg/conversation.go
++++ b/internal/conversation_msg/conversation.go
+@@ -22,6 +22,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/common"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/model_struct"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/privateexpiry"
+ 	sdk "github.com/openimsdk/openim-sdk-core/v3/pkg/sdk_params_callback"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/server_api_params"
+@@ -33,7 +34,7 @@ import (
+ 
+ 	"github.com/jinzhu/copier"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 
+ 	"github.com/OpenIMSDK/protocol/msg"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+@@ -188,7 +189,7 @@ func (c *Conversation) getAdvancedHistoryMessageList(ctx context.Context, req sd
+ 			temp.GroupID = temp.RecvID
+ 			temp.RecvID = c.loginUserID
+ 		}
+-		if attachedInfo.IsPrivateChat && temp.SendTime+int64(attachedInfo.BurnDuration) < time.Now().Unix() {
++		if privateexpiry.Expired(attachedInfo.IsPrivateChat, attachedInfo.HasReadTime, int64(attachedInfo.BurnDuration), time.Now().UnixMilli()) {
+ 			continue
+ 		}
+ 		messageList = append(messageList, &temp)
+@@ -392,7 +393,7 @@ func (c *Conversation) searchLocalMessages(ctx context.Context, searchParam *sdk
+ 	//log.Debug("hahh",utils.KMP("SSSsdf3434","SDF3"))
+ 	// log.Debug("", "get raw data length is", len(list))
+ 	log.ZDebug(ctx, "get raw data length is", len(list))
+-	
++
+ 	for _, v := range list {
+ 		temp := sdk_struct.MsgStruct{}
+ 		temp.ClientMsgID = v.ClientMsgID
+diff --git a/internal/conversation_msg/conversation_msg.go b/internal/conversation_msg/conversation_msg.go
+index b5b876b..73a6c9d 100644
+--- a/internal/conversation_msg/conversation_msg.go
++++ b/internal/conversation_msg/conversation_msg.go
+@@ -18,7 +18,7 @@ import (
+ 	"context"
+ 	"encoding/json"
+ 	"errors"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	utils2 "github.com/OpenIMSDK/tools/utils"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/business"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/cache"
+@@ -38,9 +38,11 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/syncer"
+ 
++	"github.com/OpenIMSDK/protocol/sdkws"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
+ 	"sort"
++	"sync"
+ 	"time"
+ 
+ 	"github.com/jinzhu/copier"
+@@ -49,6 +51,8 @@ import (
+ var SearchContentType = []int{constant.Text, constant.AtText, constant.File}
+ 
+ type Conversation struct {
++	compatSignalMutex sync.RWMutex
++	compatSignal      func(context.Context, *sdkws.MsgData)
+ 	*interaction.LongConnMgr
+ 	conversationSyncer   *syncer.Syncer[*model_struct.LocalConversation, string]
+ 	db                   db_interface.DataBase
+@@ -1062,3 +1066,17 @@ func (c *Conversation) GetInputStates(ctx context.Context, conversationID string
+ func (c *Conversation) ChangeInputStates(ctx context.Context, conversationID string, focus bool) error {
+ 	return c.typing.ChangeInputStates(ctx, conversationID, focus)
+ }
++
++func (c *Conversation) SetCompatSignalHandler(handler func(context.Context, *sdkws.MsgData)) {
++	c.compatSignalMutex.Lock()
++	c.compatSignal = handler
++	c.compatSignalMutex.Unlock()
++}
++func (c *Conversation) handleCompatSignal(ctx context.Context, message *sdkws.MsgData) {
++	c.compatSignalMutex.RLock()
++	handler := c.compatSignal
++	c.compatSignalMutex.RUnlock()
++	if handler != nil {
++		handler(ctx, message)
++	}
++}
+diff --git a/internal/conversation_msg/conversation_notification.go b/internal/conversation_msg/conversation_notification.go
+index 31ec48e..0ee82c4 100644
+--- a/internal/conversation_msg/conversation_notification.go
++++ b/internal/conversation_msg/conversation_notification.go
+@@ -25,8 +25,8 @@ import (
+ 	"time"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
+ 	utils2 "github.com/OpenIMSDK/tools/utils"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func (c *Conversation) Work(c2v common.Cmd2Value) {
+@@ -64,7 +64,7 @@ func (c *Conversation) doDeleteConversation(c2v common.Cmd2Value) {
+ 	if err != nil {
+ 		log.ZError(ctx, "ResetConversation err:", err)
+ 	}
+-	c.doUpdateConversation(common.Cmd2Value{Value: common.UpdateConNode{"", constant.TotalUnreadMessageChanged, ""}})
++	c.doUpdateConversation(common.Cmd2Value{Value: common.UpdateConNode{ConID: "", Action: constant.TotalUnreadMessageChanged, Args: ""}})
+ }
+ 
+ func (c *Conversation) getConversationLatestMsgClientID(latestMsg string) string {
+@@ -650,6 +650,10 @@ func (c *Conversation) doNotificationNew(c2v common.Cmd2Value) {
+ 		}
+ 		for _, v := range msgs.Msgs {
+ 			switch {
++			case v.ContentType == 2300:
++				c.handleCompatGroupReceipt(ctx, v)
++			case v.ContentType >= 1601 && v.ContentType <= 1605:
++				c.handleCompatSignal(ctx, v)
+ 			case v.ContentType == constant.ConversationChangeNotification:
+ 				c.DoConversationChangedNotification(ctx, v)
+ 			case v.ContentType == constant.ConversationPrivateChatNotification:
+diff --git a/internal/conversation_msg/create_message.go b/internal/conversation_msg/create_message.go
+index db06d2f..ad0150c 100644
+--- a/internal/conversation_msg/create_message.go
++++ b/internal/conversation_msg/create_message.go
+@@ -17,7 +17,7 @@ package conversation_msg
+ import (
+ 	"context"
+ 	"errors"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
+ 
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
+diff --git a/internal/conversation_msg/delete.go b/internal/conversation_msg/delete.go
+index 982efc9..6ba2fb1 100644
+--- a/internal/conversation_msg/delete.go
++++ b/internal/conversation_msg/delete.go
+@@ -26,8 +26,8 @@ import (
+ 
+ 	pbMsg "github.com/OpenIMSDK/protocol/msg"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
+ 	"github.com/jinzhu/copier"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ // Delete the local and server
+@@ -113,19 +113,16 @@ func (c *Conversation) deleteAllMsgFromLocal(ctx context.Context, markDelete boo
+ 	if err != nil {
+ 		return err
+ 	}
+-	var successCids []string
+-	log.ZDebug(ctx, "deleteAllMsgFromLocal", "conversations", conversations, "markDelete", markDelete)
++	ids := make([]string, 0, len(conversations))
+ 	for _, v := range conversations {
+-		if err := c.clearConversationAndDeleteAllMsg(ctx, v.ConversationID, markDelete, c.db.ClearConversation); err != nil {
+-			log.ZError(ctx, "clearConversation err", err, "conversationID", v.ConversationID)
+-			continue
+-		}
+-		successCids = append(successCids, v.ConversationID)
++		ids = append(ids, v.ConversationID)
+ 	}
+-	c.doUpdateConversation(common.Cmd2Value{Value: common.UpdateConNode{Action: constant.ConChange, Args: successCids}})
+-	c.doUpdateConversation(common.Cmd2Value{Value: common.UpdateConNode{Action: constant.TotalUnreadMessageChanged}})
+-	return nil
+-
++	return clearLocalConversationBatch(ctx, ids, func(ctx context.Context, id string) error {
++		return c.clearConversationAndDeleteAllMsg(ctx, id, markDelete, c.db.ClearConversation)
++	}, func(successCids []string) {
++		c.doUpdateConversation(common.Cmd2Value{Value: common.UpdateConNode{Action: constant.ConChange, Args: successCids}})
++		c.doUpdateConversation(common.Cmd2Value{Value: common.UpdateConNode{Action: constant.TotalUnreadMessageChanged}})
++	})
+ }
+ 
+ // Delete a message from the local
+@@ -234,7 +231,7 @@ func (c *Conversation) doDeleteMsgs(ctx context.Context, msg *sdkws.MsgData) {
+ func (c *Conversation) doClearConversations(ctx context.Context, msg *sdkws.MsgData) {
+ 	tips := sdkws.ClearConversationTips{}
+ 	utils.UnmarshalNotificationElem(msg.Content, &tips)
+-	log.ZDebug(ctx, "doClearConversations", "tips", tips)
++	log.ZDebug(ctx, "doClearConversations")
+ 	for _, v := range tips.ConversationIDs {
+ 		if err := c.clearConversationAndDeleteAllMsg(ctx, v, false, c.db.ClearConversation); err != nil {
+ 			log.ZError(ctx, "clearConversation err", err, "conversationID", v)
+diff --git a/internal/conversation_msg/delete_batch.go b/internal/conversation_msg/delete_batch.go
+new file mode 100644
+index 0000000..ac34e74
+--- /dev/null
++++ b/internal/conversation_msg/delete_batch.go
+@@ -0,0 +1,31 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++package conversation_msg
++
++import (
++	"context"
++
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
++)
++
++// Continue attempting the remaining local conversations and publish confirmed
++// successes even after a failure. The fixed error must not contain a database
++// error, conversation identifier, or message content. This is a partial-result
++// error: a server clear may already have committed and cannot be rolled back.
++func clearLocalConversationBatch(ctx context.Context, ids []string, clear func(context.Context, string) error, notify func([]string)) error {
++	successes := make([]string, 0, len(ids))
++	failed := false
++	for _, id := range ids {
++		if err := clear(ctx, id); err != nil {
++			failed = true
++			continue
++		}
++		successes = append(successes, id)
++	}
++	notify(successes)
++	if failed {
++		return sdkerrs.New(sdkerrs.SdkInternalError, "local message clear incomplete", "")
++	}
++	return nil
++}
+diff --git a/internal/conversation_msg/delete_batch_test.go b/internal/conversation_msg/delete_batch_test.go
+new file mode 100644
+index 0000000..0a4ca86
+--- /dev/null
++++ b/internal/conversation_msg/delete_batch_test.go
+@@ -0,0 +1,73 @@
++// Copyright 2026 LuoboIM contributors.
++// SPDX-License-Identifier: Apache-2.0
++
++package conversation_msg
++
++import (
++	"context"
++	"errors"
++	"reflect"
++	"strings"
++	"testing"
++)
++
++func TestLocalClearPartialFailureIsNotReportedAsSuccess(t *testing.T) {
++	for _, failed := range []string{"first", "middle", "last", "all"} {
++		t.Run(failed, func(t *testing.T) {
++			ids := []string{"first", "middle", "last"}
++			var attempted, notified []string
++			calls := 0
++			ctx := context.WithValue(context.Background(), clearBatchContextKey{}, "frozen-owner")
++			err := clearLocalConversationBatch(ctx, ids, func(received context.Context, id string) error {
++				if received != ctx {
++					t.Fatal("operation context was replaced")
++				}
++				attempted = append(attempted, id)
++				if failed == "all" || failed == id {
++					return errors.New("secret-db-error-with-message-and-conversation")
++				}
++				return nil
++			}, func(successes []string) {
++				calls++
++				notified = append(notified, successes...)
++			})
++			if err == nil || !strings.Contains(err.Error(), "local message clear incomplete") || strings.Contains(err.Error(), "secret-db-error") {
++				t.Fatalf("expected fixed safe partial-result error, got %v", err)
++			}
++			if !reflect.DeepEqual(attempted, ids) || calls != 1 {
++				t.Fatalf("all conversations must be attempted before one notification: %v/%d", attempted, calls)
++			}
++			var want []string
++			for _, id := range ids {
++				if failed != "all" && failed != id {
++					want = append(want, id)
++				}
++			}
++			if !reflect.DeepEqual(notified, want) {
++				t.Fatalf("notification contains unconfirmed clears: %v, want %v", notified, want)
++			}
++		})
++	}
++}
++
++type clearBatchContextKey struct{}
++
++func TestLocalClearSuccessfulAndEmptyBatch(t *testing.T) {
++	for _, ids := range [][]string{nil, {"one", "two"}} {
++		t.Run(map[bool]string{true: "empty", false: "all_success"}[len(ids) == 0], func(t *testing.T) {
++			attempts, notifications := 0, 0
++			err := clearLocalConversationBatch(context.Background(), ids, func(context.Context, string) error {
++				attempts++
++				return nil
++			}, func(successes []string) {
++				notifications++
++				if len(successes) != len(ids) {
++					t.Fatalf("successful batch notification lost rows: %v", successes)
++				}
++			})
++			if err != nil || attempts != len(ids) || notifications != 1 {
++				t.Fatalf("complete or empty batch should succeed: %v/%d/%d", err, attempts, notifications)
++			}
++		})
++	}
++}
+diff --git a/internal/conversation_msg/entering.go b/internal/conversation_msg/entering.go
+index 2b0ecd2..a2e1b03 100644
+--- a/internal/conversation_msg/entering.go
++++ b/internal/conversation_msg/entering.go
+@@ -5,7 +5,7 @@ import (
+ 	"encoding/json"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+ 	"github.com/OpenIMSDK/tools/errs"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	utils2 "github.com/OpenIMSDK/tools/utils"
+ 	"github.com/jinzhu/copier"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
+diff --git a/internal/conversation_msg/enterprise_group_read.go b/internal/conversation_msg/enterprise_group_read.go
+new file mode 100644
+index 0000000..c0928e6
+--- /dev/null
++++ b/internal/conversation_msg/enterprise_group_read.go
+@@ -0,0 +1,156 @@
++package conversation_msg
++
++import (
++	"context"
++	"encoding/json"
++	groupPb "github.com/OpenIMSDK/protocol/group"
++	msgPb "github.com/OpenIMSDK/protocol/msg"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/openimsdk/openim-sdk-core/v3/internal/util"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
++	"strings"
++)
++
++func (c *Conversation) CompatGroupReaders(ctx context.Context, conversation, id string, filter, offset, count int) ([]map[string]any, error) {
++	if !strings.HasPrefix(conversation, "sg_") || id == "" || filter < 0 || filter > 1 || offset < 0 || offset > 100000 || count < 1 || count > 100 {
++		return nil, sdkerrs.ErrArgs
++	}
++	stored, err := c.db.GetConversation(ctx, conversation)
++	if err != nil || stored.GroupID == "" {
++		return nil, sdkerrs.ErrArgs
++	}
++	// Runtime constants are 0=read,1=unread; old proto comments were reversed.
++	request := &msgPb.GetGroupMessageHasReadReq{ConversationID: conversation, ClientMsgID: id, Type: int32(filter), Pagination: &sdkws.RequestPagination{PageNumber: int32(offset/count + 1), ShowNumber: int32(count)}}
++	response, err := util.CallApi[msgPb.GetGroupMessageHasReadResp](ctx, "/msg/get_group_message_has_read", request)
++	if err != nil {
++		return nil, err
++	}
++	reads := response.Reads
++	skip := offset % count
++	if skip > 0 && len(reads) > skip {
++		request.Pagination.PageNumber++
++		next, err := util.CallApi[msgPb.GetGroupMessageHasReadResp](ctx, "/msg/get_group_message_has_read", request)
++		if err != nil {
++			return nil, err
++		}
++		reads = append(reads, next.Reads...)
++	}
++	if skip >= len(reads) {
++		return []map[string]any{}, nil
++	}
++	reads = reads[skip:]
++	if len(reads) > count {
++		reads = reads[:count]
++	}
++	ids := make([]string, 0, len(reads))
++	for _, read := range reads {
++		ids = append(ids, read.UserID)
++	}
++	if len(ids) == 0 {
++		return []map[string]any{}, nil
++	}
++	members, err := util.CallApi[groupPb.GetGroupMembersInfoResp](ctx, "/group/get_group_members_info", &groupPb.GetGroupMembersInfoReq{GroupID: stored.GroupID, UserIDs: ids})
++	if err != nil {
++		return nil, err
++	}
++	mapped := make(map[string]*sdkws.GroupMemberFullInfo)
++	for _, member := range members.Members {
++		mapped[member.UserID] = member
++	}
++	result := make([]map[string]any, 0, len(reads))
++	for _, read := range reads {
++		value := map[string]any{"userID": read.UserID, "groupID": stored.GroupID, "readTime": read.ReadTime}
++		if member := mapped[read.UserID]; member != nil {
++			data, _ := json.Marshal(member)
++			json.Unmarshal(data, &value)
++			value["readTime"] = read.ReadTime
++		}
++		result = append(result, value)
++	}
++	return result, nil
++}
++func (c *Conversation) CompatMarkGroupRead(ctx context.Context, conversation string, ids []string) (*msgPb.MarkGroupMessageReadResp, error) {
++	if !strings.HasPrefix(conversation, "sg_") || len(ids) == 0 || len(ids) > 1000 {
++		return nil, sdkerrs.ErrArgs
++	}
++	senders := make(map[string]string, len(ids))
++	for _, id := range ids {
++		if ctx.Err() != nil {
++			return nil, sdkerrs.ErrCtxDeadline
++		}
++		message, err := c.db.GetMessage(ctx, conversation, id)
++		if err != nil {
++			return nil, err
++		}
++		senders[id] = message.SendID
++	}
++	return util.CallApi[msgPb.MarkGroupMessageReadResp](ctx, "/msg/mark_group_message_read", &msgPb.MarkGroupMessageReadReq{UserID: ccontext.Info(ctx).UserID(), ConversationID: conversation, ClientMsgs: senders})
++}
++func (c *Conversation) handleCompatGroupReceipt(ctx context.Context, message *sdkws.MsgData) {
++	var envelope struct {
++		Detail string `json:"detail"`
++	}
++	data := message.Content
++	if json.Unmarshal(data, &envelope) == nil && envelope.Detail != "" {
++		data = []byte(envelope.Detail)
++	}
++	var tips sdkws.GroupMsgReadTips
++	if json.Unmarshal(data, &tips) != nil {
++		return
++	}
++	events := make([]map[string]any, 0, len(tips.Reads))
++	for _, read := range tips.Reads {
++		if read == nil || !strings.HasPrefix(read.ConversationID, "sg_") || read.ClientMsgID == "" {
++			continue
++		}
++		users := make([]map[string]any, 0, len(read.Users))
++		ids := []string{}
++		for _, user := range read.Users {
++			if user != nil {
++				users = append(users, map[string]any{"userID": user.UserID, "readTime": user.ReadTime})
++				ids = append(ids, user.UserID)
++			}
++		}
++		if stored, err := c.db.GetMessage(ctx, read.ConversationID, read.ClientMsgID); err == nil {
++			attached := make(map[string]any)
++			json.Unmarshal([]byte(stored.AttachedInfo), &attached)
++			if attached == nil {
++				attached = make(map[string]any)
++			}
++			group, _ := attached["groupHasReadInfo"].(map[string]any)
++			if group == nil {
++				group = make(map[string]any)
++			}
++			existing := make(map[string]bool)
++			if previous, ok := group["hasReadUserIDList"].([]any); ok {
++				for _, id := range previous {
++					if text, ok := id.(string); ok {
++						existing[text] = true
++					}
++				}
++			}
++			for _, id := range ids {
++				existing[id] = true
++			}
++			combined := make([]string, 0, len(existing))
++			for id := range existing {
++				combined = append(combined, id)
++			}
++			group["hasReadUserIDList"] = combined
++			group["hasReadCount"] = read.ReadNum
++			group["unreadCount"] = read.UnreadNum
++			attached["groupHasReadInfo"] = group
++			encoded, _ := json.Marshal(attached)
++			stored.AttachedInfo = string(encoded)
++			if ctx.Err() == nil {
++				_ = c.db.UpdateMessage(ctx, read.ConversationID, stored)
++			}
++		}
++		events = append(events, map[string]any{"clientMsgID": read.ClientMsgID, "hasReadCount": read.ReadNum, "unreadCount": read.UnreadNum, "readMembers": users})
++	}
++	if len(events) > 0 && ctx.Err() == nil {
++		encoded, _ := json.Marshal(events)
++		c.msgListener().OnRecvGroupReadReceipt(string(encoded))
++	}
++}
+diff --git a/internal/conversation_msg/enterprise_group_read_test.go b/internal/conversation_msg/enterprise_group_read_test.go
+new file mode 100644
+index 0000000..7eb7d3e
+--- /dev/null
++++ b/internal/conversation_msg/enterprise_group_read_test.go
+@@ -0,0 +1,124 @@
++package conversation_msg
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/db"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/model_struct"
++	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
++	"net/http"
++	"net/http/httptest"
++	"testing"
++)
++
++type receiptCapture struct {
++	open_im_sdk_callback.OnAdvancedMsgListener
++	events []string
++}
++
++func (r *receiptCapture) OnRecvGroupReadReceipt(value string) { r.events = append(r.events, value) }
++func groupTestDB(t *testing.T, base string) (context.Context, *db.DataBase) {
++	t.Helper()
++	ctx := ccontext.WithInfo(context.Background(), &ccontext.GlobalConfig{UserID: "alice", Token: "synthetic-token", IMConfig: sdk_struct.IMConfig{ApiAddr: base, AllowInsecureLoopbackForTesting: true}})
++	store, err := db.NewDataBase(ctx, "alice", t.TempDir(), 1)
++	if err != nil {
++		t.Fatal(err)
++	}
++	t.Cleanup(func() { store.Close(ctx) })
++	if err := store.InsertConversation(ctx, &model_struct.LocalConversation{ConversationID: "sg_fixture", GroupID: "fixture", ConversationType: 3}); err != nil {
++		t.Fatal(err)
++	}
++	store.GetMessage(ctx, "sg_fixture", "initialize-table")
++	for _, message := range []*model_struct.LocalChatLog{{ClientMsgID: "first", SendID: "bob", AttachedInfo: `{"custom":{"keep":true},"groupHasReadInfo":{"groupMemberCount":5,"hasReadUserIDList":["bob"]}}`}, {ClientMsgID: "second", SendID: "carol", AttachedInfo: "null"}} {
++		if err := store.InsertMessage(ctx, "sg_fixture", message); err != nil {
++			t.Fatal(err)
++		}
++	}
++	return ctx, store
++}
++func TestCompatGroupReceiptPersistsOnlyTargetAndPreservesExtensions(t *testing.T) {
++	ctx, store := groupTestDB(t, "")
++	capture := &receiptCapture{}
++	c := &Conversation{db: store, msgListener: func() open_im_sdk_callback.OnAdvancedMsgListener { return capture }}
++	tips := &sdkws.GroupMsgReadTips{Reads: []*sdkws.GroupMsgReadTipsRead{{ConversationID: "sg_fixture", ClientMsgID: "first", ReadNum: 2, UnreadNum: 3, Users: []*sdkws.GroupMsgReadTipsUser{{UserID: "alice", ReadTime: 12}}}}}
++	data, _ := json.Marshal(tips)
++	envelope, _ := json.Marshal(map[string]string{"detail": string(data)})
++	c.handleCompatGroupReceipt(ctx, &sdkws.MsgData{Content: envelope})
++	first, _ := store.GetMessage(ctx, "sg_fixture", "first")
++	second, _ := store.GetMessage(ctx, "sg_fixture", "second")
++	if second.AttachedInfo != "null" {
++		t.Fatal("receipt changed unrelated message")
++	}
++	var attached map[string]any
++	json.Unmarshal([]byte(first.AttachedInfo), &attached)
++	if attached["custom"].(map[string]any)["keep"] != true {
++		t.Fatal("extension dropped")
++	}
++	group := attached["groupHasReadInfo"].(map[string]any)
++	if group["hasReadCount"] != float64(2) || group["unreadCount"] != float64(3) || group["groupMemberCount"] != float64(5) || len(group["hasReadUserIDList"].([]any)) != 2 {
++		t.Fatal("receipt fields lost")
++	}
++	var typed sdk_struct.AttachedInfoElem
++	if json.Unmarshal([]byte(first.AttachedInfo), &typed) != nil || typed.GroupHasReadInfo.UnreadCount != 3 {
++		t.Fatal("typed native history drops unread count")
++	}
++	// JSON null is a valid historical value and must not panic.
++	tips.Reads[0].ClientMsgID = "second"
++	data, _ = json.Marshal(tips)
++	c.handleCompatGroupReceipt(ctx, &sdkws.MsgData{Content: data})
++	if len(capture.events) != 2 {
++		t.Fatal("receipt callback missing")
++	}
++}
++func TestCompatGroupReadRequestUsesStoredSenderAndOffsetPaging(t *testing.T) {
++	var marking map[string]any
++	var pages []float64
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		var request map[string]any
++		json.NewDecoder(r.Body).Decode(&request)
++		var data any
++		switch r.URL.Path {
++		case "/msg/mark_group_message_read":
++			marking = request
++			data = map[string]any{}
++		case "/msg/get_group_message_has_read":
++			if request["type"] != float64(0) {
++				t.Error("runtime read filter reversed")
++			}
++			page := request["pagination"].(map[string]any)["pageNumber"].(float64)
++			pages = append(pages, page)
++			if page == 1 {
++				data = map[string]any{"reads": []map[string]any{{"userID": "bob", "readTime": 1}, {"userID": "carol", "readTime": 2}}}
++			} else {
++				data = map[string]any{"reads": []map[string]any{{"userID": "dave", "readTime": 3}}}
++			}
++		case "/group/get_group_members_info":
++			data = map[string]any{"members": []map[string]any{{"userID": "carol", "nickname": "Carol"}, {"userID": "dave", "nickname": "Dave"}}}
++		default:
++			t.Error("unexpected route")
++		}
++		json.NewEncoder(w).Encode(map[string]any{"errCode": 0, "data": data})
++	}))
++	defer server.Close()
++	ctx, store := groupTestDB(t, server.URL)
++	c := &Conversation{db: store}
++	if _, err := c.CompatMarkGroupRead(ctx, "sg_fixture", []string{"first"}); err != nil {
++		t.Fatal(err)
++	}
++	if marking["userID"] != "alice" || marking["clientMsgs"].(map[string]any)["first"] != "bob" {
++		t.Fatal("actor/sender not bound")
++	}
++	readers, err := c.CompatGroupReaders(ctx, "sg_fixture", "first", 0, 1, 2)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if len(pages) != 2 || len(readers) != 2 || readers[0]["userID"] != "carol" || readers[1]["userID"] != "dave" || readers[0]["readTime"] != int64(2) {
++		t.Fatal("offset paging or profile metadata lost")
++	}
++	if _, err := c.CompatMarkGroupRead(ctx, "sg_fixture", []string{"nonexistent"}); err == nil {
++		t.Fatal("unknown local message dispatched")
++	}
++}
+diff --git a/internal/conversation_msg/message_check.go b/internal/conversation_msg/message_check.go
+index aa5cf08..c72a689 100644
+--- a/internal/conversation_msg/message_check.go
++++ b/internal/conversation_msg/message_check.go
+@@ -22,7 +22,7 @@ import (
+ 	sdk "github.com/openimsdk/openim-sdk-core/v3/pkg/sdk_params_callback"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+ 	utils2 "github.com/OpenIMSDK/tools/utils"
+@@ -174,7 +174,7 @@ func (c *Conversation) pullMessageAndReGetHistoryMessages(ctx context.Context, c
+ 	seqRange.End = newSeqList[len(newSeqList)-1]
+ 	seqRange.Num = int64(len(newSeqList))
+ 	pullMsgReq.SeqRanges = append(pullMsgReq.SeqRanges, &seqRange)
+-	log.ZDebug(ctx, "conversation pull message,  ", "req", pullMsgReq)
++	log.ZDebug(ctx, "conversation pull message")
+ 	if notStartTime && !c.LongConnMgr.IsConnected() {
+ 		return
+ 	}
+@@ -183,10 +183,9 @@ func (c *Conversation) pullMessageAndReGetHistoryMessages(ctx context.Context, c
+ 		errHandle(newSeqList, list, err, messageListCallback)
+ 		log.ZDebug(ctx, "pullmsg SendReqWaitResp failed", err, "req")
+ 	} else {
+-		log.ZDebug(ctx, "syncMsgFromServerSplit pull msg", "resp", pullMsgResp)
++		log.ZDebug(ctx, "syncMsgFromServerSplit pull msg")
+ 		if pullMsgResp.Msgs == nil {
+-			log.ZWarn(ctx, "syncMsgFromServerSplit pull msg is null", errors.New("pull message is null"),
+-				"req", pullMsgReq)
++			log.ZWarn(ctx, "syncMsgFromServerSplit pull msg is null", errors.New("pull message is null"))
+ 			return
+ 		}
+ 		if v, ok := pullMsgResp.Msgs[conversationID]; ok {
+diff --git a/internal/conversation_msg/message_controller.go b/internal/conversation_msg/message_controller.go
+index 6d51959..d63716c 100644
+--- a/internal/conversation_msg/message_controller.go
++++ b/internal/conversation_msg/message_controller.go
+@@ -26,7 +26,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ type MessageController struct {
+diff --git a/internal/conversation_msg/progress.go b/internal/conversation_msg/progress.go
+index dddc894..b54a563 100644
+--- a/internal/conversation_msg/progress.go
++++ b/internal/conversation_msg/progress.go
+@@ -21,7 +21,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/db_interface"
+ 	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func NewUploadFileCallback(ctx context.Context, progress func(progress int), msg *sdk_struct.MsgStruct, conversationID string, db db_interface.DataBase) file.UploadFileCallback {
+diff --git a/internal/conversation_msg/read_drawing.go b/internal/conversation_msg/read_drawing.go
+index 61ff561..9ad3e37 100644
+--- a/internal/conversation_msg/read_drawing.go
++++ b/internal/conversation_msg/read_drawing.go
+@@ -29,7 +29,7 @@ import (
+ 
+ 	pbMsg "github.com/OpenIMSDK/protocol/msg"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func (c *Conversation) markMsgAsRead2Svr(ctx context.Context, conversationID string, seqs []int64) error {
+diff --git a/internal/conversation_msg/revoke.go b/internal/conversation_msg/revoke.go
+index 5e5a3b1..5aa2255 100644
+--- a/internal/conversation_msg/revoke.go
++++ b/internal/conversation_msg/revoke.go
+@@ -26,7 +26,7 @@ import (
+ 
+ 	pbMsg "github.com/OpenIMSDK/protocol/msg"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	utils2 "github.com/OpenIMSDK/tools/utils"
+ 	"github.com/jinzhu/copier"
+ )
+diff --git a/internal/conversation_msg/sdk.go b/internal/conversation_msg/sdk.go
+index 2531c6d..8ecce79 100644
+--- a/internal/conversation_msg/sdk.go
++++ b/internal/conversation_msg/sdk.go
+@@ -36,7 +36,7 @@ import (
+ 	"sync"
+ 	"time"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 
+ 	pbConversation "github.com/OpenIMSDK/protocol/conversation"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+diff --git a/internal/conversation_msg/sync.go b/internal/conversation_msg/sync.go
+index ca8ec86..90b11a6 100644
+--- a/internal/conversation_msg/sync.go
++++ b/internal/conversation_msg/sync.go
+@@ -23,7 +23,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/syncer"
+ 	"time"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func (c *Conversation) SyncConversationsAndTriggerCallback(ctx context.Context, conversationsOnServer []*model_struct.LocalConversation) error {
+diff --git a/internal/diagnostics/log.go b/internal/diagnostics/log.go
+new file mode 100644
+index 0000000..564e001
+--- /dev/null
++++ b/internal/diagnostics/log.go
+@@ -0,0 +1,35 @@
++// Package diagnostics discards legacy content-bearing logs at their source boundary.
++// Its API is intentionally incapable of enabling request, SQL, token or payload logs.
++// Applications may report explicit, enumerated safe events outside the native core.
++package diagnostics
++
++import (
++	"context"
++	"gorm.io/gorm/logger"
++	"time"
++)
++
++func InitFromConfig(...any) error                   { return nil }
++func ZDebug(context.Context, string, ...any)        {}
++func ZInfo(context.Context, string, ...any)         {}
++func ZWarn(context.Context, string, error, ...any)  {}
++func ZError(context.Context, string, error, ...any) {}
++func Debug(...any)                                  {}
++func Info(...any)                                   {}
++func Warn(...any)                                   {}
++func Error(...any)                                  {}
++func NewDebug(...any)                               {}
++func NewInfo(...any)                                {}
++func NewError(...any)                               {}
++func Printf(...any)                                 {}
++
++// GORM must never render SQL text, even when a caller changes LogMode.
++func NewSqlLogger(logger.LogLevel, bool, time.Duration) logger.Interface { return silentSQL{} }
++
++type silentSQL struct{}
++
++func (silentSQL) LogMode(logger.LogLevel) logger.Interface                        { return silentSQL{} }
++func (silentSQL) Info(context.Context, string, ...any)                            {}
++func (silentSQL) Warn(context.Context, string, ...any)                            {}
++func (silentSQL) Error(context.Context, string, ...any)                           {}
++func (silentSQL) Trace(context.Context, time.Time, func() (string, int64), error) {}
+diff --git a/internal/diagnostics/log_test.go b/internal/diagnostics/log_test.go
+new file mode 100644
+index 0000000..aceb44c
+--- /dev/null
++++ b/internal/diagnostics/log_test.go
+@@ -0,0 +1,18 @@
++package diagnostics
++
++import (
++	"context"
++	"errors"
++	"gorm.io/gorm/logger"
++	"testing"
++	"time"
++)
++
++// A strict SQL logger must not even evaluate the closure, which can contain a
++// message body and may execute expensive formatting even when output is hidden.
++func TestSQLContentNeverEvaluatedAtAnyLogLevel(t *testing.T) {
++	for _, level := range []logger.LogLevel{logger.Silent, logger.Error, logger.Warn, logger.Info} {
++		log := NewSqlLogger(level, false, 0).LogMode(level)
++		log.Trace(context.Background(), time.Now(), func() (string, int64) { t.Fatal("SQL content evaluated"); return "private", 1 }, errors.New("private"))
++	}
++}
+diff --git a/internal/file/cb.go b/internal/file/cb.go
+index f7cb062..d9f04cf 100644
+--- a/internal/file/cb.go
++++ b/internal/file/cb.go
+@@ -14,8 +14,6 @@
+ 
+ package file
+ 
+-import "fmt"
+-
+ type UploadFileCallback interface {
+ 	Open(size int64)                                                    // 文件打开的大小
+ 	PartSize(partSize int64, num int)                                   // 分片大小,数量
+@@ -30,33 +28,25 @@ type UploadFileCallback interface {
+ type emptyUploadCallback struct{}
+ 
+ func (e emptyUploadCallback) Open(size int64) {
+-	fmt.Println("Callback Open:", size)
+ }
+ 
+ func (e emptyUploadCallback) PartSize(partSize int64, num int) {
+-	fmt.Println("Callback PartSize:", partSize, num)
+ }
+ 
+ func (e emptyUploadCallback) HashPartProgress(index int, size int64, partHash string) {
+-	//fmt.Println("Callback HashPartProgress:", index, size, partHash)
+ }
+ 
+ func (e emptyUploadCallback) HashPartComplete(partsHash string, fileHash string) {
+-	fmt.Println("Callback HashPartComplete:", partsHash, fileHash)
+ }
+ 
+ func (e emptyUploadCallback) UploadID(uploadID string) {
+-	fmt.Println("Callback UploadID:", uploadID)
+ }
+ 
+ func (e emptyUploadCallback) UploadPartComplete(index int, partSize int64, partHash string) {
+-	fmt.Println("Callback UploadPartComplete:", index, partSize, partHash)
+ }
+ 
+ func (e emptyUploadCallback) UploadComplete(fileSize int64, streamSize int64, storageSize int64) {
+-	fmt.Println("Callback UploadComplete:", fileSize, streamSize, storageSize)
+ }
+ 
+ func (e emptyUploadCallback) Complete(size int64, url string, typ int) {
+-	fmt.Println("Callback Complete:", size, url, typ)
+ }
+diff --git a/internal/file/upload.go b/internal/file/upload.go
+index b693a4a..188d631 100644
+--- a/internal/file/upload.go
++++ b/internal/file/upload.go
+@@ -35,7 +35,7 @@ import (
+ 	"time"
+ 
+ 	"github.com/OpenIMSDK/protocol/third"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ type UploadFileReq struct {
+diff --git a/internal/friend/friend.go b/internal/friend/friend.go
+index faf6760..4ffaa16 100644
+--- a/internal/friend/friend.go
++++ b/internal/friend/friend.go
+@@ -27,7 +27,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func NewFriend(loginUserID string, db db_interface.DataBase, user *user.User, conversationCh chan common.Cmd2Value) *Friend {
+diff --git a/internal/friend/sdk.go b/internal/friend/sdk.go
+index c1010c0..5bf6ff2 100644
+--- a/internal/friend/sdk.go
++++ b/internal/friend/sdk.go
+@@ -26,7 +26,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/server_api_params"
+ 
+ 	"github.com/OpenIMSDK/protocol/friend"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func (f *Friend) GetSpecifiedFriendsInfo(ctx context.Context, friendUserIDList []string) ([]*server_api_params.FullUserInfo, error) {
+diff --git a/internal/friend/sync.go b/internal/friend/sync.go
+index 87a009a..165691e 100644
+--- a/internal/friend/sync.go
++++ b/internal/friend/sync.go
+@@ -22,7 +22,7 @@ import (
+ 
+ 	"github.com/OpenIMSDK/protocol/friend"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func (f *Friend) SyncBothFriendRequest(ctx context.Context, fromUserID, toUserID string) error {
+diff --git a/internal/full/open_im_sdk_full.go b/internal/full/open_im_sdk_full.go
+index 5af5471..9e8a379 100644
+--- a/internal/full/open_im_sdk_full.go
++++ b/internal/full/open_im_sdk_full.go
+@@ -17,7 +17,7 @@ package full
+ import (
+ 	"context"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/common"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/model_struct"
+diff --git a/internal/group/enterprise_sync_test.go b/internal/group/enterprise_sync_test.go
+new file mode 100644
+index 0000000..3c55482
+--- /dev/null
++++ b/internal/group/enterprise_sync_test.go
+@@ -0,0 +1,119 @@
++package group
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/common"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/db"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/db_interface"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/model_struct"
++	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
++	"net/http"
++	"net/http/httptest"
++	"sync"
++	"sync/atomic"
++	"testing"
++)
++
++type concurrentGroupReads struct {
++	db_interface.DataBase
++	snapshots sync.WaitGroup
++}
++
++func (d *concurrentGroupReads) GetGroups(ctx context.Context, ids []string) ([]*model_struct.LocalGroup, error) {
++	rows, err := d.DataBase.GetGroups(ctx, ids)
++	d.snapshots.Done()
++	d.snapshots.Wait()
++	return rows, err
++}
++
++type addedGroupCapture struct {
++	open_im_sdk_callback.OnGroupListener
++	count atomic.Int32
++}
++
++func (c *addedGroupCapture) OnJoinedGroupAdded(string) { c.count.Add(1) }
++
++// CreateGroup's explicit sync and the concurrent server notification can both
++// read an empty cache before either inserts. A successful server write must not
++// turn into a local UNIQUE error under this ordinary delivery order.
++func TestCompatConcurrentGroupSynchronizationKeepsOneCacheEntry(t *testing.T) {
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		json.NewEncoder(w).Encode(map[string]any{"errCode": 0, "data": map[string]any{"groupInfos": []map[string]any{{"groupID": "fixture-group", "groupName": "Synthetic group", "ownerUserID": "alice", "groupType": 2}}}})
++	}))
++	defer server.Close()
++	ctx := ccontext.WithInfo(context.Background(), &ccontext.GlobalConfig{UserID: "alice", Token: "synthetic", IMConfig: sdk_struct.IMConfig{ApiAddr: server.URL, AllowInsecureLoopbackForTesting: true}})
++	store, err := db.NewDataBase(ctx, "alice", t.TempDir(), 1)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer store.Close(ctx)
++	cache := &concurrentGroupReads{DataBase: store}
++	cache.snapshots.Add(2)
++	manager := NewGroup("alice", cache, make(chan common.Cmd2Value, 8))
++	capture := &addedGroupCapture{}
++	manager.SetGroupListener(func() open_im_sdk_callback.OnGroupListener { return capture })
++	errors := make(chan error, 2)
++	for index := 0; index < 2; index++ {
++		go func() { errors <- manager.SyncGroups(ctx, "fixture-group") }()
++	}
++	for index := 0; index < 2; index++ {
++		if err := <-errors; err != nil {
++			t.Errorf("concurrent sync rejected successful server state: %v", err)
++		}
++	}
++	rows, err := store.GetGroups(ctx, []string{"fixture-group"})
++	if err != nil || len(rows) != 1 || rows[0].OwnerUserID != "alice" {
++		t.Fatal("group cache lost identity or duplicated state")
++	}
++}
++
++type concurrentMemberReads struct {
++	db_interface.DataBase
++	snapshots sync.WaitGroup
++}
++
++func (d *concurrentMemberReads) GetGroupSomeMemberInfo(ctx context.Context, id string, users []string) ([]*model_struct.LocalGroupMember, error) {
++	rows, err := d.DataBase.GetGroupSomeMemberInfo(ctx, id, users)
++	d.snapshots.Done()
++	d.snapshots.Wait()
++	return rows, err
++}
++func (c *addedGroupCapture) OnGroupMemberAdded(string) { c.count.Add(1) }
++func (c *addedGroupCapture) OnGroupInfoChanged(string) {}
++
++func TestCompatConcurrentGroupMemberSynchronizationKeepsOneIdentity(t *testing.T) {
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		json.NewEncoder(w).Encode(map[string]any{"errCode": 0, "data": map[string]any{"members": []map[string]any{{"groupID": "fixture-group", "userID": "bob", "nickname": "Synthetic Bob", "roleLevel": 20}}}})
++	}))
++	defer server.Close()
++	ctx := ccontext.WithInfo(context.Background(), &ccontext.GlobalConfig{UserID: "alice", Token: "synthetic", IMConfig: sdk_struct.IMConfig{ApiAddr: server.URL, AllowInsecureLoopbackForTesting: true}})
++	store, err := db.NewDataBase(ctx, "alice", t.TempDir(), 1)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer store.Close(ctx)
++	if err := store.InsertGroup(ctx, &model_struct.LocalGroup{GroupID: "fixture-group", GroupType: 2, GroupName: "Synthetic group"}); err != nil {
++		t.Fatal(err)
++	}
++	cache := &concurrentMemberReads{DataBase: store}
++	cache.snapshots.Add(2)
++	manager := NewGroup("alice", cache, make(chan common.Cmd2Value, 8))
++	capture := &addedGroupCapture{}
++	manager.SetGroupListener(func() open_im_sdk_callback.OnGroupListener { return capture })
++	errors := make(chan error, 2)
++	for index := 0; index < 2; index++ {
++		go func() { errors <- manager.SyncGroupMembers(ctx, "fixture-group", "bob") }()
++	}
++	for index := 0; index < 2; index++ {
++		if err := <-errors; err != nil {
++			t.Errorf("concurrent member sync rejected existing identity: %v", err)
++		}
++	}
++	rows, err := store.GetGroupSomeMemberInfo(ctx, "fixture-group", []string{"bob"})
++	if err != nil || len(rows) != 1 || rows[0].UserID != "bob" {
++		t.Fatal("group member identity duplicated or lost")
++	}
++}
+diff --git a/internal/group/group.go b/internal/group/group.go
+index 150814d..5cc10d8 100644
+--- a/internal/group/group.go
++++ b/internal/group/group.go
+@@ -18,7 +18,7 @@ import (
+ 	"context"
+ 	"github.com/OpenIMSDK/protocol/group"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	utils2 "github.com/OpenIMSDK/tools/utils"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/util"
+ 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
+diff --git a/internal/group/notification.go b/internal/group/notification.go
+index 79f5b3b..4cc598d 100644
+--- a/internal/group/notification.go
++++ b/internal/group/notification.go
+@@ -23,7 +23,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func (g *Group) DoNotification(ctx context.Context, msg *sdkws.MsgData) {
+diff --git a/internal/group/sdk.go b/internal/group/sdk.go
+index df3d0c5..f79e85c 100644
+--- a/internal/group/sdk.go
++++ b/internal/group/sdk.go
+@@ -24,7 +24,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdk_params_callback"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 
+ 	"github.com/OpenIMSDK/protocol/group"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+diff --git a/internal/group/sync.go b/internal/group/sync.go
+index afeac31..97e0121 100644
+--- a/internal/group/sync.go
++++ b/internal/group/sync.go
+@@ -22,7 +22,7 @@ import (
+ 	"errors"
+ 	"github.com/OpenIMSDK/protocol/group"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	utils2 "github.com/OpenIMSDK/tools/utils"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/util"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
+diff --git a/internal/interaction/legacy_encryption.go b/internal/interaction/legacy_encryption.go
+new file mode 100644
+index 0000000..9121351
+--- /dev/null
++++ b/internal/interaction/legacy_encryption.go
+@@ -0,0 +1,124 @@
++package interaction
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/OpenIMSDK/protocol/encryption"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/openimsdk/openim-sdk-core/v3/internal/legacycipher"
++	"github.com/openimsdk/openim-sdk-core/v3/internal/util"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
++	"sort"
++)
++
++func legacyConversation(ctx context.Context, message *sdkws.MsgData) string {
++	if message.GroupID != "" {
++		return "sg_" + message.GroupID
++	}
++	pair := []string{message.SendID, message.RecvID}
++	sort.Strings(pair)
++	if pair[0] == "" {
++		pair[0] = ccontext.Info(ctx).UserID()
++		sort.Strings(pair)
++	}
++	return "si_" + pair[0] + "_" + pair[1]
++}
++func (c *LongConnMgr) legacyKey(ctx context.Context, conversation string, version int32) (string, int32, error) {
++	c.legacyKeyMutex.Lock()
++	defer c.legacyKeyMutex.Unlock()
++	if ctx.Err() != nil {
++		return "", 0, sdkerrs.ErrCtxDeadline
++	}
++	if c.legacyKeys == nil {
++		c.legacyKeys = make(map[string]map[int32]string)
++	}
++	keys := c.legacyKeys[conversation]
++	if keys == nil {
++		keys = make(map[int32]string)
++		c.legacyKeys[conversation] = keys
++	}
++	if version > 0 {
++		if key, ok := keys[version]; ok {
++			return key, version, nil
++		}
++	}
++	// Version zero means server-authoritative latest; do not pin it indefinitely.
++	response, err := util.CallApi[encryption.GetEncryptionKeyResp](ctx, "/encryption/get_encryption_key", &encryption.GetEncryptionKeyReq{ConversationID: conversation, KeyVersion: version})
++	if err != nil {
++		return "", 0, err
++	}
++	for _, entry := range response.VersionKeyList {
++		if entry != nil && entry.Version > 0 && len(entry.Key) == 32 {
++			keys[entry.Version] = entry.Key
++		}
++	}
++	if version > 0 {
++		if key, ok := keys[version]; ok {
++			return key, version, nil
++		}
++	} else {
++		var latest int32
++		for candidate := range keys {
++			if candidate > latest {
++				latest = candidate
++			}
++		}
++		if latest > 0 {
++			return keys[latest], latest, nil
++		}
++	}
++	return "", 0, sdkerrs.ErrArgs.Wrap("encryption key unavailable")
++}
++func (c *LongConnMgr) encryptLegacyMessage(ctx context.Context, message *sdkws.MsgData) error {
++	if !c.legacyEncryption.Load() || message.ContentType < constant.Text || message.ContentType >= 1000 {
++		return nil
++	}
++	key, version, err := c.legacyKey(ctx, legacyConversation(ctx, message), 0)
++	if err != nil {
++		return err
++	}
++	encrypted, err := legacycipher.Encrypt(key, message.Content)
++	if err != nil {
++		return sdkerrs.ErrArgs.Wrap("message encryption failed")
++	}
++	message.Content = encrypted
++	message.KeyVersion = version
++	return nil
++}
++func (c *LongConnMgr) decryptLegacyMessages(ctx context.Context, conversations map[string]*sdkws.PullMsgs) error {
++	// Decode the complete batch before committing any content. A missing key or
++	// corrupt item must leave the original wire batch retryable.
++	decoded := make(map[*sdkws.MsgData][]byte)
++	for conversation, pulled := range conversations {
++		if pulled == nil {
++			continue
++		}
++		for _, message := range pulled.Msgs {
++			if message == nil || message.KeyVersion <= 0 {
++				continue
++			}
++			canonical := legacyConversation(ctx, message)
++			if conversation != canonical {
++				return sdkerrs.ErrArgs.Wrap("encrypted conversation mismatch")
++			}
++			key, _, err := c.legacyKey(ctx, canonical, message.KeyVersion)
++			if err != nil {
++				return err
++			}
++			plain, err := legacycipher.Decrypt(key, message.Content)
++			if err != nil || !json.Valid(plain) {
++				return sdkerrs.ErrArgs.Wrap("message decryption failed")
++			}
++			decoded[message] = plain
++		}
++	}
++	if ctx.Err() != nil {
++		return sdkerrs.ErrCtxDeadline
++	}
++	for message, plain := range decoded {
++		message.Content = plain
++	}
++	return nil
++}
+diff --git a/internal/interaction/legacy_encryption_test.go b/internal/interaction/legacy_encryption_test.go
+new file mode 100644
+index 0000000..e8dd031
+--- /dev/null
++++ b/internal/interaction/legacy_encryption_test.go
+@@ -0,0 +1,112 @@
++package interaction
++
++import (
++	"bytes"
++	"context"
++	"encoding/json"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/golang/protobuf/proto"
++	"github.com/openimsdk/openim-sdk-core/v3/internal/legacycipher"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
++	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
++	"net/http"
++	"net/http/httptest"
++	"sync/atomic"
++	"testing"
++	"time"
++)
++
++func TestCompatEncryptionRefreshesLatestAndRejectsBadInbound(t *testing.T) {
++	const one = "0123456789abcdef0123456789abcdef"
++	const two = "abcdef0123456789abcdef0123456789"
++	var current atomic.Int32
++	current.Store(1)
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		var request struct {
++			ConversationID string `json:"conversationID"`
++			Version        int32  `json:"keyVersion"`
++		}
++		json.NewDecoder(r.Body).Decode(&request)
++		if request.ConversationID != "si_alice_bob" {
++			t.Error("wrong conversation key scope")
++		}
++		version := request.Version
++		if version == 0 {
++			version = current.Load()
++		}
++		var keys []map[string]any
++		if version == 1 {
++			keys = []map[string]any{{"version": 1, "key": one}}
++		} else if version == 2 {
++			keys = []map[string]any{{"version": 2, "key": two}}
++		}
++		json.NewEncoder(w).Encode(map[string]any{"errCode": 0, "data": map[string]any{"versionKeyList": keys}})
++	}))
++	defer server.Close()
++	ctx := ccontext.WithInfo(context.Background(), &ccontext.GlobalConfig{UserID: "alice", Token: "synthetic", IMConfig: sdk_struct.IMConfig{ApiAddr: server.URL, AllowInsecureLoopbackForTesting: true}})
++	core := &LongConnMgr{}
++	core.legacyEncryption.Store(true)
++	for version := int32(1); version <= 2; version++ {
++		current.Store(version)
++		message := &sdkws.MsgData{SendID: "alice", RecvID: "bob", ContentType: 101, Content: []byte(`{"content":"synthetic"}`)}
++		if err := core.encryptLegacyMessage(ctx, message); err != nil {
++			t.Fatal(err)
++		}
++		if message.KeyVersion != version {
++			t.Fatal("latest key pinned to old cached version")
++		}
++		key := one
++		if version == 2 {
++			key = two
++		}
++		plain, err := legacycipher.Decrypt(key, message.Content)
++		if err != nil || string(plain) != `{"content":"synthetic"}` {
++			t.Fatal("outgoing ciphertext mismatch")
++		}
++	}
++	encrypted, _ := legacycipher.Encrypt(one, []byte(`{"content":"historical"}`))
++	message := &sdkws.MsgData{SendID: "bob", RecvID: "alice", ContentType: 101, KeyVersion: 1, Content: encrypted}
++	core.legacyEncryption.Store(false)
++	if err := core.decryptLegacyMessages(ctx, map[string]*sdkws.PullMsgs{"si_alice_bob": {Msgs: []*sdkws.MsgData{message}}}); err != nil || string(message.Content) != `{"content":"historical"}` {
++		t.Fatal("historical encrypted message not decoded after server toggle")
++	}
++	// A bad item must not partially decrypt a batch, so later retry can use the
++	// original ciphertext for every message without double decoding the first.
++	first := &sdkws.MsgData{SendID: "bob", RecvID: "alice", KeyVersion: 1, Content: append([]byte(nil), encrypted...)}
++	bad := &sdkws.MsgData{SendID: "bob", RecvID: "alice", KeyVersion: 1, Content: []byte("bad")}
++	if err := core.decryptLegacyMessages(ctx, map[string]*sdkws.PullMsgs{"si_alice_bob": {Msgs: []*sdkws.MsgData{first, bad}}}); err == nil || !bytes.Equal(first.Content, encrypted) {
++		t.Fatal("failed batch mutated prior ciphertext")
++	}
++
++	for _, test := range []struct {
++		conversation string
++		version      int32
++		content      []byte
++	}{{"si_alice_bob", 1, []byte("corrupt")}, {"si_alice_bob", 9, encrypted}, {"si_wrong", 1, encrypted}} {
++		m := &sdkws.MsgData{SendID: "bob", RecvID: "alice", ContentType: 101, KeyVersion: test.version, Content: test.content}
++		if err := core.decryptLegacyMessages(ctx, map[string]*sdkws.PullMsgs{test.conversation: {Msgs: []*sdkws.MsgData{m}}}); err == nil {
++			t.Fatal("invalid ciphertext/key scope accepted")
++		}
++	}
++}
++
++func TestCompatNonEmptyMaxSeqResponseIsNotParsedAsMessagePull(t *testing.T) {
++	ctx := ccontext.WithInfo(context.Background(), &ccontext.GlobalConfig{UserID: "alice"})
++	core := &LongConnMgr{ctx: ctx, encoder: NewGobEncoder(), Syncer: NewWsRespAsyn()}
++	mid, ch := core.Syncer.AddCh("alice")
++	defer core.Syncer.DelCh(mid)
++	payload, _ := proto.Marshal(&sdkws.GetMaxSeqResp{MaxSeqs: map[string]int64{"n_service_alice": 12, "si_alice_bob": 7}, MinSeqs: map[string]int64{"si_alice_bob": 1}})
++	wire, _ := core.encoder.Encode(&GeneralWsResp{ReqIdentifier: constant.GetNewestSeq, MsgIncr: mid, Data: payload})
++	if err := core.handleMessage(wire); err != nil {
++		t.Fatal("synchronization response rejected", err)
++	}
++	select {
++	case response := <-ch:
++		if !bytes.Equal(response.Data, payload) {
++			t.Fatal("max sequence response was transformed")
++		}
++	case <-time.After(time.Second):
++		t.Fatal("max sequence waiter not notified")
++	}
++}
+diff --git a/internal/interaction/long_conn_mgr.go b/internal/interaction/long_conn_mgr.go
+index 30e0da3..c05d946 100644
+--- a/internal/interaction/long_conn_mgr.go
++++ b/internal/interaction/long_conn_mgr.go
+@@ -31,13 +31,14 @@ import (
+ 	"strconv"
+ 	"strings"
+ 	"sync"
++	"sync/atomic"
+ 	"time"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+ 	"github.com/OpenIMSDK/tools/errs"
+-	"github.com/OpenIMSDK/tools/log"
+ 	"github.com/golang/protobuf/proto"
+ 	"github.com/gorilla/websocket"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ const (
+@@ -78,6 +79,9 @@ var (
+ )
+ 
+ type LongConnMgr struct {
++	legacyEncryption atomic.Bool
++	legacyKeyMutex   sync.Mutex
++	legacyKeys       map[string]map[int32]string
+ 	//conn status mutex
+ 	w          sync.Mutex
+ 	connStatus int
+@@ -129,6 +133,13 @@ func (c *LongConnMgr) Run(ctx context.Context) {
+ }
+ 
+ func (c *LongConnMgr) SendReqWaitResp(ctx context.Context, m proto.Message, reqIdentifier int, resp proto.Message) error {
++	if message, ok := m.(*sdkws.MsgData); ok && reqIdentifier == constant.SendMsg {
++		copied := proto.Clone(message).(*sdkws.MsgData)
++		if err := c.encryptLegacyMessage(ctx, copied); err != nil {
++			return err
++		}
++		m = copied
++	}
+ 	data, err := proto.Marshal(m)
+ 	if err != nil {
+ 		return sdkerrs.ErrArgs
+@@ -142,7 +153,14 @@ func (c *LongConnMgr) SendReqWaitResp(ctx context.Context, m proto.Message, reqI
+ 		},
+ 		Resp: make(chan *GeneralWsResp, 1),
+ 	}
+-	c.send <- msg
++	if ctx.Err() != nil {
++		return sdkerrs.ErrCtxDeadline
++	}
++	select {
++	case c.send <- msg:
++	case <-ctx.Done():
++		return sdkerrs.ErrCtxDeadline
++	}
+ 	log.ZDebug(ctx, "send message to send channel success", "msg", m, "reqIdentifier", reqIdentifier)
+ 	select {
+ 	case <-ctx.Done():
+@@ -437,6 +455,12 @@ func (c *LongConnMgr) handleMessage(message []byte) error {
+ 	log.ZInfo(ctx, "recv msg", "errCode", wsResp.ErrCode, "errMsg", wsResp.ErrMsg,
+ 		"reqIdentifier", wsResp.ReqIdentifier)
+ 	switch wsResp.ReqIdentifier {
++	case 2100:
++		var config sdkws.ServerConfig
++		if proto.Unmarshal(wsResp.Data, &config) != nil {
++			return sdkerrs.ErrArgs
++		}
++		c.legacyEncryption.Store(config.IsEncryption)
+ 	case constant.PushMsg:
+ 		if err = c.doPushMsg(ctx, wsResp); err != nil {
+ 			log.ZError(ctx, "doWSPushMsg failed", err, "wsResp", wsResp)
+@@ -451,9 +475,22 @@ func (c *LongConnMgr) handleMessage(message []byte) error {
+ 		c.listener.OnKickedOffline()
+ 		_ = common.TriggerCmdLogOut(ctx, c.loginMgrCh)
+ 		return errors.New("client kicked offline")
+-	case constant.GetNewestSeq:
+-		fallthrough
+-	case constant.PullMsgBySeqList:
++	case constant.GetNewestSeq, constant.PullMsgBySeqList:
++		// Only message-pull responses contain encrypted MsgData. MaxSeq maps
++		// must remain opaque; re-decoding them as pulls loses sequence values.
++		if wsResp.ReqIdentifier == constant.PullMsgBySeqList {
++			var pulled sdkws.PullMessageBySeqsResp
++			if proto.Unmarshal(wsResp.Data, &pulled) != nil {
++				return sdkerrs.ErrArgs
++			}
++			if err := c.decryptLegacyMessages(ctx, pulled.Msgs); err != nil {
++				return err
++			}
++			wsResp.Data, err = proto.Marshal(&pulled)
++			if err != nil {
++				return err
++			}
++		}
+ 		fallthrough
+ 	case constant.SendMsg:
+ 		fallthrough
+@@ -558,6 +595,9 @@ func (c *LongConnMgr) doPushMsg(ctx context.Context, wsResp GeneralWsResp) error
+ 	if err != nil {
+ 		return err
+ 	}
++	if err := c.decryptLegacyMessages(ctx, msg.Msgs); err != nil {
++		return err
++	}
+ 	return common.TriggerCmdPushMsg(ctx, &msg, c.pushMsgAndMaxSeqCh)
+ }
+ func (c *LongConnMgr) Close(ctx context.Context) {
+diff --git a/internal/interaction/msg_sync.go b/internal/interaction/msg_sync.go
+index e24e0b8..49c6ea4 100644
+--- a/internal/interaction/msg_sync.go
++++ b/internal/interaction/msg_sync.go
+@@ -23,7 +23,7 @@ import (
+ 	"strings"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ const (
+@@ -190,9 +190,9 @@ func (m *MsgSyncer) pushTriggerAndSync(ctx context.Context, pullMsgs map[string]
+ 		return
+ 	}
+ 	needSyncSeqMap := make(map[string][2]int64)
+-	var lastSeq int64
+-	var storageMsgs []*sdkws.MsgData
+ 	for conversationID, msgs := range pullMsgs {
++		var lastSeq int64
++		var storageMsgs []*sdkws.MsgData
+ 		for _, msg := range msgs.Msgs {
+ 			if msg.Seq == 0 {
+ 				_ = triggerFunc(ctx, map[string]*sdkws.PullMsgs{conversationID: {Msgs: []*sdkws.MsgData{msg}}})
+diff --git a/internal/interaction/msg_sync_compat_test.go b/internal/interaction/msg_sync_compat_test.go
+new file mode 100644
+index 0000000..1c21c76
+--- /dev/null
++++ b/internal/interaction/msg_sync_compat_test.go
+@@ -0,0 +1,47 @@
++package interaction
++
++import (
++	"context"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"testing"
++)
++
++func TestCompatNotificationConversationNamespaces(t *testing.T) {
++	for _, id := range []string{"n_service_alice"} {
++		if !IsNotification(id) {
++			t.Errorf("notification namespace not recognized: %s", id)
++		}
++	}
++	for _, id := range []string{"sn_service_alice", "si_alice_bob", "sg_group", "sn", "normal"} {
++		if IsNotification(id) {
++			t.Errorf("ordinary conversation misclassified: %s", id)
++		}
++	}
++}
++
++func TestCompatPushDoesNotMixConversationSequences(t *testing.T) {
++	defer func() {
++		if recover() != nil {
++			t.Fatal("contiguous independent conversations unexpectedly required network synchronization")
++		}
++	}()
++	syncer := &MsgSyncer{syncedMaxSeqs: make(map[string]int64)}
++	a := &sdkws.MsgData{ClientMsgID: "message-a", Seq: 1}
++	b := &sdkws.MsgData{ClientMsgID: "message-b", Seq: 1}
++	expected := map[string]*sdkws.MsgData{"si_alice_bob": a, "sg_group": b}
++	received := make(map[string]bool)
++	syncer.pushTriggerAndSync(context.Background(), map[string]*sdkws.PullMsgs{
++		"si_alice_bob": {Msgs: []*sdkws.MsgData{a}}, "sg_group": {Msgs: []*sdkws.MsgData{b}},
++	}, func(_ context.Context, batch map[string]*sdkws.PullMsgs) error {
++		for id, msgs := range batch {
++			if len(msgs.Msgs) != 1 || msgs.Msgs[0] != expected[id] {
++				t.Fatal("messages crossed conversation boundary")
++			}
++			received[id] = true
++		}
++		return nil
++	})
++	if len(received) != 2 || syncer.syncedMaxSeqs["si_alice_bob"] != 1 || syncer.syncedMaxSeqs["sg_group"] != 1 {
++		t.Fatal("independent contiguous messages were dropped")
++	}
++}
+diff --git a/internal/interaction/ws_js.go b/internal/interaction/ws_js.go
+index 2b31f26..ec91db7 100644
+--- a/internal/interaction/ws_js.go
++++ b/internal/interaction/ws_js.go
+@@ -22,7 +22,7 @@ import (
+ 	"context"
+ 	"encoding/json"
+ 	"fmt"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"io"
+ 	"net/http"
+ 	"net/url"
+diff --git a/internal/interaction/ws_resp_asyn.go b/internal/interaction/ws_resp_asyn.go
+index d6018f5..3a331c7 100644
+--- a/internal/interaction/ws_resp_asyn.go
++++ b/internal/interaction/ws_resp_asyn.go
+@@ -21,7 +21,7 @@ import (
+ 	"sync"
+ 	"time"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ type GeneralWsResp struct {
+diff --git a/internal/legacycipher/legacy.go b/internal/legacycipher/legacy.go
+new file mode 100644
+index 0000000..2480c2e
+--- /dev/null
++++ b/internal/legacycipher/legacy.go
+@@ -0,0 +1,66 @@
++// Package legacycipher implements only the existing OpenIM Enterprise wire
++// cipher verified against synthetic native captures. It must never be chosen
++// as a new general-purpose encryption protocol: deterministic IV and absent
++// authentication are inherited compatibility constraints. A negotiated new
++// protocol must use random nonces and authenticated encryption.
++package legacycipher
++
++import (
++	"crypto/aes"
++	"crypto/cipher"
++	"crypto/subtle"
++	"errors"
++)
++
++var ErrInvalidCiphertext = errors.New("invalid legacy ciphertext")
++var ErrInvalidKey = errors.New("invalid legacy key")
++
++// Encrypt preserves the old raw-32-byte-key, IV=key[:16], PKCS7 wire format.
++// Version selection and authorization belong to the account-bound key provider.
++func Encrypt(key string, plaintext []byte) ([]byte, error) {
++	if len(key) != 32 {
++		return nil, ErrInvalidKey
++	}
++	block, err := aes.NewCipher([]byte(key))
++	if err != nil {
++		return nil, ErrInvalidKey
++	}
++	padding := aes.BlockSize - len(plaintext)%aes.BlockSize
++	input := make([]byte, len(plaintext)+padding)
++	copy(input, plaintext)
++	for index := len(plaintext); index < len(input); index++ {
++		input[index] = byte(padding)
++	}
++	output := make([]byte, len(input))
++	cipher.NewCBCEncrypter(block, []byte(key)[:aes.BlockSize]).CryptBlocks(output, input)
++	return output, nil
++}
++
++// Decrypt checks block length and all padding bytes before returning plaintext.
++// Valid padding cannot authenticate CBC content. Callers must additionally
++// validate the expected message schema and never expose a padding oracle.
++func Decrypt(key string, ciphertext []byte) ([]byte, error) {
++	if len(key) != 32 {
++		return nil, ErrInvalidKey
++	}
++	if len(ciphertext) == 0 || len(ciphertext)%aes.BlockSize != 0 {
++		return nil, ErrInvalidCiphertext
++	}
++	block, err := aes.NewCipher([]byte(key))
++	if err != nil {
++		return nil, ErrInvalidKey
++	}
++	output := make([]byte, len(ciphertext))
++	cipher.NewCBCDecrypter(block, []byte(key)[:aes.BlockSize]).CryptBlocks(output, ciphertext)
++	padding := int(output[len(output)-1])
++	valid := subtle.ConstantTimeLessOrEq(1, padding) & subtle.ConstantTimeLessOrEq(padding, aes.BlockSize)
++	for index := 0; index < aes.BlockSize; index++ {
++		within := subtle.ConstantTimeLessOrEq(index+1, padding)
++		match := subtle.ConstantTimeByteEq(output[len(output)-1-index], byte(padding))
++		valid &= subtle.ConstantTimeSelect(within, match, 1)
++	}
++	if valid != 1 {
++		return nil, ErrInvalidCiphertext
++	}
++	return output[:len(output)-padding], nil
++}
+diff --git a/internal/legacycipher/legacy_test.go b/internal/legacycipher/legacy_test.go
+new file mode 100644
+index 0000000..6afb7e2
+--- /dev/null
++++ b/internal/legacycipher/legacy_test.go
+@@ -0,0 +1,86 @@
++package legacycipher
++
++import (
++	"bytes"
++	"crypto/aes"
++	"crypto/cipher"
++	"encoding/base64"
++	"encoding/json"
++	"errors"
++	"os"
++	"testing"
++)
++
++func TestActualNativeCapturesBothKeyVersions(t *testing.T) {
++	data, err := os.ReadFile("testdata/native_vectors.json")
++	if err != nil {
++		t.Fatal(err)
++	}
++	var fixture struct {
++		Captures []struct {
++			Key     string `json:"key"`
++			Content string `json:"contentBase64"`
++		} `json:"captures"`
++		Plaintext []string `json:"plaintextUtf8"`
++	}
++	if err := json.Unmarshal(data, &fixture); err != nil {
++		t.Fatal(err)
++	}
++	if len(fixture.Captures) != 3 {
++		t.Fatal("expected native captures")
++	}
++	for index, capture := range fixture.Captures {
++		ciphertext, err := base64.StdEncoding.DecodeString(capture.Content)
++		if err != nil {
++			t.Fatal(err)
++		}
++		plain, err := Decrypt(capture.Key, ciphertext)
++		if err != nil || string(plain) != fixture.Plaintext[index] {
++			t.Fatalf("native capture %d decryption mismatch", index)
++		}
++		encoded, err := Encrypt(capture.Key, []byte(fixture.Plaintext[index]))
++		if err != nil || !bytes.Equal(encoded, ciphertext) {
++			t.Fatalf("native capture %d encryption mismatch", index)
++		}
++	}
++}
++
++func TestRejectsMalformedLengthAndEveryInvalidPaddingByte(t *testing.T) {
++	key := "0123456789abcdef0123456789abcdef"
++	for _, value := range [][]byte{nil, {}, {1}, make([]byte, 31)} {
++		if _, err := Decrypt(key, value); !errors.Is(err, ErrInvalidCiphertext) {
++			t.Fatal("malformed block accepted")
++		}
++	}
++	block, _ := aes.NewCipher([]byte(key))
++	for padding := 1; padding <= aes.BlockSize; padding++ {
++		for invalidIndex := 0; invalidIndex < padding; invalidIndex++ {
++			plain := bytes.Repeat([]byte{byte(padding)}, aes.BlockSize)
++			plain[len(plain)-1-invalidIndex] = 0
++			encoded := make([]byte, len(plain))
++			cipher.NewCBCEncrypter(block, []byte(key)[:aes.BlockSize]).CryptBlocks(encoded, plain)
++			if _, err := Decrypt(key, encoded); !errors.Is(err, ErrInvalidCiphertext) {
++				t.Fatal("corrupt padding accepted")
++			}
++		}
++	}
++}
++
++func TestDoesNotModifyCallerBuffersAndChecksKeySize(t *testing.T) {
++	key := "0123456789abcdef0123456789abcdef"
++	plain := []byte("fixture")
++	encoded, _ := Encrypt(key, plain)
++	before := append([]byte(nil), encoded...)
++	if _, err := Decrypt(key, encoded); err != nil {
++		t.Fatal(err)
++	}
++	if string(plain) != "fixture" || !bytes.Equal(before, encoded) {
++		t.Fatal("caller buffer modified")
++	}
++	if _, err := Encrypt("short", plain); !errors.Is(err, ErrInvalidKey) {
++		t.Fatal("bad key accepted")
++	}
++	if _, err := Decrypt("short", encoded); !errors.Is(err, ErrInvalidKey) {
++		t.Fatal("bad key accepted")
++	}
++}
+diff --git a/internal/legacycipher/testdata/native_vectors.json b/internal/legacycipher/testdata/native_vectors.json
+new file mode 100644
+index 0000000..9dbda80
+--- /dev/null
++++ b/internal/legacycipher/testdata/native_vectors.json
+@@ -0,0 +1,49 @@
++{
++  "syntheticOnly": true,
++  "captures": [
++    {
++      "capturedAt": "2026-10-15T05:57:30Z",
++      "contentBase64": "j5xeigE92OoLZ75P0bHYG/CIeD0SKLxqUguCXQMO7nnoEbv2+MHrxPIq96q9LV74",
++      "contentType": 101,
++      "key": "0123456789abcdef0123456789abcdef",
++      "keyVersion": 1,
++      "synthetic": true
++    },
++    {
++      "capturedAt": "2026-10-15T05:57:30Z",
++      "contentBase64": "j5xeigE92OoLZ75P0bHYG/CIeD0SKLxqUguCXQMO7nnoEbv2+MHrxPIq96q9LV74",
++      "contentType": 101,
++      "key": "0123456789abcdef0123456789abcdef",
++      "keyVersion": 1,
++      "synthetic": true
++    },
++    {
++      "capturedAt": "2026-10-15T05:57:31Z",
++      "contentBase64": "k2Y9vM3Q8ubM1ZVT+JG4KTkHfBMjegZyMc5uMOuSOBkd4O4ht9Mqlo7POAo9UdvNLBCbW625nwJBIVlk3fGLwA==",
++      "contentType": 101,
++      "key": "abcdef0123456789abcdef0123456789",
++      "keyVersion": 2,
++      "synthetic": true
++    }
++  ],
++  "plaintextUtf8": [
++    "{\"content\":\"Synthetic encryption fixture\"}",
++    "{\"content\":\"Synthetic encryption fixture\"}",
++    "{\"content\":\"Synthetic rotated outgoing fixture\"}"
++  ],
++  "nativeInboundDecryption": {
++    "versions": [
++      1,
++      2
++    ],
++    "plaintexts": [
++      "Synthetic inbound version1",
++      "Synthetic inbound version2"
++    ],
++    "marker": "LUOBO_ENCRYPTION_WIRE_ROTATION_PASS"
++  },
++  "observedKeyRequests": [
++    0,
++    2
++  ]
++}
+diff --git a/internal/user/sync.go b/internal/user/sync.go
+index 0447c74..343ecff 100644
+--- a/internal/user/sync.go
++++ b/internal/user/sync.go
+@@ -23,7 +23,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+ 	"github.com/OpenIMSDK/tools/errs"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"gorm.io/gorm"
+ )
+ 
+diff --git a/internal/user/user.go b/internal/user/user.go
+index 078cff5..9748f6c 100644
+--- a/internal/user/user.go
++++ b/internal/user/user.go
+@@ -27,7 +27,7 @@ import (
+ 	authPb "github.com/OpenIMSDK/protocol/auth"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+ 	userPb "github.com/OpenIMSDK/protocol/user"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 
+ 	PbConstant "github.com/OpenIMSDK/protocol/constant"
+ 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
+diff --git a/internal/util/post.go b/internal/util/post.go
+index 6275536..7e27288 100644
+--- a/internal/util/post.go
++++ b/internal/util/post.go
+@@ -18,23 +18,20 @@ import (
+ 	"bytes"
+ 	"context"
+ 	"encoding/json"
+-	"fmt"
++	"github.com/OpenIMSDK/protocol/sdkws"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
+ 	"io"
+ 	"net/http"
++	"net/url"
++	"strings"
+ 	"time"
+-
+-	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
+ )
+ 
+-// apiClient is a global HTTP client with a timeout of one minute.
+-var apiClient = &http.Client{
+-	Timeout: time.Minute,
+-}
++// Requests never log credentials, message content, raw bodies or server text.
++// A redirect is a new trust decision and cannot inherit the IM token.
++var apiClient = &http.Client{Timeout: 15 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+ 
+-// ApiResponse represents the standard structure of an API response.
+ type ApiResponse struct {
+ 	ErrCode int             `json:"errCode"`
+ 	ErrMsg  string          `json:"errMsg"`
+@@ -42,117 +39,73 @@ type ApiResponse struct {
+ 	Data    json.RawMessage `json:"data"`
+ }
+ 
+-// ApiPost performs an HTTP POST request to a specified API endpoint.
+-// It serializes the request object, sends it to the API, and unmarshals the response into the resp object.
+-// It handles logging, error wrapping, and operation ID validation.
+-// Context (ctx) is used for passing metadata and control information.
+-// api: the API endpoint to which the request is sent.
+-// req: the request object to be sent to the API.
+-// resp: a pointer to the response object where the API response will be unmarshalled.
+-// Returns an error if the request fails at any stage.
+-func ApiPost(ctx context.Context, api string, req, resp any) (err error) {
+-	// Extract operationID from context and validate.
+-	operationID, _ := ctx.Value("operationID").(string)
+-	if operationID == "" {
+-		err := sdkerrs.ErrArgs.Wrap("call api operationID is empty")
+-		log.ZError(ctx, "ApiRequest", err, "type", "ctx not set operationID")
+-		return err
++func ApiPost(ctx context.Context, api string, req, resp any) error {
++	if ctx.Err() != nil {
++		return sdkerrs.ErrCtxDeadline
+ 	}
+-
+-	// Deferred function to log the result of the API call.
+-	defer func(start time.Time) {
+-		elapsed := time.Since(start).Milliseconds()
+-		if err == nil {
+-			log.ZDebug(ctx, "CallApi", "api", api, "state", "success", "cost time", fmt.Sprintf("%dms", elapsed))
+-		} else {
+-			log.ZError(ctx, "CallApi", err, "api", api, "state", "failed", "cost time", fmt.Sprintf("%dms", elapsed))
+-		}
+-	}(time.Now())
+-
+-	// Serialize the request object to JSON.
+-	reqBody, err := json.Marshal(req)
++	info := ccontext.Info(ctx)
++	base, err := url.Parse(info.ApiAddr())
++	if err != nil || base.Hostname() == "" || base.User != nil || base.RawQuery != "" || base.Fragment != "" {
++		return sdkerrs.ErrArgs.Wrap("invalid API origin")
++	}
++	config, _ := ctx.Value(ccontext.GlobalConfigKey{}).(*ccontext.GlobalConfig)
++	allowedTest := config != nil && config.AllowInsecureLoopbackForTesting && (base.Hostname() == "127.0.0.1" || base.Hostname() == "10.0.2.2" || base.Hostname() == "localhost")
++	if base.Scheme != "https" && !(base.Scheme == "http" && allowedTest) {
++		return sdkerrs.ErrArgs.Wrap("HTTPS API required")
++	}
++	if !strings.HasPrefix(api, "/") || strings.ContainsAny(api, "?#") {
++		return sdkerrs.ErrArgs.Wrap("invalid API route")
++	}
++	base.Path = strings.TrimRight(base.Path, "/") + api
++	body, err := json.Marshal(req)
+ 	if err != nil {
+-		log.ZError(ctx, "ApiRequest", err, "type", "json.Marshal(req) failed")
+-		return sdkerrs.ErrSdkInternal.Wrap("json.Marshal(req) failed " + err.Error())
++		return sdkerrs.ErrArgs.Wrap("invalid request")
+ 	}
+-
+-	// Construct the full API URL and create a new HTTP request with context.
+-	ctxInfo := ccontext.Info(ctx)
+-	reqUrl := ctxInfo.ApiAddr() + api
+-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, reqUrl, bytes.NewReader(reqBody))
++	request, err := http.NewRequestWithContext(ctx, http.MethodPost, base.String(), bytes.NewReader(body))
+ 	if err != nil {
+-		log.ZError(ctx, "ApiRequest", err, "type", "http.NewRequestWithContext failed")
+-		return sdkerrs.ErrSdkInternal.Wrap("sdk http.NewRequestWithContext failed " + err.Error())
++		return sdkerrs.ErrArgs.Wrap("invalid request")
+ 	}
+-
+-	// Set headers for the request.
+-	log.ZDebug(ctx, "ApiRequest", "url", reqUrl, "body", string(reqBody))
+-	request.ContentLength = int64(len(reqBody))
+ 	request.Header.Set("Content-Type", "application/json")
+-	request.Header.Set("operationID", operationID)
+-	request.Header.Set("token", ctxInfo.Token())
+-
+-	// Send the request and receive the response.
++	request.Header.Set("operationID", info.OperationID())
++	request.Header.Set("token", info.Token())
+ 	response, err := apiClient.Do(request)
+ 	if err != nil {
+-		log.ZError(ctx, "ApiRequest", err, "type", "network error")
+-		return sdkerrs.ErrNetwork.Wrap("ApiPost http.Client.Do failed " + err.Error())
++		return sdkerrs.ErrNetwork.Wrap("API transport failed")
+ 	}
+-
+-	// Ensure the response body is closed after processing.
+ 	defer response.Body.Close()
+-
+-	// Read the response body.
+-	respBody, err := io.ReadAll(response.Body)
+-	if err != nil {
+-		log.ZError(ctx, "ApiResponse", err, "type", "read body", "status", response.Status)
+-		return sdkerrs.ErrSdkInternal.Wrap("io.ReadAll(ApiResponse) failed " + err.Error())
++	if response.StatusCode != http.StatusOK {
++		return sdkerrs.ErrNetwork.Wrap("API status failed")
+ 	}
+-
+-	// Log the response for debugging purposes.
+-	log.ZDebug(ctx, "ApiResponse", "url", reqUrl, "status", response.Status, "body", string(respBody))
+-
+-	// Unmarshal the response body into the ApiResponse structure.
+-	var baseApi ApiResponse
+-	if err := json.Unmarshal(respBody, &baseApi); err != nil {
+-		log.ZError(ctx, "ApiResponse", err, "type", "api code parse")
+-		return sdkerrs.ErrSdkInternal.Wrap(fmt.Sprintf("api %s json.Unmarshal(%q, %T) failed %s", api, string(respBody), &baseApi, err.Error()))
++	const maximum = 16 << 20
++	data, err := io.ReadAll(io.LimitReader(response.Body, maximum+1))
++	if err != nil || len(data) > maximum {
++		return sdkerrs.ErrSdkInternal.Wrap("invalid API response")
+ 	}
+-
+-	// Check if the API returned an error code and handle it.
+-	if baseApi.ErrCode != 0 {
+-		err := sdkerrs.New(baseApi.ErrCode, baseApi.ErrMsg, baseApi.ErrDlt)
+-		ccontext.GetApiErrCodeCallback(ctx).OnError(ctx, err)
+-		log.ZError(ctx, "ApiResponse", err, "type", "api code error", "msg", baseApi.ErrMsg, "dlt", baseApi.ErrDlt)
+-		return err
++	var envelope ApiResponse
++	if json.Unmarshal(data, &envelope) != nil {
++		return sdkerrs.ErrSdkInternal.Wrap("invalid API response")
+ 	}
+-
+-	// If no data is received, or it's null, return with no error.
+-	if resp == nil || len(baseApi.Data) == 0 || string(baseApi.Data) == "null" {
++	if envelope.ErrCode != 0 {
++		failure := sdkerrs.New(envelope.ErrCode, "request failed", "")
++		ccontext.GetApiErrCodeCallback(ctx).OnError(ctx, failure)
++		return failure
++	}
++	if resp == nil || len(envelope.Data) == 0 || string(envelope.Data) == "null" {
+ 		return nil
+ 	}
+-
+-	// Unmarshal the actual data part of the response into the provided response object.
+-	if err := json.Unmarshal(baseApi.Data, resp); err != nil {
+-		log.ZError(ctx, "ApiResponse", err, "type", "api data parse", "data", string(baseApi.Data), "bind", fmt.Sprintf("%T", resp))
+-		return sdkerrs.ErrSdkInternal.Wrap(fmt.Sprintf("json.Unmarshal(%q, %T) failed %s", string(baseApi.Data), resp, err.Error()))
++	if json.Unmarshal(envelope.Data, resp) != nil {
++		return sdkerrs.ErrSdkInternal.Wrap("invalid API data")
+ 	}
+-
+ 	return nil
+ }
+-
+-// CallApi wraps ApiPost to make an API call and unmarshal the response into a new instance of type T.
+ func CallApi[T any](ctx context.Context, api string, req any) (*T, error) {
+-	var resp T
+-	if err := ApiPost(ctx, api, req, &resp); err != nil {
++	var response T
++	if err := ApiPost(ctx, api, req, &response); err != nil {
+ 		return nil, err
+ 	}
+-	return &resp, nil
++	return &response, nil
+ }
+ 
+-// GetPageAll handles pagination for API requests. It iterates over pages of data until all data is retrieved.
+-// A is the request type with pagination support, B is the response type, and C is the type of data to be returned.
+-// The function fn processes each page of response data to extract a slice of C.
+ func GetPageAll[A interface {
+ 	GetPagination() *sdkws.RequestPagination
+ }, B, C any](ctx context.Context, api string, req A, fn func(resp *B) []C) ([]C, error) {
+diff --git a/internal/util/post_test.go b/internal/util/post_test.go
+new file mode 100644
+index 0000000..4092fd8
+--- /dev/null
++++ b/internal/util/post_test.go
+@@ -0,0 +1,69 @@
++package util
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
++	"io"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"sync/atomic"
++	"testing"
++)
++
++func apiTestContext(base string, test bool) context.Context {
++	return ccontext.WithOperationID(ccontext.WithInfo(context.Background(), &ccontext.GlobalConfig{UserID: "alice", Token: "synthetic-token", IMConfig: sdk_struct.IMConfig{ApiAddr: base, AllowInsecureLoopbackForTesting: test}}), "synthetic-op")
++}
++func TestCompatAPIRedirectNeverForwardsToken(t *testing.T) {
++	var reached atomic.Int32
++	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { reached.Add(1) }))
++	defer target.Close()
++	source := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		http.Redirect(w, r, target.URL, http.StatusTemporaryRedirect)
++	}))
++	defer source.Close()
++	if err := ApiPost(apiTestContext(source.URL, true), "/route", map[string]any{}, nil); err == nil {
++		t.Fatal("redirect accepted")
++	}
++	if reached.Load() != 0 {
++		t.Fatal("credential-bearing redirect followed")
++	}
++}
++func TestCompatAPISafeErrorsAndCancellation(t *testing.T) {
++	var calls atomic.Int32
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		calls.Add(1)
++		if r.URL.Path != "/api/route" || r.Header.Get("token") != "synthetic-token" {
++			t.Error("route or authentication lost")
++		}
++		json.NewEncoder(w).Encode(map[string]any{"errCode": 10001, "errMsg": "PRIVATE-PAYLOAD", "errDlt": "PRIVATE-TOKEN"})
++	}))
++	defer server.Close()
++	err := ApiPost(apiTestContext(server.URL+"/api/", true), "/route", nil, nil)
++	if err == nil || strings.Contains(err.Error(), "PRIVATE") {
++		t.Fatal("server content escaped in error")
++	}
++	if err := ApiPost(apiTestContext(server.URL, false), "/route", nil, nil); err == nil {
++		t.Fatal("insecure default accepted")
++	}
++	ctx, cancel := context.WithCancel(apiTestContext(server.URL, true))
++	cancel()
++	if err := ApiPost(ctx, "/route", nil, nil); err == nil {
++		t.Fatal("cancelled request accepted")
++	}
++	if calls.Load() != 1 {
++		t.Fatal("rejected request dispatched")
++	}
++}
++func TestCompatAPIOversizedAndMalformedResponse(t *testing.T) {
++	for _, body := range []string{"not-json", `{"errCode":0,"data":"wrong-shape"}`, strings.Repeat("x", (16<<20)+1)} {
++		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { io.WriteString(w, body) }))
++		var response struct{ Value string }
++		if err := ApiPost(apiTestContext(server.URL, true), "/route", nil, &response); err == nil {
++			t.Fatal("malformed response accepted")
++		}
++		server.Close()
++	}
++}
+diff --git a/internal/work_moments/work_moments.go b/internal/work_moments/work_moments.go
+index 2a38e45..73a83e1 100644
+--- a/internal/work_moments/work_moments.go
++++ b/internal/work_moments/work_moments.go
+@@ -21,7 +21,7 @@ package workMoments
+ //	"open_im_sdk/pkg/db/model_struct"
+ //	"open_im_sdk/pkg/utils"
+ //
+-//	"github.com/OpenIMSDK/tools/log"
++//	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ //)
+ //
+ //type WorkMoments struct {
+diff --git a/open_im_sdk/apicb.go b/open_im_sdk/apicb.go
+index bb3f42d..f51aa10 100644
+--- a/open_im_sdk/apicb.go
++++ b/open_im_sdk/apicb.go
+@@ -3,7 +3,7 @@ package open_im_sdk
+ import (
+ 	"context"
+ 	"github.com/OpenIMSDK/tools/errs"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/common"
+ 	"sync/atomic"
+diff --git a/open_im_sdk/caller.go b/open_im_sdk/caller.go
+index f638b70..f863ec8 100644
+--- a/open_im_sdk/caller.go
++++ b/open_im_sdk/caller.go
+@@ -24,10 +24,9 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
+ 	"reflect"
+ 	"runtime"
+-	"runtime/debug"
+ 	"time"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 
+ 	"github.com/OpenIMSDK/tools/errs"
+ )
+@@ -99,7 +98,6 @@ func call_(operationID string, fn any, args ...any) (res any, err error) {
+ 	ctx := ccontext.WithOperationID(UserForSDK.BaseCtx(), operationID)
+ 	defer func(start time.Time) {
+ 		if r := recover(); r != nil {
+-			fmt.Printf("panic: %+v\n%s", r, debug.Stack())
+ 			err = fmt.Errorf("call panic: %+v", r)
+ 		} else {
+ 			elapsed := time.Since(start).Milliseconds()
+@@ -251,7 +249,6 @@ func syncCall(operationID string, fn any, args ...any) (res string) {
+ 	t := time.Now()
+ 	defer func(start time.Time) {
+ 		if r := recover(); r != nil {
+-			fmt.Printf("panic: %+v\n%s", r, debug.Stack())
+ 		} else {
+ 			elapsed := time.Since(start).Milliseconds()
+ 			if err == nil {
+@@ -355,8 +352,7 @@ func messageCall(callback open_im_sdk_callback.SendMsgCallBack, operationID stri
+ func messageCall_(callback open_im_sdk_callback.SendMsgCallBack, operationID string, fn any, args ...any) {
+ 	defer func() {
+ 		if r := recover(); r != nil {
+-			fmt.Println(" panic err:", r, string(debug.Stack()))
+-			callback.OnError(sdkerrs.SdkInternalError, fmt.Sprintf("recover: %+v", r))
++			callback.OnError(sdkerrs.SdkInternalError, "internal operation failed")
+ 			return
+ 		}
+ 	}()
+diff --git a/open_im_sdk/conversation_msg.go b/open_im_sdk/conversation_msg.go
+index 4851263..9ae41e4 100644
+--- a/open_im_sdk/conversation_msg.go
++++ b/open_im_sdk/conversation_msg.go
+@@ -159,11 +159,11 @@ func CreateForwardMessage(operationID string, m string) string {
+ func GetConversationIDBySessionType(operationID string, sourceID string, sessionType int) string {
+ 	return syncCall(operationID, UserForSDK.Conversation().GetConversationIDBySessionType, sourceID, sessionType)
+ }
+-func SendMessage(callback open_im_sdk_callback.SendMsgCallBack, operationID, message, recvID, groupID, offlinePushInfo string, isOnlineOnly bool) {
+-	messageCall(callback, operationID, UserForSDK.Conversation().SendMessage, message, recvID, groupID, offlinePushInfo, isOnlineOnly)
++func SendMessage(callback open_im_sdk_callback.SendMsgCallBack, operationID, message, recvID, groupID, offlinePushInfo string) {
++	messageCall(callback, operationID, UserForSDK.Conversation().SendMessage, message, recvID, groupID, offlinePushInfo, false)
+ }
+-func SendMessageNotOss(callback open_im_sdk_callback.SendMsgCallBack, operationID string, message, recvID, groupID string, offlinePushInfo string, isOnlineOnly bool) {
+-	messageCall(callback, operationID, UserForSDK.Conversation().SendMessageNotOss, message, recvID, groupID, offlinePushInfo, isOnlineOnly)
++func SendMessageNotOss(callback open_im_sdk_callback.SendMsgCallBack, operationID string, message, recvID, groupID string, offlinePushInfo string) {
++	messageCall(callback, operationID, UserForSDK.Conversation().SendMessageNotOss, message, recvID, groupID, offlinePushInfo, false)
+ }
+ 
+ func FindMessageList(callback open_im_sdk_callback.Base, operationID string, findMessageOptions string) {
+diff --git a/open_im_sdk/em.go b/open_im_sdk/em.go
+index 6ea102f..a3eb4a0 100644
+--- a/open_im_sdk/em.go
++++ b/open_im_sdk/em.go
+@@ -17,7 +17,7 @@ package open_im_sdk
+ import (
+ 	"context"
+ 	"errors"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
+ )
+ 
+diff --git a/open_im_sdk/enterprise_group_read.go b/open_im_sdk/enterprise_group_read.go
+new file mode 100644
+index 0000000..c34b6fb
+--- /dev/null
++++ b/open_im_sdk/enterprise_group_read.go
+@@ -0,0 +1,19 @@
++package open_im_sdk
++
++import (
++	"context"
++	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
++)
++
++func GetGroupMessageReaderList(callback open_im_sdk_callback.Base, operationID, conversationID, clientMsgID string, filter, offset, count int32) {
++	call(callback, operationID, UserForSDK.compatGroupReaders, conversationID, clientMsgID, filter, offset, count)
++}
++func SendGroupMessageReadReceipt(callback open_im_sdk_callback.Base, operationID, conversationID, clientMsgIDs string) {
++	call(callback, operationID, UserForSDK.Conversation().CompatMarkGroupRead, conversationID, clientMsgIDs)
++}
++
++// Preserve the original JNI int32 ABI while converting explicitly at the domain
++// boundary; the legacy reflection dispatcher intentionally does not coerce ints.
++func (u *LoginMgr) compatGroupReaders(ctx context.Context, conversationID, clientMsgID string, filter, offset, count int32) ([]map[string]any, error) {
++	return u.Conversation().CompatGroupReaders(ctx, conversationID, clientMsgID, int(filter), int(offset), int(count))
++}
+diff --git a/open_im_sdk/enterprise_rtc_compat.go b/open_im_sdk/enterprise_rtc_compat.go
+new file mode 100644
+index 0000000..997e65d
+--- /dev/null
++++ b/open_im_sdk/enterprise_rtc_compat.go
+@@ -0,0 +1,215 @@
++package open_im_sdk
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/OpenIMSDK/protocol/rtc"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/openimsdk/openim-sdk-core/v3/internal/util"
++	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/sdkerrs"
++	"time"
++)
++
++type compatSignalingInfo struct {
++	UserID          string                 `json:"userID"`
++	Invitation      *rtc.InvitationInfo    `json:"invitation"`
++	OfflinePushInfo *sdkws.OfflinePushInfo `json:"offlinePushInfo"`
++}
++
++func SetSignalingListener(listener open_im_sdk_callback.OnSignalingListener) {
++	listenerCall(UserForSDK.SetCompatSignalingListener, listener)
++}
++func (u *LoginMgr) SetCompatSignalingListener(listener open_im_sdk_callback.OnSignalingListener) {
++	u.compatSignalMutex.Lock()
++	u.signalingListener = listener
++	u.compatSignalMutex.Unlock()
++}
++func SetSelfInfoEx(callback open_im_sdk_callback.Base, operationID, userInfo string) {
++	SetSelfInfo(callback, operationID, userInfo)
++}
++func SignalingInvite(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignal, "invite", info)
++}
++func SignalingInviteInGroup(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignal, "inviteInGroup", info)
++}
++func SignalingAccept(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignal, "accept", info)
++}
++func SignalingReject(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignal, "reject", info)
++}
++func SignalingCancel(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignal, "cancel", info)
++}
++func SignalingHungUp(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignal, "hungUp", info)
++}
++func SignalingGetTokenByRoomID(callback open_im_sdk_callback.Base, operationID, room string) {
++	call(callback, operationID, UserForSDK.compatSignal, "getTokenByRoomID", room)
++}
++func (u *LoginMgr) compatSignal(ctx context.Context, kind, input string) (any, error) {
++	if ctx.Err() != nil {
++		return nil, sdkerrs.ErrCtxDeadline
++	}
++	var info compatSignalingInfo
++	if kind != "getTokenByRoomID" {
++		if json.Unmarshal([]byte(input), &info) != nil || info.Invitation == nil {
++			return nil, sdkerrs.ErrArgs
++		}
++	}
++	if info.Invitation != nil && (kind == "invite" || kind == "inviteInGroup") {
++		info.Invitation.InviterUserID = ccontext.Info(ctx).UserID()
++		info.Invitation.PlatformID = ccontext.Info(ctx).PlatformID()
++		if info.Invitation.Timeout <= 0 {
++			info.Invitation.Timeout = 30
++		}
++		if info.Invitation.InitiateTime == 0 {
++			info.Invitation.InitiateTime = time.Now().Unix()
++		}
++	}
++	actor := ccontext.Info(ctx).UserID()
++	platform := ccontext.Info(ctx).PlatformID()
++	participant := &rtc.ParticipantMetaData{UserInfo: &sdkws.PublicUserInfo{UserID: actor}}
++	if u.User() != nil {
++		if self, err := u.User().GetSelfUserInfo(ctx); err == nil {
++			participant.UserInfo.Nickname = self.Nickname
++			participant.UserInfo.FaceURL = self.FaceURL
++		}
++	}
++	var request rtc.SignalReq
++	switch kind {
++	case "invite":
++		request.Payload = &rtc.SignalReq_Invite{Invite: &rtc.SignalInviteReq{Invitation: info.Invitation, OfflinePushInfo: info.OfflinePushInfo, Participant: participant, UserID: actor}}
++	case "inviteInGroup":
++		request.Payload = &rtc.SignalReq_InviteInGroup{InviteInGroup: &rtc.SignalInviteInGroupReq{Invitation: info.Invitation, OfflinePushInfo: info.OfflinePushInfo, Participant: participant, UserID: actor}}
++	case "accept":
++		request.Payload = &rtc.SignalReq_Accept{Accept: &rtc.SignalAcceptReq{Invitation: info.Invitation, OfflinePushInfo: info.OfflinePushInfo, UserID: actor, OpUserPlatformID: platform, Participant: participant}}
++	case "reject":
++		request.Payload = &rtc.SignalReq_Reject{Reject: &rtc.SignalRejectReq{Invitation: info.Invitation, OfflinePushInfo: info.OfflinePushInfo, UserID: actor, OpUserPlatformID: platform, Participant: participant}}
++	case "cancel":
++		request.Payload = &rtc.SignalReq_Cancel{Cancel: &rtc.SignalCancelReq{Invitation: info.Invitation, OfflinePushInfo: info.OfflinePushInfo, Participant: participant, UserID: actor}}
++	case "hungUp":
++		request.Payload = &rtc.SignalReq_HungUp{HungUp: &rtc.SignalHungUpReq{Invitation: info.Invitation, OfflinePushInfo: info.OfflinePushInfo, UserID: actor}}
++	case "getTokenByRoomID":
++		request.Payload = &rtc.SignalReq_GetTokenByRoomID{GetTokenByRoomID: &rtc.SignalGetTokenByRoomIDReq{RoomID: input, UserID: actor}}
++	default:
++		return nil, sdkerrs.ErrArgs
++	}
++	// Current gateway serializes the RPC assembly wrapper. Original Enterprise
++	// JNI succeeds against this exact wire contract; do not flatten the server.
++	var assembled rtc.SignalMessageAssembleResp
++	if err := u.longConnMgr.SendReqWaitResp(ctx, &request, constant.SendSignalMsg, &assembled); err != nil {
++		return nil, err
++	}
++	if ctx.Err() != nil {
++		return nil, sdkerrs.ErrCtxDeadline
++	}
++	response := assembled.SignalResp
++	if response == nil {
++		return nil, sdkerrs.ErrArgs.Wrap("missing signaling response")
++	}
++	if kind == "invite" && response.GetInvite() != nil {
++		info.Invitation.RoomID = response.GetInvite().RoomID
++		u.trackCompatInvitation(ctx, info)
++	}
++	if kind == "inviteInGroup" && response.GetInviteInGroup() != nil {
++		info.Invitation.RoomID = response.GetInviteInGroup().RoomID
++		u.trackCompatInvitation(ctx, info)
++	}
++	if info.Invitation != nil && (kind == "accept" || kind == "reject" || kind == "cancel" || kind == "hungUp") {
++		u.updateCompatInvitation(ctx, kind, actor, info.Invitation.RoomID)
++	}
++	switch kind {
++	case "invite":
++		if response.GetInvite() == nil {
++			return nil, sdkerrs.ErrArgs
++		}
++		return response.GetInvite(), nil
++	case "inviteInGroup":
++		if response.GetInviteInGroup() == nil {
++			return nil, sdkerrs.ErrArgs
++		}
++		return response.GetInviteInGroup(), nil
++	case "accept":
++		if response.GetAccept() == nil {
++			return nil, sdkerrs.ErrArgs
++		}
++		return response.GetAccept(), nil
++	case "getTokenByRoomID":
++		if response.GetGetTokenByRoomID() == nil {
++			return nil, sdkerrs.ErrArgs
++		}
++		return response.GetGetTokenByRoomID(), nil
++	default:
++		return map[string]any{}, nil
++	}
++}
++func (u *LoginMgr) compatSignalPost(ctx context.Context, route, input string) (json.RawMessage, error) {
++	if len(input) > 1<<20 {
++		return nil, sdkerrs.ErrArgs
++	}
++	request := make(map[string]any)
++	if input != "" && json.Unmarshal([]byte(input), &request) != nil {
++		return nil, sdkerrs.ErrArgs
++	}
++	switch route {
++	case "/signal/signal_get_meetings", "/signal/get_signal_invitation_info_start_app", "/signal/signal_join_meeting":
++		request["userID"] = ccontext.Info(ctx).UserID()
++	}
++	if route == "/signal/signal_create_meeting" && (request["meetingHostUserID"] == nil || request["meetingHostUserID"] == "") {
++		request["meetingHostUserID"] = ccontext.Info(ctx).UserID()
++	}
++	if route == "/signal/signal_join_meeting" || route == "/signal/signal_create_meeting" {
++		user := map[string]any{"userID": ccontext.Info(ctx).UserID()}
++		if u.User() != nil {
++			if self, err := u.User().GetSelfUserInfo(ctx); err == nil {
++				user["nickname"] = self.Nickname
++				user["faceURL"] = self.FaceURL
++			}
++		}
++		if nickname, ok := request["participantNickname"].(string); ok && nickname != "" {
++			user["nickname"] = nickname
++		}
++		request["participant"] = map[string]any{"userInfo": user}
++	}
++	var response json.RawMessage
++	if err := util.ApiPost(ctx, route, request, &response); err != nil {
++		return nil, err
++	}
++	if len(response) == 0 {
++		response = []byte(`{}`)
++	}
++	return response, nil
++}
++func SignalingGetRoomByGroupID(callback open_im_sdk_callback.Base, operationID, group string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_get_room_by_group_id", compatJSON(map[string]any{"groupID": group}))
++}
++func GetSignalingInvitationInfoStartApp(callback open_im_sdk_callback.Base, operationID string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/get_signal_invitation_info_start_app", "")
++}
++func SignalingCreateMeeting(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_create_meeting", info)
++}
++func SignalingJoinMeeting(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_join_meeting", info)
++}
++func SignalingUpdateMeetingInfo(callback open_im_sdk_callback.Base, operationID, info string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_update_meeting_info", info)
++}
++func SignalingGetMeetings(callback open_im_sdk_callback.Base, operationID string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_get_meetings", "")
++}
++func SignalingCloseRoom(callback open_im_sdk_callback.Base, operationID, room string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_close_room", compatJSON(map[string]any{"roomID": room}))
++}
++func SignalingOperateStream(callback open_im_sdk_callback.Base, operationID, stream, room, user string, mute, muteAll bool) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_operate_stream", compatJSON(map[string]any{"streamType": stream, "roomID": room, "userID": user, "mute": mute, "muteAll": muteAll}))
++}
++func SignalingSendCustomSignal(callback open_im_sdk_callback.Base, operationID, custom, room string) {
++	call(callback, operationID, UserForSDK.compatSignalPost, "/signal/signal_send_custom_signal", compatJSON(map[string]any{"customInfo": custom, "roomID": room}))
++}
++func compatJSON(value any) string { data, _ := json.Marshal(value); return string(data) }
+diff --git a/open_im_sdk/enterprise_rtc_compat_test.go b/open_im_sdk/enterprise_rtc_compat_test.go
+new file mode 100644
+index 0000000..d5005af
+--- /dev/null
++++ b/open_im_sdk/enterprise_rtc_compat_test.go
+@@ -0,0 +1,151 @@
++package open_im_sdk
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/OpenIMSDK/protocol/rtc"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/golang/protobuf/proto"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
++	"net/http"
++	"net/http/httptest"
++	"sync"
++	"testing"
++	"time"
++)
++
++type compatCapture struct {
++	mu      sync.Mutex
++	events  map[string]int
++	timeout chan struct{}
++}
++
++func (c *compatCapture) add(name string)                       { c.mu.Lock(); c.events[name]++; c.mu.Unlock() }
++func (c *compatCapture) OnReceiveNewInvitation(string)         { c.add("invite") }
++func (c *compatCapture) OnInviteeAccepted(string)              { c.add("accept") }
++func (c *compatCapture) OnInviteeAcceptedByOtherDevice(string) { c.add("other-accept") }
++func (c *compatCapture) OnInviteeRejected(string)              { c.add("reject") }
++func (c *compatCapture) OnInviteeRejectedByOtherDevice(string) { c.add("other-reject") }
++func (c *compatCapture) OnInvitationCancelled(string)          { c.add("cancel") }
++func (c *compatCapture) OnInvitationTimeout(string) {
++	c.add("timeout")
++	if c.timeout != nil {
++		select {
++		case c.timeout <- struct{}{}:
++		default:
++		}
++	}
++}
++func (c *compatCapture) OnHangUp(string)                      { c.add("hangup") }
++func (c *compatCapture) OnRoomParticipantConnected(string)    { c.add("connected") }
++func (c *compatCapture) OnRoomParticipantDisconnected(string) { c.add("disconnected") }
++func (c *compatCapture) OnStreamChange(string)                { c.add("stream") }
++func (c *compatCapture) OnReceiveCustomSignal(string)         { c.add("custom") }
++func compatTestContext(base string) context.Context {
++	return ccontext.WithOperationID(ccontext.WithInfo(context.Background(), &ccontext.GlobalConfig{UserID: "alice", Token: "synthetic-token", IMConfig: sdk_struct.IMConfig{PlatformID: 2, ApiAddr: base, AllowInsecureLoopbackForTesting: true}}), "synthetic-operation")
++}
++func TestCompatProtobufEventsAndMultiDevice(t *testing.T) {
++	ctx, cancel := context.WithCancel(compatTestContext(""))
++	defer cancel()
++	capture := &compatCapture{events: make(map[string]int)}
++	u := &LoginMgr{ctx: ctx, signalingListener: capture}
++	defer u.clearCompatTimers()
++	inv := &rtc.InvitationInfo{InviterUserID: "bob", InviteeUserIDList: []string{"alice"}, RoomID: "room", Timeout: 30, InitiateTime: time.Now().Unix(), MediaType: "audio"}
++	messages := []proto.Message{&rtc.SignalReq{Payload: &rtc.SignalReq_Invite{Invite: &rtc.SignalInviteReq{UserID: "bob", Invitation: inv}}}, &rtc.SignalOnRoomParticipantConnectedReq{Invitation: inv}, &rtc.SignalOnRoomParticipantDisconnectedReq{Invitation: inv}, &rtc.SignalOnStreamChangeReq{RoomID: "room", StreamType: "audio", Mute: true}, &rtc.SignalSendCustomSignalReq{RoomID: "room", CustomInfo: "synthetic"}}
++	for index, message := range messages {
++		wire, _ := proto.Marshal(message)
++		u.dispatchCompatSignal(ctx, &sdkws.MsgData{ContentType: int32(1601 + index), Content: wire})
++	}
++	accepted := &rtc.SignalReq{Payload: &rtc.SignalReq_Accept{Accept: &rtc.SignalAcceptReq{UserID: "alice", OpUserPlatformID: 5, Invitation: inv}}}
++	wire, _ := proto.Marshal(accepted)
++	u.dispatchCompatSignal(ctx, &sdkws.MsgData{ContentType: 1601, Content: wire})
++	for _, event := range []string{"invite", "connected", "disconnected", "stream", "custom", "other-accept"} {
++		if capture.events[event] != 1 {
++			t.Fatalf("callback %s missing", event)
++		}
++	}
++	if capture.events["accept"] != 0 {
++		t.Fatal("other-device accepted delivered as local accept")
++	}
++	u.compatTimerMutex.Lock()
++	pending := len(u.compatPending)
++	u.compatTimerMutex.Unlock()
++	if pending != 0 {
++		t.Fatal("handled call timer remains")
++	}
++}
++func TestCompatTimeoutAndSessionCancellation(t *testing.T) {
++	ctx, cancel := context.WithCancel(compatTestContext(""))
++	capture := &compatCapture{events: make(map[string]int), timeout: make(chan struct{}, 2)}
++	u := &LoginMgr{ctx: ctx, signalingListener: capture}
++	defer u.clearCompatTimers()
++	u.trackCompatInvitation(ctx, compatSignalingInfo{Invitation: &rtc.InvitationInfo{RoomID: "expired", Timeout: 1, InitiateTime: time.Now().Add(-2 * time.Second).Unix()}})
++	select {
++	case <-capture.timeout:
++	case <-time.After(time.Second):
++		t.Fatal("timeout callback missing")
++	}
++	u.trackCompatInvitation(ctx, compatSignalingInfo{Invitation: &rtc.InvitationInfo{RoomID: "pending", Timeout: 60, InitiateTime: time.Now().Unix()}})
++	cancel()
++	deadline := time.Now().Add(time.Second)
++	for {
++		u.compatTimerMutex.Lock()
++		count := len(u.compatPending)
++		u.compatTimerMutex.Unlock()
++		if count == 0 {
++			break
++		}
++		if time.Now().After(deadline) {
++			t.Fatal("session timer leaked")
++		}
++		time.Sleep(time.Millisecond)
++	}
++	capture.mu.Lock()
++	count := capture.events["timeout"]
++	capture.mu.Unlock()
++	if count != 1 {
++		t.Fatal("cancelled session emitted timeout")
++	}
++}
++func TestCompatMeetingRequestsPreserveTargetAndBindActor(t *testing.T) {
++	var requests []map[string]any
++	var mu sync.Mutex
++	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		var body map[string]any
++		json.NewDecoder(r.Body).Decode(&body)
++		if r.Header.Get("token") != "synthetic-token" {
++			t.Error("missing authenticated token")
++		}
++		mu.Lock()
++		requests = append(requests, body)
++		mu.Unlock()
++		json.NewEncoder(w).Encode(map[string]any{"errCode": 0, "data": map[string]any{"ok": true}})
++	}))
++	defer server.Close()
++	ctx := compatTestContext(server.URL)
++	u := &LoginMgr{ctx: ctx}
++	for _, route := range []string{"/signal/signal_operate_stream", "/signal/signal_get_meetings", "/signal/get_signal_invitation_info_start_app", "/signal/signal_close_room", "/signal/signal_send_custom_signal", "/signal/signal_update_meeting_info", "/signal/signal_get_room_by_group_id"} {
++		_, err := u.compatSignalPost(ctx, route, `{"userID":"target","roomID":"room"}`)
++		if err != nil {
++			t.Fatal(err)
++		}
++	}
++	if requests[0]["userID"] != "target" {
++		t.Fatal("moderation target overwritten by actor")
++	}
++	if requests[1]["userID"] != "alice" || requests[2]["userID"] != "alice" {
++		t.Fatal("self request used untrusted actor")
++	}
++}
++
++func TestCompatOriginsRequireTLSAndExplicitLoopbackFixture(t *testing.T) {
++	for _, test := range []struct {
++		raw, scheme string
++		test, valid bool
++	}{{"https://im.example/api", "https", false, true}, {"wss://im.example/ws", "wss", false, true}, {"http://im.example", "https", true, false}, {"http://127.0.0.1:1", "https", false, false}, {"http://127.0.0.1:1", "https", true, true}, {"ws://10.0.2.2:1", "wss", true, true}, {"wss://user:pass@im.example", "wss", false, false}, {"https://im.example?token=x", "https", false, false}} {
++		if validCoreOrigin(test.raw, test.scheme, test.test) != test.valid {
++			t.Fatalf("origin policy mismatch: %s", test.raw)
++		}
++	}
++}
+diff --git a/open_im_sdk/enterprise_rtc_notify.go b/open_im_sdk/enterprise_rtc_notify.go
+new file mode 100644
+index 0000000..3ab017d
+--- /dev/null
++++ b/open_im_sdk/enterprise_rtc_notify.go
+@@ -0,0 +1,112 @@
++package open_im_sdk
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/OpenIMSDK/protocol/rtc"
++	"github.com/OpenIMSDK/protocol/sdkws"
++	"github.com/golang/protobuf/proto"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++)
++
++func (u *LoginMgr) dispatchCompatSignal(ctx context.Context, message *sdkws.MsgData) {
++	if ctx.Err() != nil {
++		return
++	}
++	u.compatSignalMutex.RLock()
++	listener := u.signalingListener
++	u.compatSignalMutex.RUnlock()
++	if listener == nil {
++		return
++	}
++	switch message.ContentType {
++	case 1601:
++		var request rtc.SignalReq
++		if proto.Unmarshal(message.Content, &request) != nil {
++			return
++		}
++		actor := ""
++		var invitation *rtc.InvitationInfo
++		var push *sdkws.OfflinePushInfo
++		var action func(string)
++		actionName := ""
++		switch payload := request.Payload.(type) {
++		case *rtc.SignalReq_Invite:
++			actor = payload.Invite.UserID
++			invitation = payload.Invite.Invitation
++			push = payload.Invite.OfflinePushInfo
++			action = listener.OnReceiveNewInvitation
++			actionName = "invite"
++		case *rtc.SignalReq_InviteInGroup:
++			actor = payload.InviteInGroup.UserID
++			invitation = payload.InviteInGroup.Invitation
++			push = payload.InviteInGroup.OfflinePushInfo
++			action = listener.OnReceiveNewInvitation
++			actionName = "invite"
++		case *rtc.SignalReq_Accept:
++			actor = payload.Accept.UserID
++			invitation = payload.Accept.Invitation
++			push = payload.Accept.OfflinePushInfo
++			action = listener.OnInviteeAccepted
++			actionName = "accept"
++			if actor == ccontext.Info(ctx).UserID() && payload.Accept.OpUserPlatformID != ccontext.Info(ctx).PlatformID() {
++				action = listener.OnInviteeAcceptedByOtherDevice
++			}
++		case *rtc.SignalReq_Reject:
++			actor = payload.Reject.UserID
++			invitation = payload.Reject.Invitation
++			push = payload.Reject.OfflinePushInfo
++			action = listener.OnInviteeRejected
++			actionName = "reject"
++			if actor == ccontext.Info(ctx).UserID() && payload.Reject.OpUserPlatformID != ccontext.Info(ctx).PlatformID() {
++				action = listener.OnInviteeRejectedByOtherDevice
++			}
++		case *rtc.SignalReq_Cancel:
++			actor = payload.Cancel.UserID
++			invitation = payload.Cancel.Invitation
++			push = payload.Cancel.OfflinePushInfo
++			action = listener.OnInvitationCancelled
++			actionName = "cancel"
++		case *rtc.SignalReq_HungUp:
++			actor = payload.HungUp.UserID
++			invitation = payload.HungUp.Invitation
++			push = payload.HungUp.OfflinePushInfo
++			action = listener.OnHangUp
++			actionName = "hungUp"
++		}
++		if action != nil && invitation != nil {
++			info := compatSignalingInfo{UserID: actor, Invitation: invitation, OfflinePushInfo: push}
++			if actionName == "invite" {
++				u.trackCompatInvitation(ctx, info)
++			} else {
++				u.updateCompatInvitation(ctx, actionName, actor, invitation.RoomID)
++			}
++			encoded, _ := json.Marshal(info)
++			action(string(encoded))
++		}
++	case 1602:
++		var event rtc.SignalOnRoomParticipantConnectedReq
++		if proto.Unmarshal(message.Content, &event) != nil {
++			return
++		}
++		listener.OnRoomParticipantConnected(compatJSON(&event))
++	case 1603:
++		var event rtc.SignalOnRoomParticipantDisconnectedReq
++		if proto.Unmarshal(message.Content, &event) != nil {
++			return
++		}
++		listener.OnRoomParticipantDisconnected(compatJSON(&event))
++	case 1604:
++		var event rtc.SignalOnStreamChangeReq
++		if proto.Unmarshal(message.Content, &event) != nil {
++			return
++		}
++		listener.OnStreamChange(compatJSON(&event))
++	case 1605:
++		var event rtc.SignalSendCustomSignalReq
++		if proto.Unmarshal(message.Content, &event) != nil {
++			return
++		}
++		listener.OnReceiveCustomSignal(compatJSON(&event))
++	}
++}
+diff --git a/open_im_sdk/enterprise_rtc_timers.go b/open_im_sdk/enterprise_rtc_timers.go
+new file mode 100644
+index 0000000..e53e27b
+--- /dev/null
++++ b/open_im_sdk/enterprise_rtc_timers.go
+@@ -0,0 +1,141 @@
++package open_im_sdk
++
++import (
++	"context"
++	"encoding/json"
++	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
++	"time"
++)
++
++type compatPendingInvitation struct {
++	timer      *time.Timer
++	cancelStop func() bool
++	info       compatSignalingInfo
++	remaining  map[string]bool
++}
++
++func (u *LoginMgr) trackCompatInvitation(ctx context.Context, info compatSignalingInfo) {
++	if ctx.Err() != nil || info.Invitation == nil || info.Invitation.RoomID == "" {
++		return
++	}
++
++	invitation := *info.Invitation
++	invitation.InviteeUserIDList = append([]string(nil), info.Invitation.InviteeUserIDList...)
++	info.Invitation = &invitation
++	timeout := invitation.Timeout
++	if timeout <= 0 {
++		timeout = 30
++	}
++	if timeout > 120 {
++		timeout = 120
++	}
++	initiated := time.Unix(invitation.InitiateTime, 0)
++	if invitation.InitiateTime == 0 {
++		initiated = time.Now()
++	}
++	remaining := time.Until(initiated.Add(time.Duration(timeout) * time.Second))
++	if remaining < 0 {
++		remaining = 0
++	}
++	room := invitation.RoomID
++	u.compatTimerMutex.Lock()
++	defer u.compatTimerMutex.Unlock()
++	if ctx.Err() != nil {
++		return
++	}
++	if u.compatPending == nil {
++		u.compatPending = make(map[string]*compatPendingInvitation)
++	}
++	if _, exists := u.compatPending[room]; exists {
++		return
++	}
++	pending := &compatPendingInvitation{info: info, remaining: make(map[string]bool)}
++	for _, user := range invitation.InviteeUserIDList {
++		pending.remaining[user] = true
++	}
++	pending.timer = time.AfterFunc(remaining, func() {
++		u.compatTimerMutex.Lock()
++		if u.compatPending[room] != pending {
++			u.compatTimerMutex.Unlock()
++			return
++		}
++		delete(u.compatPending, room)
++		if pending.cancelStop != nil {
++			pending.cancelStop()
++		}
++		u.compatTimerMutex.Unlock()
++		if ctx.Err() != nil {
++			return
++		}
++		u.compatSignalMutex.RLock()
++		listener := u.signalingListener
++		u.compatSignalMutex.RUnlock()
++		if listener != nil {
++			encoded, _ := json.Marshal(info)
++			listener.OnInvitationTimeout(string(encoded))
++		}
++	})
++	u.compatPending[room] = pending
++	pending.cancelStop = context.AfterFunc(ctx, func() { u.stopCompatPending(room, pending) })
++}
++func (u *LoginMgr) stopCompatInvitation(room string) {
++	u.compatTimerMutex.Lock()
++	defer u.compatTimerMutex.Unlock()
++	if pending := u.compatPending[room]; pending != nil {
++		pending.timer.Stop()
++		if pending.cancelStop != nil {
++			pending.cancelStop()
++		}
++		delete(u.compatPending, room)
++	}
++}
++func (u *LoginMgr) updateCompatInvitation(ctx context.Context, action, actor, room string) {
++	if action == "cancel" || action == "hungUp" {
++		u.stopCompatInvitation(room)
++		return
++	}
++	self := ccontext.Info(ctx).UserID()
++	u.compatTimerMutex.Lock()
++	pending := u.compatPending[room]
++	stop := false
++	if pending != nil {
++		if actor == self || pending.info.Invitation.GroupID == "" {
++			stop = true
++		} else if pending.info.Invitation.InviterUserID == self {
++			if action == "accept" {
++				stop = true
++			} else if action == "reject" {
++				delete(pending.remaining, actor)
++				stop = len(pending.remaining) == 0
++			}
++		}
++		if stop {
++			pending.timer.Stop()
++			if pending.cancelStop != nil {
++				pending.cancelStop()
++			}
++			delete(u.compatPending, room)
++		}
++	}
++	u.compatTimerMutex.Unlock()
++}
++func (u *LoginMgr) clearCompatTimers() {
++	u.compatTimerMutex.Lock()
++	defer u.compatTimerMutex.Unlock()
++	for room, pending := range u.compatPending {
++		pending.timer.Stop()
++		if pending.cancelStop != nil {
++			pending.cancelStop()
++		}
++		delete(u.compatPending, room)
++	}
++}
++
++func (u *LoginMgr) stopCompatPending(room string, expected *compatPendingInvitation) {
++	u.compatTimerMutex.Lock()
++	defer u.compatTimerMutex.Unlock()
++	if current := u.compatPending[room]; current == expected {
++		current.timer.Stop()
++		delete(u.compatPending, room)
++	}
++}
+diff --git a/open_im_sdk/init_login.go b/open_im_sdk/init_login.go
+index 20bb1f7..b9b5a14 100644
+--- a/open_im_sdk/init_login.go
++++ b/open_im_sdk/init_login.go
+@@ -17,15 +17,14 @@ package open_im_sdk
+ import (
+ 	"context"
+ 	"encoding/json"
+-	"fmt"
+ 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk_callback"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/ccontext"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
+ 	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
+-	"strings"
++	"net/url"
+ 
+-	"github.com/OpenIMSDK/tools/log"
+ 	"github.com/OpenIMSDK/tools/mcontext"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func GetSdkVersion() string {
+@@ -43,29 +42,21 @@ func SetHeartbeatInterval(heartbeatInterval int) {
+ 
+ func InitSDK(listener open_im_sdk_callback.OnConnListener, operationID string, config string) bool {
+ 	if UserForSDK != nil {
+-		fmt.Println(operationID, "Initialize multiple times, use the existing ", UserForSDK, " Previous configuration ", UserForSDK.ImConfig(), " now configuration: ", config)
+-		return true
++		// Reusing an old singleton would silently retain its tenant/DataDir.
++		return false
+ 	}
+ 	var configArgs sdk_struct.IMConfig
+ 	if err := json.Unmarshal([]byte(config), &configArgs); err != nil {
+-		fmt.Println(operationID, "Unmarshal failed ", err.Error(), config)
+ 		return false
+ 	}
+ 	if configArgs.PlatformID == 0 {
+ 		return false
+ 	}
+ 	if err := log.InitFromConfig("open-im-sdk-core", "", int(configArgs.LogLevel), configArgs.IsLogStandardOutput, false, configArgs.LogFilePath, rotateCount, rotationTime); err != nil {
+-		fmt.Println(operationID, "log init failed ", err.Error())
+ 	}
+-	fmt.Println("init log success")
+ 	// localLog.NewPrivateLog("", configArgs.LogLevel)
+ 	ctx := mcontext.NewCtx(operationID)
+-	if !strings.Contains(configArgs.ApiAddr, "http") {
+-		log.ZError(ctx, "api is http protocol, api format is invalid", nil)
+-		return false
+-	}
+-	if !strings.Contains(configArgs.WsAddr, "ws") {
+-		log.ZError(ctx, "ws is ws protocol, ws format is invalid", nil)
++	if !validCoreOrigin(configArgs.ApiAddr, "https", configArgs.AllowInsecureLoopbackForTesting) || !validCoreOrigin(configArgs.WsAddr, "wss", configArgs.AllowInsecureLoopbackForTesting) {
+ 		return false
+ 	}
+ 
+@@ -79,7 +70,6 @@ func InitSDK(listener open_im_sdk_callback.OnConnListener, operationID string, c
+ }
+ func UnInitSDK(operationID string) {
+ 	if UserForSDK == nil {
+-		fmt.Println(operationID, "UserForSDK is nil,")
+ 		return
+ 	}
+ 	UserForSDK.UnInitSDK()
+@@ -133,3 +123,18 @@ func (u *LoginMgr) NetworkStatusChanged(ctx context.Context) {
+ func (u *LoginMgr) GetLoginStatus(ctx context.Context) int {
+ 	return u.getLoginStatus(ctx)
+ }
++
++func validCoreOrigin(raw, secureScheme string, allowTest bool) bool {
++	parsed, err := url.Parse(raw)
++	if err != nil || parsed.Hostname() == "" || parsed.User != nil || parsed.RawQuery != "" || parsed.Fragment != "" {
++		return false
++	}
++	if parsed.Scheme == secureScheme {
++		return true
++	}
++	insecure := "http"
++	if secureScheme == "wss" {
++		insecure = "ws"
++	}
++	return allowTest && parsed.Scheme == insecure && (parsed.Hostname() == "127.0.0.1" || parsed.Hostname() == "10.0.2.2" || parsed.Hostname() == "localhost")
++}
+diff --git a/open_im_sdk/third.go b/open_im_sdk/third.go
+index 6dd07b4..c980e38 100644
+--- a/open_im_sdk/third.go
++++ b/open_im_sdk/third.go
+@@ -27,6 +27,6 @@ func SetAppBadge(callback open_im_sdk_callback.Base, operationID string, appUnre
+ 	call(callback, operationID, UserForSDK.Third().SetAppBadge, appUnreadCount)
+ }
+ 
+-func UploadLogs(callback open_im_sdk_callback.Base, operationID string, ex string, progress open_im_sdk_callback.UploadLogProgress) {
+-	call(callback, operationID, UserForSDK.Third().UploadLogs, ex, third.Progress(progress))
++func UploadLogs(callback open_im_sdk_callback.Base, operationID string, progress open_im_sdk_callback.UploadLogProgress) {
++	call(callback, operationID, UserForSDK.Third().UploadLogs, "", third.Progress(progress))
+ }
+diff --git a/open_im_sdk/userRelated.go b/open_im_sdk/userRelated.go
+index 9d77afa..235a0e1 100644
+--- a/open_im_sdk/userRelated.go
++++ b/open_im_sdk/userRelated.go
+@@ -18,12 +18,11 @@ import (
+ 	"context"
+ 	"encoding/json"
+ 	"errors"
+-	"fmt"
+ 	"github.com/OpenIMSDK/protocol/push"
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+-	"github.com/OpenIMSDK/tools/log"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/business"
+ 	conv "github.com/openimsdk/openim-sdk-core/v3/internal/conversation_msg"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/file"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/friend"
+ 	"github.com/openimsdk/openim-sdk-core/v3/internal/full"
+@@ -110,6 +109,9 @@ type LoginMgr struct {
+ 	batchMsgListener     open_im_sdk_callback.OnBatchMsgListener
+ 	userListener         open_im_sdk_callback.OnUserListener
+ 	signalingListener    open_im_sdk_callback.OnSignalingListener
++	compatSignalMutex    sync.RWMutex
++	compatTimerMutex     sync.Mutex
++	compatPending        map[string]*compatPendingInvitation
+ 	businessListener     open_im_sdk_callback.OnCustomBusinessListener
+ 	msgKvListener        open_im_sdk_callback.OnMessageKvInfoListener
+ 
+@@ -150,6 +152,8 @@ func (u *LoginMgr) UserListener() open_im_sdk_callback.OnUserListener {
+ }
+ 
+ func (u *LoginMgr) SignalingListener() open_im_sdk_callback.OnSignalingListener {
++	u.compatSignalMutex.RLock()
++	defer u.compatSignalMutex.RUnlock()
+ 	return u.signalingListener
+ }
+ 
+@@ -360,6 +364,7 @@ func (u *LoginMgr) login(ctx context.Context, userID, token string) error {
+ }
+ 
+ func (u *LoginMgr) setListener(ctx context.Context) {
++	u.conversation.SetCompatSignalHandler(u.dispatchCompatSignal)
+ 	setListener(ctx, &u.userListener, u.UserListener, u.user.SetListener, newEmptyUserListener)
+ 	setListener(ctx, &u.friendListener, u.FriendListener, u.friend.SetListener, newEmptyFriendshipListener)
+ 	setListener(ctx, &u.groupListener, u.GroupListener, u.group.SetGroupListener, newEmptyGroupListener)
+@@ -413,7 +418,6 @@ func (u *LoginMgr) initResources() {
+ 
+ func (u *LoginMgr) UnInitSDK() {
+ 	if u.getLoginStatus(context.Background()) == Logged {
+-		fmt.Println("sdk not logout, please logout first")
+ 		return
+ 	}
+ 	u.info = nil
+diff --git a/open_im_sdk_callback/callback_client.go b/open_im_sdk_callback/callback_client.go
+index 6828539..1932340 100644
+--- a/open_im_sdk_callback/callback_client.go
++++ b/open_im_sdk_callback/callback_client.go
+@@ -111,6 +111,8 @@ type OnListenerForService interface {
+ }
+ 
+ type OnSignalingListener interface {
++	OnStreamChange(event string)
++	OnReceiveCustomSignal(event string)
+ 	OnReceiveNewInvitation(receiveNewInvitationCallback string)
+ 
+ 	OnInviteeAccepted(inviteeAcceptedCallback string)
+diff --git a/open_im_sdk_callback/callback_go_sdk.go b/open_im_sdk_callback/callback_go_sdk.go
+index ad9d778..b01295f 100644
+--- a/open_im_sdk_callback/callback_go_sdk.go
++++ b/open_im_sdk_callback/callback_go_sdk.go
+@@ -19,7 +19,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/model_struct"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ type OnFriendshipListenerSdk interface {
+diff --git a/pkg/common/trigger_channel.go b/pkg/common/trigger_channel.go
+index 5d0ca4f..92c20ef 100644
+--- a/pkg/common/trigger_channel.go
++++ b/pkg/common/trigger_channel.go
+@@ -22,7 +22,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
+ 	"time"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 
+ 	"github.com/OpenIMSDK/protocol/sdkws"
+ )
+diff --git a/pkg/db/chat_log_model_v3.go b/pkg/db/chat_log_model_v3.go
+index d3d82ef..87a3133 100644
+--- a/pkg/db/chat_log_model_v3.go
++++ b/pkg/db/chat_log_model_v3.go
+@@ -26,7 +26,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 	"github.com/openimsdk/openim-sdk-core/v3/sdk_struct"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ func (d *DataBase) initChatLog(ctx context.Context, conversationID string) {
+@@ -45,7 +45,10 @@ func (d *DataBase) initChatLog(ctx context.Context, conversationID string) {
+ 	}
+ }
+ func (d *DataBase) UpdateMessage(ctx context.Context, conversationID string, c *model_struct.LocalChatLog) error {
+-	t := d.conn.WithContext(ctx).Table(utils.GetTableName(conversationID)).Updates(c)
++	if c == nil || c.ClientMsgID == "" {
++		return errors.New("message identifier required")
++	}
++	t := d.conn.WithContext(ctx).Table(utils.GetTableName(conversationID)).Where("client_msg_id = ?", c.ClientMsgID).Updates(c)
+ 	if t.RowsAffected == 0 {
+ 		return utils.Wrap(errors.New("RowsAffected == 0"), "no update ")
+ 	}
+diff --git a/pkg/db/conversation_model.go b/pkg/db/conversation_model.go
+index 7c5e6c4..6d86685 100644
+--- a/pkg/db/conversation_model.go
++++ b/pkg/db/conversation_model.go
+@@ -26,7 +26,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+ 	"github.com/OpenIMSDK/tools/errs"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"gorm.io/gorm"
+ )
+ 
+diff --git a/pkg/db/db_init.go b/pkg/db/db_init.go
+index 43fca17..51f3e69 100644
+--- a/pkg/db/db_init.go
++++ b/pkg/db/db_init.go
+@@ -28,7 +28,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/model_struct"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"gorm.io/driver/sqlite"
+ 	"gorm.io/gorm"
+ 	"gorm.io/gorm/logger"
+diff --git a/pkg/db/group_member_model.go b/pkg/db/group_member_model.go
+index 1d9bffc..cce39e6 100644
+--- a/pkg/db/group_member_model.go
++++ b/pkg/db/group_member_model.go
+@@ -24,6 +24,7 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/constant"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/db/model_struct"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
++	"gorm.io/gorm/clause"
+ )
+ 
+ func (d *DataBase) GetGroupMemberInfoByGroupIDUserID(ctx context.Context, groupID, userID string) (*model_struct.LocalGroupMember, error) {
+@@ -179,7 +180,8 @@ func (d *DataBase) GetGroupMemberUIDListByGroupID(ctx context.Context, groupID s
+ func (d *DataBase) InsertGroupMember(ctx context.Context, groupMember *model_struct.LocalGroupMember) error {
+ 	d.groupMtx.Lock()
+ 	defer d.groupMtx.Unlock()
+-	return utils.Wrap(d.conn.WithContext(ctx).Create(groupMember).Error, "")
++	// Explicit API synchronization can race the corresponding push notification.
++	return utils.Wrap(d.conn.WithContext(ctx).Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "group_id"}, {Name: "user_id"}}, DoNothing: true}).Create(groupMember).Error, "")
+ }
+ 
+ //funcation (d *DataBase) BatchInsertMessageList(ctx context.Context, MessageList []*model_struct.LocalChatLog) error {
+diff --git a/pkg/db/group_model.go b/pkg/db/group_model.go
+index bc2fe66..c28f526 100644
+--- a/pkg/db/group_model.go
++++ b/pkg/db/group_model.go
+@@ -25,12 +25,15 @@ import (
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 
+ 	"gorm.io/gorm"
++	"gorm.io/gorm/clause"
+ )
+ 
+ func (d *DataBase) InsertGroup(ctx context.Context, groupInfo *model_struct.LocalGroup) error {
+ 	d.groupMtx.Lock()
+ 	defer d.groupMtx.Unlock()
+-	return utils.Wrap(d.conn.WithContext(ctx).Create(groupInfo).Error, "InsertGroup failed")
++	// API response and push notification may synchronize the same new group.
++	// Keep the existing identity/cache row; normal Syncer update paths apply changes.
++	return utils.Wrap(d.conn.WithContext(ctx).Clauses(clause.OnConflict{Columns: []clause.Column{{Name: "group_id"}}, DoNothing: true}).Create(groupInfo).Error, "InsertGroup failed")
+ }
+ func (d *DataBase) DeleteGroup(ctx context.Context, groupID string) error {
+ 	d.groupMtx.Lock()
+diff --git a/pkg/privateexpiry/expiry.go b/pkg/privateexpiry/expiry.go
+new file mode 100644
+index 0000000..0510e94
+--- /dev/null
++++ b/pkg/privateexpiry/expiry.go
+@@ -0,0 +1,33 @@
++// Copyright 2026 LuoboIM contributors. Licensed under Apache-2.0.
++package privateexpiry
++
++// Deadline uses an observed read timestamp, never send time or IsRead alone.
++// Millisecond dates are unchanged. Historical Unix-second values are accepted
++// only within the explicit modern-date window2000-01-01 through2100-01-01.
++// Missing/zero duration preserves the original Flutter client's30s default.
++// A negative timestamp/duration or overflowing deadline is unknown, not expired.
++func Deadline(readAt, durationSeconds int64) (int64, bool) {
++	if readAt <= 0 || durationSeconds < 0 {
++		return 0, false
++	}
++	if readAt >= 946684800 && readAt <= 4102444800 {
++		readAt *= 1000
++	}
++	if durationSeconds == 0 {
++		durationSeconds = 30
++	}
++	// Match the mobile DateTime range, also guarding multiplication/addition.
++	const maxTimestamp int64 = 8640000000000000
++	if readAt > maxTimestamp || durationSeconds > (maxTimestamp-readAt)/1000 {
++		return 0, false
++	}
++	return readAt + durationSeconds*1000, true
++}
++
++func Expired(isPrivate bool, readAt, durationSeconds, nowMillis int64) bool {
++	if !isPrivate {
++		return false
++	}
++	deadline, known := Deadline(readAt, durationSeconds)
++	return known && nowMillis >= deadline
++}
+diff --git a/pkg/privateexpiry/expiry_test.go b/pkg/privateexpiry/expiry_test.go
+new file mode 100644
+index 0000000..f6fe989
+--- /dev/null
++++ b/pkg/privateexpiry/expiry_test.go
+@@ -0,0 +1,57 @@
++package privateexpiry
++
++import (
++	"math"
++	"testing"
++)
++
++func TestDeadlineCompatibilityAndInvalidMetadata(t *testing.T) {
++	for _, tc := range []struct {
++		name                     string
++		read, duration, expected int64
++		known                    bool
++	}{
++		{"milliseconds", 1700000000123, 30, 1700000030123, true},
++		{"zero_duration_legacy_default", 1700000000123, 0, 1700000030123, true},
++		{"seconds_lower_inclusive", 946684800, 5, 946684805000, true},
++		{"seconds_upper_inclusive", 4102444800, 5, 4102444805000, true},
++		{"below_seconds_window_unchanged_ms", 946684799, 5, 946689799, true},
++		{"above_seconds_window_unchanged_ms", 4102444801, 5, 4102449801, true},
++		{"unread", 0, 30, 0, false},
++		{"negative_read", -1, 30, 0, false},
++		{"negative_duration", 1700000000123, -1, 0, false},
++		{"invalid_read_overflow", math.MaxInt64, 30, 0, false},
++		{"duration_overflow", 1700000000123, math.MaxInt64, 0, false},
++		{"deadline_overflow", 8640000000000000, 30, 0, false},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			at, known := Deadline(tc.read, tc.duration)
++			if at != tc.expected || known != tc.known {
++				t.Fatalf("deadline=(%d,%t), want(%d,%t)", at, known, tc.expected, tc.known)
++			}
++		})
++	}
++}
++
++func TestExpiredUsesReadTimeAndExactBoundaryOnly(t *testing.T) {
++	const read int64 = 1700000000123
++	for _, tc := range []struct {
++		name      string
++		private   bool
++		read, now int64
++		want      bool
++	}{
++		{"before", true, read, read + 29999, false},
++		{"exact", true, read, read + 30000, true},
++		{"after", true, read, read + 30001, true},
++		{"ordinary_encrypted_chat", false, read, read + 30001, false},
++		{"unread_even_if_sent_long_ago", true, 0, read + 30001, false},
++		{"future_observed_read", true, read + 60000, read, false},
++	} {
++		t.Run(tc.name, func(t *testing.T) {
++			if actual := Expired(tc.private, tc.read, 30, tc.now); actual != tc.want {
++				t.Fatalf("Expired=%t, want%t", actual, tc.want)
++			}
++		})
++	}
++}
+diff --git a/pkg/syncer/syncer.go b/pkg/syncer/syncer.go
+index e4be19f..4ef5933 100644
+--- a/pkg/syncer/syncer.go
++++ b/pkg/syncer/syncer.go
+@@ -20,7 +20,7 @@ import (
+ 
+ 	"github.com/google/go-cmp/cmp"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ // New creates a new Syncer instance with the provided synchronization functions.
+diff --git a/sdk_struct/sdk_struct.go b/sdk_struct/sdk_struct.go
+index 20a246a..caa45ae 100644
+--- a/sdk_struct/sdk_struct.go
++++ b/sdk_struct/sdk_struct.go
+@@ -288,6 +288,7 @@ type MessageEntity struct {
+ type GroupHasReadInfo struct {
+ 	HasReadUserIDList []string `json:"hasReadUserIDList,omitempty"`
+ 	HasReadCount      int32    `json:"hasReadCount"`
++	UnreadCount       int32    `json:"unreadCount"`
+ 	GroupMemberCount  int32    `json:"groupMemberCount"`
+ }
+ type NewMsgList []*MsgStruct
+@@ -308,15 +309,16 @@ func (n NewMsgList) Swap(i, j int) {
+ }
+ 
+ type IMConfig struct {
+-	SystemType           string `json:"systemType"`
+-	PlatformID           int32  `json:"platformID"`
+-	ApiAddr              string `json:"apiAddr"`
+-	WsAddr               string `json:"wsAddr"`
+-	DataDir              string `json:"dataDir"`
+-	LogLevel             uint32 `json:"logLevel"`
+-	IsLogStandardOutput  bool   `json:"isLogStandardOutput"`
+-	LogFilePath          string `json:"logFilePath"`
+-	IsExternalExtensions bool   `json:"isExternalExtensions"`
++	AllowInsecureLoopbackForTesting bool   `json:"allowInsecureLoopbackForTesting"`
++	SystemType                      string `json:"systemType"`
++	PlatformID                      int32  `json:"platformID"`
++	ApiAddr                         string `json:"apiAddr"`
++	WsAddr                          string `json:"wsAddr"`
++	DataDir                         string `json:"dataDir"`
++	LogLevel                        uint32 `json:"logLevel"`
++	IsLogStandardOutput             bool   `json:"isLogStandardOutput"`
++	LogFilePath                     string `json:"logFilePath"`
++	IsExternalExtensions            bool   `json:"isExternalExtensions"`
+ }
+ 
+ type CmdNewMsgComeToConversation struct {
+diff --git a/testv2/empty_test.go b/testv2/empty_test.go
+index 3824f62..5c68b86 100644
+--- a/testv2/empty_test.go
++++ b/testv2/empty_test.go
+@@ -15,7 +15,7 @@
+ package testv2
+ 
+ import (
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/open_im_sdk"
+ 	"testing"
+ 	"time"
+diff --git a/testv2/init.go b/testv2/init.go
+index e4b705b..ff41142 100644
+--- a/testv2/init.go
++++ b/testv2/init.go
+@@ -28,7 +28,7 @@ import (
+ 	"strconv"
+ 	"time"
+ 
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ )
+ 
+ var (
+diff --git a/wasm/event_listener/caller.go b/wasm/event_listener/caller.go
+index 9923703..db0c404 100644
+--- a/wasm/event_listener/caller.go
++++ b/wasm/event_listener/caller.go
+@@ -21,7 +21,7 @@ import (
+ 	"bytes"
+ 	"context"
+ 	"errors"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 	"github.com/openimsdk/openim-sdk-core/v3/wasm/exec"
+ 	"reflect"
+diff --git a/wasm/event_listener/listener.go b/wasm/event_listener/listener.go
+index 65410f6..8be9e3d 100644
+--- a/wasm/event_listener/listener.go
++++ b/wasm/event_listener/listener.go
+@@ -465,3 +465,10 @@ func (s SignalingCallback) OnHangUp(hangUpCallback string) {
+ func NewSignalingCallback(callback *js.Value) *SignalingCallback {
+ 	return &SignalingCallback{CallbackWriter: NewEventData(callback)}
+ }
++
++func (s SignalingCallback) OnStreamChange(data string) {
++	s.CallbackWriter.SetEvent(utils.GetSelfFuncName()).SetData(data).SendMessage()
++}
++func (s SignalingCallback) OnReceiveCustomSignal(data string) {
++	s.CallbackWriter.SetEvent(utils.GetSelfFuncName()).SetData(data).SendMessage()
++}
+diff --git a/wasm/exec/executor.go b/wasm/exec/executor.go
+index 983efd5..10fe01c 100644
+--- a/wasm/exec/executor.go
++++ b/wasm/exec/executor.go
+@@ -21,7 +21,7 @@ import (
+ 	"context"
+ 	"errors"
+ 	"github.com/OpenIMSDK/tools/errs"
+-	"github.com/OpenIMSDK/tools/log"
++	log "github.com/openimsdk/openim-sdk-core/v3/internal/diagnostics"
+ 	"github.com/openimsdk/openim-sdk-core/v3/pkg/utils"
+ 	"runtime"
+ 	"syscall/js"

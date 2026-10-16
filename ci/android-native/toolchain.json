@@ -1,0 +1,165 @@
+{
+  "schema": "luobo.cloud-android.toolchain-plan.v1",
+  "state": "versions_and_primary_metadata_pinned_binary_acquisition_not_executed",
+  "flutter": {
+    "repository": "https://github.com/flutter/flutter.git",
+    "tag": "3.47.7",
+    "framework_revision": "abaf9c523780a608bd46686fd5e53740a07077f8",
+    "engine_revision": "deb287481e3ce9468f3434937ced4240a70539ca",
+    "dart_version": "3.13.5",
+    "official_remote_verification": "required_at_CI_fetch_no_substitution_or_floating_channel"
+  },
+  "go": {
+    "version": "1.27.2",
+    "os_arch": "linux/amd64",
+    "url": "https://go.dev/dl/go1.27.2.linux-amd64.tar.gz",
+    "sha256": "ecbadb99091a3f46e31f5f934b068b1864eafa7995211b39eaddf76996045fe5",
+    "bytes": 70590635,
+    "source": "https://go.dev/dl/?mode=json&include=all",
+    "GOTOOLCHAIN": "local"
+  },
+  "mobile": {
+    "version": "v0.0.0-20261011034528-197770444867",
+    "repository": "https://go.googlesource.com/mobile",
+    "commit": "19777044486779222400e9ca16c4306f9c6dbfa9",
+    "sum": "h1:rav73cdd7OQUPgt1aIFbZQTiPNnjfueKXvfOiLCY0Ss=",
+    "go_mod_sum": "h1:HR/iBzuQmVTl/us733QPwrqHp43a8m9ZLgyKXD3ST6U=",
+    "tools": [
+      "golang.org/x/mobile/cmd/gomobile",
+      "golang.org/x/mobile/cmd/gobind"
+    ],
+    "source": "cached official module.info and reviewed patched go.sum; future download must match Go checksum database"
+  },
+  "jdk": {
+    "vendor": "Eclipse Temurin",
+    "version": "17.0.20.1+1",
+    "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.20.1%2B1/OpenJDK17U-jdk_x64_linux_hotspot_17.0.20.1_1.tar.gz",
+    "sha256": "3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e",
+    "source": "https://github.com/adoptium/temurin17-binaries/releases/expanded_assets/jdk-17.0.20.1%2B1"
+  },
+  "gradle": {
+    "version": "9.3.1",
+    "url": "https://services.gradle.org/distributions/gradle-9.3.1-all.zip",
+    "sha256": "17f277867f6914d61b1aa02efab1ba7bb439ad652ca485cd8ca6842fccec6e43",
+    "official_wrapper_jar_sha256": "b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13",
+    "retained_wrapper_jar_sha256": "16caeaf66d57a0d1d2087fef6a97efa62de8da69afa5b908f40db35afc4342da",
+    "entry": "Invoke verified unpacked9.3.1/bin/gradle directly, as historical approved runner did. Do not execute the retained older wrapper jar or imply its SHA equals official9.3.1.",
+    "source": "https://gradle.org/release-checksums/"
+  },
+  "AGP": {
+    "version": "9.1.1",
+    "coordinate": "com.android.tools.build:gradle:9.1.1",
+    "repository": "https://dl.google.com/dl/android/maven2/",
+    "source": "https://developer.android.com/build/releases/agp-9-1-0-release-notes"
+  },
+  "Kotlin": {
+    "version": "2.4.0",
+    "coordinate": "org.jetbrains.kotlin.android:org.jetbrains.kotlin.android.gradle.plugin:2.4.0",
+    "repository": "https://plugins.gradle.org/m2/ and https://repo.maven.apache.org/maven2/"
+  },
+  "android_commandline_tools": {
+    "version": "22.0",
+    "build": "15859902",
+    "url": "https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip",
+    "sha256": "4e4c464f145a7512b57d088ac6c278c03c9eea610886b35a5e0804e74eedf583",
+    "source": "https://developer.android.com/studio?authuser=1019739252"
+  },
+  "android_sdk": {
+    "required_packages": [
+      {
+        "path": "platforms;android-37.0",
+        "revision": "2"
+      },
+      {
+        "path": "platforms;android-36",
+        "revision": "2"
+      },
+      {
+        "path": "build-tools;36.0.0",
+        "revision": "36.0.0"
+      }
+    ],
+    "compileSdk_app": 37,
+    "compileSdk_plugin": 36,
+    "targetSdk": 36,
+    "minSdk": 24,
+    "same_crossplatform_API_inputs": [
+      {
+        "path": "platforms/android-37.0/android.jar",
+        "bytes": 43044472,
+        "sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177"
+      },
+      {
+        "path": "platforms/android-36/android.jar",
+        "bytes": 27768026,
+        "sha256": "d9eb9da824d9e247a352f570f01e1169e725b2954bca9e283a71786c59b59f9a"
+      },
+      {
+        "path": "platforms/android-37.0/source.properties",
+        "bytes": 343,
+        "sha256": "fa89029fc0cee414cb5e44a37cd3033771217eeecb5086577bb6d9b1b03b5b5f"
+      },
+      {
+        "path": "platforms/android-36/source.properties",
+        "bytes": 257,
+        "sha256": "72291ff6611dbfc46fdfb6de2821c4a62c87befa5200713847eda426e3a501c2"
+      }
+    ],
+    "source": "Official sdkmanager22.0 repository metadata with internal package checksum verification; exact revision and android.jar SHA required, no sdkmanager --update/extra emulator/images/platform-tools. Linux package archive SHA256 not yet independently pinned."
+  },
+  "ndk": {
+    "version": "28.2.13676358",
+    "release": "r28c",
+    "url": "https://dl.google.com/android/repository/android-ndk-r28c-linux.zip",
+    "bytes": 722261334,
+    "official_sha1": "a7b54a5de87fecd125a17d54f73c446199e72a64",
+    "sha256": null,
+    "source": "https://github.com/android/ndk/wiki/Unsupported-Downloads#r28c",
+    "status": "Official page publishesSHA1 only. Future cloud acquisition must check length+SHA1, record actualSHA256 before use; no claim that a LinuxSHA256 has already been verified. Version retained for exact reproducibility, not latest recommendation."
+  },
+  "locks": {
+    "app_pubspec_lock": {
+      "path": "app/pubspec.lock",
+      "bytes": 40663,
+      "sha256": "dd9f75df4899be9c6aaca509d39e259a14164ce8be7b8ed693860bce7df4b648"
+    },
+    "patched_core_go_mod": {
+      "path": "go.mod",
+      "bytes": 1481,
+      "sha256": "ffeead4028cab91144bdb7460ff8b39da351ca0ef2fcafc84926d3f17666e450"
+    },
+    "patched_core_go_sum": {
+      "path": "go.sum",
+      "bytes": 7409,
+      "sha256": "81035756f13f282d14ca4629a94535d3317df4b5e35022b6f11f5becd79c574d"
+    },
+    "protocol_modules": [
+      {
+        "path": "server/pkg/protocol/go.mod",
+        "bytes": 374,
+        "sha256": "badbbca7e55346a0b2bb295779db61e0a007df0f7af017f4b2da419851e14294"
+      },
+      {
+        "path": "server/pkg/protocol/go.sum",
+        "bytes": 1743,
+        "sha256": "7ecb9e6d3ccee8738c9fe70740c08a91f2ed669f6af01b4e42038e2e7ee58df4"
+      }
+    ],
+    "pub": "pub.dev package SHA256 from unchanged lock; pub get --enforce-lockfile, then offline. Record resolved packages/native-hook inputs; no old stamp/dill reuse.",
+    "go": "Reviewed go.sum and exact52 local protocol; mobile tools exact version/commit/h1; download during setup, then GOPROXY=off/GOTOOLCHAIN=local for native build. Record module graph and tool binaries.",
+    "Gradle_dependency_lockfiles": 0,
+    "Gradle_verification_metadata_files": 0,
+    "Maven_artifact_hashes_prepinned": false,
+    "Gradle_gap": "Exact plugin versions are pinned, full Maven transitive bytes are not yet hash-locked. First cloud setup must record resolved graph+every consumed artifact SHA256 and reject dynamic versions. This is acquisition evidence, not a preexisting hermetic lock. Review/freeze verification-metadata separately for stronger subsequent reproduction; no silent upgrade or dependency-file rewrite."
+  },
+  "downloads_or_builds_performed_in_preparation": 0,
+  "sqlite_Android_ARM64_if_hook_reachable": {
+    "package": "sqlite3-3.5.2",
+    "source": "package locked by app/pubspec.lock; lib/src/hook/asset_hashes.dart + assets.dart + compile/description.dart",
+    "filename": "libsqlite3.arm64.android.so",
+    "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.arm64.android.so",
+    "sha256": "0c2d3bfc8c87abceb21ed72a4bb49964121c5fe1a8ef3848d83ba907d01b6161",
+    "fresh_seed_relative": "app/.dart_tool/hooks_runner/shared/sqlite3/build/download-0c2d3bfc/libsqlite3.so",
+    "contract": "Only new official binary verified against locked package hash; no hook snapshot/stamp. Confirm actual fresh hook shared path before seeding; offline hook must independently rehash. If unused by build, absence is not a failure; if reachable and unavailable, stop with setup missingasset, do not fetch inside denied build or switch to system SQLite."
+  }
+}

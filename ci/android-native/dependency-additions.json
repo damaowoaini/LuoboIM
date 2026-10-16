@@ -1,0 +1,46 @@
+{
+  "schema": "luobo.cloud-android.native-dependency-additions.v1",
+  "state": "source_reviewed_no_acquisition",
+  "reason": "Original426 includes app/plugin source but not full native hosted-dependency toolchain. Preserve prior426/toolchain bytes; add only these required cloud dependencies.",
+  "required_SDK_packages": [
+    {
+      "path": "platforms;android-35",
+      "revision": "2"
+    },
+    {
+      "path": "cmake;3.22.1",
+      "revision": "3.22.1"
+    }
+  ],
+  "crossplatform_API_inputs": [
+    {
+      "path": "platforms/android-35/android.jar",
+      "bytes": 27092450,
+      "sha256": "4566663c3876e022b4fa4ced8c8697c4ab1688267f090114fd92d027b32e619b"
+    },
+    {
+      "path": "platforms/android-35/source.properties",
+      "bytes": 257,
+      "sha256": "2c3764446f335ad2cc44383a0360fe247620b7c774ec100d5087771ac8ed3b28"
+    }
+  ],
+  "locked_pub_source_evidence": [
+    {
+      "path": "jni-1.1.0/android/build.gradle",
+      "bytes": 1987,
+      "sha256": "7a70fa8cb48b09cb272b7163e3268eaf82f0dd3dad4b6ca484fe6a9a9b135dc5"
+    },
+    {
+      "path": "flutter_webrtc-1.6.2+hotfix.4/android/build.gradle",
+      "bytes": 2458,
+      "sha256": "e9025bf04579d40a1dd4eac30be978ec4cce63cf52ccebc012e990bff953ec46"
+    }
+  ],
+  "JitPack": {
+    "repository": "https://jitpack.io",
+    "module": "com.github.davidliu:audioswitch",
+    "version": "039a35aefab7747c557242fa216c9ea11743b604",
+    "admission": "only this exact module/commit; record first-acquired artifactSHA/URL; no preexisting hermetic hash claim"
+  },
+  "CMake_selection": "generated local.properties cmake.dir points only new SDK/cmake3.22.1; no pubplugin/product edit"
+}

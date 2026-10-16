@@ -1,0 +1,63 @@
+{
+  "overlay": "patches/0002-debug-fixture-tls-only.patch",
+  "overlay_sha256": "72bb5adddedf262be493afa08bd4091a5dafc3a5596799b5a2fa7f272c37e0b3",
+  "requires_base_patch_sha256": "dcbc80f89ce07eaac8a2c28c23e1cbaef0db9c2c79cacffdaa020d61a356e1f7",
+  "build_tag": "luobo_fixture_ca_debug",
+  "modified_files": [
+    {
+      "path": "internal/interaction/ws_default.go",
+      "sha256": "5e124898febf5e71b2913fe210c236eb6ca5955e0b28a70fbe49d37709b97d71"
+    },
+    {
+      "path": "internal/util/post.go",
+      "sha256": "5a6cda269472968e9468b0447d8fc909e46abf1165901d20f4882852ca32880e"
+    },
+    {
+      "path": "pkg/fixturetls/config.go",
+      "sha256": "18fb46dd472fa4d66550174279ab03659d73583857ec0007f01db137c12bc990"
+    },
+    {
+      "path": "pkg/fixturetls/config_debug.go",
+      "sha256": "e91b267f092be9da1effd6e82f5dd443083df98d0ae3ddd74459537441b3f22f"
+    },
+    {
+      "path": "pkg/fixturetls/config_debug_test.go",
+      "sha256": "38dc951a3125f6cb2c8fddf12eac004a770a263befdae35e4b63e3bb961c1857"
+    },
+    {
+      "path": "pkg/fixturetls/config_default.go",
+      "sha256": "ba8cd7c85ffaa02a1cdcbff80bae9590089bb0359f570b4813337810e625d5c5"
+    },
+    {
+      "path": "pkg/fixturetls/config_default_test.go",
+      "sha256": "5cae8fe7ea6b7ff81ab5766be028abe79db86424c607d511ff9d26af0ccbbe06"
+    },
+    {
+      "path": "pkg/fixturetls/config_test.go",
+      "sha256": "d1f83b49233439c9ab9222d13dbc7f68026366b1512609a81f3cddd0e5c16429"
+    },
+    {
+      "path": "pkg/network/http_client.go",
+      "sha256": "f0697f3e8e8a6c9335c9a75853224eff7825ac4955d749e53d9da9edacb2a8bb"
+    },
+    {
+      "path": "pkg/network/new_http.go",
+      "sha256": "93baef1477ae8ee38a543c66403a63e6d1e16d0f14a7a6909038858d0ee0fb8b"
+    }
+  ],
+  "generated_file": "pkg/fixturetls/fixture_ca_generated_debug.go",
+  "scope": "explicit separate debug QA artifact only; exact10.0.2.2:34443 API/WSS trust; baseline production candidates unchanged",
+  "created_at": "2026-10-15T17:09:37.087711+08:00",
+  "review_hardening": {
+    "previous_overlay_sha256": "e5c68c74314efd79af961121317d43f0bbd8382f18aa6c54f14a6c2a7b5baae3",
+    "previous_manifest": "qa-fixture-source-before-path-review.json",
+    "change": "canonical API path required; literal dot/double-slash and empty query rejected; HTTP/WS TLS settings unchanged",
+    "additional_regressions": "4 noncanonical/empty-query URL cases passed in default and explicit debug tag small-package runs; docs/sdk/candidate-qa-tls-unit.json"
+  },
+  "private_read_expiry_source_update": {
+    "old_QA_artifact_base_patch": "45989d90141c8c6595c173d2765659df4f526150428000b0833fc07a30e7aaf4",
+    "new_source_patch": "67958cdc0e5d32984aa68b29f4d3cb7190f4e5ca3943f3a0713c156caf1d2be4",
+    "new_native_artifact_built": false,
+    "old_qa5600_manifest": "history/qa-fixture-source-qa5600.json"
+  }
+}

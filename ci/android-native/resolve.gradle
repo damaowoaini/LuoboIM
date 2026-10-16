@@ -1,0 +1,84 @@
+// Used only by the online dependency-preparation phase, never by a service.
+// "dependencies" is an existing permitted QA inspection task.
+import groovy.json.JsonOutput
+import java.security.MessageDigest
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+
+def roots = [System.getenv('ANDROID_NATIVE_WORK')].findAll { it != null }.collect { new File(it).canonicalFile }
+if (roots.size() != 1) throw new GradleException('one owned cloud root required')
+def owned = roots[0]
+def hosts = ['dl.google.com','maven.google.com','repo.maven.apache.org','repo1.maven.org',
+             'plugins.gradle.org','plugins-artifacts.gradle.org','storage.googleapis.com','jitpack.io'] as Set
+def checkRepo = { repo ->
+    if (repo.hasProperty('url')) {
+        def u = repo.url as URI
+        if (u.scheme == 'file') {
+            def f = new File(u).canonicalFile
+            if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('repository outside owned root')
+        } else if (u.scheme != 'https' || u.userInfo != null || u.query != null || u.fragment != null || !hosts.contains(u.host)) {
+            throw new GradleException('unexpected dependency repository')
+        }
+        if (u.host == 'jitpack.io') {
+            if (u.path != '' && u.path != '/') throw new GradleException('unexpected JitPack repository path')
+            repo.content { includeModule('com.github.davidliu','audioswitch') }
+        }
+    }
+}
+gradle.settingsEvaluated { s ->
+    s.pluginManagement.repositories.each(checkRepo)
+    s.pluginManagement.repositories.whenObjectAdded(checkRepo)
+}
+gradle.beforeProject { p ->
+    p.repositories.whenObjectAdded(checkRepo)
+    p.buildscript.repositories.whenObjectAdded(checkRepo)
+    [p.configurations,p.buildscript.configurations].each { configs -> configs.all { c ->
+        c.resolutionStrategy.eachDependency { d ->
+            def v = d.requested.version
+            if (d.requested.group == 'com.github.davidliu' && d.requested.name == 'audioswitch' &&
+                    v != '039a35aefab7747c557242fa216c9ea11743b604') throw new GradleException('JitPack source commit differs')
+            if (v != null && (v.contains('+') || v.toLowerCase().contains('latest') || v.contains('SNAPSHOT') || v.startsWith('[') || v.startsWith('('))) {
+                throw new GradleException('dynamic dependency version refused')
+            }
+        }
+    } }
+}
+gradle.projectsEvaluated {
+    gradle.rootProject.tasks.named('dependencies').configure {
+        doLast {
+            def rows = []
+            gradle.rootProject.allprojects.each { p ->
+                [p.configurations, p.buildscript.configurations].each { configs ->
+                    configs.findAll { it.canBeResolved && !(it.name.toLowerCase() =~ /release|profile|test|lint/) }.each { c ->
+                        // A resolution failure is a real setup failure, never ignored.
+                        c.resolvedConfiguration.resolvedArtifacts.each { a ->
+                            def f = a.file.canonicalFile
+                            if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('artifact outside owned root')
+                            if (a.id.componentIdentifier instanceof ProjectComponentIdentifier) {
+                                rows.add([project:p.path,configuration:c.name,projectComponent:a.id.componentIdentifier.displayName,
+                                          deferred_to_actual_APK_compile:true])
+                                return
+                            }
+                            if (!f.isFile()) throw new GradleException('resolved external artifact missing')
+                            def h = MessageDigest.getInstance('SHA-256')
+                            f.withInputStream { stream ->
+                                byte[] b = new byte[65536]; int n
+                                while ((n = stream.read(b)) > 0) h.update(b,0,n)
+                            }
+                            rows.add([project:p.path,configuration:c.name,coordinate:a.moduleVersion.id.toString(),
+                                      path:owned.toPath().relativize(f.toPath()).toString(),bytes:f.length(),sha256:h.digest().encodeHex().toString()])
+                        }
+                    }
+                }
+                p.repositories.each(checkRepo)
+                p.buildscript.repositories.each(checkRepo)
+            }
+            def out = new File(owned,'evidence/gradle-resolved-artifacts.json')
+            if (out.exists()) throw new GradleException('no overwrite of dependency evidence')
+            def stream = new FileOutputStream(out)
+            try {
+                stream.write((JsonOutput.prettyPrint(JsonOutput.toJson(rows))+'\n').getBytes('UTF-8'))
+                stream.flush(); stream.fd.sync()
+            } finally { stream.close() }
+        }
+    }
+}
