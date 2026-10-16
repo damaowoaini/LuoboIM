@@ -1,0 +1,45 @@
+name: Current257 generated module metadata evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: 'Real Android ARM64 module projection; no binding/native build'
+        type: choice
+        required: true
+        options: [current257-generated-module-evidence-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: generated-module-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generated-module-evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GENERATED_MODULE_COHORT: ${{ inputs.cohort }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select one fresh private diagnostic root
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/generated-module-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "GENERATED_MODULE_WORK=$RUNNER_TEMP/generated-module-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current257" >> "$GITHUB_ENV"
+      - name: Collect real projected module and acquisition evidence
+        run: |
+          python3 -B ci/android-native/test_generated_module_probe.py
+          python3 -B ci/android-native/generated_module_probe.py --cohort "$GENERATED_MODULE_COHORT" --execute --work "$GENERATED_MODULE_WORK"
+      - name: Preserve raw module locks, graphs and command resources
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: current257-generated-module-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.GENERATED_MODULE_WORK }}/evidence/
+          retention-days: 14
+          if-no-files-found: warn
