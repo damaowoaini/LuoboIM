@@ -12,6 +12,7 @@ import tarfile
 import generated_module_probe as projection
 import go_observer as observer
 import gradle_selector_fixture as selectors
+import gradle_variant_fixture as variants
 import run as parent
 import support as s
 import verify_inputs
@@ -19,7 +20,7 @@ import verify_inputs
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r5-explicit-file-descriptor-sync'
+REVISION = 'root-r6-strict-module-artifact-view'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 
@@ -89,6 +90,7 @@ class Job(parent.Job):
             if (self.w / 'evidence' / name).exists():
                 raise ValueError('fixture may not consume preexisting dependency evidence')
         cases = selectors.prepare(self.w)
+        cases += variants.prepare(self.w)
         results = []
         for case in cases:
             for name in selectors.OUTPUTS:
@@ -99,7 +101,7 @@ class Job(parent.Job):
                 '--no-watch-fs', '--console=plain', '--offline', '--project-cache-dir',
                 self.w / 'selector-project-cache' / case['label'],
                 '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m',
-                '-I', HERE / 'resolve-observed.gradle', 'dependencies']
+                '-I', HERE / 'resolve-observed.gradle', case.get('task', 'dependencies')]
             captured = {}
             control_env = parent.environment(self.w, True)
             # Synthetic file-Maven artifacts must never contaminate the
@@ -110,7 +112,7 @@ class Job(parent.Job):
                     'selector-control-' + case['label'], 120, case['expected_rejection'])
             finally:
                 captured = selectors.capture_outputs(self.w, case['cwd'])
-            proof = selectors.check(case, log, captured)
+            proof = variants.check(case, log, captured) if case.get('variant_contract') else selectors.check(case, log, captured)
             row = {'case': case['label'], 'state': 'passed', 'actual_Gradle': True,
                 'expected_rejection': case['expected_rejection'], 'outputs': captured, **proof}
             s.write_json(Path(case['cwd']) / 'evidence/result.json', row)

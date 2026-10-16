@@ -123,9 +123,8 @@ gradle.projectsEvaluated {
                 projects.add(checkedProject(p))
                 [p.configurations, p.buildscript.configurations].each { configs ->
                     configs.findAll { it.canBeResolved && !(it.name.toLowerCase() =~ /release|profile|test|lint/) }.each { c ->
-                        // Trigger the original strict artifact resolution first.
-                        // Its failure retains the real rule exception/cause.
-                        def artifacts = c.resolvedConfiguration.resolvedArtifacts
+                        // Inspect the complete graph, including dependencies
+                        // below local projects, before filtering any artifacts.
                         c.incoming.resolutionResult.allDependencies.each { edge ->
                             def requested = selectorIdentity(edge.requested)
                             if (edge instanceof UnresolvedDependencyResult) {
@@ -135,26 +134,44 @@ gradle.projectsEvaluated {
                             if (!(edge instanceof ResolvedDependencyResult)) {
                                 throw new GradleException('unknown dependency result refused: ' + requested.identity)
                             }
+                            def selected = componentIdentity(edge.selected.id)
                             selections.add([project:p.path, configuration:c.name,
                                     from:componentIdentity(edge.from.id), requested:requested,
-                                    selected:componentIdentity(edge.selected.id)])
+                                    selected:selected])
+                            if (edge.selected.id instanceof ProjectComponentIdentifier) {
+                                rows.add([project:p.path, configuration:c.name,
+                                        projectComponent:edge.selected.id.displayName,
+                                        selected:selected, deferred_to_actual_APK_compile:true])
+                            }
                         }
-                        artifacts.each { a ->
+                        // A strict artifact view filters components, not graph
+                        // edges. Local AGP secondary artifacts are chosen by
+                        // the eventual real APK tasks, not this metadata read.
+                        def moduleView = c.incoming.artifactView { view ->
+                            view.setLenient(false)
+                            view.componentFilter { component ->
+                                if (component instanceof ModuleComponentIdentifier) {
+                                    checkModule(component.group, component.module, component.version)
+                                    return true
+                                }
+                                if (component instanceof ProjectComponentIdentifier) return false
+                                throw new GradleException('unknown artifact component identifier refused')
+                            }
+                        }
+                        moduleView.getArtifacts().getArtifacts().each { a ->
                             def f = a.file.canonicalFile
                             if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('artifact outside owned root')
                             def selected = componentIdentity(a.id.componentIdentifier)
-                            if (a.id.componentIdentifier instanceof ProjectComponentIdentifier) {
-                                rows.add([project:p.path,configuration:c.name,projectComponent:a.id.componentIdentifier.displayName,
-                                          selected:selected, deferred_to_actual_APK_compile:true])
-                                return
-                            }
+                            if (!(a.id.componentIdentifier instanceof ModuleComponentIdentifier))
+                                throw new GradleException('non-module artifact escaped strict component view')
                             if (!f.isFile()) throw new GradleException('resolved external artifact missing')
                             def h = MessageDigest.getInstance('SHA-256')
                             f.withInputStream { stream ->
                                 byte[] b = new byte[65536]; int n
                                 while ((n = stream.read(b)) > 0) h.update(b,0,n)
                             }
-                            rows.add([project:p.path,configuration:c.name,coordinate:a.moduleVersion.id.toString(),
+                            rows.add([project:p.path,configuration:c.name,
+                                      coordinate:selected.group + ':' + selected.module + ':' + selected.version,
                                       selected:selected, path:owned.toPath().relativize(f.toPath()).toString(),
                                       bytes:f.length(),sha256:h.digest().encodeHex().toString()])
                         }
