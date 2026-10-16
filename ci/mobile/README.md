@@ -1,3 +1,17 @@
+# Mobile current294 source validation (draft, not run)
+
+This independent adoption draft follows frozen shortcut7c8173e2 (3prod+2newfixture/test paths). current294/portable346 are exact new identities; old292 source is not aliased. Mandatory target184 preserves original166 and adds18; full872 preserves original854 and adds18; strictanalyze0 remains required. Required-name v4 keeps the original accepted822+groupentry29+actualrouter3 as the complete parent854 multiset. All18 new names/92 expect expressions are prepared,0newDart executed.
+
+ParentR4 run38889622983/job116935677596 completed SUCCESS. Agent independently verified original16-member ZIP97752B/SHA7ff61e77,source344 exact,target166/full854 truefooters0error0skip,old822+29+3 exact successful names,58 ordered six-stage cleanups and safeexit6 in each phase,0hitTest/overflowwarnings and strictanalyze0. Root independent receipt is pending at draftfreeze; Root must finish its review before shortcut adoption. Earlier R3 actual166/854PASSanalysis3infoFAIL remains preserved. Old source/CI/evidence remain in Git and private candidate history.
+
+Original optional search reference remains defaultoff: full294 context with the same4 exact historical search replacements, original1namedassertFAIL+1oldfilterPASS, strict unchanged parser and exact after restoration. Its aggregate is recomputed from the entire294 source plus replacements, including changed common ContactSearchPage and2 new test files; do not reuse old292 digest. The newshortcut missing-entry before2 is a separate prepared-only plan; it adds no workflow phase and is not mistaken for that search reference.
+
+Existing28 purePython tests retain their assertions; only schema/cohort/count labels and rejection of old292 alias change. The9 protected controller function/class ASTs are unchanged. OfficialFlutter/SDK51/migration1/174dependencies/SQLite/locks, setup-onlynetwork, fresh loopbacknetns,4GiBinitial/1GiB .2s/768MiB/900s/processgroup/latchedfailure/completion gates are unchanged. Local app/tool/check.sh remains local-only absent public; no new inventory exception.
+
+No localDart/Flutter/Go/pubget/native/build/DB/network service/UI/main/public edits/dispatch executed. Widget tests simulate only the existing native/HTTP transport boundaries and do not prove device journeys or service authorization.
+
+## Preserved parent README (historical identities/results below)
+
 # Mobile current292 / portable344
 
 Atomic source adoption requires the chat-CID-page-key r1 selected4 plus this CI selected9; this draft applies nothing. Accepted287/run38878571484 remains actual134/822/analyze0 history. Current291/run38882772904 failed naturally:162PASS/1bounded-conditionERROR,16hiddenPASS,old134exact/new28+1;full851/analyze never started. Preserve original ZIP/logs/failure review.

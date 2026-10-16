@@ -8,10 +8,11 @@ import '../contacts_providers.dart';
 import '../domain/contact.dart';
 import 'contact_widgets.dart';
 
-enum _LookupKind { userId, phoneNumber, groupId }
+enum ContactSearchKind { userId, phoneNumber, groupId }
 
 class ContactSearchPage extends ConsumerStatefulWidget {
-  const ContactSearchPage({super.key});
+  const ContactSearchPage({super.key, this.initialKind = ContactSearchKind.userId});
+  final ContactSearchKind initialKind;
   @override
   ConsumerState<ContactSearchPage> createState() => _ContactSearchPageState();
 }
@@ -20,7 +21,7 @@ class _ContactSearchPageState extends ConsumerState<ContactSearchPage> {
   final input = TextEditingController();
   final users = <Contact>[];
   final groups = <GroupSummary>[];
-  _LookupKind kind = _LookupKind.userId;
+  late ContactSearchKind kind;
   bool busy = false, searched = false;
   AppFailure? failure;
   int ticket = 0;
@@ -28,7 +29,19 @@ class _ContactSearchPageState extends ConsumerState<ContactSearchPage> {
   @override
   void initState() {
     super.initState();
+    kind = widget.initialKind;
     input.addListener(inputChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant ContactSearchPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialKind != widget.initialKind) {
+      kind = widget.initialKind;
+      // A route mode is a new lookup intent. Keep the explicit input but never
+      // re-use another namespace's result or automatically repeat its request.
+      invalidateLookup();
+    }
   }
 
   void inputChanged() {
@@ -78,7 +91,7 @@ class _ContactSearchPageState extends ConsumerState<ContactSearchPage> {
       groups.clear();
     });
     try {
-      if (lookupKind == _LookupKind.groupId) {
+      if (lookupKind == ContactSearchKind.groupId) {
         final values = await repository.searchGroups(query);
         if (isCurrent()) {
           setState(() => groups.addAll(values));
@@ -86,7 +99,7 @@ class _ContactSearchPageState extends ConsumerState<ContactSearchPage> {
       } else {
         final result = await repository.lookupUser(
           query,
-          lookupKind == _LookupKind.userId
+          lookupKind == ContactSearchKind.userId
               ? ContactLookupMode.userId
               : ContactLookupMode.phoneNumber,
         );
@@ -121,17 +134,18 @@ class _ContactSearchPageState extends ConsumerState<ContactSearchPage> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          DropdownButtonFormField<_LookupKind>(
+          DropdownButtonFormField<ContactSearchKind>(
+            key: ValueKey(kind),
             initialValue: kind,
             isExpanded: true,
             decoration: const InputDecoration(labelText: '查询方式'),
             items: const [
-              DropdownMenuItem(value: _LookupKind.userId, child: Text('账号 ID')),
+              DropdownMenuItem(value: ContactSearchKind.userId, child: Text('账号 ID')),
               DropdownMenuItem(
-                value: _LookupKind.phoneNumber,
+                value: ContactSearchKind.phoneNumber,
                 child: Text('手机号'),
               ),
-              DropdownMenuItem(value: _LookupKind.groupId, child: Text('群 ID')),
+              DropdownMenuItem(value: ContactSearchKind.groupId, child: Text('群 ID')),
             ],
             onChanged: (value) {
               if (value == null || value == kind) return;
@@ -145,9 +159,9 @@ class _ContactSearchPageState extends ConsumerState<ContactSearchPage> {
             onSubmitted: (_) => search(),
             decoration: InputDecoration(
               hintText: switch (kind) {
-                _LookupKind.userId => '输入完整账号 ID',
-                _LookupKind.phoneNumber => '输入完整手机号',
-                _LookupKind.groupId => '输入完整群 ID',
+                ContactSearchKind.userId => '输入完整账号 ID',
+                ContactSearchKind.phoneNumber => '输入完整手机号',
+                ContactSearchKind.groupId => '输入完整群 ID',
               },
               prefixIcon: const Icon(Icons.search),
             ),

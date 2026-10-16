@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v7",
-  "state": "current292_group_entry_analysis_r4_pending_cloud",
+  "schema": "luobo.mobile.portable-ci-inputs.v8",
+  "state": "current294_inbox_contact_shortcuts_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -40,7 +40,8 @@
     "chat_cid_page_key_r1_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
     "chat_cid_page_key_fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd",
     "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd",
-    "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257"
+    "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257",
+    "inbox_contact_shortcuts_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -316,10 +317,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current292": 344
+    "current294": 346
   },
   "portable_digests": {
-    "current292": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08"
+    "current294": "06234b58e6fe842d4bb46e94f0ec7a473623afb4673b542a9c7d6ca4cd803291"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -614,14 +615,28 @@
         "group_creation_action.dart121 nullawareelement"
       ],
       "accepted_workflow": false
+    },
+    "current292_group_entry_analysis_r4_parent": {
+      "commit": "59f3f511481422d31f449e37963315589d3d4d49",
+      "run": 38889622983,
+      "job": 116935677596,
+      "artifactID": 12041486536,
+      "ZIP_bytes": 97752,
+      "ZIP_sha256": "7ff61e770ae4e58775ea39bf5cc4a5bb500eb08830d58b4e8a43d5fdd127b430",
+      "verification_sha256": "32228f341df41d1effe5fb90b28d134b110b44a4d68eb98cf4a7ca90036025c8",
+      "source292_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
+      "portable344_digest": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08",
+      "input_manifest_sha256": "218dc544a3ca967712ff23c930206ab53041ee8195a4f4a5367faa844767072a",
+      "actual": "target166+17hidden/full854+113hidden PASS/truefooters0error0skip;allold822+29+3 namesexact;58sixmarkercleanup+safeexit6each;0hitTest/overflow;strictanalyze0;3phasechild0;0latchedgate",
+      "root_review": "pending independentRootreceipt at thisdraftfreeze; no shortcutapply authorized by thisrecord"
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current292",
-    "members": 292,
-    "reference_source_digest": "74307fdd20e4796615959aa29b2059ac10df5d9b64e7358d87186fa6ed751abb",
+    "working_cohort": "current294",
+    "members": 294,
+    "reference_source_digest": "580a761639e054932844ff3485930566b2a81881ec2bcf7967597c6232f0ae8e",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -656,7 +671,8 @@
     "not_a_257_full_or_native_result": true,
     "not_a_269_full_or_native_result": true,
     "not_a_287_full_or_native_result": true,
-    "not_a_291_full_or_native_result": true
+    "not_a_291_full_or_native_result": true,
+    "not_a_292_full_or_native_result": true
   },
   "auxiliary_preserved": [
     {
@@ -680,12 +696,12 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 130355,
-    "sha256": "0eb7f56d7abb522f5ea4e9efae60e33b1b24db64c260011dc702d9320436928a"
+    "bytes": 135222,
+    "sha256": "7191899b7054300afbfdd4ea58497c48bc82af12e5dd568c008205204c53d87e"
   },
-  "current292": {
-    "members": 292,
-    "source_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
+  "current294": {
+    "members": 294,
+    "source_digest": "ed634fa8df97bf4e02b19797a35cdfdb5add7ea931598dc35173a25181888bc7",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -694,8 +710,8 @@
       },
       {
         "path": "app/lib/app.dart",
-        "bytes": 20156,
-        "sha256": "1f4aeb54d1a87f6874a0fc5de2cd514670d9476557e347e9f63a5c0d65edcb60"
+        "bytes": 20391,
+        "sha256": "421d0445c01e816dee3c1d56a01ef82b91a5aa374d43c87aa11ddb94512b89b6"
       },
       {
         "path": "app/lib/core/access/access_store.dart",
@@ -1019,8 +1035,8 @@
       },
       {
         "path": "app/lib/features/contacts/presentation/contact_search_page.dart",
-        "bytes": 5834,
-        "sha256": "15754014bd1183628bd7a0c2b266e2c02aec8982c14162cbb408c232fbfc48ff"
+        "bytes": 6431,
+        "sha256": "33caa0947556cc07b57c9a50aab79099f7d570f8b9e2faa5affc9dc38923e7fb"
       },
       {
         "path": "app/lib/features/contacts/presentation/contact_widgets.dart",
@@ -1064,8 +1080,8 @@
       },
       {
         "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 15893,
-        "sha256": "2bd97b544e751c6070df629abe2477125bfdbe8c317ae257c93e92eb766a3091"
+        "bytes": 18513,
+        "sha256": "0b64052cb0905daa3da06c1aabd3375813a6d8d5c34f6b2a75d2be000d19cc27"
       },
       {
         "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
@@ -1793,6 +1809,16 @@
         "sha256": "4948a2cf56946d6c33546d039d4a68bd9939c50400de0ef1747d03f63299d99d"
       },
       {
+        "path": "app/test/features/conversation/contact_shortcuts_fixture.dart",
+        "bytes": 5687,
+        "sha256": "e1257a33c2b76d75be2d2fe5a44d212f849d583018cc7acabd64d55ed0d696d5"
+      },
+      {
+        "path": "app/test/features/conversation/contact_shortcuts_test.dart",
+        "bytes": 17460,
+        "sha256": "e8d2ed6d8dfc51d56b2283c5d7360b15baac43602fa44bbb30a697f157a1acd3"
+      },
+      {
         "path": "app/test/features/conversation/conversation_repository_test.dart",
         "bytes": 5083,
         "sha256": "363768da0084598a3dd474a96f41d9434ef6f9fe9b2ca0abcbf0bc0a4906670d"
@@ -2148,8 +2174,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 166,
-    "expected_full_tests": 854,
+    "expected_target_tests": 184,
+    "expected_full_tests": 872,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -2158,7 +2184,8 @@
       "test/features/group/create_group_workflow_test.dart",
       "test/features/group/group_creation_entry_test.dart",
       "test/features/group/group_creation_entry_workflow_test.dart",
-      "test/features/group/chat_cid_route_test.dart"
+      "test/features/group/chat_cid_route_test.dart",
+      "test/features/conversation/contact_shortcuts_test.dart"
     ]
   }
 }

@@ -1,7 +1,7 @@
 {
-  "schema": "luobo.mobile.required-successful-names.v3",
-  "cohort": "current292",
-  "parent_full822": [
+  "schema": "luobo.mobile.required-successful-names.v4",
+  "cohort": "current294",
+  "parent_full854": [
     {
       "name": "/login stays scrollable at 320pt and 200% text",
       "count": 1
@@ -3289,9 +3289,7 @@
     {
       "name": "wrong typed known payload fields fall back without string coercion",
       "count": 1
-    }
-  ],
-  "new_group_entry29": [
+    },
     {
       "name": "accepted create through chat expansion recovers only conversation read without another create",
       "count": 1
@@ -3407,9 +3405,7 @@
     {
       "name": "unknown create through the new inbox entry remains frozen and cannot create twice",
       "count": 1
-    }
-  ],
-  "new_chat_route3": [
+    },
     {
       "name": "production router replaces a different CID and retires the owned group creation stack after read retry",
       "count": 1
@@ -3423,7 +3419,81 @@
       "count": 1
     }
   ],
-  "current_target166": [
+  "new_shortcuts18": [
+    {
+      "name": "inbox add friend opens the real ID lookup and normal back preserves inbox state",
+      "count": 1
+    },
+    {
+      "name": "inbox search group opens the real group lookup without changing existing menu actions",
+      "count": 1
+    },
+    {
+      "name": "group shortcut performs complete exact SDK lookup and opens the real group detail without joining",
+      "count": 1
+    },
+    {
+      "name": "friend shortcut uses exact ID and real profile hydration without a phone fallback or automatic request",
+      "count": 1
+    },
+    {
+      "name": "production contact route  preserves safe ID default and explicit phone mode",
+      "count": 1
+    },
+    {
+      "name": "production contact route ?kind=unknown preserves safe ID default and explicit phone mode",
+      "count": 1
+    },
+    {
+      "name": "same contact route changed to group mode invalidates an already dispatched ID reply without reissuing it",
+      "count": 1
+    },
+    {
+      "name": "lookup failure keeps a visible explicit read retry and never falls back to another namespace",
+      "count": 1
+    },
+    {
+      "name": "same owner unread metadata refresh does not retire a legitimate inbox shortcut",
+      "count": 1
+    },
+    {
+      "name": "a pending lookup cannot publish after the actual contacts provider is replaced",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after actor replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after tenant replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after issuer replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "a foreign route and return retires the old inbox callback but a new menu action remains usable",
+      "count": 1
+    },
+    {
+      "name": "covering the actual owned popup then returning does not revive its old choice",
+      "count": 1
+    },
+    {
+      "name": "canceling an owned menu and reopening keeps the legitimate shortcut usable",
+      "count": 1
+    },
+    {
+      "name": "a synchronous repeated old shortcut callback pushes only one search page",
+      "count": 1
+    },
+    {
+      "name": "inbox shortcuts and the group lookup remain usable at 320 by 568 with large text",
+      "count": 1
+    }
+  ],
+  "current_target184": [
     {
       "name": "CID clear begun after dispatch blocks unknown late IDs before privacy observe",
       "count": 1
@@ -3438,6 +3508,18 @@
     },
     {
       "name": "Unicode creation limit counts emoji and combining graphemes rather than UTF16 units",
+      "count": 1
+    },
+    {
+      "name": "a foreign route and return retires the old inbox callback but a new menu action remains usable",
+      "count": 1
+    },
+    {
+      "name": "a pending lookup cannot publish after the actual contacts provider is replaced",
+      "count": 1
+    },
+    {
+      "name": "a synchronous repeated old shortcut callback pushes only one search page",
       "count": 1
     },
     {
@@ -3493,6 +3575,10 @@
       "count": 1
     },
     {
+      "name": "canceling an owned menu and reopening keeps the legitimate shortcut usable",
+      "count": 1
+    },
+    {
       "name": "cancelled OS picker and cancelled preview permit explicit retry without upload",
       "count": 1
     },
@@ -3510,6 +3596,10 @@
     },
     {
       "name": "conversation metadata wait cannot renew the original create view",
+      "count": 1
+    },
+    {
+      "name": "covering the actual owned popup then returning does not revive its old choice",
       "count": 1
     },
     {
@@ -3621,6 +3711,10 @@
       "count": 1
     },
     {
+      "name": "friend shortcut uses exact ID and real profile hydration without a phone fallback or automatic request",
+      "count": 1
+    },
+    {
       "name": "gallery cancel and no code have explicit non-success states",
       "count": 1
     },
@@ -3661,11 +3755,19 @@
       "count": 1
     },
     {
+      "name": "group shortcut performs complete exact SDK lookup and opens the real group detail without joining",
+      "count": 1
+    },
+    {
       "name": "group-only inbox selection cannot silently open one-to-one chat",
       "count": 1
     },
     {
       "name": "image error releases busy and a later explicit selection may be decoded",
+      "count": 1
+    },
+    {
+      "name": "inbox add friend opens the real ID lookup and normal back preserves inbox state",
       "count": 1
     },
     {
@@ -3685,7 +3787,15 @@
       "count": 1
     },
     {
+      "name": "inbox search group opens the real group lookup without changing existing menu actions",
+      "count": 1
+    },
+    {
       "name": "inbox selected friends reach accepted editor and one exact native group intent",
+      "count": 1
+    },
+    {
+      "name": "inbox shortcuts and the group lookup remain usable at 320 by 568 with large text",
       "count": 1
     },
     {
@@ -3769,6 +3879,10 @@
       "count": 1
     },
     {
+      "name": "lookup failure keeps a visible explicit read retry and never falls back to another namespace",
+      "count": 1
+    },
+    {
       "name": "malformed global structure is an error rather than a successful empty search: {\"totalCount\":1,\"searchResultItems\":[{\"conversationID\":\"\",\"messageCount\":1,\"messageList\":[]}]}",
       "count": 1
     },
@@ -3841,6 +3955,18 @@
       "count": 1
     },
     {
+      "name": "old inbox shortcut callback after actor replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after issuer replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after tenant replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
       "name": "old repository cannot acquire a fresh issuer tenant or owner after rotation",
       "count": 1
     },
@@ -3898,6 +4024,14 @@
     },
     {
       "name": "primary inbox entry reaches the mounted complete global search",
+      "count": 1
+    },
+    {
+      "name": "production contact route  preserves safe ID default and explicit phone mode",
+      "count": 1
+    },
+    {
+      "name": "production contact route ?kind=unknown preserves safe ID default and explicit phone mode",
       "count": 1
     },
     {
@@ -3974,6 +4108,14 @@
     },
     {
       "name": "same clientID private facts conservatively affect both CIDs rather than leaking a body",
+      "count": 1
+    },
+    {
+      "name": "same contact route changed to group mode invalidates an already dispatched ID reply without reissuing it",
+      "count": 1
+    },
+    {
+      "name": "same owner unread metadata refresh does not retire a legitimate inbox shortcut",
       "count": 1
     },
     {
@@ -4090,21 +4232,28 @@
     }
   ],
   "provenance": {
-    "accepted_parent_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
-    "run": 38878571484,
-    "job": 116899482457,
-    "artifact_zip_sha256": "30b58b10baa38e2ce51010f351d68229b31fe6c2866ecfb745787b872ca69b0f",
-    "raw_full822_sha256": "986d253bbd137ca767da0c9a9dd26a17f336216b026f54d7c6a74ece40b3221c",
-    "raw_target134_sha256": "784352bc95e5673f331e13463c3065803395ff3fa4f8634908a6c8880932b78d",
-    "agent_verification_sha256": "69218bb8944743d8ac6610f696d258ae3677027bde85c1b7a4fcadef3d7cec87",
-    "root_acceptance_sha256": "cc014244d795b4747a2e409a1f03ef1b51ea3e858cf331507d239a914cf98d44",
-    "parent_required_names_sha256": "e71206a1d7fef5551319225da6324919c7347e78204faf473e4b80d248aa7102",
-    "group_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
-    "prepared29_names_sha256": "acbd3843b1a11dbaf4040eadf97c994f82e864dc794fc96276a9c8c5cf416fe1",
-    "group_entry_names_prepared_not_run": true,
-    "previous_current291_required_names_sha256": "cf597471ae20590f9e66036a64ff7c1466e28748dcb20c5f94229cf29600781f",
-    "chat_cid_page_key_r1_candidate_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
-    "new3_prepared_0Dart": true
+    "parent": {
+      "commit": "59f3f511481422d31f449e37963315589d3d4d49",
+      "run": 38889622983,
+      "job": 116935677596,
+      "artifactID": 12041486536,
+      "ZIP_bytes": 97752,
+      "ZIP_sha256": "7ff61e770ae4e58775ea39bf5cc4a5bb500eb08830d58b4e8a43d5fdd127b430",
+      "verification_sha256": "32228f341df41d1effe5fb90b28d134b110b44a4d68eb98cf4a7ca90036025c8",
+      "source292_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
+      "portable344_digest": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08",
+      "input_manifest_sha256": "218dc544a3ca967712ff23c930206ab53041ee8195a4f4a5367faa844767072a",
+      "actual": "target166+17hidden/full854+113hidden PASS/truefooters0error0skip;allold822+29+3 namesexact;58sixmarkercleanup+safeexit6each;0hitTest/overflow;strictanalyze0;3phasechild0;0latchedgate",
+      "root_review": "pending independentRootreceipt at thisdraftfreeze; no shortcutapply authorized by thisrecord"
+    },
+    "parent_required_names": {
+      "path": "ci/mobile/required-test-names.json",
+      "bytes": 130355,
+      "sha256": "0eb7f56d7abb522f5ea4e9efae60e33b1b24db64c260011dc702d9320436928a"
+    },
+    "shortcut_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f",
+    "new18_state": "prepared0actual",
+    "old822_plus29_plus3_exact_preserved": true
   },
-  "meaning": "Full854 exactly accepted822+original29+new3 with multiplicity; current291 first target162/1 is historical failure, not accepted851. Target166 exactly old134+29+3. Names are required future successful outcomes, not claimed results."
+  "meaning": "Expected exact successful name multisets, no skips/hidden errors/false footer/timeout accepted. Newshortcut before2 is independent preparedonly and is not the original search1FAIL1PASS reference."
 }

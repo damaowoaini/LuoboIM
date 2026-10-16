@@ -24,6 +24,8 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
   late final ConversationsController controller;
   final search = TextEditingController();
   bool searching = false;
+  int _lookupView = 0;
+  bool _lookupMenuOpen = false;
 
   @override
   void initState() {
@@ -36,6 +38,34 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
     );
     controller.addListener(_changed);
     unawaited(controller.refresh());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_lookupMenuOpen && ModalRoute.of(context)?.isCurrent == false) {
+      ++_lookupView;
+    }
+  }
+
+  void _retireLookupShortcut() {
+    ++_lookupView;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
+  }
+
+  void _lookupShortcut(String kind, Object? owner, int original) {
+    if (!mounted || original != _lookupView ||
+        !controller.repository.current || owner == null ||
+        !identical(controller.repository.session.state.credentials, owner) ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    context.push('/contacts/search?kind=$kind');
   }
 
   void _changed() {
@@ -52,6 +82,8 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lookupOwner = controller.repository.session.state.credentials;
+    final lookupView = _lookupView;
     final query = search.text.trim().toLowerCase();
     final items = controller.items
         .where(
@@ -84,7 +116,18 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
           ),
           PopupMenuButton<String>(
             tooltip: '更多操作',
+            onOpened: () { _lookupMenuOpen = true; },
+            onCanceled: () {
+              _lookupMenuOpen = false;
+              _retireLookupShortcut();
+            },
             onSelected: (value) async {
+              _lookupMenuOpen = false;
+              if (value == 'addFriend' || value == 'addGroup') {
+                _lookupShortcut(value == 'addGroup' ? 'group' : 'user', lookupOwner, lookupView);
+                _retireLookupShortcut();
+                return;
+              }
               if (value == 'meetings') {
                 context.push('/meetings');
                 return;
@@ -116,9 +159,15 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
                 }
               }
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'meetings', child: Text('会议（预约与管理）')),
-              PopupMenuItem(value: 'logout', child: Text('退出登录')),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: 'addFriend', height: 48,
+                child: _LookupMenuGuard(onCovered: _retireLookupShortcut,
+                  child: const Text('添加好友'))),
+              PopupMenuItem(value: 'addGroup', height: 48,
+                child: _LookupMenuGuard(onCovered: _retireLookupShortcut,
+                  child: const Text('搜索加群'))),
+              const PopupMenuItem(value: 'meetings', child: Text('会议（预约与管理）')),
+              const PopupMenuItem(value: 'logout', child: Text('退出登录')),
             ],
           ),
         ],
@@ -446,4 +495,29 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
     );
     if (failure != null && mounted) _notice(failure.message);
   }
+}
+
+// Normal opening/closing of this owned popup does not retire its entry. A
+// foreign route covering the popup does: returning must not revive that choice.
+class _LookupMenuGuard extends StatefulWidget {
+  const _LookupMenuGuard({required this.onCovered, required this.child});
+  final VoidCallback onCovered;
+  final Widget child;
+  @override
+  State<_LookupMenuGuard> createState() => _LookupMenuGuardState();
+}
+
+class _LookupMenuGuardState extends State<_LookupMenuGuard> {
+  bool covered = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (!covered && route?.isActive == true && route?.isCurrent == false) {
+      covered = true;
+      widget.onCovered();
+    }
+  }
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

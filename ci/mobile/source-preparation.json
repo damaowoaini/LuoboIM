@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.source-preparation.v7",
-  "state": "current292_group_entry_analysis_r4_pending_cloud",
+  "schema": "luobo.mobile.source-preparation.v8",
+  "state": "current294_inbox_contact_shortcuts_pending_cloud",
   "accepted_parent287": {
     "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
     "actual_run": 38878571484,
@@ -40,17 +40,17 @@
     "test_and_fixture": 3
   },
   "default_cloud_sequence": [
-    "unchanged28_Python_gates",
-    "strict292_344",
-    "officialFlutter_pinned_pubget_enforce_lockfile",
-    "target166_old134_plus29_plus3_exactnames",
-    "full854_accepted822_plus29_plus3_exactnames",
+    "unchanged28Python",
+    "strict294_346",
+    "officialFlutter_enforce_lockfile",
+    "target184_original166_plus18_exact_names",
+    "full872_original854_plus18_exact_names",
     "strictanalyze0"
   ],
   "actual_new3_Dart_tests": 0,
   "expected_not_actual": {
-    "target": 166,
-    "full": 854,
+    "target": 184,
+    "full": 872,
     "analyze_required": 0
   },
   "original29_preserved": "Same29 names;all68 original workflow expect expressions preserved,new5 strengthen priorfailure. New3 directly use actualrouterProvider and realChatPage/controller, mock only existingOS/MethodChannel/HTTP seams.",
@@ -113,5 +113,29 @@
   },
   "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257",
   "analysis_r4_scope": "Onlyexistinggroup_creation_action:equivalentbraces;explicitmounted&&originalcurrentbeforeNavigator;[?selectedPeer].Zerochangesalltests/names/runner/locks/resources/network.",
-  "actual_analysis_r4_Dart_tests": 0
+  "actual_analysis_r4_Dart_tests": 0,
+  "current292_analysis_r4_parent": {
+    "commit": "59f3f511481422d31f449e37963315589d3d4d49",
+    "run": 38889622983,
+    "job": 116935677596,
+    "artifactID": 12041486536,
+    "ZIP_bytes": 97752,
+    "ZIP_sha256": "7ff61e770ae4e58775ea39bf5cc4a5bb500eb08830d58b4e8a43d5fdd127b430",
+    "verification_sha256": "32228f341df41d1effe5fb90b28d134b110b44a4d68eb98cf4a7ca90036025c8",
+    "source292_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
+    "portable344_digest": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08",
+    "input_manifest_sha256": "218dc544a3ca967712ff23c930206ab53041ee8195a4f4a5367faa844767072a",
+    "actual": "target166+17hidden/full854+113hidden PASS/truefooters0error0skip;allold822+29+3 namesexact;58sixmarkercleanup+safeexit6each;0hitTest/overflow;strictanalyze0;3phasechild0;0latchedgate",
+    "root_review": "pending independentRootreceipt at thisdraftfreeze; no shortcutapply authorized by thisrecord"
+  },
+  "source294_digest": "ed634fa8df97bf4e02b19797a35cdfdb5add7ea931598dc35173a25181888bc7",
+  "portable346_digest": "06234b58e6fe842d4bb46e94f0ec7a473623afb4673b542a9c7d6ca4cd803291",
+  "shortcut_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f",
+  "current_delta": {
+    "production_existing": 3,
+    "new_test_and_fixture": 2,
+    "actual_new_Dart_tests": 0,
+    "prepared_new_cases": 18
+  },
+  "shortcut_before2": "Separatepreparedonlysamefull294compilationcontextwith3originalbeforebodies;onlyfirst2missingentryassertions,count2FAILexpected;no undefinedcallback/compile/load/timeout accepted productRED. Not default phase/not originalsearch reference."
 }

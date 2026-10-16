@@ -182,7 +182,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           QrCodePage(groupId: state.pathParameters['groupId']!)),
       GoRoute(
         path: '/contacts/search',
-        builder: (_, _) => const ContactSearchPage(),
+        builder: (_, state) => ContactSearchPage(
+          initialKind: switch (state.uri.queryParameters['kind']) {
+            'group' => ContactSearchKind.groupId,
+            'phone' => ContactSearchKind.phoneNumber,
+            _ => ContactSearchKind.userId,
+          },
+        ),
       ),
       GoRoute(
         path: '/contacts/requests/:kind',
