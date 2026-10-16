@@ -1,0 +1,61 @@
+name: Android current257 observed offline bind debug
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: 'Derived observed-bind source; no full-bind acceptance from metadata'
+        required: true
+        type: choice
+        options: [current257-auditable-arm64-observed-bind-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-observed-${{ github.ref }}-${{ inputs.cohort }}
+  cancel-in-progress: false
+
+jobs:
+  observed-arm64-debug:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ANDROID_COHORT: ${{ inputs.cohort }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select one new private job root
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "ANDROID_WORK=$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current257" >> "$GITHUB_ENV"
+      - name: Validate original29, metadata8 and observer10 Python controls
+        run: |
+          python3 -B ci/secret_scan.py
+          python3 -B ci/android-native/test_tools.py
+          python3 -B ci/android-native/test_generated_module_probe.py
+          python3 -B ci/android-native/test_go_observer.py
+      - name: Readonly pins and cold admission
+        run: |
+          python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage admission --work "$ANDROID_WORK"
+          python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage readonly
+      - name: Prepare pinned native tools and warm only reviewed metadata in same cache
+        run: python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage setup --work "$ANDROID_WORK"
+      - name: Actual offline bind with bounded real generated-source evidence
+        run: sudo unshare --net -- bash ci/android-native/netns-observed.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" core
+      - name: Resolve Java dependencies with original source provenance checks
+        run: python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage gradle-setup --work "$ANDROID_WORK"
+      - name: Original seven negative gates and real Debug APK offline
+        run: sudo unshare --net -- bash ci/android-native/netns-observed.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" apk
+      - name: Keep exact generated source evidence, raw locks, failure and artifacts
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current257-observed-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/evidence/
+            ${{ env.ANDROID_WORK }}/artifacts/
+          retention-days: 14
+          if-no-files-found: warn

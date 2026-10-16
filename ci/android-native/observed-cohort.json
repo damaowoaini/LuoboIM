@@ -1,0 +1,176 @@
+{
+  "schema": "luobo.observed-bind.explicit-cohort.v1",
+  "cohort": "current257-auditable-arm64-observed-bind-v1",
+  "source_ref": "314ac556fdc4be7f98dbd74370201922c71e67c5",
+  "source_digest": "5a8d283873826125aea888380cee0b37d5651613859ff32bad2da542dd5a5a55",
+  "controller_inputs": [
+    {
+      "path": ".github/workflows/android-debug.yml",
+      "bytes": 2595,
+      "sha256": "4222ed3e9b9d303544fe5ce4853a04bae50685bb6cb98b39d48e8aed843cb4e2"
+    },
+    {
+      "path": ".github/workflows/android-generated-module-evidence.yml",
+      "bytes": 1727,
+      "sha256": "dbb3561842568c495531d11dde93543ee21a78470457c61e69adc4bd1da68a42"
+    },
+    {
+      "path": ".github/workflows/android-observed-debug.yml",
+      "bytes": 2892,
+      "sha256": "457a9ceec50f030f6f1146f43f2629f4a6534709d97c1c32601d145c778d6ea3"
+    },
+    {
+      "path": "ci/android-native/audit.py",
+      "bytes": 8531,
+      "sha256": "1edf23b5ce32258e3e37d7af615b672e764de8193540aaa7de8a6fc03888d974"
+    },
+    {
+      "path": "ci/android-native/bindings.json",
+      "bytes": 130088,
+      "sha256": "6833a16883a6ae43b91b7400ecd49af6f44dd0d85adcc1b4e98f45213302f4fd"
+    },
+    {
+      "path": "ci/android-native/cohort.json",
+      "bytes": 1743,
+      "sha256": "34ec3ae5007774de773af66de98d07de450ca5a831488e3ab645f3cad9079b93"
+    },
+    {
+      "path": "ci/android-native/dependency-additions.json",
+      "bytes": 1651,
+      "sha256": "1f11a3a67e28e19a6c4114421947923b44015bb4a8df2d356b96bcde796f054e"
+    },
+    {
+      "path": "ci/android-native/generated_module_probe.py",
+      "bytes": 20761,
+      "sha256": "04ab0a4e6a34e52663e5b813711a0ac943ecd86472ae81286e33e982d57ddfc2"
+    },
+    {
+      "path": "ci/android-native/go_observer.py",
+      "bytes": 14494,
+      "sha256": "e7939ea1fe1332cb9891449309a69706fa63b72fea948384cb3612fa600cd44d"
+    },
+    {
+      "path": "ci/android-native/inputs.json",
+      "bytes": 83426,
+      "sha256": "1852fa0318522f8ca6cf41468880a7153022ae64f31369eddd9af0abadeb4364"
+    },
+    {
+      "path": "ci/android-native/luobo_module_projection_test.go",
+      "bytes": 3768,
+      "sha256": "8656e3104a902b78b48ff818c1c90b798a915ea6734a57e089347e9615e6422c"
+    },
+    {
+      "path": "ci/android-native/netns-observed.sh",
+      "bytes": 515,
+      "sha256": "871694aaded6cf2e971d484b06146a685d8688bf570fe780e04eb3ba2beb8ee6"
+    },
+    {
+      "path": "ci/android-native/netns.sh",
+      "bytes": 505,
+      "sha256": "4b685076b2d61f9b90ac7903f2bf2fda17362ef1e120e45c9c5f127392243e2a"
+    },
+    {
+      "path": "ci/android-native/observed-inputs.json",
+      "bytes": 81903,
+      "sha256": "eeee0b96bdae47e98fff10433f8a9c4391703421100e3164e312328c8be4574c"
+    },
+    {
+      "path": "ci/android-native/observed_bind.py",
+      "bytes": 18476,
+      "sha256": "dcacba6d0738387c1292a1459fd1e944ec37fefe96fc0492bb4f91fc6b288617"
+    },
+    {
+      "path": "ci/android-native/projected-module-after.mod",
+      "bytes": 4081,
+      "sha256": "f68c72acfd31c65d734712c229af867f8d2b8d06ab2ffae631dbf26a59223841"
+    },
+    {
+      "path": "ci/android-native/projected-module-before.mod",
+      "bytes": 4081,
+      "sha256": "05e30d386898edc45e01458e5dcd79d166965d89cb4537a436ed5beeaba21088"
+    },
+    {
+      "path": "ci/android-native/resolve.gradle",
+      "bytes": 4859,
+      "sha256": "fbd6cca215d4739ea89748650f4eb6a5c297253eb5c1b6f2ca888a8c52d812ad"
+    },
+    {
+      "path": "ci/android-native/run.py",
+      "bytes": 42548,
+      "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
+    },
+    {
+      "path": "ci/android-native/support.py",
+      "bytes": 11876,
+      "sha256": "818ed812deab20b25d4e8352f7d31b637039c0a881c8fc0fa070bc2ce1ea8fbd"
+    },
+    {
+      "path": "ci/android-native/test_generated_module_probe.py",
+      "bytes": 7209,
+      "sha256": "c5e0682033df28bcc64b40a212ea16ade6a8c6bf5fc8fedf3858c00501636461"
+    },
+    {
+      "path": "ci/android-native/test_go_observer.py",
+      "bytes": 9933,
+      "sha256": "3ac3cf014acef12919ce97870f7b36fcbeaa5407add2aed6aca1026a8938faf5"
+    },
+    {
+      "path": "ci/android-native/test_tools.py",
+      "bytes": 19907,
+      "sha256": "701c229a197c5ba1dcd6b59b47047b3fa9cc5bbdfb8e5b5453fbbdac09f1833c"
+    },
+    {
+      "path": "ci/android-native/toolchain.json",
+      "bytes": 8078,
+      "sha256": "13cdeeb22b003d24714525c7de483446d8e0e0eed23200c4f54df1badd2251bd"
+    },
+    {
+      "path": "ci/android-native/verify_inputs.py",
+      "bytes": 2962,
+      "sha256": "266a89fe31cbd9c40aa566a8f8f1404d9a04fed2a9a736a6cafac7e9142eede5"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/UPSTREAM-LICENSE-APACHE-2.0",
+      "bytes": 11356,
+      "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
+      "bytes": 18776,
+      "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/build_candidate.py",
+      "bytes": 16877,
+      "sha256": "44d5d7d713e1f3e536db405318998ff618beb1ce6e25030269ba3557f373c32c"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/build_observed_candidate.py",
+      "bytes": 19159,
+      "sha256": "84c5977a57b2830385824abaecb1bf29ecb4f593454b724a554b86747346c079"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/candidate-source-manifest.json",
+      "bytes": 21153,
+      "sha256": "c4311042854604c113ce484b327349c9ff566b80ba326fc071d358cdbaa67447"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/patches/0001-enterprise-protocol-compat.patch",
+      "bytes": 142887,
+      "sha256": "dcbc80f89ce07eaac8a2c28c23e1cbaef0db9c2c79cacffdaa020d61a356e1f7"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/patches/0002-debug-fixture-tls-only.patch",
+      "bytes": 17958,
+      "sha256": "72bb5adddedf262be493afa08bd4091a5dafc3a5596799b5a2fa7f272c37e0b3"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/tool/native_core/qa-fixture-source-manifest.json",
+      "bytes": 2838,
+      "sha256": "a9d23ebeac7ca7ed637628838b96ac79ba61e6f238e3392c108a10e2529b02ce"
+    }
+  ],
+  "members": 428,
+  "old427_r1_r2_immutable": true,
+  "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true
+}
