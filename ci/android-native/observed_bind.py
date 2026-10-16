@@ -25,7 +25,7 @@ import rich_fixture
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r13-accepted-R12-finite-rich-consumer-r1'
+REVISION = 'root-r14-bounded-artifact-refusal-evidence-v1'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 

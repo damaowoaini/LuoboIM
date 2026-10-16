@@ -98,9 +98,9 @@
       "sha256": "eeee0b96bdae47e98fff10433f8a9c4391703421100e3164e312328c8be4574c"
     },
     {
-      "bytes": 27167,
       "path": "ci/android-native/observed_bind.py",
-      "sha256": "a2cea0e27be45e79697530257d93a9f525d70ec0a4fe3ee887c18acf120f762c"
+      "bytes": 27167,
+      "sha256": "5607c6862da980c4f30b5b591124168fad393fe393b29739181bd1a9495fdd67"
     },
     {
       "bytes": 4995,
@@ -118,9 +118,9 @@
       "sha256": "05e30d386898edc45e01458e5dcd79d166965d89cb4537a436ed5beeaba21088"
     },
     {
-      "bytes": 33367,
       "path": "ci/android-native/resolve-observed.gradle",
-      "sha256": "06f9e8111406aa8a70c3f846bc54fdd485784639a43aa79f7eeebf76e39cd6f3"
+      "bytes": 34084,
+      "sha256": "85e79a582a84898711e72f974da6cdc08f34129b7b6fb6c80f58c2f60c10add3"
     },
     {
       "bytes": 4859,
@@ -133,9 +133,9 @@
       "sha256": "db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe"
     },
     {
-      "bytes": 6964,
       "path": "ci/android-native/rich-consumer.gradle",
-      "sha256": "9ba3305baf5339321f5b5bfbd75c0708aeb3d8b2e25d67c7407926965556058f"
+      "bytes": 8235,
+      "sha256": "3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3"
     },
     {
       "bytes": 2214,
@@ -143,9 +143,14 @@
       "sha256": "f0856e71a7a1ba39bac3eda046e8611e3870ec6c14f0f42c5f30011fe61b3d54"
     },
     {
-      "bytes": 7844,
+      "path": "ci/android-native/rich-refusal-fixture.gradle",
+      "bytes": 5360,
+      "sha256": "deb9bbb417fe858ea2cd8ad0ebc91d2693599d030362fd38559e63d8f61e79a4"
+    },
+    {
       "path": "ci/android-native/rich_consumer.py",
-      "sha256": "80d22ac2254e095ee04827f6360e4be0cb3b0e6f889df7120c0c0180d18ef919"
+      "bytes": 10081,
+      "sha256": "2084090e1f6e126f4c7cc9f7877a64f3c7a4832d2237bef2f85c81a8d1059955"
     },
     {
       "bytes": 9059,
@@ -196,6 +201,11 @@
       "bytes": 8934,
       "path": "ci/android-native/test_rich_consumer.py",
       "sha256": "a6e44fa58de245b9fc254c63c4256a3355e09de9ffbb2880ebe3135f712cb02b"
+    },
+    {
+      "path": "ci/android-native/test_rich_refusal.py",
+      "bytes": 8881,
+      "sha256": "449bd94e3e8bdd363c3306f42f52b22e2e8fe81a12030ed79152caf6507bf75b"
     },
     {
       "bytes": 17552,
@@ -258,7 +268,7 @@
       "sha256": "a9d23ebeac7ca7ed637628838b96ac79ba61e6f238e3392c108a10e2529b02ce"
     }
   ],
-  "controller_revision": "root-r13-accepted-R12-finite-rich-consumer-r1",
+  "controller_revision": "root-r14-bounded-artifact-refusal-evidence-v1",
   "members": 428,
   "old427_r1_r2_immutable": true,
   "schema": "luobo.observed-bind.explicit-cohort.v1",

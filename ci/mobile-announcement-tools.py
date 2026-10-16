@@ -88,11 +88,11 @@ class AnnouncementFocusedTests(unittest.TestCase):
         work = Path('/tmp/fresh-mobile-announcement')
         analyses, command = focused.phase_commands(work)
         self.assertEqual([args[-1] for args in analyses], focused.RUN_ANALYSIS)
-        self.assertEqual(len(analyses), 9)
-        self.assertEqual(focused.RUN_ANALYSIS, focused.ANALYSIS[2:])
+        self.assertEqual(len(analyses), 6)
+        self.assertEqual(focused.RUN_ANALYSIS, focused.ANALYSIS[5:])
         cfg = json.loads(INPUT.read_text())
         rows = [r['source_pin'] for r in cfg['target']['analysis_reuse_entries']]
-        self.assertEqual(focused.reused_analysis_contract(cfg, rows)['reused_successes'], 2)
+        self.assertEqual(focused.reused_analysis_contract(cfg, rows)['reused_successes'], 5)
         changed = copy.deepcopy(cfg)
         changed['target']['analysis_reuse_entries'][0]['log_utf8'] += 'changed'
         with self.assertRaisesRegex(ValueError, 'source pin differs'):
@@ -117,6 +117,52 @@ class AnnouncementFocusedTests(unittest.TestCase):
         self.assertEqual(env['XDG_CONFIG_HOME'], str(work/'config'))
         self.assertEqual(env['XDG_CACHE_HOME'], str(work/'config/cache'))
         self.assertTrue(all(env[key] == str(work/'tmp') for key in ('TMPDIR', 'TMP', 'TEMP')))
+
+
+    def test_diagnostic_collection_continues_but_infrastructure_and_unknown_output_stop(self):
+        commands = focused.phase_commands(Path('/tmp/fresh-mobile-announcement'))[0][:3]
+        calls, reports = [], []
+
+        def result(label, command, diagnostic=False):
+            heading = 'Analyzing ' + Path(command[-1]).name + '...\n'
+            text = (heading + '\n   info - ' + Path(command[-1]).name
+                    + ':1:1 - Add braces. - curly_braces_in_flow_control_structures\n\n1 issue found.\n'
+                    if diagnostic else heading + 'No issues found!\n')
+            return {'phase': label, 'command': command, 'child_exit_code': 1 if diagnostic else 0,
+                    'latched_failure': None, 'log_sha256': focused.sha(text.encode())}, text
+
+        def execute(label, command):
+            calls.append(label)
+            return result(label, command, diagnostic=len(calls) == 2)
+
+        summary = focused.collect_analyses(commands, execute, lambda: None, reports.append)
+        self.assertEqual(len(calls), 3)
+        self.assertEqual(len(reports), 3)
+        self.assertFalse(summary['all_passed'])
+        self.assertEqual(summary['failed_paths'], [commands[1][-1]])
+        calls.clear()
+
+        def resource_failure(label, command):
+            calls.append(label)
+            if len(calls) == 2:
+                raise RuntimeError('resource/timeout/source boundary stopped')
+            return result(label, command)
+
+        with self.assertRaisesRegex(RuntimeError, 'boundary stopped'):
+            focused.collect_analyses(commands, resource_failure, lambda: None, lambda _: None)
+        self.assertEqual(len(calls), 2)
+        calls.clear()
+
+        def unknown_output(label, command):
+            calls.append(label)
+            record, _ = result(label, command)
+            text = 'Unexpected SDK failure\n'
+            record['log_sha256'] = focused.sha(text.encode())
+            return record, text
+
+        with self.assertRaisesRegex(ValueError, 'unknown successful analyzer'):
+            focused.collect_analyses(commands, unknown_output, lambda: None, lambda _: None)
+        self.assertEqual(len(calls), 1)
 
 
 if __name__ == '__main__':

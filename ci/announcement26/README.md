@@ -1,7 +1,7 @@
 This prepared manual lane overlays only the eleven formatted announcement files
 into an exact current354/406 setup. The checked-out product stays354; the fresh
-owned source becomes candidate359/411. It reuses the exact source and raw successful analyses1/2 from run38974011605,
-runs only the remaining nine selected fatal-info analyses, then target26: the complete new24 and the exact old2 listed in
+owned source becomes candidate359/411. It reuses the exact source and raw successful analyses1/2 from run38974011605 and3/4/5
+from run38975527239, then runs only the remaining six selected fatal-info analyses, then target26: the complete new24 and the exact old2 listed in
 inputs.json. It cannot run Card80, group-revoke58, a full suite or the optional
 historical search reference. Full1304 is only expected arithmetic, never a result.
 
@@ -37,3 +37,9 @@ analysis successes are real; the first26 still has not run. Raw logs/resources
 are embedded with exact hashes in inputs.json; no offline-phase fetch is used.
 Future formal product359 adoption must be a separate reviewed change; historical
 354 helper identities must be pinned to their original source ref before reuse.
+
+The six analyses retain fatal-infos. Complete ordinary Dart diagnostics are
+collected for all six, then any diagnostic fails the lane before target26.
+Resource/time/source changes, unknown exits and unrecognized tool output stop
+immediately. Only one original phase/reuse control and one new diagnostic-fault
+control require a future targeted check; the other three remain reused.

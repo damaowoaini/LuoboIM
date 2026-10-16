@@ -7,7 +7,7 @@ from pathlib import Path
 import stat
 
 CATALOG_SHA = 'db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe'
-SCRIPT_SHA = '9ba3305baf5339321f5b5bfbd75c0708aeb3d8b2e25d67c7407926965556058f'
+SCRIPT_SHA = '3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3'
 
 
 def sha(body):
@@ -67,6 +67,42 @@ def validate_report(catalog, report):
     if project(report['artifacts'])!=project(expected['artifacts']):
         raise ValueError('rich selected artifact18 set/body differs')
     return expected
+
+
+def inspect_refusal(catalog, value):
+    """Explain bounded failed evidence; never convert it to an accepted report."""
+    config = next((c for c in catalog['configurations'] if c['name']==value.get('configuration')),None)
+    if (value.get('kind')!='rich-artifact-refusal-v1' or value.get('accepted') is not False
+            or value.get('catalog_sha256')!=CATALOG_SHA or config is None
+            or value.get('project')!=catalog['scope']['project']):
+        raise ValueError('untrusted refusal scope/catalog')
+    if value.get('snapshot_omitted')=='bounded-evidence-cap':
+        return dict(accepted=False,configuration=config['name'],evidence_complete=False,
+                    actual_artifact_count=value['actual_artifact_count'])
+    expected=[{k:v for k,v in a.items() if k!='origin'} for a in config['artifacts']]
+    if (value.get('scope_sources')!=catalog['scope']['sources']
+            or value.get('no_force_or_substitution') is not True
+            or sorted(map(canonical,value['edges']))!=sorted(map(canonical,config['edges']))
+            or sorted(map(canonical,value['expected_artifacts']))!=sorted(map(canonical,expected))
+            or len(value['actual_artifacts'])>64):
+        raise ValueError('refusal does not prove unchanged pre-artifact admission')
+    actual=value['actual_artifacts']; fields=['id','filename','bytes','sha256','variant']
+    if any(set(a)!=set(fields) for a in actual):
+        raise ValueError('unexpected refusal artifact fields')
+    differences=[]; used=set()
+    for wanted in expected:
+        matches=[(i,a) for i,a in enumerate(actual) if a['id']==wanted['id']]
+        if len(matches)!=1:
+            differences.append(dict(id=wanted['id'],fields=['missing-or-duplicate-component']))
+            continue
+        i,observed=matches[0];used.add(i)
+        changed=[k for k in fields if observed[k]!=wanted[k]]
+        if changed: differences.append(dict(id=wanted['id'],fields=changed))
+    extras=len(actual)-len(used)
+    if not differences and extras==0:
+        raise ValueError('equal artifacts are not an artifact refusal')
+    return dict(accepted=False,configuration=config['name'],evidence_complete=True,
+                differences=differences,extra_rows=extras)
 
 
 def reports(work, here, phase, require_all):

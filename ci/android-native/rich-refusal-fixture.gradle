@@ -1,0 +1,87 @@
+// Test-only builtin project; production catalog/entry points are unchanged.
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import org.gradle.api.artifacts.component.ModuleComponentSelector
+
+def dir=gradle.startParameter.currentDir.canonicalFile
+def spec=new JsonSlurper().parse(new File(dir,'control-catalog.json'))
+def digest={ f -> MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString() }
+def lib=new File(dir,'rich-consumer.gradle')
+if (digest(lib)!=spec.library_sha256) throw new GradleException('control library changed')
+def factory=new GroovyShell(getClass().classLoader).evaluate(lib)
+def owned=dir.parentFile.parentFile
+def ownedPrincipal=Files.getOwner(owned.toPath(),LinkOption.NOFOLLOW_LINKS)
+def richPhase='metadata'
+def richSource=spec
+
+// Read the whole exact production source, not a fixture-maintained writer copy.
+def writerPin=new JsonSlurper().parse(new File(dir,'production-writer-pin.json'))
+def resolver=new File(dir,'production-resolver.gradle')
+def resolverSha='85e79a582a84898711e72f974da6cdc08f34129b7b6fb6c80f58c2f60c10add3'
+if (writerPin.path!='production-resolver.gradle' || writerPin.sha256!=resolverSha ||
+        resolver.canonicalFile!=resolver.absoluteFile || !Files.isRegularFile(resolver.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+        Files.getOwner(resolver.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal ||
+        Files.getAttribute(resolver.toPath(),'unix:nlink',LinkOption.NOFOLLOW_LINKS)!=1 ||
+        resolver.length()!=writerPin.bytes || digest(resolver)!=resolverSha)
+    throw new GradleException('whole production resolver source differs')
+def text=resolver.getText('UTF-8')
+def startMarker='def richPersist ='
+def endMarker='def richWrite ='
+if (text.indexOf(startMarker)<0 || text.indexOf(startMarker)!=text.lastIndexOf(startMarker) ||
+        text.indexOf(endMarker)<0 || text.indexOf(endMarker)!=text.lastIndexOf(endMarker) ||
+        text.indexOf(endMarker)<=text.indexOf(startMarker))
+    throw new GradleException('unique production writer markers required')
+def block=text.substring(text.indexOf(startMarker),text.indexOf(endMarker))
+def blockSha=MessageDigest.getInstance('SHA-256').digest(block.getBytes('UTF-8')).encodeHex().toString()
+if (blockSha!=writerPin.block_sha256) throw new GradleException('production writer block differs')
+def imports='import groovy.json.JsonOutput\nimport java.nio.file.Files\nimport java.nio.file.LinkOption\nimport org.gradle.api.GradleException\n'
+def writerBinding=new Binding([owned:owned,richSource:richSource,richPhase:richPhase,ownedPrincipal:ownedPrincipal])
+def richPersist=new GroovyShell(getClass().classLoader,writerBinding).evaluate(imports+block+'\nreturn richPersist\n')
+// Gate still uses exact independent synthetic constraints; its model is not production provenance.
+def local={ f ->
+    if (f.canonicalFile!=f.absoluteFile || !f.toPath().startsWith(owned.toPath()) ||
+            Files.isSymbolicLink(f.toPath()) || !f.isFile()) throw new GradleException('control file unsafe')
+    [bytes:f.length(),sha256:digest(f)]
+}
+def gate=factory(owned,spec,local,digest,'synthetic-control-only')
+gradle.beforeProject { p ->
+    p.configurations.all { c ->
+        if (gate.scoped(p,c)) c.incoming.beforeResolve { gate.declarations(p,c) }
+        c.resolutionStrategy.dependencySubstitution.all { d ->
+            if (!(d.requested instanceof ModuleComponentSelector)) throw new GradleException('control module only')
+            if (gate.isRich(d.requested.versionConstraint)) gate.requested(p,c,d.requested)
+        }
+    }
+}
+gradle.projectsEvaluated {
+    gradle.rootProject.tasks.register('checkRichConsumer') {
+        doLast {
+            def app=gradle.rootProject.project(':app')
+            spec.configurations.each { config ->
+                def current=app.configurations.getByName(config.name)
+                def proof=gate.audit(app,current,{ refused ->
+                    if (refused.accepted!=false || refused.kind!='rich-artifact-refusal-v1')
+                        throw new GradleException('expected original refusal proof')
+                    richPersist(current,refused,'rich-refused')
+                    println('LUOBO_RICH_WRITER_COMPLETED writer_sha256=63f1330c16da061fbd41a390887bd7fb51db75a06d24724524c1c03e8d6b0e8b source_sha256=85e79a582a84898711e72f974da6cdc08f34129b7b6fb6c80f58c2f60c10add3 configuration='+current.name)
+                })
+                richPersist(current,proof,'rich-consumed')
+            }
+            // The same closure must reject nonfinite destinations before any write.
+            for (args in [[app.configurations.first(),[:],'unexpected-family'],
+                          [[name:'../outside'],[:],'rich-consumed']]) {
+                boolean rejected=false
+                try { richPersist(*args) }
+                catch (GradleException e) {
+                    if (e.message!='finite rich evidence destination required') throw e
+                    rejected=true
+                }
+                if (!rejected) throw new GradleException('production finite writer destination was not rejected')
+            }
+            if (digest(resolver)!=resolverSha) throw new GradleException('production writer source changed after actual calls')
+        }
+    }
+}

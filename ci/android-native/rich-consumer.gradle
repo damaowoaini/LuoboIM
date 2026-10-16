@@ -76,7 +76,7 @@ return { File owned, Map source, Closure localRef, Closure fileDigest, String ca
         external:v.externalVariant.present ? [display:v.externalVariant.get().displayName,
             owner:module(v.externalVariant.get().owner),attributes:attrs(v.externalVariant.get().attributes),
             capabilities:caps(v.externalVariant.get().capabilities)] : null] }
-    def audit = { p,c ->
+    def audit = { p,c,Closure recordRefusal = null ->
         declarations(p,c)
         def graph=c.incoming.resolutionResult
         def edges=graph.allDependencies.collect { e ->
@@ -94,8 +94,29 @@ return { File owned, Map source, Closure localRef, Closure fileDigest, String ca
             [id:module(a.id.componentIdentifier),filename:a.file.name,bytes:f.bytes,sha256:f.sha256,variant:variant(a.variant)]
         }
         def projected=spec(c).artifacts.collect { a -> a.findAll { k,v -> k!='origin' } }
-        if (artifacts.collect(canonical).sort()!=projected.collect(canonical).sort())
-            throw new GradleException('rich artifact18 selected/body differs')
+        if (artifacts.collect(canonical).sort()!=projected.collect(canonical).sort()) {
+            def refusal = new GradleException('rich artifact18 selected/body differs')
+            // This observation grants nothing. The original exact comparison,
+            // graph/source gates and failure remain mandatory.
+            if (recordRefusal != null) {
+                try {
+                    def proof = [kind:'rich-artifact-refusal-v1',accepted:false,
+                        catalog_sha256:catalogSha,project:p.path,configuration:c.name,
+                        scope_sources:source.scope.sources,no_force_or_substitution:true,
+                        edges:edges,expected_artifacts:projected,actual_artifacts:artifacts]
+                    def encoded = JsonOutput.toJson(proof).getBytes('UTF-8')
+                    if (artifacts.size()>64 || encoded.length>128*1024) {
+                        proof = [kind:'rich-artifact-refusal-v1',accepted:false,
+                            catalog_sha256:catalogSha,project:p.path,configuration:c.name,
+                            actual_artifact_count:artifacts.size(),snapshot_omitted:'bounded-evidence-cap']
+                    }
+                    recordRefusal(proof)
+                } catch (Exception evidenceFailure) {
+                    refusal.addSuppressed(evidenceFailure)
+                }
+            }
+            throw refusal
+        }
         [catalog_sha256:catalogSha,project:p.path,configuration:c.name,scope_sources:source.scope.sources,
          no_force_or_substitution:true,edges:edges,artifacts:artifacts]
     }

@@ -133,7 +133,7 @@
     "sha256": "dd9f75df4899be9c6aaca509d39e259a14164ce8be7b8ed693860bce7df4b648"
   },
   "schema": "luobo.android.current-app.v2",
-  "shared_registry_sha256": "40f81d5ee611afa42e53280b84db15a8118af7e42f9487050463986a86db15a3",
+  "shared_registry_sha256": "5fd3cfc422b98cf89718e526ff9edc0ccdee8063162e836b1ab96bd08f915e75",
   "shared_source_identity": "historical257/428 helper validation only; never App source used by this entry",
   "source_digest": "769bea7065a7de175aff4a12ea95bf0d571bf8919b130c1fde0af0d052f10508",
   "source_members": 530,

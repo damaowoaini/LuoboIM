@@ -454,8 +454,9 @@ final class GroupRepository {
   Future<String> conversation(String id, {bool Function()? isCurrent}) async {
     void check() {
       access.check();
-      if (isCurrent?.call() == false)
+      if (isCurrent?.call() == false) {
         throw const AppFailure(FailureKind.cancelled);
+      }
     }
 
     check();

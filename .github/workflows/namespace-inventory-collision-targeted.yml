@@ -1,0 +1,45 @@
+name: Namespace inventory collision fixture targeted one
+
+# Only the failed pure case. Prior7/24 including live Mongo/Redis+CLI are reused.
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: namespace-inventory-collision-target1-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  target1:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety and exact fixture successor; two new pure controls reviewed locally once before adoption
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/namespace-inventory-collision/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Only failed pure collision top under source/resource/network guards; no Docker or DB
+        run: python3 -B ci/namespace-inventory-collision/run.py
+      - name: Preserve only explicit public source/test/resource evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: namespace-inventory-collision-target1-${{ github.run_id }}
+          path: ci-results/namespace-inventory-collision/
+          if-no-files-found: warn
+          retention-days: 14

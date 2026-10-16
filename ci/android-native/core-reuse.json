@@ -36,14 +36,14 @@
       "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
     },
     {
-      "bytes": 27167,
       "path": "ci/android-native/observed_bind.py",
-      "sha256": "a2cea0e27be45e79697530257d93a9f525d70ec0a4fe3ee887c18acf120f762c"
+      "bytes": 27167,
+      "sha256": "5607c6862da980c4f30b5b591124168fad393fe393b29739181bd1a9495fdd67"
     },
     {
-      "bytes": 9624,
       "path": "ci/android-native/observed-cohort.json",
-      "sha256": "40f81d5ee611afa42e53280b84db15a8118af7e42f9487050463986a86db15a3"
+      "bytes": 9978,
+      "sha256": "5fd3cfc422b98cf89718e526ff9edc0ccdee8063162e836b1ab96bd08f915e75"
     },
     {
       "bytes": 8282,
@@ -51,14 +51,14 @@
       "sha256": "d5607a481e4eff833ffc4d7b18923483383dad3032613d92f3d14df11c450c49"
     },
     {
-      "bytes": 7844,
       "path": "ci/android-native/rich_consumer.py",
-      "sha256": "80d22ac2254e095ee04827f6360e4be0cb3b0e6f889df7120c0c0180d18ef919"
+      "bytes": 10081,
+      "sha256": "2084090e1f6e126f4c7cc9f7877a64f3c7a4832d2237bef2f85c81a8d1059955"
     },
     {
-      "bytes": 33367,
       "path": "ci/android-native/resolve-observed.gradle",
-      "sha256": "06f9e8111406aa8a70c3f846bc54fdd485784639a43aa79f7eeebf76e39cd6f3"
+      "bytes": 34084,
+      "sha256": "85e79a582a84898711e72f974da6cdc08f34129b7b6fb6c80f58c2f60c10add3"
     },
     {
       "bytes": 63745,
@@ -84,9 +84,9 @@
       "sha256": "02a9692af697bbbdf9d909672c5e57d8159baf510a1d43ddd3b82e6b6fec5a1c"
     },
     {
-      "bytes": 7362,
       "path": "ci/android-native/current-app-cohort.json",
-      "sha256": "e072c33425230a6021c83a531e99a67e99ef69905114ffd345e6afc5dee1ab73"
+      "bytes": 7362,
+      "sha256": "ee8bf199ae2993f572a639d9d8392214cb6f81e802ffa1f4b1cf0408e5d51cf9"
     },
     {
       "bytes": 10591,
@@ -109,7 +109,7 @@
       "sha256": "2d942e6995bb7d554c051f75f7fe8f1998b2b1cebae278443b8cb7cfe549a5e4"
     }
   ],
-  "current_context_sha256": "e072c33425230a6021c83a531e99a67e99ef69905114ffd345e6afc5dee1ab73",
+  "current_context_sha256": "ee8bf199ae2993f572a639d9d8392214cb6f81e802ffa1f4b1cf0408e5d51cf9",
   "custody_source": "ci/apple-sdk-link/custody.py",
   "original_binary_local_download": false,
   "original_public_CA_sha256": "034f4cf67d58c7a7a3757fbd1ff225776d8bc73989248a13f9a9c96521dc660b",
@@ -267,5 +267,6 @@
   ],
   "schema": 1,
   "source_digest": "769bea7065a7de175aff4a12ea95bf0d571bf8919b130c1fde0af0d052f10508",
-  "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e"
+  "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e",
+  "failure_evidence_revision": "root-r14-bounded-artifact-refusal-evidence-v1"
 }

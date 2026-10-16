@@ -1,7 +1,7 @@
 {
   "schema": "luobo.mobile.announcement26.isolated-cloud.v1",
   "cohort": "candidate359-announcement26",
-  "status": "prepared_only_r2_nine_analysis_plus_prior_two",
+  "status": "prepared_only_r3_six_analysis_plus_prior_five",
   "base": {
     "cohort": "current354",
     "source_members": 354,
@@ -70,14 +70,14 @@
   },
   "candidate": {
     "manifest": {
-      "path": "references/integration/mobile-group-announcement-panel-lint-r2-candidate-20261017/source-manifest.json",
-      "bytes": 9048,
-      "sha256": "c924d997102cd798c80d5f2ada2f8be82b0844d1e47e892b663c4d6baa5b36b6"
+      "path": "references/integration/mobile-group-announcement-group-lint-r3-candidate-20261017/source-manifest.json",
+      "bytes": 12996,
+      "sha256": "c57b8e1f7637dc40486629fe40547cd665beabb8ece4b2b96b7098b4972c80b9"
     },
     "source_members": 359,
-    "source_digest": "9259f2890ab8d7f84a4c00ffdd661cf5140b71c3fe92d4c5b368b3d86103e48d",
+    "source_digest": "1fd4048febdce707a91822f7b7ca56833a894c1d0251866734cd42d2ef2d8c8e",
     "portable_members": 411,
-    "portable_digest": "75b45ed4da0d2993c64d28525d2db09eba42942b33a5a0fcb71e8fe3471dab3d",
+    "portable_digest": "a2f024ce7225b6815d13e17ef40d3837be1824103cf47a56b885474849e050c5",
     "payload_prefix": "ci/candidates/mobile-announcement26/after",
     "selected11": [
       {
@@ -117,8 +117,8 @@
       },
       {
         "path": "app/lib/features/group/data/group_repository.dart",
-        "bytes": 18709,
-        "sha256": "780ed40bf1be140e51dbbcb8ce857e6669b54dce4f4d61444ef97ef73dc98e71",
+        "bytes": 18719,
+        "sha256": "febf050af779434f60ec596963e3193ca07f791bb6f9c5362c48807d8569b337",
         "new": false,
         "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/group/data/group_repository.dart"
       },
@@ -158,7 +158,7 @@
         "payload_path": "ci/candidates/mobile-announcement26/after/app/test/features/chat/group_announcement_workflow_test.dart"
       }
     ],
-    "source_revision": "panel-lint-r2"
+    "source_revision": "group-lint-r3"
   },
   "target": {
     "analysis_paths": [
@@ -277,9 +277,6 @@
     "unit6_no_sdk_cleanup_claimed": true,
     "old2_existing_fixture_teardown_unchanged": true,
     "analysis_run_paths": [
-      "lib/features/chat/presentation/group_announcement_panel.dart",
-      "lib/features/conversation/data/conversation_repository.dart",
-      "lib/features/conversation/domain/conversation.dart",
       "lib/features/group/data/group_repository.dart",
       "lib/features/group/domain/group.dart",
       "lib/providers.dart",
@@ -287,7 +284,6 @@
       "test/features/chat/group_announcement_store_test.dart",
       "test/features/chat/group_announcement_workflow_test.dart"
     ],
-    "analysis_reuse_run": "38974011605",
     "analysis_reuse_entries": [
       {
         "analysis_path": "lib/features/chat/data/group_announcement_store.dart",
@@ -307,7 +303,9 @@
           "sha256": "425a82b4253eebfc1c2989593b7f13adbfea7f48fecc3b02d08db43ad6af7f79"
         },
         "log_utf8": "Analyzing group_announcement_store.dart...\nNo issues found!\n",
-        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/data/group_announcement_store.dart\"\n  ],\n  \"elapsed_seconds\": 1.812,\n  \"latched_failure\": null,\n  \"log_sha256\": \"e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2\",\n  \"minimum_free_bytes\": 90100535296,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-1\"\n}\n"
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/data/group_announcement_store.dart\"\n  ],\n  \"elapsed_seconds\": 1.812,\n  \"latched_failure\": null,\n  \"log_sha256\": \"e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2\",\n  \"minimum_free_bytes\": 90100535296,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-1\"\n}\n",
+        "run": "38974011605",
+        "job": "117218966812"
       },
       {
         "analysis_path": "lib/features/chat/presentation/chat_page.dart",
@@ -327,10 +325,83 @@
           "sha256": "80f7d82dab8a8baab1d14610e9553ee15cb3c61934f7db52117be693fe6798cf"
         },
         "log_utf8": "Analyzing chat_page.dart...\nNo issues found!\n",
-        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/presentation/chat_page.dart\"\n  ],\n  \"elapsed_seconds\": 19.433,\n  \"latched_failure\": null,\n  \"log_sha256\": \"ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0\",\n  \"minimum_free_bytes\": 90089451520,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-2\"\n}\n"
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/presentation/chat_page.dart\"\n  ],\n  \"elapsed_seconds\": 19.433,\n  \"latched_failure\": null,\n  \"log_sha256\": \"ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0\",\n  \"minimum_free_bytes\": 90089451520,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-2\"\n}\n",
+        "run": "38974011605",
+        "job": "117218966812"
+      },
+      {
+        "run": "38975527239",
+        "job": "117223929591",
+        "analysis_path": "lib/features/chat/presentation/group_announcement_panel.dart",
+        "source_pin": {
+          "path": "app/lib/features/chat/presentation/group_announcement_panel.dart",
+          "bytes": 17053,
+          "sha256": "5c45548163ed6dc9fc8ef0f96dd405199e4e19bc1b8e078694772955491dbecf"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-3.log",
+          "bytes": 60,
+          "sha256": "37c5d8b80e1275336578f7a67e33f0adfc976f455c58107d307e7aaf759e6343"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-3.resource.json",
+          "bytes": 497,
+          "sha256": "32a237685abe1da2a16b7f72d8c66009c3939e5857a79d798500c5bee62343c5"
+        },
+        "log_utf8": "Analyzing group_announcement_panel.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/presentation/group_announcement_panel.dart\"\n  ],\n  \"elapsed_seconds\": 5.311,\n  \"latched_failure\": null,\n  \"log_sha256\": \"37c5d8b80e1275336578f7a67e33f0adfc976f455c58107d307e7aaf759e6343\",\n  \"minimum_free_bytes\": 90100015104,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-3\"\n}\n"
+      },
+      {
+        "run": "38975527239",
+        "job": "117223929591",
+        "analysis_path": "lib/features/conversation/data/conversation_repository.dart",
+        "source_pin": {
+          "path": "app/lib/features/conversation/data/conversation_repository.dart",
+          "bytes": 7551,
+          "sha256": "299b465182570c55a2b829c36b13b7db6c62454f157e4549ffd26417373501e8"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-4.log",
+          "bytes": 59,
+          "sha256": "b2edb2535cb7e727ababeab90707bc44dfd565377af333dd980ba8a4e0db599d"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-4.resource.json",
+          "bytes": 496,
+          "sha256": "98d64d9fee144c0695fe5db44eb08dde4eab672b75d441e2432048dcbc84fb50"
+        },
+        "log_utf8": "Analyzing conversation_repository.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/conversation/data/conversation_repository.dart\"\n  ],\n  \"elapsed_seconds\": 1.107,\n  \"latched_failure\": null,\n  \"log_sha256\": \"b2edb2535cb7e727ababeab90707bc44dfd565377af333dd980ba8a4e0db599d\",\n  \"minimum_free_bytes\": 90098073600,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-4\"\n}\n"
+      },
+      {
+        "run": "38975527239",
+        "job": "117223929591",
+        "analysis_path": "lib/features/conversation/domain/conversation.dart",
+        "source_pin": {
+          "path": "app/lib/features/conversation/domain/conversation.dart",
+          "bytes": 1952,
+          "sha256": "5e114b9a1c8559f24236662f6bb050dd73550d7f38551b9955fffdc8ddf3d098"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-5.log",
+          "bytes": 48,
+          "sha256": "daab4b4fe08b20c8598f0b6bd27571407e7e64a0b01dc22341f5f19128f3376b"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-5.resource.json",
+          "bytes": 487,
+          "sha256": "020902974c2f1c2ddb6cd675c0eaf9c4cda7fc9abcd06383ef94ad1dd8e24d3d"
+        },
+        "log_utf8": "Analyzing conversation.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/conversation/domain/conversation.dart\"\n  ],\n  \"elapsed_seconds\": 0.306,\n  \"latched_failure\": null,\n  \"log_sha256\": \"daab4b4fe08b20c8598f0b6bd27571407e7e64a0b01dc22341f5f19128f3376b\",\n  \"minimum_free_bytes\": 90096607232,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-5\"\n}\n"
       }
     ],
-    "analysis_total_coverage": 11
+    "analysis_total_coverage": 11,
+    "analysis_reuse_runs": [
+      "38974011605",
+      "38975527239"
+    ],
+    "diagnostic_collection": "Continueonlyrecognizable complete fatal-info Dart diagnostics; any diagnostic prevents26. Resource/timeout/sourcechange/unknowninfrastructure immediately stops."
   },
   "resource": {
     "initial_bytes": 4294967296,
@@ -492,8 +563,8 @@
         },
         "after359": {
           "path": "app/lib/features/group/data/group_repository.dart",
-          "bytes": 18709,
-          "sha256": "780ed40bf1be140e51dbbcb8ce857e6669b54dce4f4d61444ef97ef73dc98e71"
+          "bytes": 18719,
+          "sha256": "febf050af779434f60ec596963e3193ca07f791bb6f9c5362c48807d8569b337"
         }
       }
     ],
@@ -914,6 +985,14 @@
       "static3_failure": "3 unnecessary non-null assertions",
       "static4to11_and_test26": "notexecuted",
       "all_raw_frozen": "references/integration/mobile-announcement-cloud-run-38974011605/raw"
+    },
+    "retry_r2_actual": {
+      "run": "38975527239",
+      "job": "117223929591",
+      "static3to5_success_reused": true,
+      "static6_failure": "1curlybraces info",
+      "static7to11_test26": "notexecuted",
+      "raw_frozen": "references/integration/mobile-announcement-cloud-run-38975527239/raw"
     }
   }
 }

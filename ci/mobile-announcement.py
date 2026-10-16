@@ -26,9 +26,9 @@ WIDGET_NAMES = ['actual group chat opens a fresh ordinary-member announcement an
 MARKERS = ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end']
 HELPERS = ['ci/mobile-source.py', 'ci/mobile-check.py', 'ci/mobile-setup.sh', 'ci/mobile/inputs.json', 'ci/mobile/required-test-names.json']
 
-RUN_ANALYSIS = ANALYSIS[2:]
-REUSE_RUN = '38974011605'
-REUSE_EXPECTED = [{'analysis_path': 'lib/features/chat/data/group_announcement_store.dart', 'source_pin': {'path': 'app/lib/features/chat/data/group_announcement_store.dart', 'bytes': 5012, 'sha256': 'b5da8994042e75f703e4cae3ac3f4a4e1b773fdb166b31a46323a15d0c7a6be4'}, 'log_pin': {'path': 'announcement-analyze-1.log', 'bytes': 60, 'sha256': 'e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2'}, 'resource_pin': {'path': 'announcement-analyze-1.resource.json', 'bytes': 489, 'sha256': '425a82b4253eebfc1c2989593b7f13adbfea7f48fecc3b02d08db43ad6af7f79'}}, {'analysis_path': 'lib/features/chat/presentation/chat_page.dart', 'source_pin': {'path': 'app/lib/features/chat/presentation/chat_page.dart', 'bytes': 99227, 'sha256': 'b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9'}, 'log_pin': {'path': 'announcement-analyze-2.log', 'bytes': 45, 'sha256': 'ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0'}, 'resource_pin': {'path': 'announcement-analyze-2.resource.json', 'bytes': 483, 'sha256': '80f7d82dab8a8baab1d14610e9553ee15cb3c61934f7db52117be693fe6798cf'}}]
+RUN_ANALYSIS = ANALYSIS[5:]
+REUSE_RUNS = ['38974011605', '38975527239']
+REUSE_EXPECTED = [{'run': '38974011605', 'job': '117218966812', 'analysis_path': 'lib/features/chat/data/group_announcement_store.dart', 'source_pin': {'path': 'app/lib/features/chat/data/group_announcement_store.dart', 'bytes': 5012, 'sha256': 'b5da8994042e75f703e4cae3ac3f4a4e1b773fdb166b31a46323a15d0c7a6be4'}, 'log_pin': {'path': 'announcement-analyze-1.log', 'bytes': 60, 'sha256': 'e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2'}, 'resource_pin': {'path': 'announcement-analyze-1.resource.json', 'bytes': 489, 'sha256': '425a82b4253eebfc1c2989593b7f13adbfea7f48fecc3b02d08db43ad6af7f79'}}, {'run': '38974011605', 'job': '117218966812', 'analysis_path': 'lib/features/chat/presentation/chat_page.dart', 'source_pin': {'path': 'app/lib/features/chat/presentation/chat_page.dart', 'bytes': 99227, 'sha256': 'b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9'}, 'log_pin': {'path': 'announcement-analyze-2.log', 'bytes': 45, 'sha256': 'ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0'}, 'resource_pin': {'path': 'announcement-analyze-2.resource.json', 'bytes': 483, 'sha256': '80f7d82dab8a8baab1d14610e9553ee15cb3c61934f7db52117be693fe6798cf'}}, {'run': '38975527239', 'job': '117223929591', 'analysis_path': 'lib/features/chat/presentation/group_announcement_panel.dart', 'source_pin': {'path': 'app/lib/features/chat/presentation/group_announcement_panel.dart', 'bytes': 17053, 'sha256': '5c45548163ed6dc9fc8ef0f96dd405199e4e19bc1b8e078694772955491dbecf'}, 'log_pin': {'path': 'announcement-analyze-3.log', 'bytes': 60, 'sha256': '37c5d8b80e1275336578f7a67e33f0adfc976f455c58107d307e7aaf759e6343'}, 'resource_pin': {'path': 'announcement-analyze-3.resource.json', 'bytes': 497, 'sha256': '32a237685abe1da2a16b7f72d8c66009c3939e5857a79d798500c5bee62343c5'}}, {'run': '38975527239', 'job': '117223929591', 'analysis_path': 'lib/features/conversation/data/conversation_repository.dart', 'source_pin': {'path': 'app/lib/features/conversation/data/conversation_repository.dart', 'bytes': 7551, 'sha256': '299b465182570c55a2b829c36b13b7db6c62454f157e4549ffd26417373501e8'}, 'log_pin': {'path': 'announcement-analyze-4.log', 'bytes': 59, 'sha256': 'b2edb2535cb7e727ababeab90707bc44dfd565377af333dd980ba8a4e0db599d'}, 'resource_pin': {'path': 'announcement-analyze-4.resource.json', 'bytes': 496, 'sha256': '98d64d9fee144c0695fe5db44eb08dde4eab672b75d441e2432048dcbc84fb50'}}, {'run': '38975527239', 'job': '117223929591', 'analysis_path': 'lib/features/conversation/domain/conversation.dart', 'source_pin': {'path': 'app/lib/features/conversation/domain/conversation.dart', 'bytes': 1952, 'sha256': '5e114b9a1c8559f24236662f6bb050dd73550d7f38551b9955fffdc8ddf3d098'}, 'log_pin': {'path': 'announcement-analyze-5.log', 'bytes': 48, 'sha256': 'daab4b4fe08b20c8598f0b6bd27571407e7e64a0b01dc22341f5f19128f3376b'}, 'resource_pin': {'path': 'announcement-analyze-5.resource.json', 'bytes': 487, 'sha256': '020902974c2f1c2ddb6cd675c0eaf9c4cda7fc9abcd06383ef94ad1dd8e24d3d'}}]
 
 
 def sha(body):
@@ -65,8 +65,8 @@ def validate_descriptor(cfg):
             or [r['path'] for r in cfg['base']['helper_pins']] != HELPERS
             or cfg['base']['source_digest'] != '113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c'
             or cfg['base']['portable_digest'] != '81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c'
-            or cfg['candidate']['source_digest'] != '9259f2890ab8d7f84a4c00ffdd661cf5140b71c3fe92d4c5b368b3d86103e48d'
-            or cfg['candidate']['portable_digest'] != '75b45ed4da0d2993c64d28525d2db09eba42942b33a5a0fcb71e8fe3471dab3d'
+            or cfg['candidate']['source_digest'] != '1fd4048febdce707a91822f7b7ca56833a894c1d0251866734cd42d2ef2d8c8e'
+            or cfg['candidate']['portable_digest'] != 'a2f024ce7225b6815d13e17ef40d3837be1824103cf47a56b885474849e050c5'
             or cfg['candidate']['payload_prefix'] != PAYLOAD
             or [r['path'] for r in cfg['base']['before6']] != PRODUCT
             or [r['path'] for r in selected] != SELECTED
@@ -76,7 +76,7 @@ def validate_descriptor(cfg):
             or cfg['target']['analysis_paths'] != ANALYSIS
             or cfg['target']['analysis_run_paths'] != RUN_ANALYSIS
             or cfg['target']['analysis_total_coverage'] != 11
-            or cfg['target']['analysis_reuse_run'] != REUSE_RUN
+            or cfg['target']['analysis_reuse_runs'] != REUSE_RUNS
             or cfg['target']['names'] != TWENTY_SIX or len(set(TWENTY_SIX)) != 26
             or cfg['target']['new24'] != TWENTY_SIX[:24]
             or [r['name'] for r in cfg['target']['old2']] != TWENTY_SIX[24:]
@@ -130,9 +130,9 @@ def lineage_contract(cfg, base_plan):
 
 def reused_analysis_contract(cfg, actual_rows):
     entries = cfg['target']['analysis_reuse_entries']
-    fields = ('analysis_path', 'source_pin', 'log_pin', 'resource_pin')
+    fields = ('run', 'job', 'analysis_path', 'source_pin', 'log_pin', 'resource_pin')
     if ([{k: r[k] for k in fields} for r in entries] != REUSE_EXPECTED
-            or cfg['target']['analysis_reuse_run'] != REUSE_RUN):
+            or cfg['target']['analysis_reuse_runs'] != REUSE_RUNS):
         raise ValueError('reused analysis identity differs')
     actual = {r['path']: r for r in actual_rows}
     for entry in entries:
@@ -147,8 +147,8 @@ def reused_analysis_contract(cfg, actual_rows):
                 or resource['command'][-3:] != ['analyze', '--fatal-infos', entry['analysis_path']]
                 or 'No issues found!' not in log.decode('utf-8')):
             raise ValueError('reused analysis is not a successful fatal-info result')
-    return {'prior_run': REUSE_RUN, 'exact_source_and_raw_resource_pins': REUSE_EXPECTED,
-            'reused_successes': 2, 'not_executed_again': True}
+    return {'prior_runs': REUSE_RUNS, 'exact_source_and_raw_resource_pins': REUSE_EXPECTED,
+            'reused_successes': 5, 'not_executed_again': True}
 
 
 def descriptor():
@@ -304,6 +304,48 @@ def phase_commands(work):
              '--no-enable-vmservice', '--name', '^(?:' + '|'.join(map(re.escape, TWENTY_SIX)) + ')$'] + TESTS)
 
 
+def analysis_outcome(record, text, label, command):
+    """Only complete recognizable Dart diagnostics may defer lane failure."""
+    code = record['child_exit_code']
+    if (type(code) is not int or code not in (0, 1, 2, 3)
+            or record['latched_failure'] is not None or record['phase'] != label
+            or record['command'] != command or record['log_sha256'] != sha(text.encode('utf-8'))):
+        raise ValueError('analysis resource, command or tool failure')
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    heading = 'Analyzing ' + Path(command[-1]).name + '...'
+    if code == 0:
+        if lines != [heading, 'No issues found!']:
+            raise ValueError('unknown successful analyzer output')
+        return {'phase': label, 'path': command[-1], 'passed': True, 'diagnostics': 0}
+    if len(lines) < 3 or lines[0] != heading:
+        raise ValueError('unknown analyzer failure')
+    footer = re.fullmatch(r'([1-9][0-9]*) issues? found\.', lines[-1])
+    diagnostics = [re.fullmatch(r'(info|warning|error) - (.+?):([1-9][0-9]*):([1-9][0-9]*) - (.+) - ([a-z_][a-z_0-9]*)',
+                                line) for line in lines[1:-1]]
+    if (footer is None or not diagnostics or any(match is None for match in diagnostics)
+            or int(footer[1]) != len(diagnostics)
+            or max({'info': 1, 'warning': 2, 'error': 3}[match[1]] for match in diagnostics) != code):
+        raise ValueError('incomplete or unknown analyzer diagnostic failure')
+    return {'phase': label, 'path': command[-1], 'passed': False,
+            'diagnostics': len(diagnostics), 'child_exit_code': code}
+
+
+def collect_analyses(commands, execute, verify, report):
+    """Continue ordinary Dart diagnostics; exceptions immediately propagate."""
+    results = []
+    for index, command in enumerate(commands, 6):
+        verify()
+        label = 'announcement-analyze-' + str(index)
+        record, text = execute(label, command)
+        result = analysis_outcome(record, text, label, command)
+        verify()
+        results.append(result)
+        report(result)
+    return {'results': results, 'executed_new': len(results),
+            'all_passed': all(result['passed'] for result in results),
+            'failed_paths': [result['path'] for result in results if not result['passed']]}
+
+
 def cleanup_summary(text):
     starts, sequences = {}, {}
     for line in text.splitlines():
@@ -366,11 +408,21 @@ def run(work):
         reuse_proof = reused_analysis_contract(cfg, source.rows(files))
         check.write_json(work/'evidence/announcement-reused-analyses.json',
                          {'proof': reuse_proof, 'raw_entries': cfg['target']['analysis_reuse_entries']})
-        for index, command in enumerate(analyses, 3):
-            verify_work(work, cfg, source)
-            check.guarded(command, work, guard, 'announcement-analyze-' + str(index),
-                          timeout=cfg['resource']['phase_seconds'])
-        counts['analysis'] = dict(reuse_proof, executed_new=9, total_coverage=11)
+        def execute_analysis(label, command):
+            # Exits1..3 are permitted only so a recognized diagnostic can be collected.
+            # Guard resource/time failures and all other exits still immediately raise.
+            log = check.guarded(command, work, guard, label,
+                                timeout=cfg['resource']['phase_seconds'], accepted_exits=(0, 1, 2, 3))
+            record = json.loads(regular(work/'evidence'/(label + '.resource.json')))
+            return record, log.read_text()
+
+        analysis_results = collect_analyses(
+            analyses, execute_analysis, lambda: verify_work(work, cfg, source),
+            lambda result: check.write_json(work/'evidence'/(result['phase'] + '.summary.json'), result))
+        counts['analysis'] = dict(reuse_proof, **analysis_results, total_coverage=11)
+        check.write_json(work/'evidence/announcement-analyses.summary.json', counts['analysis'])
+        if not analysis_results['all_passed']:
+            raise ValueError('Dart diagnostics collected; target26 was not started')
         verify_work(work, cfg, source)
         log = check.guarded(tests, work, guard, 'announcement-target26',
                             timeout=cfg['resource']['phase_seconds'])
@@ -384,7 +436,7 @@ def run(work):
         verify_work(work, cfg, source)
         check.write_json(work/'evidence/announcement.summary.json', counts)
         check.write_json(work/'evidence/announcement-passed.json',
-                         {'state': 'candidate_target26_analysis9new_plus2reused_completed',
+                         {'state': 'candidate_target26_analysis6new_plus5reused_completed',
                           'cohort': cfg['cohort'], 'source359': cfg['candidate']['source_digest'],
                           'portable411': cfg['candidate']['portable_digest'], 'counts': counts,
                           'oldCard80_Revoke58_full_not_rerun': True,
@@ -408,7 +460,7 @@ def run(work):
             thread.join()
     if guard.reason:
         raise ValueError('latched final resource failure: ' + guard.reason)
-    print(json.dumps({'state': 'candidate26_PASS_analysis9new_plus2reused_0', 'counts': counts}))
+    print(json.dumps({'state': 'candidate26_PASS_analysis6new_plus5reused_0', 'counts': counts}))
 
 
 def run_environment(work, run_as):
