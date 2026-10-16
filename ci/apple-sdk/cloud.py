@@ -305,7 +305,7 @@ def profile(w):
     policy=w/'setup-policy.sb'
     return ('(version 1)(allow default)(deny network*)(deny file-write*)'
        '(allow file-write* (require-all (subpath '+json.dumps(str(w))+') (require-not (literal '+json.dumps(str(policy))+'))) (literal "/dev/null"))'
-       '(allow network-outbound (remote ip "*:443") (remote ip "*:53"))').encode()
+       '(allow network-outbound (remote ip "*:443") (remote ip "*:53") (literal "/private/var/run/mDNSResponder"))').encode()
 
 
 def outer_worker(w,stage):

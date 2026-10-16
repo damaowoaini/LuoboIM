@@ -1,4 +1,4 @@
-name: Group ordinary isolated source1126
+name: Group ordinary isolated source1133
 
 # Run full regression once after the known issues are fixed and targeted checks pass.
 on:
@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   source-regressions:
-    name: Full28 packages / source only
+    name: Full29 packages / source only
     runs-on: ubuntu-24.04
     timeout-minutes: 70
     env:
@@ -34,6 +34,7 @@ jobs:
         run: |
           python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
           python3 -B ci/group-ordinary/test_run.py
+          python3 -B ci/group-ordinary/test_mysql_fixture.py
           python3 -B ci/group-ordinary/run.py --verify
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
         with:
@@ -48,8 +49,22 @@ jobs:
             --record "$GITHUB_WORKSPACE/ci-results/group-ordinary-prepare.resource.json" \
             --min-free-mib 1024 --timeout 600 --poll-interval 0.2 \
             -- bash ci/backend-integration.sh prepare
-      - name: Compile, all full-package race tests and all28 vet
+      - name: Prepare exact owned private MySQL fixture
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/group-ordinary-mysql-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/group-ordinary-mysql-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval 0.2 \
+            -- python3 -B ci/group-ordinary/mysql_fixture.py prepare
+      - name: Compile, all full-package race tests and all29 vet
         run: python3 -B ci/group-ordinary/run.py
+      - name: Always collect exact owned SQL residuals
+        if: always()
+        run: python3 -B ci/group-ordinary/mysql_fixture.py collect
+      - name: Always stop and remove exact owned SQL container
+        if: always()
+        run: python3 -B ci/group-ordinary/mysql_fixture.py cleanup
       - name: Always collect exact fixture residuals
         if: always()
         run: bash ci/backend-integration.sh collect

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "ordinary_source1126_full28_packages_no_runtime_adoption",
+  "scope": "ordinary_source1133_full29_packages_no_runtime_adoption",
   "parent_runner": {
     "path": "ci/group-stage3/run.py",
     "bytes": 18503,
@@ -2590,6 +2590,11 @@
       "sha256": "4bf2405ec0c4274dbf946ed5e4431de4df64eef14964e5ae52c4f85ea121367c"
     },
     {
+      "path": "server/internal/rpc/group/risk_sql_owner_integration_test.go",
+      "bytes": 3213,
+      "sha256": "761257b4188cb5142cf649e13fbcefe25727e1d59077f81aadc87538c48f0106"
+    },
+    {
       "path": "server/internal/rpc/group/role_effects_legacy_fixture_test.go",
       "bytes": 5027,
       "sha256": "a47954e3e00597a4827fb5bfebd7cadaf1683e91c75cd3f21ce19d638675ea5d"
@@ -2893,6 +2898,11 @@
       "path": "server/internal/sessionlogout/service_integration_test.go",
       "bytes": 4115,
       "sha256": "b3620ce858c93b1493c7166e89f88a770d4790460737d89e13b2c1ab3dbe2584"
+    },
+    {
+      "path": "server/internal/testutil/riskmysql/fixture.go",
+      "bytes": 5465,
+      "sha256": "5bcb60a5ba99486ae3785fe64b3c7354ae28ab4f24c7c8311c3dd46af69afb69"
     },
     {
       "path": "server/internal/tools/conversation.go",
@@ -4015,9 +4025,34 @@
       "sha256": "931350395ad3b09128df339eeed904570294b2b68122020cdc20116274cff2d6"
     },
     {
+      "path": "server/pkg/common/riskcontrol/database.go",
+      "bytes": 5374,
+      "sha256": "5bab95a57fd66db8b8022bcfc053097cb1a0f00dbf14add441ff91c0a10e38d1"
+    },
+    {
+      "path": "server/pkg/common/riskcontrol/database_integration_test.go",
+      "bytes": 4634,
+      "sha256": "ffc1934bc4a0c44ba688019e8028ed64b24947b255cda0966d3f1bf1856cb4d0"
+    },
+    {
+      "path": "server/pkg/common/riskcontrol/database_test.go",
+      "bytes": 6217,
+      "sha256": "da4de31ef18d438915706b9532565f0d6a5cec7ec9c882a096c73a29b7ce5b49"
+    },
+    {
+      "path": "server/pkg/common/riskcontrol/policy.go",
+      "bytes": 1478,
+      "sha256": "f0fed6cd935ea537c4510ec8a26c0284574e91e966d3e545423a9c75b112aa03"
+    },
+    {
+      "path": "server/pkg/common/riskcontrol/policy_test.go",
+      "bytes": 2958,
+      "sha256": "f1defd4bbd3ed3584861d1004d5263c4148573c93647310414066f744b9872e6"
+    },
+    {
       "path": "server/pkg/common/riskcontrol/risk_control.go",
-      "bytes": 3260,
-      "sha256": "5e2cd4f8330bcfef6260c4b046b37415b5a7f0dcf8e2e5e1b5831b7cd34a941e"
+      "bytes": 2292,
+      "sha256": "47aeb5652b1605989fc75f0031314f7d063c8a023cd4c3d6f5bfb4585cdbe8ae"
     },
     {
       "path": "server/pkg/common/rpcmiddleware/rpc.go",
@@ -6771,10 +6806,17 @@
     "server/internal/rpc/group/group_role_effects_integration_test.go": 420,
     "server/internal/rpc/group/role_effects_legacy_fixture_test.go": 420,
     "server/internal/rpc/group/role_effects_mongo_fixture_test.go": 420,
-    "server/internal/rpc/group/role_notice_authority_integration_test.go": 420
+    "server/internal/rpc/group/role_notice_authority_integration_test.go": 420,
+    "server/internal/rpc/group/risk_sql_owner_integration_test.go": 420,
+    "server/internal/testutil/riskmysql/fixture.go": 420,
+    "server/pkg/common/riskcontrol/database.go": 420,
+    "server/pkg/common/riskcontrol/database_integration_test.go": 420,
+    "server/pkg/common/riskcontrol/database_test.go": 420,
+    "server/pkg/common/riskcontrol/policy.go": 420,
+    "server/pkg/common/riskcontrol/policy_test.go": 420
   },
-  "effective_count": 1126,
-  "effective_digest": "aa5c01aa4b19df6560e3121252828868b54352574cc6feda6498e7b92772c3f9",
+  "effective_count": 1133,
+  "effective_digest": "39057cde4d0bbc466685536717fba39c1073b671e87d5c149416b264f6b800ec",
   "delta": [
     {
       "target": "server/cmd/tools/ordinary-alias-receipts/backend.go",
@@ -7473,6 +7515,12 @@
       "bytes": 17412
     },
     {
+      "target": "server/internal/rpc/group/risk_sql_owner_integration_test.go",
+      "beforeSHA256": null,
+      "sha256": "761257b4188cb5142cf649e13fbcefe25727e1d59077f81aadc87538c48f0106",
+      "bytes": 3213
+    },
+    {
       "target": "server/internal/rpc/group/role_effects_legacy_fixture_test.go",
       "beforeSHA256": null,
       "sha256": "a47954e3e00597a4827fb5bfebd7cadaf1683e91c75cd3f21ce19d638675ea5d",
@@ -7495,6 +7543,12 @@
       "beforeSHA256": "96b2e27c55dc1207005f66dd5a5463119462bf0fc02b7b6fbb96e0e1ac7968d7",
       "sha256": "314a55bf327db760d47b5d6ef5eda635103e4718091cce3f9189a9512bc67f71",
       "bytes": 5261
+    },
+    {
+      "target": "server/internal/testutil/riskmysql/fixture.go",
+      "beforeSHA256": null,
+      "sha256": "5bcb60a5ba99486ae3785fe64b3c7354ae28ab4f24c7c8311c3dd46af69afb69",
+      "bytes": 5465
     },
     {
       "target": "server/internal/tools/msg.go",
@@ -7549,6 +7603,42 @@
       "beforeSHA256": "a634987144428cdb76fdb355a2023b9289c6ce83d29e80f1d512c35c2f3927c2",
       "sha256": "6db0a92bcb00f52d7ab81f36b688f4887af28453dac38aeff15891671f38c4f2",
       "bytes": 2251
+    },
+    {
+      "target": "server/pkg/common/riskcontrol/database.go",
+      "beforeSHA256": null,
+      "sha256": "5bab95a57fd66db8b8022bcfc053097cb1a0f00dbf14add441ff91c0a10e38d1",
+      "bytes": 5374
+    },
+    {
+      "target": "server/pkg/common/riskcontrol/database_integration_test.go",
+      "beforeSHA256": null,
+      "sha256": "ffc1934bc4a0c44ba688019e8028ed64b24947b255cda0966d3f1bf1856cb4d0",
+      "bytes": 4634
+    },
+    {
+      "target": "server/pkg/common/riskcontrol/database_test.go",
+      "beforeSHA256": null,
+      "sha256": "da4de31ef18d438915706b9532565f0d6a5cec7ec9c882a096c73a29b7ce5b49",
+      "bytes": 6217
+    },
+    {
+      "target": "server/pkg/common/riskcontrol/policy.go",
+      "beforeSHA256": null,
+      "sha256": "f0fed6cd935ea537c4510ec8a26c0284574e91e966d3e545423a9c75b112aa03",
+      "bytes": 1478
+    },
+    {
+      "target": "server/pkg/common/riskcontrol/policy_test.go",
+      "beforeSHA256": null,
+      "sha256": "f1defd4bbd3ed3584861d1004d5263c4148573c93647310414066f744b9872e6",
+      "bytes": 2958
+    },
+    {
+      "target": "server/pkg/common/riskcontrol/risk_control.go",
+      "beforeSHA256": "5e2cd4f8330bcfef6260c4b046b37415b5a7f0dcf8e2e5e1b5831b7cd34a941e",
+      "sha256": "47aeb5652b1605989fc75f0031314f7d063c8a023cd4c3d6f5bfb4585cdbe8ae",
+      "bytes": 2292
     },
     {
       "target": "server/pkg/msgprocessor/storage_branches.go",
@@ -8006,6 +8096,7 @@
         "TestRoleEffectsCommittedRevocationFencesDelayedMemberBatch",
         "TestRoleEffectsCrossGroupBatchIsAtomicAndReadScopeDoesNotWidenWrites",
         "TestRoleEffectsKnownCommitCacheFailureReturnsACKAndRetainsAfter",
+        "TestRoleEffectsOrdinaryOwnerRPCSQLRecoveryAndMongoCommit",
         "TestRoleEffectsQueueFailureRollsBackBothGroupsAndCacheJobs",
         "TestRoleEffectsRetryKeepsCommandAndBeforeCallbackRunsOnce",
         "TestRoleEffectsSelfProfileAndRoleAssignmentContract",
@@ -8099,6 +8190,7 @@
         "TestRoleEffectsCommittedRevocationFencesDelayedMemberBatch",
         "TestRoleEffectsCrossGroupBatchIsAtomicAndReadScopeDoesNotWidenWrites",
         "TestRoleEffectsKnownCommitCacheFailureReturnsACKAndRetainsAfter",
+        "TestRoleEffectsOrdinaryOwnerRPCSQLRecoveryAndMongoCommit",
         "TestRoleEffectsQueueFailureRollsBackBothGroupsAndCacheJobs",
         "TestRoleEffectsRetryKeepsCommandAndBeforeCallbackRunsOnce",
         "TestRoleEffectsSelfProfileAndRoleAssignmentContract",
@@ -8480,10 +8572,42 @@
         "TestCallbackOperatorStaleExpectedCannotBorrowNewerRecord",
         "TestCallbackOperatorUnknownConfirmIsDurableOnceAndNeverAutoReplayed"
       ]
+    },
+    "pkg/common/riskcontrol": {
+      "top_tests": [
+        "TestRiskDatabaseAttemptIsBoundedAndDriverErrorIsPrivate",
+        "TestRiskDatabaseConcurrentInitializationUsesOnePool",
+        "TestRiskDatabaseDriverInputPreservesCredentialsAndBoundsIO",
+        "TestRiskDatabaseFailureKeepsActionFailClosed",
+        "TestRiskDatabaseInitializationFailureCanRecoverWithoutRestart",
+        "TestRiskDatabaseRejectsNilOrCanceledContextAndNilPool",
+        "TestRiskDatabaseWaitingCallerCanCancelWithoutCancelingLeader",
+        "TestRiskPolicyStrictDecisionPreservesValidAndRejectsMalformedConfiguration",
+        "TestRiskSQLInitialCredentialFailureRecoversWithoutProcessRestart",
+        "TestRiskSQLKilledOwnedConnectionReconnectsWithoutPoolReplacement",
+        "TestRiskSQLLockedReadHonorsContextAndRecoversSamePool"
+      ],
+      "allowed_legacy_skips": [],
+      "required_leaves": [
+        "TestRiskDatabaseAttemptIsBoundedAndDriverErrorIsPrivate",
+        "TestRiskDatabaseConcurrentInitializationUsesOnePool",
+        "TestRiskDatabaseDriverInputPreservesCredentialsAndBoundsIO",
+        "TestRiskDatabaseFailureKeepsActionFailClosed",
+        "TestRiskDatabaseInitializationFailureCanRecoverWithoutRestart",
+        "TestRiskDatabaseRejectsNilOrCanceledContextAndNilPool",
+        "TestRiskDatabaseWaitingCallerCanCancelWithoutCancelingLeader",
+        "TestRiskPolicyStrictDecisionPreservesValidAndRejectsMalformedConfiguration",
+        "TestRiskSQLInitialCredentialFailureRecoversWithoutProcessRestart",
+        "TestRiskSQLKilledOwnedConnectionReconnectsWithoutPoolReplacement",
+        "TestRiskSQLLockedReadHonorsContextAndRecoversSamePool"
+      ],
+      "full_package": true,
+      "compileOnly": false,
+      "expected_sub": 18
     }
   },
-  "expected_top_source_inventory": 438,
-  "expected_required_pass": 431,
+  "expected_top_source_inventory": 450,
+  "expected_required_pass": 443,
   "allowed_legacy_skip_count": 7,
   "dependencies": [
     {
@@ -8520,6 +8644,11 @@
       "path": ".github/workflows/group-stage3-source.yml",
       "bytes": 2444,
       "sha256": "cc84bf396672cc9e52302ba9033858d75446735fa1234ee023ffc211d9065e2b"
+    },
+    {
+      "path": "ci/group-ordinary/mysql_fixture.py",
+      "bytes": 15402,
+      "sha256": "30033783a915a0734143657e6a61f96537a0583ef36e9332083df298b37b9fb1"
     }
   ],
   "limitations": [
@@ -8528,7 +8657,8 @@
     "Executable owned inspect/confirm proof-file tooling, not only Store helper methods.",
     "Legal offline callbacks and Getui/JPush, Seq0/modifier/ordinary allocator/read floor/migration scopes still required; unsupported dependency must reject startup rather than silently disable functionality.",
     "Whole cloud compile/test/vet results are still pending; this source composition is not proof of runtime reliability.",
-    "source1126/full28/438 anticipated only; new roles targeted24top42sub locally, full regression not run; action-aware notification receiver not yet assembled; no runtime adoption"
+    "source1126/full28/438 anticipated only; new roles targeted24top42sub locally, full regression not run; action-aware notification receiver not yet assembled; no runtime adoption",
+    "Source1133 adds exact risk8 Go files; four SQL tests require owned private MySQL8.4.11 plus existing Mongo. Full29/450 expected only; not executed by this source candidate."
   ],
   "overlay": [
     {
@@ -9460,6 +9590,14 @@
       "beforeSHA256": null
     },
     {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/risk_sql_owner_integration_test.go",
+      "target": "server/internal/rpc/group/risk_sql_owner_integration_test.go",
+      "bytes": 3213,
+      "sha256": "761257b4188cb5142cf649e13fbcefe25727e1d59077f81aadc87538c48f0106",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
       "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/role_effects_legacy_fixture_test.go",
       "target": "server/internal/rpc/group/role_effects_legacy_fixture_test.go",
       "mode": "0o644",
@@ -9490,6 +9628,14 @@
       "sha256": "314a55bf327db760d47b5d6ef5eda635103e4718091cce3f9189a9512bc67f71",
       "mode": "0o644",
       "beforeSHA256": "96b2e27c55dc1207005f66dd5a5463119462bf0fc02b7b6fbb96e0e1ac7968d7"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/testutil/riskmysql/fixture.go",
+      "target": "server/internal/testutil/riskmysql/fixture.go",
+      "bytes": 5465,
+      "sha256": "5bcb60a5ba99486ae3785fe64b3c7354ae28ab4f24c7c8311c3dd46af69afb69",
+      "mode": "0o644",
+      "beforeSHA256": null
     },
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/tools/msg.go",
@@ -9562,6 +9708,54 @@
       "sha256": "6db0a92bcb00f52d7ab81f36b688f4887af28453dac38aeff15891671f38c4f2",
       "mode": "0o644",
       "beforeSHA256": "a634987144428cdb76fdb355a2023b9289c6ce83d29e80f1d512c35c2f3927c2"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/pkg/common/riskcontrol/database.go",
+      "target": "server/pkg/common/riskcontrol/database.go",
+      "bytes": 5374,
+      "sha256": "5bab95a57fd66db8b8022bcfc053097cb1a0f00dbf14add441ff91c0a10e38d1",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/pkg/common/riskcontrol/database_integration_test.go",
+      "target": "server/pkg/common/riskcontrol/database_integration_test.go",
+      "bytes": 4634,
+      "sha256": "ffc1934bc4a0c44ba688019e8028ed64b24947b255cda0966d3f1bf1856cb4d0",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/pkg/common/riskcontrol/database_test.go",
+      "target": "server/pkg/common/riskcontrol/database_test.go",
+      "bytes": 6217,
+      "sha256": "da4de31ef18d438915706b9532565f0d6a5cec7ec9c882a096c73a29b7ce5b49",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/pkg/common/riskcontrol/policy.go",
+      "target": "server/pkg/common/riskcontrol/policy.go",
+      "bytes": 1478,
+      "sha256": "f0fed6cd935ea537c4510ec8a26c0284574e91e966d3e545423a9c75b112aa03",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/pkg/common/riskcontrol/policy_test.go",
+      "target": "server/pkg/common/riskcontrol/policy_test.go",
+      "bytes": 2958,
+      "sha256": "f1defd4bbd3ed3584861d1004d5263c4148573c93647310414066f744b9872e6",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/pkg/common/riskcontrol/risk_control.go",
+      "target": "server/pkg/common/riskcontrol/risk_control.go",
+      "bytes": 2292,
+      "sha256": "47aeb5652b1605989fc75f0031314f7d063c8a023cd4c3d6f5bfb4585cdbe8ae",
+      "mode": "0o644",
+      "beforeSHA256": "5e2cd4f8330bcfef6260c4b046b37415b5a7f0dcf8e2e5e1b5831b7cd34a941e"
     },
     {
       "path": "ci/candidates/group-ordinary/source/server/pkg/msgprocessor/storage_branches.go",
@@ -10394,7 +10588,7 @@
       "afterSHA256": "3171ffa41a7c2b4d0604ecf10e4f32c0f32b0ba044d03f2f78d8087a00ce2dd2"
     }
   ],
-  "physical_before_effective_digest": "4c03d1121f396d54a1eaf11b61d0d45f26c6af08b941dea2fc7f20631b490c87",
+  "physical_before_effective_digest": "131e7ab7cc5e1d1432c42273d84ebea92710ff5defb04253c839e71ec3a2c7d5",
   "physical_before_contract": {
     "onlyProductRestore": [
       "kafka_alias_vendor.go",
@@ -12508,5 +12702,13 @@
       "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary/ordinary-owner"
     ],
     "timeout": "TestRoleCallbackTimeoutPreservesLegacyClientCap"
+  },
+  "mandatory_risk_sql": {
+    "sql": [
+      "TestRiskSQLInitialCredentialFailureRecoversWithoutProcessRestart",
+      "TestRiskSQLKilledOwnedConnectionReconnectsWithoutPoolReplacement",
+      "TestRiskSQLLockedReadHonorsContextAndRecoversSamePool"
+    ],
+    "owner": "TestRoleEffectsOrdinaryOwnerRPCSQLRecoveryAndMongoCommit"
   }
 }

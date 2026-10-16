@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Seventeen pure controller gates; no Go, Docker, DB or source1126 materialization."""
+"""Eighteen pure controller gates; no Go, Docker, DB or source1133 materialization."""
 import hashlib
 import importlib.util
 import json
@@ -410,6 +410,41 @@ class ControllerTests(unittest.TestCase):
         changed['mandatory_role_effects']['subcases'].pop()
         with self.assertRaises(ValueError):
             SUBJECT.role_required(changed)
+
+    def test_four_risk_sql_cases_cannot_be_missing_or_skipped(self):
+        contract = json.loads(Path(__file__).with_name('inputs.json').read_text())
+        SUBJECT.risk_required(contract)
+        required = contract['mandatory_risk_sql']
+        for short, names in (('pkg/common/riskcontrol', required['sql']),
+                             ('internal/rpc/group', [required['owner']])):
+            spec = contract['packages'][short]
+            package = SUBJECT.PREFIX + short
+            events = []
+            # risk has eighteen policy-table subcases; this fixture concerns
+            # mandatory SQL presence, so omit only that independent count here.
+            fixture_spec = dict(spec)
+            fixture_spec.pop('expected_sub', None)
+            for test in spec['top_tests']:
+                events.append({'Package':package, 'Action':'run', 'Test':test})
+                for leaf in spec['required_leaves']:
+                    if leaf.startswith(test + '/'):
+                        events.extend([{'Package':package, 'Action':'run', 'Test':leaf},
+                                       {'Package':package, 'Action':'pass', 'Test':leaf}])
+                events.append({'Package':package, 'Action':'pass', 'Test':test})
+            events.append({'Package':package, 'Action':'pass'})
+            self.assertTrue(SUBJECT.audit(events, 0, short, fixture_spec)['accepted'])
+            for test in names:
+                missing = [e for e in events if e.get('Test') != test]
+                self.assertFalse(SUBJECT.audit(missing, 0, short, fixture_spec)['accepted'])
+                skipped = [dict(e) for e in events]
+                for event in skipped:
+                    if event.get('Test') == test and event['Action'] == 'pass':
+                        event['Action'] = 'skip'
+                self.assertFalse(SUBJECT.audit(skipped, 0, short, fixture_spec)['accepted'])
+        changed = json.loads(json.dumps(contract))
+        changed['mandatory_risk_sql']['sql'].pop()
+        with self.assertRaises(ValueError):
+            SUBJECT.risk_required(changed)
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Isolated source1126 full28-package validation; no ordinary runtime adoption."""
+"""Isolated source1133 full29-package validation; no ordinary runtime adoption."""
 import argparse
 from collections import Counter
 import hashlib
@@ -14,11 +14,11 @@ import sys
 
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = REPO / 'ci/group-ordinary/inputs.json'
-SCOPE = 'ordinary_source1126_full28_packages_no_runtime_adoption'
+SCOPE = 'ordinary_source1133_full29_packages_no_runtime_adoption'
 PREFIX = 'github.com/openimsdk/open-im-server/v3/'
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 REDIS = 'redis://127.0.0.1:36379/15'
-PACKAGES = {'internal/groupeffects', 'internal/groupdelivery', 'internal/push/offlinepush/fcm', 'internal/rpc/group', 'internal/groupcleanup', 'pkg/common/startrpc', 'internal/api', 'internal/groupauthority', 'pkg/common/db/controller', 'internal/tools', 'internal/push/offlinepush', 'internal/rpc/msg', 'pkg/common/cmd', 'internal/msgtransfer', 'pkg/common/db/unrelation', 'internal/retention', 'cmd/openim-rpc/openim-rpc-group', 'pkg/common/db/table/relation', 'pkg/common/db/mgo', 'pkg/common/db/cache', 'internal/push', 'internal/messagedelivery', 'pkg/msgprocessor', 'cmd/tools/ordinary-device-receipts', 'internal/push/offlinepush/aliasvendor', 'cmd/tools/ordinary-alias-receipts', 'internal/meetingbooking', 'cmd/tools/ordinary-callback-receipts'}
+PACKAGES = {'internal/groupeffects', 'internal/groupdelivery', 'internal/push/offlinepush/fcm', 'internal/rpc/group', 'internal/groupcleanup', 'pkg/common/startrpc', 'internal/api', 'internal/groupauthority', 'pkg/common/db/controller', 'internal/tools', 'internal/push/offlinepush', 'internal/rpc/msg', 'pkg/common/cmd', 'internal/msgtransfer', 'pkg/common/db/unrelation', 'internal/retention', 'cmd/openim-rpc/openim-rpc-group', 'pkg/common/db/table/relation', 'pkg/common/db/mgo', 'pkg/common/db/cache', 'internal/push', 'internal/messagedelivery', 'pkg/msgprocessor', 'cmd/tools/ordinary-device-receipts', 'internal/push/offlinepush/aliasvendor', 'cmd/tools/ordinary-alias-receipts', 'internal/meetingbooking', 'cmd/tools/ordinary-callback-receipts', 'pkg/common/riskcontrol'}
 LEGACY_SKIPS = {
     'pkg/common/db/controller': {'Test_BatchInsertChat2DB', 'Test_Insert', 'Test_Revoke',
                                  'Test_FindBySeq', 'TestName'},
@@ -173,15 +173,31 @@ def role_required(c):
         raise ValueError('role9 real Mongo/4HTTP/3ordinary owner plus timeout must pass')
 
 
+def risk_required(c):
+    mandatory = c['mandatory_risk_sql']
+    sql = ['TestRiskSQLInitialCredentialFailureRecoversWithoutProcessRestart',
+           'TestRiskSQLKilledOwnedConnectionReconnectsWithoutPoolReplacement',
+           'TestRiskSQLLockedReadHonorsContextAndRecoversSamePool']
+    owner = 'TestRoleEffectsOrdinaryOwnerRPCSQLRecoveryAndMongoCommit'
+    risk = c['packages']['pkg/common/riskcontrol']
+    group = c['packages']['internal/rpc/group']
+    if (mandatory != {'sql':sql, 'owner':owner} or risk['allowed_legacy_skips']
+            or len(risk['top_tests']) != 11 or risk.get('expected_sub') != 18
+            or risk['required_leaves'] != risk['top_tests']
+            or not set(sql) <= set(risk['top_tests'])
+            or owner not in group['top_tests'] or owner not in group['required_leaves']):
+        raise ValueError('three actual SQL cases plus ordinary-owner SQL->Mongo must pass')
+
+
 def verify():
     c = json.loads(regular(INPUTS))
-    if (c['schema'] != 1 or c['scope'] != SCOPE or c['effective_count'] != 1126
-            or c['parent_count'] != 1023 or c['expected_top_source_inventory'] != 438
-            or c['expected_required_pass'] != 431 or c['allowed_legacy_skip_count'] != 7
+    if (c['schema'] != 1 or c['scope'] != SCOPE or c['effective_count'] != 1133
+            or c['parent_count'] != 1023 or c['expected_top_source_inventory'] != 450
+            or c['expected_required_pass'] != 443 or c['allowed_legacy_skip_count'] != 7
             or c['parent_runner']['path'] != 'ci/group-stage3/run.py'
             or c['parent_inputs']['path'] != 'ci/group-stage3/inputs.json'
-            or len(c['overlay']) != 131):
-        raise ValueError('exact source1126 full-package contract required')
+            or len(c['overlay']) != 139):
+        raise ValueError('exact source1133 full-package contract required')
     for row in c['dependencies']:
         pinned(row)
     pinned(c['parent_inputs'])
@@ -191,14 +207,14 @@ def verify():
         raise ValueError('accepted source1023 differs')
     bodies = apply_overlay(c, dict(old))
     fixtures = role_fixture_map(c, old, bodies)
-    if (len(bodies) != 1126 or rows(bodies) != c['effective_source']
+    if (len(bodies) != 1133 or rows(bodies) != c['effective_source']
             or digest(rows(bodies)) != c['effective_digest']
             or exact_delta(old, bodies, fixtures) != c['delta']):
         raise ValueError('complete source or before delta differs')
-    if set(c['packages']) != PACKAGES or len(PACKAGES) != 28:
-        raise ValueError('complete28package contract required')
-    if sum(len(s['top_tests']) for s in c['packages'].values()) != 438:
-        raise ValueError('full438 source-name inventory required')
+    if set(c['packages']) != PACKAGES or len(PACKAGES) != 29:
+        raise ValueError('complete29package contract required')
+    if sum(len(s['top_tests']) for s in c['packages'].values()) != 450:
+        raise ValueError('full450 source-name inventory required')
     for package, spec in c['packages'].items():
         if name(package) != package or spec['full_package'] is not True:
             raise ValueError('full canonical package required')
@@ -257,6 +273,7 @@ def verify():
             or c['mandatory_callback_cli_lineage'] not in c['packages']['cmd/tools/ordinary-callback-receipts']['required_leaves']):
         raise ValueError('callback11 Mongo, real worker HTTP and CLI lineage must execute')
     role_required(c)
+    risk_required(c)
     previous = dict(bodies)
     wanted_before = {'server/internal/messagedelivery/' + n for n in
                      ('kafka_alias_vendor.go', 'kafka_vendor.go', 'kafka_fcm_devices.go')}
@@ -420,6 +437,13 @@ def cloud_environment():
     if any(k in os.environ and os.environ[k] != v for k, v in inherited.items()):
         raise ValueError('inherited fixture configuration differs')
     os.environ.update(inherited)
+    private = Path('/tmp/luobo-risk-' + run_id + '-' + attempt + '/private/fixture.json')
+    key = 'LUOBO_RISK_TEST_MYSQL_FIXTURE'
+    if key in os.environ and os.environ[key] != str(private):
+        raise ValueError('foreign SQL fixture configuration refused')
+    subprocess.run([sys.executable, '-B', str(REPO / 'ci/group-ordinary/mysql_fixture.py'),
+                    'check'], check=True, timeout=60)
+    os.environ[key] = str(private)
 
 
 
@@ -445,14 +469,14 @@ def run():
                     os.environ['GITHUB_RUN_ID'] + ':' + os.environ['GITHUB_RUN_ATTEMPT'],
                     os.environ['GITHUB_SHA']], check=True, timeout=20)
     temporary = Path(os.environ['RUNNER_TEMP'])
-    work = temporary / 'group-ordinary-source1126'
+    work = temporary / 'group-ordinary-source1133'
     if not temporary.is_absolute() or temporary.resolve() != temporary or work.exists():
         raise ValueError('fresh canonical work path required')
     fs = os.statvfs(temporary)
     if fs.f_bavail * fs.f_frsize < 4 * 1024 ** 3:
         raise ValueError('4GiB bootstrap floor required')
     work.mkdir(mode=0o700)
-    output = REPO / 'ci-results/group-ordinary-source1126'
+    output = REPO / 'ci-results/group-ordinary-source1133'
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     for target, body in bodies.items():
         path = work / target
@@ -471,7 +495,7 @@ def run():
         os.environ[key] = str(path)
     os.environ.update(GOTOOLCHAIN='local', GOMAXPROCS='2', GOMEMLIMIT='900MiB', GOWORK='off')
     write(output / 'source.json', {'scope':SCOPE, 'commit':os.environ['GITHUB_SHA'],
-          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1126,
+          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1133,
           'effective_digest':c['effective_digest'], 'go_version':version,
           'generated_public_config_sha256':sha(template), 'no_runtime_adoption':True})
 
@@ -560,14 +584,14 @@ def run():
     counts = Counter()
     for summary in summaries.values():
         counts.update(summary['counts'])
-    if counts.get('top_pass', 0) != 431 or counts.get('top_skip', 0) != 7 or counts.get('sub_skip', 0) != 0:
-        raise ValueError('exact431 mandatory PASS and7 old top SKIP required')
+    if counts.get('top_pass', 0) != 443 or counts.get('top_skip', 0) != 7 or counts.get('sub_skip', 0) != 0:
+        raise ValueError('exact443 mandatory PASS and7 old top SKIP required')
     write(output / 'summary.json', {'state':'passed_full_source_packages_only', 'scope':SCOPE,
           'effective_digest':c['effective_digest'], 'counts':dict(counts),
           'packages':summaries, 'vet_exit':{p:0 for p in packages},
           'final_free_bytes':final_free,
           'legacy_skips_are_not_integration_passes':True, 'no_runtime_adoption':True})
-    print('Ordinary source1126 full28-package validation complete; runtime remains unadopted.')
+    print('Ordinary source1133 full29-package validation complete; runtime remains unadopted.')
 
 
 if __name__ == '__main__':
@@ -577,7 +601,7 @@ if __name__ == '__main__':
     try:
         if args.verify:
             verify()
-            print('Ordinary exact source1126 verified; no Go/DB execution.')
+            print('Ordinary exact source1133 verified; no Go/DB execution.')
         else:
             run()
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError):
