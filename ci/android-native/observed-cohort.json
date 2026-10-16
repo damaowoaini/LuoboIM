@@ -16,8 +16,8 @@
     },
     {
       "path": ".github/workflows/android-observed-debug.yml",
-      "bytes": 3183,
-      "sha256": "74b9bde8a49dd9b7b15276b5d9e27b865e91f24bda396055cddeca40d8417f76"
+      "bytes": 3195,
+      "sha256": "9b1391fe18f54ae08800a9e544a26e64ade8409a7d868b1671b58ea35e967324"
     },
     {
       "path": "ci/android-native/audit.py",
@@ -50,14 +50,29 @@
       "sha256": "e7939ea1fe1332cb9891449309a69706fa63b72fea948384cb3612fa600cd44d"
     },
     {
+      "path": "ci/android-native/gradle-producer-sources.json",
+      "bytes": 4741,
+      "sha256": "e3dd7e85b7de17ccc41505d4bd03e1b000bc7206d4c7970209c89425fa12c60f"
+    },
+    {
+      "path": "ci/android-native/gradle_classpath_catalog.py",
+      "bytes": 8055,
+      "sha256": "2b7125df9998fb74d1359d3d720b44c40250ed563cf0e67e987176fdcc8f5216"
+    },
+    {
+      "path": "ci/android-native/gradle_local_file_fixture.py",
+      "bytes": 6310,
+      "sha256": "0b5c3e772d8142acd7b1037a283b62ff202c27aa5b8a833718ec460243ac5588"
+    },
+    {
       "path": "ci/android-native/gradle_selector_fixture.py",
       "bytes": 9888,
       "sha256": "c9ce2721ee9a8e8dfbdaf925c604decbb7423b46003519ed8e3ea307b3cbb232"
     },
     {
       "path": "ci/android-native/gradle_variant_fixture.py",
-      "bytes": 6255,
-      "sha256": "62bc490afba920c49a51b54a4bdeca901fd7d98dcbe0f6944a27d0354f827850"
+      "bytes": 6425,
+      "sha256": "93f076c22c5e99f6ad8dc96d520471cab918c755ed8d049f05653634611b6a12"
     },
     {
       "path": "ci/android-native/inputs.json",
@@ -86,8 +101,13 @@
     },
     {
       "path": "ci/android-native/observed_bind.py",
-      "bytes": 23832,
-      "sha256": "00bb4a67113d5443fbc61cf80d54b76de5285eb733063353d9ce868a012de188"
+      "bytes": 25032,
+      "sha256": "f2a2691fa1cef814c24e9d18485134577cc0f60d7f8a9856e2c4b3a60bed2130"
+    },
+    {
+      "path": "ci/android-native/preseal-classpaths.gradle",
+      "bytes": 4995,
+      "sha256": "d6c69402fc5b6de5de6f279f3a6137e9b8cb018a5924f25b8e6dbcf22d83f96a"
     },
     {
       "path": "ci/android-native/projected-module-after.mod",
@@ -101,8 +121,8 @@
     },
     {
       "path": "ci/android-native/resolve-observed.gradle",
-      "bytes": 11455,
-      "sha256": "1c05e325531d7df767d2d61bdba9c718b6811b9f230d676a546e36627f077ce1"
+      "bytes": 19301,
+      "sha256": "9bbbe3c88f56421c9f31e8684dfabc4b4409c7ac8d241152cf77670c82867fb1"
     },
     {
       "path": "ci/android-native/resolve.gradle",
@@ -131,8 +151,8 @@
     },
     {
       "path": "ci/android-native/test_gradle_selectors.py",
-      "bytes": 7437,
-      "sha256": "975e1a54903b8849827710c795b5be1063a8c55c9ea16d2dca2a10b7b0ea694e"
+      "bytes": 7906,
+      "sha256": "a2a1b65364bd5262adcffb0b37c1c7b982e9d5a86ed530fc881d85365d80c4c8"
     },
     {
       "path": "ci/android-native/test_tools.py",
@@ -193,5 +213,5 @@
   "members": 428,
   "old427_r1_r2_immutable": true,
   "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true,
-  "controller_revision": "root-r6-strict-module-artifact-view"
+  "controller_revision": "root-r7-independent-builtin-classpath-producer"
 }

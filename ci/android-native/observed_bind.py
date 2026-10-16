@@ -12,6 +12,7 @@ import tarfile
 import generated_module_probe as projection
 import go_observer as observer
 import gradle_selector_fixture as selectors
+import gradle_classpath_catalog as classpaths
 import gradle_variant_fixture as variants
 import run as parent
 import support as s
@@ -20,7 +21,7 @@ import verify_inputs
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r6-strict-module-artifact-view'
+REVISION = 'root-r7-independent-builtin-classpath-producer'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 
@@ -50,6 +51,7 @@ def metadata():
 
 class Job(parent.Job):
     def cmd(self, args, cwd, env, label, timeout=900, reject=None, stdin=None):
+        catalog_before = None
         if label == 'gradle-dependency-setup':
             if getattr(self, '_typed_resolver_dispatch', None) is not False:
                 raise ValueError('one dispatch only inside inherited gradle_prepare')
@@ -60,16 +62,33 @@ class Job(parent.Job):
                     or env != parent.environment(self.w, False)
                     or timeout != 1800 or reject is not None or stdin is not None):
                 raise ValueError('inherited dependency command/cwd/env contract differs')
+            catalog_before = classpaths.verified_catalog(self.w)
             changed = list(args)
             changed[changed.index('-I') + 1] = HERE / 'resolve-observed.gradle'
+            changed += ['-PluoboClasspathCatalog=' + str(catalog_before[0]),
+                        '-PluoboClasspathCatalogSha256=' + catalog_before[1]]
             s.write_json(self.w / 'evidence/observed-resolver-dispatch.json', {
                 'controller_revision': REVISION, 'original_argv': list(map(str, args)),
-                'derived_argv': list(map(str, changed)), 'only_change': '-I value',
+                'derived_argv': list(map(str, changed)),
+                'only_changes': ['-I value', 'two fixed independently produced catalog properties'],
+                'catalog_sha256': catalog_before[1],
                 'original_resolver_sha256': s.sha(parent.HERE / 'resolve.gradle'),
                 'derived_resolver_sha256': s.sha(HERE / 'resolve-observed.gradle')})
             self._typed_resolver_dispatch = True
             args = changed
-        return super().cmd(args, cwd, env, label, timeout, reject, stdin)
+        elif label.startswith('selector-control-'):
+            # Source-only fixture preparation does not parse a Gradle model.
+            # Both builtin models run before this first actual fixture model.
+            if not (self.w / classpaths.ROOT).exists():
+                classpaths.seal(self, HERE)
+            catalog_before = classpaths.verified_catalog(self.w)
+            args = list(args) + ['-PluoboClasspathCatalog=' + str(catalog_before[0]),
+                                '-PluoboClasspathCatalogSha256=' + catalog_before[1]]
+        try:
+            return super().cmd(args, cwd, env, label, timeout, reject, stdin)
+        finally:
+            if catalog_before is not None and classpaths.verified_catalog(self.w) != catalog_before:
+                raise ValueError('independent catalog changed during Gradle dispatch')
 
     def gradle_prepare(self):
         # Reuse the original method, including all source, Maven-origin and

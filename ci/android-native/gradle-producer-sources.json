@@ -1,0 +1,79 @@
+{
+  "Gradle": "9.3.1",
+  "source_tag": "v9.3.1",
+  "rows": [
+    {
+      "path": "official-gradle-9.3.1/FileCollectionDependency.java",
+      "bytes": 1030,
+      "sha256": "b3019d3c4b2805062a3b1f0e5d0e5496604e9221918a12106a2b2411d687d785",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/core-api/src/main/java/org/gradle/api/artifacts/FileCollectionDependency.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/OpaqueComponentArtifactIdentifier.java",
+      "bytes": 1972,
+      "sha256": "254a33f6ff54e798095322f222a6e56da6fb3dfddd48f412e7c0b2a98300c2c1",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/platforms/software/dependency-management/src/main/java/org/gradle/internal/component/local/model/OpaqueComponentArtifactIdentifier.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/OpaqueComponentIdentifier.java",
+      "bytes": 1929,
+      "sha256": "103ebf87351915e5efc1c073951a6ab5ee19852ca80ab399a024b22938d5e82a",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/core/src/main/java/org/gradle/internal/component/local/model/OpaqueComponentIdentifier.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/DefaultFileCollectionDependency.java",
+      "bytes": 2350,
+      "sha256": "29272d0e8828130709b48042650d8141ae5ed2a8603da95e3286ccd73fd07333",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/core/src/main/java/org/gradle/api/internal/artifacts/dependencies/DefaultFileCollectionDependency.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/DependencyFactoryInternal.java",
+      "bytes": 1876,
+      "sha256": "087d9b345b63fbe9a594d14c1f5994912ea7243e022fa6531ee2d2b4f0427950",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/core/src/main/java/org/gradle/api/internal/artifacts/dsl/dependencies/DependencyFactoryInternal.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/DependencyClassPathNotationConverter.java",
+      "bytes": 8384,
+      "sha256": "d966ccab408e4b9f51c989ab975f66d49d9dce81b0571af51943db248cae6a13",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/notations/DependencyClassPathNotationConverter.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/LocalFileDependencyBackedArtifactSet.java",
+      "bytes": 14284,
+      "sha256": "028b0f7d9ce14b86e4eaaa44e7b13cdc37b2f0444e23ea47ba6d6e973549f777",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/artifacts/ivyservice/resolveengine/artifact/LocalFileDependencyBackedArtifactSet.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/RuntimeShadedJarFactory.java",
+      "bytes": 3364,
+      "sha256": "e3256630efc95e3722292c780bae1cb53e4a76dcd1dbd04c5b20070821d84377",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/runtimeshaded/RuntimeShadedJarFactory.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/RuntimeShadedJarType.java",
+      "bytes": 1153,
+      "sha256": "8faaab68899dc9029b6e4b02d868e8d4e33d923c73b880c24b561c6d36e3a4de",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/runtimeshaded/RuntimeShadedJarType.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/RuntimeShadedJarCreator.java",
+      "bytes": 13993,
+      "sha256": "669b7cbc9d29c205f8e15be83d7b7fd42f78d5305e4e8c84a082a43700345f6c",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/runtimeshaded/RuntimeShadedJarCreator.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/DefaultGeneratedGradleJarCache.java",
+      "bytes": 2282,
+      "sha256": "f87583d081ab0caa6ec2d35ee9dd695a160e11f5d263b89029b39a2afe8f8cab",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/core/src/main/java/org/gradle/cache/internal/DefaultGeneratedGradleJarCache.java"
+    },
+    {
+      "path": "official-gradle-9.3.1/GeneratedGradleJarCache.java",
+      "bytes": 1601,
+      "sha256": "b329dafa9590f288013033a5e662a750af4f7bab67e69143aa3c50f9c90f7212",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/v9.3.1/subprojects/core/src/main/java/org/gradle/cache/internal/GeneratedGradleJarCache.java"
+    }
+  ],
+  "claim": "source review provenance; runtime producer is exact verified Gradle ZIP and first builtin-only models, not a binary reproducibility claim"
+}

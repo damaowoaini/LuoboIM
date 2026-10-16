@@ -1,5 +1,6 @@
-// Explicit observed-r4 resolver; original resolve.gradle remains immutable.
+// Explicit observed-r7 resolver; original resolve.gradle remains immutable.
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import java.security.MessageDigest
 import java.nio.file.Files
 import java.nio.file.LinkOption
@@ -9,11 +10,123 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.artifacts.component.ProjectComponentSelector
+import org.gradle.api.internal.artifacts.dependencies.DefaultFileCollectionDependency
+import org.gradle.internal.component.local.model.OpaqueComponentIdentifier
+import org.gradle.internal.component.local.model.OpaqueComponentArtifactIdentifier
 
 def roots = [System.getenv('ANDROID_NATIVE_WORK')].findAll { it != null }.collect { new File(it).canonicalFile }
 if (roots.size() != 1) throw new GradleException('one owned cloud root required')
 def owned = roots[0]
 def ownedPrincipal = Files.getOwner(owned.toPath(), LinkOption.NOFOLLOW_LINKS)
+def digestBytes = { bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
+def fileDigest = { file ->
+    def h = MessageDigest.getInstance('SHA-256')
+    file.withInputStream { stream ->
+        byte[] b = new byte[65536]; int n
+        while ((n = stream.read(b)) > 0) h.update(b,0,n)
+    }
+    h.digest().encodeHex().toString()
+}
+def catalogPath = new File(owned, 'evidence/classpath-preseal/catalog.json')
+def properties = gradle.startParameter.projectProperties
+def expectedCatalogSha = properties['luoboClasspathCatalogSha256']
+if (properties['luoboClasspathCatalog'] != catalogPath.path || !(expectedCatalogSha ==~ /[0-9a-f]{64}/) ||
+        catalogPath.canonicalFile != catalogPath ||
+        !Files.isRegularFile(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+        Files.getOwner(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal ||
+        Files.getAttribute(catalogPath.toPath(), 'unix:nlink', LinkOption.NOFOLLOW_LINKS) != 1 ||
+        catalogPath.length() > 2 * 1024 * 1024)
+    throw new GradleException('fixed owned producer catalog and literal SHA required')
+def catalogBytes = Files.readAllBytes(catalogPath.toPath())
+if (digestBytes(catalogBytes) != expectedCatalogSha)
+    throw new GradleException('independent producer catalog SHA differs')
+def catalog = new JsonSlurper().parseText(new String(catalogBytes, 'UTF-8'))
+def notationNames = ['GRADLE_API', 'LOCAL_GROOVY', 'GRADLE_TEST_KIT'] as Set
+if (catalog.schema != 1 || catalog.Gradle != '9.3.1' ||
+        catalog.application_or_fixture_parsed_before_producer != false ||
+        catalog.producer_archives.gradle.sha256 != '17f277867f6914d61b1aa02efab1ba7bb439ad652ca485cd8ca6842fccec6e43' ||
+        catalog.producer_archives.jdk.sha256 != '3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e' ||
+        catalog.reports.keySet() != (['actual','selector'] as Set))
+    throw new GradleException('exact independent builtin producer required')
+def approvedFiles = [:]
+catalog.reports.each { name, report ->
+    if (report.notations.keySet() != notationNames)
+        throw new GradleException('exact three builtin notations required')
+    report.notations.each { notation, source ->
+        if (source.notation != notation || source.component_class != OpaqueComponentIdentifier.name ||
+                source.files.empty || source.files.size() > 512)
+            throw new GradleException('bounded official builtin source required')
+        source.files.each { row ->
+            def prior = approvedFiles[row.path]
+            if (prior != null && (prior.sha256 != row.sha256 || prior.bytes != row.bytes))
+                throw new GradleException('producer catalog conflicts')
+            approvedFiles[row.path] = row
+        }
+    }
+}
+def localRef = { File original ->
+    def file = original.canonicalFile
+    if (file != original.absoluteFile || !file.toPath().startsWith(owned.toPath()) ||
+            !Files.isRegularFile(file.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(file.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal ||
+            Files.getAttribute(file.toPath(), 'unix:nlink', LinkOption.NOFOLLOW_LINKS) != 1 ||
+            file.length() <= 0 || file.length() > 512L * 1024 * 1024)
+        throw new GradleException('unsafe local component file')
+    [path:owned.toPath().relativize(file.toPath()).toString(), bytes:file.length(), sha256:fileDigest(file)]
+}
+def refusal = { component, p, c, reason ->
+    def detail = [component_class:component.getClass().name.take(256), project:p.path,
+        configuration:c.name, reason:reason, catalog_sha256:expectedCatalogSha,
+        display_ref_sha256:digestBytes(component.displayName.take(1024).getBytes('UTF-8'))]
+    if (component.getClass() == OpaqueComponentArtifactIdentifier) {
+        try { detail.file = localRef(component.getFile()) }
+        catch (Exception error) { detail.file_refusal_class = error.getClass().name.take(256) }
+    }
+    if (component.getClass() == OpaqueComponentIdentifier)
+        detail.notation = component.getClassPathNotation().name().take(128)
+    logger.error('LUOBO_COMPONENT_REFUSAL ' + JsonOutput.toJson(detail))
+    throw new GradleException('unknown or unapproved local artifact component refused: ' + reason)
+}
+def approvedLocal = { File file, component, p, c ->
+    def row
+    try { row = localRef(file) }
+    catch (Exception error) { refusal(component, p, c, 'unsafe-file') }
+    def expected = approvedFiles[row.path]
+    if (expected == null || expected.bytes != row.bytes || expected.sha256 != row.sha256)
+        refusal(component, p, c, 'file-not-in-independent-producer')
+    row
+}
+def localIdentity = { component, p, c ->
+    if (component.getClass() == OpaqueComponentArtifactIdentifier) {
+        def file = approvedLocal(component.getFile(), component, p, c)
+        return [kind:'presealed-file', component_class:component.getClass().name,
+            file:file, catalog_sha256:expectedCatalogSha]
+    }
+    if (component.getClass() == OpaqueComponentIdentifier) {
+        def notation = component.getClassPathNotation().name()
+        if (!notationNames.contains(notation)) refusal(component, p, c, 'notation-not-allowed')
+        def home = gradle.gradleUserHomeDir.canonicalFile
+        def cache = home == new File(owned,'gradle-cache') ? 'actual' :
+            home == new File(owned,'selector-gradle-home') ? 'selector' : null
+        if (cache == null) refusal(component, p, c, 'cache-not-allowed')
+        def expected = catalog.reports[cache].notations[notation].files
+        // Exact factory identity must be backed by an actual declared
+        // FileCollectionDependency. The notation alone cannot authorize files.
+        def declarations = c.allDependencies.findAll {
+            it instanceof DefaultFileCollectionDependency && it.getTargetComponentId() == component
+        }
+        if (declarations.empty) refusal(component, p, c, 'missing-file-collection-declaration')
+        expected.each { row -> approvedLocal(new File(owned,row.path), component, p, c) }
+        declarations.each { dependency ->
+            def actual = dependency.getFiles().files.collect { file -> approvedLocal(file,component,p,c).path } as Set
+            if (actual != (expected.collect { it.path } as Set))
+                refusal(component, p, c, 'declared-classpath-set-differs')
+        }
+        return [kind:'presealed-gradle-classpath', component_class:component.getClass().name,
+            notation:notation, cache:cache, catalog_sha256:expectedCatalogSha]
+    }
+    refusal(component, p, c, 'unsupported-component-type')
+}
 def checkedProject = { p ->
     def directory = p.projectDir.canonicalFile
     def script = p.buildFile.canonicalFile
@@ -145,9 +258,10 @@ gradle.projectsEvaluated {
                             }
                         }
                         // A strict artifact view filters components, not graph
-                        // edges. Local AGP secondary artifacts are chosen by
+                        // edges. Modules and independently presealed local files only.
+                        // Local AGP secondary artifacts are chosen by
                         // the eventual real APK tasks, not this metadata read.
-                        def moduleView = c.incoming.artifactView { view ->
+                        def auditedView = c.incoming.artifactView { view ->
                             view.setLenient(false)
                             view.componentFilter { component ->
                                 if (component instanceof ModuleComponentIdentifier) {
@@ -155,15 +269,27 @@ gradle.projectsEvaluated {
                                     return true
                                 }
                                 if (component instanceof ProjectComponentIdentifier) return false
-                                throw new GradleException('unknown artifact component identifier refused')
+                                localIdentity(component, p, c)
+                                return true
                             }
                         }
-                        moduleView.getArtifacts().getArtifacts().each { a ->
+                        auditedView.getArtifacts().getArtifacts().each { a ->
                             def f = a.file.canonicalFile
                             if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('artifact outside owned root')
-                            def selected = componentIdentity(a.id.componentIdentifier)
-                            if (!(a.id.componentIdentifier instanceof ModuleComponentIdentifier))
-                                throw new GradleException('non-module artifact escaped strict component view')
+                            def component = a.id.componentIdentifier
+                            if (!(component instanceof ModuleComponentIdentifier)) {
+                                def selected = localIdentity(component, p, c)
+                                def file = approvedLocal(f, component, p, c)
+                                if (selected.kind == 'presealed-gradle-classpath' &&
+                                        !catalog.reports[selected.cache].notations[selected.notation].files.any { it.path == file.path })
+                                    refusal(component, p, c, 'artifact-outside-notation')
+                                if (selected.kind == 'presealed-file' && selected.file.path != file.path)
+                                    refusal(component, p, c, 'artifact-differs-from-file-component')
+                                rows.add([project:p.path, configuration:c.name, selected:selected,
+                                    path:file.path, bytes:file.bytes, sha256:file.sha256])
+                                return
+                            }
+                            def selected = componentIdentity(component)
                             if (!f.isFile()) throw new GradleException('resolved external artifact missing')
                             def h = MessageDigest.getInstance('SHA-256')
                             f.withInputStream { stream ->

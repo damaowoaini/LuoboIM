@@ -38,11 +38,15 @@ class SelectorSourceTests(unittest.TestCase):
             def fake_command(_job, args, cwd, env, label, timeout, reject, stdin):
                 calls.append((list(args), cwd, env, label, timeout, reject, stdin))
                 return log
-            with patch.object(observed.parent.Job, 'cmd', fake_command):
+            catalog = (root / 'evidence/classpath-preseal/catalog.json', '1' * 64)
+            with patch.object(observed.classpaths, 'verified_catalog', return_value=catalog), \
+                    patch.object(observed.parent.Job, 'cmd', fake_command):
                 job.gradle_prepare()
             self.assertEqual(len(calls), 1)
             expected = list(original)
             expected[expected.index('-I') + 1] = observed.HERE / 'resolve-observed.gradle'
+            expected += ['-PluoboClasspathCatalog=' + str(catalog[0]),
+                         '-PluoboClasspathCatalogSha256=' + catalog[1]]
             self.assertEqual(calls[0], (expected, root / 'source/app/android',
                 observed.parent.environment(root, False), 'gradle-dependency-setup', 1800, None, None))
             self.assertEqual(job.verify.call_count, 2)
@@ -55,6 +59,8 @@ class SelectorSourceTests(unittest.TestCase):
             dispatch = json.loads((root / 'evidence/observed-resolver-dispatch.json').read_text())
             changed = [i for i, (a, b) in enumerate(zip(dispatch['original_argv'], dispatch['derived_argv'])) if a != b]
             self.assertEqual(changed, [dispatch['original_argv'].index('-I') + 1])
+            self.assertEqual(dispatch['derived_argv'][-2:], expected[-2:])
+            self.assertEqual(dispatch['catalog_sha256'], catalog[1])
 
     def test_dispatch_outside_parent_or_changed_command_is_zero_execution(self):
         for mode in ['outside', 'wrong-I', 'extra-arg', 'wrong-env']:

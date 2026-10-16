@@ -1,0 +1,83 @@
+// The first Gradle models of the job: no application or fixture plugins.
+import groovy.json.JsonOutput
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.security.MessageDigest
+import org.gradle.api.internal.artifacts.dependencies.DefaultFileCollectionDependency
+import org.gradle.internal.component.local.model.OpaqueComponentIdentifier
+
+def work = new File(System.getenv('ANDROID_NATIVE_WORK')).canonicalFile
+def label = gradle.startParameter.projectProperties['luoboPresealCache']
+if (!(label in ['actual', 'selector']) || gradle.gradleVersion != '9.3.1')
+    throw new GradleException('fixed preseal Gradle/cache required')
+def home = new File(work, label == 'actual' ? 'gradle-cache' : 'selector-gradle-home')
+def projectPath = new File(work, 'evidence/classpath-preseal/project-' + label)
+def gradleHome = new File(work, 'gradle')
+if (gradle.gradleHomeDir.canonicalFile != gradleHome || gradle.gradleUserHomeDir.canonicalFile != home ||
+        new File(System.getProperty('java.home')).canonicalFile != new File(work, 'jdk'))
+    throw new GradleException('fixed owned Gradle/JDK/cache paths required')
+def owner = Files.getOwner(work.toPath(), LinkOption.NOFOLLOW_LINKS)
+def hash = { File file ->
+    def digest = MessageDigest.getInstance('SHA-256')
+    file.withInputStream { stream ->
+        byte[] buffer = new byte[65536]; int count
+        while ((count = stream.read(buffer)) > 0) digest.update(buffer, 0, count)
+    }
+    digest.digest().encodeHex().toString()
+}
+def checked = { File original ->
+    def file = original.canonicalFile
+    if (original.absoluteFile != file || !file.toPath().startsWith(work.toPath()) ||
+            !Files.isRegularFile(file.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(file.toPath(), LinkOption.NOFOLLOW_LINKS) != owner ||
+            Files.getAttribute(file.toPath(), 'unix:nlink', LinkOption.NOFOLLOW_LINKS) != 1 ||
+            file.length() <= 0 || file.length() > 512L * 1024 * 1024)
+        throw new GradleException('bounded canonical owned single-link classpath file required')
+    def origin
+    if (file.toPath().startsWith(new File(gradleHome, 'lib').toPath())) {
+        origin = 'verified-Gradle-distribution'
+    } else if (file.parentFile == new File(home, 'caches/9.3.1/generated-gradle-jars') &&
+            file.name in ['gradle-api-9.3.1.jar', 'gradle-test-kit-9.3.1.jar']) {
+        origin = 'first-builtin-model-runtime-shaded-output'
+    } else {
+        throw new GradleException('classpath file outside fixed distribution/generator outputs')
+    }
+    [path:work.toPath().relativize(file.toPath()).toString(), bytes:file.length(),
+     sha256:hash(file), origin:origin]
+}
+gradle.projectsEvaluated {
+    def root = gradle.rootProject
+    if (root.projectDir.canonicalFile != projectPath || root.allprojects.size() != 1 ||
+            !gradle.includedBuilds.empty || !root.repositories.empty || !root.buildscript.repositories.empty)
+        throw new GradleException('only one owned builtin-only preseal model allowed')
+    root.tasks.register('sealOwnedClasspaths') {
+        doLast {
+            def dependencies = [GRADLE_API:root.dependencies.gradleApi(),
+                                LOCAL_GROOVY:root.dependencies.localGroovy(),
+                                GRADLE_TEST_KIT:root.dependencies.gradleTestKit()]
+            def notations = [:]
+            dependencies.each { notation, dependency ->
+                if (!(dependency instanceof DefaultFileCollectionDependency))
+                    throw new GradleException('unexpected builtin dependency implementation')
+                def component = dependency.getTargetComponentId()
+                if (component == null || component.getClass() != OpaqueComponentIdentifier ||
+                        component.getClassPathNotation().name() != notation)
+                    throw new GradleException('unexpected builtin component/notation')
+                def files = dependency.getFiles().files.toList().sort { it.absolutePath }
+                if (files.empty || files.size() > 512)
+                    throw new GradleException('bounded nonempty builtin classpath required')
+                notations[notation] = [component_class:component.getClass().name,
+                    notation:notation, files:files.collect(checked)]
+            }
+            def output = new File(work, 'evidence/classpath-preseal/' + label + '.json')
+            if (output.exists()) throw new GradleException('preseal output cannot overwrite')
+            def stream = new FileOutputStream(output)
+            try {
+                stream.write((JsonOutput.prettyPrint(JsonOutput.toJson([schema:1, cache:label,
+                    Gradle:'9.3.1', project:projectPath.path, JDK:System.getProperty('java.version'),
+                    application_or_fixture_plugins:false, notations:notations])) + '\n').getBytes('UTF-8'))
+                stream.flush(); stream.getFD().sync()
+            } finally { stream.close() }
+        }
+    }
+}

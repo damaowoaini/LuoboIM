@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 
 import gradle_selector_fixture as original
+import gradle_local_file_fixture as local_files
 import support as s
 
 AMBIGUITY = 'cannot choose between the following variants'
@@ -91,10 +92,12 @@ tasks.register('legacyArtifactProbe') {
     s.write_json(root / 'prepared-variants.json', {'state': 'prepared_not_executed',
         'cases': result, 'original9_unchanged': True, 'Gradle_processes': 3,
         'actual_Gradle_or_AGP_not_yet_executed': True})
-    return result
+    return result + local_files.prepare(work)
 
 
 def check(case, log, captured):
+    if case.get('local_file_contract'):
+        return local_files.check(case, log, captured)
     if case['label'] == CASES[0]:
         text = Path(log).read_text(errors='replace')
         if AMBIGUITY not in text or 'compileClasspath' not in text or captured:
