@@ -1,11 +1,75 @@
 {
   "platforms": [
     {
+      "archive_SHA256_provenance": "R9 successful actual cloud acquisition receipt; not locally rehashed original ZIP; reverify against official SHA1/size and actual full SHA256 before any member use",
+      "archive_sha256": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d",
       "jar": {
         "bytes": 43044472,
         "path": "platforms/android-37.0/android.jar",
         "sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177"
       },
+      "jar_inventory": [
+        {
+          "member": "android-37.0/android-stubs-src.jar",
+          "path": "platforms/android-37.0/android-stubs-src.jar",
+          "purpose": "source-only_not_classpath",
+          "role": "source-only"
+        },
+        {
+          "member": "android-37.0/android.jar",
+          "path": "platforms/android-37.0/android.jar",
+          "purpose": "Android boot/API classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/core-for-system-modules.jar",
+          "path": "platforms/android-37.0/core-for-system-modules.jar",
+          "purpose": "Android JDK image input",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/optional/android.car.jar",
+          "path": "platforms/android-37.0/optional/android.car.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/optional/android.test.base.jar",
+          "path": "platforms/android-37.0/optional/android.test.base.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/optional/android.test.mock.jar",
+          "path": "platforms/android-37.0/optional/android.test.mock.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/optional/android.test.runner.jar",
+          "path": "platforms/android-37.0/optional/android.test.runner.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/optional/org.apache.http.legacy.jar",
+          "path": "platforms/android-37.0/optional/org.apache.http.legacy.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/optional/wear-sdk.jar",
+          "path": "platforms/android-37.0/optional/wear-sdk.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-37.0/uiautomator.jar",
+          "path": "platforms/android-37.0/uiautomator.jar",
+          "purpose": "legacy UI automation API classpath",
+          "role": "classpath"
+        }
+      ],
       "jar_member": "android-37.0/android.jar",
       "official": {
         "checksum": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
@@ -15,6 +79,10 @@
         "size": 67281901,
         "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip"
       },
+      "optional_manifest": {
+        "member": "android-37.0/optional/optional.json",
+        "path": "platforms/android-37.0/optional/optional.json"
+      },
       "properties": {
         "bytes": 343,
         "path": "platforms/android-37.0/source.properties",
@@ -23,11 +91,75 @@
       "properties_member": "android-37.0/source.properties"
     },
     {
+      "archive_SHA256_provenance": "R9 successful actual cloud acquisition receipt; not locally rehashed original ZIP; reverify against official SHA1/size and actual full SHA256 before any member use",
+      "archive_sha256": "37607369a28c5b640b3a7998868d45898ebcb777565a0e85f9acf36f29631d2e",
       "jar": {
         "bytes": 27768026,
         "path": "platforms/android-36/android.jar",
         "sha256": "d9eb9da824d9e247a352f570f01e1169e725b2954bca9e283a71786c59b59f9a"
       },
+      "jar_inventory": [
+        {
+          "member": "android-36/android-stubs-src.jar",
+          "path": "platforms/android-36/android-stubs-src.jar",
+          "purpose": "source-only_not_classpath",
+          "role": "source-only"
+        },
+        {
+          "member": "android-36/android.jar",
+          "path": "platforms/android-36/android.jar",
+          "purpose": "Android boot/API classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/core-for-system-modules.jar",
+          "path": "platforms/android-36/core-for-system-modules.jar",
+          "purpose": "Android JDK image input",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/optional/android.car.jar",
+          "path": "platforms/android-36/optional/android.car.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/optional/android.test.base.jar",
+          "path": "platforms/android-36/optional/android.test.base.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/optional/android.test.mock.jar",
+          "path": "platforms/android-36/optional/android.test.mock.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/optional/android.test.runner.jar",
+          "path": "platforms/android-36/optional/android.test.runner.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/optional/org.apache.http.legacy.jar",
+          "path": "platforms/android-36/optional/org.apache.http.legacy.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/optional/wear-sdk.jar",
+          "path": "platforms/android-36/optional/wear-sdk.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-36/uiautomator.jar",
+          "path": "platforms/android-36/uiautomator.jar",
+          "purpose": "legacy UI automation API classpath",
+          "role": "classpath"
+        }
+      ],
       "jar_member": "android-36/android.jar",
       "official": {
         "checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
@@ -37,6 +169,10 @@
         "size": 65878410,
         "url": "https://dl.google.com/android/repository/platform-36_r02.zip"
       },
+      "optional_manifest": {
+        "member": "android-36/optional/optional.json",
+        "path": "platforms/android-36/optional/optional.json"
+      },
       "properties": {
         "bytes": 257,
         "path": "platforms/android-36/source.properties",
@@ -45,11 +181,69 @@
       "properties_member": "android-36/source.properties"
     },
     {
+      "archive_SHA256_provenance": "R9 successful actual cloud acquisition receipt; not locally rehashed original ZIP; reverify against official SHA1/size and actual full SHA256 before any member use",
+      "archive_sha256": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0",
       "jar": {
         "bytes": 27092450,
         "path": "platforms/android-35/android.jar",
         "sha256": "4566663c3876e022b4fa4ced8c8697c4ab1688267f090114fd92d027b32e619b"
       },
+      "jar_inventory": [
+        {
+          "member": "android-35/android-stubs-src.jar",
+          "path": "platforms/android-35/android-stubs-src.jar",
+          "purpose": "source-only_not_classpath",
+          "role": "source-only"
+        },
+        {
+          "member": "android-35/android.jar",
+          "path": "platforms/android-35/android.jar",
+          "purpose": "Android boot/API classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-35/core-for-system-modules.jar",
+          "path": "platforms/android-35/core-for-system-modules.jar",
+          "purpose": "Android JDK image input",
+          "role": "classpath"
+        },
+        {
+          "member": "android-35/optional/android.car.jar",
+          "path": "platforms/android-35/optional/android.car.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-35/optional/android.test.base.jar",
+          "path": "platforms/android-35/optional/android.test.base.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-35/optional/android.test.mock.jar",
+          "path": "platforms/android-35/optional/android.test.mock.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-35/optional/android.test.runner.jar",
+          "path": "platforms/android-35/optional/android.test.runner.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-35/optional/org.apache.http.legacy.jar",
+          "path": "platforms/android-35/optional/org.apache.http.legacy.jar",
+          "purpose": "optional-library-classpath",
+          "role": "classpath"
+        },
+        {
+          "member": "android-35/uiautomator.jar",
+          "path": "platforms/android-35/uiautomator.jar",
+          "purpose": "legacy UI automation API classpath",
+          "role": "classpath"
+        }
+      ],
       "jar_member": "android-35/android.jar",
       "official": {
         "checksum": "0bb560a90a7a2cbd0dd8348224d518b638fe7949",
@@ -59,6 +253,10 @@
         "size": 64273788,
         "url": "https://dl.google.com/android/repository/platform-35_r02.zip"
       },
+      "optional_manifest": {
+        "member": "android-35/optional/optional.json",
+        "path": "platforms/android-35/optional/optional.json"
+      },
       "properties": {
         "bytes": 257,
         "path": "platforms/android-35/source.properties",
@@ -67,6 +265,6 @@
       "properties_member": "android-35/source.properties"
     }
   ],
-  "schema": 1,
-  "source": "reviewed R9 official metadata plus original toolchain/additions static crossplatform SHA256"
+  "schema": 2,
+  "source": "R10 finite whole-platform JAR closure: independent locked official ZIP member bytes, never installed-file hash self-registration"
 }

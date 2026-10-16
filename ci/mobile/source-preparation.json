@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v9",
-  "state": "current304_call_records_async_fixture_r3_pending_cloud",
+  "state": "current304_call_records_page_r4_pending_cloud",
   "accepted_parent294": {
     "commit": "a2e59b08b125dd67e05c8cdf877235daf1933431",
     "run": 38893402709,
@@ -9,12 +9,12 @@
     "actual": "184/872/strictanalyze0;new18+old854 exact;76sixmarker+safeexit6each;0warnings",
     "root_acceptance_sha256": "80c0a46710fde0adbe61ad77dcb6598a59f01a9a07d011003736371a55ad6e05"
   },
-  "source304_digest": "4e54cc05977e210c706dceccb46c31ce426f4ca6fe603de069491937637fe709",
-  "portable356_digest": "d113b9775dc7790038e4f3272df33c1d46665336d93349931e096638900a9119",
+  "source304_digest": "93c52fce3f0e03cbc1bc2e86803c15624f44db8d141987f910983f342e6457e2",
+  "portable356_digest": "67d6a6d924998209024186dd4b214ff01b74873f870bcbe345c50ae86de95ed9",
   "candidate_manifest": {
-    "path": "references/integration/mobile-call-records-r3-async-fixture-candidate/candidate-manifest.json",
-    "bytes": 4401,
-    "sha256": "83c5625443dd9649fceb890c8205c95e1452246d73e3f4c6e7ab2f634678b3d6"
+    "path": "references/integration/mobile-call-records-r4-page-candidate/candidate-manifest.json",
+    "bytes": 2498,
+    "sha256": "02c8d8831cc4325fee4173a10eb6ee58fc1369bde5159bbc6ef856d41fbdb764"
   },
   "current_delta": {
     "selected": 14,
@@ -41,7 +41,7 @@
     "state": "preparedonly;future actualraw/testIDs required"
   },
   "gates": "9protectedAST exact,old28helper assertions preserved,4newcleanup helper tests prepared;officialtoolchain/174locks/SDK51/migration1/resources/netns/fullcompletion unchanged",
-  "reference": "Original optional search still defaultoff/same4 replacements/strict1namedassertFAIL1oldfilterPASS/restoration; recomputed reference source304 6215d217dfbb187988329be51b690ec28241f4f44684284ca06cfaf80a1a4405. No new before phase.",
+  "reference": "Original optional search defaultoff/same4 replacements/strict1assertFAIL1oldfilterPASS/restoration; new source304digest 45e01cf8f7f1bc2dc7f4497e7e6a75440dbc856e837e371a6a48f970aee72c24. No extra referencephase.",
   "check_sh": "Strict public authored inventory has zeroexceptions;701B known localhelper remains localonly,notcopied/required/uploaded.",
   "old_history_preparation": {
     "schema": "luobo.mobile.source-preparation.v8",
@@ -240,5 +240,28 @@
     },
     "actual": "218PASS+4ERROR;21hiddenPASS;244start/243done;missingdonefooter;new34PASS/4ERROR/12unstarted;old184exact;900.149phasetimeout child0;full/analyze notstarted",
     "cause_boundary": "timer/queue scheduling diagnoses are source-backed hypotheses, not R3 runtime proof; four actual outcomes remain separately preserved"
+  },
+  "actual_parent_R3": {
+    "run": 38902412585,
+    "job": 116977614395,
+    "commit": "410d4b59fc8ea384f28ca847deb03dc2f94f5c29",
+    "review": {
+      "path": "references/integration/cloud-mobile-ci/run-38902412585-agent/verification.json",
+      "bytes": 5629,
+      "sha256": "8f93b162a93c9cba24c4c5e01a72eee807fad5aba6957bf24fecc3b941d8e7b3"
+    },
+    "artifact_sha256": "c33ef413c6dbe4fa59193bfb92dfc5095e6816d466e2dd4290137e6f9230392f",
+    "actual": "target234 232PASS2ERROR/22hiddenPASS/falsefooter;old184exact/new48PASS2ERROR;lifetime3PASS;35newcleanup/14unmount+76parent/safe6exact;105.935s child1/noresourcegate;full/analyze notstarted",
+    "confirmed_product_errors": [
+      "retained delete callback ancestor lookup from deactivated builder context",
+      "actual deletion IconButton height40 below44"
+    ]
+  },
+  "current_revision_R4": {
+    "selected_production": 1,
+    "test_fixture_changed": 0,
+    "all50_names222_expects": "exact unchanged",
+    "actual_Dart_execution": 0,
+    "two_fix_scope": "captured owned route+navigator in original sheet finish;explicit44x44/density/taptarget"
   }
 }

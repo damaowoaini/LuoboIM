@@ -1,3 +1,34 @@
+# Current304 call-records page R4 (prepared, not run)
+
+R3 run38902412585 naturally failed: actual target234 fully completed232PASS and
+2ERROR,22hiddenPASS,0skip/warnings,falsefooter. Old184 exact and new48 passed,
+including all3 owner-retirement lifetime cases and actual remaining ring timer.
+Every35 recorder cleanup sequence(33normal/2expectedfailure),14ownedunmounts,
+76parentcreation and safeexit6 completed.105.935s/child1/noresourcegate. Full922
+and analyze did not start; accepted294/872/strict0 stays authoritative history.
+
+Both failures are product defects rather than fixture count allowances: retained
+delete confirmation looked up ancestors on its deactivated builder context, and
+the actual delete IconButton rendered40px against the existing44px expectation.
+R4 changes only that one production page. The active builder captures its exact
+ModalRoute and NavigatorState. Retained finish checks captured active/current
+route, its exact navigator, navigator.mounted and ALL original owner/view guards
+for non-null results, then pops via captured navigator. It performs no callback
+ancestor lookup or fresh owner/route lease; cancel only closes the same current
+owned route and never a foreign overlay. Delete has explicit44x44 constraints,
+standarddensity and padded tap target; no global theme or permission change.
+
+All50 names and all222 assertions, every R3 fixture/test byte and sharedHarness
+stay exact. Same target234=old184+50/full922=old872+50/strictanalyze0 are mandatory;
+these are expected, not current results. Workflow/controller32Python/9AST, strict
+name/hidden/footer/cleanup, officialtoolchain/174locks/SDK51/migration1/resources/
+netns/completion gates unchanged. Only3 metadata inputs rebind current304/356 and
+the defaultoff original search reference digest. Publicinventory has noexception;
+check.sh remains localonly. No localDart/DB/Flutter, current/public mutation, new
+run/rerun/cancel or native/service acceptance is performed by this draft.
+
+## Preserved R3 and earlier documentation
+
 # Current304 call-records async fixture R3 (prepared, not run)
 
 Parent R2 run38899133951 failed naturally. Exact raw shows old184 successful plus

@@ -17,6 +17,7 @@ HERE = Path(__file__).resolve().parent
 PACKAGES = ('platforms;android-37.0', 'platforms;android-36', 'platforms;android-35')
 ARCHIVE_BYTES = 197434099
 TAMPER_LABEL = 'selector-control-sdk-samepath-tamper'
+SYSTEM_TAMPER_LABEL = 'selector-control-sdk-system-samepath-tamper'
 KEYS = ('st_dev', 'st_ino', 'st_mode', 'st_uid', 'st_gid', 'st_nlink',
         'st_size', 'st_mtime_ns', 'st_ctime_ns')
 
@@ -70,9 +71,27 @@ def read_json(work, path):
 
 def contract():
     value = json.loads((HERE / 'sdk-platform-sources.json').read_text())
-    if (value['schema'] != 1 or tuple(x['official']['package'] for x in value['platforms']) != PACKAGES
+    if (value['schema'] != 2 or tuple(x['official']['package'] for x in value['platforms']) != PACKAGES
             or sum(x['official']['size'] for x in value['platforms']) != ARCHIVE_BYTES):
         raise ValueError('exact three reviewed SDK platform contracts required')
+    inventories = [row['jar_inventory'] for row in value['platforms']]
+    if ([len(x) for x in inventories] != [10, 10, 9]
+            or sum(item['role'] == 'classpath' for x in inventories for item in x) != 26
+            or sum(item['role'] == 'source-only' for x in inventories for item in x) != 3):
+        raise ValueError('exact finite29 JAR inventory/classification required')
+    for row in value['platforms']:
+        inventory = row['jar_inventory']
+        prefix = row['official']['package'].split(';')[1] + '/'
+        if (not re.fullmatch('[0-9a-f]{64}', row['archive_sha256'])
+                or len({x['member'].casefold() for x in inventory}) != len(inventory)):
+            raise ValueError('reviewed archive SHA and unique finite members required')
+        for item in inventory:
+            s.name(item['member'])
+            if (not item['member'].startswith(prefix) or not item['member'].endswith('.jar')
+                    or item['path'] != 'platforms/' + item['member']
+                    or item['role'] not in ('classpath', 'source-only')
+                    or (item['role'] == 'source-only') != (item['member'] == prefix + 'android-stubs-src.jar')):
+                raise ValueError('finite member path/role differs')
     return value['platforms']
 
 
@@ -136,6 +155,99 @@ def compare_member(work, bundle, member, pin, budget):
             'ZIP_member': member, 'installed_stat': identity(before), 'byte_comparison': True}
 
 
+def jar_inventory(bundle, expected):
+    """Enumerate the official archive, never the installed SDK directory."""
+    actual = [x for x in bundle.infolist() if x.filename.lower().endswith('.jar')]
+    names = [x.filename for x in actual]
+    wanted = [x['member'] for x in expected['jar_inventory']]
+    if (len(names) > 16 or len(names) != len(wanted) or set(names) != set(wanted)
+            or len({x.casefold() for x in names}) != len(names)):
+        raise ValueError('official ZIP finite JAR inventory missing/extra/case collision')
+    for info in actual:
+        s.name(info.filename)
+        mode = info.external_attr >> 16
+        if (info.is_dir() or info.flag_bits & 1 or stat.S_IFMT(mode) not in (0, stat.S_IFREG)
+                or not 0 < info.file_size <= 128 * 1024 ** 2):
+            raise ValueError('bounded regular official JAR member required')
+    return sorted(names)
+
+
+def archive_pin(work, archive, expected, acquired):
+    row = file_row(work, archive)
+    official = expected['official']
+    if (acquired['source_url'] != official['url'] or acquired['official_sha1_checked'] is not True
+            or acquired['sha256'] != expected['archive_sha256']
+            or row['sha256'] != expected['archive_sha256']
+            or row['bytes'] != acquired['bytes'] or row['bytes'] != official['size']):
+        raise ValueError('official archive differs from reviewed prior-acquisition full lock')
+    return row
+
+
+def member_pin(bundle, member, installed_path, budget):
+    """Hash source bytes first; installed content cannot self-authorize a pin."""
+    info = bundle.getinfo(member)
+    if info.is_dir() or not 0 < info.file_size <= 128 * 1024 ** 2:
+        raise ValueError('bounded selected official member required')
+    digest, count = hashlib.sha256(), 0
+    with bundle.open(info) as stream:
+        for block in iter(lambda: stream.read(65536), b''):
+            count += len(block)
+            if count > info.file_size:
+                raise ValueError('official member exceeds declared length')
+            digest.update(block)
+            budget.check()
+    if count != info.file_size:
+        raise ValueError('official member length differs')
+    return {'path': installed_path, 'bytes': count, 'sha256': digest.hexdigest()}
+
+
+def optional_metadata(body, inventory):
+    if len(body) > 1024 ** 2:
+        raise ValueError('bounded optional library metadata required')
+    def unique_pairs(items):
+        value = {}
+        for key, item in items:
+            if key in value:
+                raise ValueError('duplicate optional metadata key')
+            value[key] = item
+        return value
+    rows = json.loads(body, object_pairs_hook=unique_pairs)
+    expected = {Path(x['member']).name for x in inventory
+                if '/optional/' in x['member'] and x['role'] == 'classpath'}
+    if not isinstance(rows, list) or len(rows) != len(expected):
+        raise ValueError('optional metadata must cover exact finite optional JARs')
+    names, jars = set(), set()
+    for row in rows:
+        if (not isinstance(row, dict) or set(row) != {'name', 'jar', 'manifest'}
+                or not isinstance(row['name'], str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,128}', row['name'])
+                or not isinstance(row['jar'], str) or row['jar'] not in expected
+                or row['jar'] != Path(row['jar']).name or type(row['manifest']) is not bool
+                or row['name'] in names or row['jar'] in jars):
+            raise ValueError('optional metadata unknown/unsafe/duplicate declaration')
+        names.add(row['name'])
+        jars.add(row['jar'])
+    if jars != expected:
+        raise ValueError('optional metadata differs from finite official members')
+    return rows
+
+
+def validate_jar_claim(expected, source):
+    wanted = {x['member']: x for x in expected['jar_inventory']}
+    rows = source['JAR_inventory']
+    if len(rows) != len(wanted) or len({x['ZIP_member'] for x in rows}) != len(rows):
+        raise ValueError('complete finite official JAR claim required')
+    for row in rows:
+        pin = wanted.get(row['ZIP_member'])
+        if (pin is None or row['path'] != 'android/' + pin['path'] or row['role'] != pin['role']
+                or row['pin_authority'] != 'locked-official-archive-member'
+                or row['byte_comparison'] is not True or not re.fullmatch('[0-9a-f]{64}', row['sha256'])
+                or type(row['bytes']) is not int or not 0 < row['bytes'] <= 128 * 1024 ** 2):
+            raise ValueError('JAR claim cannot expand member/path/role/source authority')
+    if (source['classpath_JARs'] != [x for x in rows if x['role'] == 'classpath']
+            or source['source_only_JARs'] != [x for x in rows if x['role'] == 'source-only']):
+        raise ValueError('classpath/source-only projection differs from finite producer')
+
+
 def require_initial_boundary(job, args, cwd, env, timeout, reject, stdin):
     original = ['git', 'init', '--quiet', job.w / 'flutter']
     if (list(map(str, args)) != list(map(str, original)) or cwd != job.w
@@ -196,19 +308,34 @@ def produce(job, args, cwd, env, timeout, reject, stdin):
         archive = proof / 'archives' / (tag + '.zip')
         s.mkdir(archive.parent)
         acquired = s.download({'url': official['url'], 'bytes': official['size'],
-            'max_bytes': official['size'], 'official_sha1': official['checksum']}, archive, job.b)
+            'max_bytes': official['size'], 'official_sha1': official['checksum'],
+            'sha256': row['archive_sha256']}, archive, job.b)
         s.sync(archive.parent)
         s.write_json(proof / (tag + '-download.json'), acquired)
         s.write_json(w / 'evidence' / ('SDK-source-' + tag + '-download.json'), acquired)
         if acquired['official_sha1_checked'] is not True:
             raise ValueError('published official platform SHA1 not checked')
-        archive_row = file_row(w, archive)
-        if archive_row['bytes'] != official['size'] or archive_row['sha256'] != acquired['sha256']:
-            raise ValueError('acquired archive changed')
+        archive_row = archive_pin(w, archive, row, acquired)
         with zipfile.ZipFile(archive) as bundle:
             safe_zip(bundle)
+            observed_JAR_names = jar_inventory(bundle, row)
             jar = compare_member(w, bundle, row['jar_member'], row['jar'], job.b)
             prop = compare_member(w, bundle, row['properties_member'], row['properties'], job.b)
+            all_jars = []
+            for item in row['jar_inventory']:
+                pin = member_pin(bundle, item['member'], item['path'], job.b)
+                if item['member'] == row['jar_member'] and pin != row['jar']:
+                    raise ValueError('archive-derived API JAR differs from original static pin')
+                compared = compare_member(w, bundle, item['member'], pin, job.b)
+                all_jars.append({**compared, 'role': item['role'], 'purpose': item['purpose'],
+                    'pin_authority': 'locked-official-archive-member'})
+            optional = row['optional_manifest']
+            optional_pin = member_pin(bundle, optional['member'], optional['path'], job.b)
+            if optional_pin['bytes'] > 1024 ** 2:
+                raise ValueError('bounded official optional metadata required')
+            optional_row = compare_member(w, bundle, optional['member'], optional_pin, job.b)
+            optional_body = read_body(w, w / optional_row['path'], 1024 ** 2)
+            optional_libraries = optional_metadata(optional_body, row['jar_inventory'])
         if file_row(w, archive) != archive_row:
             raise ValueError('SDK archive changed during full CRC/member proof')
         prop_body = read_body(w, w / prop['path'], 64 * 1024)
@@ -223,19 +350,32 @@ def produce(job, args, cwd, env, timeout, reject, stdin):
         raw = w / 'evidence/sdk-platform-raw'
         s.put(raw / (tag + '-package.xml'), package_body)
         s.put(raw / (tag + '-source.properties'), prop_body)
+        s.put(raw / (tag + '-optional.json'), optional_body)
         source = {'kind': 'official-SDK-platform-ZIP-member', 'package': official['package'],
             'revision': official['revision'], 'official': official, 'archive': archive_row,
             'official_sha1_checked': True, 'full_ZIP_CRC_and_safety_checked': True,
-            'selected_members_only': [jar, prop], 'jar': jar, 'properties': prop,
+            'selected_members_only': [*all_jars, prop, optional_row],
+            'jar': jar, 'properties': prop, 'JAR_inventory': all_jars,
+            'complete_official_JAR_names': observed_JAR_names,
+            'classpath_JARs': [x for x in all_jars if x['role'] == 'classpath'],
+            'source_only_JARs': [x for x in all_jars if x['role'] == 'source-only'],
+            'optional_manifest': optional_row, 'optional_libraries': optional_libraries,
+            'raw_optional_manifest': file_row(w, raw / (tag + '-optional.json')),
             'package_xml': file_row(w, raw / (tag + '-package.xml')),
             'raw_properties': file_row(w, raw / (tag + '-source.properties'))}
         s.write_json(proof / (tag + '-proof.json'), source)
         s.write_json(w / 'evidence' / ('SDK-source-' + tag + '-proof.json'), source)
         results.append(source)
-    result = {'schema': 1, 'state': 'passed', 'before_first_model': True, 'platforms': results,
+    if (sum(len(x['JAR_inventory']) for x in results) != 29
+            or sum(len(x['classpath_JARs']) for x in results) != 26
+            or sum(x['bytes'] for p in results for x in p['classpath_JARs']) > 256 * 1024 ** 2):
+        raise ValueError('bounded complete26 classpath/29 installed JAR closure required')
+    result = {'schema': 2, 'state': 'passed', 'before_first_model': True, 'platforms': results,
         'contract_sha256': s.sha(HERE / 'sdk-platform-sources.json'),
-        'archive_total_bytes': ARCHIVE_BYTES, 'archive_SHA256_preexisting_lock': False,
-        'authority': 'published official metadata SHA1 and exact ZIP member bytes plus original static SHA256'}
+        'inventory_JAR_count': 29, 'classpath_JAR_count': 26, 'source_only_JAR_count': 3,
+        'archive_total_bytes': ARCHIVE_BYTES, 'archive_SHA256_preexisting_lock': True,
+        'archive_SHA256_provenance': 'R9 cloud acquisition receipt, not local ZIP rehash; independently rechecked this job',
+        'authority': 'published official metadata SHA1/size + prior archive SHA256 + complete finite ZIP members/installed bytes; original static API pins retained'}
     s.write_json(proof / 'complete.json', result)
     # Compact artifact contains receipts/raw XML/properties, never the 197MB archives.
     s.write_json(w / 'evidence/sdk-platform-source-complete.json', result)
@@ -267,6 +407,7 @@ def archive_upload_admission(work):
             if item['complete_download_receipt_present']:
                 receipt = read_json(w, w / ROOT / (tag + '-download.json'))
                 if (receipt['bytes'] != item['bytes'] or receipt['sha256'] != item['sha256']
+                        or receipt['sha256'] != row['archive_sha256']
                         or receipt['official_sha1_checked'] is not True):
                     raise ValueError('source upload differs from acquired archive')
             rows.append(item)
@@ -296,9 +437,11 @@ def archive_upload_admission(work):
 def verified_sources(work):
     w = Path(work)
     result = read_json(w, w / ROOT / 'complete.json')
-    if (result['schema'] != 1 or result['state'] != 'passed' or result['before_first_model'] is not True
+    if (result['schema'] != 2 or result['state'] != 'passed' or result['before_first_model'] is not True
             or result['contract_sha256'] != s.sha(HERE / 'sdk-platform-sources.json')
-            or result['archive_total_bytes'] != ARCHIVE_BYTES or len(result['platforms']) != 3):
+            or result['archive_total_bytes'] != ARCHIVE_BYTES or len(result['platforms']) != 3
+            or result['inventory_JAR_count'] != 29 or result['classpath_JAR_count'] != 26
+            or result['source_only_JAR_count'] != 3):
         raise ValueError('complete independent SDK source producer required')
     for expected, source in zip(contract(), result['platforms']):
         if (source['official'] != expected['official'] or source['kind'] != 'official-SDK-platform-ZIP-member'
@@ -316,10 +459,32 @@ def verified_sources(work):
                 raise ValueError('independently proven SDK input changed')
         archive = source['archive']
         if (archive['path'] != ROOT + '/archives/' + expected['official']['package'].split(';')[1] + '.zip'
-                or archive['bytes'] != expected['official']['size']):
+                or archive['bytes'] != expected['official']['size'] or archive['sha256'] != expected['archive_sha256']):
             raise ValueError('only exact acquired platform archive may authorize members')
         if file_row(w, w / s.name(source['archive']['path'])) != source['archive']:
             raise ValueError('retained official SDK archive changed')
+        validate_jar_claim(expected, source)
+        if source['complete_official_JAR_names'] != sorted(x['member'] for x in expected['jar_inventory']):
+            raise ValueError('complete official archive JAR enumeration differs')
+        for item in source['JAR_inventory']:
+            if file_row(w, w / s.name(item['path'])) != {k: item[k] for k in ('path', 'bytes', 'sha256')}:
+                raise ValueError('finite installed JAR body/source changed')
+            current = (w / item['path']).lstat()
+            if any(getattr(current, key) != item['installed_stat'][key]
+                   for key in ('st_dev', 'st_ino', 'st_mode', 'st_uid', 'st_gid', 'st_nlink', 'st_mtime_ns')):
+                raise ValueError('original installed JAR inode/metadata changed')
+        for key in ('optional_manifest', 'raw_optional_manifest', 'package_xml', 'raw_properties'):
+            item = source[key]
+            if file_row(w, w / s.name(item['path'])) != {k: item[k] for k in ('path', 'bytes', 'sha256')}:
+                raise ValueError('source metadata bytes changed')
+        meta = source['optional_manifest']
+        if (meta['path'] != 'android/' + expected['optional_manifest']['path']
+                or meta['ZIP_member'] != expected['optional_manifest']['member']
+                or source['raw_optional_manifest']['sha256'] != meta['sha256']
+                or optional_metadata(read_body(w, w / meta['path'], 1024 ** 2), expected['jar_inventory']) != source['optional_libraries']):
+            raise ValueError('optional library metadata/source projection differs')
+    if sum(x['bytes'] for p in result['platforms'] for x in p['classpath_JARs']) > 256 * 1024 ** 2:
+        raise ValueError('bounded complete platform classpath required')
     return result
 
 
@@ -328,9 +493,27 @@ def tamper_for_control(work, synthetic):
     """Only fresh job SDK37; retain original inode, restore before next command."""
     w = Path(work)
     source = verified_sources(w)['platforms'][0]['jar']
+    with tamper_member(w, synthetic, source, 'sdk-samepath-tamper'):
+        yield
+
+
+@contextmanager
+def tamper_system_control(work, synthetic):
+    w = Path(work)
+    source = next(x for x in verified_sources(w)['platforms'][0]['classpath_JARs']
+                  if x['ZIP_member'] == 'android-37.0/core-for-system-modules.jar')
+    with tamper_member(w, synthetic, source, 'sdk-system-samepath-tamper'):
+        yield
+
+
+@contextmanager
+def tamper_member(work, synthetic, source, case_name):
+    if case_name not in ('sdk-samepath-tamper', 'sdk-system-samepath-tamper'):
+        raise ValueError('only two explicit SDK fault-control identities required')
+    w = Path(work)
     target = w / source['path']
-    control = w / 'evidence/selector-controls/sdk-samepath-tamper'
-    backup = control / 'original-android.jar'
+    control = w / 'evidence/selector-controls' / case_name
+    backup = control / ('original-' + target.name)
     if backup.exists() or backup.is_symlink():
         raise ValueError('no partial SDK fault-control resume')
     before = target.lstat()
@@ -368,12 +551,16 @@ def tamper_for_control(work, synthetic):
             'original': original, 'before_stat': identity(before), 'after_stat': identity(after)})
 
 
-def require_fault_dispatch(job, args, cwd, env, timeout, reject, stdin, resolver, catalog):
+def require_fault_dispatch(job, args, cwd, env, timeout, reject, stdin, resolver, catalog,
+                           label=TAMPER_LABEL):
     """No ambient test bypass: only the fixed real negative control can fault SDK37."""
-    case = job.w / 'evidence/selector-controls/sdk-samepath-tamper'
+    if label not in (TAMPER_LABEL, SYSTEM_TAMPER_LABEL):
+        raise ValueError('only exact reviewed SDK fault-control labels allowed')
+    name = label.removeprefix('selector-control-')
+    case = job.w / 'evidence/selector-controls' / name
     expected = [job.w / 'gradle/bin/gradle', '--no-daemon', '--max-workers=1',
         '--no-watch-fs', '--console=plain', '--offline', '--project-cache-dir',
-        job.w / 'selector-project-cache/sdk-samepath-tamper',
+        job.w / 'selector-project-cache' / name,
         '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m',
         '-I', resolver, 'dependencies', '-DluoboClasspathCatalog=' + str(catalog[0]),
         '-DluoboClasspathCatalogSha256=' + catalog[1]]

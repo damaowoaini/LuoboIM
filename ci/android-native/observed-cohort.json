@@ -13,9 +13,9 @@
       "sha256": "dbb3561842568c495531d11dde93543ee21a78470457c61e69adc4bd1da68a42"
     },
     {
-      "bytes": 4289,
+      "bytes": 4278,
       "path": ".github/workflows/android-observed-debug.yml",
-      "sha256": "f257d41d492069b3e14cbed9033a77d9be8436e75a4c0605f53497508cce538a"
+      "sha256": "6d4ce9b74b5dc4bec212313dcf469ecaf37d40e18ed4529e87067583302eb2e1"
     },
     {
       "bytes": 8531,
@@ -98,9 +98,9 @@
       "sha256": "eeee0b96bdae47e98fff10433f8a9c4391703421100e3164e312328c8be4574c"
     },
     {
-      "bytes": 25734,
+      "bytes": 25934,
       "path": "ci/android-native/observed_bind.py",
-      "sha256": "b61eb434f28a3547f3895a6054a40a960669aaec6b9d4359b0056c0447402f60"
+      "sha256": "5851b972db5d08a09f2828e03a97b23ff1eb6fd5181283bf47932e2ebcecab7c"
     },
     {
       "bytes": 4995,
@@ -118,9 +118,9 @@
       "sha256": "05e30d386898edc45e01458e5dcd79d166965d89cb4537a436ed5beeaba21088"
     },
     {
-      "bytes": 24221,
+      "bytes": 30820,
       "path": "ci/android-native/resolve-observed.gradle",
-      "sha256": "7f270976f4922ae8c2e8c6d934194d71e6c9a2b5cb91db0318dbd3e471529273"
+      "sha256": "7dc9f5c30c9e40c5530e170fedc081c9b00e9f830595dffa38d1dd8ffd37020b"
     },
     {
       "bytes": 4859,
@@ -133,19 +133,19 @@
       "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
     },
     {
-      "bytes": 2555,
+      "bytes": 10754,
       "path": "ci/android-native/sdk-platform-sources.json",
-      "sha256": "458521e73daf071305478af09e35eb5eff960dd94a7fbdd795ac400561ec5e86"
+      "sha256": "52a293fde26a65cf5c3a57942a96ccba5944dcd21350973105b665291130eb71"
     },
     {
-      "bytes": 5489,
+      "bytes": 12077,
       "path": "ci/android-native/sdk_platform_fixture.py",
-      "sha256": "afe3fe5732e167be60144a7711dd401f8dcf4bae8ccd8575575cf4298162e6e1"
+      "sha256": "6e81dcc4c1edd75a0ba21a4485ee1bad7cace7f08536a4ab92cb05fb44fbeb12"
     },
     {
-      "bytes": 21934,
+      "bytes": 33162,
       "path": "ci/android-native/sdk_platform_producer.py",
-      "sha256": "79c1b26feee8284ed7aba1c270564da055b612c52d0ccc4e33a4ef4321d4d33a"
+      "sha256": "97a97361e141b37d2f771711b12387a44bd6111395474b49b19b73ef33be6371"
     },
     {
       "bytes": 11876,
@@ -168,9 +168,9 @@
       "sha256": "9c637263fb3503d76702215362206cd05b79741ece6c72006e599ec01bb68cfc"
     },
     {
-      "bytes": 7149,
+      "bytes": 17552,
       "path": "ci/android-native/test_sdk_platform_producer.py",
-      "sha256": "223387bcbded0f62013ae34f12a03815c1486ce9db04e0abb6efe7af8c0f050a"
+      "sha256": "d216368e70c1a4b246f25646951ad35c3c00a50af3b89a96bdf8608aad81481b"
     },
     {
       "bytes": 19907,
@@ -228,7 +228,7 @@
       "sha256": "a9d23ebeac7ca7ed637628838b96ac79ba61e6f238e3392c108a10e2529b02ce"
     }
   ],
-  "controller_revision": "root-r9-independent-official-SDK-platform-producer",
+  "controller_revision": "root-r10-complete-finite-official-platform-classpath",
   "members": 428,
   "old427_r1_r2_immutable": true,
   "schema": "luobo.observed-bind.explicit-cohort.v1",

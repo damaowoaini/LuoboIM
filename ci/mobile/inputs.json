@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v9",
-  "state": "current304_call_records_async_fixture_r3_pending_cloud",
+  "state": "current304_call_records_page_r4_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -45,7 +45,8 @@
     "inbox_contact_shortcuts_r1_manifest_sha256": "f1aa575372ec3b4686d7c966ce969f96257b5d43874d80b15acc0aac1068c63c",
     "call_records_r1_manifest_sha256": "4f4a31bc0120bf13da2e802adbf7c29189624b4e0d2b372787e1fd88d5837aad",
     "call_records_fixture_R2_manifest_sha256": "f06cfefea9e397d4fe304be39ac8976a6edb7c8e3c7c8318d24a92ab080019b7",
-    "call_records_async_fixture_R3_manifest_sha256": "83c5625443dd9649fceb890c8205c95e1452246d73e3f4c6e7ab2f634678b3d6"
+    "call_records_async_fixture_R3_manifest_sha256": "83c5625443dd9649fceb890c8205c95e1452246d73e3f4c6e7ab2f634678b3d6",
+    "call_records_page_R4_manifest_sha256": "02c8d8831cc4325fee4173a10eb6ee58fc1369bde5159bbc6ef856d41fbdb764"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -324,7 +325,7 @@
     "current304": 356
   },
   "portable_digests": {
-    "current304": "d113b9775dc7790038e4f3272df33c1d46665336d93349931e096638900a9119"
+    "current304": "67d6a6d924998209024186dd4b214ff01b74873f870bcbe345c50ae86de95ed9"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -675,6 +676,22 @@
       },
       "actual": "218PASS+4ERROR;21hiddenPASS;244start/243done;missingdonefooter;new34PASS/4ERROR/12unstarted;old184exact;900.149phasetimeout child0;full/analyze notstarted",
       "cause_boundary": "timer/queue scheduling diagnoses are source-backed hypotheses, not R3 runtime proof; four actual outcomes remain separately preserved"
+    },
+    "call_records_async_fixture_R3_failure": {
+      "run": 38902412585,
+      "job": 116977614395,
+      "commit": "410d4b59fc8ea384f28ca847deb03dc2f94f5c29",
+      "review": {
+        "path": "references/integration/cloud-mobile-ci/run-38902412585-agent/verification.json",
+        "bytes": 5629,
+        "sha256": "8f93b162a93c9cba24c4c5e01a72eee807fad5aba6957bf24fecc3b941d8e7b3"
+      },
+      "artifact_sha256": "c33ef413c6dbe4fa59193bfb92dfc5095e6816d466e2dd4290137e6f9230392f",
+      "actual": "target234 232PASS2ERROR/22hiddenPASS/falsefooter;old184exact/new48PASS2ERROR;lifetime3PASS;35newcleanup/14unmount+76parent/safe6exact;105.935s child1/noresourcegate;full/analyze notstarted",
+      "confirmed_product_errors": [
+        "retained delete callback ancestor lookup from deactivated builder context",
+        "actual deletion IconButton height40 below44"
+      ]
     }
   },
   "reference_entry": {
@@ -682,7 +699,7 @@
     "default_enabled": false,
     "working_cohort": "current304",
     "members": 304,
-    "reference_source_digest": "6215d217dfbb187988329be51b690ec28241f4f44684284ca06cfaf80a1a4405",
+    "reference_source_digest": "45e01cf8f7f1bc2dc7f4497e7e6a75440dbc856e837e371a6a48f970aee72c24",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -748,7 +765,7 @@
   },
   "current304": {
     "members": 304,
-    "source_digest": "4e54cc05977e210c706dceccb46c31ce426f4ca6fe603de069491937637fe709",
+    "source_digest": "93c52fce3f0e03cbc1bc2e86803c15624f44db8d141987f910983f342e6457e2",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1512,8 +1529,8 @@
       },
       {
         "path": "app/lib/features/rtc/presentation/call_records_page.dart",
-        "bytes": 12581,
-        "sha256": "e6b4cfabbd9862b379c911fc471a834100327903676842f3ab7861ebdd237b60"
+        "bytes": 13187,
+        "sha256": "0cb809de352b7ca854e60a62247bb90dda92418017b5f8249f64540ad0a97302"
       },
       {
         "path": "app/lib/features/rtc/presentation/call_records_providers.dart",

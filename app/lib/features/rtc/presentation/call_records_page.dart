@@ -91,10 +91,16 @@ class _CallRecordsPageState extends ConsumerState<CallRecordsPage> {
     try {
       return await showModalBottomSheet<String>(context: context, isScrollControlled: true,
         builder: (context) {
+          // Freeze this owned route while the builder is active. A retained
+          // callback must not look up ancestors from a retired element.
+          final sheetRoute = ModalRoute.of(context);
+          final navigator = Navigator.of(context);
           void finish([String? result]) {
-            if (ModalRoute.of(context)?.isCurrent != true ||
+            if (!navigator.mounted || sheetRoute?.isActive != true ||
+                sheetRoute?.isCurrent != true ||
+                !identical(sheetRoute?.navigator, navigator) ||
                 (result != null && (!_ownerCurrent || view != _view))) return;
-            Navigator.pop(context, result);
+            navigator.pop(result);
           }
           return _CallHistoryOverlay(
           history: history, current: () => _ownerCurrent && view == _view,
@@ -220,7 +226,11 @@ class _CallRecordsPageState extends ConsumerState<CallRecordsPage> {
               leading: Icon(row.direction == CallDirection.incoming ? Icons.call_received : Icons.call_made),
               title: Text(row.name), subtitle: Text('ID：${row.peerId}\n${row.video ? '视频' : '语音'} · ${row.label(live: history.live(row.id))}${row.connected ? ' · ${row.durationMs ~/ 1000}秒' : ''}\n$date'),
               onTap: _operation == null ? () => _act(row, view: renderedView) : null,
-              trailing: IconButton(tooltip: '删除 ${row.name} 的通话记录', onPressed: _operation == null ? () => _act(row, view: renderedView, deleting: true) : null, icon: const Icon(Icons.delete_outline)));
+              trailing: IconButton(
+                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                visualDensity: VisualDensity.standard,
+                style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.padded),
+                tooltip: '删除 ${row.name} 的通话记录', onPressed: _operation == null ? () => _act(row, view: renderedView, deleting: true) : null, icon: const Icon(Icons.delete_outline)));
           }))),
     ])),
   );

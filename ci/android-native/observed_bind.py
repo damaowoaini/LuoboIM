@@ -23,7 +23,7 @@ import verify_inputs
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r9-independent-official-SDK-platform-producer'
+REVISION = 'root-r10-complete-finite-official-platform-classpath'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 
@@ -89,11 +89,13 @@ class Job(parent.Job):
             catalog_before = classpaths.verified_catalog(self.w)
             args = list(args) + ['-DluoboClasspathCatalog=' + str(catalog_before[0]),
                                 '-DluoboClasspathCatalogSha256=' + catalog_before[1]]
-        if label == sdk_sources.TAMPER_LABEL:
+        if label in (sdk_sources.TAMPER_LABEL, sdk_sources.SYSTEM_TAMPER_LABEL):
             sdk_sources.require_fault_dispatch(self, args, cwd, env, timeout, reject, stdin,
-                                               HERE / 'resolve-observed.gradle', catalog_before)
+                                               HERE / 'resolve-observed.gradle', catalog_before, label)
         try:
-            fault = (sdk_sources.tamper_for_control(self.w, selectors.jar_bytes())
+            fault = (sdk_sources.tamper_system_control(self.w, selectors.jar_bytes())
+                     if label == sdk_sources.SYSTEM_TAMPER_LABEL else
+                     sdk_sources.tamper_for_control(self.w, selectors.jar_bytes())
                      if label == sdk_sources.TAMPER_LABEL else nullcontext())
             with fault:
                 return super().cmd(args, cwd, env, label, timeout, reject, stdin)
