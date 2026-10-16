@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "mongo": {
+    "version": "8.0.15",
+    "image": "mongo:8.0.15@sha256:8332f93f6cb881db35f58caaea2e986e6044f97a3cf2629515875361b3ae359c",
+    "index_digest": "sha256:f4d54619262ae3bc6a0a8efbebcef970b87b8ad70697479a75ce308a6f400158",
+    "platform": "linux/amd64",
+    "official_metadata_url": "https://hub.docker.com/v2/repositories/library/mongo/tags/8.0.15",
+    "metadata_response_sha256": "a5c502d7cbdec033b38f878af7cbf547237f1b34f436fbe56f24d6d3892ba9ba"
+  },
+  "redis": {
+    "version": "8.2.2",
+    "image": "redis:8.2.2@sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+    "index_digest": "sha256:4521b581dbddea6e7d81f8fe95ede93f5648aaa66a9dacd581611bf6fe7527bd",
+    "platform": "linux/amd64",
+    "official_metadata_url": "https://hub.docker.com/v2/repositories/library/redis/tags/8.2.2",
+    "metadata_response_sha256": "1c70622250ec17d1556482a7051eab5ff028067500413901ec9c4fea15c80264"
+  },
+  "image_metadata_verified_at": "2026-10-16",
+  "modules": [
+    "server"
+  ],
+  "scopes": [
+    {
+      "package": "./internal/meetingbooking",
+      "required_integration_top_tests": [
+        "TestBookingMongoConcurrentIntentAndLostACKRecovery",
+        "TestBookingMongoResolveAgainstDelayedCreate",
+        "TestBookingMongoTenantAndOwnerQueriesNeverCross",
+        "TestBookingMongoTransactionRollbackUsesActualSession",
+        "TestBookingMongoUpdateCancelCASAndMinimalReceipt",
+        "TestBookingMongoBookingNeverCreatesRTCOrMediaState",
+        "TestBookingMongoMissingIndexesCannotCreateStateUntilExplicitPreparation",
+        "TestBookingMongoUnsafePartialIndexIsNotRepairedByRuntimeOrOperator"
+      ]
+    },
+    {
+      "package": "./internal/favorite",
+      "required_integration_top_tests": [
+        "TestMongoFavoriteTwelveContractsAndOwnership",
+        "TestMongoFavoriteConcurrentRetryAndCategoryDeletion",
+        "TestMongoCategoryDeleteFailureRollsBackCategoryAndItems"
+      ]
+    },
+    {
+      "package": "./internal/retention",
+      "required_integration_top_tests": [
+        "TestRetentionMongoOffExtensionAndABADenyOldSnapshot",
+        "TestRetentionMongoRealPolicyDocumentConflictPreventsWriteSkew",
+        "TestRetentionMongoCommittedPrefixSurvivesLaterDisableAndOtherOwnerUnchanged",
+        "TestRetentionMongoOutboxFailureRollsBackPolicyFloorAndSourceFence",
+        "TestRetentionMongoPendingOutboxRecoversAfterRestartWithoutPolicyReplay",
+        "TestRetentionMongoFullDAOUpdateAndStableOwnerCIDPaging",
+        "TestRetentionMongoUnmigratedLegacyFloorDeniesPlanAndPreparation",
+        "TestRetentionMongoFullControllerSetterUpdatesExistingAndCreatesMissingOnce",
+        "TestRetentionMongoTwoWorkersCommitOneChunkOnly",
+        "TestRetentionMongoMessageWriteAfterPlanningConflictsBeforeFloor",
+        "TestRetentionMongoExplicitlyCoveredLegacyFloorPreparesMetadataOnly",
+        "TestRetentionMongoMixedPeerAndPolicyWritesCommitTogetherAndEffectsWait",
+        "TestRetentionMongoPolicyWritersRejectWeakExternalSessionBeforeAnyWrite"
+      ]
+    },
+    {
+      "package": "./pkg/common/db/mongotx",
+      "required_integration_top_tests": [
+        "TestTransactionsUseEachRequestContext"
+      ]
+    },
+    {
+      "package": "./internal/api",
+      "required_integration_top_tests": [
+        "TestFavoriteHTTPUsesRealIMTokenAndRejectsRevokedOrForeignOwner",
+        "TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope",
+        "TestRealIMLogoutHTTPRejectsForeignOwnerAndProtectsDigestServiceBoundary",
+        "TestMeetingBookingHTTPActualGuardAndLiveTokenStatus",
+        "TestUserRegisterHTTPPreservesLegacyAndRequiresPurposeBoundInitialMarkerProof",
+        "TestEvidenceHTTPRequiresServiceClassMACLiveSessionAndBoundedJSON"
+      ]
+    },
+    {
+      "package": "./pkg/common/db/controller",
+      "required_integration_top_tests": [
+        "TestRealRetentionPersistsFloorBeforePhysicalRemovalAndRejectsStorageFailure",
+        "TestRealClearVisibilityFloorSurvivesCacheLossConcurrencyAndInflightReads",
+        "TestRealMessageDeletionSurvivesInflightCacheReadRehydrationAndQueueReplay",
+        "TestMongoMessageBatchHandlesLeadingNilAndRejectsInvalidSequenceBeforeWrite",
+        "TestMongoGroupReceiptsConcurrentSnapshotMarkRestartAndImmutableCohort",
+        "TestMongoGroupReceiptSnapshotAndReadFailuresNeverBecomeSuccess",
+        "TestMongoLegacyGroupReceiptImportFiltersUntrustedRecipientsAndPreservesSource",
+        "TestRealMongoRedisClientMessageLookupEnforcesVisibilityAndStoredIdentity"
+      ]
+    },
+    {
+      "package": "./pkg/common/db/mgo",
+      "required_integration_top_tests": [
+        "TestMongoUserCommandPersistentCRUDAndConcurrentRetry",
+        "TestMongoMembershipHistoryTracksAuthoritativeLeaveAndRollback",
+        "TestMongoBootstrapConcurrentStartsPreserveExistingProfiles",
+        "TestMongoRegistrationProofFullModelBatchBootstrapAndProfileUpdates",
+        "TestMongoRegistrationProofCASDoesNotEraseConcurrentAuthoritativeValue",
+        "TestMongoGroupMemberExactSearchPreservesEffectiveNicknameContract",
+        "TestMongoGroupMemberSearchIndexSetupIsRepeatableAndAdditive",
+        "TestMongoGroupMemberExactSearchUsesEqualityIndexesOnSyntheticGroup",
+        "TestObjectAliasPersistsOwnerAndHash"
+      ]
+    },
+    {
+      "package": "./pkg/common/db/cache",
+      "required_integration_top_tests": [
+        "TestRedisEncryptionVersionAllocationPreservesHistoryUnderConcurrency",
+        "TestAtomicTerminalKickCannotResurrectRevokedSession",
+        "TestVisibilityFloorRedisNeverLowersForOldOutboxOrInt64Precision"
+      ]
+    }
+  ],
+  "outside_scope": [
+    "MySQL",
+    "SMTP",
+    "MinIO provider uploads",
+    "Kafka/MQ or ZooKeeper services",
+    "RTC/LiveKit media",
+    "Native and real UI acceptance"
+  ],
+  "required_tests_must_pass_not_skip": true,
+  "unselected_environment_tests_are_not_integration_passes": true
+}

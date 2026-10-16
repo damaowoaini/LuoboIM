@@ -1,0 +1,58 @@
+name: Backend synthetic integration
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-synthetic-integration-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  mongo-redis:
+    name: Mongo replica set + Redis / isolated owner contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      GOMAXPROCS: "2"
+      GOMEMLIMIT: 2GiB
+      LUOBO_EMAIL_INTEGRATION: "0"
+      LUOBO_RUN_LEGACY_LOAD_TESTS: "0"
+      LUOBO_RUN_LEGACY_EXAMPLES: "0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check upload safety before creating disposable config
+        run: python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.2"
+          check-latest: false
+          cache-dependency-path: |
+            server/go.sum
+            server/pkg/protocol/go.sum
+      - name: Prepare fresh loopback-only Mongo replica set and Redis
+        run: bash ci/backend-integration.sh prepare
+      - name: Serial race tests, vet and mandatory integration receipts
+        run: bash ci/backend-integration.sh test
+      - name: Always preserve fixture diagnostics and check residual counts
+        if: always()
+        run: bash ci/backend-integration.sh collect
+      - name: Always remove only containers owned by this run
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve test, skip, container and cleanup evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: backend-synthetic-integration-${{ github.run_attempt }}
+          path: ci-results/backend-integration/
+          if-no-files-found: warn
+          retention-days: 14

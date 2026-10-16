@@ -7,10 +7,12 @@ import (
 	"github.com/OpenIMSDK/protocol/conversation"
 	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/OpenIMSDK/tools/tokenverify"
+	"github.com/OpenIMSDK/tools/mw"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/openimsdk/open-im-server/v3/pkg/adminauth"
+	"github.com/openimsdk/open-im-server/v3/internal/admincapability"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/config"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/db/cache"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/db/table/relation"
@@ -54,19 +56,27 @@ func TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope(t *test
 	db := client.Database("luobo_preview_http_" + strings.ReplaceAll(uuid.NewString(), "-", ""))
 	defer db.Drop(ctx)
 	rdb := redis.NewClient(&redis.Options{Network: "unix", Addr: socket, DB: 15})
-	defer rdb.Close()
+	t.Cleanup(func() {
+		if err := rdb.Close(); err != nil {
+			t.Error("preview fixture Redis close failed")
+		}
+	})
 	service, user, administrator := "service-"+uuid.NewString(), "owner-"+uuid.NewString(), "admin-"+uuid.NewString()
 	conv := "si_" + user + "_zz-peer"
 	secretOld, adminsOld := config.Config.Secret, config.Config.IMAdmin.UserID
+	issuerOld := config.Config.AdminDelegation.Issuer
 	config.Config.Secret = strings.Repeat("test-preview-", 4)
 	config.Config.IMAdmin.UserID = []string{service}
+	config.Config.AdminDelegation.Issuer = "synthetic-preview-integration"
 	defer func() { config.Config.Secret = secretOld; config.Config.IMAdmin.UserID = adminsOld }()
+	defer func() { config.Config.AdminDelegation.Issuer = issuerOld }()
 	t.Setenv("LUOBO_CHART_TOKEN_SECRET", "")
 	t.Setenv("LUOBO_MESSAGE_PREVIEW_ADMIN_IDS", "[]")
-	imToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenverify.BuildClaims(service, 5, 1)).SignedString([]byte(config.Config.Secret))
+	imToken := integrationServiceToken(t, service, 5)
+	legacyToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenverify.BuildClaims(service, 5, 1)).SignedString([]byte(config.Config.Secret))
 	chartToken, _ := jwt.NewWithClaims(jwt.SigningMethodHS256, &adminauth.Claims{UserID: administrator, UserType: 2, RegisteredClaims: jwt.RegisteredClaims{ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute))}}).SignedString([]byte(config.Config.Secret))
 	tokens := cache.NewMsgCacheModel(rdb)
-	tokens.SetTokenMapByUidPid(ctx, service, 5, map[string]int{imToken: 0})
+	tokens.SetTokenMapByUidPid(ctx, service, 5, map[string]int{imToken: 0, legacyToken: 0})
 	chartKey := "CHAT_UID_TOKEN_STATUS:" + administrator
 	rdb.HSet(ctx, chartKey, chartToken, 0)
 	defer tokens.DeleteAllTokensByUidPid(ctx, service, 5)
@@ -84,11 +94,15 @@ func TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope(t *test
 	tokens.SetMinSeq(ctx, conv, 1)
 	tokens.SetMessageToCache(ctx, conv, []*sdkws.MsgData{{Seq: 1, SendID: "zz-peer", RecvID: user, ContentType: constant.Text, Content: []byte(`{"content":"read-only visible"}`)}})
 	router := gin.New()
+	router.Use(mw.GinParseOperationID(), admincapability.Guard(rdb, nil))
 	registerAdminPreviewRoutes(router, GinParseToken(rdb), db, rdb, previewConversationRPC{owner: user, id: conv})
 	call := func(operation, body, im, chart string) (int, map[string]json.RawMessage) {
 		request := httptest.NewRequest("POST", "/admin/message_preview/"+operation, strings.NewReader(body))
 		request.Header.Set("token", im)
 		request.Header.Set(previewChartTokenHeader, chart)
+		if im != "" {
+			signIntegrationServiceRequest(t, rdb, request, im, []byte(body))
+		}
 		w := httptest.NewRecorder()
 		router.ServeHTTP(w, request)
 		var result map[string]json.RawMessage
@@ -100,6 +114,9 @@ func TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope(t *test
 		return code, result
 	}
 	body, _ := json.Marshal(map[string]any{"userID": user, "conversationID": conv})
+	if code, _ := call("search", string(body), legacyToken, chartToken); code == 0 {
+		t.Fatal("legacy shared management token accepted even with normal Redis status")
+	}
 	if code, _ := call("search", string(body), imToken, ""); code == 0 {
 		t.Fatal("missing chart actor credential accepted")
 	}
