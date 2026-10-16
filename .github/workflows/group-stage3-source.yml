@@ -6,12 +6,14 @@ on:
       - 'ci/group-stage3/**'
       - 'ci/candidates/group-stage3/**'
       - 'ci/candidates/group-stage3-fixture/**'
+      - 'ci/candidates/group-stage3-member-notice/**'
       - '.github/workflows/group-stage3-source.yml'
   pull_request:
     paths:
       - 'ci/group-stage3/**'
       - 'ci/candidates/group-stage3/**'
       - 'ci/candidates/group-stage3-fixture/**'
+      - 'ci/candidates/group-stage3-member-notice/**'
       - '.github/workflows/group-stage3-source.yml'
   workflow_dispatch:
 
