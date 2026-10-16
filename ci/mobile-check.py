@@ -136,7 +136,7 @@ class Guard:
         with self.lock:
             v = os.statvfs(self.work)
             free = v.f_bavail * v.f_frsize
-            used = allocated(self.work / 'source')
+            used = allocated(self.work / 'source') + allocated(self.work / 'source-reference-entry')
             self.minimum = free if self.minimum is None else min(self.minimum, free)
             self.peak = max(self.peak, used)
             self.reason = self.reason or ('disk_floor' if free < FLOOR else None)
@@ -152,7 +152,7 @@ class Guard:
                     self.reason = self.reason or 'monitor_infrastructure_failed'
 
 
-def guarded(command, work, guard, label, timeout=900):
+def guarded(command, work, guard, label, timeout=900, *, cwd=None, accepted_exits=(0,)):
     log = work / 'evidence' / (label + '.log')
     child = None
     started = time.monotonic()
@@ -162,7 +162,7 @@ def guarded(command, work, guard, label, timeout=900):
     print(json.dumps({'event': 'mobile_phase_start', 'phase': label}), flush=True)
     try:
         with log.open('x') as stream:
-            child = subprocess.Popen(command, cwd=work / 'source/app', stdout=stream,
+            child = subprocess.Popen(command, cwd=cwd or work / 'source/app', stdout=stream,
                                      stderr=subprocess.STDOUT, start_new_session=True)
             while child.poll() is None:
                 if time.monotonic() - started > timeout:
@@ -186,7 +186,7 @@ def guarded(command, work, guard, label, timeout=900):
                           'child_exit_code': child.returncode,
                           'latched_failure': guard.reason,
                           'elapsed_seconds': record['elapsed_seconds']}), flush=True)
-        if guard.reason or child.returncode != 0:
+        if guard.reason or child.returncode not in accepted_exits:
             raise ValueError('phase failed: ' + label)
         return log
     finally:
@@ -214,7 +214,145 @@ def prove_namespace():
             raise ValueError('external network reachable')
 
 
-def run(work, cohort):
+def reference_entry_summary(text, child_exit, reference):
+    """Accept only the named missing-entry assertion plus the old filter control.
+
+    A nonzero process/loader/timeout/panic is never a reference reproduction.
+    Hidden successful loads are counted separately; hidden failure is rejected.
+    """
+    starts, finished, errors, footers = {}, {}, [], []
+    for line in text.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        kind = event.get('type')
+        if footers and kind is not None:
+            raise ValueError('reference event after terminal done')
+        if kind == 'testStart':
+            test = event['test']
+            if test['id'] in starts:
+                raise ValueError('reference duplicate test start')
+            starts[test['id']] = test['name']
+        elif kind == 'testDone':
+            identity = event['testID']
+            if identity in finished or identity not in starts:
+                raise ValueError('reference duplicate or unstarted test completion')
+            if not isinstance(event.get('hidden'), bool) or not isinstance(event.get('skipped'), bool):
+                raise ValueError('reference completion flags missing')
+            finished[identity] = event
+        elif kind == 'error':
+            errors.append(event)
+        elif kind == 'done':
+            footers.append(event.get('success'))
+    visible = {starts[key]: (key, event) for key, event in finished.items() if not event['hidden']}
+    fail_name, pass_name = reference['failed_test_name'], reference['passed_test_name']
+    if (child_exit != reference['expected_child_exit'] or len(footers) != 1
+            or footers[0] is not False or set(starts) != set(finished)
+            or len(visible) != 2 or set(visible) != {fail_name, pass_name}
+            or any(event['skipped'] for event in finished.values())
+            or any(event['result'] != 'success' for event in finished.values() if event['hidden'])
+            or visible[pass_name][1]['result'] != 'success'
+            or visible[fail_name][1]['result'] not in ('failure', 'error')
+            or len(errors) != 1):
+        raise ValueError('reference is not complete named 1assertFAIL/1controlPASS')
+    error = errors[0]
+    message = error.get('error', '')
+    if (error.get('testID') != visible[fail_name][0] or error.get('isFailure') is not True
+            or not isinstance(message, str)
+            or not all(fragment in message for fragment in
+                       ('Expected:', 'Actual:', 'Found 0', reference['expected_missing_tooltip']))
+            or any(fragment in message.lower() for fragment in
+                   ('timeout', 'timed out', 'panic', 'compilation failed', 'failed to load',
+                    'unhandled exception', 'syntax error'))):
+        raise ValueError('reference must be the exact missing-entry assertion, not load/runtime failure')
+    return {'state': 'reference_only_expected_entry_assertion_failure', 'passed': 1,
+            'assertion_failed': 1, 'visible': 2,
+            'hidden_successful_loads': sum(event['hidden'] for event in finished.values()),
+            'skipped': 0, 'unexpected_errors': 0, 'child_exit_code': child_exit,
+            'not_historical257_full': True}
+
+
+def run_reference_entry(work, cohort, plan, tests, guard):
+    """Separate full269 tree; restore exact after4 even if the reference fails."""
+    _, current, _ = source.load_sources(cohort)
+    reference = source.reference_sources(plan, current)
+    root = work / 'source-reference-entry'
+    if root.exists() or root.is_symlink():
+        raise ValueError('reference tree must be fresh; partial prior trees cannot resume')
+    root.mkdir(mode=0o700)
+    for name, body in reference.items():
+        guard.sample()
+        if guard.reason:
+            raise ValueError('reference materialization stopped; partial retained')
+        target = root / source.safe_name(name)
+        target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        with target.open('xb') as stream:
+            stream.write(body)
+    # Only JSON dependency mappings are rebased. No build/stamp/dill/hook result
+    # or package cache is copied. Official SQLite raw bytes get a new shared seed.
+    config_path = work / 'source/app/.dart_tool/package_config.json'
+    config = json.loads(source.regular(config_path))
+    for item in config['packages']:
+        uri = urlparse(item['rootUri'])
+        if uri.scheme not in ('', 'file') or uri.netloc:
+            raise ValueError('nonlocal reference package mapping')
+        path = Path(unquote(uri.path))
+        path = (path if path.is_absolute() else config_path.parent / path).resolve()
+        if path.is_relative_to(work / 'source'):
+            path = root / path.relative_to(work / 'source')
+        if not any(path == allowed or path.is_relative_to(allowed) for allowed in
+                   (root / 'app', root / 'packages/flutter_openim_sdk',
+                    work / 'flutter', work / 'pub-cache')):
+            raise ValueError('reference dependency escapes fresh roots')
+        item['rootUri'] = path.as_uri() + '/'
+    target_config = root / 'app/.dart_tool/package_config.json'
+    target_config.parent.mkdir(parents=True, mode=0o700)
+    write_json(target_config, config)
+    sqlite = plan['sqlite_linux']
+    native = source.regular(work / 'source' / sqlite['seed_path'])
+    if source.sha(native) != sqlite['sha256']:
+        raise ValueError('reference SQLite must be original verified raw binary')
+    target = root / sqlite['seed_path']
+    target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with target.open('xb') as stream:
+        stream.write(native)
+
+    def verify_tree(expected):
+        for name, body in expected.items():
+            if source.regular(root / name) != body:
+                raise ValueError('reference source changed: ' + name)
+
+    try:
+        verify_tree(reference)
+        log = guarded(tests + [plan['reference_entry']['test_path']], work, guard,
+                      'reference-entry2', cwd=root / 'app', accepted_exits=(1,))
+        # guarded() records the actual child status; a TERM/guard failure wins.
+        resource = json.loads((work / 'evidence/reference-entry2.resource.json').read_text())
+        result = reference_entry_summary(log.read_text(), resource['child_exit_code'], plan['reference_entry'])
+        verify_tree(reference)
+        write_json(work / 'evidence/reference-entry2.summary.json', result)
+        return result
+    finally:
+        for row in plan['reference_entry']['replacement_files']:
+            target = root / row['path']
+            if target.resolve() != target or not target.is_file():
+                raise ValueError('reference restore path changed; partial retained')
+            with target.open('wb') as stream:
+                stream.write(current[row['path']])
+                stream.flush()
+                os.fsync(stream.fileno())
+        verify_tree(current)
+        verify(work, cohort)
+        write_json(work / 'evidence/reference-after-restored.json',
+                   {'state': 'after269_and_primary_source_reverified',
+                    'source_digest': plan['current269']['source_digest'],
+                    'restored_existing_files': 4, 'native_or_full257_result': False})
+
+
+def run(work, cohort, reference=False):
     prove_namespace()
     plan, digest = verify(work, cohort)
     guard = Guard(work)
@@ -226,15 +364,20 @@ def run(work, cohort):
         flutter = str(work / 'flutter/bin/flutter')
         tests = [flutter, 'test', '--no-pub', '--machine', '--concurrency=1', '--no-enable-vmservice']
         counts = {}
-        target_expected = plan['current257']['expected_target_tests']
+        if reference:
+            counts['reference_entry'] = run_reference_entry(work, cohort, plan, tests, guard)
+        verify(work, cohort)
+        target_expected = plan['current269']['expected_target_tests']
         target_label = 'target' + str(target_expected)
-        log = guarded(tests + plan['current257']['target_paths'], work, guard, target_label)
+        log = guarded(tests + plan['current269']['target_paths'], work, guard, target_label)
         counts['target'] = machine_summary(log.read_text(), target_expected)
         write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
-        expected = plan['current257']['expected_full_tests']
+        verify(work, cohort)
+        expected = plan['current269']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
         write_json(work / 'evidence/full.summary.json', counts['full'])
+        verify(work, cohort)
         guarded([flutter, 'analyze', '--no-pub', '--fatal-infos', '--fatal-warnings'],
                 work, guard, 'analyze')
         verify(work, cohort)
@@ -270,7 +413,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current257',), required=True)
+    p.add_argument('--cohort', choices=('current269',), required=True)
+    p.add_argument('--reference-before-entry', action='store_true',
+                   help='explicit full269 variant; exactly one entry assertion fails and one old filter passes')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')
@@ -278,7 +423,7 @@ def main():
         _, digest = verify(a.work, a.cohort)
         print(json.dumps({'state': 'verified', 'cohort': a.cohort, 'source_digest': digest}))
     else:
-        run(a.work, a.cohort)
+        run(a.work, a.cohort, reference=a.reference_before_entry)
 
 
 if __name__ == '__main__':

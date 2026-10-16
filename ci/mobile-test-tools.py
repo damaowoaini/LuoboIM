@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Prepared offline CI-tool checks, separate from the 548/73/621 product tests."""
+"""Pure Python CI gate checks, separate from current269 target46/full734."""
+import copy
 import importlib.util
 import json
 from pathlib import Path
 import unittest
+from unittest import mock
 
 spec = importlib.util.spec_from_file_location('mobile_check', Path(__file__).with_name('mobile-check.py'))
 check = importlib.util.module_from_spec(spec)
@@ -47,6 +49,92 @@ class ReporterTests(unittest.TestCase):
     def test_event_after_success_footer_is_not_pass(self):
         with self.assertRaisesRegex(ValueError, 'after terminal'):
             check.machine_summary(reporter() + '\n' + json.dumps({'type': 'done', 'success': True}), 1)
+
+
+def reference_report():
+    plan = check.source.descriptor()['reference_entry']
+    return [
+        {'type': 'testStart', 'test': {'id': 0, 'name': 'loading synthetic entry.dart'}},
+        {'type': 'testDone', 'testID': 0, 'hidden': True, 'skipped': False, 'result': 'success'},
+        {'type': 'testStart', 'test': {'id': 1, 'name': plan['failed_test_name']}},
+        {'type': 'error', 'testID': 1, 'isFailure': True,
+         'error': 'Expected: exactly one matching candidate\nActual: Found 0 widgets with tooltip "全局搜索"'},
+        {'type': 'testDone', 'testID': 1, 'hidden': False, 'skipped': False, 'result': 'error'},
+        {'type': 'testStart', 'test': {'id': 2, 'name': plan['passed_test_name']}},
+        {'type': 'testDone', 'testID': 2, 'hidden': False, 'skipped': False, 'result': 'success'},
+        {'type': 'done', 'success': False},
+    ]
+
+
+class ReferenceReporterTests(unittest.TestCase):
+    def run_report(self, events, code=1):
+        return check.reference_entry_summary('\n'.join(map(json.dumps, events)), code,
+                                             check.source.descriptor()['reference_entry'])
+
+    def test_reference_accepts_named_assertion_and_existing_filter_only(self):
+        result = self.run_report(reference_report())
+        self.assertEqual((result['passed'], result['assertion_failed'], result['hidden_successful_loads']), (1, 1, 1))
+
+    def test_reference_rejects_hidden_load_failure(self):
+        events = reference_report(); events[1]['result'] = 'error'
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_timeout_even_with_other_assertion_words(self):
+        events = reference_report(); events[3]['error'] += '\nTimeoutException timed out'
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_panic(self):
+        events = reference_report(); events[3]['error'] += '\npanic: native loader'
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_arbitrary_assertion(self):
+        events = reference_report(); events[3]['error'] = 'Expected: true\nActual: false'
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_exit0(self):
+        with self.assertRaises(ValueError): self.run_report(reference_report(), code=0)
+
+    def test_reference_requires_footer(self):
+        with self.assertRaises(ValueError): self.run_report(reference_report()[:-1])
+
+    def test_reference_rejects_numeric_false_footer(self):
+        events = reference_report(); events[-1]['success'] = 0
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_duplicate_start(self):
+        events = reference_report(); events.insert(3, copy.deepcopy(events[2]))
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_event_after_footer(self):
+        events = reference_report(); events.append({'type': 'testStart', 'test': {'id': 5, 'name': 'late'}})
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_failed_positive(self):
+        events = reference_report(); events[6]['result'] = 'error'
+        with self.assertRaises(ValueError): self.run_report(events)
+
+    def test_reference_rejects_skipped_case(self):
+        events = reference_report(); events[6]['skipped'] = True
+        with self.assertRaises(ValueError): self.run_report(events)
+
+
+class DescriptorTests(unittest.TestCase):
+    def rejects(self, change):
+        plan = check.source.descriptor(); change(plan)
+        with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
+            with self.assertRaises(ValueError): check.source.descriptor()
+
+    def test_historical257_cannot_alias269(self):
+        self.rejects(lambda p: p.update(current257={}))
+
+    def test_wrong_full_count_cannot_pass(self):
+        self.rejects(lambda p: p['current269'].update(expected_full_tests=688))
+
+    def test_reference_requires_all_four_before_files(self):
+        self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
+
+    def test_reference_is_not_enabled_by_default(self):
+        self.rejects(lambda p: p['reference_entry'].update(default_enabled=True))
 
 
 if __name__ == '__main__':

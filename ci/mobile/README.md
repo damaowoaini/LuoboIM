@@ -1,64 +1,62 @@
-# Flutter 云验证（schema v2）
+# 移动端云验证（schema v3）
 
-默认只有 `current257` 一个 cohort：257 个业务源码文件，加 51 个固定 SDK Dart/
-pubspec/tool 源和 1 个迁移 helper，共 309 个可移植输入。先执行群头像 28 项与
-批量移除 36 项（`test/features/group`，合计目标 64），再完整 688 项及严格 analyze。
-这些是必须实际满足的预期计数；当前原子采用草稿尚未执行组合 688，不是通过声明。
-采用后为 working257，Root 核验完整云端原件前，accepted230/548 仍是历史验收基线。
+默认仅接受 `current269`：269份已采用业务源码 + SDK Dart/pubspec/tool 51份 +
+迁移helper 1份，共321份固定输入。串行执行全局搜索目标46、完整734和严格analyze。
+这些是强制预期，尚未执行的269不能借用父257/688结果。没有新依赖、原生构建或部署。
 
-## 历史复现
+历史257的run38854472595已实际target64/full688/analyze0通过；原输入digest和
+Root receipt保留在 `inputs.json.history.accepted_current257`。230/249/257均不是269
+别名；复现旧结果须使用其明确历史提交及该提交的工具/输入。默认job不重复运行旧257。
 
-`current230` / `booking-custom249` 不是 schema v2 的别名。需要历史 cohort 时明确
-checkout 公共提交 `292bea12ddcf250194beaf90ae62570faea1ab46`，使用该提交的 v1
-workflow/inputs/loader：run `38852506276` 的 current230 完整 548/analyze0；候选249
-目标76和完整624通过，但分析17项失败，没有被采用。后续独立 v8-r2 修复17项后
-本机76/analyze0通过；它不能借用父树624冒充自身完整通过。所有原始失败与私有证据保留。
-本次退役 `ci/mobile/candidate/` 的23份重复正文；有效业务源仅在 `app/`，不会静默
-把249或230标签映射为257。旧源仍由上述不可变提交及原私有封存追溯。
+## 输入与执行
 
-## 精确输入
-
-`inputs.json` 固定每一文件路径、字节数和完整 SHA256，并分别锁257与309聚合。
-其中业务源来自 Root sealed257（booking/custom v8-r2 + 群头像 + 批量移除），
-`group_repository.dart` 采用已按 hunk 合并的唯一正文，不覆盖其中任一功能。
-Loader 拒绝旧cohort/schema、额外/缺失源、symlink、重复路径、候选正文残留和错误摘要。
-只读验证不物化工作树；显式 `--output` 只允许 checkout 外的新 canonical 目录。
+`inputs.json`锁每文件路径/字节/SHA与269/321聚合；新增16份源中4替换、12新增。
+仅global-search r1三处显式mounted补充覆盖原v1同文件，所有46测试正文不变。
+Loader严格拒绝额外/缺失源、symlink、旧cohort及旧candidate重复正文。
+本地主工作区已有的 `app/tool/check.sh` 辅件留在本机，原字节出处单列记录；
+它不上传、不计入269/321、不执行。公共发布树与CI不接受额外辅助文件例外。
 
 ```sh
 python3 ci/mobile-test-tools.py
-python3 ci/mobile-source.py --cohort current257
-bash ci/mobile-setup.sh current257 "$RUNNER_TEMP/mobile-current257"
+python3 ci/mobile-source.py --cohort current269
+bash ci/mobile-setup.sh current269 "$RUNNER_TEMP/mobile-current269"
 sudo unshare --net -- bash "$PWD/ci/mobile-netns.sh" \
-  "$(id -un)" "$PWD" "$RUNNER_TEMP/mobile-current257" current257
+  "$(id -un)" "$PWD" "$RUNNER_TEMP/mobile-current269" current269
 ```
 
-## 工具链、隔离与完整结果
+纯Python工具单元22项单列，不计入46/734。这里的个数是prepared，须以实际日志为准。
 
-从官方 `https://github.com/flutter/flutter.git` 精确 fetch tag `3.47.7`，验证本地 tag
-和 framework `abaf9c523780a608bd46686fd5e53740a07077f8`、engine
-`deb287481e3ce9468f3434937ced4240a70539ca`、Dart `3.13.5`，不浮动/降级。
-Setup 是唯一可联网阶段：安装 Linux tester 系统库、官方 engine、原锁定依赖。
-`flutter pub get --enforce-lockfile` 后不改 pubspec/lock。SQLite3 3.5.2 Linux x64 裸
-binary 核上游包内声明与 SHA256
-`b17729184e5a2818055ecbddd5ed6642521bfe6e56aafa472330e483c0e2e0d2`，
-只 seed 新 shared output；不上传/复用旧 hook dill、stamp、SDK 或 pub 缓存。
+## 可选参考入口（默认关闭）
 
-测试与分析严格串行，在新 Linux network namespace 内只启用 loopback，无外部
-route、无宿主服务；测试可创建自己的 synthetic HTTP fixture。这不是 macOS SBPL
-端口/Unix socket 验证，也不是后端联调。HOME/config/PUB_CACHE/TMP 全部新建，
-测试不继承 credential、proxy 或应用 URL。每阶段前后复核所有输入。
+仅workflow_dispatch显式启用 `reference_before_entry`，或向netns脚本增加最后参数
+`reference-before-entry`。它创建独立 `source-reference-entry`：同一完整269上下文及
+同SDK51/迁移helper，只把4个生产文件换成 `ci/mobile/reference/global-search-before`
+锁定的原字节。其余新搜索源和测试仍在，避免缺API引发伪RED。
 
-初始至少4GiB可用；每0.2秒监测1GiB硬底线和source工作树768MiB allocated cap，
-每阶段900秒。concurrency1、关闭VM service，不启用coverage/start-paused/实验快跑。
-只有 child exit0、完整 start/done、唯一 success footer、精确64/688、0skip（含hidden）、
-0error与资源全部通过才接受。最终receipt写入/fsync仍持续监控，迟到失败优先。
-6个Python工具单元用例单列，不计入64/688。workflow仅上传evidence：版本、输入、
-SQLite receipt、完整raw测试/分析日志、summary与资源，不上传工作树/依赖/设备数据。
+只运行 `global_search_entry_test.dart` 的2项；必须完整收齐：原会话filter正控1PASS，
+缺全局入口的具名、真实expect断言1FAIL，child1、唯一false footer、0skip、无隐藏
+load失败/超时/panic。任何其它非0、编译/加载失败或不同断言都失败，不能当参考复现。
+该阶段绝不称“旧257 full”。纯parser有独立反例门禁。
 
-## 运行与发布限制
+依赖config仅重定位到此隔离树；不复制旧dill/stamp/编译或hook输出，只给新shared
+目录复制已核SHA的SQLite原始binary。参考阶段finally把隔离树4份源恢复为after269，
+复验全部321及主工作树；partial禁止复用。该可选阶段失败仍保留完整日志，后续阶段停止。
 
-309 是 Linux 源码单元/组件/分析闭包；不是完整原生375闭包，也不证明真实SDK、
-设备登录、消息/群写、预约服务、媒体、签名或上架验收。原Android/iOS native8、
-协议52、CA/QA配置、AAR/XCFramework、账号/token、数据库和用户数据都不在本CI
-上传范围。默认无Android/iOS build job；原生产4ABI AAR不替换。
-将来改源码必须显式更新pins/预期计数，旧548/624不能替代新688。
+## 保留的工具、网络与资源合同
+
+官方Flutter tag3.47.7、framework `abaf9c523780a608bd46686fd5e53740a07077f8`、
+engine `deb287481e3ce9468f3434937ced4240a70539ca`、Dart3.13.5不浮动。
+Setup是唯一联网阶段，使用原pubspec/lock与 `pub get --enforce-lockfile`，SQLite原始
+binary精确SHA仍由官方锁包交叉核对；不复制旧生成cache。之后在全新Linux network
+namespace内只开loopback，无外部路由、无宿主fixture；不继承credential/proxy/业务URL。
+这不等于macOS SBPL或真实服务联调。
+
+初始4GiB，持续0.2s检查1GiB底线；主source与可选reference合计allocated上限768MiB，
+每阶段900s、concurrency1、关闭VMservice，禁止coverage/start-paused。每阶段前后
+复核固定业务/SDK输入；reporter要求完整start/done、唯一bool footer、精确46/734、
+0skip（含hidden）/0error。最后receipt fsync期间继续监控，任何latched failure优先。
+workflow always上传evidence，包括失败日志/summary/resource，不上传源码工作树、缓存、
+账号、数据库或native binary。权限contents:read、checkout不持久化凭证。
+
+本轮只证明源码单元/组件/分析。真实native空CID全局搜索语义、全量分配内存边界、隐藏
+会话及文件OS打开/原消息定位仍需独立设备探针；public core源码不是原opaque4ABI证明。

@@ -2,7 +2,8 @@
 """Verify minimal pinned source; optionally copy it to a new CI-only tree.
 
 No local task archive, mutable reference directory, native SDK binary or old
-generated cache is an input. The candidate is never applied to the checkout.
+generated cache is an input. Current269 must already be adopted in the checkout.
+The optional reference is full269 with exactly four pinned baseline files.
 """
 import argparse
 import hashlib
@@ -53,30 +54,40 @@ def source_digest(files):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v2'
-            or plan['current257']['members'] != 257
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v3'
+            or plan['current269']['members'] != 269
             or plan['sdk_portable']['members'] != 51
-            or plan['portable_members'] != {'current257': 309}
-            or plan['current257']['expected_target_tests'] != 64
-            or plan['current257']['expected_full_tests'] != 688
-            or plan['current257']['target_paths'] != ['test/features/group']
-            or 'current230' in plan or 'candidate249' in plan):
-        raise ValueError('current257 schema v2 inventory differs; no historical aliases')
+            or plan['portable_members'] != {'current269': 321}
+            or plan['current269']['expected_target_tests'] != 46
+            or plan['current269']['expected_full_tests'] != 734
+            or plan['current269']['target_paths'] != ['test/features/search']
+            or any(key in plan for key in ('current230', 'candidate249', 'current257'))):
+        raise ValueError('current269 schema v3 inventory differs; no historical aliases')
+    reference = plan['reference_entry']
+    if (reference['working_cohort'] != 'current269' or reference['members'] != 269
+            or reference['default_enabled'] is not False
+            or len(reference['replacement_files']) != 4
+            or len({row['path'] for row in reference['replacement_files']}) != 4
+            or reference['test_path'] != 'test/features/search/global_search_entry_test.dart'
+            or reference['expected_visible_tests'] != 2
+            or reference['expected_assertion_failures'] != 1
+            or reference['expected_passed'] != 1 or reference['expected_child_exit'] != 1):
+        raise ValueError('reference entry must be the explicit two-test full269 variant')
     return plan
 
 
 def load_sources(cohort):
-    if cohort != 'current257':
-        raise ValueError('schema v2 supports current257 only; use historical Git commit for old cohorts')
+    if cohort != 'current269':
+        raise ValueError('schema v3 supports current269 only; historical cohorts are not aliases')
     plan = descriptor()
     selected = {}
-    for row in plan['current257']['files']:
+    for row in plan['current269']['files']:
         name = row['path']
         if name in selected or not name.startswith('app/'):
             raise ValueError('duplicate or out-of-scope current source')
         selected[name] = check(regular(REPO / safe_name(name)), row)
-    if len(selected) != 257 or source_digest(selected) != plan['current257']['source_digest']:
-        raise ValueError('current257 aggregate differs')
+    if len(selected) != 269 or source_digest(selected) != plan['current269']['source_digest']:
+        raise ValueError('current269 aggregate differs')
     actual = set()
     for prefix in ('app/lib', 'app/test', 'app/tool'):
         for directory, dirs, names in os.walk(REPO / prefix, followlinks=False):
@@ -85,7 +96,8 @@ def load_sources(cohort):
                     raise ValueError('authored-source directory symlink')
             for name in names:
                 actual.add(str((Path(directory) / name).relative_to(REPO)))
-    if actual != {p for p in selected if p.startswith(('app/lib/', 'app/test/', 'app/tool/'))}:
+    expected = {p for p in selected if p.startswith(('app/lib/', 'app/test/', 'app/tool/'))}
+    if actual != expected:
         raise ValueError('unlocked app authored-source inventory')
     legacy = REPO / 'ci/mobile/candidate'
     if legacy.is_symlink() or (legacy.exists() and any(legacy.rglob('*'))):
@@ -99,7 +111,23 @@ def load_sources(cohort):
     if (len(selected) != plan['portable_members'][cohort]
             or source_digest(selected) != plan['portable_digests'][cohort]):
         raise ValueError('portable closure count or digest differs')
+    reference_sources(plan, selected)  # Missing/wrong before pins fail even if reference execution is off.
     return plan, selected, authored_digest
+
+
+def reference_sources(plan, files):
+    """Full321 portable closure; only the four named App source bodies differ."""
+    result = dict(files)
+    baseline = plan['reference_entry']
+    for row in baseline['replacement_files']:
+        name = str(safe_name(row['path']))
+        if name not in result or not name.startswith('app/lib/'):
+            raise ValueError('reference replacement outside original production files')
+        result[name] = check(regular(REPO / baseline['baseline_prefix'] / name), row)
+    authored = {name: body for name, body in result.items() if name.startswith('app/')}
+    if len(authored) != 269 or source_digest(authored) != baseline['reference_source_digest']:
+        raise ValueError('reference is not the exact full269 variant')
+    return result
 
 
 def materialize(output, cohort):
@@ -128,7 +156,7 @@ def materialize(output, cohort):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cohort', choices=('current257',), required=True)
+    p.add_argument('--cohort', choices=('current269',), required=True)
     p.add_argument('--output', type=Path, help='explicit fresh output; omitted means readonly')
     args = p.parse_args()
     if args.output:

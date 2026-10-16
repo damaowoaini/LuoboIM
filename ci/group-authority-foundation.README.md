@@ -16,9 +16,12 @@
   包括真实 Mongo revision 冲突、跨群回滚、精确 scope、缓存义务及恢复，
   以及固定驱动的 Mock 事务重试、提交未知结果和预算检查。
 
-这些是执行要求，准备提交时实际测试为零。只有原始 JSON、进程退出、精确计数、
-唯一包结尾和所有必跑项共同满足才算通过；编译、fixture、超时、race、panic 均不能
-冒充 before 预期失败。21/31 不含 Python 证据门禁自身测试。
+r2 的 [run38856855673](https://github.com/damaowoaini/LuoboIM/actions/runs/38856855673)
+已经实际通过：before精确预期断言失败并保留合法正控；after21顶层/31子测试全部
+race通过、0skip、vet0。双ZIP原始事件和52成员已独立核验，Mongo/Redis残留0、
+容器清理成功。首轮编译失败0测试、r1夹具失败原件保留；r2更正了测试实际工作
+session并核对update/commit同一lsid及txnNumber。21/31不含Python门禁测试。
+这仍只验收基础机制，不代表产品入口接入或运行部署。
 
 “提交 ACK 丢失”回归是在真实已确认提交后，用私有测试 session 边界替换返回值，
 用于检查不重跑业务；不声称制造了真实网络丢包。事务内部最多 20 秒，未知提交只重试

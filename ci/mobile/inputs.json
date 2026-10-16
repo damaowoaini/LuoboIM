@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v2",
-  "state": "working_current257_pending_first_combined_cloud688_not_native_acceptance",
+  "schema": "luobo.mobile.portable-ci-inputs.v3",
+  "state": "working_current269_pending_first_target46_full734_and_analysis_not_native_acceptance",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,9 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI"
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI",
+    "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
+    "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -23,9 +25,325 @@
     "dart_version": "3.13.5",
     "official_remote_verification": "required_at_CI_fetch_no_substitution_or_floating_channel"
   },
-  "current257": {
-    "members": 257,
-    "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
+  "sdk_portable": {
+    "members": 51,
+    "files": [
+      {
+        "path": "packages/flutter_openim_sdk/lib/flutter_openim_sdk.dart",
+        "bytes": 1826,
+        "sha256": "6d172fefef2f4587f542c1cc755dbee883f1fe9f3f0ff52c5b3f52f8e349e43f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/allow_type.dart",
+        "bytes": 74,
+        "sha256": "40a204b1d4c117ae0070784e928cd9b4cf3bc4cbba4f953d1f6a2fcf4150e220"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/conversation_type.dart",
+        "bytes": 301,
+        "sha256": "5b4f2ccbd5ba12947c5db2978c71bca82e44044a1cbed328e79048ffc70b6e7f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_at_type.dart",
+        "bytes": 386,
+        "sha256": "2f8381e45825ebe02b3933ffe43c5b421d286c23bdbdd3694a16e9ddf73b7032"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_member_filter.dart",
+        "bytes": 230,
+        "sha256": "630c5588e89e2aef497b409420b664ac911cb97e93608036ca971269bde1513b"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_role_level.dart",
+        "bytes": 192,
+        "sha256": "eeb99bfb139292ed04f51520de02c7b4623f41027ac68352e5fa2d2d15815fa3"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_status.dart",
+        "bytes": 148,
+        "sha256": "7acc19c57130d7360aeaf96acec4eb6f17f72f82f1fe0caf45713cfec3bcc0fd"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_type.dart",
+        "bytes": 188,
+        "sha256": "60bf0667cfca31093b1ea43b9111bb09a09999c684ee913f606ea866cb53c4bd"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_verification.dart",
+        "bytes": 386,
+        "sha256": "4ee8a3e8dbda6b0306a1c1ddad6d2ea5c160412bc5f622dfd227a53904438e0f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/im_platform.dart",
+        "bytes": 344,
+        "sha256": "d5002983752430cf03d281c199c7807c022c03fc6e97a20421dce22fe36dc55a"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/join_source.dart",
+        "bytes": 102,
+        "sha256": "93c163333b5c41fdc86cf97d738877f0d772c3341746c8ec97a3a2ea5fced086"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/listener_type.dart",
+        "bytes": 966,
+        "sha256": "d98f84e7a09ea8c74b915818c77e5cc47b75cf8e96f7b708acac835a2dd7c2a8"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/login_status.dart",
+        "bytes": 104,
+        "sha256": "3a8633023ad67b45765e313f1225cdf679ac4a5bda350c06cf8f17690e6141b9"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/message_status.dart",
+        "bytes": 242,
+        "sha256": "4363365e4c72b3b3cd011eb390eb11bfe1422883d84d7336c2b7fc262566e67e"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/message_type.dart",
+        "bytes": 4187,
+        "sha256": "32d26337478668f4bab3a7e13d785b267c4e63f6d83176c15584a8a6d095ea25"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/receive_message_opt.dart",
+        "bytes": 116,
+        "sha256": "b585a65491ffe2a15b038e4821219cd6e605cd3857979f9266951e42f9a6177b"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/relationship.dart",
+        "bytes": 72,
+        "sha256": "99a02e96c1c210f97542425f0cfde228784af86b9984f9d61b5414a78f3ff263"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/sdk_error_code.dart",
+        "bytes": 4896,
+        "sha256": "19f95e488daa548bb1080e4ca2e7ef0eca1c48e3b29d4e1e0a20c4ae648cfc33"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/advanced_msg_listener.dart",
+        "bytes": 2428,
+        "sha256": "9a5caf502155f19463523f06034a49dc3cbe51ba7d3164ef65813d76c620fea2"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/connect_listener.dart",
+        "bytes": 1053,
+        "sha256": "2bfe0ec04328b97a48785228b89c955f69566f0fa4e9dab84d11ca6e586a723e"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/conversation_listener.dart",
+        "bytes": 1242,
+        "sha256": "3846e87b7788e5051256b55053cef08e2852b0198aa9126f6333f6f084ec0e68"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/custom_business_listener.dart",
+        "bytes": 243,
+        "sha256": "b8abc1d45fcc5f7e5e0ef7bbd84dbfb75af038f83d182c793fc4678197c94e6a"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/friendship_listener.dart",
+        "bytes": 2038,
+        "sha256": "41c19fbceee8f9b50a1786dc3380b931ba477ece2c9063486a8c45d6718132eb"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/group_listener.dart",
+        "bytes": 2471,
+        "sha256": "fae5327454d0a84cc629cf01cd9d7fd6ff69e93fac337075b216f110499e5770"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/listener_for_service.dart",
+        "bytes": 1129,
+        "sha256": "7fc5a117160ab5b070ee94aefbfcd2f24eb88cb20ec2c8352eeec221e8d5dc5f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/message_kv_info_listener.dart",
+        "bytes": 310,
+        "sha256": "fee8e2a9aa46cbf549d9164c37c3afbc53727f6f2b2470ed2278b7425120db6a"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/msg_send_progress_listener.dart",
+        "bytes": 314,
+        "sha256": "882a03165869559ef5a3e5d61bae2543dc356a32c80e8593ee62dbff0c5fda76"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/signaling_listener.dart",
+        "bytes": 2939,
+        "sha256": "96bef0fb7188d75bd0b352f81e5756cdbb0619e2dc5a0beae51e51bc376a10a5"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/upload_file_listener.dart",
+        "bytes": 1758,
+        "sha256": "7d42b533be8196198607292b877f9108b7dcde706f8232adc029cb174d7fea9d"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/user_listener.dart",
+        "bytes": 618,
+        "sha256": "e506dc653bf5a65e08c469870f9ccf0ebc0bf6cd628116275cae9b5f17fd030c"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/logger.dart",
+        "bytes": 604,
+        "sha256": "1dd33f80233868cfa9ad71b69d785f961081fb823261f117db715a6a36ca9133"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_conversation_manager.dart",
+        "bytes": 12682,
+        "sha256": "b56a5152ed39fd7539dbf93900b2c7af6b4ea2cdb07f74e6b6fed02771e7999f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_friendship_manager.dart",
+        "bytes": 7869,
+        "sha256": "3ebae5cb4ed8fa3087714250797606aada16e3401cde9364a11a6773771e325d"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_group_manager.dart",
+        "bytes": 18777,
+        "sha256": "7c31aa3c4fa9d53ba1ca44dfbaaf2d24accaa627117ff6e3a55d325740fcb29d"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_manager.dart",
+        "bytes": 27017,
+        "sha256": "a57afb44fb24b819cb522dfbbec0513b7c553859c094a822b94a03a974c9bc0b"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_message_manager.dart",
+        "bytes": 31563,
+        "sha256": "896938466e9d93c484ba6387074d10139fa9fffcb91e9535623ada4174df3956"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_signaling_manager.dart",
+        "bytes": 10188,
+        "sha256": "6a586404453380dfb15b07a706d536bd4c0d83f7563be00f84fa555f4fa164b4"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_user_manager.dart",
+        "bytes": 4301,
+        "sha256": "703c96eef6aa00a98169d7339de25eef3b2a136d78cd4ddb669339863de09df4"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/conversation_info.dart",
+        "bytes": 4952,
+        "sha256": "559b288b7b80459c05de231610939f94a0972e72f26f078b75269be40510fab2"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/group_info.dart",
+        "bytes": 10514,
+        "sha256": "10c23e72969d8c11e71dfbedd5250ad39c9a72b0e25172c3bc9c0f0c97f24e86"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/init_config.dart",
+        "bytes": 1146,
+        "sha256": "33e3ad80fccd93dab15f3b14830c35cf47f51435ab2ca3224811628e68029df2"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/meeting_info.dart",
+        "bytes": 5464,
+        "sha256": "538235d95997f6a2c41ee89544dda6faf281386604b4fac610131e3787e4c290"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/message.dart",
+        "bytes": 37894,
+        "sha256": "f8ded4b316ee739db334fbc50b7e1dbca23e7f1f731fd8b2fca6d53f68589ed1"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/notification_info.dart",
+        "bytes": 11746,
+        "sha256": "c6f70e31dea5ae4acab82802fcf9c07fbbb4674272cc651406ae2d8870f2eba7"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/search_info.dart",
+        "bytes": 3619,
+        "sha256": "10921415efae75c7c2330def43b987daf4fa5b939fa8d6fd7397f38157d479f7"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/signaling_info.dart",
+        "bytes": 6099,
+        "sha256": "c2c96af4260d39b47bd3fcd3cbecac849c7502a174c36e8171e67d053bcd86c6"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/user_info.dart",
+        "bytes": 10680,
+        "sha256": "f1628f73760f4e6749f2826a263b1461d6a6b9b0d037d71029ae0933c9dad44f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/openim.dart",
+        "bytes": 291,
+        "sha256": "f1ce2af68f16300f64c82ad972da985f31cfe74b0154ed631b97f5d8c7341236"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/utils.dart",
+        "bytes": 521,
+        "sha256": "de2e9970b01c58825f7d050bb1d9b377ede16fc61377f67db1154a4320899907"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/pubspec.yaml",
+        "bytes": 2187,
+        "sha256": "0e36e2e27e5e3e77c398858647d95ed41ec79c98d67e2934341deba0a427a1ad"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart",
+        "bytes": 2516,
+        "sha256": "039c73a2f9556611f23744e031682f0b6b4298ab31f0859cf79c7090f64a78ee"
+      }
+    ]
+  },
+  "migration": {
+    "path": "migration/legacy_personal_export/legacy_personal_export.dart",
+    "bytes": 2942,
+    "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
+  },
+  "portable_members": {
+    "current269": 321
+  },
+  "portable_digests": {
+    "current269": "a7ede4a134ee2e55c920e4a282249c1bddd2f9bfac6f5c9b9d877f3e82faad83"
+  },
+  "sqlite_linux": {
+    "package": "sqlite3",
+    "version": "3.5.2",
+    "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.x64.linux.so",
+    "sha256": "b17729184e5a2818055ecbddd5ed6642521bfe6e56aafa472330e483c0e2e0d2",
+    "seed_path": "app/.dart_tool/hooks_runner/shared/sqlite3/build/download-b1772918/libsqlite3.so",
+    "old_hook_dill_or_stamp_copied": false
+  },
+  "excluded": [
+    "private QA CA/config",
+    "credentials/tokens",
+    "local databases/logs",
+    "SDK native binaries",
+    "generated .dart_tool/build caches",
+    "Mac-only SBPL runner",
+    "all mutable task references"
+  ],
+  "native_limits": "Linux unit/widget tests and analysis only; no Android/iOS, 16KiB runtime, RTC device or service acceptance",
+  "history": {
+    "accepted_current230": {
+      "git_commit": "292bea12ddcf250194beaf90ae62570faea1ab46",
+      "source_digest": "9e00a25ac45b277f3a1de33cd4c42c9c3b2893deb0d7969dcafcf8a313c446b1",
+      "expected_full": 548,
+      "actual_run": 38852506276,
+      "actual_full_and_analysis": "complete548PASS/analyze0"
+    },
+    "candidate249_v7": {
+      "git_commit": "292bea12ddcf250194beaf90ae62570faea1ab46",
+      "source_digest": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
+      "actual_run": 38852506276,
+      "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
+    },
+    "reproduction": "Historical cohorts require their explicit immutable commit and inputs; schema v3 has no current230/249/257 aliases. Optional reference_entry compiles full269 with only4 original files replaced, and is not historical257 full.",
+    "accepted_current257": {
+      "git_commit": "314ac55",
+      "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
+      "portable_digest": "013194c7b391d62383ea47825b2db0627061e9b2ee32930166530c466bd3a0ea",
+      "actual_run": 38854472595,
+      "actual_target_passed": 64,
+      "actual_full_passed": 688,
+      "actual_analysis_issues": 0,
+      "root_acceptance_sha256": "78d57cd7c88d6c7d476015aebf6b93e59c5bc11b564c12f0ffe3666efe0af6d6",
+      "original_inputs_sha256": "16c47bf31a7c1f2ccee11a6390ce06cfb4c7e265f4a0cae1f2e5361acc8dcb26"
+    }
+  },
+  "current269": {
+    "members": 269,
+    "source_digest": "61c5faec6515a1aeeeb5621ee828748e2a47ee62b9fc2901aadc0cedd37a0cf9",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -34,8 +352,8 @@
       },
       {
         "path": "app/lib/app.dart",
-        "bytes": 18789,
-        "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
+        "bytes": 19211,
+        "sha256": "f29379051c51ec5431c7399d3455beb78454ae16ca2df08e7c76d4d6e3e9c9df"
       },
       {
         "path": "app/lib/core/access/access_store.dart",
@@ -254,8 +572,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_controller.dart",
-        "bytes": 14205,
-        "sha256": "5f91a186610cd0cd150fb44476e8be1a884f54da8b4224ee7d32b40b0af1a188"
+        "bytes": 15443,
+        "sha256": "22fd2ea7a4e78e1500f9876f76c04e8bf7d697443da0dce45abe3a763ed49728"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_forward_page.dart",
@@ -274,8 +592,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 61403,
-        "sha256": "37e4e1eca3c1b8a29be1b8fa7e5488763a8c88c90a8056c20a4e0eb50b5b3b51"
+        "bytes": 61885,
+        "sha256": "57f207dd4ce4f8dc604c90cead1df465e4b862ce9c043d36c1a8a1df1d28d8b3"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
@@ -404,8 +722,8 @@
       },
       {
         "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 15415,
-        "sha256": "8ca9286eeaee1689463023b6551cba3caaefd1b910d40813f19dcfc612631dc2"
+        "bytes": 15558,
+        "sha256": "9e46f857997b491072c631c4711eb10123dfd2624aa1f046664508a449c367c3"
       },
       {
         "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
@@ -741,6 +1059,36 @@
         "path": "app/lib/features/rtc/presentation/rtc_providers.dart",
         "bytes": 572,
         "sha256": "da0041987a21bb432f956a4ef4b94d9558b8c908b59bff53de56267dbcbd14db"
+      },
+      {
+        "path": "app/lib/features/search/data/global_search_repository.dart",
+        "bytes": 8218,
+        "sha256": "d3758fa2e5571816c10c6fff1c7df3e45bb1ce112f7e5fd3ae80fe6900aec9e1"
+      },
+      {
+        "path": "app/lib/features/search/domain/global_search.dart",
+        "bytes": 2166,
+        "sha256": "3da2f5ddc58d6515ccaab2ac63409bc4db5bf618b2f05b18ed5d0026e2b162df"
+      },
+      {
+        "path": "app/lib/features/search/presentation/global_search_controller.dart",
+        "bytes": 6360,
+        "sha256": "5fbd2ef8a57eb0cb46a374e88af937c7d76d664b4f4587cb19b96efabb1ed6bc"
+      },
+      {
+        "path": "app/lib/features/search/presentation/global_search_file_page.dart",
+        "bytes": 5793,
+        "sha256": "e8a3880ff86686464759eda7adc26acbc7ccc9374168c7e1f4881e204936e264"
+      },
+      {
+        "path": "app/lib/features/search/presentation/global_search_matches_page.dart",
+        "bytes": 2904,
+        "sha256": "6cc792d8cbf69fdf3eb1f6632cf5b4b5390a4bf983aa67015dc6e5f823f0a5b6"
+      },
+      {
+        "path": "app/lib/features/search/presentation/global_search_page.dart",
+        "bytes": 7782,
+        "sha256": "38ab04205cebe4f6cfeee45395db04852e2871e7d68a4ad9d7f891cd48c2c54c"
       },
       {
         "path": "app/lib/main.dart",
@@ -1293,6 +1641,36 @@
         "sha256": "20225bf1ca3d9885630de3d8df547837a85b7a10320c6414c0f31d75ae948dcd"
       },
       {
+        "path": "app/test/features/search/global_search_controller_test.dart",
+        "bytes": 6130,
+        "sha256": "475c5bf66b19794343b29b32f9b2e14ce59d1a914d35163d8f3242a85153c8d2"
+      },
+      {
+        "path": "app/test/features/search/global_search_entry_test.dart",
+        "bytes": 1218,
+        "sha256": "17edabb8f098184a1ec4373e8999b949c962ae283590ea4eebf2c5ba7581f667"
+      },
+      {
+        "path": "app/test/features/search/global_search_fixture.dart",
+        "bytes": 9938,
+        "sha256": "3f42e387668db247450c03842b31557de346736bf45d1b253c4e79bc357aa4df"
+      },
+      {
+        "path": "app/test/features/search/global_search_pages_test.dart",
+        "bytes": 9749,
+        "sha256": "271d47ffb3b0cb7faca7f090565b476f3538bf288fe1af512655d9fb1a4610fd"
+      },
+      {
+        "path": "app/test/features/search/global_search_repository_test.dart",
+        "bytes": 12421,
+        "sha256": "a86a24903d548e8b17e15262606403191f51522066b789f63f0d7796747b4f15"
+      },
+      {
+        "path": "app/test/features/search/global_source_navigation_test.dart",
+        "bytes": 7782,
+        "sha256": "6ba32c86f76a8054af654bab171efda2c57dba2ddbf29770ea31226828baa5c4"
+      },
+      {
         "path": "app/test/support/http_adapter.dart",
         "bytes": 676,
         "sha256": "6b28819ec545295b8d3a60e440b93ccc9c17dd7ca8d0d9567146fa2e74a0fba3"
@@ -1313,315 +1691,57 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 64,
-    "expected_full_tests": 688,
+    "expected_target_tests": 46,
+    "expected_full_tests": 734,
     "target_paths": [
-      "test/features/group"
+      "test/features/search"
     ]
   },
-  "sdk_portable": {
-    "members": 51,
-    "files": [
+  "reference_entry": {
+    "state": "explicit_optional_reference_only_not_old257_full",
+    "default_enabled": false,
+    "working_cohort": "current269",
+    "members": 269,
+    "reference_source_digest": "042aa00d66670621dcaa2dbdfd4102930a43f64e3c1bda0558b545b4301c912d",
+    "replacement_files": [
       {
-        "path": "packages/flutter_openim_sdk/lib/flutter_openim_sdk.dart",
-        "bytes": 1826,
-        "sha256": "6d172fefef2f4587f542c1cc755dbee883f1fe9f3f0ff52c5b3f52f8e349e43f"
+        "path": "app/lib/app.dart",
+        "bytes": 18789,
+        "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
       },
       {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/allow_type.dart",
-        "bytes": 74,
-        "sha256": "40a204b1d4c117ae0070784e928cd9b4cf3bc4cbba4f953d1f6a2fcf4150e220"
+        "path": "app/lib/features/chat/presentation/chat_controller.dart",
+        "bytes": 14205,
+        "sha256": "5f91a186610cd0cd150fb44476e8be1a884f54da8b4224ee7d32b40b0af1a188"
       },
       {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/conversation_type.dart",
-        "bytes": 301,
-        "sha256": "5b4f2ccbd5ba12947c5db2978c71bca82e44044a1cbed328e79048ffc70b6e7f"
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 61403,
+        "sha256": "37e4e1eca3c1b8a29be1b8fa7e5488763a8c88c90a8056c20a4e0eb50b5b3b51"
       },
       {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/group_at_type.dart",
-        "bytes": 386,
-        "sha256": "2f8381e45825ebe02b3933ffe43c5b421d286c23bdbdd3694a16e9ddf73b7032"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/group_member_filter.dart",
-        "bytes": 230,
-        "sha256": "630c5588e89e2aef497b409420b664ac911cb97e93608036ca971269bde1513b"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/group_role_level.dart",
-        "bytes": 192,
-        "sha256": "eeb99bfb139292ed04f51520de02c7b4623f41027ac68352e5fa2d2d15815fa3"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/group_status.dart",
-        "bytes": 148,
-        "sha256": "7acc19c57130d7360aeaf96acec4eb6f17f72f82f1fe0caf45713cfec3bcc0fd"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/group_type.dart",
-        "bytes": 188,
-        "sha256": "60bf0667cfca31093b1ea43b9111bb09a09999c684ee913f606ea866cb53c4bd"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/group_verification.dart",
-        "bytes": 386,
-        "sha256": "4ee8a3e8dbda6b0306a1c1ddad6d2ea5c160412bc5f622dfd227a53904438e0f"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/im_platform.dart",
-        "bytes": 344,
-        "sha256": "d5002983752430cf03d281c199c7807c022c03fc6e97a20421dce22fe36dc55a"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/join_source.dart",
-        "bytes": 102,
-        "sha256": "93c163333b5c41fdc86cf97d738877f0d772c3341746c8ec97a3a2ea5fced086"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/listener_type.dart",
-        "bytes": 966,
-        "sha256": "d98f84e7a09ea8c74b915818c77e5cc47b75cf8e96f7b708acac835a2dd7c2a8"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/login_status.dart",
-        "bytes": 104,
-        "sha256": "3a8633023ad67b45765e313f1225cdf679ac4a5bda350c06cf8f17690e6141b9"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/message_status.dart",
-        "bytes": 242,
-        "sha256": "4363365e4c72b3b3cd011eb390eb11bfe1422883d84d7336c2b7fc262566e67e"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/message_type.dart",
-        "bytes": 4187,
-        "sha256": "32d26337478668f4bab3a7e13d785b267c4e63f6d83176c15584a8a6d095ea25"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/receive_message_opt.dart",
-        "bytes": 116,
-        "sha256": "b585a65491ffe2a15b038e4821219cd6e605cd3857979f9266951e42f9a6177b"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/relationship.dart",
-        "bytes": 72,
-        "sha256": "99a02e96c1c210f97542425f0cfde228784af86b9984f9d61b5414a78f3ff263"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/enum/sdk_error_code.dart",
-        "bytes": 4896,
-        "sha256": "19f95e488daa548bb1080e4ca2e7ef0eca1c48e3b29d4e1e0a20c4ae648cfc33"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/advanced_msg_listener.dart",
-        "bytes": 2428,
-        "sha256": "9a5caf502155f19463523f06034a49dc3cbe51ba7d3164ef65813d76c620fea2"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/connect_listener.dart",
-        "bytes": 1053,
-        "sha256": "2bfe0ec04328b97a48785228b89c955f69566f0fa4e9dab84d11ca6e586a723e"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/conversation_listener.dart",
-        "bytes": 1242,
-        "sha256": "3846e87b7788e5051256b55053cef08e2852b0198aa9126f6333f6f084ec0e68"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/custom_business_listener.dart",
-        "bytes": 243,
-        "sha256": "b8abc1d45fcc5f7e5e0ef7bbd84dbfb75af038f83d182c793fc4678197c94e6a"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/friendship_listener.dart",
-        "bytes": 2038,
-        "sha256": "41c19fbceee8f9b50a1786dc3380b931ba477ece2c9063486a8c45d6718132eb"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/group_listener.dart",
-        "bytes": 2471,
-        "sha256": "fae5327454d0a84cc629cf01cd9d7fd6ff69e93fac337075b216f110499e5770"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/listener_for_service.dart",
-        "bytes": 1129,
-        "sha256": "7fc5a117160ab5b070ee94aefbfcd2f24eb88cb20ec2c8352eeec221e8d5dc5f"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/message_kv_info_listener.dart",
-        "bytes": 310,
-        "sha256": "fee8e2a9aa46cbf549d9164c37c3afbc53727f6f2b2470ed2278b7425120db6a"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/msg_send_progress_listener.dart",
-        "bytes": 314,
-        "sha256": "882a03165869559ef5a3e5d61bae2543dc356a32c80e8593ee62dbff0c5fda76"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/signaling_listener.dart",
-        "bytes": 2939,
-        "sha256": "96bef0fb7188d75bd0b352f81e5756cdbb0619e2dc5a0beae51e51bc376a10a5"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/upload_file_listener.dart",
-        "bytes": 1758,
-        "sha256": "7d42b533be8196198607292b877f9108b7dcde706f8232adc029cb174d7fea9d"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/listener/user_listener.dart",
-        "bytes": 618,
-        "sha256": "e506dc653bf5a65e08c469870f9ccf0ebc0bf6cd628116275cae9b5f17fd030c"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/logger.dart",
-        "bytes": 604,
-        "sha256": "1dd33f80233868cfa9ad71b69d785f961081fb823261f117db715a6a36ca9133"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/manager/im_conversation_manager.dart",
-        "bytes": 12682,
-        "sha256": "b56a5152ed39fd7539dbf93900b2c7af6b4ea2cdb07f74e6b6fed02771e7999f"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/manager/im_friendship_manager.dart",
-        "bytes": 7869,
-        "sha256": "3ebae5cb4ed8fa3087714250797606aada16e3401cde9364a11a6773771e325d"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/manager/im_group_manager.dart",
-        "bytes": 18777,
-        "sha256": "7c31aa3c4fa9d53ba1ca44dfbaaf2d24accaa627117ff6e3a55d325740fcb29d"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/manager/im_manager.dart",
-        "bytes": 27017,
-        "sha256": "a57afb44fb24b819cb522dfbbec0513b7c553859c094a822b94a03a974c9bc0b"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/manager/im_message_manager.dart",
-        "bytes": 31563,
-        "sha256": "896938466e9d93c484ba6387074d10139fa9fffcb91e9535623ada4174df3956"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/manager/im_signaling_manager.dart",
-        "bytes": 10188,
-        "sha256": "6a586404453380dfb15b07a706d536bd4c0d83f7563be00f84fa555f4fa164b4"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/manager/im_user_manager.dart",
-        "bytes": 4301,
-        "sha256": "703c96eef6aa00a98169d7339de25eef3b2a136d78cd4ddb669339863de09df4"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/conversation_info.dart",
-        "bytes": 4952,
-        "sha256": "559b288b7b80459c05de231610939f94a0972e72f26f078b75269be40510fab2"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/group_info.dart",
-        "bytes": 10514,
-        "sha256": "10c23e72969d8c11e71dfbedd5250ad39c9a72b0e25172c3bc9c0f0c97f24e86"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/init_config.dart",
-        "bytes": 1146,
-        "sha256": "33e3ad80fccd93dab15f3b14830c35cf47f51435ab2ca3224811628e68029df2"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/meeting_info.dart",
-        "bytes": 5464,
-        "sha256": "538235d95997f6a2c41ee89544dda6faf281386604b4fac610131e3787e4c290"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/message.dart",
-        "bytes": 37894,
-        "sha256": "f8ded4b316ee739db334fbc50b7e1dbca23e7f1f731fd8b2fca6d53f68589ed1"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/notification_info.dart",
-        "bytes": 11746,
-        "sha256": "c6f70e31dea5ae4acab82802fcf9c07fbbb4674272cc651406ae2d8870f2eba7"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/search_info.dart",
-        "bytes": 3619,
-        "sha256": "10921415efae75c7c2330def43b987daf4fa5b939fa8d6fd7397f38157d479f7"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/signaling_info.dart",
-        "bytes": 6099,
-        "sha256": "c2c96af4260d39b47bd3fcd3cbecac849c7502a174c36e8171e67d053bcd86c6"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/models/user_info.dart",
-        "bytes": 10680,
-        "sha256": "f1628f73760f4e6749f2826a263b1461d6a6b9b0d037d71029ae0933c9dad44f"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/openim.dart",
-        "bytes": 291,
-        "sha256": "f1ce2af68f16300f64c82ad972da985f31cfe74b0154ed631b97f5d8c7341236"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/lib/src/utils.dart",
-        "bytes": 521,
-        "sha256": "de2e9970b01c58825f7d050bb1d9b377ede16fc61377f67db1154a4320899907"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/pubspec.yaml",
-        "bytes": 2187,
-        "sha256": "0e36e2e27e5e3e77c398858647d95ed41ec79c98d67e2934341deba0a427a1ad"
-      },
-      {
-        "path": "packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart",
-        "bytes": 2516,
-        "sha256": "039c73a2f9556611f23744e031682f0b6b4298ab31f0859cf79c7090f64a78ee"
+        "path": "app/lib/features/conversation/presentation/conversations_page.dart",
+        "bytes": 15415,
+        "sha256": "8ca9286eeaee1689463023b6551cba3caaefd1b910d40813f19dcfc612631dc2"
       }
-    ]
+    ],
+    "baseline_prefix": "ci/mobile/reference/global-search-before",
+    "test_path": "test/features/search/global_search_entry_test.dart",
+    "expected_visible_tests": 2,
+    "expected_assertion_failures": 1,
+    "expected_passed": 1,
+    "failed_test_name": "primary inbox entry reaches the mounted complete global search",
+    "passed_test_name": "existing explicitly named inbox filter remains available",
+    "expected_missing_tooltip": "全局搜索",
+    "expected_child_exit": 1,
+    "not_a_257_full_or_native_result": true
   },
-  "migration": {
-    "path": "migration/legacy_personal_export/legacy_personal_export.dart",
-    "bytes": 2942,
-    "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
-  },
-  "portable_members": {
-    "current257": 309
-  },
-  "portable_digests": {
-    "current257": "013194c7b391d62383ea47825b2db0627061e9b2ee32930166530c466bd3a0ea"
-  },
-  "sqlite_linux": {
-    "package": "sqlite3",
-    "version": "3.5.2",
-    "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.x64.linux.so",
-    "sha256": "b17729184e5a2818055ecbddd5ed6642521bfe6e56aafa472330e483c0e2e0d2",
-    "seed_path": "app/.dart_tool/hooks_runner/shared/sqlite3/build/download-b1772918/libsqlite3.so",
-    "old_hook_dill_or_stamp_copied": false
-  },
-  "excluded": [
-    "private QA CA/config",
-    "credentials/tokens",
-    "local databases/logs",
-    "SDK native binaries",
-    "generated .dart_tool/build caches",
-    "Mac-only SBPL runner",
-    "all mutable task references"
-  ],
-  "native_limits": "Linux unit/widget tests and analysis only; no Android/iOS, 16KiB runtime, RTC device or service acceptance",
-  "history": {
-    "accepted_current230": {
-      "git_commit": "292bea12ddcf250194beaf90ae62570faea1ab46",
-      "source_digest": "9e00a25ac45b277f3a1de33cd4c42c9c3b2893deb0d7969dcafcf8a313c446b1",
-      "expected_full": 548,
-      "actual_run": 38852506276,
-      "actual_full_and_analysis": "complete548PASS/analyze0"
-    },
-    "candidate249_v7": {
-      "git_commit": "292bea12ddcf250194beaf90ae62570faea1ab46",
-      "source_digest": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
-      "actual_run": 38852506276,
-      "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
-    },
-    "reproduction": "Check out the explicit historical commit to use its v1 inputs and cohorts. Schema v2 has no current230 or booking-custom249 aliases and no candidate-body directory."
-  }
+  "auxiliary_preserved": [
+    {
+      "path": "app/tool/check.sh",
+      "bytes": 701,
+      "sha256": "679208a95989061fa75b46f61ab2834d022d5a3a8803919013938f12e41f6cbd",
+      "reason": "Local workspace provenance only. Keep original helper locally; do not upload, execute, require in public CI, or include in269/321. Public authored inventory has no auxiliary exceptions."
+    }
+  ]
 }

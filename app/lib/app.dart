@@ -13,6 +13,8 @@ import 'features/app_lock/presentation/app_access_host.dart';
 import 'features/app_lock/presentation/app_lock_settings_page.dart';
 import 'features/chat/presentation/chat_page.dart';
 import 'features/conversation/presentation/conversations_page.dart';
+import 'features/search/domain/global_search.dart';
+import 'features/search/presentation/global_search_page.dart';
 import 'features/contacts/domain/contact.dart' show ContactRequestKind;
 import 'features/contacts/presentation/contacts_page.dart';
 import 'features/contacts/presentation/contact_requests_page.dart';
@@ -170,6 +172,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) =>
             FavoriteDetailPage(favoriteId: state.pathParameters['favoriteId']!),
       ),
+      GoRoute(path: '/search', builder: (_, _) => const GlobalSearchPage()),
       GoRoute(
         path: '/contacts/search',
         builder: (_, _) => const ContactSearchPage(),
@@ -217,10 +220,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/chat/:conversationId',
-        builder: (_, state) => ChatPage(
-          conversationId: state.pathParameters['conversationId']!,
-          sourceMessageId: state.uri.queryParameters['message'],
-        ),
+        builder: (_, state) {
+          final cid = state.pathParameters['conversationId']!;
+          final id = state.uri.queryParameters['message'];
+          return ChatPage(
+            conversationId: cid,
+            sourceMessageId: id,
+            sourceCurrent: globalSourceGuard(cid, id, state.extra,
+                fromGlobal: state.uri.queryParameters['source'] == 'global'),
+          );
+        },
       ),
     ],
   );

@@ -42,11 +42,13 @@ class ChatPage extends ConsumerStatefulWidget {
     super.key,
     required this.conversationId,
     this.sourceMessageId,
+    this.sourceCurrent,
     this.now,
     this.playbackFactory,
   });
   final String conversationId;
   final String? sourceMessageId;
+  final bool Function()? sourceCurrent;
   final DateTime Function()? now;
   final ChatAudioPlayback Function(VoidCallback onFailure)? playbackFactory;
   @override
@@ -186,21 +188,26 @@ class _ChatPageState extends ConsumerState<ChatPage>
   }
 
   Future<void> _start() async {
-    await controller.start();
+    bool initialCurrent() => mounted && (widget.sourceCurrent == null ||
+        _routeVisible && widget.sourceCurrent!());
+    if (!initialCurrent()) return;
+    await controller.start(isCurrent: widget.sourceCurrent == null ? null : initialCurrent);
     final id = widget.sourceMessageId;
-    if (id == null || !mounted || !controller.usable) return;
-    await _locateSource(id);
+    if (id == null || !mounted || !controller.usable || widget.sourceCurrent?.call() == false) return;
+    await _locateSource(id, sourceCurrent: widget.sourceCurrent);
   }
 
-  Future<void> _locateSource(String id) async {
-    if (!mounted || !controller.usable) return;
+  Future<void> _locateSource(String id, {bool Function()? sourceCurrent}) async {
+    bool current() => mounted && controller.usable &&
+        (sourceCurrent == null || _routeVisible && sourceCurrent());
+    if (!current()) return;
     try {
-      final found = await controller.viewSource(id);
-      if (!mounted || !controller.usable) return;
+      final found = await controller.viewSource(id, isCurrent: current);
+      if (!current()) return;
       if (!found) _notice('原消息已删除或尚未同步到本机');
       if (found && scroll.hasClients) scroll.jumpTo(0);
     } catch (_) {
-      if (mounted && controller.usable) _notice('暂时无法定位原消息，请稍后重试');
+      if (current()) _notice('暂时无法定位原消息，请稍后重试');
     }
   }
 

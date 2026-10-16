@@ -67,6 +67,8 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
+          IconButton(tooltip: '全局搜索', icon: const Icon(Icons.travel_explore),
+              onPressed: () => context.push('/search')),
           IconButton(
             tooltip: '搜索当前会话',
             icon: const Icon(Icons.search),

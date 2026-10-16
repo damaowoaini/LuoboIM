@@ -127,24 +127,38 @@ final class ChatController extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  Future<void> start() async {
+  Future<void> start({bool Function()? isCurrent}) async {
+    bool current() => usable && isCurrent?.call() != false;
+    if (!current()) return;
     final timeline = ++_timeline;
     loading = true;
     failure = null;
     notifyListeners();
     try {
       final metadata = await repository.conversation();
-      if (!usable || timeline != _timeline) return;
+      if (!current() || timeline != _timeline) return;
       final page = await repository.history();
-      if (!usable || timeline != _timeline) return;
-      conversation = metadata;
-      draft = metadata.draft;
-      _merge(page.messages);
-      hasMore = !page.isEnd;
-      _lastMinSeq = page.lastMinSeq;
-      await _markRead();
+      if (!current() || timeline != _timeline) return;
+      if (isCurrent == null) {
+        // Preserve the original normal-chat publication/read ordering.
+        conversation = metadata;
+        draft = metadata.draft;
+        _merge(page.messages);
+        hasMore = !page.isEnd;
+        _lastMinSeq = page.lastMinSeq;
+        await _markRead();
+      } else {
+        // Initial search content remains staged while automatic reads settle.
+        final updated = await _markRead(isCurrent: current, source: page.messages);
+        if (!current() || timeline != _timeline) return;
+        conversation = metadata;
+        draft = metadata.draft;
+        _merge([...page.messages, ...updated]);
+        hasMore = !page.isEnd;
+        _lastMinSeq = page.lastMinSeq;
+      }
     } catch (error) {
-      if (usable && timeline == _timeline) failure = _failure(error);
+      if (current() && timeline == _timeline) failure = _failure(error);
     } finally {
       if (!_disposed && timeline == _timeline) {
         loading = false;
@@ -191,15 +205,18 @@ final class ChatController extends ChangeNotifier {
     if (!_disposed && timeline == _timeline) notifyListeners();
   }
 
-  Future<bool> viewSource(String id) async {
-    if (!usable) return false;
+  Future<bool> viewSource(String id, {bool Function()? isCurrent}) async {
+    bool current() => usable && isCurrent?.call() != false;
+    if (!current()) return false;
     final timeline = ++_timeline;
     loadingOlder = false;
     loading = false;
     final source = await repository.findSource(id);
-    if (source == null || !usable || timeline != _timeline) return false;
+    // A global-search selection cannot acquire a fresh history lease after
+    // its original owner/query/CID revision was invalidated during find.
+    if (source == null || !current() || timeline != _timeline) return false;
     final page = await repository.history(beforeId: id);
-    if (!usable || timeline != _timeline) return false;
+    if (!current() || timeline != _timeline) return false;
     messages = const [];
     _merge([...page.messages, source]);
     hasMore = !page.isEnd;
@@ -254,32 +271,37 @@ final class ChatController extends ChangeNotifier {
     }
   }
 
-  Future<void> _markRead() async {
+  Future<List<ChatMessage>> _markRead({
+    bool Function()? isCurrent,
+    Iterable<ChatMessage>? source,
+  }) async {
+    bool current() => usable && isCurrent?.call() != false;
+    if (!current()) return const [];
     final timeline = _timeline;
-    final incoming = messages.where((item) => !item.mine);
+    final values = source ?? messages;
+    final incoming = values.where((item) => !item.mine);
     final latestId = incoming.isEmpty ? '' : incoming.last.id;
-    if (_lastReadId == latestId) return;
+    if (_lastReadId == latestId) return const [];
     try {
+      if (!current()) return const [];
       await repository.markRead();
-      if (!usable || timeline != _timeline) return;
-      final privateIds = messages
-          .where(
-            (item) =>
-                !item.mine &&
-                item.privacy.isPrivateChat == true &&
-                (item.privacy.messageReadAtMilliseconds ?? 0) <= 0 &&
-                (item.privacy.attachmentReadAtMilliseconds ?? 0) <= 0,
-          )
-          .map((item) => item.id)
-          .toList();
+      if (!current() || timeline != _timeline) return const [];
+      final privateIds = values
+          .where((item) => !item.mine && item.privacy.isPrivateChat == true &&
+              (item.privacy.messageReadAtMilliseconds ?? 0) <= 0 &&
+              (item.privacy.attachmentReadAtMilliseconds ?? 0) <= 0)
+          .map((item) => item.id).toList();
+      List<ChatMessage> updated = const [];
       if (privateIds.isNotEmpty) {
-        final updated = await repository.refreshReadMetadata(privateIds);
-        if (!usable || timeline != _timeline) return;
-        _merge(updated);
+        updated = await repository.refreshReadMetadata(privateIds);
+        if (!current() || timeline != _timeline) return const [];
+        if (source == null) _merge(updated);
       }
       _lastReadId = latestId;
+      return updated;
     } catch (error) {
-      if (usable && timeline == _timeline) failure = _failure(error);
+      if (current() && timeline == _timeline) failure = _failure(error);
+      return const [];
     }
   }
 
