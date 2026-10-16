@@ -54,6 +54,55 @@ final class ConversationRepository {
     });
   }
 
+  /// One complete SDK inbox snapshot, independent of the UI's loaded pages.
+  /// The original owner/history/CID cut is retained through subsequent layout.
+  Future<UnreadConversationSnapshot> unreadSnapshot({required bool Function() sourceCurrent}) {
+    final epoch = generation;
+    final owner = session.state.credentials;
+    final interactive = session.interactiveRevision;
+    final history = gateway.historyAccess(epoch);
+    final revisions = gateway.conversationHistorySnapshot;
+    void check() {
+      if (!current || !sourceCurrent() || owner == null ||
+          !identical(session.state.credentials, owner) ||
+          !session.isInteractiveCurrent(epoch, interactive)) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+      history.check();
+    }
+    bool cidCurrent(String id) {
+      try {
+        check();
+        if (id.isEmpty || id.length > 512 || gateway.isConversationHistoryClearing(id) ||
+            gateway.conversationHistoryRevision(id) != (revisions[id] ?? 0)) {
+          return false;
+        }
+        // Admission only; never substitute this for the original cut above.
+        gateway.historyAccess(epoch, conversationId: id).check();
+        return true;
+      } on AppFailure { return false; }
+    }
+    check();
+    return gateway.runForHistory(epoch, (manager, access) async {
+      check();
+      final result = await manager.conversationManager.getAllConversationList();
+      check();
+      final seen = <String>{};
+      final mapped = <Conversation>[];
+      for (final item in result) {
+        if (item.conversationID.isEmpty || item.conversationID.length > 512 ||
+            !seen.add(item.conversationID)) {
+          throw const AppFailure(FailureKind.invalidResponse);
+        }
+        final allowed = cidCurrent(item.conversationID);
+        mapped.add(allowed ? mapConversation(item, ledger: gateway.privacyLedger)
+            : mapConversation(item, includePreview: false));
+      }
+      check();
+      return UnreadConversationSnapshot(List.unmodifiable(mapped), check, cidCurrent);
+    }, access: history);
+  }
+
   Future<Conversation> get(String id) => gateway.runForHistory(generation, (
     manager,
     access,
@@ -137,4 +186,12 @@ Conversation mapConversation(
     draft: item.draftText ?? '',
     mentions: (item.groupAtType ?? 0) != 0,
   );
+}
+
+/// Ephemeral read ticket; not a serialized store and never renewed after clear.
+final class UnreadConversationSnapshot {
+  const UnreadConversationSnapshot(this.items, this.check, this.cidCurrent);
+  final List<Conversation> items;
+  final void Function() check;
+  final bool Function(String id) cidCurrent;
 }

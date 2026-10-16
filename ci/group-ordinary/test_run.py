@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Seven pure controller gates; no Go, Docker, DB or source1064 materialization."""
+"""Eleven pure controller gates; no Go, Docker, DB or source1099 materialization."""
 import hashlib
 import importlib.util
 import json
@@ -139,6 +139,120 @@ class ControllerTests(unittest.TestCase):
             SUBJECT.compile_packages(packages, monitor_error)
         self.assertEqual(calls, packages[:4])
 
+
+
+    def test_alias_and_operator_contracts_reject_missing_or_skipped_new_cases(self):
+        contract = json.loads(Path(__file__).with_name('inputs.json').read_text())
+        for short in ('internal/push/offlinepush/aliasvendor', 'cmd/tools/ordinary-alias-receipts'):
+            spec = contract['packages'][short]
+            package = SUBJECT.PREFIX + short
+            events = []
+            for test in spec['top_tests']:
+                events.append({'Package':package, 'Action':'run', 'Test':test})
+                for leaf in spec['required_leaves']:
+                    if leaf.startswith(test + '/'):
+                        events.extend([{'Package':package, 'Action':'run', 'Test':leaf},
+                                       {'Package':package, 'Action':'pass', 'Test':leaf}])
+                events.append({'Package':package, 'Action':'pass', 'Test':test})
+            events.append({'Package':package, 'Action':'pass'})
+            self.assertTrue(SUBJECT.audit(events, 0, short, spec)['accepted'])
+            skipped = [dict(item) for item in events]
+            skipped[-2]['Action'] = 'skip'
+            self.assertFalse(SUBJECT.audit(skipped, 0, short, spec)['accepted'])
+            missing = [item for item in events if item.get('Test') != spec['top_tests'][-1]]
+            self.assertFalse(SUBJECT.audit(missing, 0, short, spec)['accepted'])
+
+    def test_physical_before_requires_exact_assertions_and_all_positive_controls(self):
+        package = SUBJECT.PREFIX + 'internal/messagedelivery'
+        denied = 'TestKafkaPhysicalPermitMongoClearBeforeFinalAdmissionNeverGrantsPOST'
+        normal = 'TestKafkaPhysicalPermitMongoKnownCommitIsOneStartedAttemptEvenIfClearCommitsLater'
+        events = []
+        for top, action in ((denied, 'fail'), (normal, 'pass')):
+            events.append({'Package':package, 'Action':'run', 'Test':top})
+            for mode in ('alias', 'generic', 'fcm'):
+                events.append({'Package':package, 'Action':'run', 'Test':top + '/' + mode})
+                if action == 'fail':
+                    events.append({'Package':package, 'Action':'output', 'Test':top + '/' + mode,
+                        'Output':'    kafka_physical_permit_integration_test.go:125: Clear committed before admission but old plaintext acquired a physical POST permit\n'})
+                events.append({'Package':package, 'Action':action, 'Test':top + '/' + mode})
+            events.append({'Package':package, 'Action':action, 'Test':top})
+        events.append({'Package':package, 'Action':'fail'})
+        self.assertTrue(SUBJECT.audit_physical_before(events, 1)['accepted'])
+        self.assertFalse(SUBJECT.audit_physical_before(events, 0)['accepted'])
+        self.assertFalse(SUBJECT.audit_physical_before(events[:-1], 1)['accepted'])
+        skipped = [dict(item) for item in events]
+        skipped[-2]['Action'] = 'skip'
+        self.assertFalse(SUBJECT.audit_physical_before(skipped, 1)['accepted'])
+        poisoned = events[:-1] + [{'Package':package, 'Action':'output', 'Output':'panic: fixture failure'}] + events[-1:]
+        self.assertFalse(SUBJECT.audit_physical_before(poisoned, 1)['accepted'])
+
+
+    def physical_before_raw_fixture(self):
+        package = SUBJECT.PREFIX + 'internal/messagedelivery'
+        denied = 'TestKafkaPhysicalPermitMongoClearBeforeFinalAdmissionNeverGrantsPOST'
+        normal = 'TestKafkaPhysicalPermitMongoKnownCommitIsOneStartedAttemptEvenIfClearCommitsLater'
+        assertion = 'Clear committed before admission but old plaintext acquired a physical POST permit'
+        events = [{'Package':package, 'Action':'start'}]
+        for top, action in ((denied, 'fail'), (normal, 'pass')):
+            events.extend([{'Package':package, 'Action':'run', 'Test':top},
+                           {'Package':package, 'Action':'output', 'Test':top, 'Output':'=== RUN   ' + top + '\n'}])
+            for mode in ('alias', 'generic', 'fcm'):
+                leaf = top + '/' + mode
+                events.extend([{'Package':package, 'Action':'run', 'Test':leaf},
+                               {'Package':package, 'Action':'output', 'Test':leaf, 'Output':'=== RUN   ' + leaf + '\n'}])
+                if action == 'fail':
+                    events.append({'Package':package, 'Action':'output', 'Test':leaf,
+                        'Output':'    kafka_physical_permit_integration_test.go:125: ' + assertion + '\n'})
+                events.extend([{'Package':package, 'Action':'output', 'Test':leaf,
+                                'Output':('--- FAIL: ' if action == 'fail' else '--- PASS: ') + leaf + ' (0.01s)\n'},
+                               {'Package':package, 'Action':action, 'Test':leaf}])
+            events.append({'Package':package, 'Action':action, 'Test':top})
+        events.extend([{'Package':package, 'Action':'output', 'Output':'FAIL\n'},
+                       {'Package':package, 'Action':'fail'}])
+        return events, denied, assertion
+
+    def test_same_failed_names_with_wrong_assertion_or_fixture_only_reject(self):
+        events, denied, assertion = self.physical_before_raw_fixture()
+        correct = SUBJECT.audit_physical_before(events, 1)
+        self.assertTrue(correct['accepted'])
+        expected_failures = correct['failed_tests']
+        for message in ('unexpected permission assertion', 'owned nonce database claim failed'):
+            changed = [dict(event) for event in events]
+            for event in changed:
+                if event.get('Action') == 'output' and assertion in event.get('Output', ''):
+                    event['Output'] = '    mongo_fixture_test.go:91: ' + message + '\n'
+            actual = SUBJECT.audit_physical_before(changed, 1)
+            self.assertEqual(actual['failed_tests'], expected_failures)
+            self.assertTrue(actual['complete'])
+            self.assertFalse(actual['poison_output'])
+            self.assertFalse(actual['accepted'])
+
+    def test_physical_assertions_must_be_unique_exact_and_bound_to_each_leaf(self):
+        events, denied, assertion = self.physical_before_raw_fixture()
+        indexes = [i for i, event in enumerate(events) if assertion in event.get('Output', '')]
+        self.assertEqual(len(indexes), 3)
+        for fault in ('missing', 'duplicate', 'foreign-test-id', 'extra-fixture', 'parent-fixture', 'substring-only', 'same-text-wrong-file'):
+            changed = [dict(event) for event in events]
+            index = indexes[-1]
+            if fault == 'missing':
+                del changed[index]
+            elif fault == 'duplicate':
+                changed.insert(index, dict(changed[index]))
+            elif fault == 'foreign-test-id':
+                changed[index]['Test'] = denied + '/alias'
+            elif fault == 'extra-fixture':
+                extra = dict(changed[index]);extra['Output'] = '    mongo_fixture_test.go:91: claim failed\n'
+                changed.insert(index, extra)
+            elif fault == 'parent-fixture':
+                extra = dict(changed[index]);extra['Test'] = denied;extra['Output'] = '    mongo_fixture_test.go:91: parent cleanup failed\n'
+                changed.insert(index, extra)
+            elif fault == 'substring-only':
+                changed[index]['Output'] = changed[index]['Output'].rstrip() + ' unrelated failure\n'
+            else:
+                changed[index]['Output'] = '    mongo_fixture_test.go:91: ' + assertion + '\n'
+            actual = SUBJECT.audit_physical_before(changed, 1)
+            self.assertEqual(actual['failed_tests'], SUBJECT.audit_physical_before(events, 1)['failed_tests'])
+            self.assertFalse(actual['accepted'], fault)
 
 if __name__ == '__main__':
     unittest.main()

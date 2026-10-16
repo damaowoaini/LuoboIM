@@ -13,6 +13,7 @@ import '../../group/presentation/group_creation_action.dart';
 import '../data/conversation_repository.dart';
 import '../domain/conversation.dart';
 import 'conversations_controller.dart';
+import 'conversation_unread_signal.dart';
 
 class ConversationsPage extends ConsumerStatefulWidget {
   const ConversationsPage({super.key});
@@ -24,6 +25,15 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
   late final ConversationsController controller;
   final search = TextEditingController();
   bool searching = false;
+  final _scroll = ScrollController();
+  final _viewport = GlobalKey(debugLabel: 'conversation-viewport');
+  final _rowContexts = <String, BuildContext>{};
+  ConversationUnreadSignal? _unreadSignal;
+  late final Object? _unreadOwner;
+  late final int _unreadGeneration, _unreadInteractive;
+  int _unreadView = 0, _unreadQuery = 0;
+  bool _unreadBusy = false;
+  TransitionRoute<bool>? _unreadDialog;
   int _lookupView = 0;
   bool _lookupMenuOpen = false;
   _LookupPopupTicket? _pendingLookupPopup, _openedLookupPopup;
@@ -37,6 +47,9 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
         ref.read(appRuntimeProvider).session,
       ),
     );
+    _unreadOwner = controller.repository.session.state.credentials;
+    _unreadGeneration = controller.repository.session.state.generation;
+    _unreadInteractive = controller.repository.session.interactiveRevision;
     controller.addListener(_changed);
     unawaited(controller.refresh());
   }
@@ -44,12 +57,23 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final signal = ConversationUnreadScope.maybeOf(context);
+    if (!identical(signal, _unreadSignal)) {
+      _unreadSignal?.removeListener(_unreadRequested);
+      _unreadSignal = signal;
+      signal?.addListener(_unreadRequested);
+    }
+    if (!_lookupMenuOpen && _unreadDialog?.isActive != true &&
+        ModalRoute.of(context)?.isCurrent == false) {
+      _retireUnread();
+    }
     if (!_lookupMenuOpen && ModalRoute.of(context)?.isCurrent == false) {
       ++_lookupView;
     }
   }
 
   void _retireLookupShortcut() {
+    _retireUnread();
     ++_lookupView;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -96,9 +120,10 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
       return;
     }
     final allowed = !ticket.retired && _lookupCurrent(ticket) &&
-        const ['user', 'group', 'calls'].contains(choice.kind);
+        const ['user', 'group', 'calls', 'unread'].contains(choice.kind);
     _lookupClosed(ticket);
     if (!allowed) return;
+    if (choice.kind == 'unread') { unawaited(_nextUnread()); return; }
     context.push(choice.kind == 'calls' ? '/calls' : '/contacts/search?kind=${choice.kind}');
   }
 
@@ -108,6 +133,8 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
 
   @override
   void dispose() {
+    _unreadSignal?.removeListener(_unreadRequested);
+    _scroll.dispose();
     controller.removeListener(_changed);
     controller.dispose();
     search.dispose();
@@ -118,7 +145,7 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
   Widget build(BuildContext context) {
     final lookupOwner = controller.repository.session.state.credentials;
     final lookupView = _lookupView;
-    final query = search.text.trim().toLowerCase();
+    final query = searching ? search.text.trim().toLowerCase() : '';
     final items = controller.items
         .where(
           (item) =>
@@ -144,6 +171,8 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
             tooltip: '搜索当前会话',
             icon: const Icon(Icons.search),
             onPressed: () => setState(() {
+              _retireUnread();
+              ++_unreadQuery;
               searching = !searching;
               if (!searching) search.clear();
             }),
@@ -205,6 +234,9 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
                     onCovered: () => _lookupCovered(ticket),
                     onClosed: () => _lookupClosed(ticket),
                     child: const Text('搜索加群'))),
+                PopupMenuItem<Object>(value: _LookupShortcutChoice('unread', ticket.id), height: 48,
+                  child: _LookupMenuGuard(onCovered: () => _lookupCovered(ticket),
+                    onClosed: () => _lookupClosed(ticket), child: const Text('下一未读会话'))),
                 PopupMenuItem<Object>(value: _LookupShortcutChoice('calls', ticket.id), height: 48,
                   child: _LookupMenuGuard(onCovered: () => _lookupCovered(ticket),
                     onClosed: () => _lookupClosed(ticket), child: const Text('通话记录'))),
@@ -230,7 +262,11 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
                       hintText: '搜索当前会话',
                       prefixIcon: Icon(Icons.search),
                     ),
-                    onChanged: (_) => setState(() {}),
+                    onChanged: (_) {
+                      ++_unreadQuery;
+                      _retireUnread();
+                      setState(() {});
+                    },
                   ),
                 ),
               if (controller.connection != null)
@@ -250,12 +286,18 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
                   onRefresh: controller.refresh,
                   child: NotificationListener<ScrollNotification>(
                     onNotification: (event) {
+                      if (event is ScrollStartNotification && event.dragDetails != null ||
+                          event is ScrollUpdateNotification && event.dragDetails != null) {
+                        _retireUnread(stopAnimation: false);
+                      }
                       if (event.metrics.extentAfter < 240 && query.isEmpty) {
                         unawaited(controller.loadMore());
                       }
                       return false;
                     },
                     child: CustomScrollView(
+                      key: _viewport,
+                      controller: _scroll,
                       physics: const AlwaysScrollableScrollPhysics(),
                       slivers: [
                         if (controller.loading && controller.items.isEmpty)
@@ -271,7 +313,13 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
                         else
                           SliverList.builder(
                             itemCount: items.length,
-                            itemBuilder: (_, index) => _row(items[index]),
+                            itemBuilder: (_, index) => _UnreadRowProbe(
+                              key: ValueKey(items[index].id),
+                              registered: (context) => _rowContexts[items[index].id] = context,
+                              retired: (context) {
+                                final id = items[index].id;
+                                if (identical(_rowContexts[id], context)) _rowContexts.remove(id);
+                              }, child: _row(items[index])) ,
                           ),
                         if (controller.loadingMore)
                           const SliverToBoxAdapter(
@@ -291,6 +339,102 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
         ),
       ),
     );
+  }
+
+  void _unreadRequested() { unawaited(_nextUnread()); }
+
+  bool _unreadCurrent(int view, int query) => mounted && view == _unreadView &&
+      query == _unreadQuery && _unreadOwner != null &&
+      identical(controller.repository.session.state.credentials, _unreadOwner) &&
+      controller.repository.session.isInteractiveCurrent(_unreadGeneration, _unreadInteractive) &&
+      controller.repository.current && ModalRoute.of(context)?.isCurrent == true;
+
+  void _retireUnread({bool stopAnimation = true}) {
+    final retired = ++_unreadView;
+    controller.cancelUnread(notify: false);
+    if (stopAnimation) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && retired == _unreadView && !controller.locatingUnread && _scroll.hasClients) {
+          _scroll.jumpTo(_scroll.offset); // Cancel only the retired view's scroll activity.
+        }
+      });
+    }
+  }
+
+  Rect? _bounds(BuildContext? element) => conversationUnreadBounds(element);
+
+  String? _visibleUnreadAnchor() {
+    final viewport = _bounds(_viewport.currentContext);
+    if (viewport == null) return null;
+    final visible = _rowContexts.entries.where((entry) {
+      final bounds = _bounds(entry.value);
+      return bounds != null && bounds.overlaps(viewport);
+    }).toList()..sort((a, b) => _bounds(a.value)!.top.compareTo(_bounds(b.value)!.top));
+    return visible.isEmpty ? null : visible.first.key;
+  }
+
+  Future<bool> _seekUnread(UnreadConversationLocation location) async {
+    final id = location.id;
+    if (id == null) return false;
+    return revealUnreadConversation(id: id, scroll: _scroll,
+      rowContexts: _rowContexts, viewport: () => _viewport.currentContext,
+      orderedIds: () => controller.items.map((item) => item.id).toList(growable: false),
+      current: () => mounted && location.current);
+  }
+
+  Future<void> _nextUnread() async {
+    final view = _unreadView, query = _unreadQuery;
+    if (!_unreadCurrent(view, query)) return;
+    if (_unreadBusy || controller.locatingUnread) { _notice('正在定位未读会话，请稍候'); return; }
+    _unreadBusy = true;
+    UnreadConversationLocation? location;
+    try {
+      if (searching && search.text.trim().isNotEmpty) {
+        final dialog = DialogRoute<bool>(context: context, builder: (dialogContext) =>
+          _LookupMenuGuard(onCovered: _retireUnread, onClosed: () {}, child: AlertDialog(
+            title: const Text('查找下一未读会话'),
+            content: const Text('当前正在筛选会话，是否切换到全部会话再查找？'),
+            actions: [
+              TextButton(onPressed: () {
+                if (dialogContext.mounted && identical(ModalRoute.of(dialogContext), _unreadDialog) &&
+                    ModalRoute.of(dialogContext)?.isCurrent == true) {
+                  Navigator.pop(dialogContext, false); // Safe cancellation of this exact owned dialog.
+                }
+              }, child: const Text('取消')),
+              FilledButton(onPressed: () {
+                if (dialogContext.mounted && identical(ModalRoute.of(dialogContext), _unreadDialog) &&
+                    ModalRoute.of(dialogContext)?.isCurrent == true) {
+                  final allowed = identical(_unreadOwner, controller.repository.session.state.credentials) &&
+                      view == _unreadView && query == _unreadQuery && controller.repository.current;
+                  Navigator.pop(dialogContext, allowed); // A retired intent may close, never renew.
+                }
+              }, child: const Text('查看全部会话')),
+            ])));
+        _unreadDialog = dialog;
+        final accepted = await Navigator.of(context).push(dialog);
+        await dialog.completed;
+        if (identical(_unreadDialog, dialog)) _unreadDialog = null;
+        if (!mounted || !_unreadCurrent(view, query) || accepted != true) return;
+        setState(() => searching = false); // Preserve the user's text for reopening.
+      }
+      if (!_unreadCurrent(view, query)) return;
+      final anchor = _visibleUnreadAnchor();
+      location = await controller.nextUnread(visibleAnchor: anchor,
+        sourceCurrent: () => _unreadCurrent(view, query));
+      if (!mounted || !location.current) return;
+      if (location.id == null) { _notice('暂无未读会话'); return; }
+      final reached = await _seekUnread(location);
+      if (!mounted || !location.current) return;
+      controller.completeUnread(location, reached: reached);
+      _notice(reached ? '已定位到下一未读会话' : '暂时无法定位，请重试');
+    } on AppFailure catch (failure) {
+      if (mounted && _unreadCurrent(view, query)) _notice(failure.message);
+    } catch (_) {
+      if (mounted && _unreadCurrent(view, query)) _notice('暂时无法定位，请重试');
+    } finally {
+      if (location != null) controller.completeUnread(location, reached: false);
+      _unreadBusy = false;
+    }
   }
 
   Widget _banner(String label, IconData icon) => Container(
@@ -590,4 +734,19 @@ final class _LookupShortcutChoice {
   const _LookupShortcutChoice(this.kind, this.ticket);
   final String kind;
   final Object ticket;
+}
+
+/// Only mounted sliver rows are retained; no key/context for an unseen row.
+class _UnreadRowProbe extends StatefulWidget {
+  const _UnreadRowProbe({super.key, required this.registered, required this.retired, required this.child});
+  final ValueChanged<BuildContext> registered, retired;
+  final Widget child;
+  @override
+  State<_UnreadRowProbe> createState() => _UnreadRowProbeState();
+}
+class _UnreadRowProbeState extends State<_UnreadRowProbe> {
+  @override
+  Widget build(BuildContext context) { widget.registered(context); return widget.child; }
+  @override
+  void dispose() { widget.retired(context); super.dispose(); }
 }

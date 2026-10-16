@@ -11,6 +11,8 @@ import 'package:imapp/core/config/route_config_loader.dart';
 import 'package:imapp/core/im/open_im_gateway.dart';
 import 'package:imapp/core/tenant/session_coordinator.dart';
 import 'package:imapp/providers.dart';
+import 'package:imapp/features/meeting/booking/booking_providers.dart';
+import 'package:imapp/features/meeting/booking/presentation/booking_editor_page.dart';
 
 import '../../core/privacy_bootstrap_test.dart'
     show ConsentMemory, ImProbe, StoreProbe;
@@ -66,8 +68,9 @@ Future<void> _close(
 
 Future<ProviderContainer> _online(
   WidgetTester tester,
-  MeetingHarness harness,
-) async {
+  MeetingHarness harness, {
+  bool unavailableBooking = false,
+}) async {
   await tester.runAsync(harness.start);
   final runtime = _runtime(
     harness.sdk.session,
@@ -78,6 +81,10 @@ Future<ProviderContainer> _online(
     overrides: [
       appRuntimeProvider.overrideWith((_) => runtime),
       imGatewayProvider.overrideWithValue(harness.sdk.gateway),
+      if (unavailableBooking)
+        bookingControllerProvider.overrideWith((_) async {
+          throw StateError('Synthetic booking journal unavailable');
+        }),
     ],
   );
   addTearDown(() => _close(tester, container, harness.dispose));
@@ -225,7 +232,12 @@ void main() {
         final router = container.read(routerProvider)..go('/meetings');
         await tester.pumpAndSettle();
         if (destination == 'editor') {
-          await tester.tap(find.byTooltip('预约会议'));
+          // Keep the original existing-room editor isolation regression. New
+          // scheduling enters the separate intent-based booking page below.
+          await tester.tap(find.text('合成会议'));
+          await tester.pumpAndSettle();
+          await tester.ensureVisible(find.text('编辑主题与时间'));
+          await tester.tap(find.text('编辑主题与时间'));
         } else {
           await tester.tap(find.text('合成会议'));
           await tester.pumpAndSettle();
@@ -251,6 +263,91 @@ void main() {
         expect(harness.calls('signalingCreateMeeting'), 0);
         expect(harness.calls('signalingUpdateMeetingInfo'), 0);
         expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+  }
+
+  testWidgets(
+    'main meeting schedule uses the booking route and never falls back when its journal is unavailable',
+    (tester) async {
+      final harness = MeetingHarness();
+      final container = await _online(tester, harness, unavailableBooking: true);
+      final router = container.read(routerProvider)..go('/meetings');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('预约会议'));
+      await tester.pumpAndSettle();
+      expect(find.byType(BookingEditorPage), findsOneWidget);
+      expect(find.text('预约会议（仅排期）'), findsOneWidget);
+      expect(find.text('本地预约资料暂时无法打开，原记录会保留。'), findsOneWidget);
+      expect(find.text('保存会议'), findsNothing);
+      expect(harness.calls('signalingCreateMeeting'), 0);
+      expect(harness.calls('signalingJoinMeeting'), 0);
+      expect(tester.takeException(), isNull);
+      router.go('/home');
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  testWidgets(
+    'a retained main meeting schedule action cannot navigate after its original account signs out',
+    (tester) async {
+      final harness = MeetingHarness();
+      final container = await _online(tester, harness);
+      final router = container.read(routerProvider)..go('/meetings');
+      await tester.pumpAndSettle();
+      final retained = tester.widget<IconButton>(find.byTooltip('预约会议')).onPressed!;
+      await _signOut(tester, harness);
+      retained();
+      await tester.pumpAndSettle();
+      expect(router.routeInformationProvider.value.uri.path, '/login');
+      expect(find.byType(BookingEditorPage), findsNothing);
+      expect(harness.calls('signalingCreateMeeting'), 0);
+      expect(harness.calls('signalingJoinMeeting'), 0);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+
+  for (final returned in [false, true]) {
+    testWidgets(
+      'a retained meeting schedule action stays retired after a foreign route ${returned ? 'returns' : 'covers it'}',
+      (tester) async {
+        final harness = MeetingHarness();
+        final container = await _online(tester, harness, unavailableBooking: true);
+        final router = container.read(routerProvider)..go('/meetings');
+        await tester.pumpAndSettle();
+        final retained = tester.widget<IconButton>(find.byTooltip('预约会议')).onPressed!;
+        final navigator = Navigator.of(tester.element(find.byTooltip('预约会议')));
+        final covering = navigator.push<void>(MaterialPageRoute(
+          builder: (_) => const Scaffold(body: Text('foreign route')),
+        ));
+        await tester.pumpAndSettle();
+        if (returned) {
+          navigator.pop();
+          await tester.pumpAndSettle();
+          await covering;
+        }
+        retained();
+        await tester.pumpAndSettle();
+        expect(find.byType(BookingEditorPage), findsNothing);
+        expect(find.text('foreign route'), returned ? findsNothing : findsOneWidget);
+        expect(harness.calls('signalingCreateMeeting'), 0);
+        expect(harness.calls('signalingJoinMeeting'), 0);
+        if (!returned) {
+          navigator.pop();
+          await tester.pumpAndSettle();
+          await covering;
+        }
+        // A new explicit action from the resumed page remains usable.
+        await tester.tap(find.byTooltip('预约会议'));
+        await tester.pumpAndSettle();
+        expect(find.byType(BookingEditorPage), findsOneWidget);
+        expect(find.text('本地预约资料暂时无法打开，原记录会保留。'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        router.go('/home');
+        await tester.pumpAndSettle();
         await tester.pumpWidget(const SizedBox.shrink());
       },
     );

@@ -2,8 +2,8 @@
 """Verify minimal pinned source; optionally copy it to a new CI-only tree.
 
 No local task archive, mutable reference directory, native SDK binary or old
-generated cache is an input. Current304 must already be adopted in the checkout.
-The optional reference is full304 with exactly four pinned historical search baseline files.
+generated cache is an input. Current309 must already be adopted in the checkout.
+The optional reference is full309 with exactly four pinned historical search baseline files.
 """
 import argparse
 import hashlib
@@ -54,17 +54,17 @@ def source_digest(files):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v9'
-            or plan['current304']['members'] != 304
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v10'
+            or plan['current309']['members'] != 309
             or plan['sdk_portable']['members'] != 51
-            or plan['portable_members'] != {'current304': 356}
-            or plan['current304']['expected_target_tests'] != 234
-            or plan['current304']['expected_full_tests'] != 922
-            or plan['current304']['target_paths'] != ['test/features/qr', 'test/features/search', 'test/features/group/create_group_entry_test.dart', 'test/features/group/create_group_repository_test.dart', 'test/features/group/create_group_workflow_test.dart', 'test/features/group/group_creation_entry_test.dart', 'test/features/group/group_creation_entry_workflow_test.dart', 'test/features/group/chat_cid_route_test.dart', 'test/features/conversation/contact_shortcuts_test.dart', 'test/features/rtc/call_records_repository_test.dart', 'test/features/rtc/call_history_pipeline_test.dart', 'test/features/rtc/call_records_page_test.dart', 'test/features/rtc/call_history_lifetime_test.dart']
-            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294'))):
-        raise ValueError('current304 schema v9 inventory differs; no historical aliases')
+            or plan['portable_members'] != {'current309': 361}
+            or plan['current309']['expected_target_tests'] != 273
+            or plan['current309']['expected_full_tests'] != 955
+            or plan['current309']['target_paths'] != ['test/features/qr', 'test/features/search', 'test/features/group/create_group_entry_test.dart', 'test/features/group/create_group_repository_test.dart', 'test/features/group/create_group_workflow_test.dart', 'test/features/group/group_creation_entry_test.dart', 'test/features/group/group_creation_entry_workflow_test.dart', 'test/features/group/chat_cid_route_test.dart', 'test/features/conversation/contact_shortcuts_test.dart', 'test/features/rtc/call_records_repository_test.dart', 'test/features/rtc/call_history_pipeline_test.dart', 'test/features/rtc/call_records_page_test.dart', 'test/features/rtc/call_history_lifetime_test.dart', 'test/features/conversation/next_unread_repository_test.dart', 'test/features/conversation/next_unread_controller_test.dart', 'test/features/conversation/next_unread_page_test.dart', 'test/features/meeting/meeting_routes_test.dart']
+            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304'))):
+        raise ValueError('current309 schema v10 inventory differs; no historical aliases')
     reference = plan['reference_entry']
-    if (reference['working_cohort'] != 'current304' or reference['members'] != 304
+    if (reference['working_cohort'] != 'current309' or reference['members'] != 309
             or reference['default_enabled'] is not False
             or len(reference['replacement_files']) != 4
             or len({row['path'] for row in reference['replacement_files']}) != 4
@@ -72,22 +72,22 @@ def descriptor():
             or reference['expected_visible_tests'] != 2
             or reference['expected_assertion_failures'] != 1
             or reference['expected_passed'] != 1 or reference['expected_child_exit'] != 1):
-        raise ValueError('reference entry must be the explicit two-test full304 variant')
+        raise ValueError('reference entry must be the explicit two-test full309 variant')
     return plan
 
 
 def load_sources(cohort):
-    if cohort != 'current304':
-        raise ValueError('schema v9 supports current304 only; historical cohorts are not aliases')
+    if cohort != 'current309':
+        raise ValueError('schema v10 supports current309 only; historical cohorts are not aliases')
     plan = descriptor()
     selected = {}
-    for row in plan['current304']['files']:
+    for row in plan['current309']['files']:
         name = row['path']
         if name in selected or not name.startswith('app/'):
             raise ValueError('duplicate or out-of-scope current source')
         selected[name] = check(regular(REPO / safe_name(name)), row)
-    if len(selected) != 304 or source_digest(selected) != plan['current304']['source_digest']:
-        raise ValueError('current304 aggregate differs')
+    if len(selected) != 309 or source_digest(selected) != plan['current309']['source_digest']:
+        raise ValueError('current309 aggregate differs')
     actual = set()
     for prefix in ('app/lib', 'app/test', 'app/tool'):
         for directory, dirs, names in os.walk(REPO / prefix, followlinks=False):
@@ -117,7 +117,7 @@ def load_sources(cohort):
 
 
 def reference_sources(plan, files):
-    """Full356 portable closure; only the four named App source bodies differ."""
+    """Full361 portable closure; only the four named App source bodies differ."""
     result = dict(files)
     baseline = plan['reference_entry']
     for row in baseline['replacement_files']:
@@ -126,8 +126,8 @@ def reference_sources(plan, files):
             raise ValueError('reference replacement outside original production files')
         result[name] = check(regular(REPO / baseline['baseline_prefix'] / name), row)
     authored = {name: body for name, body in result.items() if name.startswith('app/')}
-    if len(authored) != 304 or source_digest(authored) != baseline['reference_source_digest']:
-        raise ValueError('reference is not the exact full304 variant')
+    if len(authored) != 309 or source_digest(authored) != baseline['reference_source_digest']:
+        raise ValueError('reference is not the exact full309 variant')
     return result
 
 
@@ -137,19 +137,26 @@ def required_names(plan):
     if item['path'] != 'ci/mobile/required-test-names.json':
         raise ValueError('required test names path differs')
     value = json.loads(check(regular(REPO / safe_name(item['path'])), item))
-    if value['schema'] != 'luobo.mobile.required-successful-names.v5' or value['cohort'] != 'current304':
+    if value['schema'] != 'luobo.mobile.required-successful-names.v6' or value['cohort'] != 'current309':
         raise ValueError('required test names identity differs')
-    for key, expected in [('parent_full872', 872), ('new_call_records50', 50), ('current_target234', 234)]:
-        rows = value[key]
-        if (not isinstance(rows, list) or len({r['name'] for r in rows}) != len(rows)
+    for key, expected in [('parent_full922', 922), ('new_next_unread29', 29),
+                          ('current_target273', 273), ('new_call_records50', 50),
+                          ('new_meeting_entry4', 4), ('meeting_routes10', 10)]:
+        entries = value[key]
+        if (not isinstance(entries, list) or len({r['name'] for r in entries}) != len(entries)
                 or any(not isinstance(r['name'], str) or not r['name']
-                       or type(r['count']) is not int or r['count'] < 1 for r in rows)
-                or sum(r['count'] for r in rows) != expected):
+                       or type(r['count']) is not int or r['count'] < 1 for r in entries)
+                or sum(r['count'] for r in entries) != expected):
             raise ValueError('required names inventory differs: ' + key)
-    value['current_full922'] = value['parent_full872'] + value['new_call_records50']
-    if len({r['name'] for r in value['current_full922']}) != len(value['current_full922']):
+    value['current_full955'] = value['parent_full922'] + value['new_next_unread29'] + value['new_meeting_entry4']
+    if len({r['name'] for r in value['current_full955']}) != len(value['current_full955']):
         raise ValueError('new names overlap parent names')
+    meeting_names = {row['name'] for row in value['meeting_routes10']}
+    if (not {row['name'] for row in value['new_meeting_entry4']} <= meeting_names
+            or not meeting_names <= {row['name'] for row in value['current_full955']}):
+        raise ValueError('meeting route names do not preserve parent plus new cases')
     cleanup_contract(plan, value)
+    next_unread_contract(plan, value)
     return value
 
 
@@ -179,6 +186,18 @@ def cleanup_contract(plan, names):
     return contract
 
 
+def next_unread_contract(plan, names):
+    contract = plan['next_unread_cleanup']
+    fixtures, units, geometry = (contract['fixture_names'], contract['unit_names'], contract['geometry_names'])
+    union = fixtures + units + geometry
+    if (len(fixtures) != 11 or len(units) != 16 or len(geometry) != 2
+            or len(set(union)) != 29
+            or set(union) != {row['name'] for row in names['new_next_unread29']}
+            or contract['markers'] != ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end']):
+        raise ValueError('next unread cleanup source contract differs')
+    return contract
+
+
 def materialize(output, cohort):
     # Initial admission precedes reading the full source inventory.
     if (not output.is_absolute() or output.resolve() != output or output.exists()
@@ -205,7 +224,7 @@ def materialize(output, cohort):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cohort', choices=('current304',), required=True)
+    p.add_argument('--cohort', choices=('current309',), required=True)
     p.add_argument('--output', type=Path, help='explicit fresh output; omitted means readonly')
     args = p.parse_args()
     if args.output:

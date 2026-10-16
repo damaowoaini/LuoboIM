@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current304 target234/full922."""
+"""Pure Python CI gate checks, separate from current309 target273/full955."""
 import copy
 import importlib.util
 import json
@@ -134,13 +134,13 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical_cohorts_cannot_alias304(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294'):
+    def test_historical_cohorts_cannot_alias309(self):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current304'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current309'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -239,6 +239,34 @@ class CleanupTests(unittest.TestCase):
         events[a], events[b] = events[b], events[a]
         with self.assertRaisesRegex(ValueError, 'parent creation sequence'):
             check.call_records_cleanup_summary('\n'.join(map(json.dumps, events)), contract)
+
+
+class NextUnreadCleanupTests(unittest.TestCase):
+    def fixture(self):
+        contract = {'fixture_names': ['actual page'], 'markers': ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end'],
+                    'unit_names': ['unit'], 'geometry_names': ['geometry']}
+        events = [{'type': 'testStart', 'test': {'id': 1, 'name': 'actual page'}}]
+        events += [{'type': 'print', 'testID': 1, 'message': 'next_unread_cleanup ' + marker}
+                   for marker in contract['markers']]
+        return contract, events
+
+    def test_next_unread_cleanup_requires_the_actual_owned_sdk_and_unmount_sequence(self):
+        contract, events = self.fixture()
+        result = check.next_unread_cleanup_summary('\n'.join(map(json.dumps, events)), contract)
+        self.assertEqual((result['sdk_fixture_sequences'], result['unit_awaited_teardown_cases'],
+                          result['owned_geometry_finally_cases']), (1, 1, 1))
+
+    def test_next_unread_cleanup_missing_shutdown_tail_does_not_pass(self):
+        contract, events = self.fixture()
+        with self.assertRaises(ValueError):
+            check.next_unread_cleanup_summary('\n'.join(map(json.dumps, events[:-1])), contract)
+
+    def test_next_unread_cleanup_rejects_duplicate_or_foreign_prints(self):
+        contract, events = self.fixture()
+        for extra in [events[-1], {'type': 'print', 'testID': 99, 'message': 'next_unread_cleanup sdk.end'}]:
+            with self.subTest(extra=extra):
+                with self.assertRaises(ValueError):
+                    check.next_unread_cleanup_summary('\n'.join(map(json.dumps, events + [extra])), contract)
 
 
 if __name__ == '__main__':

@@ -37,6 +37,7 @@ func registerAdminPreviewRoutes(router *gin.Engine, authenticate gin.HandlerFunc
 	}
 	historyReader, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(db)
 	if err != nil { panic(err) }
+	if err := historyReader.CheckReady(ctx); err != nil { panic(err) }
 	key := sha256.Sum256([]byte("luobo-admin-preview-cursor-v1\n" + config.Config.Secret))
 	api := &adminPreviewAPI{redis: rdb, service: &adminpreview.Service{Source: &adminpreview.DataSource{Database: db, Redis: rdb, Reader: controller.NewReadOnlyMessageReader(rdb, db, historyReader), Conversations: conversations}, Audit: audit, CursorKey: key[:]}}
 	group := router.Group("/admin/message_preview", authenticate)

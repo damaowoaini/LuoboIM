@@ -93,6 +93,7 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	friendRpcClient := rpcclient.NewFriendRpcClient(client)
 	historyReader, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(mongo.GetDatabase())
 	if err != nil { return err }
+	if err := historyReader.CheckReady(context.Background()); err != nil { return err }
 	msgDatabase := controller.NewCommonMsgDatabase(msgDocModel, cacheModel, historyReader)
 
 	// 初始化敏感词检查器

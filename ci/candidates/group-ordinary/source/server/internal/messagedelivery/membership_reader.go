@@ -55,6 +55,17 @@ func NewHistoryWindowReaderFromEnvironment(db *mongo.Database) (*HistoryWindowRe
 	return &HistoryWindowReader{store: s}, nil
 }
 
+// Called by every real required-mode startup factory before exposing its
+// reader/controller. Construction still performs no I/O or implicit DDL.
+func (r *HistoryWindowReader) CheckReady(ctx context.Context) error {
+ if ctx == nil { return ErrUnprepared }
+ if r == nil { return nil } // Explicit complete legacy-mode environment only.
+ if r.store == nil { return ErrUnprepared }
+ current, cancel := context.WithTimeout(ctx, 5*time.Second)
+ defer cancel()
+ return r.store.CheckReady(current)
+}
+
 func (r *HistoryWindowReader) ReadGroupHistoryUpper(ctx context.Context, cid, owner string) (bool, int64, error) {
 	// A typed nil is the explicit legacy-mode adapter supplied by factories.
 	if r == nil { return false, 0, nil }

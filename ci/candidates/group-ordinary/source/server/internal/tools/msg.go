@@ -91,6 +91,7 @@ func InitMsgTool() (*MsgTool, error) {
 	}
 	historyReader, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(mongo.GetDatabase())
 	if err != nil { return nil, err }
+	if err := historyReader.CheckReady(context.Background()); err != nil { return nil, err }
 	msgDatabase := controller.InitCommonMsgDatabase(rdb, mongo.GetDatabase(), historyReader)
 	userMongoDB := unrelation.NewUserMongoDriver(mongo.GetDatabase())
 	ctxTx := mongotx.New(mongo.GetClient())

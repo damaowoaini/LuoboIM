@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart' show kDoubleTapTimeout;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +16,7 @@ import 'features/app_lock/presentation/app_access_host.dart';
 import 'features/app_lock/presentation/app_lock_settings_page.dart';
 import 'features/chat/presentation/chat_page.dart';
 import 'features/conversation/presentation/conversations_page.dart';
+import 'features/conversation/presentation/conversation_unread_signal.dart';
 import 'features/search/domain/global_search.dart';
 import 'features/search/presentation/global_search_page.dart';
 import 'features/contacts/domain/contact.dart' show ContactRequestKind;
@@ -260,21 +264,66 @@ final routerProvider = Provider<GoRouter>((ref) {
   return router;
 });
 
-class MainShell extends StatelessWidget {
+class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key, required this.path, required this.child});
   final String path;
   final Widget child;
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: child,
-    bottomNavigationBar: NavigationBar(
-      selectedIndex: path == '/mine'
-          ? 2
-          : path == '/contacts'
-          ? 1
-          : 0,
-      onDestinationSelected: (index) =>
-          context.go(['/home', '/contacts', '/mine'][index]),
+  ConsumerState<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends ConsumerState<MainShell> {
+  final _unread = ConversationUnreadSignal();
+  Timer? _messageTap;
+  int _view = 0;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (ModalRoute.of(context)?.isCurrent == false) {
+      ++_view;
+      _messageTap?.cancel();
+      _messageTap = null;
+    }
+  }
+  @override
+  void didUpdateWidget(MainShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.path != widget.path) { ++_view; _messageTap?.cancel(); _messageTap = null; }
+  }
+  @override
+  void dispose() {
+    _messageTap?.cancel(); _unread.dispose(); super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    final session = ref.read(appRuntimeProvider).session;
+    final owner = session.state.credentials;
+    final generation = session.state.generation;
+    final interactive = session.interactiveRevision;
+    final view = _view;
+    return ConversationUnreadScope(signal: _unread, child: Scaffold(
+      body: widget.child,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: widget.path == '/mine' ? 2 : widget.path == '/contacts' ? 1 : 0,
+        onDestinationSelected: (index) {
+          if (!mounted || view != _view || owner == null ||
+              !identical(owner, session.state.credentials) ||
+              !session.isInteractiveCurrent(generation, interactive) ||
+              ModalRoute.of(context)?.isCurrent == false) {
+            return;
+          }
+          if (index == 0 && widget.path == '/home') {
+            if (_messageTap?.isActive == true) {
+              _messageTap!.cancel(); _messageTap = null;
+              _unread.request();
+            } else {
+              _messageTap = Timer(kDoubleTapTimeout, () { _messageTap = null; });
+            }
+            return;
+          }
+          _messageTap?.cancel(); _messageTap = null;
+          context.go(['/home', '/contacts', '/mine'][index]);
+        },
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.forum_outlined),
@@ -292,8 +341,9 @@ class MainShell extends StatelessWidget {
           label: '我的',
         ),
       ],
-    ),
-  );
+      ),
+    ));
+  }
 }
 
 class LuoboApp extends ConsumerWidget {

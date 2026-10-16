@@ -105,6 +105,7 @@ type kafkaFCMDevice struct {
 	Outcome string `bson:"outcome_sha256"`
 	ProviderReceipt string `bson:"provider_receipt_sha256"`
 	History string `bson:"history_sha256"`
+	PhysicalPermit bool `bson:"physical_permit,omitempty" json:"physicalPermit,omitempty"`
 }
 
 func terminalFCMDevice(state string)bool{return state=="accepted" || state=="unregistered" || state=="operator-rejected"}
@@ -131,7 +132,7 @@ func (m *KafkaFCMManifest) read(ctx context.Context,device string)(*kafkaFCMDevi
 	if !validFCMDevice(row,m.row){return nil,ErrConflict};return &row,nil
 }
 
-type KafkaFCMDeviceDispatch struct { manifest *KafkaFCMManifest; row kafkaFCMDevice; permit atomic.Bool }
+type KafkaFCMDeviceDispatch struct { manifest *KafkaFCMManifest; row kafkaFCMDevice; attempted,permit,uncertain atomic.Bool }
 
 // Unknown for one device blocks ONLY that frozen device. The recipient-wide
 // manifest cannot grant a batch attempt, replace tokens, or retry siblings.
@@ -169,12 +170,23 @@ func (m *KafkaFCMManifest) BeginDevice(ctx context.Context,call KafkaOfflineCall
 
 // This method is consumed by the owned HTTP v1 physical gate AFTER OAuth and
 // token/badge awaits. A permit may cross this final boundary only once.
+// As for alias/generic, only a known strong transaction commit grants HTTP.
+// The device state is not reset or renamed: historical dispatching/unknown
+// records remain unknown; only this newly claimed attempt can acquire a permit.
 func (a *KafkaFCMDeviceDispatch) BeforeProvider(ctx context.Context,call KafkaOfflineCall,user,request string)error{
-	if a==nil || a.manifest==nil || a.manifest.store==nil || request!=a.row.Request || hash([]byte(user))!=a.row.User{return ErrInvalid}
-	if err:=a.manifest.store.ValidateKafkaOfflineCall(ctx,call,user);err!=nil{return err}
-	row,err:=a.manifest.read(ctx,a.row.Device);if err!=nil{return err}
-	if row==nil || row.Revision!=a.row.Revision || row.State!="dispatching" || row.Attempt!=a.row.Attempt || row.Instance!=a.row.Instance || row.Request!=a.row.Request || !a.permit.CompareAndSwap(false,true){return ErrConflict}
-	return nil
+ if a==nil || a.manifest==nil || a.manifest.store==nil || ctx==nil || mongo.SessionFromContext(ctx)!=nil || request!=a.row.Request || hash([]byte(user))!=a.row.User{return ErrInvalid}
+ if !a.attempted.CompareAndSwap(false,true){return ErrConflict}
+ err:=a.manifest.store.transaction(ctx,func(tx context.Context)error{
+  if err:=a.manifest.store.ValidateKafkaOfflineCall(tx,call,user);err!=nil{return err}
+  parent,err:=a.manifest.store.readDutyRecord(tx,call.BranchID);if err!=nil{return err}
+  row,err:=a.manifest.read(tx,a.row.Device);if err!=nil{return err}
+  if row==nil || row.Revision!=a.row.Revision || row.State!="dispatching" || row.Attempt!=a.row.Attempt || row.Instance!=a.row.Instance || row.Request!=a.row.Request || row.PhysicalPermit{return ErrConflict}
+  if err:=a.manifest.store.fenceKafkaVendorParent(tx,parent,call);err!=nil{return err}
+  filter:=bson.M{"_id":row.ID,"epoch":row.Epoch,"revision":row.Revision,"state":row.State,"attempt_id":row.Attempt,"instance_id":row.Instance,"request_sha256":row.Request,"$or":bson.A{bson.M{"physical_permit":false},bson.M{"physical_permit":bson.M{"$exists":false}}}}
+  changed,err:=a.manifest.store.db.Collection(Effects).UpdateOne(tx,filter,bson.M{"$set":bson.M{"physical_permit":true}})
+  if err!=nil{return err};if changed.MatchedCount!=1 || changed.ModifiedCount!=1{return ErrConflict};return nil
+ })
+ if err!=nil{a.uncertain.Store(errors.Is(err,ErrCommitUnconfirmed));return err};a.permit.Store(true);return nil
 }
 
 type KafkaFCMDeviceReport struct {
@@ -196,6 +208,7 @@ func (a *KafkaFCMDeviceDispatch) complete(parent context.Context,state,proof,rec
 // Called only when the actual owned physical transport proves zero POSTs.
 // Cancellation or a local gate rejection is not a rollback of another device.
 func (a *KafkaFCMDeviceDispatch) NotDispatched(ctx context.Context,evidenceSHA string)error{
+	if a==nil || a.uncertain.Load(){return ErrKafkaOfflineUnconfirmed}
 	return a.complete(ctx,"not-dispatched",evidenceSHA,"")
 }
 

@@ -33,6 +33,7 @@ func registerFavoriteRoutes(router *gin.Engine, authenticate gin.HandlerFunc, rd
 	}
 	historyReader, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(connection.GetDatabase())
 	if err != nil { panic(err) }
+	if err := historyReader.CheckReady(ctx); err != nil { panic(err) }
 	api := &favoriteAPI{service: &favorite.Service{Store: store}, retention: &favorite.RetentionGate{Source: &favoriteMessageSource{
 		conversations: conversations, messages: controller.NewReadOnlyMessageIdentityReader(rdb, connection.GetDatabase(), historyReader),
 	}}}

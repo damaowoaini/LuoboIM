@@ -67,10 +67,10 @@ func (s *Store) RecoverKafkaOffline(ctx context.Context,branch string,reader Vis
 	call:=KafkaOfflineCall{BranchID:branch,ConversationID:a.duty.CID,PolicySHA256:a.duty.PolicySHA,ClaimID:a.claim,ClaimRevision:a.duty.Revision,Message:proto.Clone(&message).(*sdkws.MsgData),Recipients:append([]string(nil),a.targets...)}
 	var failures []error
 	for _,uid:=range a.targets{
-		terminal,err:=s.readKafkaVendorReceipt(current,a.duty,uid)
+		terminal,err:=s.readKafkaOfflineOutcome(current,a.duty,uid)
 		if err!=nil{failures=append(failures,err);continue}
-		if terminal!=nil && kafkaVendorTerminal(terminal.State){continue}
-		if terminal!=nil && (terminal.State=="dispatching" || terminal.State=="unconfirmed"){failures=append(failures,ErrKafkaOfflineUnconfirmed);continue}
+		if terminal!=nil && terminal.Terminal{continue}
+		if terminal!=nil && (terminal.State=="prepared" || terminal.State=="dispatching" || terminal.State=="unconfirmed"){failures=append(failures,ErrKafkaOfflineUnconfirmed);continue}
 		route,known:=a.duty.OfflineRouting[hash([]byte(uid))]
 		if !known{failures=append(failures,ErrKafkaOfflineUnconfirmed);continue}
 		denied:=false;for _,h:=range a.duty.VisibilityDenied{if h==hash([]byte(uid)){denied=true}}
@@ -157,8 +157,8 @@ func (a *offlineAttempt) finish(parent context.Context,deliveryErr error)error{
 		if d.Revision!=a.duty.Revision || d.OfflineClaim!=a.claim || d.OfflineInstance!=a.store.instanceID || d.Hidden{return ErrConflict}
 		added:=int64(0)
 		for _,uid:=range a.targets{
-			row,err:=a.store.readKafkaVendorReceipt(tx,d,uid);if err!=nil{return err}
-			if row==nil || !kafkaVendorTerminal(row.State){pending=true;continue}
+			row,err:=a.store.readKafkaOfflineOutcome(tx,d,uid);if err!=nil{return err}
+			if row==nil || !row.Terminal{pending=true;continue}
 			if row.Accounted{continue}
 			changed,err:=a.store.db.Collection(Effects).UpdateOne(tx,bson.M{"_id":row.ID,"revision":row.Revision,"state":row.State,"accounted":false},bson.M{"$set":bson.M{"accounted":true},"$inc":bson.M{"revision":int64(1)}})
 			if err!=nil{return err};if changed.MatchedCount!=1 || changed.ModifiedCount!=1{return ErrConflict};added++

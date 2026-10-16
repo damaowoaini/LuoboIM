@@ -312,7 +312,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full304 tree; restore exact after4 even if the reference fails."""
+    """Separate full309 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -383,8 +383,8 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after304_and_primary_source_reverified',
-                    'source_digest': plan['current304']['source_digest'],
+                   {'state': 'after309_and_primary_source_reverified',
+                    'source_digest': plan['current309']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
 
 
@@ -453,6 +453,41 @@ def call_records_cleanup_summary(text, contract):
             'repository_teardown_is_framework_awaited_not_marker_proof': True}
 
 
+def next_unread_cleanup_summary(text, contract):
+    starts, sequences = {}, {}
+    prefix = 'next_unread_cleanup '
+    for line in text.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if event.get('type') == 'testStart':
+            identity = event['test']['id']
+            if identity in starts:
+                raise ValueError('next unread cleanup duplicate test start')
+            starts[identity] = event['test'].get('name')
+        if event.get('type') == 'print' and isinstance(event.get('message'), str) and event['message'].startswith(prefix):
+            identity = event.get('testID')
+            if identity not in starts:
+                raise ValueError('next unread cleanup print without test')
+            sequences.setdefault(identity, []).append(event['message'][len(prefix):])
+    actual = []
+    for identity, sequence in sequences.items():
+        name = starts[identity]
+        if name not in contract['fixture_names'] or name in actual or sequence != contract['markers']:
+            raise ValueError('next unread cleanup sequence/name differs')
+        actual.append(name)
+    if set(actual) != set(contract['fixture_names']):
+        raise ValueError('next unread cleanup missing SDK shutdown/storage/unmount tail')
+    return {'sdk_fixture_sequences': len(actual), 'four_markers_exact': True,
+            'unit_awaited_teardown_cases': len(contract['unit_names']),
+            'owned_geometry_finally_cases': len(contract['geometry_names']),
+            'SDK_end_includes_awaited_session_gateway_support_directory_cleanup': True,
+            'no_own_SQLite_or_marker_claim_for_other18': True}
+
+
 def run(work, cohort, reference=False):
     prove_namespace()
     plan, digest = verify(work, cohort)
@@ -468,22 +503,29 @@ def run(work, cohort, reference=False):
         if reference:
             counts['reference_entry'] = run_reference_entry(work, cohort, plan, tests, guard)
         verify(work, cohort)
-        target_expected = plan['current304']['expected_target_tests']
+        target_expected = plan['current309']['expected_target_tests']
         target_label = 'target' + str(target_expected)
-        log = guarded(tests + plan['current304']['target_paths'], work, guard, target_label)
+        log = guarded(tests + plan['current309']['target_paths'], work, guard, target_label)
         counts['target'] = machine_summary(log.read_text(), target_expected)
         required = source.required_names(plan)
-        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target234'])
+        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target273'])
         cleanup = source.cleanup_contract(plan, required)
         counts['target_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
+        next_cleanup = source.next_unread_contract(plan, required)
+        counts['target_next_unread_cleanup'] = next_unread_cleanup_summary(log.read_text(), next_cleanup)
+        write_json(work / 'evidence' / (target_label + '.next-unread-cleanup.json'), counts['target_next_unread_cleanup'])
         write_json(work / 'evidence' / (target_label + '.cleanup.json'), counts['target_cleanup'])
         write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
         verify(work, cohort)
-        expected = plan['current304']['expected_full_tests']
+        expected = plan['current309']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
-        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full922'])
+        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full955'])
         counts['full_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
+        counts['full_next_unread_cleanup'] = next_unread_cleanup_summary(log.read_text(), next_cleanup)
+        write_json(work / 'evidence/full.next-unread-cleanup.json', counts['full_next_unread_cleanup'])
+        counts['parent922_names_preserved'] = True
+        counts['new_next_unread29_exact'] = True
         write_json(work / 'evidence/full.cleanup.json', counts['full_cleanup'])
         counts['parent872_preserved'] = True
         counts['new_call_records50_exact'] = True
@@ -526,9 +568,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current304',), required=True)
+    p.add_argument('--cohort', choices=('current309',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full304 variant; exactly one entry assertion fails and one old filter passes')
+                   help='explicit full309 variant; exactly one entry assertion fails and one old filter passes')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')

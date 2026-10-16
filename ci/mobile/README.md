@@ -1,3 +1,44 @@
+# Mobile current309 / portable361: next unread + booking entry (prepared)
+
+Parent R5 run38905415839 is Root accepted: actual234/922/strict0, exact old872
+and callrecords50 names, strict cleanup and zero warnings. This isolated proposal
+overlays the9 frozen next-unread paths and2 Root meeting-entry-v2 paths. They are
+disjoint. Next-unread logic/tests stay exact; all7 R5 corrections are inherited
+unchanged. App309/portable361 is a new identity, never an alias for parent304.
+
+Mandatory normal sequence:35 pure-Python gates -> strict309/361 -> official
+locked setup -> target273 -> full955 -> strict analyze0. Target273 retains
+original234 plus next29 and whole meeting_routes10 (6 accepted old+4new). Full955
+requires accepted922 plus next29 plus4new meeting names. Source/event names and
+multiplicity are exact; hidden/error/skip/footer/resource rules remain strict.
+These are prepared requirements,0newDart execution,not claimed results.
+
+Next29 comprise9repository+7controller+11actualproductionpage/router+2same actual
+seekhelper variable-height Sliver tests. New11 pagefixtures require four exact
+SDK shutdown/storage-tail/unmount markers.16unit cases await real SDK teardown,
+2geometry cases own unmount+scrollController disposal,without synthetic marker
+claims. Parent35recorder(33normal2expectedfailure)/14unmounts,repo15 awaited
+teardown,76creation and safeexit6 remain unchanged and separate.
+
+Meeting new schedules enter existing booking route, existing room edits remain
+Detail->Editor. Default release catalog is still empty, so no scheduling write or
+media admission is enabled. Journal failure has explicit error and no legacy
+Create/Join fallback. Account/foreign-cover/ABA retire toolbar intents while a
+new explicit action remains usable. Four new cases do not prove backend/device
+booking delivery.
+
+Historical optional search reference stays defaultoff with same4 replacements,
+strict1namedassertFAIL1oldfilterPASS/exactrestore and recomputed combined309
+digest. Next-unread beforeentry2 remains prepared only, no new automatic phase.
+Old32 helper assertions stay;3additional cleanup tests add to35.9protected
+controller AST and old callrecords parser,resource4GiB/1GiB .2/768MiB/900s,
+netns,SDK51/migration1/174locked deps/toolchain/strictcompletion are unchanged.
+Public inventory has zero exceptions; local check.sh is not required or copied.
+
+No main/public edits,dispatch/rerun/cancel,localDart/DB/pubget/native/build.
+
+## Preserved accepted-parent source documentation
+
 # Current304 call-records equivalent strict-analysis R5 (prepared, not run)
 
 R4 run38903862919 completed target234 and full922 with all visible cases passing,

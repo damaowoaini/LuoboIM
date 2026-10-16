@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v9",
-  "state": "current304_call_records_lint_r5_pending_cloud",
+  "schema": "luobo.mobile.portable-ci-inputs.v10",
+  "state": "current309_next_unread_meeting_entry_whitespace_r1_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -47,7 +47,22 @@
     "call_records_fixture_R2_manifest_sha256": "f06cfefea9e397d4fe304be39ac8976a6edb7c8e3c7c8318d24a92ab080019b7",
     "call_records_async_fixture_R3_manifest_sha256": "83c5625443dd9649fceb890c8205c95e1452246d73e3f4c6e7ab2f634678b3d6",
     "call_records_page_R4_manifest_sha256": "02c8d8831cc4325fee4173a10eb6ee58fc1369bde5159bbc6ef856d41fbdb764",
-    "call_records_lint_R5_manifest_sha256": "8c14f0e0b0c8f860eac1074eeb7d527317db46f935399cc79b56ba1f1e69e5b6"
+    "call_records_lint_R5_manifest_sha256": "8c14f0e0b0c8f860eac1074eeb7d527317db46f935399cc79b56ba1f1e69e5b6",
+    "next_unread_candidate": {
+      "path": "references/integration/mobile-next-unread-r5-parent-candidate/candidate-manifest.json",
+      "bytes": 15696,
+      "sha256": "161f9c374eb04b80e79cffd2f18ed26ac324ab4f5f5a9d2cf3477d0a6ea4ea58"
+    },
+    "meeting_entry_candidate": {
+      "path": "references/integration/mobile-meeting-booking-entry-r2-candidate/candidate-manifest.json",
+      "bytes": 2645,
+      "sha256": "fbc9d6423f26f34f41e4c1a6d5b4592f9503ccb8c66ffabf0f42cef67a9ec3cb"
+    },
+    "next_unread_whitespace_r1": {
+      "path": "references/integration/mobile-next-unread-whitespace-r1-candidate/candidate-manifest.json",
+      "bytes": 2379,
+      "sha256": "09db54c6808377776e53953d3fc10c57b7ffd1f42a88604e2e80b06d5dc424e4"
+    }
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -323,10 +338,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current304": 356
+    "current309": 361
   },
   "portable_digests": {
-    "current304": "db14c253f5bd2e3db582079c05128a4e21af9443c03a337e3610cbfee58de7bb"
+    "current309": "09d58552efdfc3a08469a657d9190fc4062a1aa7887d55e9eeac9a83246fd3cb"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -710,14 +725,25 @@
         "braces": 10,
         "avoid_print": 11
       }
+    },
+    "accepted_call_records_R5": {
+      "commit": "1067e02cf578d9df232445434a8fe81fe72a9029",
+      "source_digest": "0c7f1c676d45f1cf5eda8ddc04db070ac58fe275de2022ba0b639bed0153fdd8",
+      "portable356": "db14c253f5bd2e3db582079c05128a4e21af9443c03a337e3610cbfee58de7bb",
+      "actual_acceptance": {
+        "path": "references/integration/cloud-mobile-ci/run-38905415839-agent/root-acceptance.json",
+        "bytes": 4589,
+        "sha256": "1096f3fc47877635843af94af05748e9deaab500a30909356ac2398e7cc2d37e"
+      },
+      "actual": "234/922/strict0 and exact50/all old872;cleanup/warnings strict"
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current304",
-    "members": 304,
-    "reference_source_digest": "9d58f575aeeba73ec5c538eb599b107dd4188fce7b716aa57e1da79e5ea8760b",
+    "working_cohort": "current309",
+    "members": 309,
+    "reference_source_digest": "04ab7c6d4b4fc47b2e930b2c93fc6c2d1821199a900d772b9624e431d24978f4",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -778,12 +804,466 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 258838,
-    "sha256": "9c2545d12bf7c3c257c1cacd1fb6a4416c3d5174a4101a8dbc883e693105f6d6"
+    "bytes": 306554,
+    "sha256": "9aa6fc04a0445e87eb7692aff2e108e67d9ad66e2bd397526e3a386f6c7720b0"
   },
-  "current304": {
-    "members": 304,
-    "source_digest": "0c7f1c676d45f1cf5eda8ddc04db070ac58fe275de2022ba0b639bed0153fdd8",
+  "call_records_cleanup": {
+    "named_fixtures": [
+      {
+        "name": "actual provider and native signaling codec feed the owner SQLite recorder without opening its page",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "actual outgoing coordinator lifecycle persists a terminal call and monotonic duration across wall clock rollback",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "only a genuine incoming remote cancellation before acceptance appears in missed",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "actual incoming ring timer freezes a known missed outcome rather than a cold-start guess",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "manual incoming decline is explicit and is never classified as missed",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "outgoing cancellation and locally denied permissions stay in all without inventing missed calls",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "incoming permission failure and other-device handling are explicit non-missed outcomes",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "same-room duplicate invitation does not terminate the active record while a different room records busy separately",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "accepted incoming media completion and duplicate remote endings create exactly one terminal record",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "transport errors retain an uncertain result instead of fabricating a remote refusal",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "unaddressed expired and group invitations do not become legacy single-call history",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "logout seals old events before delayed permissions return and cold provisional remains unknown",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "stable recorder creates a fresh exact owner binding after actor login replacement",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "stable recorder creates a fresh exact owner binding after issuer login replacement",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "stable recorder creates a fresh exact owner binding after tenant login replacement",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "close awaits already frozen SQLite events after owner sealing and does not publish old completion to a new owner",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "persistence retry reuses frozen local events without repeating native dialing",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "an undrained storage failure is observable from awaited close rather than an unhandled provider future",
+        "kind": "expected_close_failure",
+        "markers": [
+          "recorder.begin",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "production inbox more menu reaches actual durable call history and back retains the inbox",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "all and missed tabs render distinct actual coordinator outcomes with stable peer identity",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "storage read error is not presented as empty and only explicit retry recovers",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "new durable RTC events mark a loaded snapshot stale and explicit refresh reads the new record",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "cancelled delete preserves its row while confirmed delete is durable and never hangs up a call",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "real history audio redial dispatches the exact stored peer through RtcCoordinator once",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "real history video redial dispatches the exact stored peer through RtcCoordinator once",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "busy changes while the owned redial sheet is open stop a second native call",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "a saved old row callback after foreign route ABA cannot renew its view ticket while a new click works",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "foreign coverage of an owned redial sheet retires its sensitive content and does not revive the old choice",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "owner replacement removes old confirmation details and its retained delete callback cannot affect either owner",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "deleting an active record does not hang up and its later real terminal event cannot resurrect it",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "leaving during a delayed initial SQLite open cannot publish old rows or errors into the inbox",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "call history and owned actions remain scrollable and accessible at 320 by 568 with large text",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "successfully retired owners do not accumulate across repeated real logins and the new pipeline stays writable",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "sealing releases the old credential reference before a blocked original SQLite queue finishes draining",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "failed retirement keeps only an observable generic failure while a replacement owner records normally",
+        "kind": "expected_close_failure",
+        "markers": [
+          "recorder.begin",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      }
+    ],
+    "repository_awaited_teardown_names": [
+      "attempt connected and terminal events survive a real SQLite close and reopen",
+      "durable delete tombstone blocks already queued connected and terminal events after reopen",
+      "first terminal rejects both older and forged higher connected revisions",
+      "same room with a conflicting inviter cannot create a second history row",
+      "remote initiation time is part of an immutable claim rather than a second room identity",
+      "two account SQLite files with the same peer and room remain separate",
+      "stable admission sequence pages all records without relying on end dates",
+      "a provisional to missed transition invalidates an old filter cursor instead of losing a page",
+      "insert and delete changes reject existing pagination cursors",
+      "cursor ownership filter and limits are validated before reading the database",
+      "a retired UI delete transaction rolls back and preserves the visible record",
+      "read failure is an explicit storage error and a later explicit retry can recover",
+      "a reopened writer offsets revisions and keeps known connection facts and original sequence",
+      "safe avatar storage drops signed credentials and rejects excessive identity data",
+      "database ownership metadata refuses opening another account file under a new account key"
+    ],
+    "expected_fixture_instances": 35,
+    "expected_successful_recorder_closes": 33,
+    "expected_intentional_close_failures": 2,
+    "expected_page_unmounts": 14,
+    "parent_creation_instances": 76,
+    "parent_creation_markers": [
+      "release.begin",
+      "native.drained",
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ],
+    "parent_safe_exit_markers": [
+      "create.entered",
+      "signout.begin",
+      "signout.end",
+      "route.removed",
+      "create.released",
+      "create.returned"
+    ],
+    "meaning": "Source enumeration;future raw validation per visible testID/name.15SQLite tests have realframework-awaited teardown,not syntheticcloseprints.76oldcreation instances are independent parentacceptedR1raw count;not guessed100."
+  },
+  "current309": {
+    "members": 309,
+    "source_digest": "9f1d9c21076aa72289b83b4918bad41c0a8babb16bbe8ba5817b914115e7e977",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -792,8 +1272,8 @@
       },
       {
         "path": "app/lib/app.dart",
-        "bytes": 20545,
-        "sha256": "8ddb2f3333e66e8c1a72d9ed15a3ac41f323cf392372a2a5536ddc886c69915b"
+        "bytes": 22417,
+        "sha256": "64a3c6ded6e2d225e285b994a095bfb848094123f28cf3787a83d6869601f619"
       },
       {
         "path": "app/lib/core/access/access_store.dart",
@@ -1142,8 +1622,8 @@
       },
       {
         "path": "app/lib/features/conversation/data/conversation_repository.dart",
-        "bytes": 4934,
-        "sha256": "b717aef50b1396ce71dac63abe53c41db8929beca788199dc571199fa65fc51d"
+        "bytes": 7335,
+        "sha256": "005dd617e6bbdb8f5597bca03934d5b4fa66bae9845333ca14401c795745de0f"
       },
       {
         "path": "app/lib/features/conversation/domain/conversation.dart",
@@ -1156,14 +1636,19 @@
         "sha256": "db59309bd1fc3c4411a71602366e100479df13662a3a3641c10df729de73a5d3"
       },
       {
+        "path": "app/lib/features/conversation/presentation/conversation_unread_signal.dart",
+        "bytes": 3115,
+        "sha256": "ba906c0f03229127f9cca987bdf1ee6bde1a390e7bb52538a2de0074f41ac456"
+      },
+      {
         "path": "app/lib/features/conversation/presentation/conversations_controller.dart",
-        "bytes": 6149,
-        "sha256": "bb7a7da08cf8c789bf40990db32edcde55d1cba2b7893e112de78a421d722c44"
+        "bytes": 9721,
+        "sha256": "cebb0c6b7c38ce13a2b39fee43047d27722a54fd45db1d709a4351e687e95dae"
       },
       {
         "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 21293,
-        "sha256": "4c950ede45ea4c88753edbe30e02ded18d0a3610454a41a1d561f4b7f14a98e4"
+        "bytes": 29311,
+        "sha256": "c92e1fa9cddd6cc0e1f9f3cd7bd9da509af9e7a4db700dfc2169463713792d87"
       },
       {
         "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
@@ -1352,8 +1837,8 @@
       },
       {
         "path": "app/lib/features/meeting/presentation/meetings_page.dart",
-        "bytes": 6496,
-        "sha256": "87e4dd39073e49367ec5ecfd7cff4e04812e3cc1e6e7a4f8900c717f28af032f"
+        "bytes": 6898,
+        "sha256": "e8336844c41aaa8bbb49a600c9623cf6dc06095d2ce141e35b1272cd72465d77"
       },
       {
         "path": "app/lib/features/mine/account_providers.dart",
@@ -1936,6 +2421,26 @@
         "sha256": "71238af91422f64d19c0cc8debae3a95c81fb37941f7fb6e382799629a4a417e"
       },
       {
+        "path": "app/test/features/conversation/next_unread_controller_test.dart",
+        "bytes": 5936,
+        "sha256": "6014e86cb268aea91610be2b7935856c03a4b25b1543efd7e95662ce549637d8"
+      },
+      {
+        "path": "app/test/features/conversation/next_unread_fixture.dart",
+        "bytes": 7322,
+        "sha256": "23d7926bca44276915b403b63af20d006ca3a670b9aee85edd68d0b1c395e47e"
+      },
+      {
+        "path": "app/test/features/conversation/next_unread_page_test.dart",
+        "bytes": 14651,
+        "sha256": "ebd05bfd54ff4faf4c66516f5949ca5722461b00e7b69781788f6c0c26a611c5"
+      },
+      {
+        "path": "app/test/features/conversation/next_unread_repository_test.dart",
+        "bytes": 6468,
+        "sha256": "54adca0d2c7c3845fc1cbc806dcf661c9e3927d258e3f4e321240f4c8b9ba90c"
+      },
+      {
         "path": "app/test/features/favorite/favorite_attachment_store_test.dart",
         "bytes": 6319,
         "sha256": "10a54415c33446295808defb8be0915e372b54a63ba5ac8ad1f654f669190f20"
@@ -2102,8 +2607,8 @@
       },
       {
         "path": "app/test/features/meeting/meeting_routes_test.dart",
-        "bytes": 9497,
-        "sha256": "fef5accaaa38c21d09098f4d2573a13fa06e32403398785825f66043ba873033"
+        "bytes": 14038,
+        "sha256": "3428f288827144ac2f2dfed1f068e1f238e562b4959579842c577349defa39a1"
       },
       {
         "path": "app/test/features/mine/account_cancellation_test.dart",
@@ -2306,8 +2811,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 234,
-    "expected_full_tests": 922,
+    "expected_target_tests": 273,
+    "expected_full_tests": 955,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -2321,461 +2826,67 @@
       "test/features/rtc/call_records_repository_test.dart",
       "test/features/rtc/call_history_pipeline_test.dart",
       "test/features/rtc/call_records_page_test.dart",
-      "test/features/rtc/call_history_lifetime_test.dart"
+      "test/features/rtc/call_history_lifetime_test.dart",
+      "test/features/conversation/next_unread_repository_test.dart",
+      "test/features/conversation/next_unread_controller_test.dart",
+      "test/features/conversation/next_unread_page_test.dart",
+      "test/features/meeting/meeting_routes_test.dart"
     ]
   },
-  "call_records_cleanup": {
-    "named_fixtures": [
-      {
-        "name": "actual provider and native signaling codec feed the owner SQLite recorder without opening its page",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "actual outgoing coordinator lifecycle persists a terminal call and monotonic duration across wall clock rollback",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "only a genuine incoming remote cancellation before acceptance appears in missed",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "actual incoming ring timer freezes a known missed outcome rather than a cold-start guess",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "manual incoming decline is explicit and is never classified as missed",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "outgoing cancellation and locally denied permissions stay in all without inventing missed calls",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "incoming permission failure and other-device handling are explicit non-missed outcomes",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "same-room duplicate invitation does not terminate the active record while a different room records busy separately",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "accepted incoming media completion and duplicate remote endings create exactly one terminal record",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "transport errors retain an uncertain result instead of fabricating a remote refusal",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "unaddressed expired and group invitations do not become legacy single-call history",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "logout seals old events before delayed permissions return and cold provisional remains unknown",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "stable recorder creates a fresh exact owner binding after actor login replacement",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "stable recorder creates a fresh exact owner binding after issuer login replacement",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "stable recorder creates a fresh exact owner binding after tenant login replacement",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "close awaits already frozen SQLite events after owner sealing and does not publish old completion to a new owner",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "persistence retry reuses frozen local events without repeating native dialing",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "an undrained storage failure is observable from awaited close rather than an unhandled provider future",
-        "kind": "expected_close_failure",
-        "markers": [
-          "recorder.begin",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "production inbox more menu reaches actual durable call history and back retains the inbox",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "all and missed tabs render distinct actual coordinator outcomes with stable peer identity",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "storage read error is not presented as empty and only explicit retry recovers",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "new durable RTC events mark a loaded snapshot stale and explicit refresh reads the new record",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "cancelled delete preserves its row while confirmed delete is durable and never hangs up a call",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "real history audio redial dispatches the exact stored peer through RtcCoordinator once",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "real history video redial dispatches the exact stored peer through RtcCoordinator once",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "busy changes while the owned redial sheet is open stop a second native call",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "a saved old row callback after foreign route ABA cannot renew its view ticket while a new click works",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "foreign coverage of an owned redial sheet retires its sensitive content and does not revive the old choice",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "owner replacement removes old confirmation details and its retained delete callback cannot affect either owner",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "deleting an active record does not hang up and its later real terminal event cannot resurrect it",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "leaving during a delayed initial SQLite open cannot publish old rows or errors into the inbox",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "call history and owned actions remain scrollable and accessible at 320 by 568 with large text",
-        "kind": "page",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "successfully retired owners do not accumulate across repeated real logins and the new pipeline stays writable",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "sealing releases the old credential reference before a blocked original SQLite queue finishes draining",
-        "kind": "unit",
-        "markers": [
-          "recorder.begin",
-          "recorder.end",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      },
-      {
-        "name": "failed retirement keeps only an observable generic failure while a replacement owner records normally",
-        "kind": "expected_close_failure",
-        "markers": [
-          "recorder.begin",
-          "sdk.begin",
-          "sdk.end",
-          "storage.end"
-        ]
-      }
+  "next_unread_cleanup": {
+    "fixture_names": [
+      "actual inbox more menu exposes an accessible next unread entry without replacing existing actions",
+      "ordinary message and contacts tab navigation remains available without reading or marking unread",
+      "real message tab double tap reveals the muted unread beyond the first SDK page at large text",
+      "actual next unread menu reaches the end then wraps to the original CID without opening chat",
+      "canceling the actual search switch confirmation preserves the typed filter and performs no full read",
+      "explicitly switching to all conversations finds a hidden-by-filter unread and retains the search draft for reopening",
+      "typing a new filter retires an already dispatched complete read before any old result can scroll",
+      "manual scrolling cancels an admitted pending unread seek and its late reply cannot take the scroll position back",
+      "foreign route coverage and return cannot revive a dispatched unread view but a new explicit action can work",
+      "SDK deletion before the unread reply retires the original CID and never redirects to its shifted row index",
+      "owner replacement retires both a dispatched page read and retained old message-tab callbacks"
     ],
-    "repository_awaited_teardown_names": [
-      "attempt connected and terminal events survive a real SQLite close and reopen",
-      "durable delete tombstone blocks already queued connected and terminal events after reopen",
-      "first terminal rejects both older and forged higher connected revisions",
-      "same room with a conflicting inviter cannot create a second history row",
-      "remote initiation time is part of an immutable claim rather than a second room identity",
-      "two account SQLite files with the same peer and room remain separate",
-      "stable admission sequence pages all records without relying on end dates",
-      "a provisional to missed transition invalidates an old filter cursor instead of losing a page",
-      "insert and delete changes reject existing pagination cursors",
-      "cursor ownership filter and limits are validated before reading the database",
-      "a retired UI delete transaction rolls back and preserves the visible record",
-      "read failure is an explicit storage error and a later explicit retry can recover",
-      "a reopened writer offsets revisions and keeps known connection facts and original sequence",
-      "safe avatar storage drops signed credentials and rejects excessive identity data",
-      "database ownership metadata refuses opening another account file under a new account key"
-    ],
-    "expected_fixture_instances": 35,
-    "expected_successful_recorder_closes": 33,
-    "expected_intentional_close_failures": 2,
-    "expected_page_unmounts": 14,
-    "parent_creation_instances": 76,
-    "parent_creation_markers": [
-      "release.begin",
-      "native.drained",
+    "markers": [
       "sdk.begin",
       "sdk.end",
       "unmount.begin",
       "unmount.end"
     ],
-    "parent_safe_exit_markers": [
-      "create.entered",
-      "signout.begin",
-      "signout.end",
-      "route.removed",
-      "create.released",
-      "create.returned"
+    "unit_names": [
+      "next unread reads the entire SDK inbox beyond forty and preserves muted ordering without writes",
+      "next unread complete empty snapshot differs from a native read failure",
+      "next unread rejects duplicate conversation identities rather than claiming a complete cycle",
+      "next unread keeps the original query ticket through a delayed native reply",
+      "next unread source cannot renew its owner after real logout and login starts",
+      "next unread original CID revision prevents private preview observation after a concurrent clear",
+      "next unread admission rejects a quarantined CID instead of replacing the original cut with a fresh lease",
+      "next unread issuer replacement cannot adopt an old in-flight native snapshot",
+      "next unread tenant replacement cannot adopt an old in-flight native snapshot",
+      "next unread cycles the complete ordered inbox including muted rows and wraps by CID",
+      "next unread does not advance its CID anchor until actual row reveal succeeds",
+      "next unread handles a single unread and a complete all-read inbox without changing counts",
+      "next unread prevents concurrent complete reads while allowing a later explicit new intent",
+      "SDK unread changes retire a pending next-unread request before refresh debounce",
+      "next unread replaces an older paginated response without allowing its late append to corrupt the snapshot",
+      "deleting the previous anchor CID uses the real current viewport anchor on a new explicit cycle"
     ],
-    "meaning": "Source enumeration;future raw validation per visible testID/name.15SQLite tests have realframework-awaited teardown,not syntheticcloseprints.76oldcreation instances are independent parentacceptedR1raw count;not guessed100."
+    "geometry_names": [
+      "real production seek reveals a variable-height sliver target by measured geometry rather than an average height",
+      "production measured seek stops after its original view ticket retires during an actual scroll animation"
+    ],
+    "source_counts": {
+      "SDK_fixture11": 11,
+      "unit16": 16,
+      "geometry2": 2
+    },
+    "SDK_storage_tail": "next_unread_cleanup sdk.end follows awaited closeUnit -> SdkHarness.dispose: real SessionCoordinator.dispose, gateway.dispose, then owned support directory recursive delete. No additional own SQLite database exists in this feature.",
+    "sdk_dispose_primary": {
+      "path": "Newchat-openim/app/test/core/im/sdk_harness.dart",
+      "bytes": 8228,
+      "sha256": "be8ecae48cdd344757a9b4a9e3805272dbb43e84fa35657ea460bee983ed5b56"
+    },
+    "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
+    "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
   }
 }

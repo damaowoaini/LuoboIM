@@ -63,6 +63,7 @@ func (s *Store) ConfirmKafkaVendor(ctx context.Context,user string,expected Kafk
 	if err!=nil || !bytes.Equal(a,b) || actual.State!="dispatching" && actual.State!="unconfirmed"{return ErrConflict}
 	d,err:=s.readDutyRecord(current,expected.BranchID);if err!=nil{return err}
 	row,err:=s.readKafkaVendorReceipt(current,d,user);if err!=nil || row==nil || row.Kind!="kafka-vendor-v1"{return ErrConflict} // Device manifests require exact per-device inspect/confirmation.
+	latest,err:=json.Marshal(vendorSummary(*row));if err!=nil || !bytes.Equal(latest,b){return ErrConflict}
 	state:=""
 	switch confirmation.Decision{
 	case "not-applied":

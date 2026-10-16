@@ -8,11 +8,10 @@ import '../data/meeting_repository.dart';
 import '../meeting_providers.dart';
 import 'meeting_controller.dart';
 import 'meeting_detail_page.dart';
-import 'meeting_editor_page.dart';
 import 'meeting_format.dart';
 
-/// Kept independent until the root router and shared RTC admission lease are
-/// wired in a later cohort. No provider or SDK is touched before mounting.
+/// Lists existing rooms. New schedules use the separate booking route;
+/// room membership is never used as a substitute for media admission.
 class MeetingsPage extends ConsumerStatefulWidget {
   const MeetingsPage({super.key, this.repository});
   final MeetingRepository? repository;
@@ -23,6 +22,7 @@ class MeetingsPage extends ConsumerStatefulWidget {
 class _MeetingsPageState extends ConsumerState<MeetingsPage> {
   late final MeetingController controller;
   final query = TextEditingController();
+  int _viewEpoch = 0;
   @override
   void initState() {
     super.initState();
@@ -46,19 +46,27 @@ class _MeetingsPageState extends ConsumerState<MeetingsPage> {
     super.dispose();
   }
 
-  Future<void> _create() async {
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => MeetingEditorPage(repository: controller.repository),
-      ),
-    );
-    if (mounted && controller.usable) {
-      await controller.refresh();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (ModalRoute.of(context)?.isCurrent == false) {
+      ++_viewEpoch;
     }
+  }
+
+  void _openBooking(String path, int view) {
+    if (!mounted || !controller.usable || view != _viewEpoch ||
+        ModalRoute.of(context)?.isCurrent != true) {
+      return;
+    }
+    // Scheduling has its own durable intent and never issues a media grant.
+    // Existing room edits continue through MeetingDetailPage.
+    context.push(path);
   }
 
   @override
   Widget build(BuildContext context) {
+    final view = _viewEpoch;
     final keyword = query.text.trim().toLowerCase();
     final values = controller.items
         .where(
@@ -72,11 +80,18 @@ class _MeetingsPageState extends ConsumerState<MeetingsPage> {
       appBar: AppBar(
         title: const Text('会议'),
         actions: [
-          IconButton(tooltip: '我的预约（仅排期）', icon: const Icon(Icons.event_note),
-            onPressed: controller.usable ? () => context.push('/meetings/bookings') : null),
+          IconButton(
+            tooltip: '我的预约（仅排期）',
+            icon: const Icon(Icons.event_note),
+            onPressed: controller.usable
+                ? () => _openBooking('/meetings/bookings', view)
+                : null,
+          ),
           IconButton(
             tooltip: '预约会议',
-            onPressed: controller.usable ? _create : null,
+            onPressed: controller.usable
+                ? () => _openBooking('/meetings/bookings/new', view)
+                : null,
             icon: const Icon(Icons.add),
           ),
         ],
@@ -101,7 +116,7 @@ class _MeetingsPageState extends ConsumerState<MeetingsPage> {
                 ),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: Text('显示当前账号尚未结束的会议，可预约和管理会议；音视频入会与屏幕共享暂未开放。'),
+                  child: Text('管理当前账号已有的会议；预约只保存排期，不会加入通话。音视频入会与屏幕共享暂未开放。'),
                 ),
                 if (controller.failure case final failure?)
                   MaterialBanner(

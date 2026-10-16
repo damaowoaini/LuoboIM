@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"math"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/uuid"
@@ -52,6 +53,7 @@ type kafkaVendorReceipt struct {
 	HistorySHA string `bson:"history_sha256"`
 	Results []KafkaVendorDeviceResult `bson:"device_results"`
 	Accounted bool `bson:"accounted"`
+	PhysicalPermit bool `bson:"physical_permit,omitempty" json:"physicalPermit,omitempty"`
 }
 
 func kafkaVendorTerminal(state string)bool{
@@ -128,6 +130,16 @@ func (s *Store) recordKafkaOfflineSuppressed(ctx context.Context,call KafkaOffli
 		d,err:=s.boundKafkaOfflineDuty(tx,call);if err!=nil{return err}
 		inPage:=false;for _,uid:=range call.Recipients{if uid==user{inPage=true}}
 		if !inPage{return ErrInvalid}
+        alias,err:=s.readKafkaAliasReceipt(tx,d,user);if err!=nil{return err}
+        if alias!=nil{
+            other,err:=s.readKafkaVendorReceipt(tx,d,user);if err!=nil{return err};if other!=nil || reason=="configured-no-vendor"{return ErrConflict}
+            if aliasTerminal(alias.State){return nil}
+            if alias.State!="not-dispatched" && alias.State!="pending-confirmed"{return ErrKafkaOfflineUnconfirmed}
+            if alias.Revision>=math.MaxInt64-1{return ErrConflict}
+            if err:=s.fenceKafkaVendorParent(tx,d,call);err!=nil{return err}
+            changed,err:=s.db.Collection(Effects).UpdateOne(tx,bson.M{"_id":alias.ID,"revision":alias.Revision,"state":alias.State,"accounted":false},bson.M{"$set":bson.M{"state":"suppressed","outcome_sha256":evidenceSHA},"$inc":bson.M{"revision":int64(1)}})
+            if err!=nil{return err};if changed.MatchedCount!=1 || changed.ModifiedCount!=1{return ErrConflict};return nil
+        }
 		old,err:=s.readKafkaVendorReceipt(tx,d,user);if err!=nil{return err}
 		if old!=nil{if kafkaVendorTerminal(old.State){return nil};if old.State!="pending-not-dispatched" && old.State!="pending-confirmed"{return ErrKafkaOfflineUnconfirmed}}
 		state:="suppressed"
@@ -160,7 +172,7 @@ func (s *Store) fenceKafkaVendorParent(ctx context.Context,d deliveryDuty,call K
 	if err!=nil{return err};if changed.MatchedCount!=1 || changed.ModifiedCount!=1{return ErrConflict};return nil
 }
 
-type KafkaVendorDispatch struct{store *Store;row kafkaVendorReceipt}
+type KafkaVendorDispatch struct{store *Store;row kafkaVendorReceipt;attempted,granted,uncertain atomic.Bool}
 
 func (s *Store) BeginKafkaVendor(ctx context.Context,call KafkaOfflineCall,user string,input KafkaVendorRequest)(*KafkaVendorDispatch,error){
 	if s==nil || ctx==nil || mongo.SessionFromContext(ctx)!=nil || !validKafkaVendorInput(input) || input.Protocol!=""{return nil,ErrInvalid}
@@ -179,6 +191,7 @@ func (s *Store) BeginKafkaVendor(ctx context.Context,call KafkaOfflineCall,user 
 		if policy.OfflinePushBinding!=""{return ErrUnprepared}
 		body,err:=json.Marshal([]any{d.Epoch,d.BranchID,d.CID,hash([]byte(user)),d.PayloadSHA,d.PolicySHA,input});if err!=nil{return ErrInvalid}
 		requestSHA:=hash(body)
+        alias,err:=s.readKafkaAliasReceipt(tx,d,user);if err!=nil{return err};if alias!=nil{return ErrConflict}
 		old,err:=s.readKafkaVendorReceipt(tx,d,user);if err!=nil{return err}
 		if old!=nil{
 			if kafkaVendorTerminal(old.State){return nil}
@@ -202,13 +215,23 @@ func (s *Store) BeginKafkaVendor(ctx context.Context,call KafkaOfflineCall,user 
 	if err!=nil{return nil,err};if !dispatch{return nil,nil};return &KafkaVendorDispatch{store:s,row:claimed},nil
 }
 
+// Commit of the parent-duty fence + exact child permit is attempt start.
+// The previous aggregate state remains dispatching for legacy compatibility;
+// its new optional physical_permit field prevents any second local admission.
 func (d *KafkaVendorDispatch) BeforeProvider(ctx context.Context,call KafkaOfflineCall,user,providerRequestSHA string)error{
-	if d==nil || d.store==nil || providerRequestSHA!=d.row.Input.ProviderRequestSHA256 || hash([]byte(user))!=d.row.UserSHA{return ErrInvalid}
-	if err:=d.store.ValidateKafkaOfflineCall(ctx,call,user);err!=nil{return err}
-	var current kafkaVendorReceipt
-	if err:=d.store.db.Collection(Effects).FindOne(ctx,bson.M{"_id":d.row.ID}).Decode(&current);err!=nil{return err}
-	if !validKafkaVendorReceipt(current) || current.Revision!=d.row.Revision || current.State!="dispatching" || current.AttemptID!=d.row.AttemptID || current.InstanceID!=d.row.InstanceID || current.RequestSHA!=d.row.RequestSHA{return ErrConflict}
-	return nil
+ if d==nil || d.store==nil || ctx==nil || mongo.SessionFromContext(ctx)!=nil || providerRequestSHA!=d.row.Input.ProviderRequestSHA256 || hash([]byte(user))!=d.row.UserSHA{return ErrInvalid}
+ if !d.attempted.CompareAndSwap(false,true){return ErrConflict}
+ err:=d.store.transaction(ctx,func(tx context.Context)error{
+  if err:=d.store.ValidateKafkaOfflineCall(tx,call,user);err!=nil{return err}
+  parent,err:=d.store.readDutyRecord(tx,call.BranchID);if err!=nil{return err}
+  row,err:=d.store.readKafkaVendorReceipt(tx,parent,user);if err!=nil{return err}
+  if row==nil || row.Kind!="kafka-vendor-v1" || row.Revision!=d.row.Revision || row.State!="dispatching" || row.AttemptID!=d.row.AttemptID || row.InstanceID!=d.row.InstanceID || row.RequestSHA!=d.row.RequestSHA || row.PhysicalPermit{return ErrConflict}
+  if err:=d.store.fenceKafkaVendorParent(tx,parent,call);err!=nil{return err}
+  filter:=bson.M{"_id":row.ID,"revision":row.Revision,"state":row.State,"attempt_id":row.AttemptID,"instance_id":row.InstanceID,"request_sha256":row.RequestSHA,"accounted":false,"$or":bson.A{bson.M{"physical_permit":false},bson.M{"physical_permit":bson.M{"$exists":false}}}}
+  changed,err:=d.store.db.Collection(Effects).UpdateOne(tx,filter,bson.M{"$set":bson.M{"physical_permit":true}})
+  if err!=nil{return err};if changed.MatchedCount!=1 || changed.ModifiedCount!=1{return ErrConflict};return nil
+ })
+ if err!=nil{d.uncertain.Store(errors.Is(err,ErrCommitUnconfirmed));return err};d.granted.Store(true);return nil
 }
 
 func (d *KafkaVendorDispatch) complete(parent context.Context,state,proof string,results []KafkaVendorDeviceResult)error{
@@ -219,10 +242,10 @@ func (d *KafkaVendorDispatch) complete(parent context.Context,state,proof string
 	if state=="unconfirmed"{return ErrKafkaOfflineUnconfirmed};return nil
 }
 
-func (d *KafkaVendorDispatch) NotDispatched(ctx context.Context)error{return d.complete(ctx,"pending-not-dispatched",hash([]byte("owned provider adapter confirms zero invocation")),nil)}
+func (d *KafkaVendorDispatch) NotDispatched(ctx context.Context)error{if d==nil || d.uncertain.Load(){return ErrKafkaOfflineUnconfirmed};return d.complete(ctx,"pending-not-dispatched",hash([]byte("owned provider adapter confirms zero invocation")),nil)}
 
 func (d *KafkaVendorDispatch) Finish(ctx context.Context,report KafkaVendorReport)error{
-	if d==nil || d.store==nil{return ErrInvalid}
+	if d==nil || d.store==nil || report.DispatchStarted && !d.granted.Load(){return ErrInvalid}
 	wanted:=map[string]bool{};for _,device:=range d.row.Input.DeviceSHA256{wanted[device]=true}
 	seen:=map[string]bool{};known:=make([]KafkaVendorDeviceResult,0,len(report.Results));valid:=true
 	for _,result:=range report.Results{

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Isolated source1064 full23-package validation; no ordinary runtime adoption."""
+"""Isolated source1099 full26-package validation; no ordinary runtime adoption."""
 import argparse
 from collections import Counter
 import hashlib
@@ -14,11 +14,11 @@ import sys
 
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = REPO / 'ci/group-ordinary/inputs.json'
-SCOPE = 'ordinary_source1064_full23_packages_no_runtime_adoption'
+SCOPE = 'ordinary_source1099_full26_packages_no_runtime_adoption'
 PREFIX = 'github.com/openimsdk/open-im-server/v3/'
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 REDIS = 'redis://127.0.0.1:36379/15'
-PACKAGES = {'internal/groupeffects', 'internal/groupdelivery', 'internal/push/offlinepush/fcm', 'internal/rpc/group', 'internal/groupcleanup', 'pkg/common/startrpc', 'internal/api', 'internal/groupauthority', 'pkg/common/db/controller', 'internal/tools', 'internal/push/offlinepush', 'internal/rpc/msg', 'pkg/common/cmd', 'internal/msgtransfer', 'pkg/common/db/unrelation', 'internal/retention', 'cmd/openim-rpc/openim-rpc-group', 'pkg/common/db/table/relation', 'pkg/common/db/mgo', 'pkg/common/db/cache', 'internal/push', 'internal/messagedelivery', 'pkg/msgprocessor'}
+PACKAGES = {'internal/groupeffects', 'internal/groupdelivery', 'internal/push/offlinepush/fcm', 'internal/rpc/group', 'internal/groupcleanup', 'pkg/common/startrpc', 'internal/api', 'internal/groupauthority', 'pkg/common/db/controller', 'internal/tools', 'internal/push/offlinepush', 'internal/rpc/msg', 'pkg/common/cmd', 'internal/msgtransfer', 'pkg/common/db/unrelation', 'internal/retention', 'cmd/openim-rpc/openim-rpc-group', 'pkg/common/db/table/relation', 'pkg/common/db/mgo', 'pkg/common/db/cache', 'internal/push', 'internal/messagedelivery', 'pkg/msgprocessor', 'cmd/tools/ordinary-device-receipts', 'internal/push/offlinepush/aliasvendor', 'cmd/tools/ordinary-alias-receipts'}
 LEGACY_SKIPS = {
     'pkg/common/db/controller': {'Test_BatchInsertChat2DB', 'Test_Insert', 'Test_Revoke',
                                  'Test_FindBySeq', 'TestName'},
@@ -111,13 +111,13 @@ def exact_delta(parent, bodies):
 
 def verify():
     c = json.loads(regular(INPUTS))
-    if (c['schema'] != 1 or c['scope'] != SCOPE or c['effective_count'] != 1064
-            or c['parent_count'] != 1023 or c['expected_top_source_inventory'] != 328
-            or c['expected_required_pass'] != 321 or c['allowed_legacy_skip_count'] != 7
+    if (c['schema'] != 1 or c['scope'] != SCOPE or c['effective_count'] != 1099
+            or c['parent_count'] != 1023 or c['expected_top_source_inventory'] != 371
+            or c['expected_required_pass'] != 364 or c['allowed_legacy_skip_count'] != 7
             or c['parent_runner']['path'] != 'ci/group-stage3/run.py'
             or c['parent_inputs']['path'] != 'ci/group-stage3/inputs.json'
-            or len(c['overlay']) != 58):
-        raise ValueError('exact source1064 full-package contract required')
+            or len(c['overlay']) != 93):
+        raise ValueError('exact source1099 full-package contract required')
     for row in c['dependencies']:
         pinned(row)
     pinned(c['parent_inputs'])
@@ -126,14 +126,14 @@ def verify():
     if len(old) != 1023 or parent['effective_digest'] != c['parent_digest']:
         raise ValueError('accepted source1023 differs')
     bodies = apply_overlay(c, dict(old))
-    if (len(bodies) != 1064 or rows(bodies) != c['effective_source']
+    if (len(bodies) != 1099 or rows(bodies) != c['effective_source']
             or digest(rows(bodies)) != c['effective_digest']
             or exact_delta(old, bodies) != c['delta']):
         raise ValueError('complete source or before delta differs')
-    if set(c['packages']) != PACKAGES or len(PACKAGES) != 23:
-        raise ValueError('complete23package contract required')
-    if sum(len(s['top_tests']) for s in c['packages'].values()) != 328:
-        raise ValueError('full328 source-name inventory required')
+    if set(c['packages']) != PACKAGES or len(PACKAGES) != 26:
+        raise ValueError('complete26package contract required')
+    if sum(len(s['top_tests']) for s in c['packages'].values()) != 371:
+        raise ValueError('full371 source-name inventory required')
     for package, spec in c['packages'].items():
         if name(package) != package or spec['full_package'] is not True:
             raise ValueError('full canonical package required')
@@ -150,8 +150,32 @@ def verify():
             raise ValueError('accepted old test name disappeared')
     fcm = c['packages']['internal/push/offlinepush/fcm']
     device = [n for n in c['packages']['internal/messagedelivery']['top_tests'] if n.startswith('TestKafkaFCMDeviceMongo')]
-    if len(fcm['top_tests']) != 8 or fcm['expected_sub'] != 26 or fcm['allowed_legacy_skips'] or len(device) != 3:
+    if len(fcm['top_tests']) != 13 or fcm['expected_sub'] != 31 or fcm['allowed_legacy_skips'] or len(device) != 3:
         raise ValueError('new FCM8/26 and deviceMongo3 mandatory contract required')
+    if len(c['accepted1064_test_files']) != 189 or len(c['frozen1080_test_files']) != 5:
+        raise ValueError('exact inherited test-file custody required')
+    for row in c['accepted1064_test_files'] + c['frozen1080_test_files']:
+        if row['path'] not in bodies or sha(bodies[row['path']]) != row['sha256']:
+            raise ValueError('inherited test body differs')
+    mandatory = c['mandatory_new_mongo']
+    if (len(mandatory) != 9 or len(set(mandatory)) != 9
+            or any(t not in c['packages']['internal/messagedelivery']['top_tests'] for t in mandatory)):
+        raise ValueError('exact9 new real Mongo cases required')
+    previous = dict(bodies)
+    wanted_before = {'server/internal/messagedelivery/' + n for n in
+                     ('kafka_alias_vendor.go', 'kafka_vendor.go', 'kafka_fcm_devices.go')}
+    if {r['target'] for r in c['physical_before']} != wanted_before or len(c['physical_before']) != 3:
+        raise ValueError('only exact3 previous permit products allowed')
+    for row in c['physical_before']:
+        if (row['path'] != 'ci/candidates/group-ordinary/before-physical/' + row['target']
+                or sha(bodies[row['target']]) != row['afterSHA256']):
+            raise ValueError('physical before context differs')
+        previous[row['target']] = pinned(row)
+    if digest(rows(previous)) != c['physical_before_effective_digest']:
+        raise ValueError('complete physical before source closure differs')
+    before_root = REPO / 'ci/candidates/group-ordinary/before-physical'
+    if {str(p.relative_to(REPO)) for p in before_root.rglob('*') if p.is_file() or p.is_symlink()} != {r['path'] for r in c['physical_before']}:
+        raise ValueError('extra/missing physical before source')
     return c, bodies
 
 
@@ -198,6 +222,61 @@ def audit(events, code, package, spec):
             'failed_tests':failures, 'missing_required_leaves':missing_leaves,
             'actual_sub':sub_count, 'compile_only_package':compile_only,
             'complete':complete, 'poison_output':poison, 'scope':SCOPE}
+
+
+
+def audit_physical_before(events, code):
+    denied = 'TestKafkaPhysicalPermitMongoClearBeforeFinalAdmissionNeverGrantsPOST'
+    normal = 'TestKafkaPhysicalPermitMongoKnownCommitIsOneStartedAttemptEvenIfClearCommitsLater'
+    modes = ('alias', 'generic', 'fcm')
+    spec = {'top_tests':[denied, normal], 'allowed_legacy_skips':[],
+            'required_leaves':[normal + '/' + mode for mode in modes], 'expected_sub':6}
+    result = audit(events, code, 'internal/messagedelivery', spec)
+    failed = {denied} | {denied + '/' + mode for mode in modes}
+    passed = {normal} | {normal + '/' + mode for mode in modes}
+    result['accepted'] = (code == 1 and result['complete'] and result['footer'] == ['fail']
+        and not result['poison_output'] and not result['unexpected_skip']
+        and not result['legacy_skips'] and not result['missing_required_leaves']
+        and set(result['failed_tests']) == failed
+        and {n for n, state in result['terminal'].items() if state == 'pass'} == passed
+        and result['actual_sub'] == 6)
+    # Names alone do not distinguish a product assertion from fixture failure.
+    # Bind the single exact frozen Fatal diagnostic to EACH denied leaf's raw
+    # test2json Output. Reject other source diagnostics anywhere in the baseline.
+    assertion = 'Clear committed before admission but old plaintext acquired a physical POST permit'
+    diagnostic = re.compile(r'^\s*\S+\.go:[1-9][0-9]*:')
+    actual_assertion = re.compile(r'^\s*kafka_physical_permit_integration_test\.go:[1-9][0-9]*: '
+                                  + re.escape(assertion) + r'$')
+    leaves = {denied + '/' + mode for mode in modes}
+    evidence = {leaf:{'exact_assertion_lines':0, 'assertion_occurrences':0,
+                      'source_diagnostics':0} for leaf in sorted(leaves)}
+    other_diagnostics = 0
+    for event in events:
+        if event.get('Action') != 'output':
+            continue
+        output = event.get('Output', '')
+        if not isinstance(output, str):
+            raise ValueError('non-string original before Output')
+        leaf = event.get('Test')
+        if leaf in evidence:
+            evidence[leaf]['assertion_occurrences'] += output.count(assertion)
+        for line in output.splitlines():
+            if not diagnostic.match(line):
+                continue
+            if leaf not in evidence:
+                other_diagnostics += 1
+                continue
+            evidence[leaf]['source_diagnostics'] += 1
+            if actual_assertion.fullmatch(line):
+                evidence[leaf]['exact_assertion_lines'] += 1
+    actual_red = (other_diagnostics == 0 and all(
+        row == {'exact_assertion_lines':1, 'assertion_occurrences':1, 'source_diagnostics':1}
+        for row in evidence.values()))
+    result['accepted'] = result['accepted'] and actual_red
+    result['before_assertion_evidence'] = evidence
+    result['before_other_source_diagnostics'] = other_diagnostics
+    result['meaning'] = 'exact3 leaf-bound Clear assertions fail once each plus3 valid positives; every other source failure diagnostic rejects'
+    return result
 
 
 def require_resource(resource, code):
@@ -268,14 +347,14 @@ def run():
                     os.environ['GITHUB_RUN_ID'] + ':' + os.environ['GITHUB_RUN_ATTEMPT'],
                     os.environ['GITHUB_SHA']], check=True, timeout=20)
     temporary = Path(os.environ['RUNNER_TEMP'])
-    work = temporary / 'group-ordinary-source1064'
+    work = temporary / 'group-ordinary-source1099'
     if not temporary.is_absolute() or temporary.resolve() != temporary or work.exists():
         raise ValueError('fresh canonical work path required')
     fs = os.statvfs(temporary)
     if fs.f_bavail * fs.f_frsize < 4 * 1024 ** 3:
         raise ValueError('4GiB bootstrap floor required')
     work.mkdir(mode=0o700)
-    output = REPO / 'ci-results/group-ordinary-source1064'
+    output = REPO / 'ci-results/group-ordinary-source1099'
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     for target, body in bodies.items():
         path = work / target
@@ -294,11 +373,14 @@ def run():
         os.environ[key] = str(path)
     os.environ.update(GOTOOLCHAIN='local', GOMAXPROCS='2', GOMEMLIMIT='900MiB', GOWORK='off')
     write(output / 'source.json', {'scope':SCOPE, 'commit':os.environ['GITHUB_SHA'],
-          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1064,
+          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1099,
           'effective_digest':c['effective_digest'], 'go_version':version,
           'generated_public_config_sha256':sha(template), 'no_runtime_adoption':True})
 
-    def command(package, args, phase, timeout):
+    def command(package, args, phase, timeout, source_root=None):
+        run_root = work if source_root is None else source_root
+        if run_root not in (work, work / 'before-physical'):
+            raise ValueError('unowned command source root')
         folder = output / package.replace('/', '_')
         folder.mkdir(exist_ok=True)
         stdout, stderr = folder / (phase + '.log'), folder / (phase + '.stderr.log')
@@ -306,7 +388,7 @@ def run():
         capture = [sys.executable, '-B', str(REPO / 'ci/group-effects/capture.py'),
                    '--stdout', str(stdout), '--stderr', str(stderr), '--'] + args
         wrapped = [sys.executable, '-B', str(REPO / 'ci/group-effects/resource_guard.py'),
-                   '--cwd', str(work / 'server'), '--log', str(folder / (phase + '.guard.log')),
+                   '--cwd', str(run_root / 'server'), '--log', str(folder / (phase + '.guard.log')),
                    '--record', str(receipt), '--min-free-mib', '1024', '--timeout', str(timeout),
                    '--poll-interval', '0.2', '--allocated-root', str(work),
                    '--max-allocated-mib', '16384', '--'] + capture
@@ -325,6 +407,34 @@ def run():
         'tests_started':False, 'vet_started':False})
     if any(code != 0 for code in compile_codes.values()):
         raise ValueError('compile failed; complete raw diagnostics retained; no tests or vet')
+    # Separate full1099 source context; only3 products are restored. The same
+    # new Mongo test file is byte-identical, not a missing-helper compile RED.
+    before_work = work / 'before-physical'
+    before_work.mkdir(mode=0o700)
+    previous = dict(bodies)
+    for row in c['physical_before']:
+        previous[row['target']] = pinned(row)
+    for target, body in previous.items():
+        path = before_work / target
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('xb') as f:
+            f.write(body)
+        path.chmod(c['source_modes'][target])
+    with (before_work / 'server/config/config.yaml').open('xb') as f:
+        f.write(template)
+    expression = '^TestKafkaPhysicalPermitMongo(ClearBeforeFinalAdmissionNeverGrantsPOST|KnownCommitIsOneStartedAttemptEvenIfClearCommitsLater)$'
+    log, code = command('internal/messagedelivery',
+        ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1',
+         '-timeout=240s', '-run', expression, './internal/messagedelivery'],
+        'before-physical', 900, source_root=before_work)
+    events = [json.loads(line) for line in regular(log).decode().splitlines() if line.strip()]
+    baseline = audit_physical_before(events, code)
+    write(output / 'physical-before-summary.json', baseline)
+    if not baseline['accepted']:
+        raise ValueError('physical before is not exact assertion-only RED with positive controls')
+    for target, body in previous.items():
+        if regular(before_work / target) != body:
+            raise ValueError('before source changed during real baseline')
     summaries = {}
     for package, spec in c['packages'].items():
         log, code = command(package, ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1',
@@ -352,14 +462,14 @@ def run():
     counts = Counter()
     for summary in summaries.values():
         counts.update(summary['counts'])
-    if counts.get('top_pass', 0) != 321 or counts.get('top_skip', 0) != 7 or counts.get('sub_skip', 0) != 0:
-        raise ValueError('exact321 mandatory PASS and7 old top SKIP required')
+    if counts.get('top_pass', 0) != 364 or counts.get('top_skip', 0) != 7 or counts.get('sub_skip', 0) != 0:
+        raise ValueError('exact364 mandatory PASS and7 old top SKIP required')
     write(output / 'summary.json', {'state':'passed_full_source_packages_only', 'scope':SCOPE,
           'effective_digest':c['effective_digest'], 'counts':dict(counts),
           'packages':summaries, 'vet_exit':{p:0 for p in packages},
           'final_free_bytes':final_free,
           'legacy_skips_are_not_integration_passes':True, 'no_runtime_adoption':True})
-    print('Ordinary source1064 full23-package validation complete; runtime remains unadopted.')
+    print('Ordinary source1099 full26-package validation complete; runtime remains unadopted.')
 
 
 if __name__ == '__main__':
@@ -369,7 +479,7 @@ if __name__ == '__main__':
     try:
         if args.verify:
             verify()
-            print('Ordinary exact source1064 verified; no Go/DB execution.')
+            print('Ordinary exact source1099 verified; no Go/DB execution.')
         else:
             run()
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError):
