@@ -1,10 +1,10 @@
 {
   "schema": "luobo.mobile.source-preparation.v3",
-  "state": "current269_fixture_r2_and_reference_parser_r2_prepared_pending_cloud",
+  "state": "current269_fixture_r3_prepared_pending_cloud",
   "parent_public_commit": "7d8a9cd42fb009f0d51747c9728e1ed442fa410e",
   "root_final_base_must_match_before_CI_and257_rows": true,
-  "source269_digest": "19c7b1b7dd22677df7c5bdd2b7ea86022a25df3d25c16f95d9e568e377282285",
-  "portable321_digest": "03c8897fb16d787f4fb37b390a2981256b715a5e005f80f1b7e3fe2567085cf9",
+  "source269_digest": "8b018c5a67d8278054eceecb2d0f544f7b6d375d3d605af51047f3bda7effd99",
+  "portable321_digest": "beddfff9dc698275420ca137d04a69b85315b11191eaa5e0314f840e25356ac8",
   "global_search_v1_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
   "global_search_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
   "selected_source_delta": {
@@ -27,7 +27,7 @@
   },
   "actual_this_revision": {
     "Dart_Flutter_format_pubget_tests_native": 0,
-    "pure_Python_evidence": "Separate immutable draft validation receipt; not part of46/734."
+    "pure_Python_evidence": "readonly pins below; unchanged23 gate stays mandatory in existing push workflow"
   },
   "accepted_history": {
     "git_commit": "314ac55",
@@ -44,16 +44,17 @@
   "unchanged_contract": "Official framework/engine/Dart and locked packages/SQLite raw SHA; new HOME/TMP/pubcache; setup-only networking; fresh Linux netns; reporter strict completion;4GiB initial/1GiB .2s/768MiB source+reference allocation/900s phase;latched failures win receipts",
   "native_acceptance": false,
   "root_ci_correction": "Public inventory remains strict; local-only app/tool/check.sh absent in public and never required or copied.",
-  "parent_inputs_sha256": "b2f9d3acc3901743bb7c06acc856d386410981a5b83ff5f62ed201da1b1d4c2e",
+  "parent_inputs_sha256": "7b9fe630697ee347d783cb0d48dc61ab45052e91b8084b919936250cb2953ae7",
   "followup_delta": {
-    "modified_test_files": 1,
+    "modified_private_test_fixture_files": 2,
     "production_files": 0,
     "dependencies": 0,
-    "fixture_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
-    "optional_parser": "reject duplicate visible names instead of dictionary collapse; existing exact1FAIL/1PASS contract retained",
-    "same_test_names_and_expectations": true,
+    "fixture_r3_manifest_sha256": "dfd21b0996a9363a8ee928da9dda2ef8b3a8b8c4555f9a7d2296840a45909ba0",
+    "same46_test_names_and_expectations": true,
     "selected9_extra_job": false,
-    "diagnostics": "bounded runAsync + captureTheme + phase markers in two actual ChatPage tests inside mandatory46"
+    "diagnostics": "same real session/gateway/harness disposal with per-stage20s bound before provider unmount; finally unloads even on failure; finegrain markers",
+    "public_SdkHarness_changed": false,
+    "optional_parser_r2": "already adopted and unchanged; exact2 distinct visible names contract remains"
   },
   "prior_current269_incomplete": {
     "git_commit": "5e2e12dc8da9091bfe9f8f7c928f299bcd4b7bd1",
@@ -65,5 +66,17 @@
     "artifact_zip_sha256": "13480f2dd7ca3c9d2eff1f8045fa3fd8b098e17e8c82316abe65efe2996358af",
     "actual": "target:7 visiblePASS,0 assertion failures,2 error completions,no terminal footer; phase900s timeout; child0 not accepted; full734/analyze not started",
     "root_cause": "pending; fixture-r2 is a bounded async/theme diagnostic, not a proven fix"
+  },
+  "prior_current269_r2_incomplete": {
+    "git_commit": "1281200b6299b7baf69f4d6857649bc9ca6cea45",
+    "actual_run": 38860572719,
+    "job": 116841681437,
+    "inputs_sha256": "7b9fe630697ee347d783cb0d48dc61ab45052e91b8084b919936250cb2953ae7",
+    "source_digest": "19c7b1b7dd22677df7c5bdd2b7ea86022a25df3d25c16f95d9e568e377282285",
+    "portable_digest": "03c8897fb16d787f4fb37b390a2981256b715a5e005f80f1b7e3fe2567085cf9",
+    "artifact_zip_sha256": "f9d1c68d30147ad244799b05e5378cc5a30764072a969f6d4fce6cd1cbff434b",
+    "actual": "42 visiblePASS/4 nonassertionERROR; hidden5success; two actualChatPage assertion blocks completed then cleanup20s timeout; entry2 timeout/reentrant runAsync; target900.1s phase_timeout,child0 rejected; full734/analyze not started",
+    "verification_sha256": "d3df3b52c31181d2e4d8c5b91a18248e3dba7c3fd5ea99acf0719fa8ae3371c9",
+    "root_cause": "first cleanup failure confirmed; fake/real provider disposal chain source-backed hypothesis, candidate not yet executed"
   }
 }

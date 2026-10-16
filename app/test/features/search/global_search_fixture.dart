@@ -147,10 +147,14 @@ final class GlobalFixture {
   }
   Future<void> mount(WidgetTester tester, {bool inbox = false, double width = 390,
       double height = 844, double scale = 1.5, Widget Function()? home}) async {
+    debugPrint('global_fixture_mount startup.begin');
     await tester.runAsync(start);
+    debugPrint('global_fixture_mount startup.end');
     tester.view.physicalSize = Size(width, height); tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize); addTearDown(tester.view.resetDevicePixelRatio);
+    debugPrint('global_fixture_mount theme.begin');
     final theme = await captureTheme(tester);
+    debugPrint('global_fixture_mount theme.end');
     router = GoRouter(routes: [
       GoRoute(path: '/', builder: (_, _) => home?.call() ??
           (inbox ? const ConversationsPage() : GlobalSearchPage(now: () => wall))),
@@ -165,6 +169,7 @@ final class GlobalFixture {
         return Scaffold(appBar: AppBar(title: const Text('导航边界')), body: Text('${state.pathParameters['cid']}'));
       }),
     ]);
+    debugPrint('global_fixture_mount frame.begin');
     await tester.pumpWidget(ProviderScope(overrides: [
       contactsRepositoryProvider.overrideWithValue(contacts),
       groupRepositoryProvider.overrideWithValue(groupRepository),
@@ -174,7 +179,10 @@ final class GlobalFixture {
     ], child: MaterialApp.router(routerConfig: router, theme: theme,
       builder: (context, child) => MediaQuery(data: MediaQuery.of(context)
           .copyWith(textScaler: TextScaler.linear(scale)), child: child!))));
+    debugPrint('global_fixture_mount frame.end');
+    debugPrint('global_fixture_mount settle.begin');
     await tester.pumpAndSettle();
+    debugPrint('global_fixture_mount settle.end');
   }
   Future<void> searchUI(WidgetTester tester, [String word = 'match']) async {
     await tester.enterText(find.byType(TextField), word);
@@ -184,13 +192,55 @@ final class GlobalFixture {
   Future<void> close([WidgetTester? tester]) async {
     if (closed) return;
     closed = true;
-    if (tester != null) await tester.pumpWidget(const SizedBox.shrink());
-    router?.dispose();
+    void phase(String value) => debugPrint('global_fixture_cleanup $value');
     Future<void> release() async {
+      phase('pending.begin');
       for (final finish in cleanups) { finish(); }
       await Future<void>.delayed(Duration.zero);
-      controller.dispose(); api.close(); await sdk.dispose();
+      phase('pending.end');
+      phase('controller.begin');
+      controller.dispose();
+      phase('controller.end');
+      phase('api.begin');
+      api.close();
+      phase('api.end');
+      // Keep the provider-owned runtime mounted until the real SDK teardown has
+      // settled. Unmount first would start its unawaited session.dispose in the
+      // widget's fake zone, which a later runAsync cannot drive to completion.
+      // These are the same public, idempotent steps used by SdkHarness.dispose;
+      // the final harness call still owns channel removal and native-folder IO.
+      phase('session.begin');
+      await sdk.session.dispose().timeout(const Duration(seconds: 20));
+      phase('session.end');
+      phase('gateway.begin');
+      await sdk.gateway.dispose().timeout(const Duration(seconds: 20));
+      phase('gateway.end');
+      phase('sdk-channel-native-folder.begin');
+      await sdk.dispose().timeout(const Duration(seconds: 20));
+      phase('sdk-channel-native-folder.end');
     }
-    if (tester == null) { await release(); } else { await tester.runAsync(release); }
+    try {
+      if (tester == null) {
+        await release();
+      } else {
+        var completed = false;
+        await tester.runAsync(() async {
+          await release();
+          completed = true;
+        });
+        // runAsync reports asynchronous exceptions to the framework and can
+        // return null. Do not mistake that path for completed SDK teardown.
+        if (!completed) throw StateError('Fixture release did not complete; see runAsync error');
+      }
+    } finally {
+      if (tester != null) {
+        phase('unmount.begin');
+        await tester.pumpWidget(const SizedBox.shrink());
+        phase('unmount.end');
+      }
+      phase('router.begin');
+      router?.dispose();
+      phase('router.end');
+    }
   }
 }

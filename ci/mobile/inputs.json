@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v3",
-  "state": "current269_fixture_r2_pending_new_target46_full734_analysis_not_native_acceptance",
+  "state": "current269_fixture_r3_pending_target46_full734_analyze_not_native_acceptance",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -22,7 +22,8 @@
       "check_sha256": "d8832f9375e7bef9f6e437c9171f02f5de052c6221c4a0634a9f002970eb2568",
       "pure_tests_sha256": "5887d3b05254491f05bc35ff34849a37b9e2e5106ffc546ea4e27b73a9c904c0",
       "root_review_sha256": "cad87a8b28fb8b57fc101e12e41c391557f259bb02a40aa9645b1dd9d85a22b6"
-    }
+    },
+    "global_search_fixture_r3_manifest_sha256": "dfd21b0996a9363a8ee928da9dda2ef8b3a8b8c4555f9a7d2296840a45909ba0"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -301,7 +302,7 @@
     "current269": 321
   },
   "portable_digests": {
-    "current269": "03c8897fb16d787f4fb37b390a2981256b715a5e005f80f1b7e3fe2567085cf9"
+    "current269": "beddfff9dc698275420ca137d04a69b85315b11191eaa5e0314f840e25356ac8"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -357,11 +358,23 @@
       "artifact_zip_sha256": "13480f2dd7ca3c9d2eff1f8045fa3fd8b098e17e8c82316abe65efe2996358af",
       "actual": "target:7 visiblePASS,0 assertion failures,2 error completions,no terminal footer; phase900s timeout; child0 not accepted; full734/analyze not started",
       "root_cause": "pending; fixture-r2 is a bounded async/theme diagnostic, not a proven fix"
+    },
+    "current269_r2_incomplete": {
+      "git_commit": "1281200b6299b7baf69f4d6857649bc9ca6cea45",
+      "actual_run": 38860572719,
+      "job": 116841681437,
+      "inputs_sha256": "7b9fe630697ee347d783cb0d48dc61ab45052e91b8084b919936250cb2953ae7",
+      "source_digest": "19c7b1b7dd22677df7c5bdd2b7ea86022a25df3d25c16f95d9e568e377282285",
+      "portable_digest": "03c8897fb16d787f4fb37b390a2981256b715a5e005f80f1b7e3fe2567085cf9",
+      "artifact_zip_sha256": "f9d1c68d30147ad244799b05e5378cc5a30764072a969f6d4fce6cd1cbff434b",
+      "actual": "42 visiblePASS/4 nonassertionERROR; hidden5success; two actualChatPage assertion blocks completed then cleanup20s timeout; entry2 timeout/reentrant runAsync; target900.1s phase_timeout,child0 rejected; full734/analyze not started",
+      "verification_sha256": "d3df3b52c31181d2e4d8c5b91a18248e3dba7c3fd5ea99acf0719fa8ae3371c9",
+      "root_cause": "first cleanup failure confirmed; fake/real provider disposal chain source-backed hypothesis, candidate not yet executed"
     }
   },
   "current269": {
     "members": 269,
-    "source_digest": "19c7b1b7dd22677df7c5bdd2b7ea86022a25df3d25c16f95d9e568e377282285",
+    "source_digest": "8b018c5a67d8278054eceecb2d0f544f7b6d375d3d605af51047f3bda7effd99",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1670,8 +1683,8 @@
       },
       {
         "path": "app/test/features/search/global_search_fixture.dart",
-        "bytes": 9938,
-        "sha256": "3f42e387668db247450c03842b31557de346736bf45d1b253c4e79bc357aa4df"
+        "bytes": 11961,
+        "sha256": "fcba4aef8e7f06837af23bea259e334eb9e2a8d3ec81cf34024b83d8eead93e2"
       },
       {
         "path": "app/test/features/search/global_search_pages_test.dart",
@@ -1685,8 +1698,8 @@
       },
       {
         "path": "app/test/features/search/global_source_navigation_test.dart",
-        "bytes": 10010,
-        "sha256": "c8862c8bd9ce8e9c37947de89dbd0dfbffb65b79e23c7ef864e62962ff36bca1"
+        "bytes": 9833,
+        "sha256": "1c7842ad0f048cc82d54055aee69a8d7d9f7c5363be48a1ec245d08736ef3e35"
       },
       {
         "path": "app/test/support/http_adapter.dart",
@@ -1720,7 +1733,7 @@
     "default_enabled": false,
     "working_cohort": "current269",
     "members": 269,
-    "reference_source_digest": "6d9f8ea054c911f7bdfa1fc68d571e9c19b9ce93d79d0639e4ea9e7bd8cabf69",
+    "reference_source_digest": "490122db81d45178004bd5e619b7a0e08b8479de95f137895695787698ad62af",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",

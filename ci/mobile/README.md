@@ -75,3 +75,18 @@ startup/mount/settle/assertions/unmount/cleanup阶段；45s单项超时未被放
 不再被dict折叠隐藏。新增1项纯Python反例，原严格1具名断言FAIL+1正控PASS不变。
 修改后的reference摘要随同一个测试文件重算；仍是同269上下文的4原生产文件
 参考变体，绝非旧257 full。此修订的Dart执行、根因证明和native验收仍未完成。
+
+## fixture-r3 follow-up (pending actual cloud)
+
+run38860572719保留42PASS/4ERROR：真实ChatPage两项均到assertions.end，
+随后各在cleanup20s中止；另外entry2超时/重入，target900.1s门禁失败，即使child0
+也不接受。full734/analyze未启动；不能用旧688替代。
+
+本次只改两个search私有fixture/test文件，不改公共SdkHarness或任何产品源。
+先按原清理顺序释放pending/controller/API，再有界等待同一真实session.dispose、
+gateway.dispose和原sdk.dispose（幂等检查、channel解绑、native-folder清理）；
+成功后才卸载provider-owned runtime，失败finally仍卸载且错误不吞。
+保留全部46名称/expect、真实ChatPage/入口及原mock边界，mount/release都有阶段标记。
+这一顺序与已验chat_page_test一致，仍需新云证据证实；无native完成声明。
+默认流程和所有网络/资源限制不变：23纯Python门禁→target46→full734→analyze；
+不增加替代性selected9阶段，不复制本地tool/check.sh。

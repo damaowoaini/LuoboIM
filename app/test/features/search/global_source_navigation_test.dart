@@ -150,15 +150,10 @@ void main() {
     debugPrint('global_source_phase $label startup.end');
   }
   Future<void> closeWidget(WidgetTester tester, String label) async {
-    debugPrint('global_source_phase $label unmount.begin');
-    await tester.pumpWidget(const SizedBox.shrink());
     debugPrint('global_source_phase $label cleanup.begin');
-    var finished = false;
-    await tester.runAsync(() async {
-      await f.close().timeout(const Duration(seconds: 20));
-      finished = true;
-    });
-    if (!finished) throw StateError('Fixture cleanup did not complete; see runAsync error');
+    // The shared fixture runs real teardown while the runtime is still mounted,
+    // then unmounts in finally. It also owns the single runAsync boundary.
+    await f.close(tester);
     debugPrint('global_source_phase $label cleanup.end');
   }
   testWidgets('actual ChatPage does no source reads when the initial source ticket is already false', (tester) async {
