@@ -21,6 +21,8 @@ import '../data/chat_repository.dart';
 import '../domain/chat_message.dart';
 import '../domain/chat_mention.dart';
 import '../../group/data/group_repository.dart';
+import '../../group/presentation/group_creation_action.dart';
+import '../../contacts/domain/contact.dart';
 import 'chat_controller.dart';
 import 'mention_text_controller.dart';
 import 'group_mention_picker.dart';
@@ -1581,13 +1583,27 @@ class _ChatPageState extends ConsumerState<ChatPage>
     } on AppFailure {
       return;
     }
+    final creationOwner = controller.repository.session.state.credentials;
     final action = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
       builder: (context) => SafeArea(
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (!item.isGroup && item.userId != null && item.userId!.isNotEmpty &&
+                item.userId != creationOwner?.userId)
+              GroupCreationAction(
+                key: ValueKey('expand-group-${item.id}'),
+                peer: Contact(id: item.userId!, name: item.title, avatar: item.avatar),
+                asListTile: true,
+                sourceCurrent: () => _acceptsPortal(lease) &&
+                  identical(controller.repository.session.state.credentials, creationOwner) &&
+                  controller.conversation?.id == item.id &&
+                  controller.conversation?.userId == item.userId &&
+                  controller.conversation?.isGroup == false,
+              ),
             ListTile(
               title: Text(item.isGroup ? '群资料与成员' : '联系人资料'),
               onTap: () => Navigator.pop(context, 'details'),
@@ -1613,6 +1629,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
               onTap: () => Navigator.pop(context, 'clear'),
             ),
           ],
+          ),
         ),
       ),
     );

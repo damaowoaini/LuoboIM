@@ -1,7 +1,7 @@
 {
-  "schema": "luobo.mobile.required-successful-names.v1",
-  "cohort": "current287",
-  "parent_full785": [
+  "schema": "luobo.mobile.required-successful-names.v2",
+  "cohort": "current291",
+  "parent_full822": [
     {
       "name": "/login stays scrollable at 320pt and 200% text",
       "count": 1
@@ -80,6 +80,10 @@
     },
     {
       "name": "UTF8 and escaped JSON limits produce only independently readable files",
+      "count": 1
+    },
+    {
+      "name": "Unicode creation limit counts emoji and combining graphemes rather than UTF16 units",
       "count": 1
     },
     {
@@ -291,6 +295,10 @@
       "count": 1
     },
     {
+      "name": "accepted create with conversation failure retries only its exact owned group read",
+      "count": 1
+    },
+    {
       "name": "account directories and native login use tenant endpoints and private logs disabled",
       "count": 1
     },
@@ -372,6 +380,10 @@
     },
     {
       "name": "actual descendants consult remembered identity and an old quote reacts to later private metadata",
+      "count": 1
+    },
+    {
+      "name": "actual editor permits 128 Unicode graphemes accepted by real create repository",
       "count": 1
     },
     {
@@ -599,6 +611,10 @@
       "count": 1
     },
     {
+      "name": "avatar remains optional and creation needs no storage request",
+      "count": 1
+    },
+    {
       "name": "batch deletion requires a second explicit confirmation and cancelling submits nothing",
       "count": 1
     },
@@ -699,6 +715,10 @@
       "count": 1
     },
     {
+      "name": "cancelled OS picker and cancelled preview permit explicit retry without upload",
+      "count": 1
+    },
+    {
       "name": "cancelled OS picker preserves metadata and releases pending",
       "count": 1
     },
@@ -716,6 +736,10 @@
     },
     {
       "name": "cancelling confirmation preserves selection and dispatches nothing",
+      "count": 1
+    },
+    {
+      "name": "cancelling source sheet invokes neither picker nor storage and preserves draft",
       "count": 1
     },
     {
@@ -843,6 +867,10 @@
       "count": 1
     },
     {
+      "name": "conversation metadata wait cannot renew the original create view",
+      "count": 1
+    },
+    {
       "name": "correct exact release opens readiness via a normal read, while a foreign issuer cannot activate",
       "count": 1
     },
@@ -856,6 +884,14 @@
     },
     {
       "name": "corrupt policy fails closed before SDK connection without deleting saved credentials",
+      "count": 1
+    },
+    {
+      "name": "create ACK retains the exact group before any conversation read",
+      "count": 1
+    },
+    {
+      "name": "created group recovery rejects a foreign conversation response instead of navigating it",
       "count": 1
     },
     {
@@ -1055,6 +1091,10 @@
       "count": 1
     },
     {
+      "name": "existing create convenience wrapper retains normal group and conversation behavior",
+      "count": 1
+    },
+    {
       "name": "existing explicitly named inbox filter remains available",
       "count": 1
     },
@@ -1068,6 +1108,10 @@
     },
     {
       "name": "exit during native forward creation fences the later send dispatch",
+      "count": 1
+    },
+    {
+      "name": "expired caller view dispatches neither create nor its admission callback",
       "count": 1
     },
     {
@@ -1203,6 +1247,10 @@
       "count": 1
     },
     {
+      "name": "final admission boundary rechecks a revoked caller before native create",
+      "count": 1
+    },
+    {
       "name": "final send rechecks the actual quote source after creation, even when native omits quote metadata",
       "count": 1
     },
@@ -1239,7 +1287,15 @@
       "count": 1
     },
     {
+      "name": "foreign navigation ABA cannot revive a pending picker but new selection works",
+      "count": 1
+    },
+    {
       "name": "foreign owner and malformed list never become visible empty success",
+      "count": 1
+    },
+    {
+      "name": "foreign owner in malformed create ACK is not accepted as an owned group",
       "count": 1
     },
     {
@@ -1252,6 +1308,10 @@
     },
     {
       "name": "foreign route covering the owned confirmation then returning does not revive it",
+      "count": 1
+    },
+    {
+      "name": "foreign route over owned preview permanently rejects its old approval",
       "count": 1
     },
     {
@@ -1503,11 +1563,19 @@
       "count": 1
     },
     {
+      "name": "invalid draft or insecure avatar is rejected before native dispatch",
+      "count": 1
+    },
+    {
       "name": "invalid envelopes never become a successful operation",
       "count": 1
     },
     {
       "name": "invalid image fails before signed upload and can be explicitly reselected",
+      "count": 1
+    },
+    {
+      "name": "invalid image fails in real decoder before signed storage and leaves creation draft",
       "count": 1
     },
     {
@@ -1575,7 +1643,15 @@
       "count": 1
     },
     {
+      "name": "late conversation after navigation ABA cannot navigate but explicit retry is read only",
+      "count": 1
+    },
+    {
       "name": "late conversation lookup cannot enter a session whose generation ended before native disconnect",
+      "count": 1
+    },
+    {
+      "name": "late create ACK after navigation ABA cannot start conversation or revive submit",
       "count": 1
     },
     {
@@ -1604,6 +1680,14 @@
     },
     {
       "name": "late user conversation read after foreign route ABA never pushes a chat",
+      "count": 1
+    },
+    {
+      "name": "latest accepted avatar selection wins before create; late old error=false",
+      "count": 1
+    },
+    {
+      "name": "latest accepted avatar selection wins before create; late old error=true",
       "count": 1
     },
     {
@@ -2047,6 +2131,10 @@
       "count": 1
     },
     {
+      "name": "normal multi friend flow reaches actual group editor and avatar entry without creating",
+      "count": 1
+    },
+    {
       "name": "not-found and failed receipt queries keep the real editor frozen with the same original UUID",
       "count": 1
     },
@@ -2080,6 +2168,14 @@
     },
     {
       "name": "old repository cannot acquire a fresh issuer tenant or owner after rotation",
+      "count": 1
+    },
+    {
+      "name": "old selected people and submit closure cannot acquire replacement owner repositories",
+      "count": 1
+    },
+    {
+      "name": "old selector submit cannot revive after foreign navigation ABA while new click remains usable",
       "count": 1
     },
     {
@@ -2128,6 +2224,10 @@
     },
     {
       "name": "opening interactions reads the count, clearing requires confirmation and preserves posts",
+      "count": 1
+    },
+    {
+      "name": "optional avatar keeps ordinary explicit creation and opens the accepted group",
       "count": 1
     },
     {
@@ -2251,6 +2351,10 @@
       "count": 1
     },
     {
+      "name": "pending create admits no second submit or picker and retains one native intent",
+      "count": 1
+    },
+    {
       "name": "pending picker cannot continue after issuer replacement",
       "count": 1
     },
@@ -2260,6 +2364,18 @@
     },
     {
       "name": "pending picker cannot continue after tenant replacement",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue in a replacement issuer",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue in a replacement owner",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue in a replacement tenant",
       "count": 1
     },
     {
@@ -2443,6 +2559,10 @@
       "count": 1
     },
     {
+      "name": "real PNG selection and signed upload reaches exact create faceURL",
+      "count": 1
+    },
+    {
       "name": "real QR painter exports a decodable PNG with an opaque white quiet zone",
       "count": 1
     },
@@ -2604,6 +2724,10 @@
     },
     {
       "name": "retiring the captured owner clears an open editor and leaves no callable save",
+      "count": 1
+    },
+    {
+      "name": "returning before creation preserves selected people for explicit editing",
       "count": 1
     },
     {
@@ -2783,11 +2907,19 @@
       "count": 1
     },
     {
+      "name": "session invalidation after create dispatch hides its draft and permits safe exit",
+      "count": 1
+    },
+    {
       "name": "session invalidation after real dispatch clears UI and prevents its late result from returning",
       "count": 1
     },
     {
       "name": "session invalidation clears visible conversations and rejects a late response",
+      "count": 1
+    },
+    {
+      "name": "session invalidation during real native create cannot issue a created receipt",
       "count": 1
     },
     {
@@ -2847,11 +2979,19 @@
       "count": 1
     },
     {
+      "name": "single friend selection keeps the original single chat capability",
+      "count": 1
+    },
+    {
       "name": "single-file export refuses a record count its own importer cannot restore",
       "count": 1
     },
     {
       "name": "slow old success write cannot overwrite a new failed attempt across lock and resume",
+      "count": 1
+    },
+    {
+      "name": "small large text editor keeps stable member IDs and creation action reachable",
       "count": 1
     },
     {
@@ -2936,6 +3076,10 @@
     },
     {
       "name": "statistics show every type and category at large text, keep UTC periods explicit, and refresh safely when empty",
+      "count": 1
+    },
+    {
+      "name": "storage failure releases picker and permits a new explicit upload without automatic retry",
       "count": 1
     },
     {
@@ -3051,6 +3195,10 @@
       "count": 1
     },
     {
+      "name": "unknown create never replays and offers only an explicit group-list check",
+      "count": 1
+    },
+    {
       "name": "unknown custom messages retain their description and complete protocol data",
       "count": 1
     },
@@ -3143,157 +3291,125 @@
       "count": 1
     }
   ],
-  "new_creation37": [
+  "new_group_entry29": [
     {
-      "name": "Unicode creation limit counts emoji and combining graphemes rather than UTF16 units",
+      "name": "accepted create through chat expansion recovers only conversation read without another create",
       "count": 1
     },
     {
-      "name": "accepted create with conversation failure retries only its exact owned group read",
+      "name": "existing contacts single and multi selection remain available multiple=false",
       "count": 1
     },
     {
-      "name": "actual editor permits 128 Unicode graphemes accepted by real create repository",
+      "name": "existing contacts single and multi selection remain available multiple=true",
       "count": 1
     },
     {
-      "name": "avatar remains optional and creation needs no storage request",
+      "name": "failed status read releases admission and only explicit retry can continue",
       "count": 1
     },
     {
-      "name": "cancelled OS picker and cancelled preview permit explicit retry without upload",
+      "name": "foreign navigation permanently retires pending preflight but permits a new explicit click",
       "count": 1
     },
     {
-      "name": "cancelling source sheet invokes neither picker nor storage and preserves draft",
+      "name": "group chat settings does not masquerade as single-chat expansion",
       "count": 1
     },
     {
-      "name": "conversation metadata wait cannot renew the original create view",
+      "name": "group-only inbox selection cannot silently open one-to-one chat",
       "count": 1
     },
     {
-      "name": "create ACK retains the exact group before any conversation read",
+      "name": "inbox exposes a real accessible group creation entry and reaches selection",
       "count": 1
     },
     {
-      "name": "created group recovery rejects a foreign conversation response instead of navigating it",
+      "name": "inbox preserves explicit verification preflight for status=0 without native create",
       "count": 1
     },
     {
-      "name": "existing create convenience wrapper retains normal group and conversation behavior",
+      "name": "inbox preserves explicit verification preflight for status=2 without native create",
       "count": 1
     },
     {
-      "name": "expired caller view dispatches neither create nor its admission callback",
+      "name": "inbox preserves explicit verification preflight for status=3 without native create",
       "count": 1
     },
     {
-      "name": "final admission boundary rechecks a revoked caller before native create",
+      "name": "inbox selected friends reach accepted editor and one exact native group intent",
       "count": 1
     },
     {
-      "name": "foreign navigation ABA cannot revive a pending picker but new selection works",
+      "name": "late verified reply cannot open selection after replacement issuer",
       "count": 1
     },
     {
-      "name": "foreign owner in malformed create ACK is not accepted as an owned group",
+      "name": "late verified reply cannot open selection after replacement owner",
       "count": 1
     },
     {
-      "name": "foreign route over owned preview permanently rejects its old approval",
+      "name": "late verified reply cannot open selection after replacement tenant",
       "count": 1
     },
     {
-      "name": "invalid draft or insecure avatar is rejected before native dispatch",
+      "name": "malformed verification status is an error instead of approval",
       "count": 1
     },
     {
-      "name": "invalid image fails in real decoder before signed storage and leaves creation draft",
+      "name": "old chat settings tile cannot start selection with replacement owner repositories",
       "count": 1
     },
     {
-      "name": "late conversation after navigation ABA cannot navigate but explicit retry is read only",
+      "name": "old dedicated selector callback cannot acquire another account for its fixed peer",
       "count": 1
     },
     {
-      "name": "late create ACK after navigation ABA cannot start conversation or revive submit",
+      "name": "old dedicated selector callback cannot survive route ABA while current explicit selection works",
       "count": 1
     },
     {
-      "name": "latest accepted avatar selection wins before create; late old error=false",
+      "name": "old entry callback cannot acquire a fresh route turn after ABA surface=CreationSurface.chat",
       "count": 1
     },
     {
-      "name": "latest accepted avatar selection wins before create; late old error=true",
+      "name": "old entry callback cannot acquire a fresh route turn after ABA surface=CreationSurface.inbox",
       "count": 1
     },
     {
-      "name": "normal multi friend flow reaches actual group editor and avatar entry without creating",
+      "name": "removing entry route during preflight cannot reopen selection or feedback on blank page",
       "count": 1
     },
     {
-      "name": "old selected people and submit closure cannot acquire replacement owner repositories",
+      "name": "return from new editor retains fixed peer and additional selection for explicit editing",
       "count": 1
     },
     {
-      "name": "old selector submit cannot revive after foreign navigation ABA while new click remains usable",
+      "name": "single chat fixes peer plus implicit owner and adds only explicitly selected others",
       "count": 1
     },
     {
-      "name": "optional avatar keeps ordinary explicit creation and opens the accepted group",
+      "name": "single chat settings exposes its real expansion entry with the current peer",
       "count": 1
     },
     {
-      "name": "pending create admits no second submit or picker and retains one native intent",
+      "name": "small large-text group entry and stable selection remain usable surface=CreationSurface.chat",
       "count": 1
     },
     {
-      "name": "pending picker cannot continue in a replacement issuer",
+      "name": "small large-text group entry and stable selection remain usable surface=CreationSurface.inbox",
       "count": 1
     },
     {
-      "name": "pending picker cannot continue in a replacement owner",
+      "name": "synchronous repeated inbox callback admits one read and no automatic create",
       "count": 1
     },
     {
-      "name": "pending picker cannot continue in a replacement tenant",
-      "count": 1
-    },
-    {
-      "name": "real PNG selection and signed upload reaches exact create faceURL",
-      "count": 1
-    },
-    {
-      "name": "returning before creation preserves selected people for explicit editing",
-      "count": 1
-    },
-    {
-      "name": "session invalidation after create dispatch hides its draft and permits safe exit",
-      "count": 1
-    },
-    {
-      "name": "session invalidation during real native create cannot issue a created receipt",
-      "count": 1
-    },
-    {
-      "name": "single friend selection keeps the original single chat capability",
-      "count": 1
-    },
-    {
-      "name": "small large text editor keeps stable member IDs and creation action reachable",
-      "count": 1
-    },
-    {
-      "name": "storage failure releases picker and permits a new explicit upload without automatic retry",
-      "count": 1
-    },
-    {
-      "name": "unknown create never replays and offers only an explicit group-list check",
+      "name": "unknown create through the new inbox entry remains frozen and cannot create twice",
       "count": 1
     }
   ],
-  "current_target134": [
+  "current_target163": [
     {
       "name": "CID clear begun after dispatch blocks unknown late IDs before privacy observe",
       "count": 1
@@ -3308,6 +3424,10 @@
     },
     {
       "name": "Unicode creation limit counts emoji and combining graphemes rather than UTF16 units",
+      "count": 1
+    },
+    {
+      "name": "accepted create through chat expansion recovers only conversation read without another create",
       "count": 1
     },
     {
@@ -3415,6 +3535,14 @@
       "count": 1
     },
     {
+      "name": "existing contacts single and multi selection remain available multiple=false",
+      "count": 1
+    },
+    {
+      "name": "existing contacts single and multi selection remain available multiple=true",
+      "count": 1
+    },
+    {
       "name": "existing create convenience wrapper retains normal group and conversation behavior",
       "count": 1
     },
@@ -3435,6 +3563,10 @@
       "count": 1
     },
     {
+      "name": "failed status read releases admission and only explicit retry can continue",
+      "count": 1
+    },
+    {
       "name": "file read followed by foreign-route ABA cannot late-open OS; a new explicit click works",
       "count": 1
     },
@@ -3452,6 +3584,10 @@
     },
     {
       "name": "foreign navigation ABA cannot revive a pending picker but new selection works",
+      "count": 1
+    },
+    {
+      "name": "foreign navigation permanently retires pending preflight but permits a new explicit click",
       "count": 1
     },
     {
@@ -3495,6 +3631,10 @@
       "count": 1
     },
     {
+      "name": "group chat settings does not masquerade as single-chat expansion",
+      "count": 1
+    },
+    {
       "name": "group discovery reaches real group page and only explicit request sends joinSource4",
       "count": 1
     },
@@ -3507,7 +3647,31 @@
       "count": 1
     },
     {
+      "name": "group-only inbox selection cannot silently open one-to-one chat",
+      "count": 1
+    },
+    {
       "name": "image error releases busy and a later explicit selection may be decoded",
+      "count": 1
+    },
+    {
+      "name": "inbox exposes a real accessible group creation entry and reaches selection",
+      "count": 1
+    },
+    {
+      "name": "inbox preserves explicit verification preflight for status=0 without native create",
+      "count": 1
+    },
+    {
+      "name": "inbox preserves explicit verification preflight for status=2 without native create",
+      "count": 1
+    },
+    {
+      "name": "inbox preserves explicit verification preflight for status=3 without native create",
+      "count": 1
+    },
+    {
+      "name": "inbox selected friends reach accepted editor and one exact native group intent",
       "count": 1
     },
     {
@@ -3551,6 +3715,18 @@
       "count": 1
     },
     {
+      "name": "late verified reply cannot open selection after replacement issuer",
+      "count": 1
+    },
+    {
+      "name": "late verified reply cannot open selection after replacement owner",
+      "count": 1
+    },
+    {
+      "name": "late verified reply cannot open selection after replacement tenant",
+      "count": 1
+    },
+    {
       "name": "latest accepted avatar selection wins before create; late old error=false",
       "count": 1
     },
@@ -3587,6 +3763,10 @@
       "count": 1
     },
     {
+      "name": "malformed verification status is an error instead of approval",
+      "count": 1
+    },
+    {
       "name": "metadata-only retry keeps known private and hidden tombstone facts",
       "count": 1
     },
@@ -3619,7 +3799,27 @@
       "count": 1
     },
     {
+      "name": "old chat settings tile cannot start selection with replacement owner repositories",
+      "count": 1
+    },
+    {
       "name": "old confirmation after a foreign overlay returns cannot open a profile",
+      "count": 1
+    },
+    {
+      "name": "old dedicated selector callback cannot acquire another account for its fixed peer",
+      "count": 1
+    },
+    {
+      "name": "old dedicated selector callback cannot survive route ABA while current explicit selection works",
+      "count": 1
+    },
+    {
+      "name": "old entry callback cannot acquire a fresh route turn after ABA surface=CreationSurface.chat",
+      "count": 1
+    },
+    {
+      "name": "old entry callback cannot acquire a fresh route turn after ABA surface=CreationSurface.inbox",
       "count": 1
     },
     {
@@ -3723,11 +3923,19 @@
       "count": 1
     },
     {
+      "name": "removing entry route during preflight cannot reopen selection or feedback on blank page",
+      "count": 1
+    },
+    {
       "name": "render completing after owner issuer and tenant switch never starts OS sharing",
       "count": 1
     },
     {
       "name": "repeated same-query submit while loading does not duplicate native scans",
+      "count": 1
+    },
+    {
+      "name": "return from new editor retains fixed peer and additional selection for explicit editing",
       "count": 1
     },
     {
@@ -3779,11 +3987,27 @@
       "count": 1
     },
     {
+      "name": "single chat fixes peer plus implicit owner and adds only explicitly selected others",
+      "count": 1
+    },
+    {
+      "name": "single chat settings exposes its real expansion entry with the current peer",
+      "count": 1
+    },
+    {
       "name": "single friend selection keeps the original single chat capability",
       "count": 1
     },
     {
       "name": "small large text editor keeps stable member IDs and creation action reachable",
+      "count": 1
+    },
+    {
+      "name": "small large-text group entry and stable selection remain usable surface=CreationSurface.chat",
+      "count": 1
+    },
+    {
+      "name": "small large-text group entry and stable selection remain usable surface=CreationSurface.inbox",
       "count": 1
     },
     {
@@ -3811,6 +4035,10 @@
       "count": 1
     },
     {
+      "name": "synchronous repeated inbox callback admits one read and no automatic create",
+      "count": 1
+    },
+    {
       "name": "text expansion preserves hidden CID and exact original-message selection",
       "count": 1
     },
@@ -3829,16 +4057,25 @@
     {
       "name": "unknown create never replays and offers only an explicit group-list check",
       "count": 1
+    },
+    {
+      "name": "unknown create through the new inbox entry remains frozen and cannot create twice",
+      "count": 1
     }
   ],
   "provenance": {
-    "accepted_parent_commit": "b52da23f1255f04d21dc1caf6b5950b736287bd2",
-    "run": 38870107437,
-    "artifact_zip_sha256": "895c26b9a1d2010e37150564b226d9b0536c3712fb5c8a44ec9979b3674906d7",
-    "raw_full785_sha256": "6dc5e88388e69ee8b9c0019f0b07cb1d53c6c51b51f4ffed13bd0dcf39781d23",
-    "raw_target97_sha256": "a9482c58d677225635d9ac94f5d34694a647503659b269ef135fdb6de4faf306",
-    "agent_verification_sha256": "00e8b9bec05814cbba706b321b15b6ce163c0c8c224bc6d8845f1d8ff909cb8e",
-    "creation_names_prepared_not_run": true
+    "accepted_parent_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
+    "run": 38878571484,
+    "job": 116899482457,
+    "artifact_zip_sha256": "30b58b10baa38e2ce51010f351d68229b31fe6c2866ecfb745787b872ca69b0f",
+    "raw_full822_sha256": "986d253bbd137ca767da0c9a9dd26a17f336216b026f54d7c6a74ece40b3221c",
+    "raw_target134_sha256": "784352bc95e5673f331e13463c3065803395ff3fa4f8634908a6c8880932b78d",
+    "agent_verification_sha256": "69218bb8944743d8ac6610f696d258ae3677027bde85c1b7a4fcadef3d7cec87",
+    "root_acceptance_sha256": "cc014244d795b4747a2e409a1f03ef1b51ea3e858cf331507d239a914cf98d44",
+    "parent_required_names_sha256": "e71206a1d7fef5551319225da6324919c7347e78204faf473e4b80d248aa7102",
+    "group_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
+    "prepared29_names_sha256": "acbd3843b1a11dbaf4040eadf97c994f82e864dc794fc96276a9c8c5cf416fe1",
+    "group_entry_names_prepared_not_run": true
   },
-  "meaning": "Preserve duplicate visible names by multiplicity; hidden loads never satisfy names. Full822 exactly parent785+new37; target134 exactly QR51/search46+new37."
+  "meaning": "Full851 must exactly preserve the accepted822 successful visible name multiset plus29 prepared entry/workflow cases. Target163 must exactly preserve accepted134 plus29; hidden loads never substitute a case. No new Dart result is claimed."
 }

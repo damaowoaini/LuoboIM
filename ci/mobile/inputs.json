@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v5",
-  "state": "current287_owned_confirmation_fixture_pending_cloud",
+  "schema": "luobo.mobile.portable-ci-inputs.v6",
+  "state": "current291_group_creation_entries_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -35,7 +35,8 @@
     "create_group_avatar_fixture_r3_manifest_sha256": "ce469ea2b56d574f77374cb3dfecdb9aeb3b56f57a7b7ce6e24014d8a6bd2763",
     "create_group_avatar_fixture_r4_manifest_sha256": "39e79136cf20e253d170d070f248208cd34ceedaa931f29ab380e7fac7e88370",
     "create_group_avatar_analysis_r5_manifest_sha256": "ed5e62c2a994f946875817f5ee0352f44a97edb9851a73834edc87171bf989d9",
-    "owned_confirmation_fixture_manifest_sha256": "0bea1f0b326815098bcd5021cdb57c758a6e58ee2ab436a7935a3ba6c2583e18"
+    "owned_confirmation_fixture_manifest_sha256": "0bea1f0b326815098bcd5021cdb57c758a6e58ee2ab436a7935a3ba6c2583e18",
+    "group_creation_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -311,10 +312,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current287": 339
+    "current291": 343
   },
   "portable_digests": {
-    "current287": "a0c79a9bbca06f3ce24817abfb10397b18affc869301690f156272fa20c18402"
+    "current291": "c1dad7ddc93db08c23565e09b2493a17f72e09954a84bb38735057abfc0a5b08"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -348,7 +349,7 @@
       "actual_run": 38852506276,
       "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
     },
-    "reproduction": "Historical cohorts including accepted282 require immutable commit/inputs. Schema v5 current287 only; reference full287 replaces exactly4 historical search-before and executesentry2 only.",
+    "reproduction": "Historical cohorts require their immutable commit/inputs. Schema v6 supports current291 only. Optional search reference uses full291 with exactly4 historical search-before files and executes only original search entry2 (1assertFAIL/1oldfilterPASS); not the new group-entry before2.",
     "accepted_current257": {
       "git_commit": "314ac55",
       "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
@@ -534,14 +535,30 @@
       "portable_digest": "b72230bf055323fe5a76f0a3425b77adf38d296c0183da1a634e2ce695f06b50",
       "state_at_draft_freeze": "in_progress;noresultclaim;strict134_822_analyze0required",
       "changed_product": "Only equivalent mounted-setState braces from r4; existing2 testbefore paths byteexact current."
+    },
+    "accepted_current287_owned_confirmation": {
+      "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
+      "actual_run": 38878571484,
+      "job": 116899482457,
+      "source_digest": "86e290284df603c1e182c59d469212a6dacdef602f64b238ce8358b2997715cc",
+      "portable_digest": "a0c79a9bbca06f3ce24817abfb10397b18affc869301690f156272fa20c18402",
+      "actual_target_passed": 134,
+      "actual_full_passed": 822,
+      "actual_analyze_issues": 0,
+      "old785_and_new37_success_name_multisets_exact": true,
+      "strengthened3_hitTest_warnings": 0,
+      "artifact_zip_sha256": "30b58b10baa38e2ce51010f351d68229b31fe6c2866ecfb745787b872ca69b0f",
+      "agent_verification_sha256": "69218bb8944743d8ac6610f696d258ae3677027bde85c1b7a4fcadef3d7cec87",
+      "root_acceptance_sha256": "cc014244d795b4747a2e409a1f03ef1b51ea3e858cf331507d239a914cf98d44",
+      "original_inputs_sha256": "467d5d19bdc6cff9610a2c47b76d5795fc6300a16e7a407ca99742204b89e2a9"
     }
   },
   "reference_entry": {
-    "state": "explicit_optional_reference_only_not_old257_269_or282_full",
+    "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current287",
-    "members": 287,
-    "reference_source_digest": "f1366e783affcd2feb309c1c65deebde523f9589eb4c15e646ca3ccbf9080652",
+    "working_cohort": "current291",
+    "members": 291,
+    "reference_source_digest": "2da296525658a10b8d64e377044f85cfe9d2c002420854101b3852c15deae9b3",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -574,7 +591,8 @@
     "expected_missing_tooltip": "全局搜索",
     "expected_child_exit": 1,
     "not_a_257_full_or_native_result": true,
-    "not_a_269_full_or_native_result": true
+    "not_a_269_full_or_native_result": true,
+    "not_a_287_full_or_native_result": true
   },
   "auxiliary_preserved": [
     {
@@ -596,9 +614,14 @@
     "first_actual_cloud_run": 38866360052,
     "same_enforced_lock_gate_still_mandatory": true
   },
-  "current287": {
-    "members": 287,
-    "source_digest": "86e290284df603c1e182c59d469212a6dacdef602f64b238ce8358b2997715cc",
+  "required_test_names": {
+    "path": "ci/mobile/required-test-names.json",
+    "bytes": 129185,
+    "sha256": "cf597471ae20590f9e66036a64ff7c1466e28748dcb20c5f94229cf29600781f"
+  },
+  "current291": {
+    "members": 291,
+    "source_digest": "9438367ab2fc8085aa1267a61fb03296ad60c647072fc44a0c1906aa512e00e2",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -847,8 +870,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 61885,
-        "sha256": "57f207dd4ce4f8dc604c90cead1df465e4b862ce9c043d36c1a8a1df1d28d8b3"
+        "bytes": 62835,
+        "sha256": "2cf6cd75dc37ce9fe855ef3e0cdaa19c7ddf8c8e76b4d8a1da16c4bf10f6055d"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
@@ -947,8 +970,8 @@
       },
       {
         "path": "app/lib/features/contacts/presentation/select_contacts_page.dart",
-        "bytes": 7709,
-        "sha256": "a1c1c09c9da4c1ea412cb69b1f4842e29cb7ddb6625503c2378a09b92c5abeff"
+        "bytes": 10205,
+        "sha256": "f577dde7dfa9bafa36cde6ef7f8c762c2d4f12883e349b29c5348ef1b171f199"
       },
       {
         "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
@@ -977,8 +1000,8 @@
       },
       {
         "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 15700,
-        "sha256": "e114084fa70cea0ab8c14fd152c6e64aae6264947d0495e3ab591774df1d9084"
+        "bytes": 15893,
+        "sha256": "2bd97b544e751c6070df629abe2477125bfdbe8c317ae257c93e92eb766a3091"
       },
       {
         "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
@@ -1059,6 +1082,11 @@
         "path": "app/lib/features/group/presentation/create_group_page.dart",
         "bytes": 15358,
         "sha256": "becac201a69023df4c9ba50a283d3cffeb68a68892c5e6e692588b93656eac44"
+      },
+      {
+        "path": "app/lib/features/group/presentation/group_creation_action.dart",
+        "bytes": 6394,
+        "sha256": "05007bb618dd89ee568d899e78a9533fb9e03a2d79f3b3e1754386ab3ea094a8"
       },
       {
         "path": "app/lib/features/group/presentation/group_members_page.dart",
@@ -1806,6 +1834,21 @@
         "sha256": "69e8376306787ede4d6a5c17e1ed24c0570330969d02213cc6e3ce693560e0fe"
       },
       {
+        "path": "app/test/features/group/group_creation_entry_fixture.dart",
+        "bytes": 6309,
+        "sha256": "aaf332d1e8cf3fda0fe6b4d5b2530ecab1f9a68f84f38cc70ef041df33df0279"
+      },
+      {
+        "path": "app/test/features/group/group_creation_entry_test.dart",
+        "bytes": 1689,
+        "sha256": "492bd40e1107fd5888ef922b4687ce90265d3f09e8b03fc0fd6d93ca813e5c8b"
+      },
+      {
+        "path": "app/test/features/group/group_creation_entry_workflow_test.dart",
+        "bytes": 15374,
+        "sha256": "ef1ae68a13e25935eecacf66aa02983a4982af3609fda11440bc56823e306fd8"
+      },
+      {
         "path": "app/test/features/meeting/booking/booking_controller_test.dart",
         "bytes": 5235,
         "sha256": "e55817903a681499adad4b7e25f7915a653dc6b967c70788ff5b5a105a302411"
@@ -2036,19 +2079,16 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 134,
-    "expected_full_tests": 822,
+    "expected_target_tests": 163,
+    "expected_full_tests": 851,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
       "test/features/group/create_group_entry_test.dart",
       "test/features/group/create_group_repository_test.dart",
-      "test/features/group/create_group_workflow_test.dart"
+      "test/features/group/create_group_workflow_test.dart",
+      "test/features/group/group_creation_entry_test.dart",
+      "test/features/group/group_creation_entry_workflow_test.dart"
     ]
-  },
-  "required_test_names": {
-    "path": "ci/mobile/required-test-names.json",
-    "bytes": 121267,
-    "sha256": "e71206a1d7fef5551319225da6324919c7347e78204faf473e4b80d248aa7102"
   }
 }

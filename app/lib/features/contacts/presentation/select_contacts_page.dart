@@ -35,10 +35,18 @@ class SelectContactsPage extends ConsumerStatefulWidget {
     required this.title,
     this.excluded = const {},
     this.createConversation = false,
+    this.createGroup = false,
+    this.initialMembers = const [],
+    this.expectedOwner,
+    this.expectedGroups,
   });
   final String title;
   final Set<String> excluded;
   final bool createConversation;
+  final bool createGroup;
+  final List<Contact> initialMembers;
+  final ContactsRepository? expectedOwner;
+  final GroupRepository? expectedGroups;
   @override
   ConsumerState<SelectContactsPage> createState() => _SelectContactsPageState();
 }
@@ -51,9 +59,22 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
   GroupRepository? selectionGroups;
   int view = 0;
   bool editingGroup = false;
+  late final List<Contact> fixedMembers;
+
+  @override
+  void initState() {
+    super.initState();
+    fixedMembers = List.unmodifiable(widget.initialMembers);
+    selectionOwner = widget.expectedOwner;
+    selectionGroups = widget.expectedGroups;
+  }
 
   bool current(ContactsRepository contacts, GroupRepository groups) =>
       mounted && identical(contacts, selectionOwner) && identical(groups, selectionGroups) &&
+      widget.initialMembers.length == fixedMembers.length &&
+      widget.initialMembers.indexed.every((entry) => entry.$2.id == fixedMembers[entry.$1].id) &&
+      (widget.expectedOwner == null || identical(widget.expectedOwner, contacts)) &&
+      (widget.expectedGroups == null || identical(widget.expectedGroups, groups)) &&
       identical(contacts, ref.read(contactsRepositoryProvider)) &&
       identical(groups, ref.read(groupRepositoryProvider)) &&
       contacts.access.isCurrent && groups.access.isCurrent &&
@@ -71,13 +92,18 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
     final route = ModalRoute.of(context);
     bool active() => current(contacts, groups) && original == view && route?.isCurrent == true;
     if (!active() || busy || selected.isEmpty) return;
-    final chosen = all.where((user) => selected.contains(user.id)).toList();
+    final fixedIds = fixedMembers.map((user) => user.id).toSet();
+    final chosen = [
+      ...fixedMembers,
+      ...all.where((user) => selected.contains(user.id) && !fixedIds.contains(user.id)),
+    ];
     if (chosen.isEmpty) return;
-    if (!widget.createConversation) {
+    if (!widget.createConversation && !widget.createGroup) {
       Navigator.pop(context, chosen);
       return;
     }
-    if (chosen.length > 1) {
+    if (widget.createGroup && chosen.length < 2) return;
+    if (widget.createGroup || chosen.length > 1) {
       final owner = contacts.access.credentials;
       setState(() => busy = true);
       editingGroup = true;
@@ -118,11 +144,16 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
     if (repository == null || groups == null) return const SizedBox.shrink();
     selectionOwner ??= repository;
     selectionGroups ??= groups;
-    if (!current(repository, groups)) {
+    final fixedIds = fixedMembers.map((user) => user.id).toSet();
+    if (!current(repository, groups) ||
+        fixedIds.length != fixedMembers.length ||
+        fixedIds.any((id) => id.isEmpty || id == repository.access.credentials.userId) ||
+        (widget.createGroup && (widget.expectedOwner == null || widget.expectedGroups == null))) {
       return Scaffold(appBar: AppBar(title: Text(widget.title)),
         body: const Center(child: Text('会话已变化，请返回后重新选择好友')));
     }
     final renderedView = view;
+    final count = fixedMembers.length + selected.length;
     bool renderedCurrent() => current(repository, groups) && renderedView == view &&
       ModalRoute.of(context)?.isCurrent == true;
     final friends = ref.watch(friendsProvider);
@@ -133,24 +164,43 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
           title: Text(widget.title),
           actions: [
             TextButton(
-              onPressed: !busy && selected.isNotEmpty && friends.hasValue
+              onPressed: !busy && selected.isNotEmpty && friends.hasValue &&
+                  (!widget.createGroup || count >= 2)
                   ? () => submit(friends.requireValue, repository, groups, renderedView)
                   : null,
-              child: Text(busy ? '处理中…' : '确定 (${selected.length})'),
+              child: Text(busy ? '处理中…' : '确定 ($count)'),
             ),
           ],
         ),
         body: Column(
           children: [
+            if (widget.createGroup)
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: const Text('我已作为群主加入'),
+                subtitle: Text('ID：${repository.access.credentials.userId}'),
+              ),
+            for (final member in fixedMembers)
+              CheckboxListTile(
+                key: ValueKey('fixed-group-member-${member.id}'),
+                value: true,
+                onChanged: null,
+                title: Text(member.displayName),
+                subtitle: Text('ID：${member.id}（当前联系人）'),
+                secondary: ContactAvatar(uri: member.avatar),
+              ),
             Padding(
               padding: const EdgeInsets.all(16),
               child: TextField(
                 onChanged: (value) {
                   if (renderedCurrent()) setState(() => query = value.trim().toLowerCase());
                 },
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
                   hintText: '搜索好友',
+                  helperText: widget.createGroup
+                    ? fixedMembers.isEmpty ? '至少选择两位好友' : '再选择至少一位好友'
+                    : null,
                 ),
               ),
             ),
@@ -166,6 +216,7 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
                       .where(
                         (user) =>
                             user.id != repository.access.credentials.userId &&
+                            !fixedIds.contains(user.id) &&
                             !widget.excluded.contains(user.id) &&
                             '${user.displayName} ${user.name} ${user.id}'
                                 .toLowerCase()
@@ -195,6 +246,7 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
                             },
                         secondary: ContactAvatar(uri: user.avatar),
                         title: Text(user.displayName),
+                        subtitle: widget.createGroup ? Text('ID：${user.id}') : null,
                       );
                     },
                   );

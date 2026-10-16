@@ -9,6 +9,7 @@ import '../../../core/error/app_failure.dart';
 import '../../../core/im/open_im_gateway.dart';
 import '../../../design/tokens.dart';
 import '../../../providers.dart';
+import '../../group/presentation/group_creation_action.dart';
 import '../data/conversation_repository.dart';
 import '../domain/conversation.dart';
 import 'conversations_controller.dart';
@@ -67,6 +68,8 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
           style: TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
+          GroupCreationAction(sourceCurrent: () => mounted && controller.repository.current,
+            checkVerification: true),
           IconButton(tooltip: '扫一扫', icon: const Icon(Icons.qr_code_scanner),
               onPressed: () => context.push('/qr/scan')),
           IconButton(tooltip: '全局搜索', icon: const Icon(Icons.travel_explore),
