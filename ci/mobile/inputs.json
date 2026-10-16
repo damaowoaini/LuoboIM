@@ -32,6 +32,12 @@
       "local_evidence_name": "fixture-revision-v2/manifest.json",
       "bytes": 3974,
       "sha256": "4c303771c6d700021f32e1adb234074be444c06cc97aceb1f4325ee0020ce63b"
+    },
+    "candidate_revision_v6": {
+      "manifest_sha256": "b4fda331ed8c535139d39b0938d095b607a4950be6eefb35e2e807ca702f7ae7",
+      "local_verification_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
+      "historical_failed_run38848168319": "current548 passed; candidate2passed then incomplete900s phase_timeout. Preserved artifacts.",
+      "new_claim": "local Mac21 only; pending Linux75/full623/analyze"
     }
   },
   "toolchain": {
@@ -1466,9 +1472,9 @@
   },
   "candidate249": {
     "members": 249,
-    "source_digest": "3c5da0fbfa62dd94c76368bbbb4d61e72893cbf52396935823f030de6f4cfafd",
-    "expected_target_tests": 73,
-    "expected_full_tests": 621,
+    "source_digest": "f703de845481101f7450fb78f89293b13f87b6e267e1e2ee6d02323395a7a8d1",
+    "expected_target_tests": 75,
+    "expected_full_tests": 623,
     "before": {
       "app/lib/app.dart": {
         "bytes": 18016,
@@ -1541,8 +1547,8 @@
       },
       {
         "path": "app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
-        "bytes": 3288,
-        "sha256": "4f702921c29f8b49b630708418d585c03904e409fbb7f33ddf25920a42046662"
+        "bytes": 3895,
+        "sha256": "88a8d3fac55288c57dec0cf8a58252242502c1292ee2c0c8f133376c1b74b302"
       },
       {
         "path": "app/lib/features/meeting/booking/presentation/bookings_page.dart",
@@ -1566,8 +1572,8 @@
       },
       {
         "path": "app/test/features/meeting/booking/booking_pages_test.dart",
-        "bytes": 23438,
-        "sha256": "567ddddcfb61a48daaa7720b2219acceee01cc7831f0b82ccac2bf6634ec5e93"
+        "bytes": 28151,
+        "sha256": "89c59d4d487dee3ce5009541a5d56dc75faca5c15bd8b19cdbff3bc0963f9c47"
       },
       {
         "path": "app/test/features/meeting/booking/booking_pending_journal_test.dart",
@@ -1609,6 +1615,23 @@
       ],
       "local_route_cases_passed": 2,
       "cloud_target73_full621": "pending"
+    },
+    "revision_v6": {
+      "parent_public_commit": "320b23e24515519a0c907939e6c6ecef37f004b2",
+      "parent_inputs_sha256": "531ba2aa3db1b0601cfa945db58b5b00b30edeba0b0dd12f28343dc99b6fbd0c",
+      "parent_source_digest": "3c5da0fbfa62dd94c76368bbbb4d61e72893cbf52396935823f030de6f4cfafd",
+      "changed_source_paths": [
+        "app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
+        "app/test/features/meeting/booking/booking_pages_test.dart"
+      ],
+      "product_change": "RecoveryPanel binds captured controller, current route and still-visible original UUID across legitimate Widget replacement",
+      "fixture_change": "real-origin local completion futures and pointer events; bounded alternation of widget pump and real SQL barrier;2 added retained-element negative cases",
+      "preserved_original_pages": 17,
+      "added_pages": 2,
+      "local_mac19pages_routes2": "21 actual PASS,0skip0error",
+      "source_manifest_sha256": "b4fda331ed8c535139d39b0938d095b607a4950be6eefb35e2e807ca702f7ae7",
+      "local_receipt_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
+      "cloud75_full623": "pending"
     }
   },
   "portable_members": {

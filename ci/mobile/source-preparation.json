@@ -1,5 +1,5 @@
 {
-  "state": "v2_fixture_source_prepared_route2_local_passed_current548_cloud_verified_candidate73_621_pending",
+  "state": "candidate_v6_source_prepared_actual_local21_pass_current548_cloud_verified_Linux75_full623_pending",
   "own_files": [
     {
       "path": ".github/workflows/mobile-ci.yml",
@@ -8,8 +8,8 @@
     },
     {
       "path": "ci/mobile-check.py",
-      "bytes": 12682,
-      "sha256": "612a0ad84a42fc38b17d3d63c387aad2bf2842a2c6b5e477e96bfd323b307341"
+      "bytes": 12885,
+      "sha256": "bc7c34e7370fc2e626a30c62f1e99f886afb90aeba3f29c35557797c51c8cf16"
     },
     {
       "path": "ci/mobile-netns.sh",
@@ -33,8 +33,8 @@
     },
     {
       "path": "ci/mobile/README.md",
-      "bytes": 5817,
-      "sha256": "82da0ced7aa57602c4f282342ed1275ab26332cee6aef7b0eeed7316275c861a"
+      "bytes": 5790,
+      "sha256": "78869bbd5165d8305c0c2b8cdb59f3e67bbc096b44abc758b17d8b102ff28bda"
     },
     {
       "path": "ci/mobile/candidate/app/lib/app.dart",
@@ -93,8 +93,8 @@
     },
     {
       "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
-      "bytes": 3288,
-      "sha256": "4f702921c29f8b49b630708418d585c03904e409fbb7f33ddf25920a42046662"
+      "bytes": 3895,
+      "sha256": "88a8d3fac55288c57dec0cf8a58252242502c1292ee2c0c8f133376c1b74b302"
     },
     {
       "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/bookings_page.dart",
@@ -118,8 +118,8 @@
     },
     {
       "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pages_test.dart",
-      "bytes": 23438,
-      "sha256": "567ddddcfb61a48daaa7720b2219acceee01cc7831f0b82ccac2bf6634ec5e93"
+      "bytes": 28151,
+      "sha256": "89c59d4d487dee3ce5009541a5d56dc75faca5c15bd8b19cdbff3bc0963f9c47"
     },
     {
       "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pending_journal_test.dart",
@@ -148,12 +148,12 @@
     },
     {
       "path": "ci/mobile/inputs.json",
-      "bytes": 64740,
-      "sha256": "531ba2aa3db1b0601cfa945db58b5b00b30edeba0b0dd12f28343dc99b6fbd0c"
+      "bytes": 66364,
+      "sha256": "bc320d298b55bc08bd859db15ddf7352502efe1b23bcef46a917b9cd56c0b159"
     }
   ],
-  "aggregate_sha256": "cb7db41e9f54b1752c3e04391be3b0b99660b563df6698ae263943cca47a3178",
-  "no_product_edits": true,
+  "aggregate_sha256": "a0b09f34c106778c0b2c72bb1d55de0dc07d70e1167767c83b7029e25a4c28cf",
+  "no_product_edits": false,
   "native_acceptance": false,
   "ci_followup": {
     "cause": "GitHub Actions run38844764587 validation rejected runner context in job-level env at line44",
@@ -193,5 +193,22 @@
     "current_v2": "2localMacroutePASS; Linux73/621 pending",
     "CI_observability": "fixed phase start/end enum progress; no change to timeouts/resource gates/expected counts",
     "supersedes_receipt_with_stale_initial_preparation_state_sha256": "5fe7ad78fe7187dd60c206758e812457240c4f442e6850228d8c1f5c1742396c"
+  },
+  "current_product_app230_unchanged": true,
+  "candidate_revision_v6": {
+    "prior_receipt_sha256": "08dd5ee358812b8959478a65320a22888af9a8f544c587bb392277b1f6a4b2ac",
+    "manifest_sha256": "b4fda331ed8c535139d39b0938d095b607a4950be6eefb35e2e807ca702f7ae7",
+    "actual_local_receipt_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
+    "candidate_product_fix_only": "RecoveryPanel legitimate rebuild vs stale callbacks; not applied to current product",
+    "actual_local": "19pages+2routes complete PASS/0skip/0error; no local full623",
+    "new_cloud_expected": {
+      "target": 75,
+      "full": 623,
+      "analyze": "pending"
+    },
+    "candidate_source_digest": "f703de845481101f7450fb78f89293b13f87b6e267e1e2ee6d02323395a7a8d1",
+    "preserved_original_pages": 17,
+    "added_negative_cases": 2,
+    "old_run38848168319": "candidate incomplete, not accepted; artifacts preserved"
   }
 }

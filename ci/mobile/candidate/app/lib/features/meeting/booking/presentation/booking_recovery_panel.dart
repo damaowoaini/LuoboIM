@@ -8,10 +8,20 @@ class BookingRecoveryPanel extends StatelessWidget {
   final BookingController controller;
   final ValueChanged<BookingReceipt>? onTerminal;
   final String? originalIntentID;
-  bool current(BuildContext context) => context.mounted && identical(context.widget, this) &&
-    controller.usable && ModalRoute.of(context)?.isCurrent == true;
+  bool displays(String id) => controller.unknownIDs.contains(id) ||
+    (isBookingUUID(originalIntentID) && originalIntentID == id);
+  bool current(BuildContext context, {String? intentID}) {
+    if (!context.mounted) return false;
+    final visible = context.widget;
+    // Normal route/dialog updates can replace this stateless Widget while its
+    // Element and captured owner remain valid. Never borrow a new controller
+    // or dispatch an intent that is no longer displayed by the current panel.
+    return visible is BookingRecoveryPanel && identical(visible.controller, controller) &&
+      controller.usable && ModalRoute.of(context)?.isCurrent == true &&
+      (intentID == null || visible.displays(intentID));
+  }
   Future<void> recover(BuildContext context, String id, {bool retry = false, bool resolve = false}) async {
-    if (!current(context) || (retry && !controller.canWrite)) return;
+    if (!current(context, intentID: id) || (retry && !controller.canWrite)) return;
     final receipt = await controller.recover(id, retry: retry, resolve: resolve);
     // Busy/pending/notice changes can replace this stateless panel. The result
     // belongs to the captured controller; the only consumer must fence its
@@ -35,7 +45,7 @@ class BookingRecoveryPanel extends StatelessWidget {
             ? () => recover(context, id, retry: true) : null, child: const Text('重试原操作')),
           TextButton(onPressed: controller.usable && !controller.isBusy(id) &&
             controller.availability != BookingAvailability.unsupported ? () async {
-            if (!current(context)) return;
+            if (!current(context, intentID: id)) return;
             final navigator = Navigator.of(context);
             final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
               title: const Text('核实并关闭原未知意图？'),
@@ -43,7 +53,7 @@ class BookingRecoveryPanel extends StatelessWidget {
               actions: [TextButton(onPressed: () => navigator.pop(false), child: const Text('返回')),
                 FilledButton(onPressed: () => navigator.pop(true), child: const Text('核实原意图'))],
             ));
-            if (confirmed == true && current(context)) await recover(context, id, resolve: true);
+            if (confirmed == true && current(context, intentID: id)) await recover(context, id, resolve: true);
           } : null, child: const Text('核实并关闭原意图')),
         ]),
       ]))),

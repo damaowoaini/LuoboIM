@@ -227,10 +227,12 @@ def run(work, cohort):
         tests = [flutter, 'test', '--no-pub', '--machine', '--concurrency=1', '--no-enable-vmservice']
         counts = {}
         if cohort == 'booking-custom249':
-            log = guarded(tests + plan['candidate249']['target_paths'], work, guard, 'target73')
-            counts['target'] = machine_summary(log.read_text(), 73)
-            write_json(work / 'evidence/target73.summary.json', counts['target'])
-        expected = 548 if cohort == 'current230' else 621
+            target_expected = plan['candidate249']['expected_target_tests']
+            target_label = 'target' + str(target_expected)
+            log = guarded(tests + plan['candidate249']['target_paths'], work, guard, target_label)
+            counts['target'] = machine_summary(log.read_text(), target_expected)
+            write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
+        expected = 548 if cohort == 'current230' else plan['candidate249']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
         write_json(work / 'evidence/full.summary.json', counts['full'])
