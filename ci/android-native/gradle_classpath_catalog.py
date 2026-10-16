@@ -7,6 +7,7 @@ import stat
 
 import run as parent
 import support as s
+import sdk_platform_producer as sdk_sources
 
 GRADLE_ZIP = '17f277867f6914d61b1aa02efab1ba7bb439ad652ca485cd8ca6842fccec6e43'
 JDK_ARCHIVE = '3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e'
@@ -88,6 +89,7 @@ def seal(job, here):
     for prefix in ('gradle-cache', 'selector-gradle-home'):
         if (work / prefix / 'caches/9.3.1/generated-gradle-jars').exists():
             raise ValueError('preexisting generated classpath is not a producer proof')
+    sdk_proof = sdk_sources.verified_sources(work)
     archives = {}
     for name, expected in [('gradle', GRADLE_ZIP), ('jdk', JDK_ARCHIVE)]:
         raw = read_json(work, work / 'evidence' / ('download-' + name + '.json'))
@@ -124,7 +126,8 @@ def seal(job, here):
         'distribution_files': initial, 'reports': reports,
         'reviewed_generator_source_metadata_sha256': s.sha(here / 'gradle-producer-sources.json'),
         'reviewed_generator_sources': reviewed_sources,
-        'application_or_fixture_parsed_before_producer': False}
+        'application_or_fixture_parsed_before_producer': False,
+        'SDK_platform_sources': sdk_proof}
     path = work / ROOT / 'catalog.json'
     s.write_json(path, catalog)
     s.write_json(work / ROOT / 'complete.json', {'state': 'passed', 'catalog': {

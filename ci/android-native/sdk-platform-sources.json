@@ -1,0 +1,72 @@
+{
+  "platforms": [
+    {
+      "jar": {
+        "bytes": 43044472,
+        "path": "platforms/android-37.0/android.jar",
+        "sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177"
+      },
+      "jar_member": "android-37.0/android.jar",
+      "official": {
+        "checksum": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
+        "checksum_type": "sha1",
+        "package": "platforms;android-37.0",
+        "revision": "2",
+        "size": 67281901,
+        "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip"
+      },
+      "properties": {
+        "bytes": 343,
+        "path": "platforms/android-37.0/source.properties",
+        "sha256": "fa89029fc0cee414cb5e44a37cd3033771217eeecb5086577bb6d9b1b03b5b5f"
+      },
+      "properties_member": "android-37.0/source.properties"
+    },
+    {
+      "jar": {
+        "bytes": 27768026,
+        "path": "platforms/android-36/android.jar",
+        "sha256": "d9eb9da824d9e247a352f570f01e1169e725b2954bca9e283a71786c59b59f9a"
+      },
+      "jar_member": "android-36/android.jar",
+      "official": {
+        "checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
+        "checksum_type": "sha1",
+        "package": "platforms;android-36",
+        "revision": "2",
+        "size": 65878410,
+        "url": "https://dl.google.com/android/repository/platform-36_r02.zip"
+      },
+      "properties": {
+        "bytes": 257,
+        "path": "platforms/android-36/source.properties",
+        "sha256": "72291ff6611dbfc46fdfb6de2821c4a62c87befa5200713847eda426e3a501c2"
+      },
+      "properties_member": "android-36/source.properties"
+    },
+    {
+      "jar": {
+        "bytes": 27092450,
+        "path": "platforms/android-35/android.jar",
+        "sha256": "4566663c3876e022b4fa4ced8c8697c4ab1688267f090114fd92d027b32e619b"
+      },
+      "jar_member": "android-35/android.jar",
+      "official": {
+        "checksum": "0bb560a90a7a2cbd0dd8348224d518b638fe7949",
+        "checksum_type": "sha1",
+        "package": "platforms;android-35",
+        "revision": "2",
+        "size": 64273788,
+        "url": "https://dl.google.com/android/repository/platform-35_r02.zip"
+      },
+      "properties": {
+        "bytes": 257,
+        "path": "platforms/android-35/source.properties",
+        "sha256": "2c3764446f335ad2cc44383a0360fe247620b7c774ec100d5087771ac8ed3b28"
+      },
+      "properties_member": "android-35/source.properties"
+    }
+  ],
+  "schema": 1,
+  "source": "reviewed R9 official metadata plus original toolchain/additions static crossplatform SHA256"
+}

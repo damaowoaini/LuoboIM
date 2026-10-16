@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """New explicit native cohort; old427/r1/r2 remain immutable borrowed inputs."""
 import argparse
+from contextlib import nullcontext
 import hashlib
 import json
 import os
@@ -16,12 +17,13 @@ import gradle_classpath_catalog as classpaths
 import gradle_variant_fixture as variants
 import run as parent
 import support as s
+import sdk_platform_producer as sdk_sources
 import verify_inputs
 
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r8-inherited-system-argument-catalog-binding'
+REVISION = 'root-r9-independent-official-SDK-platform-producer'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 
@@ -52,6 +54,8 @@ def metadata():
 class Job(parent.Job):
     def cmd(self, args, cwd, env, label, timeout=900, reject=None, stdin=None):
         catalog_before = None
+        if label == 'flutter-init':
+            sdk_sources.produce(self, args, cwd, env, timeout, reject, stdin)
         if label == 'gradle-dependency-setup':
             if getattr(self, '_typed_resolver_dispatch', None) is not False:
                 raise ValueError('one dispatch only inside inherited gradle_prepare')
@@ -85,8 +89,14 @@ class Job(parent.Job):
             catalog_before = classpaths.verified_catalog(self.w)
             args = list(args) + ['-DluoboClasspathCatalog=' + str(catalog_before[0]),
                                 '-DluoboClasspathCatalogSha256=' + catalog_before[1]]
+        if label == sdk_sources.TAMPER_LABEL:
+            sdk_sources.require_fault_dispatch(self, args, cwd, env, timeout, reject, stdin,
+                                               HERE / 'resolve-observed.gradle', catalog_before)
         try:
-            return super().cmd(args, cwd, env, label, timeout, reject, stdin)
+            fault = (sdk_sources.tamper_for_control(self.w, selectors.jar_bytes())
+                     if label == sdk_sources.TAMPER_LABEL else nullcontext())
+            with fault:
+                return super().cmd(args, cwd, env, label, timeout, reject, stdin)
         finally:
             if catalog_before is not None and classpaths.verified_catalog(self.w) != catalog_before:
                 raise ValueError('independent catalog changed during Gradle dispatch')

@@ -1,4 +1,4 @@
-name: Android current257 observed offline bind debug r8
+name: Android current257 observed offline bind debug r9
 
 on:
   workflow_dispatch:
@@ -31,13 +31,14 @@ jobs:
           umask 077
           mkdir -m 700 "$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "ANDROID_WORK=$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current257" >> "$GITHUB_ENV"
-      - name: Validate original29, metadata8, observer11 and selector4 Python controls
+      - name: Validate original29, metadata8, observer11, selector4 and SDK8 Python controls
         run: |
           python3 -B ci/secret_scan.py
           python3 -B ci/android-native/test_tools.py
           python3 -B ci/android-native/test_generated_module_probe.py
           python3 -B ci/android-native/test_go_observer.py
           python3 -B ci/android-native/test_gradle_selectors.py
+          python3 -B ci/android-native/test_sdk_platform_producer.py
       - name: Readonly pins and cold admission
         run: |
           python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage admission --work "$ANDROID_WORK"
@@ -46,12 +47,28 @@ jobs:
         run: python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage setup --work "$ANDROID_WORK"
       - name: Actual offline bind with bounded real generated-source evidence
         run: sudo unshare --net -- bash ci/android-native/netns-observed.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" core
-      - name: First builtin preseal models then sixteen real offline Gradle controls including inherited catalog
+      - name: First builtin preseal models then eighteen real offline Gradle controls including inherited catalog and three SDK files
         run: sudo unshare --net -- bash ci/android-native/netns-observed.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" gradle-controls
       - name: Resolve Java dependencies with original source provenance checks
         run: python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage gradle-setup --work "$ANDROID_WORK"
       - name: Original seven negative gates and real Debug APK offline
         run: sudo unshare --net -- bash ci/android-native/netns-observed.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" apk
+      - name: Bound the separate exact official SDK source archive upload
+        id: sdk_source_budget
+        if: always()
+        run: python3 -B ci/android-native/sdk_platform_producer.py --archive-upload-admission "$ANDROID_WORK"
+      - name: Preserve only three acquired official platform ZIPs in separate cloud artifact
+        if: always() && steps.sdk_source_budget.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current257-official-platform-sources-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-37.0.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-36.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-35.zip
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
       - name: Keep exact generated source evidence, raw locks, failure and artifacts
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f

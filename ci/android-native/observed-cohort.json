@@ -1,217 +1,237 @@
 {
-  "schema": "luobo.observed-bind.explicit-cohort.v1",
   "cohort": "current257-auditable-arm64-observed-bind-v1",
-  "source_ref": "314ac556fdc4be7f98dbd74370201922c71e67c5",
-  "source_digest": "5a8d283873826125aea888380cee0b37d5651613859ff32bad2da542dd5a5a55",
+  "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true,
   "controller_inputs": [
     {
-      "path": ".github/workflows/android-debug.yml",
       "bytes": 2595,
+      "path": ".github/workflows/android-debug.yml",
       "sha256": "4222ed3e9b9d303544fe5ce4853a04bae50685bb6cb98b39d48e8aed843cb4e2"
     },
     {
-      "path": ".github/workflows/android-generated-module-evidence.yml",
       "bytes": 1727,
+      "path": ".github/workflows/android-generated-module-evidence.yml",
       "sha256": "dbb3561842568c495531d11dde93543ee21a78470457c61e69adc4bd1da68a42"
     },
     {
+      "bytes": 4289,
       "path": ".github/workflows/android-observed-debug.yml",
-      "bytes": 3223,
-      "sha256": "42c5dff6265dbe2cc625a292d4af3c621d9a82fa62c277d6661c1878de670d44"
+      "sha256": "f257d41d492069b3e14cbed9033a77d9be8436e75a4c0605f53497508cce538a"
     },
     {
-      "path": "ci/android-native/audit.py",
       "bytes": 8531,
+      "path": "ci/android-native/audit.py",
       "sha256": "1edf23b5ce32258e3e37d7af615b672e764de8193540aaa7de8a6fc03888d974"
     },
     {
-      "path": "ci/android-native/bindings.json",
       "bytes": 130088,
+      "path": "ci/android-native/bindings.json",
       "sha256": "6833a16883a6ae43b91b7400ecd49af6f44dd0d85adcc1b4e98f45213302f4fd"
     },
     {
-      "path": "ci/android-native/cohort.json",
       "bytes": 1743,
+      "path": "ci/android-native/cohort.json",
       "sha256": "34ec3ae5007774de773af66de98d07de450ca5a831488e3ab645f3cad9079b93"
     },
     {
-      "path": "ci/android-native/dependency-additions.json",
       "bytes": 1651,
+      "path": "ci/android-native/dependency-additions.json",
       "sha256": "1f11a3a67e28e19a6c4114421947923b44015bb4a8df2d356b96bcde796f054e"
     },
     {
-      "path": "ci/android-native/generated_module_probe.py",
       "bytes": 20761,
+      "path": "ci/android-native/generated_module_probe.py",
       "sha256": "04ab0a4e6a34e52663e5b813711a0ac943ecd86472ae81286e33e982d57ddfc2"
     },
     {
-      "path": "ci/android-native/go_observer.py",
       "bytes": 14494,
+      "path": "ci/android-native/go_observer.py",
       "sha256": "e7939ea1fe1332cb9891449309a69706fa63b72fea948384cb3612fa600cd44d"
     },
     {
-      "path": "ci/android-native/gradle-producer-sources.json",
       "bytes": 4741,
+      "path": "ci/android-native/gradle-producer-sources.json",
       "sha256": "e3dd7e85b7de17ccc41505d4bd03e1b000bc7206d4c7970209c89425fa12c60f"
     },
     {
+      "bytes": 8193,
       "path": "ci/android-native/gradle_classpath_catalog.py",
-      "bytes": 8055,
-      "sha256": "2b7125df9998fb74d1359d3d720b44c40250ed563cf0e67e987176fdcc8f5216"
+      "sha256": "29f02f3608c6639340102048c784aa1db6cf95e5efcfd3de09c2c405181177ea"
     },
     {
+      "bytes": 10728,
       "path": "ci/android-native/gradle_local_file_fixture.py",
-      "bytes": 10561,
-      "sha256": "42d98753f46fed243bb84e3162cd44cf71bd98250eb2f8080b946fa72568ae5a"
+      "sha256": "854bbfc2e86bbf494f7afd3398c17da101b623e4531b0fe391de14d07bec6c5a"
     },
     {
-      "path": "ci/android-native/gradle_selector_fixture.py",
       "bytes": 9888,
+      "path": "ci/android-native/gradle_selector_fixture.py",
       "sha256": "c9ce2721ee9a8e8dfbdaf925c604decbb7423b46003519ed8e3ea307b3cbb232"
     },
     {
-      "path": "ci/android-native/gradle_variant_fixture.py",
       "bytes": 6425,
+      "path": "ci/android-native/gradle_variant_fixture.py",
       "sha256": "93f076c22c5e99f6ad8dc96d520471cab918c755ed8d049f05653634611b6a12"
     },
     {
-      "path": "ci/android-native/inputs.json",
       "bytes": 83426,
+      "path": "ci/android-native/inputs.json",
       "sha256": "1852fa0318522f8ca6cf41468880a7153022ae64f31369eddd9af0abadeb4364"
     },
     {
-      "path": "ci/android-native/luobo_module_projection_test.go",
       "bytes": 3768,
+      "path": "ci/android-native/luobo_module_projection_test.go",
       "sha256": "8656e3104a902b78b48ff818c1c90b798a915ea6734a57e089347e9615e6422c"
     },
     {
-      "path": "ci/android-native/netns-observed.sh",
       "bytes": 546,
+      "path": "ci/android-native/netns-observed.sh",
       "sha256": "6b7c41b40633548b342d0e0b2600747c4b379d67e2947b93bede350f3830cf32"
     },
     {
-      "path": "ci/android-native/netns.sh",
       "bytes": 505,
+      "path": "ci/android-native/netns.sh",
       "sha256": "4b685076b2d61f9b90ac7903f2bf2fda17362ef1e120e45c9c5f127392243e2a"
     },
     {
-      "path": "ci/android-native/observed-inputs.json",
       "bytes": 81903,
+      "path": "ci/android-native/observed-inputs.json",
       "sha256": "eeee0b96bdae47e98fff10433f8a9c4391703421100e3164e312328c8be4574c"
     },
     {
+      "bytes": 25734,
       "path": "ci/android-native/observed_bind.py",
-      "bytes": 25115,
-      "sha256": "359bc7e44b5badf2fc56360fd35937fcf098efcea5a03f0d41c91958ecf9d1e8"
+      "sha256": "b61eb434f28a3547f3895a6054a40a960669aaec6b9d4359b0056c0447402f60"
     },
     {
-      "path": "ci/android-native/preseal-classpaths.gradle",
       "bytes": 4995,
+      "path": "ci/android-native/preseal-classpaths.gradle",
       "sha256": "d6c69402fc5b6de5de6f279f3a6137e9b8cb018a5924f25b8e6dbcf22d83f96a"
     },
     {
-      "path": "ci/android-native/projected-module-after.mod",
       "bytes": 4081,
+      "path": "ci/android-native/projected-module-after.mod",
       "sha256": "f68c72acfd31c65d734712c229af867f8d2b8d06ab2ffae631dbf26a59223841"
     },
     {
-      "path": "ci/android-native/projected-module-before.mod",
       "bytes": 4081,
+      "path": "ci/android-native/projected-module-before.mod",
       "sha256": "05e30d386898edc45e01458e5dcd79d166965d89cb4537a436ed5beeaba21088"
     },
     {
+      "bytes": 24221,
       "path": "ci/android-native/resolve-observed.gradle",
-      "bytes": 20825,
-      "sha256": "4bf59b169dba452ba57be1574e2e266ba8ad42f8f5a8ad347e536e5edca34967"
+      "sha256": "7f270976f4922ae8c2e8c6d934194d71e6c9a2b5cb91db0318dbd3e471529273"
     },
     {
-      "path": "ci/android-native/resolve.gradle",
       "bytes": 4859,
+      "path": "ci/android-native/resolve.gradle",
       "sha256": "fbd6cca215d4739ea89748650f4eb6a5c297253eb5c1b6f2ca888a8c52d812ad"
     },
     {
-      "path": "ci/android-native/run.py",
       "bytes": 42548,
+      "path": "ci/android-native/run.py",
       "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
     },
     {
-      "path": "ci/android-native/support.py",
+      "bytes": 2555,
+      "path": "ci/android-native/sdk-platform-sources.json",
+      "sha256": "458521e73daf071305478af09e35eb5eff960dd94a7fbdd795ac400561ec5e86"
+    },
+    {
+      "bytes": 5489,
+      "path": "ci/android-native/sdk_platform_fixture.py",
+      "sha256": "afe3fe5732e167be60144a7711dd401f8dcf4bae8ccd8575575cf4298162e6e1"
+    },
+    {
+      "bytes": 21934,
+      "path": "ci/android-native/sdk_platform_producer.py",
+      "sha256": "79c1b26feee8284ed7aba1c270564da055b612c52d0ccc4e33a4ef4321d4d33a"
+    },
+    {
       "bytes": 11876,
+      "path": "ci/android-native/support.py",
       "sha256": "818ed812deab20b25d4e8352f7d31b637039c0a881c8fc0fa070bc2ce1ea8fbd"
     },
     {
-      "path": "ci/android-native/test_generated_module_probe.py",
       "bytes": 7209,
+      "path": "ci/android-native/test_generated_module_probe.py",
       "sha256": "c5e0682033df28bcc64b40a212ea16ade6a8c6bf5fc8fedf3858c00501636461"
     },
     {
-      "path": "ci/android-native/test_go_observer.py",
       "bytes": 11688,
+      "path": "ci/android-native/test_go_observer.py",
       "sha256": "af00dd3f3d8ea5fe9d25990aaeba871f1bbd800929610c137c950208e7032d8a"
     },
     {
-      "path": "ci/android-native/test_gradle_selectors.py",
       "bytes": 7906,
+      "path": "ci/android-native/test_gradle_selectors.py",
       "sha256": "9c637263fb3503d76702215362206cd05b79741ece6c72006e599ec01bb68cfc"
     },
     {
-      "path": "ci/android-native/test_tools.py",
+      "bytes": 7149,
+      "path": "ci/android-native/test_sdk_platform_producer.py",
+      "sha256": "223387bcbded0f62013ae34f12a03815c1486ce9db04e0abb6efe7af8c0f050a"
+    },
+    {
       "bytes": 19907,
+      "path": "ci/android-native/test_tools.py",
       "sha256": "701c229a197c5ba1dcd6b59b47047b3fa9cc5bbdfb8e5b5453fbbdac09f1833c"
     },
     {
-      "path": "ci/android-native/toolchain.json",
       "bytes": 8078,
+      "path": "ci/android-native/toolchain.json",
       "sha256": "13cdeeb22b003d24714525c7de483446d8e0e0eed23200c4f54df1badd2251bd"
     },
     {
-      "path": "ci/android-native/verify_inputs.py",
       "bytes": 2962,
+      "path": "ci/android-native/verify_inputs.py",
       "sha256": "266a89fe31cbd9c40aa566a8f8f1404d9a04fed2a9a736a6cafac7e9142eede5"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/UPSTREAM-LICENSE-APACHE-2.0",
       "bytes": 11356,
+      "path": "packages/flutter_openim_sdk/tool/native_core/UPSTREAM-LICENSE-APACHE-2.0",
       "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
       "bytes": 18776,
+      "path": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
       "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/build_candidate.py",
       "bytes": 16877,
+      "path": "packages/flutter_openim_sdk/tool/native_core/build_candidate.py",
       "sha256": "44d5d7d713e1f3e536db405318998ff618beb1ce6e25030269ba3557f373c32c"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/build_observed_candidate.py",
       "bytes": 19159,
+      "path": "packages/flutter_openim_sdk/tool/native_core/build_observed_candidate.py",
       "sha256": "84c5977a57b2830385824abaecb1bf29ecb4f593454b724a554b86747346c079"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/candidate-source-manifest.json",
       "bytes": 21153,
+      "path": "packages/flutter_openim_sdk/tool/native_core/candidate-source-manifest.json",
       "sha256": "c4311042854604c113ce484b327349c9ff566b80ba326fc071d358cdbaa67447"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/patches/0001-enterprise-protocol-compat.patch",
       "bytes": 142887,
+      "path": "packages/flutter_openim_sdk/tool/native_core/patches/0001-enterprise-protocol-compat.patch",
       "sha256": "dcbc80f89ce07eaac8a2c28c23e1cbaef0db9c2c79cacffdaa020d61a356e1f7"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/patches/0002-debug-fixture-tls-only.patch",
       "bytes": 17958,
+      "path": "packages/flutter_openim_sdk/tool/native_core/patches/0002-debug-fixture-tls-only.patch",
       "sha256": "72bb5adddedf262be493afa08bd4091a5dafc3a5596799b5a2fa7f272c37e0b3"
     },
     {
-      "path": "packages/flutter_openim_sdk/tool/native_core/qa-fixture-source-manifest.json",
       "bytes": 2838,
+      "path": "packages/flutter_openim_sdk/tool/native_core/qa-fixture-source-manifest.json",
       "sha256": "a9d23ebeac7ca7ed637628838b96ac79ba61e6f238e3392c108a10e2529b02ce"
     }
   ],
+  "controller_revision": "root-r9-independent-official-SDK-platform-producer",
   "members": 428,
   "old427_r1_r2_immutable": true,
-  "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true,
-  "controller_revision": "root-r8-inherited-system-argument-catalog-binding"
+  "schema": "luobo.observed-bind.explicit-cohort.v1",
+  "source_digest": "5a8d283873826125aea888380cee0b37d5651613859ff32bad2da542dd5a5a55",
+  "source_ref": "314ac556fdc4be7f98dbd74370201922c71e67c5"
 }

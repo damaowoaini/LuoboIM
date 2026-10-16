@@ -1,4 +1,4 @@
-// Explicit observed-r8 resolver; original resolve.gradle remains immutable.
+// Explicit observed-r9 resolver; original resolve.gradle remains immutable.
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import java.security.MessageDigest
@@ -91,6 +91,29 @@ catalog.reports.each { name, report ->
         }
     }
 }
+// Only three reviewed android.jar bodies; other SDK paths have no authority.
+def sdkExpected = new JsonSlurper().parseText('''{"platforms;android-35": {"archive_bytes": 64273788, "archive_path": "sdk-platform-source-proof/archives/android-35.zip", "bytes": 27092450, "member": "android-35/android.jar", "official": {"checksum": "0bb560a90a7a2cbd0dd8348224d518b638fe7949", "checksum_type": "sha1", "package": "platforms;android-35", "revision": "2", "size": 64273788, "url": "https://dl.google.com/android/repository/platform-35_r02.zip"}, "path": "android/platforms/android-35/android.jar", "sha256": "4566663c3876e022b4fa4ced8c8697c4ab1688267f090114fd92d027b32e619b"}, "platforms;android-36": {"archive_bytes": 65878410, "archive_path": "sdk-platform-source-proof/archives/android-36.zip", "bytes": 27768026, "member": "android-36/android.jar", "official": {"checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576", "checksum_type": "sha1", "package": "platforms;android-36", "revision": "2", "size": 65878410, "url": "https://dl.google.com/android/repository/platform-36_r02.zip"}, "path": "android/platforms/android-36/android.jar", "sha256": "d9eb9da824d9e247a352f570f01e1169e725b2954bca9e283a71786c59b59f9a"}, "platforms;android-37.0": {"archive_bytes": 67281901, "archive_path": "sdk-platform-source-proof/archives/android-37.0.zip", "bytes": 43044472, "member": "android-37.0/android.jar", "official": {"checksum": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410", "checksum_type": "sha1", "package": "platforms;android-37.0", "revision": "2", "size": 67281901, "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip"}, "path": "android/platforms/android-37.0/android.jar", "sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177"}}''')
+def sdkProducer = catalog.SDK_platform_sources
+if (sdkProducer == null || sdkProducer.schema != 1 || sdkProducer.state != 'passed' ||
+        sdkProducer.before_first_model != true || sdkProducer.platforms.size() != 3 ||
+        (sdkProducer.platforms.collect { it.package } as Set) != sdkExpected.keySet())
+    throw new GradleException('complete exact official SDK producer required')
+def sdkSources = [:]
+sdkProducer.platforms.each { source ->
+    def expected = sdkExpected[source.package]
+    def jar = source.jar
+    if (source.kind != 'official-SDK-platform-ZIP-member' || source.official != expected.official ||
+            source.official_sha1_checked != true || source.full_ZIP_CRC_and_safety_checked != true ||
+            jar.path != expected.path || jar.bytes != expected.bytes || jar.sha256 != expected.sha256 ||
+            jar.ZIP_member != expected.member || source.archive.path != expected.archive_path ||
+            source.archive.bytes != expected.archive_bytes || !(source.archive.sha256 ==~ /[0-9a-f]{64}/) ||
+            sdkSources.containsKey(jar.path) || approvedFiles.containsKey(jar.path))
+        throw new GradleException('SDK catalog exceeds reviewed official member authority')
+    approvedFiles[jar.path] = jar
+    sdkSources[jar.path] = [kind:source.kind, package:source.package, revision:source.revision,
+        official:source.official, archive:source.archive, ZIP_member:jar.ZIP_member,
+        original_static_sha256:jar.sha256]
+}
 gateDiagnostic('catalog_bytes_bound')
 def localRef = { File original ->
     def file = original.canonicalFile
@@ -127,8 +150,10 @@ def approvedLocal = { File file, component, p, c ->
 def localIdentity = { component, p, c ->
     if (component.getClass() == OpaqueComponentArtifactIdentifier) {
         def file = approvedLocal(component.getFile(), component, p, c)
-        return [kind:'presealed-file', component_class:component.getClass().name,
-            file:file, catalog_sha256:expectedCatalogSha]
+        def source = sdkSources[file.path]
+        return [kind:source == null ? 'presealed-file' : 'presealed-SDK-platform-file',
+            component_class:component.getClass().name, file:file,
+            source:source, catalog_sha256:expectedCatalogSha]
     }
     if (component.getClass() == OpaqueComponentIdentifier) {
         def notation = component.getClassPathNotation().name()
@@ -311,7 +336,7 @@ gradle.projectsEvaluated {
                                 if (selected.kind == 'presealed-gradle-classpath' &&
                                         !catalog.reports[selected.cache].notations[selected.notation].files.any { it.path == file.path })
                                     refusal(component, p, c, 'artifact-outside-notation')
-                                if (selected.kind == 'presealed-file' && selected.file.path != file.path)
+                                if ((selected.kind in ['presealed-file','presealed-SDK-platform-file']) && selected.file.path != file.path)
                                     refusal(component, p, c, 'artifact-differs-from-file-component')
                                 rows.add([project:p.path, configuration:c.name, selected:selected,
                                     path:file.path, bytes:file.bytes, sha256:file.sha256])

@@ -6,6 +6,7 @@ from pathlib import Path
 import gradle_classpath_catalog as producer
 import gradle_selector_fixture as original
 import support as s
+import sdk_platform_fixture as sdk_fixture
 
 CASES = ('file-project-module', 'same-name-unlisted-file', 'file-project-transitive-snapshot')
 UNLISTED = 'unknown or unapproved local artifact component refused: file-not-in-independent-producer'
@@ -61,10 +62,12 @@ def approved = new File(System.getenv('ANDROID_NATIVE_WORK'),
     s.write_json(root / 'prepared-local-files.json', {'state': 'prepared_not_executed',
         'cases': result, 'original12_unchanged': True, 'Gradle_processes': 3,
         'producer_is_separate_first_builtin_models': True})
-    return result + prepare_included(work)
+    return result + prepare_included(work) + sdk_fixture.prepare(work)
 
 
 def check(case, log, captured):
+    if case.get('SDK_platform_contract'):
+        return sdk_fixture.check(case, log, captured)
     if case.get('included_catalog_contract'):
         return check_included(case, log, captured)
     work = Path(case['cwd']).parents[2]
