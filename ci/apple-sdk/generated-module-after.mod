@@ -1,0 +1,107 @@
+module gobind
+
+go 1.27
+
+replace github.com/openimsdk/openim-sdk-core/v3 => /__LUOBO_JOB_CORE__
+
+require (
+	cloud.google.com/go/compute v1.20.1
+	cloud.google.com/go/compute/metadata v0.2.3
+	github.com/OpenIMSDK/protocol v0.0.40
+	github.com/OpenIMSDK/tools v0.0.24
+	github.com/benbjohnson/clock v1.1.0
+	github.com/beorn7/perks v1.0.1
+	github.com/bwmarrin/snowflake v0.3.0
+	github.com/bytedance/sonic v1.9.1
+	github.com/census-instrumentation/opencensus-proto v0.4.1
+	github.com/cespare/xxhash/v2 v2.2.0
+	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311
+	github.com/cncf/udpa/go v0.0.0-20220112060539-c52dc94e7fbe
+	github.com/cncf/xds/go v0.0.0-20230607035331-e9ce68804cb4
+	github.com/davecgh/go-spew v1.1.1
+	github.com/envoyproxy/go-control-plane v0.11.1-0.20230524094728-9239064ad72f
+	github.com/envoyproxy/protoc-gen-validate v0.10.1
+	github.com/gabriel-vasile/mimetype v1.4.2
+	github.com/gin-contrib/sse v0.1.0
+	github.com/gin-gonic/gin v1.9.1
+	github.com/go-playground/locales v0.14.1
+	github.com/go-playground/universal-translator v0.18.1
+	github.com/go-playground/validator/v10 v10.14.0
+	github.com/go-zookeeper/zk v1.0.3
+	github.com/goccy/go-json v0.10.2
+	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang/glog v1.1.0
+	github.com/golang/protobuf v1.5.3
+	github.com/golang/snappy v0.0.3
+	github.com/google/go-cmp v0.6.0
+	github.com/google/uuid v1.3.0
+	github.com/gorilla/websocket v1.4.2
+	github.com/jinzhu/copier v0.3.5
+	github.com/jinzhu/inflection v1.0.0
+	github.com/jinzhu/now v1.1.5
+	github.com/jonboulle/clockwork v0.4.0
+	github.com/json-iterator/go v1.1.12
+	github.com/klauspost/compress v1.13.6
+	github.com/klauspost/cpuid/v2 v2.2.4
+	github.com/kr/text v0.2.0
+	github.com/leodido/go-urn v1.2.4
+	github.com/lestrrat-go/envload v0.0.0-20180220234015-a3eb8ddeffcc
+	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
+	github.com/lestrrat-go/strftime v1.0.6
+	github.com/mattn/go-isatty v0.0.19
+	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/matttproud/golang_protobuf_extensions v1.0.4
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+	github.com/modern-go/reflect2 v1.0.2
+	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pelletier/go-toml/v2 v2.0.8
+	github.com/pkg/errors v0.9.1
+	github.com/pmezard/go-difflib v1.0.0
+	github.com/prometheus/client_golang v1.16.0
+	github.com/prometheus/client_model v0.3.0
+	github.com/prometheus/common v0.42.0
+	github.com/prometheus/procfs v0.10.1
+	github.com/rogpeppe/go-internal v1.11.0
+	github.com/stretchr/objx v0.5.0
+	github.com/stretchr/testify v1.8.3
+	github.com/twitchyliquid64/golang-asm v0.15.1
+	github.com/ugorji/go/codec v1.2.11
+	github.com/xdg-go/pbkdf2 v1.0.0
+	github.com/xdg-go/scram v1.1.2
+	github.com/xdg-go/stringprep v1.0.4
+	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d
+	go.mongodb.org/mongo-driver v1.12.0
+	go.uber.org/atomic v1.7.0
+	go.uber.org/goleak v1.1.11
+	go.uber.org/multierr v1.6.0
+	go.uber.org/zap v1.24.0
+	golang.org/x/arch v0.3.0
+	golang.org/x/crypto v0.58.0
+	golang.org/x/exp/shiny v0.0.0-20261009195045-ca0d7ba23607
+	golang.org/x/image v0.47.0
+	golang.org/x/mobile v0.0.0-20261011034528-197770444867
+	golang.org/x/mod v0.42.0
+	golang.org/x/net v0.61.0
+	golang.org/x/oauth2 v0.8.0
+	golang.org/x/sync v0.24.0
+	golang.org/x/sys v0.49.0
+	golang.org/x/term v0.47.0
+	golang.org/x/text v0.43.0
+	golang.org/x/tools v0.52.0
+	golang.org/x/tools/go/expect v0.1.1-deprecated
+	golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+	google.golang.org/appengine v1.6.7
+	google.golang.org/genproto v0.0.0-20230706204954-ccb25ca9f130
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230717213848-3f92550aa753
+	google.golang.org/grpc v1.56.2
+	google.golang.org/protobuf v1.31.0
+	gopkg.in/yaml.v3 v3.0.1
+	gorm.io/driver/sqlite v1.3.6
+	gorm.io/gorm v1.23.8
+	nhooyr.io/websocket v1.8.10
+)
+
+replace github.com/OpenIMSDK/protocol => /__LUOBO_JOB_PROTOCOL__

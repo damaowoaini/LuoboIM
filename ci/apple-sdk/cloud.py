@@ -17,6 +17,7 @@ import tarfile
 import urllib.parse
 import urllib.request
 import zipfile
+import generated_module
 
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[1]
@@ -278,9 +279,14 @@ def setup(w):
     commit=command(w,'source-object',git+['-C',upstream,'rev-parse','FETCH_HEAD'],w,e).strip()
     if commit!=s['core_commit']:raise ValueError('exact upstream commit differs')
     c=derive_inputs(w,s,e)
+    c['generated_module_provenance']={'schema':'luobo.apple.generated-provenance.v1',
+        'helper':str(w/'setup/controller/generated_module.py'),
+        'helper_sha256':sha(HERE/'generated_module.py'),
+        'catalogue_sha256':generated_module.SUM_SHA}
     controller=w/'setup/controller';mkdir(controller)
     files=[]
-    for n in ['apple_core.py','apple_observer.py','link_probe.py','core_binary.py']:
+    for n in ['apple_core.py','apple_observer.py','link_probe.py','core_binary.py','generated_module.py',
+              'generated-module-before.mod','generated-module-after.mod','generated-module-acquired.sum']:
         b=(HERE/n).read_bytes();put(controller/n,b);files.append(dict(path=n,sha256=hashlib.sha256(b).hexdigest()))
     body=(json.dumps(c,sort_keys=True,indent=2)+'\n').encode();put(controller/'inputs.json',body)
     files.append(dict(path='inputs.json',sha256=hashlib.sha256(body).hexdigest()))
@@ -296,6 +302,7 @@ def setup(w):
         after={n:sha(prefetch/'core'/n) for n in before};record(w/'evidence/prefetch-after.json',after)
         if after!=before or after['go.sum']!=s['acquired_sum_sha256']:raise ValueError('core acquired lock changed')
     command(w,'core-module-verify',[c['go'],'mod','verify'],prefetch/'core',e)
+    generated_module.prewarm(w,prefetch/'core',prefetch/'protocol',c['go'],e,command,mkdir,put,record)
     core.inputs()
     record(w/'evidence/setup-derived.json',dict(controller_manifest_sha256=sha(controller/'manifest.json'),runtime_inputs_sha256=sha(controller/'inputs.json'),
        source_registry_sha256=sha(HERE/'registry.json'),module_warm_not_actual_generated_lock=True))

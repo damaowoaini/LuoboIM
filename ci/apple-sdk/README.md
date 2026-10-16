@@ -1,23 +1,55 @@
-# Apple SDK-only cloud ARM64
+# Apple SDK-only cloud ARM64 — R6-R1 generated-module closure
 
-显式 cohort：`apple-sdk-only-cloud-arm64-r1`；底层 SDK-only 合同仍为 `auditable-sdk-apple-arm64-v1`，不指代任何当前 App。
+The explicit cloud lane remains `apple-sdk-only-cloud-arm64-r1`, SDK-only device
+and simulator arm64/min15, with no App/signing/device claim. R6 is an explicit
+registry/source revision and rejects older work through the existing registry SHA.
+Original local R1 nine files and every R2–R5 failure/evidence stay historical.
 
-仅 `workflow_dispatch`，标准公共 `macos-15` ARM64。使用已安装 Xcode 16.4/16F6、iOS SDK 18.5 和 Python 3.12.10，缺失即失败，不自动切换。云端实际工具 SHA 属于当次来源，不能冒充本地 host233。
+R5 really ran `go mod download all` in core. Its actual generated iOS and simulator
+tidy-v failed on compute1.20.1 offline; no archive/Swift/ObjC link completed. Core
+8eb9 was intact. The generated original97 template matches the independently
+accepted Android projection after only the two owned replace paths are normalized.
 
-三个固定入口（先由 Root 审核并采用）：
+R6 setup keeps core acquisition unchanged. A separate owned metadata-only warm
+root starts from original97 + independent610-line sum, sharing only the job cache.
+`download all` may perform only the reviewed8 byte-exact version changes; both
+warm locks then remain fixed through offline verify and selected graph checks.
+610 hashes cover359 identities:251 ZIP+mod pairs and108 mod-only. No per-module
+ZIP fetch loop, empty-directory tidy, version forcing or bind-error retry exists.
+The warm locks are never copied into actual generated bind trees.
 
-```sh
-python3.12 -B ci/apple-sdk/cloud.py --cohort apple-sdk-only-cloud-arm64-r1 --stage readonly
-python3.12 -B ci/apple-sdk/cloud.py --cohort apple-sdk-only-cloud-arm64-r1 --stage setup --work "$RUNNER_TEMP/luobo-apple-sdk-r1"
-python3.12 -B ci/apple-sdk/cloud.py --cohort apple-sdk-only-cloud-arm64-r1 --stage build --work "$RUNNER_TEMP/luobo-apple-sdk-r1"
-```
+Actual bind remains network-denied. Its original plain/verbose tidy argv is
+forwarded unchanged; Go/ObjC/header/module before+after/failure snapshots remain.
+On successful real tidy, one fixed real-Go `list -m -json all` read-only audit
+checks generated requires, selected versions and only two owned replacements.
+Every selected external .mod is read from the controller-bound owned GOMODCACHE,
+using official Go cache escaping and single-go.mod dirhash.Hash1, and must match
+its independent610 h1. Graph GoMod pointers are never read. GoModSum/Sum are
+optional Go JSON fields; when present they must match the finite catalogue too. Unknowns fail even if an unrelated
+tool-install cache contains them. Actual tidy may prune metadata rows; the610 lock
+is provenance/cache input, not an asserted full-bind lock. This audit runs before
+the observer returns to gomobile's archive compile. It shares signal forwarding,
+stdio evidence and the outer exact monitored process group.
 
-setup 冷准入 8GiB、owned 3GiB/1200s；仅固定官方 Go/engine、public core commit、h1 校验 Go 模块获取。保留本 job 精确下载归档，独立上传 products，评审者不自动下载大包。engine 尚无预存 ZIP SHA256，按固定 generation/size/官方 MD5+CRC32C、完整 ZIP CRC 和 50 个原 Flutter member SHA 校验，并记录实际 archive SHA。
+All prior environment/Git isolation, official Go1.27.2/mobile/engine inputs,
+static-core/platform/minOS,18 Swift+ObjC and linked-binary gates remain. Resources
+are unchanged: cold setup8GiB/allocated3GiB/1200s; build4GiB initial, continuous
+1GiB/.2s, all-owned6GiB+build3GiB/1800s. New warm caches/locks/raw count in these
+caps. No host HOME rewrite, shared cache deletion or extra network for build.
 
-build 准入 4GiB，持续 floor 1GiB/.2s，单个实际 worker 进程组，1800s；同一 guard 同时测量整个 owned root 6GiB 和 build 子树 3GiB。原 R1 worker/observer/静态 archive/平台和 minOS/18 Swift+ObjC 真编译链接门禁复用，网络全拒，只有 build 子树可写。SIGTERM/SIGINT 在调用 imported guard.run 前显式转为中断，guard 杀完整精确进程组；额度/取消/monitor 异常/最终采样失败优先于任何 passed JSON。启动与 stage-passed durable 写入在该 guard 的 worker 内，guard 自身最后落盘 resource receipt。
+Prepared only: `python3.12 -B -m unittest -v test_generated_module.GeneratedClosure`
+has4 new pure controls, including actual observer.main with a Python child. It
+never executes Go/native/network and does not prove OS cancellation or SDK link.
+Root must review then run only those4 under private TMP/network deny/1GiB/.2s/
+64MiB/30s. Reuse unchanged parser16/cloud12/env1/DNS2/streams3/observer3 evidence;
+no old/full suite rerun is requested. No local Go, downloads or cloud dispatch
+occurred in this source preparation.
 
-HOME 保留机器实际值并只读；GOPATH/GOMODCACHE/GOCACHE/TMPDIR 等全部显式任务路径，GOENV/GOAUTH 关闭，不改系统或用户设置。旧本机 R1 九文件不改；新 apple_core 副本只有 inputs / environment / prepare 三个函数变化。
-
-**尚未执行**：新 12 个 pure controls、获取、Go bind、Swift/ObjC link 或云 workflow。本地原 parser/control 结果复用，不重跑。新控制可由 Root 在 network-deny/private TMP/resource guard 下只运行 `test_cloud.py`。不要调用 cloud stages 来做 pure unit 检查。
-
-实际成功也仅证明新 SDK 的 device+sim arm64/min15 编译链接和二进制门禁，不证明全 App、签名、模拟器/真机运行、媒体或旧 opaque Enterprise 框架等价。保留 gomobile raw Info.plist MinimumOSVersion100 workaround；真实 Mach-O 部署目标另验。Apple 真实 generated dependency cache miss 仍必须失败，不能拿 Android metadata projection 锁替代。
+R6-R1 source correction: accepted R9 actual95-record post-tidy graph omitted
+GoModSum in61 external records; this is not hash evidence. Its actual GoMod line3
+was go1.27 and line8 the expected core v3 pseudo-version. Original R6 freeze stays
+immutable. Four controls remain unrun, now including real cached compute1.20.1
+mod bytes+h1, missing/corrupt/symlink/hardlink/wrong-case path rejection and a real
+Python-child observer graph with omitted optional fields. No Go/cache download is
+added; absent .mod remains a refusal. The original successful native run is not
+claimed to have exercised R6-R1.

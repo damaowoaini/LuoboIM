@@ -2,24 +2,24 @@
   "App_cohort": null,
   "files": [
     {
-      "bytes": 2766,
       "path": "README.md",
-      "sha256": "182855f49a8fb55b27896e26f4618480fd42b478c0d384bc1e5ef452fb49188c"
+      "bytes": 3769,
+      "sha256": "f0089a23b7cd8dea26b50764907a0708421faa2b21faf3ade045bc5c57603faf"
     },
     {
-      "bytes": 17605,
       "path": "apple_core.py",
-      "sha256": "66713a790710cfe3fc1229e22499fcc3226975c39a322214ea3d6c079691a0ff"
+      "bytes": 18653,
+      "sha256": "c6e52c2afcc16350f52981c86112b4eaf65efe11e911810f725c0fcb03940fd3"
     },
     {
-      "bytes": 7055,
       "path": "apple_observer.py",
-      "sha256": "92e217f263e27b4196184cb2551b99e9bcd2c95a7d2025ff148c48cd31f8b46b"
+      "bytes": 10374,
+      "sha256": "fd6d55f7b4631519d5e8aa9dd9c4f1233e76aaac055884d81b45eb13ffca489f"
     },
     {
-      "bytes": 22837,
       "path": "cloud.py",
-      "sha256": "74df5fbce1a94380b7d4906f554b29000bd9b28937b63ad80355451e029bdd7b"
+      "bytes": 23352,
+      "sha256": "a4d6e2850a3d1001d56732cf9ab14f44917e869d3bdc0c38cb1109ee33087182"
     },
     {
       "bytes": 7950,
@@ -30,6 +30,26 @@
       "bytes": 10010,
       "path": "flutter-engine-members.json",
       "sha256": "158e949f65cf4162f5d17552cb90bc2035f7fee669ef71ff11c7afd45549411d"
+    },
+    {
+      "path": "generated-module-acquired.sum",
+      "bytes": 56413,
+      "sha256": "9d8d7d82e6702218bfe964f7005b3b858d44b41efca66c89d70d02aab5539d9f"
+    },
+    {
+      "path": "generated-module-after.mod",
+      "bytes": 4081,
+      "sha256": "f68c72acfd31c65d734712c229af867f8d2b8d06ab2ffae631dbf26a59223841"
+    },
+    {
+      "path": "generated-module-before.mod",
+      "bytes": 4081,
+      "sha256": "05e30d386898edc45e01458e5dcd79d166965d89cb4537a436ed5beeaba21088"
+    },
+    {
+      "path": "generated_module.py",
+      "bytes": 14874,
+      "sha256": "e1c4c66fabdc5647683cb78f372d95cf8544890a744489ba18d90aba6082383f"
     },
     {
       "bytes": 6828,
@@ -67,9 +87,19 @@
       "sha256": "adf3afe10404a5668439f1c283616fd4af0620e0a7313acc49b9c502af41a01d"
     },
     {
+      "path": "test_generated_module.py",
+      "bytes": 14451,
+      "sha256": "a99ea523ef0bb7f9fe96a54847a7d03be558b719ae7a4a9a71a38c6919a9fc0f"
+    },
+    {
       "bytes": 5719,
       "path": "test_observer.py",
       "sha256": "e53d0603fe00480106e5323091334525e2c3a0ce2269e6f8961dc4103db67ce0"
+    },
+    {
+      "path": "testdata/compute-v1.20.1.mod",
+      "bytes": 1093,
+      "sha256": "488d935649ca7ae0730e7523d6fd81c2258984fa2d6284fd225a9354c9ade372"
     }
   ],
   "identity": "apple-sdk-only-cloud-arm64-r1",
@@ -82,5 +112,6 @@
     }
   ],
   "schema": "luobo.apple-sdk.cloud-registry.v1",
-  "underlying_SDK_cohort": "auditable-sdk-apple-arm64-v1"
+  "underlying_SDK_cohort": "auditable-sdk-apple-arm64-v1",
+  "controller_revision": "R6-R3_foreign_escaped_module_cache_fixture"
 }

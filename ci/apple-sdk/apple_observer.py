@@ -101,7 +101,7 @@ def main():
                 child.send_signal(number)
     for number in [signal.SIGINT, signal.SIGTERM, signal.SIGHUP]:
         handlers[number] = signal.signal(number, forward)
-    code, failure = None, None
+    code, failure, module_proof, warm, core_locks = None, None, None, None, None
     try:
         if tidy:
             platform, source = generated(Path.cwd(), root)
@@ -109,6 +109,22 @@ def main():
             helper.record(evidence/'intent.json', {'argv': argv, 'cwd': str(Path.cwd()), 'platform': platform,
                           'GOOS': 'ios', 'GOARCH': 'arm64', 'real_generated_sources': True})
             before = snapshot(helper, source, evidence/'before')
+            if 'module_provenance' in c:
+                p = c['module_provenance']
+                if (p.get('schema') != 'luobo.apple.generated-provenance.v1'
+                        or p.get('core') != str(root/'core') or p.get('protocol') != str(root/'protocol')
+                        or p.get('module_cache') != str(root.parent.parent/'setup/modcache')
+                        or os.environ.get('GOMODCACHE') != p.get('module_cache')
+                        or p.get('catalogue_sha256') != '9d8d7d82e6702218bfe964f7005b3b858d44b41efca66c89d70d02aab5539d9f'
+                        or hashlib.sha256(helper.regular(p['helper'])[0]).hexdigest() != p['helper_sha256']):
+                    raise ValueError('fixed finite module helper/configuration required')
+                spec = importlib.util.spec_from_file_location('apple_actual_module_provenance', p['helper'])
+                warm = importlib.util.module_from_spec(spec); spec.loader.exec_module(warm)
+                warm.catalogue()
+                warm.expected_projected_acquisition(warm.read(Path.cwd()/'go.mod'), root/'core', root/'protocol')
+                core_locks = {n: warm.digest(warm.read(root/'core'/n)) for n in ('go.mod', 'go.sum')}
+                if core_locks['go.sum'] != warm.CORE_SUM:
+                    raise ValueError('actual core8eb9 required before tidy')
         if received:
             raise InterruptedError('signal before Go dispatch')
         env = dict(os.environ); env['PATH'] = c['base_path']
@@ -119,6 +135,28 @@ def main():
                 child.kill()
             time.sleep(0.05)
         code = child.wait()
+        if tidy and code == 0 and received is None and warm is not None:
+            locks = {n: warm.read(Path.cwd()/n) for n in ('go.mod', 'go.sum')}
+            graph_env = {**env, 'GOFLAGS': '-mod=readonly', 'GOPROXY': 'off', 'GOSUMDB': 'off'}
+            graph_args = [c['go'], 'list', '-m', '-json', 'all']
+            helper.record(evidence/'selected-graph.intent.json', {'argv': graph_args, 'cwd': str(Path.cwd()),
+                          'readonly': True, 'network': 'denied_by_outer_build_profile'})
+            with (evidence/'selected-graph.log').open('xb') as out, (evidence/'selected-graph.stderr.log').open('xb') as err:
+                child = subprocess.Popen(graph_args, env=graph_env, stdout=out, stderr=err)
+                while child.poll() is None:
+                    if signal_time and time.monotonic()-signal_time > 8:
+                        child.kill()
+                    time.sleep(0.05)
+                graph_code = child.wait()
+            helper.record(evidence/'selected-graph.result.json', {'exit_code': graph_code})
+            if graph_code != 0:
+                raise ValueError('actual offline selected graph command failed')
+            if {n: warm.read(Path.cwd()/n) for n in locks} != locks:
+                raise ValueError('actual readonly graph changed generated locks')
+            module_proof = warm.validate_generated(locks['go.mod'], locks['go.sum'],
+                warm.read(evidence/'selected-graph.log').decode(), Path.cwd(), root/'core', root/'protocol',
+                Path(c['module_provenance']['module_cache']))
+            helper.record(evidence/'module-provenance.json', module_proof)
     except BaseException as exc:
         failure = type(exc).__name__
         raise
@@ -131,9 +169,12 @@ def main():
                 ordinary = lambda rows: {x['path']: x['sha256'] for x in rows if not x['path'].endswith(('/go.mod', '/go.sum'))}
                 unchanged = ordinary(before) == ordinary(after)
                 helper.record(evidence/'result.json', {'exit_code': code, 'signal': received,
-                              'failure_type': failure, 'source_unchanged': unchanged})
+                              'failure_type': failure, 'source_unchanged': unchanged,
+                              'module_provenance': module_proof})
                 if not unchanged:
                     raise ValueError('tidy changed actual generated source')
+            if core_locks is not None and {n: warm.digest(warm.read(root/'core'/n)) for n in core_locks} != core_locks:
+                raise ValueError('actual tidy or readonly graph changed core locks')
         finally:
             for number, handler in handlers.items():
                 signal.signal(number, handler)

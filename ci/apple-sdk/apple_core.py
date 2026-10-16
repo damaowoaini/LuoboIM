@@ -128,6 +128,12 @@ def inputs():
             or value.get('cloud_controller') != 'apple-sdk-only-cloud-arm64-r1'
             or manifest.get('runtime_inputs_sha256') != digest(read(HERE/'inputs.json'))):
         raise ValueError('explicit cloud SDK derivation required')
+    module = value['generated_module_provenance']
+    if (module.get('schema') != 'luobo.apple.generated-provenance.v1'
+            or module.get('helper') != str(HERE/'generated_module.py')
+            or module.get('helper_sha256') != digest(read(HERE/'generated_module.py'))
+            or module.get('catalogue_sha256') != '9d8d7d82e6702218bfe964f7005b3b858d44b41efca66c89d70d02aab5539d9f'):
+        raise ValueError('explicit finite generated module provenance required')
     for alias, target in value['aliases'].items():
         if Path(alias).resolve(strict=True) != Path(target):
             raise ValueError('fixed official tool alias changed')
@@ -198,6 +204,11 @@ def controls(c, root):
     config = {'cohort': COHORT, 'root': str(root), 'go': c['go'], 'go_sha256': c['go_sha256'],
               'base_path': base_path, 'observer_helper': c['observer_helper'],
               'observer_helper_sha256': c['observer_helper_sha256']}
+    # Original local controls remain reproducible; cloud inputs() above requires this field.
+    if 'generated_module_provenance' in c:
+        config['module_provenance'] = {**c['generated_module_provenance'],
+                                      'core': str(root/'core'), 'protocol': str(root/'protocol'),
+                                      'module_cache': c['module_cache']}
     shell = '#!/bin/sh\nexec '+shlex.quote(c['python'])+' -B '+shlex.quote(str(HERE/'apple_observer.py'))+' "$@"\n'
     protected = [root/'offline.sb', root/'observer.json', root/'bin/go', root/'bin']
     literals = ' '.join('(literal '+json.dumps(str(p))+')' for p in protected)
@@ -314,6 +325,8 @@ def worker(root, prepare_only):
         proof = json.loads(read(root/'evidence/generated'/platform/'result.json'))
         if proof['exit_code'] != 0 or not proof['source_unchanged']:
             raise ValueError('actual platform tidy proof required')
+        if proof.get('module_provenance', {}).get('state') != 'passed_finite_actual_tidy_provenance':
+            raise ValueError('actual selected module provenance required before link')
     link = load(HERE/'link_probe.py', 'apple_link_probe')
     link.run(c, root, env, slices)
     inputs(); locks(root); check_controls(c, root)
