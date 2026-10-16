@@ -1,0 +1,132 @@
+// Owned Groovy build, builtin Gradle APIs only. Never applies KGP/AGP or app plugins.
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.nio.file.Files
+import java.security.MessageDigest
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ModuleComponentSelector
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
+
+if (gradle.gradleVersion != '9.3.1') throw new GradleException('exact producer Gradle required')
+def root = new File(System.getProperty('luoboProbeWork')).canonicalFile
+if (root.path != System.getProperty('luoboProbeWork')) throw new GradleException('canonical probe root required')
+def endpoint = new URI(System.getProperty('luoboProbeOrigin'))
+if (endpoint.scheme != 'http' || endpoint.host != '127.0.0.1' || endpoint.port < 1 || endpoint.port > 65535 ||
+        endpoint.path != '/maven2/' || endpoint.userInfo || endpoint.query || endpoint.fragment) {
+    throw new GradleException('literal owned loopback origin required')
+}
+def output = new File(System.getProperty('luoboProbeOutput')).canonicalFile
+if (!output.toPath().startsWith(root.toPath()) || output.exists()) throw new GradleException('fresh owned output required')
+def spec = new JsonSlurper().parse(new File(root, 'project/inputs.json'))
+def attrs = { container ->
+    container.keySet().sort { it.name }.collectEntries { [(it.name): [type:it.type.name, value:String.valueOf(container.getAttribute(it))]] }
+}
+def caps = { list -> list.collect { [group:it.group, name:it.name, version:it.version] }.sort { JsonOutput.toJson(it) } }
+def vc = { c -> [required:c.requiredVersion, strict:c.strictVersion, preferred:c.preferredVersion,
+                 rejected:c.rejectedVersions, branch:c.branch] }
+def fixed = { v -> v != null && v ==~ /[A-Za-z0-9][A-Za-z0-9_.-]{0,127}/ &&
+                       !v.toLowerCase().contains('snapshot') && !v.toLowerCase().contains('latest') }
+def module = { c ->
+    if (!(c instanceof ModuleComponentIdentifier) || !fixed(c.version)) throw new GradleException('nonfixed selected component refused')
+    [group:c.group, module:c.module, version:c.version]
+}
+def variant = { v -> [display:v.displayName, owner:module(v.owner), attributes:attrs(v.attributes),
+    capabilities:caps(v.capabilities), external:v.externalVariant.present ?
+        [display:v.externalVariant.get().displayName, owner:module(v.externalVariant.get().owner),
+         attributes:attrs(v.externalVariant.get().attributes), capabilities:caps(v.externalVariant.get().capabilities)] : null] }
+def request = { r ->
+    if (!(r instanceof ModuleComponentSelector)) throw new GradleException('unknown producer requested selector')
+    [group:r.group, module:r.module, version:r.version, constraint:vc(r.versionConstraint),
+     attributes:attrs(r.attributes), requestedCapabilities:caps(r.requestedCapabilities),
+     capabilitySelectors:r.capabilitySelectors.collect { [type:it.class.name, value:it.toString()] }.sort { JsonOutput.toJson(it) }]
+}
+def validateRequest = { config, r ->
+    def q = request(r)
+    def c = q.constraint
+    def v = c.strict ?: c.required ?: c.preferred
+    def dynamic = [c.required,c.strict,c.preferred].any { it && !fixed(it) } || !c.rejected.empty || c.branch != null
+    if (dynamic) {
+        def matched = spec.rich.findAll { it.configuration == config && it.group == q.group && it.module == q.module && it.constraint == c }
+        if (matched.size() != 1) throw new GradleException('unreviewed fourth or changed rich selector')
+    }
+    if (c.branch != null) throw new GradleException('producer branch constraint refused')
+    q
+}
+repositories {
+    maven {
+        name = 'ownedCapturedCentral'
+        url = endpoint
+        allowInsecureProtocol = true // literal loopback transport; broker verifies upstream HTTPS.
+        metadataSources { gradleMetadata(); mavenPom() }
+    }
+}
+def names = spec.roots.collect { it.configuration }.unique().sort()
+names.each { n -> configurations.create(n) { canBeResolved = true; canBeConsumed = false; transitive = true } }
+spec.roots.each { r ->
+    def d = dependencies.create(r.group + ':' + r.module)
+    d.version { v ->
+        if (r.constraint.strict) v.strictly(r.constraint.strict)
+        else v.require(r.constraint.required)
+        if (r.constraint.preferred) v.prefer(r.constraint.preferred)
+        if (r.constraint.rejected) v.reject(*r.constraint.rejected)
+    }
+    dependencies.add(r.configuration, d)
+}
+configurations.all { c ->
+    c.resolutionStrategy.dependencySubstitution.all { d -> validateRequest(c.name, d.requested) }
+}
+tasks.register('produceVersionCatalog') {
+    doLast {
+        if (allprojects.size() != 1) throw new GradleException('producer may not include other projects')
+        def result = [schema:1, Gradle:gradle.gradleVersion, configurations:[]]
+        names.each { n ->
+            def c = configurations.getByName(n)
+            def declared = c.allDependencies.collect { d ->
+                if (d.changing) throw new GradleException('changing producer dependency refused')
+                [group:d.group, module:d.name, constraint:vc(d.versionConstraint), attributes:attrs(d.attributes),
+                 requestedCapabilities:caps(d.requestedCapabilities)]
+            }.sort { JsonOutput.toJson(it) }
+            // Nonlenient: preserve actual Gradle failure and original cause.
+            def artifacts = c.incoming.artifacts.artifacts
+            def graph = c.incoming.resolutionResult
+            def edges = graph.allDependencies.collect { d ->
+                if (d instanceof UnresolvedDependencyResult) throw new GradleException('actual producer dependency unresolved', d.failure)
+                if (!(d instanceof ResolvedDependencyResult)) throw new GradleException('unknown actual dependency result')
+                def from = d.from.id instanceof ModuleComponentIdentifier ? module(d.from.id) : [kind:'producer-root']
+                [from:from, requested:validateRequest(n, d.requested), selected:module(d.selected.id),
+                 variant:variant(d.resolvedVariant), constraint:d.constraint,
+                 selectionReasons:d.selected.selectionReason.descriptions.collect { [cause:it.cause.toString(), description:it.description] }]
+            }.sort { JsonOutput.toJson(it) }
+            def components = graph.allComponents.findAll { it.id instanceof ModuleComponentIdentifier }.collect { r ->
+                [id:module(r.id), variants:r.variants.collect(variant).sort { JsonOutput.toJson(it) }]
+            }.sort { JsonOutput.toJson(it) }
+            def bodies = artifacts.collect { a ->
+                def id = module(a.id.componentIdentifier)
+                def f = a.file.canonicalFile
+                if (!f.toPath().startsWith(root.toPath()) || !f.isFile() || Files.isSymbolicLink(a.file.toPath()) ||
+                        Files.getAttribute(f.toPath(), 'unix:nlink') != 1 || f.length() > 128L * 1024 * 1024) {
+                    throw new GradleException('owned regular artifact source required')
+                }
+                def before = Files.readAttributes(f.toPath(), 'unix:dev,ino,size,lastModifiedTime,ctime')
+                def h = MessageDigest.getInstance('SHA-256')
+                f.withInputStream { stream -> byte[] b = new byte[65536]; int k; while ((k = stream.read(b)) > 0) h.update(b, 0, k) }
+                def after = Files.readAttributes(f.toPath(), 'unix:dev,ino,size,lastModifiedTime,ctime')
+                if (before != after) throw new GradleException('artifact changed while hashing')
+                [id:id, variant:variant(a.variant), path:root.toPath().relativize(f.toPath()).toString(),
+                 bytes:f.length(), sha256:h.digest().encodeHex().toString()]
+            }.sort { JsonOutput.toJson(it) }
+            if (components.size() > 128 || edges.size() > 256 || bodies.size() > 256) throw new GradleException('producer graph budget')
+            result.configurations << [name:n, attributes:attrs(c.attributes), declared:declared,
+                edges:edges, components:components, artifacts:bodies]
+        }
+        def data = (JsonOutput.prettyPrint(JsonOutput.toJson(result)) + '\n').getBytes('UTF-8')
+        if (data.length > 4 * 1024 * 1024) throw new GradleException('producer report limit')
+        def fd = Files.newOutputStream(output.toPath(), java.nio.file.StandardOpenOption.CREATE_NEW,
+            java.nio.file.StandardOpenOption.WRITE)
+        try { fd.write(data) } finally { fd.close() }
+        def sync = new FileOutputStream(output, true)
+        try { sync.getFD().sync() } finally { sync.close() }
+        println('LUOBO_R11_ACTUAL_SELECTED_CATALOG ' + [configurations:result.configurations.size(), bytes:data.length])
+    }
+}

@@ -1,0 +1,62 @@
+name: Current257 R11 selected-version provenance only
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [current257-rich-version-provenance-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rich-provenance-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  selected-version-evidence:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      VERSION_PROBE_COHORT: ${{ inputs.cohort }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select one new private source-provenance root
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/rich-version-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "VERSION_PROBE_WORK=$RUNNER_TEMP/rich-version-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/producer" >> "$GITHUB_ENV"
+      - name: Pure Python source gates and readonly pins
+        run: |
+          python3 -B ci/secret_scan.py
+          python3 -B ci/android-version-probe/test_probe.py
+          python3 -B ci/android-version-probe/run.py --cohort "$VERSION_PROBE_COHORT" --stage readonly
+      - name: Acquire actual selected graph through captured fixed Maven origin
+        run: python3 -B ci/android-version-probe/run.py --cohort "$VERSION_PROBE_COHORT" --stage acquire --work "$VERSION_PROBE_WORK"
+      - name: Resolve again offline inside fresh loopback-only namespace
+        run: sudo unshare --net -- bash ci/android-version-probe/offline.sh "$(id -un)" "$GITHUB_WORKSPACE" "$VERSION_PROBE_WORK"
+      - name: Bound optional large raw artifact-body upload
+        id: source_upload
+        if: always()
+        run: python3 -B ci/android-version-probe/run.py --cohort "$VERSION_PROBE_COHORT" --stage upload-admission --work "$VERSION_PROBE_WORK"
+      - name: Keep exact captured dependency bodies separately
+        if: always() && steps.source_upload.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: rich-version-source-bodies-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.VERSION_PROBE_WORK }}/body-cache/artifacts/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve all compact raw metadata graphs locks resources and failures
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: rich-version-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.VERSION_PROBE_WORK }}/evidence/
+          retention-days: 14
+          if-no-files-found: warn

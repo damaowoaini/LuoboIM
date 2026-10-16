@@ -1,0 +1,193 @@
+{
+  "cohort": "current257-rich-version-provenance-v1",
+  "metadata_pins": [
+    {
+      "bytes": 1582,
+      "path": "/maven2/org/bouncycastle/bcpg-jdk18on/1.80/bcpg-jdk18on-1.80.pom",
+      "sha256": "07a246c2adafb628783a1ae84ac18d4df4025df06ae3634dfe9387ab94f9ea74"
+    },
+    {
+      "bytes": 1524,
+      "path": "/maven2/org/bouncycastle/bcpkix-jdk18on/1.80/bcpkix-jdk18on-1.80.pom",
+      "sha256": "a4a122113467b728e18f26fb0cfd57f0b1a0d7c4a53b86718ace70bf8b86ed47"
+    },
+    {
+      "bytes": 1372,
+      "path": "/maven2/org/jetbrains/kotlin/kotlin-build-tools-compat/2.4.0/kotlin-build-tools-compat-2.4.0.pom",
+      "sha256": "42c9089dd9c9579e4c12b2ce7b5a13f4679d9e939c7c469ae4b0b50329b27dd4"
+    },
+    {
+      "bytes": 143775,
+      "path": "/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/2.4.0/kotlin-gradle-plugin-2.4.0.module",
+      "sha256": "7b7c5da8bc0b62e3f6f39e43960e777625dbf3da157a55c36a7cdc0216d306fa",
+      "source_only": true
+    },
+    {
+      "bootstrap": false,
+      "bytes": 1348,
+      "path": "/maven2/org/bouncycastle/bcutil-jdk18on/1.80/bcutil-jdk18on-1.80.pom",
+      "sha256": "421a7de4bfeb9c5b38b1fc47c426a087d90878955d4107f5b7a82eb1d7b747b6"
+    }
+  ],
+  "native_fullbind_device_current_mobile_acceptance": false,
+  "official_sources": [
+    {
+      "bytes": 6722,
+      "path": "official-gradle/VersionConstraint.java",
+      "sha256": "5515aba8f57ab574cb6bb99fbb434b4293937581a04c12a27b35283740150e73",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/44f4e8d3122ee6e7cbf5a248d7e20b4ca666bda3/subprojects/core-api/src/main/java/org/gradle/api/artifacts/VersionConstraint.java"
+    },
+    {
+      "bytes": 3713,
+      "path": "official-gradle/MutableVersionConstraint.java",
+      "sha256": "e0863ed5910cbf7483c34e0247b89678f70375dcffb1a7c86e2e0b61b4402d30",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/44f4e8d3122ee6e7cbf5a248d7e20b4ca666bda3/subprojects/core-api/src/main/java/org/gradle/api/artifacts/MutableVersionConstraint.java"
+    },
+    {
+      "bytes": 1986,
+      "path": "official-gradle/ModuleComponentSelector.java",
+      "sha256": "5a47850751641c9e45122e5c4da19cfba8acd816f88a255d0f39d4a58a64f0be",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/44f4e8d3122ee6e7cbf5a248d7e20b4ca666bda3/subprojects/core-api/src/main/java/org/gradle/api/artifacts/component/ModuleComponentSelector.java"
+    },
+    {
+      "bytes": 16566,
+      "path": "official-kotlin/KotlinPluginWrapper.kt",
+      "sha256": "3ec9ce9cc3c0d9140ad0bbc824a2d596025d09927268c512a2dfbbc4f9c2ff96",
+      "url": "https://raw.githubusercontent.com/JetBrains/kotlin/add726ca8c82922b6ab4cb2a27ae738d6a780817/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/KotlinPluginWrapper.kt"
+    },
+    {
+      "bytes": 8298,
+      "path": "official-kotlin/AbiConfigs.kt",
+      "sha256": "2cd8e664f574405a3cf5b9b6c90062f05d957eacfc74b67152ff246cc89a9eab",
+      "url": "https://raw.githubusercontent.com/JetBrains/kotlin/add726ca8c82922b6ab4cb2a27ae738d6a780817/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/abi/internal/Configs.kt"
+    },
+    {
+      "bytes": 6052,
+      "path": "official-gradle/DefaultMutableVersionConstraint.java",
+      "sha256": "3131e57f48fe6d4971bcd1c8ce959cafc5b240dbff92dbda255b8f953640c8d0",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/44f4e8d3122ee6e7cbf5a248d7e20b4ca666bda3/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/artifacts/dependencies/DefaultMutableVersionConstraint.java"
+    },
+    {
+      "bytes": 5356,
+      "path": "official-gradle/DefaultImmutableVersionConstraint.java",
+      "sha256": "33a55f35d061fbdacbec46ac256c667db8c7b94c9cbc70810f78ddf1cd276644",
+      "url": "https://raw.githubusercontent.com/gradle/gradle/44f4e8d3122ee6e7cbf5a248d7e20b4ca666bda3/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/artifacts/dependencies/DefaultImmutableVersionConstraint.java"
+    }
+  ],
+  "rich": [
+    {
+      "configuration": "kotlinAbiValidationCompatClasspath",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "[2.4.0-Beta2, 2.5.0)",
+        "strict": "[2.4.0-Beta2, 2.5.0)"
+      },
+      "group": "org.jetbrains.kotlin",
+      "module": "kotlin-build-tools-impl"
+    },
+    {
+      "configuration": "kotlinBouncyCastleConfiguration",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "[1.80,1.81)",
+        "strict": ""
+      },
+      "group": "org.bouncycastle",
+      "module": "bcutil-jdk18on",
+      "source_parent": "org.bouncycastle:bcpkix-jdk18on:1.80"
+    },
+    {
+      "configuration": "kotlinBouncyCastleConfiguration",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "[1.80,1.81)",
+        "strict": ""
+      },
+      "group": "org.bouncycastle",
+      "module": "bcprov-jdk18on",
+      "source_parents": [
+        "org.bouncycastle:bcpg-jdk18on:1.80",
+        "org.bouncycastle:bcutil-jdk18on:1.80"
+      ]
+    }
+  ],
+  "root_design_review_sha256": "63302f7ca8b00e46aee9b652b32cd9cda3bd6dda590835aab8b41ef0421ad2d3",
+  "roots": [
+    {
+      "configuration": "kotlinAbiValidationCompatClasspath",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "2.4.0",
+        "strict": ""
+      },
+      "group": "org.jetbrains.kotlin",
+      "module": "kotlin-build-tools-compat"
+    },
+    {
+      "configuration": "kotlinAbiValidationCompatClasspath",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "[2.4.0-Beta2, 2.5.0)",
+        "strict": "[2.4.0-Beta2, 2.5.0)"
+      },
+      "group": "org.jetbrains.kotlin",
+      "module": "kotlin-build-tools-impl"
+    },
+    {
+      "configuration": "kotlinBouncyCastleConfiguration",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "1.80",
+        "strict": ""
+      },
+      "group": "org.bouncycastle",
+      "module": "bcpkix-jdk18on"
+    },
+    {
+      "configuration": "kotlinBouncyCastleConfiguration",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "1.80",
+        "strict": ""
+      },
+      "group": "org.bouncycastle",
+      "module": "bcpg-jdk18on"
+    }
+  ],
+  "schema": 1,
+  "source_erratum": "Original frozen plan says kotlin-build-tools-api-compat; actual Kotlin constant and R10 line23831 publish kotlin-build-tools-compat:2.4.0. This corrects the root name, not a guessed impl selected version. Old plan unchanged.",
+  "source_plan_manifest_sha256": "4dfb943077d149a2721db6ad44a75be9432d0824b7f564b6e24b49fe37adca7b",
+  "tools": {
+    "gradle": {
+      "entry": "Invoke verified unpacked9.3.1/bin/gradle directly, as historical approved runner did. Do not execute the retained older wrapper jar or imply its SHA equals official9.3.1.",
+      "official_wrapper_jar_sha256": "b3a875ddc1f044746e1b1a55f645584505f4a10438c1afea9f15e92a7c42ec13",
+      "retained_wrapper_jar_sha256": "16caeaf66d57a0d1d2087fef6a97efa62de8da69afa5b908f40db35afc4342da",
+      "sha256": "17f277867f6914d61b1aa02efab1ba7bb439ad652ca485cd8ca6842fccec6e43",
+      "source": "https://gradle.org/release-checksums/",
+      "url": "https://services.gradle.org/distributions/gradle-9.3.1-all.zip",
+      "version": "9.3.1"
+    },
+    "jdk": {
+      "sha256": "3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e",
+      "source": "https://github.com/adoptium/temurin17-binaries/releases/expanded_assets/jdk-17.0.20.1%2B1",
+      "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.20.1%2B1/OpenJDK17U-jdk_x64_linux_hotspot_17.0.20.1_1.tar.gz",
+      "vendor": "Eclipse Temurin",
+      "version": "17.0.20.1+1"
+    }
+  },
+  "verified_additional_parent_source": "BCutil1.80 published POM contains bcprov [1.80,1.81), same finite third selector; parent edge unobserved in R10 because earlier range checks refused. Literal pin adds only this parent/version. It does not assume the actual bcutil selected version."
+}

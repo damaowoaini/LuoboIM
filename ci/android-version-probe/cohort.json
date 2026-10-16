@@ -1,0 +1,79 @@
+{
+  "borrowed_scope": "Only Job.tool, netns and support primitives; import closure audit/verify_inputs and exact toolchain, plus workflow secret_scan. No parent CLI/stage called.",
+  "cohort": "current257-rich-version-provenance-v1",
+  "entry": "readonly default; explicit acquire then offline only; no native dispatch",
+  "files": [
+    {
+      "bytes": 2729,
+      "path": ".github/workflows/android-rich-version-provenance.yml",
+      "sha256": "21be13c37490f61ad29e5fdb40d907ae7abe416829bf39c43a5f8d141896d3cd"
+    },
+    {
+      "bytes": 8531,
+      "path": "ci/android-native/audit.py",
+      "sha256": "1edf23b5ce32258e3e37d7af615b672e764de8193540aaa7de8a6fc03888d974"
+    },
+    {
+      "bytes": 42548,
+      "path": "ci/android-native/run.py",
+      "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
+    },
+    {
+      "bytes": 11876,
+      "path": "ci/android-native/support.py",
+      "sha256": "818ed812deab20b25d4e8352f7d31b637039c0a881c8fc0fa070bc2ce1ea8fbd"
+    },
+    {
+      "bytes": 8078,
+      "path": "ci/android-native/toolchain.json",
+      "sha256": "13cdeeb22b003d24714525c7de483446d8e0e0eed23200c4f54df1badd2251bd"
+    },
+    {
+      "bytes": 2962,
+      "path": "ci/android-native/verify_inputs.py",
+      "sha256": "266a89fe31cbd9c40aa566a8f8f1404d9a04fed2a9a736a6cafac7e9142eede5"
+    },
+    {
+      "bytes": 23059,
+      "path": "ci/android-version-probe/broker.py",
+      "sha256": "330d3bd05bc990fa11e151f23cfa11158734354defde7560c0e952536cb103cd"
+    },
+    {
+      "bytes": 8321,
+      "path": "ci/android-version-probe/inputs.json",
+      "sha256": "ab543be0333d34d645183cfdbb958759f8deea836e59c8d0ea619f04c7af37a6"
+    },
+    {
+      "bytes": 485,
+      "path": "ci/android-version-probe/offline.sh",
+      "sha256": "3ae08b8f412c3e151b8642b2e5cc511f26fbb1562b0c3353e8b4e91cb6e2092c"
+    },
+    {
+      "bytes": 8811,
+      "path": "ci/android-version-probe/producer.gradle",
+      "sha256": "349b09908302a83894d28b63ddc396c7d98892060b73f15b4f443a4038a08818"
+    },
+    {
+      "bytes": 21149,
+      "path": "ci/android-version-probe/run.py",
+      "sha256": "2e213a2623ae14aebf3b38d935a27789b8121dc2e2b08fad921f760147b9320b"
+    },
+    {
+      "bytes": 16454,
+      "path": "ci/android-version-probe/test_probe.py",
+      "sha256": "f574932c8c7bf008843ad954b96a69719a80d7a1e1f77770875dc6f7285cea96"
+    },
+    {
+      "bytes": 6600,
+      "path": "ci/secret_scan.py",
+      "sha256": "86b539008eb65f4b81840ea20f13587ca3e87c3cf5796a039ae5d9af4fcd91da"
+    }
+  ],
+  "fixture_revision": "R1-only actual urllib response-shaped mock; no producer/broker/controller semantics change",
+  "native_execution": false,
+  "parent_candidate_manifest_sha256": "6dcca3c27f9d86521cf2b320fafae0a02827c89a040b0572e8b23095ae2e117b",
+  "root_review_sha256": "63302f7ca8b00e46aee9b652b32cd9cda3bd6dda590835aab8b41ef0421ad2d3",
+  "schema": 1,
+  "source_plan_manifest_sha256": "4dfb943077d149a2721db6ad44a75be9432d0824b7f564b6e24b49fe37adca7b",
+  "state": "frozen_source_only_pending_actual_execution"
+}
