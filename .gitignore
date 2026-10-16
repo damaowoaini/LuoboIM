@@ -1,0 +1,36 @@
+# 构建产物、日志
+_output/
+**/_output/
+*.log
+logs/
+__pycache__/
+*.pyc
+
+# 压缩包、备份（曾经把带密钥的配置打包进仓库）
+*.tar.gz
+*.tgz
+*.zip
+*.backup
+*.bak
+
+# 本地真实配置：复制一份改名后填真实密钥，不提交
+*.local.yaml
+*.local.yml
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# Local deployment and release signing material
+app/config/*.local.json
+app/android/key.properties
+*.jks
+*.keystore
+
+# Native SDK build outputs
+packages/**/.dart_tool/
+packages/**/build/
+packages/**/ios/Pods/

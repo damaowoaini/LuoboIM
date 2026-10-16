@@ -1,0 +1,64 @@
+// Copyright © 2023 OpenIM. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package msg
+
+import (
+	"context"
+
+	pbmsg "github.com/OpenIMSDK/protocol/msg"
+	"github.com/OpenIMSDK/tools/mcontext"
+
+	"github.com/openimsdk/open-im-server/v3/pkg/authverify"
+)
+
+func (m *msgServer) GetConversationMaxSeq(
+	ctx context.Context,
+	req *pbmsg.GetConversationMaxSeqReq,
+) (resp *pbmsg.GetConversationMaxSeqResp, err error) {
+	maxSeq, err := m.MsgDatabase.GetMaxSeq(ctx, req.ConversationID)
+	if err != nil {
+		return nil, err
+	}
+	return &pbmsg.GetConversationMaxSeqResp{MaxSeq: maxSeq}, nil
+}
+
+func (m *msgServer) GetMaxSeqs(ctx context.Context, req *pbmsg.GetMaxSeqsReq) (*pbmsg.SeqsInfoResp, error) {
+	maxSeqs, err := m.MsgDatabase.GetMaxSeqs(ctx, req.ConversationIDs)
+	if err != nil {
+		return nil, err
+	}
+	return &pbmsg.SeqsInfoResp{MaxSeqs: maxSeqs}, nil
+}
+
+func (m *msgServer) GetHasReadSeqs(ctx context.Context, req *pbmsg.GetHasReadSeqsReq) (*pbmsg.SeqsInfoResp, error) {
+	if opUserID := mcontext.GetOpUserID(ctx); opUserID != "" {
+		if err := authverify.CheckAccessV3(ctx, req.UserID); err != nil {
+			return nil, err
+		}
+	}
+	hasReadSeqs, err := m.MsgDatabase.GetHasReadSeqs(ctx, req.UserID, req.ConversationIDs)
+	if err != nil {
+		return nil, err
+	}
+	return &pbmsg.SeqsInfoResp{MaxSeqs: hasReadSeqs}, nil
+}
+
+func (m *msgServer) GetMsgByConversationIDs(ctx context.Context, req *pbmsg.GetMsgByConversationIDsReq) (*pbmsg.GetMsgByConversationIDsResp, error) {
+	Msgs, err := m.MsgDatabase.FindOneByDocIDs(ctx, req.ConversationIDs, req.MaxSeqs)
+	if err != nil {
+		return nil, err
+	}
+	return &pbmsg.GetMsgByConversationIDsResp{MsgDatas: Msgs}, nil
+}

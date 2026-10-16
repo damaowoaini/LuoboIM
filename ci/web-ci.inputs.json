@@ -1,0 +1,220 @@
+{
+  "version": 1,
+  "node": "24.21.0",
+  "fullMinimumTests": 625,
+  "requiredInputs": [
+    {
+      "path": "web/package.json",
+      "bytes": 5900,
+      "sha256": "ca8489ab04940a53cf2b738c9e0ac5572b12482999fc6b6407e93f9d6f64a0cc"
+    },
+    {
+      "path": "web/package-lock.json",
+      "bytes": 364188,
+      "sha256": "f5848503f427615f581d7a163385abebff6a8f0a37631447de127f05a74689e9"
+    },
+    {
+      "path": "web/tool/prepare-sdk.cjs",
+      "bytes": 1359,
+      "sha256": "4ce4d3c77db679f7daeb1ed3189d2aafc1d7ff174119aed12f00d4b400dd6e39"
+    },
+    {
+      "path": "web/sdk-patches/manifest.json",
+      "bytes": 2107,
+      "sha256": "a0c068c82c39d5a8d55484ba4c01a379147cecb1357d94dccb1b0dc0c3f8cab9"
+    },
+    {
+      "path": "web/public/openIM.wasm",
+      "bytes": 30202912,
+      "sha256": "dff9e28c95e36d9ea95beb20bde7a53d4204c1c2fd2497f19b7c4a504ca665ab"
+    },
+    {
+      "path": "web/public/sql-wasm.wasm",
+      "bytes": 1105290,
+      "sha256": "806886f413da1a6acc1db373285adda1b6750c8d434c75a5a6042af0a65cbafd"
+    },
+    {
+      "path": "web/public/wasm_exec.js",
+      "bytes": 16952,
+      "sha256": "a3034fedf9b873ef5d9ce5b06f81d911019f245e86bbfb287473ebf22d7908ab"
+    },
+    {
+      "path": "web/sdk-patches/lib__index.js.patched",
+      "bytes": 107599,
+      "sha256": "b3f5d89077154bf5b8bc60339167ea0420f8de92234bfd3a211e79a095673202"
+    },
+    {
+      "path": "web/sdk-patches/lib__index.es.js.patched",
+      "bytes": 106703,
+      "sha256": "9fb7af957d270df23c3bb9ff0fa285b498aabd0f5b63a76427e1378871fe4a76"
+    },
+    {
+      "path": "web/sdk-patches/lib__index.umd.js.patched",
+      "bytes": 112049,
+      "sha256": "e5b9a6e36170092704d79cfdc86137b130b178f333e1f8f66365267a90f815b2"
+    },
+    {
+      "path": "web/sdk-patches/lib__types__params.d.ts.patched",
+      "bytes": 10966,
+      "sha256": "a825fc6581b5ca0a96d299d8fc82a8f0e4c45ac50653f3b68d980a3d3d98f5f4"
+    },
+    {
+      "path": "web/sdk-patches/lib__worker.js.patched",
+      "bytes": 232566,
+      "sha256": "d70480aea32ac41e06aa60245198987d083cf275c75a8e419868b6ef3f85bff8"
+    },
+    {
+      "path": "web/sdk-patches/lib__worker-legacy.js.patched",
+      "bytes": 232594,
+      "sha256": "46b21be9c784bf9281705342f738542c6fc2d3cef4f31c68a346a65a4bf1452f"
+    }
+  ],
+  "candidate": {
+    "originManifestSHA256": "7404505cdbeccb27b615f87cee4a01484669ca7ec8213122a20dc4e616758d0c",
+    "tests": 33,
+    "files": [
+      {
+        "path": "ci/candidates/web-direct-edit/after/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 10990,
+        "sha256": "df14a8fea08ee14ac5de248c5d400bb36e4506770b9fa0c3665fa3e12670a8b1"
+      },
+      {
+        "path": "ci/candidates/web-direct-edit/after/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 7600,
+        "sha256": "9b2a3cc5e1e511b3fe1913b3254d53d4b48ec8a128bb3b9623e17731c2d4fa00"
+      },
+      {
+        "path": "ci/candidates/web-direct-edit/before/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 9772,
+        "sha256": "5c4004db31924ded0ee6a90136b6cc5fa52324bba6544bcd3cedb6619a0c1090"
+      },
+      {
+        "path": "ci/candidates/web-direct-edit/before/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 7085,
+        "sha256": "b06f89c3660312e787c9f6e0f330b0486c6ce0e408e6f788ea2568ee949738fc"
+      },
+      {
+        "path": "ci/candidates/web-direct-edit/tests/directEditHooks.test.ts",
+        "bytes": 6836,
+        "sha256": "135981452051280b7d65b45f9d524c5d6d1ba60bd6ba6458c9a9a55c76854dcc"
+      },
+      {
+        "path": "ci/candidates/web-direct-edit/tests/directEditHost.test.ts",
+        "bytes": 9854,
+        "sha256": "161430f90b1d0117ae22522b3cae1cc5da7d9990ca8ba3a5de16053f651a477c"
+      },
+      {
+        "path": "ci/candidates/web-direct-edit/tests/fixture.ts",
+        "bytes": 9531,
+        "sha256": "42ff26914e3ee4d1353ae34dec437d79e6a8e83928693345fda1f7934b491b2d"
+      }
+    ],
+    "beforeCurrent": [
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 9772,
+        "sha256": "5c4004db31924ded0ee6a90136b6cc5fa52324bba6544bcd3cedb6619a0c1090"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 7085,
+        "sha256": "b06f89c3660312e787c9f6e0f330b0486c6ce0e408e6f788ea2568ee949738fc"
+      }
+    ],
+    "realCallers": [
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/index.tsx",
+        "bytes": 3293,
+        "sha256": "efbb52d1fb35ae5db1c18436621d20b6f4a92ca0563adfe91af9e41032948927"
+      },
+      {
+        "path": "web/src/components/EditableContent/index.tsx",
+        "bytes": 2543,
+        "sha256": "e82ac0c142eb7d59795d3e363b78c481f2b25e050f2cd792f81b3fbcbbc86236"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/VerificationSelectContent.tsx",
+        "bytes": 1902,
+        "sha256": "d27665ae60f53d5ab684fff5bffe62247c401a5800f981b91cf327e28aa5d7c8"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/ChatHeader/index.tsx",
+        "bytes": 11927,
+        "sha256": "9663095f6a75cbd9d9a08806f94d489e9e4da951091caba886d6443541e79132"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/index.tsx",
+        "bytes": 3919,
+        "sha256": "b06174b10c41cd1e362d2e516a2f386a59f547acbb017cd57571f8cf576c0a10"
+      },
+      {
+        "path": "web/src/hooks/useCurrentMemberRole.ts",
+        "bytes": 1782,
+        "sha256": "0096fdc7979f90e03409e078a2a71461e7d9e9ced6101a4668647c6b9d2997f0"
+      },
+      {
+        "path": "web/src/hooks/useOverlayVisible.ts",
+        "bytes": 679,
+        "sha256": "a49e0bd6dbaf494d03c0ba5743772ba83a2dec1a054aee32b0a8474ece61c7f1"
+      },
+      {
+        "path": "web/src/core/session/sdk.ts",
+        "bytes": 4405,
+        "sha256": "65a9c844886297f36eb0c628996607e3056422a40d7f9037ab1bb82cb9800283"
+      },
+      {
+        "path": "web/src/core/session/sdkRuntime.ts",
+        "bytes": 1684,
+        "sha256": "c071745dc7576cedb208b357a8e366c3c5ff256e7751219731ecd9e2ad21e7bb"
+      },
+      {
+        "path": "web/src/core/messageHistory.ts",
+        "bytes": 2892,
+        "sha256": "ab7503ed2be4f0403825220dedbf995e6dbb1a4449d65b2e2778caa45b0636bf"
+      },
+      {
+        "path": "web/src/store/message.ts",
+        "bytes": 14220,
+        "sha256": "f59801ca4bfe4197fd7640add1649048cc4e20c7f032d45fa4e75c438225024a"
+      },
+      {
+        "path": "web/src/store/conversation.ts",
+        "bytes": 13190,
+        "sha256": "fd0a86cfdf4212a3f6c09c2fc9e796cec51cf345de884a42a54e6d2d0835de35"
+      },
+      {
+        "path": "web/src/layout/MainContentWrap.tsx",
+        "bytes": 5638,
+        "sha256": "4bbd6124db573e4b9db7eea06fd1cc45cdc427877c50c9857f6d999b065fdd2d"
+      },
+      {
+        "path": "web/src/i18n/resources/zh.json",
+        "bytes": 20605,
+        "sha256": "69e3f6bbae38dbe4cbead12a440d4a235dbe1ad3026a3c7ac305c915307c4796"
+      },
+      {
+        "path": "web/src/i18n/resources/en.json",
+        "bytes": 22194,
+        "sha256": "185234982745844d1be00762180784e40ff2d8f790956b1cc0bc5aba707f2625"
+      },
+      {
+        "path": "web/src/utils/common.ts",
+        "bytes": 11038,
+        "sha256": "77a8c13b36517f837e6fc579706c84a8f24afa33a1a3c336955811cf92ddf33d"
+      }
+    ],
+    "positiveNames": [
+      "keeps the normal exact-target info payload",
+      "keeps the normal exact-target nickname payload",
+      "keeps the normal exact-target verification payload",
+      "allows info for a personally muted admin after same-CID metadata replacement",
+      "allows nickname for a personally muted admin after same-CID metadata replacement",
+      "allows verification for a personally muted admin after same-CID metadata replacement",
+      "keeps an ordinary member's own nickname update available",
+      "keeps a valid avatar upload followed by its exact group metadata edit",
+      "keeps the actual verification selector's AllNot=2 payload"
+    ],
+    "portableConfigOriginSHA256": "99ad575e12b798f7e01ca3df0376c2802664d0d4ae1fd283d56f14f6bc0ef8a6",
+    "productAdopted": false
+  }
+}

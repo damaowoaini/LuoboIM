@@ -1,0 +1,76 @@
+// Copyright © 2023 OpenIM. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package api
+
+import (
+	"github.com/gin-gonic/gin"
+
+	"github.com/OpenIMSDK/protocol/conversation"
+	"github.com/OpenIMSDK/tools/a2r"
+	"github.com/OpenIMSDK/tools/apiresp"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/OpenIMSDK/tools/mcontext"
+
+	"github.com/openimsdk/open-im-server/v3/pkg/authverify"
+	"github.com/openimsdk/open-im-server/v3/pkg/rpcclient"
+)
+
+type ConversationApi rpcclient.Conversation
+
+func NewConversationApi(client rpcclient.Conversation) ConversationApi {
+	return ConversationApi(client)
+}
+
+func (o *ConversationApi) GetAllConversations(c *gin.Context) {
+	a2r.Call(conversation.ConversationClient.GetAllConversations, o.Client, c)
+}
+
+func (o *ConversationApi) GetConversationsList(c *gin.Context) {
+	a2r.Call(conversation.ConversationClient.GetConversationList, o.Client, c)
+}
+
+func (o *ConversationApi) GetConversation(c *gin.Context) {
+	var req conversation.GetConversationReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		apiresp.GinError(c, errs.ErrArgs.Wrap(err.Error()))
+		return
+	}
+	ownerUserID := req.OwnerUserID
+	if ownerUserID == "" {
+		ownerUserID = mcontext.GetOpUserID(c)
+	}
+	if err := authverify.CheckAccessV3(c, ownerUserID); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	resp, err := o.Client.GetConversation(c, &req)
+	if err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+	apiresp.GinSuccess(c, resp)
+}
+
+func (o *ConversationApi) GetConversations(c *gin.Context) {
+	a2r.Call(conversation.ConversationClient.GetConversations, o.Client, c)
+}
+
+func (o *ConversationApi) SetConversations(c *gin.Context) {
+	a2r.Call(conversation.ConversationClient.SetConversations, o.Client, c)
+}
+
+func (o *ConversationApi) GetConversationOfflinePushUserIDs(c *gin.Context) {
+	a2r.Call(conversation.ConversationClient.GetConversationOfflinePushUserIDs, o.Client, c)
+}

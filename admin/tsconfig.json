@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "Bundler",
+    "importHelpers": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@@/*": [
+        "./src/.umi/*"
+      ],
+      "@@test/*": [
+        "./src/.umi-test/*"
+      ],
+      "open-im-sdk-wasm": [
+        "./node_modules/open-im-sdk-wasm/lib/index.d.ts"
+      ],
+      "open-im-sdk-wasm/lib/*": [
+        "./node_modules/open-im-sdk-wasm/lib/*"
+      ]
+    }
+  },
+  "include": [
+    "./**/*.d.ts",
+    "./**/*.ts",
+    "./**/*.tsx"
+  ]
+}

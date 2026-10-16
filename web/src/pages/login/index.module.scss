@@ -1,0 +1,18 @@
+.page { min-height: 100dvh; height: 100%; overflow: auto; display: flex; flex-direction: column; background: radial-gradient(ellipse at 5% 55%, #e9f1ff 0, transparent 62%), #f6f8fc; color: #19263b; }
+.header { display:flex; align-items:center; justify-content:space-between; padding: 26px 5vw; }
+.brand { display:flex; align-items:center; gap:12px; font-size:21px; font-weight:700; letter-spacing:.03em; }
+.mark { display:grid; place-items:center; width:42px; height:42px; border-radius:13px; color:white; font-size:23px; background:#2163e8; box-shadow:0 5px 15px #2163e824; }
+.content { width:min(1080px, 90vw); margin:auto; padding: 36px 0 48px; display:grid; grid-template-columns:1fr 420px; align-items:center; gap:80px; }
+.intro h1 { margin:24px 0; font-size:clamp(36px,4.6vw,58px); font-weight:700; line-height:1.28; letter-spacing:-.025em; }
+.intro h1 em { color:#2163e8; font-style:normal; }
+.intro p { font-size:17px; line-height:1.9; color:#64748b; }
+.eyebrow { color:#5275ad; font-size:14px; letter-spacing:.08em; }
+.features { display:flex; flex-wrap:wrap; gap:12px; margin-top:35px; font-size:13px; color:#4f6282; }
+.features span { padding:8px 13px; background:#fff9; border:1px solid #dee7f7; border-radius:999px; }
+.card { padding:34px; width:100%; background:white; border:1px solid #e3e9f2; border-radius:20px; box-shadow:0 20px 60px #253e6b0c; }
+.login { :global { .ant-form-item-label { padding:0 0 6px; } .ant-input, .ant-select-selector, .ant-input-affix-wrapper { border-radius:8px; } .ant-btn-primary { min-height:40px; border-radius:8px; font-weight:500; } } }
+.login-method-tab { :global { .ant-tabs-nav { margin:20px 0 18px; } .ant-tabs-tab { padding:6px 0; } } }
+.footer { text-align:center; font-size:12px; color:#7b8aa0; padding:18px; }
+@media(max-width:900px) { .content { gap:36px; grid-template-columns:1fr 390px; } .intro h1 { font-size:38px; } }
+@media(max-width:720px) { .header { padding:20px; } .brand { font-size:18px; } .intro { display:none; } .content { display:block; width:min(420px, 92vw); padding:20px 0; } .card { padding:26px; } }
+@media(prefers-reduced-motion:reduce) { .page * { scroll-behavior:auto; transition:none !important; } }

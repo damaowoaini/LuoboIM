@@ -1,0 +1,49 @@
+{
+  "package": "open-im-sdk-wasm",
+  "version": "3.5.1-alpha.3",
+  "scope": "Reviewed JavaScript/typing patch only; original WASM untouched",
+  "files": [
+    {
+      "path": "lib/index.js",
+      "original_sha256": "985d5ea6e839c72cc310b6362045bc86dde43716286a97c9f36b31eba53dbc88",
+      "patched_sha256": "b3f5d89077154bf5b8bc60339167ea0420f8de92234bfd3a211e79a095673202"
+    },
+    {
+      "path": "lib/index.es.js",
+      "original_sha256": "bbcadba97c638bc9d42a8adf66416177d0446efa21ae25971d73f7779cae66df",
+      "patched_sha256": "9fb7af957d270df23c3bb9ff0fa285b498aabd0f5b63a76427e1378871fe4a76"
+    },
+    {
+      "path": "lib/index.umd.js",
+      "original_sha256": "7048acca4112dc8058419f88cffdd311f4daeff46fc2cd52500a940a5320fd9b",
+      "patched_sha256": "e5b9a6e36170092704d79cfdc86137b130b178f333e1f8f66365267a90f815b2"
+    },
+    {
+      "path": "lib/types/params.d.ts",
+      "original_sha256": "cba902a62f809c69809962dcdfc054b9800f6561ae276be01889c93c6deee0df",
+      "patched_sha256": "a825fc6581b5ca0a96d299d8fc82a8f0e4c45ac50653f3b68d980a3d3d98f5f4"
+    },
+    {
+      "path": "lib/worker.js",
+      "original_sha256": "630b5c53481103878189264de31a402f76285eefdf9ccc663a44a881e3319db1",
+      "patched_sha256": "d70480aea32ac41e06aa60245198987d083cf275c75a8e419868b6ef3f85bff8"
+    },
+    {
+      "path": "lib/worker-legacy.js",
+      "original_sha256": "3f59aae28b3b150258a0c37ccf3a30f328b01b02b6d63a7e14feffff36cd4822",
+      "patched_sha256": "46b21be9c784bf9281705342f738542c6fc2d3cef4f31c68a346a65a4bf1452f"
+    }
+  ],
+  "license": {
+    "package_metadata": "MIT",
+    "bundled_license": "Apache-2.0",
+    "status": "upstream_metadata_conflict_preserved; no statement about unknown vendor WASM licensing",
+    "preserved_file": "LICENSE.vendor",
+    "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
+  },
+  "modifications": [
+    "Allow per-session dataDir in wrapper without changing wire protocol",
+    "Default SDK stdout and method logging off; remove raw event/DB/SQL console output",
+    "Preserve original WASM, database tables and codecs"
+  ]
+}

@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_openim_sdk (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_openim_sdk (from `.symlinks/plugins/flutter_openim_sdk/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_openim_sdk:
+    :path: ".symlinks/plugins/flutter_openim_sdk/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  flutter_openim_sdk: 31d671e7d7ec86fb133c396140532b7020f52e30
+
+PODFILE CHECKSUM: c81daca54a7578a3bbfb782565c0ae1104fc09e3
+
+COCOAPODS: 1.16.2

@@ -1,0 +1,158 @@
+{
+  "state": "source_only_prepared_AST_and_bash_syntax_checked_zero_tests_zero_compile_zero_remote",
+  "own_files": [
+    {
+      "path": ".github/workflows/mobile-ci.yml",
+      "bytes": 2455,
+      "sha256": "0c280261613ea4e0d767ef000cf6c5864710fe40d3a14d991237b3c7d91fca01"
+    },
+    {
+      "path": "ci/mobile-check.py",
+      "bytes": 12320,
+      "sha256": "be658a3fdbaf7be74b54b74063e5d999552bcc7e69ddc43ef207670b1732f8a5"
+    },
+    {
+      "path": "ci/mobile-netns.sh",
+      "bytes": 1034,
+      "sha256": "b8b329bcf37009e89291566df8ec3d16c42f397c47f91062ac292b0b79423c85"
+    },
+    {
+      "path": "ci/mobile-setup.sh",
+      "bytes": 3743,
+      "sha256": "21958a774b52c2df554ace3105712b4dd47c4ff4c9bb3dfc76b8d525d236e47b"
+    },
+    {
+      "path": "ci/mobile-source.py",
+      "bytes": 6675,
+      "sha256": "c1f786fb92a8fbe95af61390bc3ee568338664e32260e452cd72127fc720db57"
+    },
+    {
+      "path": "ci/mobile-test-tools.py",
+      "bytes": 2105,
+      "sha256": "62980e110c0ae79af875503416db5696eab15be710522dbd55113ffe7ba0e88a"
+    },
+    {
+      "path": "ci/mobile/README.md",
+      "bytes": 5368,
+      "sha256": "16e83dc856b23270f4de344e5a1f17ede06038dd996cef38c3e647c248e6828e"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/app.dart",
+      "bytes": 18789,
+      "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/chat/data/message_mapper.dart",
+      "bytes": 12723,
+      "sha256": "f4c01d0e8d5e0c72fe330caabb2b25495126678997773f5446cc33e60e5d386f"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/booking_providers.dart",
+      "bytes": 4929,
+      "sha256": "c51d4767fe4b981b376e4a694da5fbc6a7d8d14f6b59d7f5a6dea129c5780326"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/booking_contract.dart",
+      "bytes": 11464,
+      "sha256": "3953ad2717c0e9881c070532fb042816d99818aa9514353a87bbd09e48355f6d"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/booking_pending_journal.dart",
+      "bytes": 19213,
+      "sha256": "55db0f98834b4d5a9bfc0f6685719ebf626a397ac70a5119980d90231d6fa85e"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/meeting_booking_repository.dart",
+      "bytes": 6805,
+      "sha256": "8d47526b7cdcaae39828871e102af24cccc2ec7b1bacc2c6c66b73c5ed11ec76"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/tenant_booking_adapter.dart",
+      "bytes": 1648,
+      "sha256": "c6977320f81835ff376ffc89a1b5d8cd1e8605e04436721904f41309fea0b17d"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/domain/booking_view.dart",
+      "bytes": 4185,
+      "sha256": "7ccdc39c4aab7ad2e5c9da699bf4913b2df9692013ab6c03bfda8e3cbfcac1c0"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_controller.dart",
+      "bytes": 8458,
+      "sha256": "f4093ba414dffe8387c3768ff6d6f1e11b70deb803d9a6c76cca55dc6329f9ff"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_detail_page.dart",
+      "bytes": 6380,
+      "sha256": "7bc26daac358ed0f4cc0afbaa6d10d7135d4c3912a2e59562aa194f9f7f94c47"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_editor_page.dart",
+      "bytes": 10683,
+      "sha256": "b05a8d8caf5b667d8a23c9ef7d825621151820c0e537644e88e95e8d300f66b3"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
+      "bytes": 3288,
+      "sha256": "4f702921c29f8b49b630708418d585c03904e409fbb7f33ddf25920a42046662"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/bookings_page.dart",
+      "bytes": 5107,
+      "sha256": "29731745cfecb9c9b9ac0fe25a205396adac4297fc5f9f73e5c03cbb6bb1031d"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/meeting/presentation/meetings_page.dart",
+      "bytes": 6496,
+      "sha256": "87e4dd39073e49367ec5ecfd7cff4e04812e3cc1e6e7a4f8900c717f28af032f"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/chat/legacy_custom_summary_test.dart",
+      "bytes": 10937,
+      "sha256": "d94a6361f190f4d25fc8eeb524650bcfb12e938f88caf952d4296508a7819185"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_controller_test.dart",
+      "bytes": 5311,
+      "sha256": "ce2c633bc08ca313ffa08e505620ad6de4372dce08fe0fd2b4071ceff037d352"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pages_test.dart",
+      "bytes": 23438,
+      "sha256": "646bb4caaf6ab6668f8e5a06d94fcb4deba06ec4d7a023f85f70ce0a0d9297d6"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pending_journal_test.dart",
+      "bytes": 25519,
+      "sha256": "5f5380d17a7e549fee81f1e69055b0a3f3bf22c1e5b820021b90fb4d859055e5"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_provider_lifecycle_test.dart",
+      "bytes": 5070,
+      "sha256": "65f815aa4f0fe527f4d66a71f48669975a71054f54e6af919d1553da53115c40"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_routes_test.dart",
+      "bytes": 2717,
+      "sha256": "97a69728f5bb45eb2c768c166ed2cd0ba0257dcb3a205347441d5ed0a37e10e7"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_test_harness.dart",
+      "bytes": 4761,
+      "sha256": "48eda9e531a9f15ac9362ad259234dce0647946360c273cff3097e74793f261b"
+    },
+    {
+      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_view_test.dart",
+      "bytes": 1808,
+      "sha256": "d25f1a90938b224b9cc2870a90fb0adbd0e2c05bfe5651a8e93121bcb2048ab5"
+    },
+    {
+      "path": "ci/mobile/inputs.json",
+      "bytes": 64006,
+      "sha256": "6371fb146f9fae28797b3c0bfb816697ed10131a6d20e174e6f878425a7d2c21"
+    }
+  ],
+  "aggregate_sha256": "10bb21cc0bf4802e0ccfed31b55438a643195009c17cdb706dd0b9926b6ad53d",
+  "no_product_edits": true,
+  "native_acceptance": false
+}

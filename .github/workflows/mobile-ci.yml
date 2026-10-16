@@ -1,0 +1,69 @@
+name: Mobile source validation
+
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'packages/flutter_openim_sdk/lib/**'
+      - 'packages/flutter_openim_sdk/pubspec.yaml'
+      - 'packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart'
+      - 'migration/legacy_personal_export/**'
+      - 'ci/mobile*'
+      - 'ci/mobile/**'
+      - '.github/workflows/mobile-ci.yml'
+  push:
+    branches: [main, master, 'codex/**']
+    paths:
+      - 'app/**'
+      - 'packages/flutter_openim_sdk/lib/**'
+      - 'packages/flutter_openim_sdk/pubspec.yaml'
+      - 'packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart'
+      - 'migration/legacy_personal_export/**'
+      - 'ci/mobile*'
+      - 'ci/mobile/**'
+      - '.github/workflows/mobile-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter-linux:
+    name: ${{ matrix.cohort }} / Linux unit + widget + analyze
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        cohort: [current230, booking-custom249]
+    env:
+      MOBILE_WORK: ${{ runner.temp }}/mobile-${{ matrix.cohort }}
+    steps:
+      - name: Checkout source without stored credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Linux tester runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
+      - name: Validate CI reporter tools
+        run: python3 ci/mobile-test-tools.py
+      - name: Prepare exact source, official Flutter and locked dependencies
+        run: bash ci/mobile-setup.sh '${{ matrix.cohort }}' "$MOBILE_WORK"
+      - name: Test and analyze with no external network or host fixtures
+        run: |
+          sudo unshare --net -- bash "$GITHUB_WORKSPACE/ci/mobile-netns.sh" \
+            "$(id -un)" "$GITHUB_WORKSPACE" "$MOBILE_WORK" '${{ matrix.cohort }}'
+      - name: Preserve actual results and setup failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: mobile-${{ matrix.cohort }}-${{ github.run_id }}
+          path: ${{ env.MOBILE_WORK }}/evidence/
+          if-no-files-found: warn
+          retention-days: 14

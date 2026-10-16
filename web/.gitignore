@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-electron/
+release/
+package/
+.umi/
+.umi-production/
+coverage/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+*.log

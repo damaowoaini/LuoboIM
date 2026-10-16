@@ -1,0 +1,21 @@
+{
+  "state": "helper_implemented_old_app_install_not_yet_verified",
+  "purpose": "旧版全局 SharedPreferences 资料通过用户明确导出后导入萝卜对话，不能跨包名直接读取沙箱",
+  "source_application_id": "com.jrtxa.wanfeng.app",
+  "target_application_id": "com.luoboduihua.imapp",
+  "integration": [
+    "将 legacy_personal_export.dart 复制进旧版项目 lib/migration/，不要修改只读 references 基线",
+    "在旧版笔记或待办入口加入 LegacyPersonalExportButton；该组件复用原依赖 shared_preferences/path_provider/share_plus 7.2.x",
+    "使用原 application ID、原签名/Team 和升级权限构建并安装旧版迁移更新，不要先卸载原 App",
+    "用户点击导出，通过系统分享面板存到文件；确认文件保存且有可恢复副本后再处理旧 App",
+    "在新 App 登录实际归属账号，通过 我的 → 笔记或待办 → 资料管理 → 导入选择 JSON，并明确确认旧资料归属",
+    "核对导入数量和内容；重复导入相同备份不重复添加，不删除原键和原文件"
+  ],
+  "limits": [
+    "旧 App 可安装签名产物尚未构建；没有原签名/升级权限时无法通过此方式访问既有沙箱",
+    "旧版笔记无账号归属，辅助导出不会根据当前登录账号伪造归属",
+    "损坏 JSON 原文仍可导出保全，新 App 会拒绝整个损坏归档，不能部分导入后删除原资料",
+    "当前单个导入文件最大16MiB、最多10000条，超限资料仍需分批导出支持",
+    "JSON备份包含资料明文；旧 App 不改键、不删除副本、也不自动上传到任何服务器"
+  ]
+}

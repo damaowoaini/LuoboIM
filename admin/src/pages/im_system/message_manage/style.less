@@ -1,0 +1,90 @@
+.send_layout_container {
+  container-name: send-message-layout;
+  container-type: inline-size;
+  min-width: 0;
+}
+
+.send_layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  min-width: 0;
+}
+
+// Use the actual content width after the management sidebar and page padding.
+// A second column needs room for selection/avatar/nickname/ID and table padding.
+@container send-message-layout (min-width: 1060px) {
+  .send_layout {
+    grid-template-columns: minmax(0, 1fr) minmax(480px, 0.9fr);
+  }
+}
+
+.send_user_table {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  background: #fff;
+  .search_input {
+    width: calc(100% - 24px);
+    margin-bottom: 6px;
+    margin-left: 12px;
+    background-color: #f6f6f6;
+  }
+  :global {
+    .ant-pro-card,
+    .ant-pro-card-body,
+    .ant-table-wrapper {
+      min-width: 0;
+      max-width: 100%;
+    }
+    .ant-table-content {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+    }
+    .ant-table-thead > tr > th {
+      background: #fff;
+    }
+    .ant-pro-card {
+      box-shadow: none !important;
+    }
+  }
+}
+
+.send_content {
+  &:after {
+    margin-right: 20px;
+  }
+}
+
+
+.send_composer {
+  min-width: 0;
+}
+
+.recipient_nickname {
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.recipient_id {
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.selected_recipient {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.recipient_hint {
+  margin: 0 16px 16px;
+  color: #5e697a;
+  font-size: 12px;
+}

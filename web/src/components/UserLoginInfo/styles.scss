@@ -1,0 +1,186 @@
+// 加载状态
+.login-info-loading {
+  padding: 8px 12px;
+  color: #999;
+  font-size: 12px;
+}
+
+// 内联显示模式（在好友列表中显示）
+.login-info-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #666;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+
+  .warning-icon {
+    font-size: 12px;
+  }
+
+  .device-model {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .ip-address {
+    font-family: "Consolas", "Monaco", monospace;
+    color: #722ed1;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .location {
+    color: #888;
+  }
+
+  // 多账户登录高亮
+  &.multi-device {
+    background-color: #fff3cd;
+    border-left: 3px solid #ff9800;
+    padding-left: 6px;
+
+    .device-model {
+      color: #ff6b00;
+      font-weight: 600;
+    }
+
+    .ip-address {
+      color: #d4380d;
+    }
+  }
+  
+  // 可点击样式
+  &.clickable {
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+      background-color: #e8e8e8;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    &.multi-device:hover {
+      background-color: #ffe8b3;
+    }
+  }
+}
+
+// 完整显示模式（在详情页中显示）
+.user-login-info {
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  margin-bottom: 16px;
+
+  // 多账户登录警告样式
+  &.multi-device-warning {
+    background-color: #fffbf0;
+    border-color: #ffa940;
+    box-shadow: 0 2px 8px rgba(255, 169, 64, 0.1);
+  }
+
+  .login-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .multi-device-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      background-color: #ff9800;
+      color: #ffffff;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      animation: pulse 2s infinite;
+    }
+  }
+
+  .login-info-content {
+    .info-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f5f5f5;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        min-width: 100px;
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .info-value {
+        flex: 1;
+        font-size: 14px;
+        color: #333;
+      }
+
+      // 多设备用户信息行
+      &.multi-device-users {
+        background-color: #fff7e6;
+        padding: 12px;
+        margin-top: 8px;
+        border-radius: 6px;
+        border: 1px solid #ffd666;
+
+        .info-value {
+          color: #d46b08;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// 脉冲动画
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .user-login-info {
+    .info-row {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .info-label {
+        margin-bottom: 4px;
+        font-size: 12px;
+      }
+
+      .info-value {
+        font-size: 13px;
+      }
+    }
+  }
+}
+

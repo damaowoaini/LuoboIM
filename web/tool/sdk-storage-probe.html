@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>萝卜对话 · SDK 隔离验收探针</title>
+  </head>
+  <body>
+    <h1>SDK 本地库隔离探针</h1>
+    <p>仅此 localhost 测试源、随机目录、合成用户；不请求业务服务或使用真实凭证。</p>
+    <button id="run" type="button">运行 SQL Worker 隔离验收</button>
+    <pre id="result" role="status">尚未运行</pre>
+    <script src="/wasm_exec.js"></script>
+    <script type="module" src="/tool/sdk-storage-probe.ts"></script>
+  </body>
+</html>

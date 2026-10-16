@@ -1,0 +1,67 @@
+name: Web CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Node 24.21.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+
+      - name: CI helper contract tests
+        run: |
+          mkdir -p ci-output/helpers
+          node --test --test-reporter=spec --test-reporter-destination=ci-output/helpers/unit.log --test-reporter=junit --test-reporter-destination=ci-output/helpers/unit.junit.xml ci/web-ci.test.mjs
+
+      - name: Locked install, tests, types, bundle, and isolated candidate
+        run: node ci/web-ci.mjs
+
+      # Upload reports separately and first: a failed bundle upload must not
+      # prevent the test diagnostics artifact from already being retained.
+      - name: Preserve reports on success or failure
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: web-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-output/web/*.log
+            ci-output/web/*.json
+            ci-output/web/*.xml
+            ci-output/helpers/*.log
+            ci-output/helpers/*.xml
+          if-no-files-found: warn
+          retention-days: 14
+          include-hidden-files: false
+
+      - name: Downloadable review bundle (never deploy)
+        if: always() && hashFiles('ci-output/web/dist-manifest.json') != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: web-dist-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-output/web/dist/
+            ci-output/web/dist-manifest.json
+          if-no-files-found: error
+          retention-days: 14
+          include-hidden-files: false

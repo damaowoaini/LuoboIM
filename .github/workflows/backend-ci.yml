@@ -1,0 +1,55 @@
+name: Backend source checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upload-safety:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Reject secret and private-data upload paths
+        run: python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+  backend:
+    needs: upload-safety
+    name: ${{ matrix.module }} / Go 1.27.2
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [server, chart, route]
+    env:
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+      GOMAXPROCS: "2"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        # https://github.com/actions/setup-go/releases/tag/v7.0.0
+        with:
+          go-version: "1.27.2"
+          check-latest: false
+          cache-dependency-path: |
+            ${{ matrix.module }}/go.sum
+            server/pkg/protocol/go.sum
+      - name: Race tests, vet and actual skip summary
+        run: bash ci/backend-ci.sh "${{ matrix.module }}"
+      - name: Preserve results, including failures
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: backend-${{ matrix.module }}-${{ github.run_attempt }}
+          path: ci-results/${{ matrix.module }}/
+          if-no-files-found: warn
+          retention-days: 14

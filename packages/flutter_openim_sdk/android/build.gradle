@@ -1,0 +1,159 @@
+import java.security.MessageDigest
+import groovy.json.JsonSlurper
+import java.util.zip.ZipFile
+
+group 'io.openim.flutter_openim_sdk'
+version '1.0'
+
+// The host app owns the Android Gradle Plugin version.
+apply plugin: 'com.android.library'
+
+// A separate, hash-pinned research artifact may be used only in debug variants.
+// An ordinary build continues resolving the original four-ABI Enterprise AAR.
+def qaCorePath = rootProject.findProperty('luoboQaCoreAar')
+def qaCoreSha = rootProject.findProperty('luoboQaCoreSha256')
+def qaCoreEnabled = qaCorePath != null || qaCoreSha != null
+def qaCoreFile
+def qaCoreArtifact
+
+// BEGIN QA TASK POLICY: evaluated directly by the small Groovy policy check.
+def qaInspectionTasks = ['clean', 'help', 'tasks', 'projects', 'properties', 'dependencies',
+                        'dependencyinsight', 'buildenvironment', 'signingreport', 'outgoingvariants'] as Set
+def qaRequestedTaskAllowed = { String taskPath ->
+    def parts = taskPath.tokenize(':')
+    if (parts.isEmpty()) { return false }
+    def name = parts.last().toLowerCase(Locale.ROOT)
+    // This QA workflow reviews the unflavoured assembleDebug entry point only.
+    name == 'assembledebug' || qaInspectionTasks.contains(name)
+}
+def qaPackagingTaskForbidden = { String taskName, Collection<String> buildTypes ->
+    // ART baseline-profile preparation belongs to a Debug variant. Preserve
+    // that exact suffix without treating a real Profile build as Debug.
+    def name = taskName.toLowerCase(Locale.ROOT).replaceFirst(/debugartprofile$/, 'debug')
+    buildTypes.any { type ->
+        def mode = type.toLowerCase(Locale.ROOT)
+        mode != 'debug' && name.contains(mode)
+    }
+}
+// END QA TASK POLICY
+
+if (qaCoreEnabled) {
+    def requestedTasks = gradle.startParameter.taskNames
+    if (requestedTasks.isEmpty() || requestedTasks.any { !qaRequestedTaskAllowed(it) }) {
+        throw new GradleException('QA core requires assembleDebug or a safe inspection task; aggregate, custom and non-debug builds are refused.')
+    }
+    if (qaCorePath == null || qaCoreSha == null || !(qaCoreSha.toString() ==~ /[0-9a-f]{64}/)) {
+        throw new GradleException('QA core requires an explicit AAR path and lowercase SHA256.')
+    }
+    qaCoreFile = rootProject.file(qaCorePath.toString()).canonicalFile
+    if (!qaCoreFile.isFile() || !(qaCoreFile.name ==~ /[A-Za-z0-9._-]+\.aar/)) {
+        throw new GradleException('QA core AAR is missing or its artifact name is invalid.')
+    }
+    def digest = MessageDigest.getInstance('SHA-256')
+    qaCoreFile.withInputStream { stream ->
+        byte[] buffer = new byte[65536]
+        int count
+        while ((count = stream.read(buffer)) > 0) { digest.update(buffer, 0, count) }
+    }
+    if (digest.digest().encodeHex().toString() != qaCoreSha.toString()) {
+        throw new GradleException('QA core AAR checksum mismatch.')
+    }
+    qaCoreArtifact = qaCoreFile.name.substring(0, qaCoreFile.name.length() - 4)
+    def qaBuildFile = new File(qaCoreFile.parentFile, "${qaCoreArtifact}.build.json")
+    if (!qaBuildFile.isFile() || qaBuildFile.length() > 65536) {
+        throw new GradleException('QA core requires its bounded, auditable build manifest.')
+    }
+    def qaBuild = new JsonSlurper().parse(qaBuildFile)
+    def qaSource = new JsonSlurper().parse(layout.projectDirectory.file('../tool/native_core/qa-fixture-source-manifest.json').asFile)
+    if (!(qaBuild instanceof Map) || qaBuild.only_debug_QA != true || qaBuild.production_replacement != false ||
+        qaBuild.artifact_sha256 != qaCoreSha.toString() ||
+        qaBuild.patch_sha256 != qaSource.requires_base_patch_sha256 ||
+        qaBuild.qa_overlay_sha256 != qaSource.overlay_sha256 ||
+        !(qaBuild.qa_ca_sha256 instanceof String) || !(qaBuild.qa_ca_sha256 ==~ /[0-9a-f]{64}/) ||
+        qaBuild.build_tags != ["-tags=${qaSource.build_tag}".toString()]) {
+        throw new GradleException('QA core build manifest does not match the reviewed debug trust artifact.')
+    }
+    def qaAbis = []
+    new ZipFile(qaCoreFile).withCloseable { archive ->
+        archive.entries().each { entry ->
+            if (entry.name ==~ /jni\/[^\/]+\/libgojni\.so/) {
+                qaAbis.add(entry.name.tokenize('/')[1])
+            }
+        }
+    }
+    if (!(qaBuild.libraries instanceof List) || qaAbis.isEmpty() ||
+        qaAbis.unique(false).size() != qaAbis.size() ||
+        qaAbis.sort() != qaBuild.libraries.collect { it.abi }.sort()) {
+        throw new GradleException('QA core ABI inventory does not match its build manifest.')
+    }
+    def originalAbis = ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'] as Set
+    if (!originalAbis.containsAll(qaAbis) ||
+        qaBuild.matches_original_abi_coverage != (qaAbis.toSet() == originalAbis)) {
+        throw new GradleException('QA ABI coverage declaration is invalid; production ABI coverage must not be implied.')
+    }
+    androidComponents.beforeVariants(androidComponents.selector().all()) { variant ->
+        if (variant.buildType != 'debug') { variant.enable = false }
+    }
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.allTasks.any { task ->
+            // A dependency may share an empty preProfileBuild lifecycle task
+            // with Debug (jni does). Inspect projects that can package this
+            // QA core, rather than unrelated dependency task names.
+            def packagesQaCore = task.project == project || task.project.plugins.hasPlugin('com.android.application')
+            if (!packagesQaCore) { return false }
+            def androidDsl = task.project.extensions.getByName('android')
+            qaPackagingTaskForbidden(task.name, androidDsl.buildTypes.collect { it.name })
+        }) {
+            throw new GradleException('The research QA core is allowed only in debug builds.')
+        }
+    }
+    // A repository coordinate avoids unsupported direct local-AAR dependencies
+    // when the Flutter plugin's library variant is built by the host application.
+    rootProject.allprojects {
+        repositories {
+            ivy {
+                name = 'OpenIMExplicitDebugQaCore'
+                url = qaCoreFile.parentFile.toURI()
+                patternLayout { artifact '[artifact].[ext]' }
+                metadataSources { artifact() }
+                content { includeModule 'luobo.qa.openim', qaCoreArtifact }
+            }
+        }
+    }
+}
+
+// The host resolves this transitive coordinate too, so expose the narrowly
+// scoped local Maven repository to each host project (not just this library).
+def customizedCoreRepository = layout.projectDirectory.dir('libs').asFile
+rootProject.allprojects {
+    repositories {
+        maven {
+            name = 'OpenIMCustomizedCore'
+            url = customizedCoreRepository.toURI()
+            content { includeGroup 'io.openim' }
+        }
+    }
+}
+
+android {
+    namespace 'io.openim.flutter_openim_sdk'
+    compileSdk 36
+
+    defaultConfig {
+        minSdkVersion(qaCoreEnabled ? 24 : 21)
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // Preserve the customized core and wire protocol until its source is recovered.
+    if (qaCoreEnabled) {
+        implementation "luobo.qa.openim:${qaCoreArtifact}:${qaCoreSha}@aar"
+    } else {
+        implementation 'io.openim:core-sdk:0.0.1@aar'
+    }
+}

@@ -1,0 +1,5 @@
+.env
+config.yaml
+route-service
+*.log
+coverage.out
