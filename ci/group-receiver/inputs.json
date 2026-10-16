@@ -141,8 +141,8 @@
     {
       "path": "ci/candidates/group-receiver/source/server/internal/messagedelivery/mongo_integration_test.go",
       "target": "server/internal/messagedelivery/mongo_integration_test.go",
-      "bytes": 9641,
-      "sha256": "a5726aa6934fabfb86d0a2054fbe99f887a34ac361368a437baa797eaacfc772",
+      "bytes": 13124,
+      "sha256": "87f5d75e593c4bfc8a930f0db3f8a3865f9d2e06f0c6c555a5d552c194a25f8c",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -340,7 +340,7 @@
     }
   ],
   "effective_source_count": 989,
-  "effective_source_sha256": "471d939ddc32f5c4c62c544d8a7f597e7cda6f7f173754aa0e3c9eae679879e0",
+  "effective_source_sha256": "2fa444f8e7dc1a719ac281d20dd370ca7cf8bb03a8b593aecf26a382b37362f7",
   "effective_source": [
     {
       "path": "server/.dockerignore",
@@ -1774,8 +1774,8 @@
     },
     {
       "path": "server/internal/messagedelivery/mongo_integration_test.go",
-      "bytes": 9641,
-      "sha256": "a5726aa6934fabfb86d0a2054fbe99f887a34ac361368a437baa797eaacfc772"
+      "bytes": 13124,
+      "sha256": "87f5d75e593c4bfc8a930f0db3f8a3865f9d2e06f0c6c555a5d552c194a25f8c"
     },
     {
       "path": "server/internal/messagedelivery/online.go",

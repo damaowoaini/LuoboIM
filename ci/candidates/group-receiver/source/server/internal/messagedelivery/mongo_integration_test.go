@@ -219,15 +219,75 @@ func TestMessageDeliveryMongoMissingCounterAndBadSeedNeverOverwriteLegacySlot(t 
 	if err := sequenceTxn(ctx, authority, "left", func(tx context.Context) error { _, err := s.Accept(tx, input); return err }); !errors.Is(err, ErrUnprepared) {
 		t.Fatal("missing migration seed silently fell back to Redis", err)
 	}
+	// Prove that the earlier failed unprepared attempt did not persist an
+	// idempotency receipt, obligation, or sequence before testing the collision.
+	for _, collection := range []string{Sequences, Receipts, Effects} {
+		count, err := db.Collection(collection).CountDocuments(ctx, bson.M{"_id": bson.M{"$ne": SchemaID}})
+		if err != nil || count != 0 {
+			t.Fatal("unprepared attempt left durable state", collection, count, err)
+		}
+	}
 	initializeSequence(t, ctx, authority, s, "sg_g", 0)
 	driver := unrelation.NewMsgMongoDriver(db)
 	if err := driver.EnsureMessageDoc(ctx, "sg_g:0"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := driver.UpdateMsg(ctx, "sg_g:0", 0, "msg", &table.MsgDataModel{Seq: 1, ClientMsgID: "legacy", Content: "must survive"}); err != nil {
+	written, err := driver.UpdateMsg(ctx, "sg_g:0", 0, "msg", &table.MsgDataModel{Seq: 1, ClientMsgID: "legacy", Content: "must survive"})
+	if err != nil {
 		t.Fatal(err)
 	}
-	if err := sequenceTxn(ctx, authority, "left", func(tx context.Context) error { _, err := s.Accept(tx, input); return err }); !errors.Is(err, ErrConflict) {
+	if written == nil || written.MatchedCount != 1 || written.ModifiedCount != 1 {
+		t.Fatal("legacy fixture write was not acknowledged exactly once")
+	}
+	var prior table.MsgDocModel
+	if err := db.Collection("msg").FindOne(ctx, bson.M{"doc_id": "sg_g:0"}).Decode(&prior); err != nil {
+		t.Fatal("legacy fixture prestate unavailable", err)
+	}
+	if len(prior.Msg) != 100 || prior.Msg[0] == nil || prior.Msg[0].Msg == nil || prior.Msg[0].GlobalDeleted ||
+		prior.Msg[0].Msg.Seq != 1 || prior.Msg[0].Msg.ClientMsgID != "legacy" || prior.Msg[0].Msg.Content != "must survive" {
+		t.Fatal("legacy fixture prestate differs from the real occupied slot")
+	}
+	legacyRows, err := db.Collection("msg").CountDocuments(ctx, bson.M{"doc_id": "sg_g:0"})
+	if err != nil || legacyRows != 1 {
+		t.Fatal("legacy fixture document identity is not unique", legacyRows, err)
+	}
+	// Diagnostic only: compare the production dotted-null predicate with an
+	// explicit array-element read. Neither query changes data or expectations.
+	dottedNull, err := db.Collection("msg").CountDocuments(ctx, bson.M{"doc_id": "sg_g:0", "msgs.0.msg": nil, "msgs.0.global_deleted": bson.M{"$ne": true}})
+	if err != nil {
+		t.Fatal("dotted slot diagnostic unavailable", err)
+	}
+	exactNull, err := db.Collection("msg").CountDocuments(ctx, bson.M{"doc_id": "sg_g:0", "$expr": bson.M{"$let": bson.M{
+		"vars": bson.M{"slot": bson.M{"$arrayElemAt": bson.A{"$msgs", 0}}},
+		"in":   bson.M{"$eq": bson.A{"$$slot.msg", nil}},
+	}}})
+	if err != nil {
+		t.Fatal("exact slot diagnostic unavailable", err)
+	}
+	t.Logf("collision_prestate: acknowledged_legacy_slot=true document_rows=%d dotted_null_matches=%d exact_null_matches=%d", legacyRows, dottedNull, exactNull)
+
+	attemptErr := sequenceTxn(ctx, authority, "left", func(tx context.Context) error { _, err := s.Accept(tx, input); return err })
+	// Retain safe, fixed-shape poststate evidence even when the original
+	// ErrConflict assertion terminates this case immediately afterwards.
+	var observed table.MsgDocModel
+	if err := db.Collection("msg").FindOne(ctx, bson.M{"doc_id": "sg_g:0"}).Decode(&observed); err != nil {
+		t.Fatal("collision poststate unavailable", err)
+	}
+	preserved := len(observed.Msg) == 100 && observed.Msg[0] != nil && observed.Msg[0].Msg != nil &&
+		observed.Msg[0].Msg.Seq == 1 && observed.Msg[0].Msg.ClientMsgID == "legacy" && observed.Msg[0].Msg.Content == "must survive"
+	var observedCounter counter
+	if err := db.Collection(Sequences).FindOne(ctx, bson.M{"_id": key(s.epoch, "sequence", "sg_g")}).Decode(&observedCounter); err != nil {
+		t.Fatal("collision sequence poststate unavailable", err)
+	}
+	t.Logf("collision_poststate: accept_success=%t expected_conflict=%t legacy_preserved=%t counter_maximum=%d", attemptErr == nil, errors.Is(attemptErr, ErrConflict), preserved, observedCounter.Maximum)
+	for _, collection := range []string{Receipts, Effects} {
+		count, err := db.Collection(collection).CountDocuments(ctx, bson.M{"_id": bson.M{"$ne": SchemaID}})
+		if err != nil {
+			t.Fatal("collision duty poststate unavailable", err)
+		}
+		t.Logf("collision_poststate: collection=%s durable_rows=%d", collection, count)
+	}
+	if err := attemptErr; !errors.Is(err, ErrConflict) {
 		t.Fatal("bad migration seed overwrote prior message", err)
 	}
 	var c counter
