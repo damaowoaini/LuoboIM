@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current269 target46/full734."""
+"""Pure Python CI gate checks, separate from current282 target97/full785."""
 import copy
 import importlib.util
 import json
@@ -134,11 +134,13 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical257_cannot_alias269(self):
-        self.rejects(lambda p: p.update(current257={}))
+    def test_historical257_cannot_alias282(self):
+        for historical in ('current257', 'current269'):
+            with self.subTest(historical=historical):
+                self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current269'].update(expected_full_tests=688))
+        self.rejects(lambda p: p['current282'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())

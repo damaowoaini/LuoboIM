@@ -20,26 +20,54 @@ class UserProfilePage extends ConsumerStatefulWidget {
 
 class _UserProfilePageState extends ConsumerState<UserProfilePage> {
   bool busy = false;
+  int _conversationView = 0;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (ModalRoute.of(context)?.isCurrent == false) ++_conversationView;
+  }
+  @override
+  void didUpdateWidget(covariant UserProfilePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userId != widget.userId || oldWidget.groupId != widget.groupId) ++_conversationView;
+  }
+  @override
+  void dispose() { ++_conversationView; super.dispose(); }
   Future<void> run(
     Future<void> Function(ContactsRepository) operation, {
     String? success,
+    bool Function()? isCurrent,
   }) async {
     final repository = ref.read(contactsRepositoryProvider);
-    if (repository == null || busy) return;
+    if (repository == null || busy || isCurrent?.call() == false) return;
     setState(() => busy = true);
     try {
       await operation(repository);
-      if (mounted && repository.access.isCurrent) {
+      if (mounted && repository.access.isCurrent && isCurrent?.call() != false) {
         refreshContacts(ref);
         if (success != null) contactNotice(context, success);
       }
     } on AppFailure catch (error) {
-      if (mounted && repository.access.isCurrent) {
+      if (mounted && repository.access.isCurrent && isCurrent?.call() != false) {
         contactNotice(context, error.message);
       }
     } finally {
       if (mounted) setState(() => busy = false);
     }
+  }
+
+  Future<void> openConversation(ContactsRepository repository, String id) async {
+    final view = _conversationView;
+    final owner = repository.access.credentials;
+    final group = widget.groupId;
+    bool current() => mounted && view == _conversationView && widget.userId == id && widget.groupId == group &&
+      repository.access.isCurrent && identical(repository.access.session.state.credentials, owner) &&
+      identical(ref.read(contactsRepositoryProvider), repository) && ModalRoute.of(context)?.isCurrent == true;
+    if (!current()) return;
+    await run((repo) async {
+      final conversation = await repo.conversation(id);
+      if (mounted && current()) context.push('/chat/${Uri.encodeComponent(conversation)}');
+    }, isCurrent: current);
   }
 
   @override
@@ -220,14 +248,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage> {
                     FilledButton.icon(
                       onPressed: busy
                           ? null
-                          : () => run((repo) async {
-                              final id = await repo.conversation(user.id);
-                              if (context.mounted && repo.access.isCurrent) {
-                                context.push(
-                                  '/chat/${Uri.encodeComponent(id)}',
-                                );
-                              }
-                            }),
+                          : () => openConversation(repository, user.id),
                       icon: const Icon(Icons.chat_bubble_outline),
                       label: const Text('发消息'),
                     ),

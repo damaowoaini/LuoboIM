@@ -1,99 +1,51 @@
 {
-  "schema": "luobo.mobile.source-preparation.v3",
-  "state": "current269_analyze_r4_prepared_pending_exact_cloud46_734_and_analyze0",
-  "parent_public_commit": "7d8a9cd42fb009f0d51747c9728e1ed442fa410e",
-  "root_final_base_must_match_before_CI_and257_rows": true,
-  "source269_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
-  "portable321_digest": "794601ed37e0bad1034363583ee6bba0bba984bcbf66c6161f797d29d56e69ec",
-  "global_search_v1_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
-  "global_search_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
+  "schema": "luobo.mobile.source-preparation.v4",
+  "state": "current282_QR_source_candidate_not_pub_resolved_no_cloud_result",
+  "parent_required": {
+    "current269_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64",
+    "source_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
+    "portable_digest": "794601ed37e0bad1034363583ee6bba0bba984bcbf66c6161f797d29d56e69ec",
+    "accepted_commit": "1d4629e573456750c50f32516aa924e3e107de55",
+    "actual_run": 38863945279,
+    "target46": 46,
+    "full734": 734,
+    "analyze_issues": 0
+  },
+  "candidate_manifest_sha256": "68fa203b134a1754b65383b0da23cdd9fbf323c1a191294f7f16e26756d58de6",
+  "source282_digest": "8769dfe761bf4808b38890551d7fc02ed73a1c53afd3e4cf397d726ded416c36",
+  "portable334_digest": "08b6e82fbc9028eb93928b238c9dc3b99397f6a639d6040118b5854081522ee7",
   "selected_source_delta": {
-    "files": 16,
-    "existing": 4,
-    "new": 12,
-    "new_dependencies": 0,
-    "new_test_fixture_files": 6
+    "files": 21,
+    "existing": 8,
+    "new": 13,
+    "test_fixture_files": 7,
+    "new_package_lock_blocks": 3
   },
   "default_cloud_sequence": [
-    "target46",
-    "full734",
-    "analyze_zero_issues"
+    "strict_Python23",
+    "verify_source282_portable334",
+    "official_flutter_and_pubget_enforce_lockfile_no_drift",
+    "target97_QR51_plus_search46",
+    "full785",
+    "analyze_zero_infos_and_warnings"
   ],
+  "expected_actual_boundaries": {
+    "QR_test_source": 51,
+    "global_search_preserved_test_source": 46,
+    "expected_target": 97,
+    "expected_full": 785,
+    "this_revision_Dart_or_Flutter_executions": 0,
+    "tests_not_yet_accepted": true
+  },
   "optional_reference": {
     "enabled_by_default": false,
-    "meaning": "Full269 compilation context with only4 original production files,entry2 only; not old257 full",
-    "expected": "1 exact missing global-entry assertion failure +1 old inbox filter positive",
-    "restore": "Only isolated reference tree changes; restore its4 after files in finally and verify main after269 again"
+    "meaning": "full282 compile context with4 original search-before files; entry2 only, exact1 product-entryassertFAIL+1 oldfilterpositivePASS; no old257/269 full claim",
+    "restore": "isolated4files restored byte-exact in finally and source282/334 reverified"
   },
-  "actual_this_revision": {
-    "local_Dart_Flutter_Go": 0,
-    "public_CI_tools": "same23 mandatory Python gates; no parser/runner feature changes"
-  },
-  "accepted_history": {
-    "git_commit": "314ac55",
-    "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
-    "portable_digest": "013194c7b391d62383ea47825b2db0627061e9b2ee32930166530c466bd3a0ea",
-    "actual_run": 38854472595,
-    "actual_target_passed": 64,
-    "actual_full_passed": 688,
-    "actual_analysis_issues": 0,
-    "root_acceptance_sha256": "78d57cd7c88d6c7d476015aebf6b93e59c5bc11b564c12f0ffe3666efe0af6d6",
-    "original_inputs_sha256": "16c47bf31a7c1f2ccee11a6390ce06cfb4c7e265f4a0cae1f2e5361acc8dcb26"
-  },
-  "auxiliary": "Preexisting local-only app/tool/check.sh retained locally at exact known SHA; absent from public tree and portable runtime, never executed. Public CI authored inventory has zero auxiliary exceptions.",
-  "unchanged_contract": "Official framework/engine/Dart and locked packages/SQLite raw SHA; new HOME/TMP/pubcache; setup-only networking; fresh Linux netns; reporter strict completion;4GiB initial/1GiB .2s/768MiB source+reference allocation/900s phase;latched failures win receipts",
+  "toolchain_and_resource": "Official Flutter3.47.7/framework/engine/Dart and SQLite pins unchanged; freshHOME/TMP/pubcache; setup-only networking; netns loopback-only with0fixture processes; 4GiB initial/1GiB .2s/768MiB root/900s perphase; all latched failures win receipts",
+  "public_inventory": "Strict zero exceptions; local-only app/tool/check.sh absent public, not copied/required/executed. Original known local helper is provenance only.",
+  "manual_dependencies": "Original171 packageblocks unchanged + exact3 officialmetadata blocks; not pub resolved. Enforce-lockfile actual cloud is mandatory and may fail, no downgrade/floating versions.",
   "native_acceptance": false,
-  "root_ci_correction": "Public inventory remains strict; local-only app/tool/check.sh absent in public and never required or copied.",
-  "parent_inputs_sha256": "91d3ebff1297a5663cf0457b46e23847f27551564c743a8f79707b150bdb6325",
-  "followup_delta": {
-    "modified_product_files": 2,
-    "behavior_changes": 0,
-    "test_files_or_assertion_changes": 0,
-    "new_dependencies": 0,
-    "analyze_r4_manifest_sha256": "330f6c8f5ce20f1165382b72ad807b2a1ab96a788b6c35b7770f675c65e4594f",
-    "reason": "Add explicit braces around unchanged continue/return branches at the two actual strict-analyzer info positions; no ignore/fatal-info weakening."
-  },
-  "prior_current269_incomplete": {
-    "git_commit": "5e2e12dc8da9091bfe9f8f7c928f299bcd4b7bd1",
-    "actual_run": 38857855453,
-    "job": 116833247279,
-    "source_digest": "61c5faec6515a1aeeeb5621ee828748e2a47ee62b9fc2901aadc0cedd37a0cf9",
-    "portable_digest": "a7ede4a134ee2e55c920e4a282249c1bddd2f9bfac6f5c9b9d877f3e82faad83",
-    "inputs_sha256": "b2f9d3acc3901743bb7c06acc856d386410981a5b83ff5f62ed201da1b1d4c2e",
-    "artifact_zip_sha256": "13480f2dd7ca3c9d2eff1f8045fa3fd8b098e17e8c82316abe65efe2996358af",
-    "actual": "target:7 visiblePASS,0 assertion failures,2 error completions,no terminal footer; phase900s timeout; child0 not accepted; full734/analyze not started",
-    "root_cause": "pending; fixture-r2 is a bounded async/theme diagnostic, not a proven fix"
-  },
-  "prior_current269_r2_incomplete": {
-    "git_commit": "1281200b6299b7baf69f4d6857649bc9ca6cea45",
-    "actual_run": 38860572719,
-    "job": 116841681437,
-    "inputs_sha256": "7b9fe630697ee347d783cb0d48dc61ab45052e91b8084b919936250cb2953ae7",
-    "source_digest": "19c7b1b7dd22677df7c5bdd2b7ea86022a25df3d25c16f95d9e568e377282285",
-    "portable_digest": "03c8897fb16d787f4fb37b390a2981256b715a5e005f80f1b7e3fe2567085cf9",
-    "artifact_zip_sha256": "f9d1c68d30147ad244799b05e5378cc5a30764072a969f6d4fce6cd1cbff434b",
-    "actual": "42 visiblePASS/4 nonassertionERROR; hidden5success; two actualChatPage assertion blocks completed then cleanup20s timeout; entry2 timeout/reentrant runAsync; target900.1s phase_timeout,child0 rejected; full734/analyze not started",
-    "verification_sha256": "d3df3b52c31181d2e4d8c5b91a18248e3dba7c3fd5ea99acf0719fa8ae3371c9",
-    "root_cause": "first cleanup failure confirmed; fake/real provider disposal chain source-backed hypothesis, candidate not yet executed"
-  },
-  "prior_current269_r3_result": {
-    "git_commit": "cafcd50c8d418e934ae8f5102f0b6ce50c67fe87",
-    "fixture_commit": "defd46abb19934f562b86992c2306c87e879e2a0",
-    "actual_run": 38863026938,
-    "job": 116849438270,
-    "inputs_sha256": "91d3ebff1297a5663cf0457b46e23847f27551564c743a8f79707b150bdb6325",
-    "source_digest": "8b018c5a67d8278054eceecb2d0f544f7b6d375d3d605af51047f3bda7effd99",
-    "portable_digest": "beddfff9dc698275420ca137d04a69b85315b11191eaa5e0314f840e25356ac8",
-    "artifact_zip_sha256": "da2c9d6040cfda695eb86bc6c5e78fb7647373168ac148f2d988eff682b69804",
-    "actual_target_passed": 46,
-    "actual_full_passed": 734,
-    "old688_completed_visible_name_multiset_subset": true,
-    "actual_analysis_issues": 2,
-    "analysis_diagnostics": [
-      "global_search_repository.dart137:49 curly_braces_in_flow_control_structures",
-      "global_search_controller.dart69:60 curly_braces_in_flow_control_structures"
-    ],
-    "accepted_all": false,
-    "verification_sha256": "78979f0eafa76330fc0d4be575376bf2bf60e0ee59200a96e9fec948b0b3fe11"
-  }
+  "old_evidence": "Current269 r4 and all failed r1/r2/r3 records remain immutable history by commit/artifact; cannot alias current282 to oldcohort labels.",
+  "source_revision": "r3: real renderer wrapper exposes exact input; no unsupported QrImageView.data read,51 assertions retained"
 }

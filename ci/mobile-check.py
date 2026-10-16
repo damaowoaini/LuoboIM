@@ -279,7 +279,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full269 tree; restore exact after4 even if the reference fails."""
+    """Separate full282 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -350,8 +350,8 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after269_and_primary_source_reverified',
-                    'source_digest': plan['current269']['source_digest'],
+                   {'state': 'after282_and_primary_source_reverified',
+                    'source_digest': plan['current282']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
 
 
@@ -370,13 +370,13 @@ def run(work, cohort, reference=False):
         if reference:
             counts['reference_entry'] = run_reference_entry(work, cohort, plan, tests, guard)
         verify(work, cohort)
-        target_expected = plan['current269']['expected_target_tests']
+        target_expected = plan['current282']['expected_target_tests']
         target_label = 'target' + str(target_expected)
-        log = guarded(tests + plan['current269']['target_paths'], work, guard, target_label)
+        log = guarded(tests + plan['current282']['target_paths'], work, guard, target_label)
         counts['target'] = machine_summary(log.read_text(), target_expected)
         write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
         verify(work, cohort)
-        expected = plan['current269']['expected_full_tests']
+        expected = plan['current282']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
         write_json(work / 'evidence/full.summary.json', counts['full'])
@@ -416,9 +416,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current269',), required=True)
+    p.add_argument('--cohort', choices=('current282',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full269 variant; exactly one entry assertion fails and one old filter passes')
+                   help='explicit full282 variant; exactly one entry assertion fails and one old filter passes')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')

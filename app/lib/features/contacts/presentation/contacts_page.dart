@@ -28,6 +28,8 @@ class _ContactsPageState extends ConsumerState<ContactsPage> {
       appBar: AppBar(
         title: const Text('通讯录'),
         actions: [
+          IconButton(tooltip: '扫一扫', icon: const Icon(Icons.qr_code_scanner),
+              onPressed: () => context.push('/qr/scan')),
           IconButton(
             tooltip: '添加好友或群',
             onPressed: () => context.push('/contacts/search'),

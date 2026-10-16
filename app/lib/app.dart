@@ -20,6 +20,8 @@ import 'features/contacts/presentation/contacts_page.dart';
 import 'features/contacts/presentation/contact_requests_page.dart';
 import 'features/contacts/presentation/contact_search_page.dart';
 import 'features/contacts/presentation/user_profile_page.dart';
+import 'features/qr/presentation/qr_scan_page.dart';
+import 'features/qr/presentation/qr_code_page.dart';
 import 'features/group/presentation/group_page.dart';
 import 'features/group/presentation/group_members_page.dart';
 import 'features/mine/presentation/mine_page.dart';
@@ -76,6 +78,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   RegExp(r'^/meetings/bookings/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$').hasMatch(path) ||
                   path == '/contacts' ||
                   path.startsWith('/contacts/') ||
+                  path.startsWith('/qr/') ||
                   path == '/favorites' ||
                   path.startsWith('/favorites/') ||
                   path == '/moments' ||
@@ -173,6 +176,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             FavoriteDetailPage(favoriteId: state.pathParameters['favoriteId']!),
       ),
       GoRoute(path: '/search', builder: (_, _) => const GlobalSearchPage()),
+      GoRoute(path: '/qr/scan', builder: (_, _) => const QrScanPage()),
+      GoRoute(path: '/qr/me', builder: (_, _) => const QrCodePage()),
+      GoRoute(path: '/qr/group/:groupId', builder: (_, state) =>
+          QrCodePage(groupId: state.pathParameters['groupId']!)),
       GoRoute(
         path: '/contacts/search',
         builder: (_, _) => const ContactSearchPage(),
@@ -196,7 +203,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/contacts/groups/:groupId',
         builder: (_, state) =>
-            GroupPage(groupId: state.pathParameters['groupId']!),
+            GroupPage(groupId: state.pathParameters['groupId']!,
+              joinSource: state.uri.queryParameters['joinSource'] == '4' ? 4 : 3),
       ),
       GoRoute(
         path: '/contacts/groups/:groupId/members',

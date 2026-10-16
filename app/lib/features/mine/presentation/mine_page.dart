@@ -125,6 +125,10 @@ class MinePage extends ConsumerWidget {
                         onTap: () => context.push('/mine/profile'),
                       ),
                       const Divider(height: 1, indent: 56),
+                      ListTile(leading: const Icon(Icons.qr_code),
+                        title: const Text('我的二维码'), trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/qr/me')),
+                      const Divider(height: 1, indent: 56),
                       ListTile(
                         leading: const Icon(Icons.notifications_outlined),
                         title: const Text('消息与隐私'),

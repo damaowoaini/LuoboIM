@@ -2,8 +2,8 @@
 """Verify minimal pinned source; optionally copy it to a new CI-only tree.
 
 No local task archive, mutable reference directory, native SDK binary or old
-generated cache is an input. Current269 must already be adopted in the checkout.
-The optional reference is full269 with exactly four pinned baseline files.
+generated cache is an input. Current282 must already be adopted in the checkout.
+The optional reference is full282 with exactly four pinned historical search baseline files.
 """
 import argparse
 import hashlib
@@ -54,17 +54,17 @@ def source_digest(files):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v3'
-            or plan['current269']['members'] != 269
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v4'
+            or plan['current282']['members'] != 282
             or plan['sdk_portable']['members'] != 51
-            or plan['portable_members'] != {'current269': 321}
-            or plan['current269']['expected_target_tests'] != 46
-            or plan['current269']['expected_full_tests'] != 734
-            or plan['current269']['target_paths'] != ['test/features/search']
-            or any(key in plan for key in ('current230', 'candidate249', 'current257'))):
-        raise ValueError('current269 schema v3 inventory differs; no historical aliases')
+            or plan['portable_members'] != {'current282': 334}
+            or plan['current282']['expected_target_tests'] != 97
+            or plan['current282']['expected_full_tests'] != 785
+            or plan['current282']['target_paths'] != ['test/features/qr', 'test/features/search']
+            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269'))):
+        raise ValueError('current282 schema v4 inventory differs; no historical aliases')
     reference = plan['reference_entry']
-    if (reference['working_cohort'] != 'current269' or reference['members'] != 269
+    if (reference['working_cohort'] != 'current282' or reference['members'] != 282
             or reference['default_enabled'] is not False
             or len(reference['replacement_files']) != 4
             or len({row['path'] for row in reference['replacement_files']}) != 4
@@ -72,22 +72,22 @@ def descriptor():
             or reference['expected_visible_tests'] != 2
             or reference['expected_assertion_failures'] != 1
             or reference['expected_passed'] != 1 or reference['expected_child_exit'] != 1):
-        raise ValueError('reference entry must be the explicit two-test full269 variant')
+        raise ValueError('reference entry must be the explicit two-test full282 variant')
     return plan
 
 
 def load_sources(cohort):
-    if cohort != 'current269':
-        raise ValueError('schema v3 supports current269 only; historical cohorts are not aliases')
+    if cohort != 'current282':
+        raise ValueError('schema v4 supports current282 only; historical cohorts are not aliases')
     plan = descriptor()
     selected = {}
-    for row in plan['current269']['files']:
+    for row in plan['current282']['files']:
         name = row['path']
         if name in selected or not name.startswith('app/'):
             raise ValueError('duplicate or out-of-scope current source')
         selected[name] = check(regular(REPO / safe_name(name)), row)
-    if len(selected) != 269 or source_digest(selected) != plan['current269']['source_digest']:
-        raise ValueError('current269 aggregate differs')
+    if len(selected) != 282 or source_digest(selected) != plan['current282']['source_digest']:
+        raise ValueError('current282 aggregate differs')
     actual = set()
     for prefix in ('app/lib', 'app/test', 'app/tool'):
         for directory, dirs, names in os.walk(REPO / prefix, followlinks=False):
@@ -116,7 +116,7 @@ def load_sources(cohort):
 
 
 def reference_sources(plan, files):
-    """Full321 portable closure; only the four named App source bodies differ."""
+    """Full334 portable closure; only the four named App source bodies differ."""
     result = dict(files)
     baseline = plan['reference_entry']
     for row in baseline['replacement_files']:
@@ -125,8 +125,8 @@ def reference_sources(plan, files):
             raise ValueError('reference replacement outside original production files')
         result[name] = check(regular(REPO / baseline['baseline_prefix'] / name), row)
     authored = {name: body for name, body in result.items() if name.startswith('app/')}
-    if len(authored) != 269 or source_digest(authored) != baseline['reference_source_digest']:
-        raise ValueError('reference is not the exact full269 variant')
+    if len(authored) != 282 or source_digest(authored) != baseline['reference_source_digest']:
+        raise ValueError('reference is not the exact full282 variant')
     return result
 
 
@@ -156,7 +156,7 @@ def materialize(output, cohort):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cohort', choices=('current269',), required=True)
+    p.add_argument('--cohort', choices=('current282',), required=True)
     p.add_argument('--output', type=Path, help='explicit fresh output; omitted means readonly')
     args = p.parse_args()
     if args.output:

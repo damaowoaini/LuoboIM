@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v3",
-  "state": "current269_analyze_r4_equivalent_braces_pending_cloud_all_stages",
+  "schema": "luobo.mobile.portable-ci-inputs.v4",
+  "state": "current282_qr_candidate_manual_lock_unresolved_pending_cloud97_785_and_analyze0",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -24,7 +24,9 @@
       "root_review_sha256": "cad87a8b28fb8b57fc101e12e41c391557f259bb02a40aa9645b1dd9d85a22b6"
     },
     "global_search_fixture_r3_manifest_sha256": "dfd21b0996a9363a8ee928da9dda2ef8b3a8b8c4555f9a7d2296840a45909ba0",
-    "global_search_analyze_r4_manifest_sha256": "330f6c8f5ce20f1165382b72ad807b2a1ab96a788b6c35b7770f675c65e4594f"
+    "global_search_analyze_r4_manifest_sha256": "330f6c8f5ce20f1165382b72ad807b2a1ab96a788b6c35b7770f675c65e4594f",
+    "qr_candidate_manifest_sha256": "68fa203b134a1754b65383b0da23cdd9fbf323c1a191294f7f16e26756d58de6",
+    "accepted_current269_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -300,10 +302,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current269": 321
+    "current282": 334
   },
   "portable_digests": {
-    "current269": "794601ed37e0bad1034363583ee6bba0bba984bcbf66c6161f797d29d56e69ec"
+    "current282": "08b6e82fbc9028eb93928b238c9dc3b99397f6a639d6040118b5854081522ee7"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -337,7 +339,7 @@
       "actual_run": 38852506276,
       "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
     },
-    "reproduction": "Historical cohorts require their explicit immutable commit and inputs; schema v3 has no current230/249/257 aliases. Optional reference_entry compiles full269 with only4 original files replaced, and is not historical257 full.",
+    "reproduction": "Historical 230/249/257/269 cohorts require explicit immutable commit and inputs; schema v4 has no historical aliases. Optional reference_entry is a full282 compile context with exactly4 original search-before files, not old257/269 full.",
     "accepted_current257": {
       "git_commit": "314ac55",
       "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
@@ -391,11 +393,73 @@
       ],
       "accepted_all": false,
       "verification_sha256": "78979f0eafa76330fc0d4be575376bf2bf60e0ee59200a96e9fec948b0b3fe11"
+    },
+    "accepted_current269_r4": {
+      "git_commit": "1d4629e573456750c50f32516aa924e3e107de55",
+      "actual_run": 38863945279,
+      "job": 116852348526,
+      "source_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
+      "portable_digest": "794601ed37e0bad1034363583ee6bba0bba984bcbf66c6161f797d29d56e69ec",
+      "actual_target_passed": 46,
+      "actual_full_passed": 734,
+      "actual_analyze_issues": 0,
+      "old688_completed_visible_name_multiset_subset": true,
+      "artifact_zip_sha256": "bdad8e1a7367ec7314cdef7ab5c41147217b67603102149bfe6f39b2c5ee1e3d",
+      "root_acceptance_sha256": "7bc547fbd84eda4154bfb2da16e60969d90ab59993c9d3291d3f7ff2dfde5ac5",
+      "original_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64"
     }
   },
-  "current269": {
-    "members": 269,
-    "source_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
+  "reference_entry": {
+    "state": "explicit_optional_reference_only_not_old257_or269_full",
+    "default_enabled": false,
+    "working_cohort": "current282",
+    "members": 282,
+    "reference_source_digest": "f3b4ea8da42a1e131448954bb68f981a94b305343ebee67043de637566adc3c4",
+    "replacement_files": [
+      {
+        "path": "app/lib/app.dart",
+        "bytes": 18789,
+        "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_controller.dart",
+        "bytes": 14205,
+        "sha256": "5f91a186610cd0cd150fb44476e8be1a884f54da8b4224ee7d32b40b0af1a188"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 61403,
+        "sha256": "37e4e1eca3c1b8a29be1b8fa7e5488763a8c88c90a8056c20a4e0eb50b5b3b51"
+      },
+      {
+        "path": "app/lib/features/conversation/presentation/conversations_page.dart",
+        "bytes": 15415,
+        "sha256": "8ca9286eeaee1689463023b6551cba3caaefd1b910d40813f19dcfc612631dc2"
+      }
+    ],
+    "baseline_prefix": "ci/mobile/reference/global-search-before",
+    "test_path": "test/features/search/global_search_entry_test.dart",
+    "expected_visible_tests": 2,
+    "expected_assertion_failures": 1,
+    "expected_passed": 1,
+    "failed_test_name": "primary inbox entry reaches the mounted complete global search",
+    "passed_test_name": "existing explicitly named inbox filter remains available",
+    "expected_missing_tooltip": "全局搜索",
+    "expected_child_exit": 1,
+    "not_a_257_full_or_native_result": true,
+    "not_a_269_full_or_native_result": true
+  },
+  "auxiliary_preserved": [
+    {
+      "path": "app/tool/check.sh",
+      "bytes": 701,
+      "sha256": "679208a95989061fa75b46f61ab2834d022d5a3a8803919013938f12e41f6cbd",
+      "reason": "Local workspace provenance only. Keep original helper locally; do not upload, execute, require in public CI, or include in269/321. Public authored inventory has no auxiliary exceptions."
+    }
+  ],
+  "current282": {
+    "members": 282,
+    "source_digest": "8769dfe761bf4808b38890551d7fc02ed73a1c53afd3e4cf397d726ded416c36",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -404,8 +468,8 @@
       },
       {
         "path": "app/lib/app.dart",
-        "bytes": 19211,
-        "sha256": "f29379051c51ec5431c7399d3455beb78454ae16ca2df08e7c76d4d6e3e9c9df"
+        "bytes": 19717,
+        "sha256": "6123d8013a7fd7d735f492340cff141b8dbde76b601d21b3c0e72dcfb71b2b99"
       },
       {
         "path": "app/lib/core/access/access_store.dart",
@@ -739,8 +803,8 @@
       },
       {
         "path": "app/lib/features/contacts/presentation/contacts_page.dart",
-        "bytes": 9293,
-        "sha256": "af8fb1c22e0c733993dae65ab44db858d78d2f2e6bb5ecf707cdde03dd9d682f"
+        "bytes": 9435,
+        "sha256": "77eba05f7a37be9f5dbe7d116959b3b4af9c96b85fcbfd44dfb5a0ea3046a230"
       },
       {
         "path": "app/lib/features/contacts/presentation/select_contacts_page.dart",
@@ -749,8 +813,8 @@
       },
       {
         "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
-        "bytes": 12969,
-        "sha256": "1f89dc13ebda39b2835ce06fed23c2e889610ef858b9783308230fe47354a77d"
+        "bytes": 13984,
+        "sha256": "b4d21b839ec328ffaaeca4d1fa90f1898ab260b8565fc573e03237b56a5145aa"
       },
       {
         "path": "app/lib/features/conversation/data/conversation_repository.dart",
@@ -774,8 +838,8 @@
       },
       {
         "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 15558,
-        "sha256": "9e46f857997b491072c631c4711eb10123dfd2624aa1f046664508a449c367c3"
+        "bytes": 15700,
+        "sha256": "e114084fa70cea0ab8c14fd152c6e64aae6264947d0495e3ab591774df1d9084"
       },
       {
         "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
@@ -859,8 +923,8 @@
       },
       {
         "path": "app/lib/features/group/presentation/group_page.dart",
-        "bytes": 28406,
-        "sha256": "3275da7bf6c904461d3dbe8fa4d2aecc3b22434a25d7635cc85048cd7cf2a9d1"
+        "bytes": 30868,
+        "sha256": "ac72ebeca2cdb65211af09102adfa95a64cce4050c659a55d899b48fc44165b8"
       },
       {
         "path": "app/lib/features/meeting/booking/booking_providers.dart",
@@ -999,8 +1063,8 @@
       },
       {
         "path": "app/lib/features/mine/presentation/mine_page.dart",
-        "bytes": 13151,
-        "sha256": "df608dcd2b8982424263e0a89974ea4b8b59cd83ef3c188e2a540d81352359ee"
+        "bytes": 13445,
+        "sha256": "e03f19d4b017b83736da361528e261e6348f4f5594d0accafefd57938db1bac7"
       },
       {
         "path": "app/lib/features/moments/data/moment_media_preparer.dart",
@@ -1076,6 +1140,36 @@
         "path": "app/lib/features/personal/presentation/personal_page.dart",
         "bytes": 27726,
         "sha256": "c3bbd8ff492ad9d73d17846e56c891aa09ea06f4a4509a1686364c95d9dafd91"
+      },
+      {
+        "path": "app/lib/features/qr/data/qr_platform.dart",
+        "bytes": 6836,
+        "sha256": "87c96843cd4aed0b2873763a935a87707dd65fcb3e5ada1c294fe4f5a70a5c73"
+      },
+      {
+        "path": "app/lib/features/qr/data/qr_repository.dart",
+        "bytes": 3588,
+        "sha256": "ab130dfd2796064b4821470e97081e1708cb91c2c54d81ee9d87f53d405222a9"
+      },
+      {
+        "path": "app/lib/features/qr/domain/qr_invite.dart",
+        "bytes": 4170,
+        "sha256": "93915de6bef8099e9f1efbbd6cccf345e5beb5ab2393209897d4815973d91821"
+      },
+      {
+        "path": "app/lib/features/qr/presentation/qr_code_page.dart",
+        "bytes": 6676,
+        "sha256": "817767bea9cd19c9fc675398b53ee0bec2034c69640114322865ca4f0441e127"
+      },
+      {
+        "path": "app/lib/features/qr/presentation/qr_route_watch.dart",
+        "bytes": 855,
+        "sha256": "8501a06f7f4c9b553d926409c095bf3b46af83870e3a487ea5f8d84c8172015c"
+      },
+      {
+        "path": "app/lib/features/qr/presentation/qr_scan_page.dart",
+        "bytes": 14487,
+        "sha256": "7b853f0f4b6feab0dea2a65eeef6cf7e5870020f5e2b250feae5083966105e95"
       },
       {
         "path": "app/lib/features/rtc/data/im_rtc_transport.dart",
@@ -1154,13 +1248,13 @@
       },
       {
         "path": "app/pubspec.lock",
-        "bytes": 40663,
-        "sha256": "dd9f75df4899be9c6aaca509d39e259a14164ce8be7b8ed693860bce7df4b648"
+        "bytes": 41354,
+        "sha256": "17422ee513d9faeff8adfd96ac2cd720f3366a132277a747adbd4774b015ac13"
       },
       {
         "path": "app/pubspec.yaml",
-        "bytes": 836,
-        "sha256": "735eaf91bcf32aa808211498158ac24ba6e9b27d0831494218eec96f53f5908b"
+        "bytes": 880,
+        "sha256": "7e8fe1e3989621344cd6788919d520229892c30ae52154b9e9fb9cf722688f7a"
       },
       {
         "path": "app/test/core/abandoned_login_test.dart",
@@ -1683,6 +1777,41 @@
         "sha256": "2e3f84b99ff9f41c1407c3a36ca5e20450a70ddfd893cfb6105b468cdb55acba"
       },
       {
+        "path": "app/test/features/qr/qr_code_page_test.dart",
+        "bytes": 7886,
+        "sha256": "013a9adb1bf06e4fc4c8e1d7a6739bb9bb415408a50f70f13a97ff833af10562"
+      },
+      {
+        "path": "app/test/features/qr/qr_entry_navigation_test.dart",
+        "bytes": 5211,
+        "sha256": "1abbf0a8e92affd6632c01112bf11f11c651a10ef6bf622daf425fe90d56cd67"
+      },
+      {
+        "path": "app/test/features/qr/qr_flow_fixture.dart",
+        "bytes": 8232,
+        "sha256": "6f12ec61539f1303ce567a0ac2b51e9718e8ea32e80e97942915df2872c9637c"
+      },
+      {
+        "path": "app/test/features/qr/qr_invite_test.dart",
+        "bytes": 4509,
+        "sha256": "318d66a751ee64756867391e1626986edbea246e65fef71d8fee0923b17c0b35"
+      },
+      {
+        "path": "app/test/features/qr/qr_png_render_test.dart",
+        "bytes": 1005,
+        "sha256": "d56fd7dbba883def700bd3c64e50c787a27e2ac0bd8ddd21ea48c2b043c5a05b"
+      },
+      {
+        "path": "app/test/features/qr/qr_repository_test.dart",
+        "bytes": 3844,
+        "sha256": "648832fde36dbfaab02d2b1fcd8f437647c2f8a0a0b8c728e1e4e4b93646c8af"
+      },
+      {
+        "path": "app/test/features/qr/qr_scan_page_test.dart",
+        "bytes": 17945,
+        "sha256": "63b8549bb0a8f9cf54fa6263afd5b02866d77ce77dac827183e3f3f8e5f6b80f"
+      },
+      {
         "path": "app/test/features/rtc/rtc_page_test.dart",
         "bytes": 3821,
         "sha256": "a5f233156cc9db9a3682e61d7b37d35bf3d2a375851ed5471c9b331c03173ddf"
@@ -1743,57 +1872,21 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 46,
-    "expected_full_tests": 734,
+    "expected_target_tests": 97,
+    "expected_full_tests": 785,
     "target_paths": [
+      "test/features/qr",
       "test/features/search"
     ]
   },
-  "reference_entry": {
-    "state": "explicit_optional_reference_only_not_old257_full",
-    "default_enabled": false,
-    "working_cohort": "current269",
-    "members": 269,
-    "reference_source_digest": "97b24341d8c2d0a354a043994b16dee07af48296e67dde6a773b194f0ba53877",
-    "replacement_files": [
-      {
-        "path": "app/lib/app.dart",
-        "bytes": 18789,
-        "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
-      },
-      {
-        "path": "app/lib/features/chat/presentation/chat_controller.dart",
-        "bytes": 14205,
-        "sha256": "5f91a186610cd0cd150fb44476e8be1a884f54da8b4224ee7d32b40b0af1a188"
-      },
-      {
-        "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 61403,
-        "sha256": "37e4e1eca3c1b8a29be1b8fa7e5488763a8c88c90a8056c20a4e0eb50b5b3b51"
-      },
-      {
-        "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 15415,
-        "sha256": "8ca9286eeaee1689463023b6551cba3caaefd1b910d40813f19dcfc612631dc2"
-      }
-    ],
-    "baseline_prefix": "ci/mobile/reference/global-search-before",
-    "test_path": "test/features/search/global_search_entry_test.dart",
-    "expected_visible_tests": 2,
-    "expected_assertion_failures": 1,
-    "expected_passed": 1,
-    "failed_test_name": "primary inbox entry reaches the mounted complete global search",
-    "passed_test_name": "existing explicitly named inbox filter remains available",
-    "expected_missing_tooltip": "全局搜索",
-    "expected_child_exit": 1,
-    "not_a_257_full_or_native_result": true
-  },
-  "auxiliary_preserved": [
-    {
-      "path": "app/tool/check.sh",
-      "bytes": 701,
-      "sha256": "679208a95989061fa75b46f61ab2834d022d5a3a8803919013938f12e41f6cbd",
-      "reason": "Local workspace provenance only. Keep original helper locally; do not upload, execute, require in public CI, or include in269/321. Public authored inventory has no auxiliary exceptions."
-    }
-  ]
+  "new_dependencies": {
+    "state": "manually_prepared_official_metadata_only_not_pub_resolved",
+    "exact_versions": {
+      "mobile_scanner": "7.4.2",
+      "qr_flutter": "4.1.0",
+      "qr": "3.0.2"
+    },
+    "gate": "fresh official Flutter pub get --enforce-lockfile must pass without lock drift; no local resolution or downloaded packages",
+    "lock_draft_sha256": "f3eba25d2bdacdc2c8288bc65617798f909154e08ffe5e7b8ff8bea448cc4aca"
+  }
 }

@@ -16,6 +16,7 @@ import '../data/group_repository.dart';
 import '../domain/group.dart';
 import '../../complaint/data/complaint_repository.dart';
 import '../../complaint/presentation/complaint_page.dart';
+import '../../qr/presentation/qr_route_watch.dart';
 
 // Keep the existing OS picker and signed upload adapters lazy. Overrides replace
 // platform/HTTP transport in tests, while staging and metadata use real code.
@@ -37,14 +38,17 @@ final groupAvatarUploaderProvider =
     );
 
 class GroupPage extends ConsumerStatefulWidget {
-  const GroupPage({super.key, required this.groupId});
+  const GroupPage({super.key, required this.groupId, this.joinSource = 3});
   final String groupId;
+  final int joinSource;
   @override
   ConsumerState<GroupPage> createState() => _GroupPageState();
 }
 
 class _GroupPageState extends ConsumerState<GroupPage> {
   bool busy = false;
+  int _conversationView = 0;
+  bool _ownedQrJoinDialog = false;
   int _avatarTurn = 0, _avatarView = 0;
   bool _avatarChoosing = false, _avatarPending = false;
   bool _avatarMetadataPending = false;
@@ -67,12 +71,13 @@ class _GroupPageState extends ConsumerState<GroupPage> {
   @override
   void didUpdateWidget(covariant GroupPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.groupId != widget.groupId) _leaveAvatarView();
+    if (oldWidget.groupId != widget.groupId) { ++_conversationView; _leaveAvatarView(); }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (!_ownedQrJoinDialog && ModalRoute.of(context)?.isCurrent == false) ++_conversationView;
     // Our source/preview dialogs deliberately cover this route. Other route
     // changes invalidate the old view even if the user later comes back.
     if (_avatarPending &&
@@ -84,6 +89,7 @@ class _GroupPageState extends ConsumerState<GroupPage> {
 
   @override
   void dispose() {
+    ++_conversationView;
     _leaveAvatarView();
     super.dispose();
   }
@@ -289,23 +295,63 @@ class _GroupPageState extends ConsumerState<GroupPage> {
   Future<void> run(
     Future<void> Function(GroupRepository) operation, {
     String? success,
+    bool Function()? isCurrent,
   }) async {
     final repository = ref.read(groupRepositoryProvider);
-    if (repository == null || busy) return;
+    if (repository == null || busy || isCurrent?.call() == false) return;
     setState(() => busy = true);
     try {
       await operation(repository);
-      if (mounted && repository.access.isCurrent) {
+      if (mounted && repository.access.isCurrent && isCurrent?.call() != false) {
         refreshContacts(ref);
         if (success != null) contactNotice(context, success);
       }
     } on AppFailure catch (error) {
-      if (mounted && repository.access.isCurrent) {
+      if (mounted && repository.access.isCurrent && isCurrent?.call() != false) {
         contactNotice(context, error.message);
       }
     } finally {
       if (mounted) setState(() => busy = false);
     }
+  }
+
+  Future<void> openConversation(GroupRepository repository, String id) async {
+    final view = _conversationView;
+    final owner = repository.access.credentials;
+    bool current() => mounted && view == _conversationView && widget.groupId == id &&
+      repository.access.isCurrent && identical(repository.access.session.state.credentials, owner) &&
+      identical(ref.read(groupRepositoryProvider), repository) && ModalRoute.of(context)?.isCurrent == true;
+    if (!current()) return;
+    await run((repo) async {
+      final conversation = await repo.conversation(id);
+      if (mounted && current()) context.push('/chat/${Uri.encodeComponent(conversation)}');
+    }, isCurrent: current);
+  }
+
+  Future<void> requestQrJoin(GroupRepository repository, String id) async {
+    final view = _conversationView;
+    final owner = repository.access.credentials;
+    bool current() => mounted && view == _conversationView && widget.groupId == id &&
+      widget.joinSource == 4 && repository.access.isCurrent &&
+      identical(repository.access.session.state.credentials, owner) &&
+      identical(ref.read(groupRepositoryProvider), repository) && ModalRoute.of(context)?.isCurrent == true;
+    if (busy || !current()) return;
+    String? reason;
+    _ownedQrJoinDialog = true;
+    try {
+      reason = await contactInput(context, '申请加入群聊', maxLength: 256, lines: 3,
+        guard: (child) => QrRouteWatch(onCovered: () { ++_conversationView; }, child: child));
+    } finally { _ownedQrJoinDialog = false; }
+    if (reason == null || !mounted || !current()) return;
+    final submittedReason = reason;
+    await run((repo) async {
+      final latest = await repo.profile(id);
+      if (!current()) return;
+      if (latest.summary.status == 2 || latest.joined) {
+        throw const AppFailure(FailureKind.permissionDenied);
+      }
+      await repo.join(id, submittedReason, source: 4);
+    }, isCurrent: current, success: '入群请求已提交');
   }
 
   Future<void> edit(
@@ -358,6 +404,7 @@ class _GroupPageState extends ConsumerState<GroupPage> {
 
   Widget _body(GroupProfile group, GroupRepository repository) {
     final id = widget.groupId;
+    final joinSource = widget.joinSource;
     final active = group.joined && group.summary.status != 2;
     final manage = active && group.canManage;
     return Center(
@@ -466,10 +513,10 @@ class _GroupPageState extends ConsumerState<GroupPage> {
               FilledButton(
                 onPressed: busy
                     ? null
-                    : () => edit(
+                    : widget.joinSource == 4 ? () => requestQrJoin(repository, id) : () => edit(
                         '申请加入群聊',
                         '',
-                        (repo, reason) => repo.join(id, reason),
+                        (repo, reason) => repo.join(id, reason, source: joinSource),
                         maxLength: 256,
                         lines: 3,
                         success: '入群请求已提交',
@@ -480,14 +527,7 @@ class _GroupPageState extends ConsumerState<GroupPage> {
               FilledButton.icon(
                 onPressed: busy
                     ? null
-                    : () => run((repo) async {
-                        final conversation = await repo.conversation(id);
-                        if (mounted && repo.access.isCurrent) {
-                          context.push(
-                            '/chat/${Uri.encodeComponent(conversation)}',
-                          );
-                        }
-                      }),
+                    : () => openConversation(repository, id),
                 icon: const Icon(Icons.chat_bubble_outline),
                 label: const Text('进入群聊'),
               ),
@@ -496,6 +536,9 @@ class _GroupPageState extends ConsumerState<GroupPage> {
               elevation: 0,
               child: Column(
                 children: [
+                  if (active) ListTile(leading: const Icon(Icons.qr_code), title: const Text('群二维码'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => context.push('/qr/group/${Uri.encodeComponent(id)}')),
                   ListTile(
                     title: const Text('群名称'),
                     subtitle: Text(group.summary.name),
