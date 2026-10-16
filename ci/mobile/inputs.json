@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v5",
-  "state": "current287_create_group_avatar37_pending_cloud",
+  "state": "current287_creation_fixture_r3_provider_import_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -31,7 +31,8 @@
     "QR_r5_manifest_sha256": "085625490299faec3f82433d7711adead78abcd6366b3967b06b76bef0927c67",
     "QR_r6_manifest_sha256": "be752630e9cc2f970ca192254b7ea5a538d98b933e0f15423d247f06f43b1df9",
     "QR_r7_manifest_sha256": "b64bc7f238db13d50ecc5a96f10be4bedd4618c5dbf35e613efc4fab8ebf7453",
-    "create_group_avatar_v2_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39"
+    "create_group_avatar_v2_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39",
+    "create_group_avatar_fixture_r3_manifest_sha256": "ce469ea2b56d574f77374cb3dfecdb9aeb3b56f57a7b7ce6e24014d8a6bd2763"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -310,7 +311,7 @@
     "current287": 339
   },
   "portable_digests": {
-    "current287": "ec45244629b617523c23c5179a6e316f03eceadba744a6bbf5f84b8e2ff09e7d"
+    "current287": "822208d964e26907182bc4bd326dda9c34c205513b18f9fbff6635aa66daa593"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -477,6 +478,18 @@
       "verification_sha256": "00e8b9bec05814cbba706b321b15b6ce163c0c8c224bc6d8845f1d8ff909cb8e",
       "original_inputs_sha256": "16dab31a738968117bbae1bbc74c99556ef193e8f196760f9aa32309b65c8ff6",
       "native_or_service_acceptance": false
+    },
+    "current287_creation_first_fixture_load_failure": {
+      "git_commit": "393013e72b029e290201e1f8a07954885e63ee4e",
+      "run": 38872382676,
+      "job": 116879281057,
+      "source_digest": "b224cb1f26da71e00884db8533b3144282107ff7d81ff7da8b63edbdb6488640",
+      "portable_digest": "ec45244629b617523c23c5179a6e316f03eceadba744a6bbf5f84b8e2ff09e7d",
+      "verification_sha256": "cd6cdcc36bb293bf76b575fba9fd1e6014a2965576d7a11c6ff0cc62ab21c79c",
+      "artifact_sha256": "bfcf05d29cb7b1292ae9c3d00718a6f7aeac0e94e0b8e4208f03bbf855eced9b",
+      "actual": "97QR/searchPASS+3creation suite loaderERROR; creation37 never started;11hiddenPASS;full822/analyze notstarted",
+      "root_cause": "Fixture omitted actual tenantApiProvider defining library import; no new product assertion executed",
+      "accepted": false
     }
   },
   "reference_entry": {
@@ -484,7 +497,7 @@
     "default_enabled": false,
     "working_cohort": "current287",
     "members": 287,
-    "reference_source_digest": "cc38bf4db555c0cd7e91267f6609ae017b46f0e63c4bce616db9f89e470f9091",
+    "reference_source_digest": "fe137165e18371eca651c8d98aecb618dce94d217b0819750b7a4b2f5cbaf1fd",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -541,7 +554,7 @@
   },
   "current287": {
     "members": 287,
-    "source_digest": "b224cb1f26da71e00884db8533b3144282107ff7d81ff7da8b63edbdb6488640",
+    "source_digest": "acf5cbefab90ba54c71a4b15fb78aad42d5943ecaf9f241290d864363335c516",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1715,8 +1728,8 @@
       },
       {
         "path": "app/test/features/group/create_group_fixture.dart",
-        "bytes": 8874,
-        "sha256": "9c7a7d148366a4f0537b3d75cfccede2cacc7eb3b413d0c68062160897c4e39c"
+        "bytes": 8950,
+        "sha256": "7baeb1707b4a7ca88fd125dab75d435ef9f2dd1da6496091c6bd73e64804f431"
       },
       {
         "path": "app/test/features/group/create_group_repository_test.dart",

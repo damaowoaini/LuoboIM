@@ -18,3 +18,7 @@ Only existing characters1.4.1 becomes a direct dependency so the data repository
 Optional workflow_dispatch search reference stays defaultoff: full287 context with exactly4 historical search-before files, entry2 only, strict named1assertFAIL/1oldfilterPASS, exactafter4 restore and primary287/339 reverify. It is not historical282/269/257 full.
 
 Public authored inventory has zero exceptions. Local-only app/tool/check.sh remains absent public/notcopied/notrequired/notexecuted. Private credentials/native binaries/generated hook stamps are not inputs. Creation37 uses actual selector/editor/repository/stager/uploader with OS/HTTP/native boundaries mocked. Existing real QR PNG test remains. No device camera/gallery/share/APK/business service acceptance is inferred.
+
+## Creation fixture r3 import correction (pending)
+
+First287 run38872382676 completed the original QR/search97 successfully, with3 new creation-suite compiler/load errors and11 successful hidden loads. The37 creation business cases, full822 and analyze did not start. The fixture omitted the actual defining library for tenantApiProvider. R3 adds only that import, showing that symbol; production and all37 test names/expectations are unchanged. Full134/822 exact-name and zero-issue analysis gates remain mandatory. Original282 acceptance and the complete failed raw artifact remain history.

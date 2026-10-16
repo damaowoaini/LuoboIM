@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:imapp/core/network/tenant_api.dart' show tenantApiProvider;
 import 'package:imapp/core/storage/object_uploader.dart';
 import 'package:imapp/core/tenant/session_access.dart';
 import 'package:imapp/features/contacts/contacts_providers.dart';

@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v5",
-  "state": "current287_create_group_avatar37_pending_cloud",
+  "state": "current287_creation_fixture_r3_provider_import_pending_cloud",
   "parent_required": {
     "git_commit": "b52da23f1255f04d21dc1caf6b5950b736287bd2",
     "actual_run": 38870107437,
@@ -18,8 +18,8 @@
     "native_or_service_acceptance": false
   },
   "candidate_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39",
-  "source287_digest": "b224cb1f26da71e00884db8533b3144282107ff7d81ff7da8b63edbdb6488640",
-  "portable339_digest": "ec45244629b617523c23c5179a6e316f03eceadba744a6bbf5f84b8e2ff09e7d",
+  "source287_digest": "acf5cbefab90ba54c71a4b15fb78aad42d5943ecaf9f241290d864363335c516",
+  "portable339_digest": "822208d964e26907182bc4bd326dda9c34c205513b18f9fbff6635aa66daa593",
   "selected_delta": {
     "files": 9,
     "existing": 4,
@@ -43,5 +43,19 @@
   "resource_and_network": "Existing4GiBinitial/1GiB .2s/768MiB/900s, processgroup/latchedfailure/machinefooter retained;setup-onlynetwork/freshnetns/0hostfixtures/noinheritedcredentials.",
   "public_inventory": "Zeroexceptions;local-onlyapp/tool/check.sh absentpublic/notcopied/notrequired/notexecuted",
   "acceptance_limit": "Linux source/widget/realPNG/MethodChannel only; native/device/services pending",
-  "parent_evidence_immutable": true
+  "parent_evidence_immutable": true,
+  "fixture_r3_manifest_sha256": "ce469ea2b56d574f77374cb3dfecdb9aeb3b56f57a7b7ce6e24014d8a6bd2763",
+  "current287_first_fixture_failure": {
+    "git_commit": "393013e72b029e290201e1f8a07954885e63ee4e",
+    "run": 38872382676,
+    "job": 116879281057,
+    "source_digest": "b224cb1f26da71e00884db8533b3144282107ff7d81ff7da8b63edbdb6488640",
+    "portable_digest": "ec45244629b617523c23c5179a6e316f03eceadba744a6bbf5f84b8e2ff09e7d",
+    "verification_sha256": "cd6cdcc36bb293bf76b575fba9fd1e6014a2965576d7a11c6ff0cc62ab21c79c",
+    "artifact_sha256": "bfcf05d29cb7b1292ae9c3d00718a6f7aeac0e94e0b8e4208f03bbf855eced9b",
+    "actual": "97QR/searchPASS+3creation suite loaderERROR; creation37 never started;11hiddenPASS;full822/analyze notstarted",
+    "root_cause": "Fixture omitted actual tenantApiProvider defining library import; no new product assertion executed",
+    "accepted": false
+  },
+  "source_revision": "r3 fixture-only missing provider import. All37 names/assertions, old785+target134 names, runner/completion/resource/network gates unchanged."
 }
