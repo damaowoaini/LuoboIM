@@ -51,8 +51,8 @@
     },
     {
       "path": "ci/web-ci.mjs",
-      "bytes": 14191,
-      "sha256": "f920fe7d8f98814457b2ff09c0354cb240821c17cb7eedfeb4a4ae0c644811d4"
+      "bytes": 18488,
+      "sha256": "2865842734e1de099ca41215c68816d7a57d7d782e9e4c07ebc97f4588183ade"
     },
     {
       "path": "ci/web-ci.audit-reporter.mjs",

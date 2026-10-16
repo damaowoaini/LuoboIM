@@ -1,4 +1,4 @@
-// Two selected production paths; actual Drawer/edit/select callers use real base source.
+// Historical direct2 plus its exact original real editor; other callers remain current/pinned.
 import { defineConfig } from "../web/node_modules/vitest/dist/config.js";
 import path from "node:path";
 import { existsSync } from "node:fs";
@@ -10,6 +10,7 @@ const stage = process.env.LUOBO_GROUP_DIRECT_EDIT_STAGE;
 if (stage !== "before" && stage !== "after") throw new Error("Explicit before|after stage required");
 const source = path.join(here, stage, "src");
 const baseSource = path.join(web, "src");
+const historicalEditor = path.join(here, "context/EditableContent.tsx");
 const selected = new Set(["pages/chat/queryChat/GroupSetting/GroupSettings.tsx", "pages/chat/queryChat/GroupSetting/useGroupSettings.tsx"]);
 export default defineConfig({
   root: here, cacheDir: path.join(here, "test-cache-" + stage),
@@ -25,6 +26,7 @@ export default defineConfig({
     const extensions = ["", ".ts", ".tsx", ".d.ts", "/index.ts", "/index.tsx"];
     const selectedRelative = extensions.map((extension) => relative + extension).find((name) => selected.has(name));
     if (selectedRelative) return path.join(source, selectedRelative);
+    if (extensions.some((extension) => relative + extension === "components/EditableContent/index.tsx")) return historicalEditor;
     if (origin === baseSource) return;
     if (extensions.some((extension) => existsSync(target + extension))) return;
     return extensions.map((extension) => path.join(web, "src", relative) + extension).find(existsSync);
@@ -32,6 +34,7 @@ export default defineConfig({
   resolve: { dedupe: ["react", "react-dom", "zustand"], alias: [
     { find: /^@\/pages\/chat\/queryChat\/GroupSetting\/GroupSettings$/, replacement: path.join(source, "pages/chat/queryChat/GroupSetting/GroupSettings.tsx") },
     { find: /^@\/pages\/chat\/queryChat\/GroupSetting\/useGroupSettings$/, replacement: path.join(source, "pages/chat/queryChat/GroupSetting/useGroupSettings.tsx") },
+    { find: /^@\/components\/EditableContent$/, replacement: historicalEditor },
     { find: "@", replacement: path.join(web, "src") },
     { find: /^react$/, replacement: path.join(web, "node_modules/react/index.js") },
     { find: /^react\/jsx-runtime$/, replacement: path.join(web, "node_modules/react/jsx-runtime.js") },

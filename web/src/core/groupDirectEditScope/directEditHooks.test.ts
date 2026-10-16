@@ -77,7 +77,7 @@ describe("actual remaining group edit hooks", () => {
     expect(f.sdk.setGroupMemberInfo).not.toHaveBeenCalled();
   });
   it.each(kinds)("does not project a late %s native error into a left view", async (kind) => {
-    await ui.render(React.createElement(Probe)); const slow = deferred(); native(kind).mockReturnValueOnce(slow.promise); let pending!: Promise<void>;
+    await ui.render(React.createElement(Probe)); const slow = deferred(); native(kind).mockReturnValueOnce(slow.promise); let pending!: Promise<void | boolean>;
     try {
       await act(async () => { pending = action(kind)(); await flush(); }); expect(native(kind)).toHaveBeenCalledOnce();
       await ui.dispose();

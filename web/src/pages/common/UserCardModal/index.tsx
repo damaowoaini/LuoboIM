@@ -465,15 +465,17 @@ const UserCardDataGroup: FC<IUserCardDataGroupProps> = ({
   isCurrent = () => false,
 }) => {
   const tryUpdateRemark = async (remark: string) => {
-    if (!isCurrent()) return;
+    if (!isCurrent()) return false;
     try {
       await IMSDK.setFriendRemark({
         toUserID: userID!,
         remark,
       });
-      if (isCurrent()) updateCardRemark?.(remark);
+      if (!isCurrent()) return false;
+      updateCardRemark?.(remark); return true;
     } catch (error) {
       if (isCurrent()) feedbackToast({ error });
+      return false;
     }
   };
   return (
@@ -489,6 +491,8 @@ const UserCardDataGroup: FC<IUserCardDataGroupProps> = ({
               value={fieldRow.value}
               editable={true}
               onChange={tryUpdateRemark}
+              editIdentity={JSON.stringify([userID, "remark"])}
+              captureEdit={() => ({ current: isCurrent })}
             />
           ) : (
             <div className="flex-1 select-text truncate">{fieldRow.value}</div>

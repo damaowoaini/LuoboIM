@@ -54,10 +54,17 @@ export function useGroupSettings({ closeOverlay, isActive }: { closeOverlay: () 
     } finally { busy.current.delete(intent.groupID); }
   };
   const captureGroupInfoEdit = useCallback(() => captureAction("info"), [scope, actor, isActive, currentGroupInfo?.groupID]);
+  // Editor lifetime is a view lease, not admin/send admission. Ordinary members
+  // may still edit their own nickname; final writes keep captureAction checks.
+  const captureGroupEditView = useCallback(() => {
+    const groupID = currentGroupInfo?.groupID;
+    if (!groupID || scope?.target.kind !== "group" || scope.target.id !== groupID || !viewCurrent()) return;
+    return { current: () => viewCurrent() && useConversationStore.getState().currentGroupInfo?.groupID === groupID };
+  }, [scope, actor, isActive, currentGroupInfo?.groupID]);
   const updateGroupInfo = useCallback(
     async (value: Partial<GroupItem>) => {
-      const intent = captureGroupInfoEdit(); if (!intent) return;
-      await perform(intent, () => IMSDK.setGroupInfo({
+      const intent = captureGroupInfoEdit(); if (!intent) return false;
+      return perform(intent, () => IMSDK.setGroupInfo({
           ...value,
           groupID: intent.groupID,
         }), t("toast.updateGroupInfoFailed"), directEditBusy);
@@ -67,8 +74,8 @@ export function useGroupSettings({ closeOverlay, isActive }: { closeOverlay: () 
 
   const updateNickNameInGroup = useCallback(
     async (value: string) => {
-      const intent = captureAction("nickname"); if (!intent) return;
-      await perform(intent, () => IMSDK.setGroupMemberInfo({
+      const intent = captureAction("nickname"); if (!intent) return false;
+      return perform(intent, () => IMSDK.setGroupMemberInfo({
           groupID: intent.groupID,
           userID: intent.actor,
           nickname: value,
@@ -163,6 +170,7 @@ export function useGroupSettings({ closeOverlay, isActive }: { closeOverlay: () 
   return {
     currentGroupInfo,
     captureGroupInfoEdit,
+    captureGroupEditView,
     updateGroupInfo,
     updateGroupMuteAll,
     updateNickNameInGroup,

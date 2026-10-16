@@ -106,27 +106,63 @@ function artifactManifest(directory) {
 }
 
 export function verifyInputs() {
-  const inputs = json(inputPath);
+  const inputs = json(inputPath), direct = inputs.candidate, edit = inputs.editableContentAdoption;
+  const same = (a, b) => a?.path === b?.path && a?.bytes === b?.bytes && a?.sha256 === b?.sha256;
   for (const entry of inputs.requiredInputs) verifyFile(repo, entry);
-  for (const entry of inputs.candidate.files) verifyFile(repo, entry);
-  // The product now contains the exact reviewed after. The historical before
-  // stays pinned to the separately tested ed88107 baseline, never current src.
-  assert(inputs.candidate.productAdopted === true && !inputs.candidate.beforeCurrent, "Explicit adopted-current/baseline schema required");
-  const baseline = inputs.candidate.baselineProvenance;
-  assert(baseline?.commitPrefix === "ed88107" && baseline.workflowRunID === 38845582472 && baseline.productBefore.length === 2, "Missing tested baseline provenance");
+  for (const entry of direct.files) verifyFile(repo, entry);
+  assert(inputs.version === 3 && inputs.fullMinimumTests >= 683 && direct.productAdopted === true && !direct.beforeCurrent, "Explicit current lineage and baseline schema required");
+  const baseline = direct.baselineProvenance;
+  assert(baseline?.commitPrefix === "ed88107" && baseline.workflowRunID === 38845582472 && baseline.productBefore.length === 2, "Missing tested historical baseline provenance");
   for (const entry of baseline.productBefore) {
     assert(entry.path.startsWith("web/src/"), "Unsafe historical product path");
     verifyFile(repo, { ...entry, path: `ci/candidates/web-direct-edit/before/src/${entry.path.slice("web/src/".length)}` });
   }
-  assert(inputs.candidate.currentAfter.length === 2 && inputs.candidate.adoptedTests.length === 3, "Incomplete product adoption pins");
-  for (const entry of inputs.candidate.currentAfter) {
-    assert(entry.path.startsWith("web/src/"), "Unsafe adopted product path");
-    verifyFile(repo, entry);
+  assert(direct.adoptedAfterBaseline.length === 2 && direct.currentAfter.length === 2 && direct.adoptedTests.length === 3, "Incomplete direct adoption pins");
+  for (const entry of direct.adoptedAfterBaseline) {
+    assert(entry.path.startsWith("web/src/"), "Unsafe original adoption path");
     verifyFile(repo, { ...entry, path: `ci/candidates/web-direct-edit/after/src/${entry.path.slice("web/src/".length)}` });
+    assert(edit.before.some((before) => same(entry, before)), "Direct-after is not the documented editor predecessor");
   }
-  for (const entry of inputs.candidate.adoptedTests) verifyFile(repo, entry);
-  // Caller and SDK pins did not change during adoption.
-  for (const entry of inputs.candidate.realCallers) verifyFile(repo, entry);
+  assert(edit.candidateManifestSHA256 === "d72ee2c6ab329acf9a85196d19ce775b372ad3a6454c15c3724a1a2778443d4f" && edit.before.length === 4 && edit.currentAfter.length === 4 && edit.adoptedTests.length === 4, "Incomplete reviewed editor lineage");
+  assert(edit.beforeCheckpoint.commit === "b45c90e121cfc7934c99d47ac45e12c152d78ed7" && edit.beforeCheckpoint.run === 38847106321, "Wrong predecessor checkpoint");
+  verifyFile(repo, edit.patch);
+  verifyFile(repo, edit.portableConfig);
+  assert(edit.frozenCandidateFiles.length === 12 && edit.tests === 25 && edit.positiveNames.length === 7, "Incomplete frozen editor regression context");
+  for (const entry of edit.frozenCandidateFiles) verifyFile(repo, entry);
+  for (const entry of edit.before) {
+    assert(entry.path.startsWith("web/src/"), "Unsafe editor predecessor path");
+    verifyFile(repo, { ...entry, path: `ci/candidates/web-editable-save/before/src/${entry.path.slice("web/src/".length)}` });
+  }
+  for (const entry of edit.currentAfter) {
+    assert(entry.path.startsWith("web/src/"), "Unsafe editor successor path");
+    verifyFile(repo, entry);
+    verifyFile(repo, { ...entry, path: `ci/candidates/web-editable-save/after/src/${entry.path.slice("web/src/".length)}` });
+  }
+  for (const entry of edit.adoptedTests) {
+    assert(entry.path.startsWith("web/src/core/editableContentSave/"), "Unsafe adopted regression path");
+    verifyFile(repo, { ...entry, path: `ci/candidates/web-editable-save/tests/${entry.path.slice("web/src/core/editableContentSave/".length)}` });
+  }
+  for (const entry of direct.currentAfter) assert(edit.currentAfter.some((after) => same(entry, after)), "Direct current pins must be a subset of the explicit four-file successor");
+  const adapter = direct.adoptedTestTypeAdapter;
+  assert(direct.adoptedTestsBaseline.length === 3 && adapter.path === "web/src/core/groupDirectEditScope/directEditHooks.test.ts", "Missing explicit test-only ACK type adapter");
+  for (const previous of direct.adoptedTestsBaseline) {
+    const now = direct.adoptedTests.find((entry) => entry.path === previous.path);
+    if (previous.path === adapter.path) assert(same(previous, adapter.before) && same(now, adapter.after), "Test type adapter pin mismatch");
+    else assert(same(previous, now), "Unrelated adopted test changed");
+  }
+  for (const entry of [...direct.adoptedTests, ...edit.adoptedTests]) verifyFile(repo, entry);
+  assert(direct.historicalContext.length === 1 && direct.realCallers.length === 16 && direct.realCallersBaseline.length === 16, "Incomplete historical caller context");
+  const editor = direct.realCallersBaseline.find((entry) => entry.path === "web/src/components/EditableContent/index.tsx");
+  const historical = direct.historicalContext[0];
+  assert(historical.path === "ci/candidates/web-direct-edit/context/EditableContent.tsx" && historical.bytes === editor?.bytes && historical.sha256 === editor?.sha256 && edit.before.some((entry) => same(entry, editor)), "Historical editor must exactly preserve the pre-editor caller");
+  verifyFile(repo, historical);
+  for (const previous of direct.realCallersBaseline) {
+    const now = direct.realCallers.find((entry) => entry.path === previous.path);
+    assert(now, "Missing current caller");
+    if (previous.path === editor.path) assert(edit.currentAfter.some((entry) => same(entry, now)), "Current editor caller must match reviewed successor");
+    else assert(same(previous, now), "Unrelated caller/SDK pin changed");
+  }
+  for (const entry of direct.realCallers) verifyFile(repo, entry);
   return { inputs, linuxBindings: verifyLinuxBindings(json(path.join(web, "package-lock.json"))) };
 }
 
@@ -166,9 +202,20 @@ async function main() {
       const files = artifactManifest(path.join(output, "dist")); assert(files.some((file) => file.path === "dist/index.html"), "Missing built index");
       writeFileSync(path.join(output, "dist-manifest.json"), JSON.stringify(files, null, 2) + "\n", { flag: "wx" }); return { files: files.length };
     });
-    for (const stage of ["before", "after"]) await phase(`direct-${stage}`, () => runTests(`direct-${stage}`,
-      { exact: inputs.candidate.tests, before: stage === "before", positiveNames: inputs.candidate.positiveNames },
-      ["--config", path.join(repo, "ci/web-ci.candidate.config.mts"), "--configLoader", "runner"], { LUOBO_GROUP_DIRECT_EDIT_STAGE: stage }));
+    for (const stage of ["before", "after"]) await phase(`direct-historical-${stage}`, async () => {
+      const result = await runTests(`direct-historical-${stage}`,
+        { exact: inputs.candidate.tests, before: stage === "before", positiveNames: inputs.candidate.positiveNames },
+        ["--config", path.join(repo, "ci/web-ci.candidate.config.mts"), "--configLoader", "runner"], { LUOBO_GROUP_DIRECT_EDIT_STAGE: stage });
+      if (stage === "before") assert(result.passed === 9 && result.failed === 24, "Historical baseline outcome changed");
+      return result;
+    });
+    for (const stage of ["before", "after"]) await phase(`editable-baseline-${stage}`, async () => {
+      const result = await runTests(`editable-baseline-${stage}`,
+        { exact: inputs.editableContentAdoption.tests, before: stage === "before", positiveNames: inputs.editableContentAdoption.positiveNames },
+        ["--config", path.join(repo, "ci/web-ci.editable.config.mts"), "--configLoader", "runner"], { LUOBO_EDITABLE_CONTENT_STAGE: stage });
+      if (stage === "before") assert(result.passed === 7 && result.failed === 18, "Editor baseline outcome changed");
+      return result;
+    });
     await phase("post-input-integrity", async () => verifyInputs());
   }
   const result = { commit: process.env.GITHUB_SHA ?? null, node: process.version, success: stages.every((stage) => stage.passed) && Boolean(prepared), stages };

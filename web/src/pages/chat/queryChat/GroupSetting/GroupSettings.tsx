@@ -54,6 +54,7 @@ const GroupSettings = ({
   const {
     currentGroupInfo,
     captureGroupInfoEdit,
+    captureGroupEditView,
     updateGroupInfo,
     updateGroupMuteAll,
     updateNickNameInGroup,
@@ -102,7 +103,7 @@ const GroupSettings = ({
 
   const updateGroupName = useCallback(
     async (groupName: string) => {
-      await updateGroupInfo({ groupName });
+      return updateGroupInfo({ groupName });
     },
     [updateGroupInfo],
   );
@@ -150,6 +151,8 @@ const GroupSettings = ({
             value={currentGroupInfo?.groupName}
             editable={hasPermissions}
             onChange={updateGroupName}
+            editIdentity={JSON.stringify([currentConversation?.conversationID, currentGroupInfo?.groupID, "name"])}
+            captureEdit={captureGroupEditView}
           />
         </div>
       </div>
@@ -199,6 +202,8 @@ const GroupSettings = ({
           value={currentMemberNickInGroup}
           editable
           onChange={updateNickNameInGroup}
+          editIdentity={JSON.stringify([currentConversation?.conversationID, currentGroupInfo?.groupID, "nickname"])}
+          captureEdit={captureGroupEditView}
         />
       </SettingRow>
       <SettingRow

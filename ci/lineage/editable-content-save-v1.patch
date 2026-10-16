@@ -1,0 +1,255 @@
+--- a/src/components/EditableContent/index.tsx
++++ b/src/components/EditableContent/index.tsx
+@@ -2,7 +2,10 @@
+ import { useClickAway } from "ahooks";
+ import { Input, InputRef } from "antd";
+ import clsx from "clsx";
+-import { FC, useRef, useState } from "react";
++import { FC, useEffect, useRef, useState } from "react";
++
++import { sessionCoordinator } from "@/core/session/browser";
++import { feedbackToast } from "@/utils/common";
+ 
+ import edit_name from "@/assets/images/chatSetting/edit_name.png";
+ 
+@@ -12,7 +15,10 @@
+   placeholder?: string;
+   className?: string;
+   textClassName?: string;
+-  onChange?: (value: string) => Promise<void>;
++  // Explicit false keeps the draft. Historical void callbacks remain success.
++  onChange?: (value: string) => void | boolean | Promise<void | boolean>;
++  editIdentity?: string;
++  captureEdit?: () => { current: () => boolean } | undefined;
+ }
+ 
+ const EditableContent: FC<IEditableContentProps> = ({
+@@ -22,45 +28,90 @@
+   className,
+   textClassName,
+   onChange,
++  editIdentity,
++  captureEdit,
+ }) => {
+   const wrapRef = useRef<HTMLDivElement>(null);
+   const inputRef = useRef<InputRef>(null);
++  const mounted = useRef(true);
++  const epoch = useRef(0);
++  const busy = useRef<object | undefined>(undefined);
++  const latest = useRef({ editable, value, editIdentity });
++  latest.current = { editable, value, editIdentity };
++  const editing = useRef<{ epoch: number; identity: string | undefined;
++    owner: typeof sessionCoordinator.current; generation: number; actor: string | undefined;
++    issuer: string | undefined; tenant: string | undefined;
++    view: { current: () => boolean } | undefined; save: IEditableContentProps["onChange"] } | undefined>(undefined);
+   const [editState, setEditState] = useState({
+     isEdit: false,
+     loading: false,
+     innerValue: value,
+   });
++  const current = (edit: NonNullable<typeof editing.current>) =>
++    mounted.current && editing.current === edit && epoch.current === edit.epoch &&
++    latest.current.editIdentity === edit.identity && sessionCoordinator.current === edit.owner &&
++    sessionCoordinator.generation === edit.generation && edit.owner?.userID === edit.actor &&
++    edit.owner?.issuer === edit.issuer && edit.owner?.tenant.serverID === edit.tenant &&
++    (!edit.view || edit.view.current());
++  const cancel = () => {
++    ++epoch.current; editing.current = undefined; busy.current = undefined;
++    setEditState({ isEdit: false, loading: false, innerValue: latest.current.value });
++  };
++  useEffect(() => {
++    mounted.current = true;
++    const dispose = sessionCoordinator.onChange(cancel);
++    return () => { mounted.current = false; ++epoch.current; editing.current = undefined; dispose(); };
++  }, []);
++  useEffect(() => { cancel(); }, [editIdentity]);
++  useEffect(() => {
++    const edit = editing.current;
++    if (edit && !current(edit)) cancel();
++  });
++  const renderedEdit = editing.current;
+ 
+   useClickAway(() => {
+     if (editState.isEdit) {
+-      setEditState({
+-        isEdit: false,
+-        loading: false,
+-        innerValue: value,
+-      });
++      cancel();
+     }
+   }, [wrapRef]);
+ 
+   const toggleEdit = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+     e.stopPropagation();
++    if (!latest.current.editable) return;
++    const view = captureEdit?.();
++    if (captureEdit && !view?.current()) return;
++    const owner = sessionCoordinator.current;
++    const edit = { epoch: ++epoch.current, identity: editIdentity, owner,
++      generation: sessionCoordinator.generation, actor: owner?.userID, issuer: owner?.issuer,
++      tenant: owner?.tenant.serverID, view, save: onChange };
++    editing.current = edit; busy.current = undefined;
+     setEditState({
+       isEdit: true,
+       loading: false,
+       innerValue: value === "-" ? "" : value,
+     });
+-    setTimeout(() => inputRef.current?.focus());
++    setTimeout(() => { if (current(edit)) inputRef.current?.focus(); });
+   };
+ 
+   const onPressEnter = async (
+     e: React.KeyboardEvent<HTMLInputElement> & { target: { value: string } },
+   ) => {
+-    setEditState((state) => ({ ...state, loading: true }));
+-    await onChange?.(e.target.value);
+-    setEditState({
+-      isEdit: false,
+-      loading: false,
+-      innerValue: e.target.value,
+-    });
++    const edit = renderedEdit;
++    if (!edit || !current(edit) || !latest.current.editable || busy.current) return;
++    const draft = e.target.value; // Never read a mutable event target after await.
++    const submission = {}; busy.current = submission;
++    setEditState((state) => ({ ...state, innerValue: draft, loading: true }));
++    try {
++      const saved = await edit.save?.(draft);
++      if (!current(edit) || saved === false) return;
++      ++epoch.current; editing.current = undefined;
++      setEditState({ isEdit: false, loading: false, innerValue: draft });
++    } catch (error) {
++      if (current(edit)) feedbackToast({ error });
++    } finally {
++      if (busy.current === submission) busy.current = undefined;
++      if (current(edit)) setEditState((state) => ({ ...state, loading: false }));
++    }
+   };
+ 
+   return (
+@@ -71,9 +122,12 @@
+           value={editState.innerValue}
+           placeholder={placeholder}
+           maxLength={255}
+-          onChange={(e) =>
+-            setEditState((state) => ({ ...state, innerValue: e.target.value }))
+-          }
++          disabled={editState.loading || !editable}
++          aria-busy={editState.loading}
++          onChange={(e) => {
++            if (renderedEdit && current(renderedEdit) && !busy.current)
++              setEditState((state) => ({ ...state, innerValue: e.target.value }));
++          }}
+           ref={inputRef}
+           onPressEnter={onPressEnter}
+           suffix={<EnterOutlined rev={undefined} />}
+--- a/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx
++++ b/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx
+@@ -54,10 +54,17 @@
+     } finally { busy.current.delete(intent.groupID); }
+   };
+   const captureGroupInfoEdit = useCallback(() => captureAction("info"), [scope, actor, isActive, currentGroupInfo?.groupID]);
++  // Editor lifetime is a view lease, not admin/send admission. Ordinary members
++  // may still edit their own nickname; final writes keep captureAction checks.
++  const captureGroupEditView = useCallback(() => {
++    const groupID = currentGroupInfo?.groupID;
++    if (!groupID || scope?.target.kind !== "group" || scope.target.id !== groupID || !viewCurrent()) return;
++    return { current: () => viewCurrent() && useConversationStore.getState().currentGroupInfo?.groupID === groupID };
++  }, [scope, actor, isActive, currentGroupInfo?.groupID]);
+   const updateGroupInfo = useCallback(
+     async (value: Partial<GroupItem>) => {
+-      const intent = captureGroupInfoEdit(); if (!intent) return;
+-      await perform(intent, () => IMSDK.setGroupInfo({
++      const intent = captureGroupInfoEdit(); if (!intent) return false;
++      return perform(intent, () => IMSDK.setGroupInfo({
+           ...value,
+           groupID: intent.groupID,
+         }), t("toast.updateGroupInfoFailed"), directEditBusy);
+@@ -67,8 +74,8 @@
+ 
+   const updateNickNameInGroup = useCallback(
+     async (value: string) => {
+-      const intent = captureAction("nickname"); if (!intent) return;
+-      await perform(intent, () => IMSDK.setGroupMemberInfo({
++      const intent = captureAction("nickname"); if (!intent) return false;
++      return perform(intent, () => IMSDK.setGroupMemberInfo({
+           groupID: intent.groupID,
+           userID: intent.actor,
+           nickname: value,
+@@ -163,6 +170,7 @@
+   return {
+     currentGroupInfo,
+     captureGroupInfoEdit,
++    captureGroupEditView,
+     updateGroupInfo,
+     updateGroupMuteAll,
+     updateNickNameInGroup,
+--- a/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx
++++ b/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx
+@@ -54,6 +54,7 @@
+   const {
+     currentGroupInfo,
+     captureGroupInfoEdit,
++    captureGroupEditView,
+     updateGroupInfo,
+     updateGroupMuteAll,
+     updateNickNameInGroup,
+@@ -102,7 +103,7 @@
+ 
+   const updateGroupName = useCallback(
+     async (groupName: string) => {
+-      await updateGroupInfo({ groupName });
++      return updateGroupInfo({ groupName });
+     },
+     [updateGroupInfo],
+   );
+@@ -150,6 +151,8 @@
+             value={currentGroupInfo?.groupName}
+             editable={hasPermissions}
+             onChange={updateGroupName}
++            editIdentity={JSON.stringify([currentConversation?.conversationID, currentGroupInfo?.groupID, "name"])}
++            captureEdit={captureGroupEditView}
+           />
+         </div>
+       </div>
+@@ -199,6 +202,8 @@
+           value={currentMemberNickInGroup}
+           editable
+           onChange={updateNickNameInGroup}
++          editIdentity={JSON.stringify([currentConversation?.conversationID, currentGroupInfo?.groupID, "nickname"])}
++          captureEdit={captureGroupEditView}
+         />
+       </SettingRow>
+       <SettingRow
+--- a/src/pages/common/UserCardModal/index.tsx
++++ b/src/pages/common/UserCardModal/index.tsx
+@@ -465,15 +465,17 @@
+   isCurrent = () => false,
+ }) => {
+   const tryUpdateRemark = async (remark: string) => {
+-    if (!isCurrent()) return;
++    if (!isCurrent()) return false;
+     try {
+       await IMSDK.setFriendRemark({
+         toUserID: userID!,
+         remark,
+       });
+-      if (isCurrent()) updateCardRemark?.(remark);
++      if (!isCurrent()) return false;
++      updateCardRemark?.(remark); return true;
+     } catch (error) {
+       if (isCurrent()) feedbackToast({ error });
++      return false;
+     }
+   };
+   return (
+@@ -489,6 +491,8 @@
+               value={fieldRow.value}
+               editable={true}
+               onChange={tryUpdateRemark}
++              editIdentity={JSON.stringify([userID, "remark"])}
++              captureEdit={() => ({ current: isCurrent })}
+             />
+           ) : (
+             <div className="flex-1 select-text truncate">{fieldRow.value}</div>

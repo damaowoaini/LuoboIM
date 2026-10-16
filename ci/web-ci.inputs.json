@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "node": "24.21.0",
-  "fullMinimumTests": 658,
+  "fullMinimumTests": 683,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -117,8 +117,8 @@
       },
       {
         "path": "web/src/components/EditableContent/index.tsx",
-        "bytes": 2543,
-        "sha256": "e82ac0c142eb7d59795d3e363b78c481f2b25e050f2cd792f81b3fbcbbc86236"
+        "bytes": 5699,
+        "sha256": "80336f295a966cb76f23acbe10294aa049c602eff513629c84a671ead70bb5d3"
       },
       {
         "path": "web/src/pages/chat/queryChat/GroupSetting/VerificationSelectContent.tsx",
@@ -234,6 +234,36 @@
     "currentAfter": [
       {
         "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 11343,
+        "sha256": "cd6703e0e9aabd55c2f30a877fd57db7ef9a0107fc63e17e14bd32101a511003"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 8185,
+        "sha256": "f64b179fdbb9cf510c0e9f9078bbd6cf6e86f02a5a14e501f1fd2c5635822795"
+      }
+    ],
+    "adoptedTests": [
+      {
+        "path": "web/src/core/groupDirectEditScope/directEditHooks.test.ts",
+        "bytes": 6846,
+        "sha256": "f4edce97fa08f894b6f176510b4d3bf6989983b22ae6c947fcab2240bbc24787"
+      },
+      {
+        "path": "web/src/core/groupDirectEditScope/directEditHost.test.ts",
+        "bytes": 9854,
+        "sha256": "1276d83d7480c131e5247856707f247deede48873b60e3846cbec9aa35c47b43"
+      },
+      {
+        "path": "web/src/core/groupDirectEditScope/fixture.ts",
+        "bytes": 9531,
+        "sha256": "42ff26914e3ee4d1353ae34dec437d79e6a8e83928693345fda1f7934b491b2d"
+      }
+    ],
+    "adoptionMeaning": "Direct2 adopted at b45 cloud658, then superseded by explicit editableContentAdoption current4 lineage. Frozen7 and historical context stay immutable.",
+    "adoptedAfterBaseline": [
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
         "bytes": 10990,
         "sha256": "df14a8fea08ee14ac5de248c5d400bb36e4506770b9fa0c3665fa3e12670a8b1"
       },
@@ -243,7 +273,97 @@
         "sha256": "9b2a3cc5e1e511b3fe1913b3254d53d4b48ec8a128bb3b9623e17731c2d4fa00"
       }
     ],
-    "adoptedTests": [
+    "realCallersBaseline": [
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/index.tsx",
+        "bytes": 3293,
+        "sha256": "efbb52d1fb35ae5db1c18436621d20b6f4a92ca0563adfe91af9e41032948927"
+      },
+      {
+        "path": "web/src/components/EditableContent/index.tsx",
+        "bytes": 2543,
+        "sha256": "e82ac0c142eb7d59795d3e363b78c481f2b25e050f2cd792f81b3fbcbbc86236"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/VerificationSelectContent.tsx",
+        "bytes": 1902,
+        "sha256": "d27665ae60f53d5ab684fff5bffe62247c401a5800f981b91cf327e28aa5d7c8"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/ChatHeader/index.tsx",
+        "bytes": 11927,
+        "sha256": "9663095f6a75cbd9d9a08806f94d489e9e4da951091caba886d6443541e79132"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/index.tsx",
+        "bytes": 3919,
+        "sha256": "b06174b10c41cd1e362d2e516a2f386a59f547acbb017cd57571f8cf576c0a10"
+      },
+      {
+        "path": "web/src/hooks/useCurrentMemberRole.ts",
+        "bytes": 1782,
+        "sha256": "0096fdc7979f90e03409e078a2a71461e7d9e9ced6101a4668647c6b9d2997f0"
+      },
+      {
+        "path": "web/src/hooks/useOverlayVisible.ts",
+        "bytes": 679,
+        "sha256": "a49e0bd6dbaf494d03c0ba5743772ba83a2dec1a054aee32b0a8474ece61c7f1"
+      },
+      {
+        "path": "web/src/core/session/sdk.ts",
+        "bytes": 4405,
+        "sha256": "65a9c844886297f36eb0c628996607e3056422a40d7f9037ab1bb82cb9800283"
+      },
+      {
+        "path": "web/src/core/session/sdkRuntime.ts",
+        "bytes": 1684,
+        "sha256": "c071745dc7576cedb208b357a8e366c3c5ff256e7751219731ecd9e2ad21e7bb"
+      },
+      {
+        "path": "web/src/core/messageHistory.ts",
+        "bytes": 2892,
+        "sha256": "ab7503ed2be4f0403825220dedbf995e6dbb1a4449d65b2e2778caa45b0636bf"
+      },
+      {
+        "path": "web/src/store/message.ts",
+        "bytes": 14220,
+        "sha256": "f59801ca4bfe4197fd7640add1649048cc4e20c7f032d45fa4e75c438225024a"
+      },
+      {
+        "path": "web/src/store/conversation.ts",
+        "bytes": 13190,
+        "sha256": "fd0a86cfdf4212a3f6c09c2fc9e796cec51cf345de884a42a54e6d2d0835de35"
+      },
+      {
+        "path": "web/src/layout/MainContentWrap.tsx",
+        "bytes": 5638,
+        "sha256": "4bbd6124db573e4b9db7eea06fd1cc45cdc427877c50c9857f6d999b065fdd2d"
+      },
+      {
+        "path": "web/src/i18n/resources/zh.json",
+        "bytes": 20605,
+        "sha256": "69e3f6bbae38dbe4cbead12a440d4a235dbe1ad3026a3c7ac305c915307c4796"
+      },
+      {
+        "path": "web/src/i18n/resources/en.json",
+        "bytes": 22194,
+        "sha256": "185234982745844d1be00762180784e40ff2d8f790956b1cc0bc5aba707f2625"
+      },
+      {
+        "path": "web/src/utils/common.ts",
+        "bytes": 11038,
+        "sha256": "77a8c13b36517f837e6fc579706c84a8f24afa33a1a3c336955811cf92ddf33d"
+      }
+    ],
+    "historicalContext": [
+      {
+        "path": "ci/candidates/web-direct-edit/context/EditableContent.tsx",
+        "bytes": 2543,
+        "sha256": "e82ac0c142eb7d59795d3e363b78c481f2b25e050f2cd792f81b3fbcbbc86236"
+      }
+    ],
+    "historicalContextMeaning": "Real pre-editor EditableContent source; old direct before/after resolve this file, preserving the measured nine-positive/twenty-four-failure baseline independently of current shared editor.",
+    "adoptedTestsBaseline": [
       {
         "path": "web/src/core/groupDirectEditScope/directEditHooks.test.ts",
         "bytes": 6836,
@@ -260,6 +380,195 @@
         "sha256": "42ff26914e3ee4d1353ae34dec437d79e6a8e83928693345fda1f7934b491b2d"
       }
     ],
-    "adoptionMeaning": "Exact two frozen after production files adopted; three tests use per-file fixture-first imports only. No global setup, no runtime dist switch."
+    "adoptedTestTypeAdapter": {
+      "path": "web/src/core/groupDirectEditScope/directEditHooks.test.ts",
+      "before": {
+        "path": "web/src/core/groupDirectEditScope/directEditHooks.test.ts",
+        "bytes": 6836,
+        "sha256": "38c890b08fe5d78eb0b277d153a81ae9d7f434ae9413a4198af4a270aebf32e0"
+      },
+      "after": {
+        "path": "web/src/core/groupDirectEditScope/directEditHooks.test.ts",
+        "bytes": 6846,
+        "sha256": "f4edce97fa08f894b6f176510b4d3bf6989983b22ae6c947fcab2240bbc24787"
+      },
+      "change": "Only local pending variable Promise<void> -> Promise<void | boolean>; no assertion or control-flow change. Frozen7 unchanged.",
+      "rootVerified": "Current Web/desktop types exit0 and adopted target25PASS; full683/cloud build pending."
+    }
+  },
+  "editableContentAdoption": {
+    "candidateManifestSHA256": "d72ee2c6ab329acf9a85196d19ce775b372ad3a6454c15c3724a1a2778443d4f",
+    "patch": {
+      "path": "ci/lineage/editable-content-save-v1.patch",
+      "bytes": 10053,
+      "sha256": "6eff13a9fc63ecdd76a8aa8b7a0a0f92cda8c6ccec09da550c6ce6c025693316"
+    },
+    "beforeCheckpoint": {
+      "commit": "b45c90e121cfc7934c99d47ac45e12c152d78ed7",
+      "run": 38847106321,
+      "runURL": "https://github.com/damaowoaini/LuoboIM/actions/runs/38847106321",
+      "sourceFiles": 4283,
+      "sourceDigest": "06518ad29e698b4a32a6c3142a863c44bf7a894b4cce86bd5ee3b80954b00607",
+      "sourceVectorSHA256": "983202c59803d17f6a9589b90025a98c45d4b40be2e85d0c333a5a216dba01de"
+    },
+    "before": [
+      {
+        "path": "web/src/components/EditableContent/index.tsx",
+        "bytes": 2543,
+        "sha256": "e82ac0c142eb7d59795d3e363b78c481f2b25e050f2cd792f81b3fbcbbc86236"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 7600,
+        "sha256": "9b2a3cc5e1e511b3fe1913b3254d53d4b48ec8a128bb3b9623e17731c2d4fa00"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 10990,
+        "sha256": "df14a8fea08ee14ac5de248c5d400bb36e4506770b9fa0c3665fa3e12670a8b1"
+      },
+      {
+        "path": "web/src/pages/common/UserCardModal/index.tsx",
+        "bytes": 17436,
+        "sha256": "84942f0ef54181608fd43787ddb0f674963226e4672d4c3194b6cfefcb3c1080"
+      }
+    ],
+    "currentAfter": [
+      {
+        "path": "web/src/components/EditableContent/index.tsx",
+        "bytes": 5699,
+        "sha256": "80336f295a966cb76f23acbe10294aa049c602eff513629c84a671ead70bb5d3"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 8185,
+        "sha256": "f64b179fdbb9cf510c0e9f9078bbd6cf6e86f02a5a14e501f1fd2c5635822795"
+      },
+      {
+        "path": "web/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 11343,
+        "sha256": "cd6703e0e9aabd55c2f30a877fd57db7ef9a0107fc63e17e14bd32101a511003"
+      },
+      {
+        "path": "web/src/pages/common/UserCardModal/index.tsx",
+        "bytes": 17619,
+        "sha256": "d9df6eb3e3930c72f137178206de75a99e1ca0037e54975f1c5555e0c50cb85a"
+      }
+    ],
+    "adoptedTests": [
+      {
+        "path": "web/src/core/editableContentSave/cardRemark.test.ts",
+        "bytes": 6680,
+        "sha256": "511f1324aa1d65ed55dc85e19eff964ba0008a06e46317f4b4631457e215a7b4"
+      },
+      {
+        "path": "web/src/core/editableContentSave/editableContent.test.ts",
+        "bytes": 10025,
+        "sha256": "f0eedd23ea1d45480e6de19fca8643ad6ec9155d838903362ad6d32c31b64182"
+      },
+      {
+        "path": "web/src/core/editableContentSave/groupEditors.test.ts",
+        "bytes": 3968,
+        "sha256": "a92aab9c5a9ad253474b960e4bae20bc78d1944cbf912823b34e3dffb7835b99"
+      },
+      {
+        "path": "web/src/core/editableContentSave/groupFixture.ts",
+        "bytes": 9531,
+        "sha256": "42ff26914e3ee4d1353ae34dec437d79e6a8e83928693345fda1f7934b491b2d"
+      }
+    ],
+    "mappingMeaning": "Four exact after production files and four same-byte test/fixture files; no global setup. Current direct2 are the relevant subset of currentAfter, not equal to historical direct-after.",
+    "actualIsolated": {
+      "before": {
+        "passed": 7,
+        "assertionFailed": 18,
+        "total": 25
+      },
+      "after": {
+        "passed": 25,
+        "total": 25
+      },
+      "originalDirect33OnNewProduct": {
+        "passed": 33,
+        "total": 33
+      }
+    },
+    "frozenCandidateFiles": [
+      {
+        "path": "ci/candidates/web-editable-save/before/src/components/EditableContent/index.tsx",
+        "bytes": 2543,
+        "sha256": "e82ac0c142eb7d59795d3e363b78c481f2b25e050f2cd792f81b3fbcbbc86236"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/before/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 10990,
+        "sha256": "df14a8fea08ee14ac5de248c5d400bb36e4506770b9fa0c3665fa3e12670a8b1"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/before/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 7600,
+        "sha256": "9b2a3cc5e1e511b3fe1913b3254d53d4b48ec8a128bb3b9623e17731c2d4fa00"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/before/src/pages/common/UserCardModal/index.tsx",
+        "bytes": 17436,
+        "sha256": "84942f0ef54181608fd43787ddb0f674963226e4672d4c3194b6cfefcb3c1080"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/after/src/components/EditableContent/index.tsx",
+        "bytes": 5699,
+        "sha256": "80336f295a966cb76f23acbe10294aa049c602eff513629c84a671ead70bb5d3"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/after/src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+        "bytes": 11343,
+        "sha256": "cd6703e0e9aabd55c2f30a877fd57db7ef9a0107fc63e17e14bd32101a511003"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/after/src/pages/chat/queryChat/GroupSetting/useGroupSettings.tsx",
+        "bytes": 8185,
+        "sha256": "f64b179fdbb9cf510c0e9f9078bbd6cf6e86f02a5a14e501f1fd2c5635822795"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/after/src/pages/common/UserCardModal/index.tsx",
+        "bytes": 17619,
+        "sha256": "d9df6eb3e3930c72f137178206de75a99e1ca0037e54975f1c5555e0c50cb85a"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/tests/cardRemark.test.ts",
+        "bytes": 6680,
+        "sha256": "511f1324aa1d65ed55dc85e19eff964ba0008a06e46317f4b4631457e215a7b4"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/tests/editableContent.test.ts",
+        "bytes": 10025,
+        "sha256": "f0eedd23ea1d45480e6de19fca8643ad6ec9155d838903362ad6d32c31b64182"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/tests/groupEditors.test.ts",
+        "bytes": 3968,
+        "sha256": "a92aab9c5a9ad253474b960e4bae20bc78d1944cbf912823b34e3dffb7835b99"
+      },
+      {
+        "path": "ci/candidates/web-editable-save/tests/groupFixture.ts",
+        "bytes": 9531,
+        "sha256": "42ff26914e3ee4d1353ae34dec437d79e6a8e83928693345fda1f7934b491b2d"
+      }
+    ],
+    "tests": 25,
+    "positiveNames": [
+      "keeps normal successful friend remark updates",
+      "does not submit a retained remark editor after the normal Card closes",
+      "keeps a historical void callback successful",
+      "keeps explicit success successful",
+      "does not abandon a normal save when the same target's authoritative value arrives before ACK",
+      "keeps the unsaved draft through an unrelated same-target metadata render",
+      "preserves a personally muted ordinary member's own nickname editor"
+    ],
+    "portableConfig": {
+      "path": "ci/web-ci.editable.config.mts",
+      "bytes": 4590,
+      "sha256": "d1783c948be27edd241e205604f7a11c9dd6299a61c0e985cc5be6a6f29673e7"
+    }
   }
 }
