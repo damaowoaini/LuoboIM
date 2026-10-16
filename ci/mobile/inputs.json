@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v9",
-  "state": "current304_call_records_r1_pending_cloud",
+  "state": "current304_call_records_fixture_r2_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -322,7 +322,7 @@
     "current304": 356
   },
   "portable_digests": {
-    "current304": "7dff106424f89768faff073dfb72d569cb54839cb7b01f30b0f9ecfbd866bb66"
+    "current304": "3c840692c2502ed2bfce7adc1599b877a882cf445fb6b8b0a37a226ce02997c6"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -639,6 +639,23 @@
       "portable_digest": "7c96e8e85434447e646f06a8f5168e467387a30a0d0a3aee98dbbf6db17f9e75",
       "actual": "184/872/strictanalyze0;new18+old854 exact;76sixmarker+safeexit6each;0warnings",
       "root_acceptance_sha256": "80c0a46710fde0adbe61ad77dcb6598a59f01a9a07d011003736371a55ad6e05"
+    },
+    "call_records_initial_R1_failure": {
+      "run": 38898318098,
+      "commit": "40214cf7a2900c9f468cb5e1fa107f56509933c7",
+      "review": {
+        "path": "references/integration/cloud-mobile-ci/run-38898318098-agent/verification.json",
+        "bytes": 5148,
+        "sha256": "5bb2393e42fd78788dfd05ec164f10af70e3c9f887f2031a3a3a03d74f0c575e"
+      },
+      "actual_target": {
+        "passed": 199,
+        "loader_errors": 3,
+        "old184_exact": true,
+        "repo15_exact": true,
+        "unexecuted_new35": true
+      },
+      "full_and_analyze": "not started"
     }
   },
   "reference_entry": {
@@ -646,7 +663,7 @@
     "default_enabled": false,
     "working_cohort": "current304",
     "members": 304,
-    "reference_source_digest": "7a7e9e82bf71c45dd6dac930cdb528dcf8a9d08df8f785148cc3a1cde98d8029",
+    "reference_source_digest": "5699ff9109cbc0e3deab1d8cedfa74a4ee6b6bd91a0024737c74d6eb985694ac",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -712,7 +729,7 @@
   },
   "current304": {
     "members": 304,
-    "source_digest": "b801edb96edc607d3c6cfd05f79f9ffae3b3b9dc60375244f6ca67934bae132d",
+    "source_digest": "c295fccc7d523d46860c849d0d763df507381e03850fa2ed130993dc5a9af630",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -2161,8 +2178,8 @@
       },
       {
         "path": "app/test/features/rtc/call_records_fixture.dart",
-        "bytes": 9514,
-        "sha256": "b1df7777a54d06412536caf8014120da11229eac14d4391c5ca2ded7f5f39758"
+        "bytes": 10193,
+        "sha256": "fd74969d9dea1026ab025636b433f36d0219a149a1c7f7d0b791cc3f7d643c57"
       },
       {
         "path": "app/test/features/rtc/call_records_page_test.dart",

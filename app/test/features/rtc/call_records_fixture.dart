@@ -192,3 +192,20 @@ final class CallRecordsFixture {
     }
   }
 }
+
+/// Fixture-local compatibility API: exercise real logout/login and exact owner
+/// binding. The shared SDK harness and all production recorder paths stay real.
+extension CallRecordsAccountSwitch on SdkHarness {
+  Future<void> signInOther({required String user,
+      String tenant = 'fixture-tenant',
+      String issuer = 'https://im.example.com/'}) async {
+    await session.signOut();
+    userId = user;
+    final next = credentials;
+    await session.signIn((_) async => SessionCredentials(
+      userId: user, tenantId: tenant, tenantName: next.tenantName,
+      domains: next.domains, chatToken: next.chatToken, imToken: next.imToken,
+      issuer: issuer,
+    ));
+  }
+}

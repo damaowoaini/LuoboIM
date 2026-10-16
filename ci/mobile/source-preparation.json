@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v9",
-  "state": "current304_call_records_r1_pending_cloud",
+  "state": "current304_call_records_fixture_r2_pending_cloud",
   "accepted_parent294": {
     "commit": "a2e59b08b125dd67e05c8cdf877235daf1933431",
     "run": 38893402709,
@@ -9,12 +9,12 @@
     "actual": "184/872/strictanalyze0;new18+old854 exact;76sixmarker+safeexit6each;0warnings",
     "root_acceptance_sha256": "80c0a46710fde0adbe61ad77dcb6598a59f01a9a07d011003736371a55ad6e05"
   },
-  "source304_digest": "b801edb96edc607d3c6cfd05f79f9ffae3b3b9dc60375244f6ca67934bae132d",
-  "portable356_digest": "7dff106424f89768faff073dfb72d569cb54839cb7b01f30b0f9ecfbd866bb66",
+  "source304_digest": "c295fccc7d523d46860c849d0d763df507381e03850fa2ed130993dc5a9af630",
+  "portable356_digest": "3c840692c2502ed2bfce7adc1599b877a882cf445fb6b8b0a37a226ce02997c6",
   "candidate_manifest": {
-    "path": "references/integration/mobile-call-records-r1-candidate/candidate-manifest.json",
-    "bytes": 10140,
-    "sha256": "4f4a31bc0120bf13da2e802adbf7c29189624b4e0d2b372787e1fd88d5837aad"
+    "path": "references/integration/mobile-call-records-r2-fixture-candidate/candidate-manifest.json",
+    "bytes": 2243,
+    "sha256": "f06cfefea9e397d4fe304be39ac8976a6edb7c8e3c7c8318d24a92ab080019b7"
   },
   "current_delta": {
     "selected": 14,
@@ -201,5 +201,16 @@
     },
     "actual_shortcut_r1_Dart_tests": 0
   },
-  "native_service_acceptance": false
+  "native_service_acceptance": false,
+  "fixture_r2": {
+    "failure": {
+      "path": "references/integration/cloud-mobile-ci/run-38898318098-agent/verification.json",
+      "bytes": 5148,
+      "sha256": "5bb2393e42fd78788dfd05ec164f10af70e3c9f887f2031a3a3a03d74f0c575e"
+    },
+    "source_delta": "fixture-local extension only",
+    "production_tests_names220expects_unchanged": true,
+    "reference_source304_digest": "5699ff9109cbc0e3deab1d8cedfa74a4ee6b6bd91a0024737c74d6eb985694ac",
+    "actual_this_revision": 0
+  }
 }
