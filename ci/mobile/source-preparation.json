@@ -4,7 +4,7 @@
     {
       "path": ".github/workflows/mobile-ci.yml",
       "bytes": 2509,
-      "sha256": "5255a95e9fc391026d2fdbed8720826f881851433c741d23e1cd8fd447c55d4b"
+      "sha256": "160f071e92dd7c9edd147985ea2d3bb1f98a4075d8e7f0906abf0c8c752ace8a"
     },
     {
       "path": "ci/mobile-check.py",
@@ -18,8 +18,8 @@
     },
     {
       "path": "ci/mobile-setup.sh",
-      "bytes": 3743,
-      "sha256": "21958a774b52c2df554ace3105712b4dd47c4ff4c9bb3dfc76b8d525d236e47b"
+      "bytes": 5727,
+      "sha256": "7129630225535f6360c8ae77b502e7ae09ae40c0e1d726ff4860bdc293a8de3d"
     },
     {
       "path": "ci/mobile-source.py",
@@ -152,7 +152,7 @@
       "sha256": "6371fb146f9fae28797b3c0bfb816697ed10131a6d20e174e6f878425a7d2c21"
     }
   ],
-  "aggregate_sha256": "05fcc6221d810cdd67bce0739a62f6f4e742d72157182a4dd76673bc91d17417",
+  "aggregate_sha256": "48d5d7a86fa5ab6acd0ed478874f704226c7eacd448e32df332d10c111dfab53",
   "no_product_edits": true,
   "native_acceptance": false,
   "ci_followup": {
@@ -160,5 +160,29 @@
     "change": "Set MOBILE_WORK from RUNNER_TEMP in first run step via GITHUB_ENV; no product/source input change",
     "prior_receipt_sha256": "be912b2566e7464ada107caf69b74aa1db29c12485b56ba1f452f5af375fe608",
     "actual_cloud_tests_executed_in_rejected_run": 0
+  },
+  "cloud_setup_followup": {
+    "run_id": 38845232362,
+    "prior_receipt_sha256": "cd17d74f9f1490e01bf6feaa318cb5b27b11fd93ec75a274132996216ebd3139",
+    "cause": "fetching only FETCH_HEAD omitted local release tag; official Flutter version detector reported 0.0.0-unknown; pub-get rejected Flutter SDK constraint",
+    "not_cause": "exact framework/engine/Dart matched and Linux precache completed; no engine404 observed",
+    "changes": [
+      "fetch explicit local refs/tags/3.47.7 and verify tag points at pinned HEAD",
+      "failclosed frameworkVersion==3.47.7 in addition to existing framework/engine/Dart checks",
+      "safe bounded setup failure stage/log tail",
+      "actions checkout7.0.1/upload7.0.0 match root official pins"
+    ],
+    "artifacts": [
+      {
+        "id": 12023265367,
+        "sha256": "9df7c47b6aa8a6e761f4310407fa723df65c78d3748c15bec1728c3621160667"
+      },
+      {
+        "id": 12022488285,
+        "sha256": "431c2cfc313939cf4fdd3c768d937d759ee670d69f24acacf253929f6fb16c00"
+      }
+    ],
+    "product_tests_executed_in_setup_failed_run": 0,
+    "local_followup_validation": "bash-n and Python heredoc AST only; no local Flutter/compile/run"
   }
 }

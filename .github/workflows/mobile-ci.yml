@@ -44,7 +44,7 @@ jobs:
       - name: Set fresh workspace path
         run: echo "MOBILE_WORK=$RUNNER_TEMP/mobile-${{ matrix.cohort }}" >> "$GITHUB_ENV"
       - name: Checkout source without stored credentials
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Linux tester runtime libraries
@@ -61,7 +61,7 @@ jobs:
             "$(id -un)" "$GITHUB_WORKSPACE" "$MOBILE_WORK" '${{ matrix.cohort }}'
       - name: Preserve actual results and setup failures
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: mobile-${{ matrix.cohort }}-${{ github.run_id }}
           path: ${{ env.MOBILE_WORK }}/evidence/
