@@ -12,9 +12,9 @@
       "sha256": "66713a790710cfe3fc1229e22499fcc3226975c39a322214ea3d6c079691a0ff"
     },
     {
-      "bytes": 7030,
+      "bytes": 7055,
       "path": "apple_observer.py",
-      "sha256": "8565cfbe3ef3be3172aa3a49ab4f73f4611c4af37179c4ab00c3602f1621331b"
+      "sha256": "92e217f263e27b4196184cb2551b99e9bcd2c95a7d2025ff148c48cd31f8b46b"
     },
     {
       "bytes": 22837,
@@ -65,6 +65,11 @@
       "bytes": 4782,
       "path": "test_core_binary.py",
       "sha256": "adf3afe10404a5668439f1c283616fd4af0620e0a7313acc49b9c502af41a01d"
+    },
+    {
+      "bytes": 5719,
+      "path": "test_observer.py",
+      "sha256": "e53d0603fe00480106e5323091334525e2c3a0ce2269e6f8961dc4103db67ce0"
     }
   ],
   "identity": "apple-sdk-only-cloud-arm64-r1",

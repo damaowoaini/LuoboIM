@@ -1,0 +1,50 @@
+name: Group receiver isolated pure13
+
+# Targeted source checks only. Full regression stays the existing manual lane.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: group-action-receiver-pure13-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pure13:
+    name: Exact five packages / thirteen selected tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety and exact source1165 without running parent full workflow
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/group-action-receiver/test_run.py
+          python3 -B ci/group-action-receiver/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Only pure13 with exact source, isolated test network and resource guards
+        run: python3 -B ci/group-action-receiver/run.py
+      - name: Always preserve actual targeted evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: group-action-receiver-pure13-${{ github.run_id }}
+          path: ci-results/group-action-receiver/
+          if-no-files-found: warn
+          retention-days: 14

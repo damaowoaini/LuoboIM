@@ -88,7 +88,7 @@ def main():
     argv = sys.argv[1:]
     if len(argv) > 512 or sum(len(a.encode()) for a in argv) > 65536:
         raise ValueError('Go argv cap')
-    tidy = argv == ['mod', 'tidy']
+    tidy = argv in (['mod', 'tidy'], ['mod', 'tidy', '-v'])
     if not tidy and 'tidy' in argv:
         raise ValueError('unexpected tidy argv')
     child, received, signal_time, before, after, evidence = None, None, None, None, None, None
