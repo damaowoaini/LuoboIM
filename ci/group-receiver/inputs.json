@@ -269,8 +269,8 @@
     {
       "path": "ci/candidates/group-receiver/source/server/internal/push/durable_online_test.go",
       "target": "server/internal/push/durable_online_test.go",
-      "bytes": 11202,
-      "sha256": "4460c6f89aea88be6e9c025fc752f007a5bd945ffc98489c3fa14a4becc607d1",
+      "bytes": 11201,
+      "sha256": "a2cbb686db175d9fce756764c8fc7b0fb1b63f56a7ba4fcbc63a7da1f06cf92e",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -340,7 +340,7 @@
     }
   ],
   "effective_source_count": 989,
-  "effective_source_sha256": "f9a36488c05bd0ebf39ce5d9055008658c2303806e03fbeeae0166eaa343bd10",
+  "effective_source_sha256": "79d670e5fcf45d7f276caed8fd70d852b18431845fb4a0cc5ebc217438f3a6c9",
   "effective_source": [
     {
       "path": "server/.dockerignore",
@@ -2049,8 +2049,8 @@
     },
     {
       "path": "server/internal/push/durable_online_test.go",
-      "bytes": 11202,
-      "sha256": "4460c6f89aea88be6e9c025fc752f007a5bd945ffc98489c3fa14a4becc607d1"
+      "bytes": 11201,
+      "sha256": "a2cbb686db175d9fce756764c8fc7b0fb1b63f56a7ba4fcbc63a7da1f06cf92e"
     },
     {
       "path": "server/internal/push/offlinepush/dummy/push.go",

@@ -99,7 +99,7 @@ func disableLegacyPushCallbacks(t *testing.T) {
 }
 func onlineCallFixture() messagedelivery.OnlineCall {
 	now := time.Now().Add(-31 * time.Second).UnixMilli()
-	return messagedelivery.OnlineCall{BranchID: "e607ca68-9fb3-4aa2-8da4-5f0d26a0f505", ConversationID: "sg_synthetic-group", Recipients: []string{"synthetic-owner", "synthetic-peer"}, Message: &sdkws.MsgData{SendID: "synthetic-actor", RecvID: "synthetic-group", GroupID: "synthetic-group", SessionType: constant.SuperGroupChatType, Seq: 42, ClientMsgID: "stable-notification", ServerMsgID: "stable-server", SendTime: now, CreateTime: now, Content: []byte("synthetic opaque content"), Options: msgprocessor.NewOptions(msgprocessor.WithHistory(true))}}
+	return messagedelivery.OnlineCall{BranchID: "e607ca68-9fb3-4aa2-8da4-5f0d26a0f505", ConversationID: "n_synthetic-group", Recipients: []string{"synthetic-owner", "synthetic-peer"}, Message: &sdkws.MsgData{SendID: "synthetic-actor", RecvID: "synthetic-group", GroupID: "synthetic-group", SessionType: constant.SuperGroupChatType, Seq: 42, ClientMsgID: "stable-notification", ServerMsgID: "stable-server", SendTime: now, CreateTime: now, Content: []byte("synthetic opaque content"), Options: msgprocessor.NewOptions(msgprocessor.WithHistory(true))}}
 }
 func successfulRows(req *msggateway.OnlineBatchPushOneMsgReq) (*msggateway.OnlineBatchPushOneMsgResp, error) {
 	result := &msggateway.OnlineBatchPushOneMsgResp{}
