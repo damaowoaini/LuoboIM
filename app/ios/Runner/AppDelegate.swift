@@ -15,5 +15,8 @@ import UIKit
     if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "LuoboAppAccess") {
       _ = AppAccessBridge(messenger: registrar.messenger())
     }
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "LuoboLocationOnce") {
+      LocationOnceBridge.register(with: registrar)
+    }
   }
 }

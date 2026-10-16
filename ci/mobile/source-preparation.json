@@ -1,46 +1,82 @@
 {
-  "schema": "luobo.mobile336.location-receive.preparation.v1",
-  "state": "refs_minimal_metadata_targeted36_actual_no_full",
-  "source336_digest": "6b7333baaf7cb4b87498601f2fd42f3dbcbf56d6703fd950ca4fd9ba6fd797a1",
-  "portable388_digest": "d42209b1279e63ffe396f3d07a8345ab837173f2aa4cef987f24ca8acbcf3486",
-  "reference336_digest": "77e272c718dc9caff1cb84baa8f5d1e2a8cc9c08245c120416c6cfa1310c6a17",
+  "schema": "luobo.mobile344.location-send.preparation.v1",
+  "state": "refs_R4_source_frozen_actual_new38_passed_CI8_and_combined460_1142_pending",
+  "source344_digest": "c59948d1274203162e2a2873dbd6c8e57769beaf5d8b02d72e29fbc729d753ab",
+  "portable396_digest": "89d3c7389b2f39c64e35da8e3e98914b3c1f16fc7e7ce3baaffeed8fb4c44a1a",
+  "reference344_digest": "7d4c91c2b3407e07c84ab5d2f84ee65179b1e12a01720e74db6afc178f2c2c8e",
   "effective_vector": {
-    "path": "references/integration/mobile-chat-location-receive-r1-candidate/effective-source-vector.json",
-    "bytes": 143554,
-    "sha256": "6d33afbc55b6b1e3764f083d8ab2b78a011d79e37bea4f4b79e9fcbc7b0aa0ba"
+    "path": "references/integration/mobile344-location-send-ci-candidate-20261017/effective-source-vector.json",
+    "bytes": 148832,
+    "sha256": "54f1b9acc63710637950c2ad5ac03e0a071d3865a94533775659b7d1e1b707b4"
   },
-  "parent331_preparation": {
-    "path": "references/integration/mobile336-location-receive-ci-candidate/before/ci/mobile/source-preparation.json",
-    "bytes": 2890,
-    "sha256": "67882e97706b0239a3863777a3e0144c5c196c1bec67ebf26b53bd1c1cd97d31"
+  "parity_R2_manifest": {
+    "path": "references/integration/mobile-chat-location-send-r2-candidate/candidate-manifest.json",
+    "bytes": 3482,
+    "sha256": "0922f818d624bc6844753bb8d59e4519b88ffe1f63615f599e2fde02dbf9a12f"
   },
-  "location_receive_v1": {
-    "path": "references/integration/mobile-chat-location-receive-candidate/candidate-manifest.json",
-    "bytes": 14152,
-    "sha256": "47db4688919d21b40812b72542046c3fe4ea5639282d6686d00464cffc392b19"
+  "parity_R1_manifest": {
+    "path": "references/integration/mobile-chat-location-send-r1-candidate/candidate-manifest.json",
+    "bytes": 6817,
+    "sha256": "9a80c446eeb7d5d584d6a418ec84641c2106a21d4a14a38805a57830c5318717"
   },
-  "location_receive_fixture_r1": {
-    "path": "references/integration/mobile-chat-location-receive-r1-candidate/candidate-manifest.json",
-    "bytes": 2796,
-    "sha256": "8d9ea741ba4c83f13cda57f3f86ee7d3463383d863107eb7bef87611bfdbaf27"
+  "native_R1_manifest": {
+    "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/manifest.json",
+    "bytes": 8523,
+    "sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894"
   },
-  "actual36": {
-    "path": ".qa/location-a-1/targeted-r1-result.json",
-    "bytes": 9628,
-    "sha256": "7fcc351d3568d9ac4e4a00da17e5de881446cc9f8ff01021de4c27523783d581"
+  "native_type_API_acceptance": {
+    "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/root-type-api-acceptance.json",
+    "bytes": 616,
+    "sha256": "ed85b0c8456de99f36f4ef1038e9c5e3ecdd834432acb1c68ae3568c1556bdc9"
   },
-  "actualBoundary": "First36=34PASS/2fixtureERROR kept; only2 corrected fixture cases rerun2PASS;34 unaffected reused.36unique exact.8filefatal-info0 by original8 plus changed1 recheck.5prod unchanged after first run.",
-  "expected_not_actual": {
-    "target422": 422,
-    "full1104": 1104,
-    "strict_analysis": 0
+  "expected_unrun": {
+    "target": 460,
+    "full": 1142
   },
-  "parent331_history": "386/1068 remain composed expected name layers, not accepted complete execution. Original cloud281/963+local targeted source history retained.",
-  "names": "Original386 target and1068 full name composition preserved as parent layers plus36 actually successful new receiving cases.",
-  "control": "Manual-only workflow_dispatch/action pins/read permissions, original11protectedAST, netns/900s phase/4GiB cold/1GiB continuous/.2s/768MiB/native4GiB/174lock/SDK51+migration1 exact. No new cleanup parser/wrapper.",
-  "python": "39old names preserved;2new composition rejection cases. Root should run8affected/new once;33others reused. No CI tests run during this source proposal.",
-  "ledger": "No ledger change: StageA receiving does not complete sending location or map selection. StageB still required.",
-  "public_inventory": "Strict336/388; private701B check.sh stays outside public, no auxiliary exception.",
-  "execution_policy": "No per-feature full/dispatch/adoption/push; final full only after known issues fixed and targeted clean.",
-  "native_device_service_acceptance": false
+  "names": "Original422/1104 names preserved and exact38 appended. 38 actual unique local tests passed; target460/full1142 are expected only and have not run.",
+  "dependency": "178 identities/4official archives unchanged; interface classification direct dev only. Fresh enforce-lockfile and4 hosted-hash metadata receipts remain mandatory. Native transitive graph not accepted.",
+  "native": "7 sources outside portable396; scene8/GPS/currentAPK/iOS runtime not accepted.",
+  "control": "manual-only/read permissions/pinned Actions/netns/reporter900s/4GiB initial/1GiB .2/768MiB unchanged.",
+  "actual_this_preparation": {
+    "tests": 0,
+    "analysis": 0,
+    "readonly_controller": 0,
+    "download": 0,
+    "main_public_apply_dispatch": 0
+  },
+  "targeted_CI_plan": "Only DescriptorTests4+LocationSendInventoryTests2+LocationSourceCouplingTests2 after Root review; old others reused.",
+  "parity_R3_manifest": {
+    "path": "references/integration/mobile-chat-location-send-r3-candidate/candidate-manifest.json",
+    "bytes": 3052,
+    "sha256": "6a8c7afb53d807c9455791c8ec826665a2d3eb42d1d43cb6999e3d524bc8f769"
+  },
+  "parity_R4_manifest": {
+    "path": "references/integration/mobile-chat-location-send-r4-candidate/candidate-manifest.json",
+    "bytes": 3099,
+    "sha256": "46124db814a632ac1ee269f62256547d58375936eee8b138e0a02c717c0ee2bd"
+  },
+  "parity_R4_selected14": {
+    "path": "references/integration/mobile-chat-location-send-r4-candidate/selected-source.json",
+    "bytes": 7256,
+    "sha256": "67d91246fc3f22603a895c50f5209eb2dc88fd551252c143c71625d8095172e8"
+  },
+  "actual_targeted38_Root_acceptance": {
+    "path": "references/integration/mobile-chat-location-send-r4-candidate/root-targeted-acceptance.json",
+    "bytes": 827,
+    "sha256": "cf764c6d3d4c0baf95131cd137d6e5c79b336292a94d42bdd8c4ade16cd3c0cd"
+  },
+  "actual_targeted38_raw_receipt": {
+    "path": ".qa/location-b-r1-1/targeted-r4-result.json",
+    "bytes": 24017,
+    "sha256": "8aff663087401229ba06685ec2487668f6c35042e956f54e02a6e219902d2fde"
+  },
+  "actual_targeted38": {
+    "unique_passed": 38,
+    "reused_initial_passed": 15,
+    "only_initial_failed_rerun_passed": 23,
+    "unique_changed_analysis_files": 12,
+    "issues": 0,
+    "full_regression_run": false,
+    "provider_GPS_device_acceptance": false
+  }
 }

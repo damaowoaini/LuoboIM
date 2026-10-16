@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v15",
-  "state": "current336_location_receive_targeted36_verified_final_regression_pending",
+  "schema": "luobo.mobile.portable-ci-inputs.v16",
+  "state": "current344_StageB_R4_source_frozen_targeted38_passed_CI8_and_combined460_1142_unrun",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI + frozen call-records-r1 selected14 (4replacement,10new); no generation in CI + frozen saved-emoji R1 selected14 (6replacement,8new); no source generation in CI + Location109 receipt selected8 (3replacements,5new), fixture R1 only; no source generation in CI",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI + frozen call-records-r1 selected14 (4replacement,10new); no generation in CI + frozen saved-emoji R1 selected14 (6replacement,8new); no source generation in CI + Location109 receipt selected8 (3replacements,5new), fixture R1 only; no source generation in CI + StageB R4 selected14 (6replace,8new); native7 separate snapshot; no source generation in CI",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -189,6 +189,69 @@
       "path": "references/integration/mobile-chat-location-receive-r1-candidate/candidate-manifest.json",
       "bytes": 2796,
       "sha256": "8d9ea741ba4c83f13cda57f3f86ee7d3463383d863107eb7bef87611bfdbaf27"
+    },
+    "location_send_R2": {
+      "manifest": {
+        "path": "references/integration/mobile-chat-location-send-r2-candidate/candidate-manifest.json",
+        "bytes": 3482,
+        "sha256": "0922f818d624bc6844753bb8d59e4519b88ffe1f63615f599e2fde02dbf9a12f"
+      },
+      "parent_R1_manifest": {
+        "path": "references/integration/mobile-chat-location-send-r1-candidate/candidate-manifest.json",
+        "bytes": 6817,
+        "sha256": "9a80c446eeb7d5d584d6a418ec84641c2106a21d4a14a38805a57830c5318717"
+      },
+      "source14": {
+        "replace": 6,
+        "new": 8
+      },
+      "actual_new38_at_preparation": false,
+      "lock_classification": {
+        "path": "references/integration/mobile-chat-location-send-r1-candidate/lock-classification-proof.json",
+        "bytes": 1528,
+        "sha256": "b4caa1a18c922de6f78a4a6993bfac6e858fec8456b99c93ef5ec53af989efee"
+      }
+    },
+    "location_send_R3": {
+      "manifest": {
+        "path": "references/integration/mobile-chat-location-send-r3-candidate/candidate-manifest.json",
+        "bytes": 3052,
+        "sha256": "6a8c7afb53d807c9455791c8ec826665a2d3eb42d1d43cb6999e3d524bc8f769"
+      },
+      "source14": {
+        "replace": 6,
+        "new": 8
+      },
+      "actual_new38_at_preparation": false,
+      "analysis": "parent R2 static+R3single equivalent info correction; wait separate Root actual receipt"
+    },
+    "location_send_R4": {
+      "manifest": {
+        "path": "references/integration/mobile-chat-location-send-r4-candidate/candidate-manifest.json",
+        "bytes": 3099,
+        "sha256": "46124db814a632ac1ee269f62256547d58375936eee8b138e0a02c717c0ee2bd"
+      },
+      "selected14": {
+        "path": "references/integration/mobile-chat-location-send-r4-candidate/selected-source.json",
+        "bytes": 7256,
+        "sha256": "67d91246fc3f22603a895c50f5209eb2dc88fd551252c143c71625d8095172e8"
+      },
+      "source14": {
+        "replace": 6,
+        "new": 8
+      },
+      "Root_targeted_acceptance": {
+        "path": "references/integration/mobile-chat-location-send-r4-candidate/root-targeted-acceptance.json",
+        "bytes": 827,
+        "sha256": "cf764c6d3d4c0baf95131cd137d6e5c79b336292a94d42bdd8c4ade16cd3c0cd"
+      },
+      "actual_new38_unique_passed": 38,
+      "reused_passed": 15,
+      "failed_only_recheck_passed": 23,
+      "actual_changed_analysis_unique": 12,
+      "analysis_issues": 0,
+      "combined_target460_full1142_executed": false,
+      "scene8_GPS_device_accepted": false
     }
   },
   "toolchain": {
@@ -465,10 +528,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current336": 388
+    "current344": 396
   },
   "portable_digests": {
-    "current336": "d42209b1279e63ffe396f3d07a8345ab837173f2aa4cef987f24ca8acbcf3486"
+    "current344": "89d3c7389b2f39c64e35da8e3e98914b3c1f16fc7e7ce3baaffeed8fb4c44a1a"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -502,7 +565,7 @@
       "actual_run": 38852506276,
       "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
     },
-    "reproduction": "v9 supports only current304. Historicalcohorts require immutablecommits/inputs. Originaloptional searchreference retains4before and1missingentryASSERTFAIL+1oldfilterPASS;callrecordsbeforeentry1 remains preparedonly,not defaultphase.",
+    "reproduction": "v16 supports only current344. Historical cohorts require their immutable commits/inputs; no alias maps old labels to new source. Optional search reference retains4 before files and1 missing-entry ASSERTFAIL+1 old-filter PASS; it is not a historical full run.",
     "accepted_current257": {
       "git_commit": "314ac55",
       "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
@@ -941,14 +1004,19 @@
         "bytes": 2890,
         "sha256": "67882e97706b0239a3863777a3e0144c5c196c1bec67ebf26b53bd1c1cd97d31"
       }
+    },
+    "current336_location_receive_only": {
+      "source_digest": "6b7333baaf7cb4b87498601f2fd42f3dbcbf56d6703fd950ca4fd9ba6fd797a1",
+      "portable_digest": "d42209b1279e63ffe396f3d07a8345ab837173f2aa4cef987f24ca8acbcf3486",
+      "target422_full1104": "expected composition unrun; actual36 targeted acceptance retained"
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current336",
-    "members": 336,
-    "reference_source_digest": "77e272c718dc9caff1cb84baa8f5d1e2a8cc9c08245c120416c6cfa1310c6a17",
+    "working_cohort": "current344",
+    "members": 344,
+    "reference_source_digest": "7d4c91c2b3407e07c84ab5d2f84ee65179b1e12a01720e74db6afc178f2c2c8e",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -986,7 +1054,8 @@
     "not_a_291_full_or_native_result": true,
     "not_a_292_full_or_native_result": true,
     "not_a_294_full_or_native_result": true,
-    "not_a_323_full_or_native_result": true
+    "not_a_323_full_or_native_result": true,
+    "not_a_336_full_or_native_result": true
   },
   "auxiliary_preserved": [
     {
@@ -1006,12 +1075,62 @@
     "gate": "fresh official Flutter pub get --enforce-lockfile must pass without lock drift; no local resolution or downloaded packages",
     "lock_draft_sha256": "f3eba25d2bdacdc2c8288bc65617798f909154e08ffe5e7b8ff8bea448cc4aca",
     "first_actual_cloud_run": 38866360052,
-    "same_enforced_lock_gate_still_mandatory": true
+    "same_enforced_lock_gate_still_mandatory": true,
+    "location_send_official4": {
+      "state": "V1actual178offline_success_R1classification_only_no_reresolution",
+      "locked_packages": 178,
+      "old174_package_identity_blocks_preserved": true,
+      "files": [
+        {
+          "name": "webview_flutter",
+          "version": "4.14.1",
+          "archive_sha256": "d53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111",
+          "archive_url": "https://pub.dev/api/archives/webview_flutter-4.14.1.tar.gz",
+          "dependency": "direct main",
+          "lock_block_sha256": "d8aa746cb1b38e99a49f8c245dedfad01d44e807545ec27c6b4691c099cd7dfd"
+        },
+        {
+          "name": "webview_flutter_android",
+          "version": "4.12.0",
+          "archive_sha256": "ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688",
+          "archive_url": "https://pub.dev/api/archives/webview_flutter_android-4.12.0.tar.gz",
+          "dependency": "direct main",
+          "lock_block_sha256": "923c3bd68d0a69502144cf873a7c40d06f3773e38f8af645bc89fe46b0d576ab"
+        },
+        {
+          "name": "webview_flutter_platform_interface",
+          "version": "2.15.1",
+          "archive_sha256": "1221c1b12f5278791042f2ec2841743784cf25c5a644e23d6680e5d718824f04",
+          "archive_url": "https://pub.dev/api/archives/webview_flutter_platform_interface-2.15.1.tar.gz",
+          "dependency": "direct dev",
+          "lock_block_sha256": "7f1d1c926540773e6e36f893c57d47aacfbdc7c1c0927b77631696c067ff03e7"
+        },
+        {
+          "name": "webview_flutter_wkwebview",
+          "version": "3.25.1",
+          "archive_sha256": "82648217f537573e1ca9ae9952d3eacedca6ab5aee69dc84445fc763766dcea2",
+          "archive_url": "https://pub.dev/api/archives/webview_flutter_wkwebview-3.25.1.tar.gz",
+          "dependency": "transitive",
+          "lock_block_sha256": "1a4119d3c7d0141b158904b074c01638d33cde30b25755ad2633ca37424033d9"
+        }
+      ],
+      "V1_actual_receipt": {
+        "path": "references/integration/mobile-chat-location-send-candidate/dependency-resolution-result.json",
+        "bytes": 3905,
+        "sha256": "27f554d387e586bda3d7887b3c53430ea3faf1691bd37e844a21d6a65a7a0fe0"
+      },
+      "R1_classification_receipt": {
+        "path": "references/integration/mobile-chat-location-send-r1-candidate/lock-classification-proof.json",
+        "bytes": 1528,
+        "sha256": "b4caa1a18c922de6f78a4a6993bfac6e858fec8456b99c93ef5ec53af989efee"
+      },
+      "new_setup_gate": "fresh enforce-lockfile plus4 exact hosted-hash receipts; not independent archive body rehash"
+    }
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 1197905,
-    "sha256": "feb3efee121d10760d3a0c1841f47d7deccdc73ae9af69b7c6c76bb0c8d90bd7"
+    "bytes": 1461750,
+    "sha256": "33e654f39c39163c35a9f4057e0437c72c66122c7a6284cad146676a249ac9c0"
   },
   "call_records_cleanup": {
     "named_fixtures": [
@@ -1523,9 +1642,9 @@
     "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
     "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
   },
-  "current336": {
-    "members": 336,
-    "source_digest": "6b7333baaf7cb4b87498601f2fd42f3dbcbf56d6703fd950ca4fd9ba6fd797a1",
+  "current344": {
+    "members": 344,
+    "source_digest": "c59948d1274203162e2a2873dbd6c8e57769beaf5d8b02d72e29fbc729d753ab",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1694,8 +1813,8 @@
       },
       {
         "path": "app/lib/features/chat/data/chat_repository.dart",
-        "bytes": 45493,
-        "sha256": "4856e647705cee0d315936763bd605643bb8d0c8ce158b8a3e005bdf9540dcb7"
+        "bytes": 47510,
+        "sha256": "1a08a9b776a6dbe028646fd4404c69e91a75c019e9fd461c8d760ab4aeeee6a9"
       },
       {
         "path": "app/lib/features/chat/data/group_mention_authority.dart",
@@ -1706,6 +1825,11 @@
         "path": "app/lib/features/chat/data/message_mapper.dart",
         "bytes": 13004,
         "sha256": "ecf9d166d8931f9826dc48fe04c9d023eede69c97b93f571ac34460f90966102"
+      },
+      {
+        "path": "app/lib/features/chat/data/native_location_once.dart",
+        "bytes": 2250,
+        "sha256": "915bc2d4e0656041032dfd086c59eb03d46fd8afacf4de159bd1c90d82c532b4"
       },
       {
         "path": "app/lib/features/chat/data/retained_merge_codec.dart",
@@ -1748,6 +1872,11 @@
         "sha256": "1e7ba929bef0da4a5920298a3c57288e6fb3591d2d181caa6d7571007f56363f"
       },
       {
+        "path": "app/lib/features/chat/domain/location_pick.dart",
+        "bytes": 7311,
+        "sha256": "e3e107772ffd27195f909d57d2b1f315671c76280230faf904450bf44f845d0e"
+      },
+      {
         "path": "app/lib/features/chat/domain/message_privacy.dart",
         "bytes": 195,
         "sha256": "eeff2f1cfc2dc211bc73abc6ebad15a7b043d3ed7e5f345ff53e0ad59e492b01"
@@ -1784,8 +1913,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_controller.dart",
-        "bytes": 18036,
-        "sha256": "eef4908ed24356e89689b12b6ee4b1d032b4fa0ad2b8c24fc56c5a625ac11559"
+        "bytes": 20536,
+        "sha256": "ecba4ae12f65179967805712f24bbaaa93f9deaace2f071a74b29545e9ca2390"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_font_size_page.dart",
@@ -1798,14 +1927,19 @@
         "sha256": "521cc19051eaf9ca2b67d01ef23a6c30dab328c3acfa4a0adb707dedda82ce4c"
       },
       {
+        "path": "app/lib/features/chat/presentation/chat_location_picker_page.dart",
+        "bytes": 22041,
+        "sha256": "c4b4f29451097dca4f42d6c19f78bb0b7c3cd0c5733fa75a9f1d3fd0a856af46"
+      },
+      {
         "path": "app/lib/features/chat/presentation/chat_location_view.dart",
         "bytes": 10811,
         "sha256": "ac12ccf7844f7e0be2c39c4e0abfd31aab00ca9a21263470952f711fd21f2282"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_media_actions.dart",
-        "bytes": 13622,
-        "sha256": "8f8979bc4dc216d37f83d4c255f5ed8180ceed15ee8e5ff93b4be4f52c5ff561"
+        "bytes": 16479,
+        "sha256": "95419ae798cb3dbb4f9051df8c9bb3d59057a70e1fb7b7fef03657b7125bbee0"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_merged_messages_page.dart",
@@ -1814,8 +1948,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 77233,
-        "sha256": "504ad4930d90f3dfd8f1e4106f6f68f21a727444e5e8fa1faf653cc9b84b8644"
+        "bytes": 81628,
+        "sha256": "08c37cced79623b04aab08a835398085c0579a844388ed27f755f949bad0f430"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
@@ -2399,13 +2533,13 @@
       },
       {
         "path": "app/pubspec.lock",
-        "bytes": 41357,
-        "sha256": "21b6344d78de79f8127e3d176643159e8761e80e41179ee040fd20bc36583858"
+        "bytes": 42399,
+        "sha256": "0e678e98a6efc7cbb34c6c3a58f8b890171bd443c2b61e6f5ec525853c4f34fa"
       },
       {
         "path": "app/pubspec.yaml",
-        "bytes": 900,
-        "sha256": "fd7ac77c2c3270e3a084d9a5e259830eb71f9d52f7d0752612d17fb33d5936ef"
+        "bytes": 1005,
+        "sha256": "0224da8c6c4e8922c921e4009d1e443b545d3d922d3ab77f41fe2dc707f7efa1"
       },
       {
         "path": "app/test/core/abandoned_login_test.dart",
@@ -2666,6 +2800,31 @@
         "path": "app/test/features/chat/legacy_message_mapping_test.dart",
         "bytes": 6144,
         "sha256": "d6dc664e391dd72328582c2cc7854e85ed55e21c175d2af25227b07c89547183"
+      },
+      {
+        "path": "app/test/features/chat/location_map_host_test.dart",
+        "bytes": 7554,
+        "sha256": "c312f40cac5fe55ca5f4d64e0b87e1398be89a7a74cb896b539bd6120906991c"
+      },
+      {
+        "path": "app/test/features/chat/location_pick_test.dart",
+        "bytes": 7883,
+        "sha256": "acb43f74eb8918a5b24b5d7986a893918d132f18577ed56f91a4c9ad3c0ed9dc"
+      },
+      {
+        "path": "app/test/features/chat/location_send_fixture.dart",
+        "bytes": 10890,
+        "sha256": "cb49397ccc7138516a7649d6c9eb73874a9f85c7b80dd2564194fa607e322043"
+      },
+      {
+        "path": "app/test/features/chat/location_send_repository_test.dart",
+        "bytes": 5560,
+        "sha256": "b17cc6e81b9ef31b45ab254145a0c198386d7491d6d95daf456184e51a4be53b"
+      },
+      {
+        "path": "app/test/features/chat/location_send_workflow_test.dart",
+        "bytes": 21023,
+        "sha256": "8ea5133b36036b8642eb47b66022e1a5ef280bfcf2e5015f3fffc0240da6e59d"
       },
       {
         "path": "app/test/features/chat/mention_composer_test.dart",
@@ -3208,8 +3367,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 422,
-    "expected_full_tests": 1104,
+    "expected_target_tests": 460,
+    "expected_full_tests": 1142,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -3241,7 +3400,112 @@
       "test/features/chat/saved_emoji_store_test.dart",
       "test/features/chat/saved_emoji_workflow_test.dart",
       "test/features/chat/chat_location_test.dart",
-      "test/features/chat/chat_location_workflow_test.dart"
+      "test/features/chat/chat_location_workflow_test.dart",
+      "test/features/chat/location_pick_test.dart",
+      "test/features/chat/location_send_repository_test.dart",
+      "test/features/chat/location_send_workflow_test.dart",
+      "test/features/chat/location_map_host_test.dart"
     ]
+  },
+  "webview_dependencies": {
+    "state": "V1actual178offline_success_R1classification_only_no_reresolution",
+    "locked_packages": 178,
+    "old174_package_identity_blocks_preserved": true,
+    "files": [
+      {
+        "name": "webview_flutter",
+        "version": "4.14.1",
+        "archive_sha256": "d53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter-4.14.1.tar.gz",
+        "dependency": "direct main",
+        "lock_block_sha256": "d8aa746cb1b38e99a49f8c245dedfad01d44e807545ec27c6b4691c099cd7dfd"
+      },
+      {
+        "name": "webview_flutter_android",
+        "version": "4.12.0",
+        "archive_sha256": "ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter_android-4.12.0.tar.gz",
+        "dependency": "direct main",
+        "lock_block_sha256": "923c3bd68d0a69502144cf873a7c40d06f3773e38f8af645bc89fe46b0d576ab"
+      },
+      {
+        "name": "webview_flutter_platform_interface",
+        "version": "2.15.1",
+        "archive_sha256": "1221c1b12f5278791042f2ec2841743784cf25c5a644e23d6680e5d718824f04",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter_platform_interface-2.15.1.tar.gz",
+        "dependency": "direct dev",
+        "lock_block_sha256": "7f1d1c926540773e6e36f893c57d47aacfbdc7c1c0927b77631696c067ff03e7"
+      },
+      {
+        "name": "webview_flutter_wkwebview",
+        "version": "3.25.1",
+        "archive_sha256": "82648217f537573e1ca9ae9952d3eacedca6ab5aee69dc84445fc763766dcea2",
+        "archive_url": "https://pub.dev/api/archives/webview_flutter_wkwebview-3.25.1.tar.gz",
+        "dependency": "transitive",
+        "lock_block_sha256": "1a4119d3c7d0141b158904b074c01638d33cde30b25755ad2633ca37424033d9"
+      }
+    ],
+    "V1_actual_receipt": {
+      "path": "references/integration/mobile-chat-location-send-candidate/dependency-resolution-result.json",
+      "bytes": 3905,
+      "sha256": "27f554d387e586bda3d7887b3c53430ea3faf1691bd37e844a21d6a65a7a0fe0"
+    },
+    "R1_classification_receipt": {
+      "path": "references/integration/mobile-chat-location-send-r1-candidate/lock-classification-proof.json",
+      "bytes": 1528,
+      "sha256": "b4caa1a18c922de6f78a4a6993bfac6e858fec8456b99c93ef5ec53af989efee"
+    },
+    "new_setup_gate": "fresh enforce-lockfile plus4 exact hosted-hash receipts; not independent archive body rehash"
+  },
+  "native_source_snapshot": {
+    "members": 7,
+    "files": [
+      {
+        "path": "app/android/app/src/main/AndroidManifest.xml",
+        "bytes": 3343,
+        "sha256": "5a4b4585cfa73575ed82c4e3e32fb9062036c96d0009a674e72ba21d9de78aa6"
+      },
+      {
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/LocationOnceBridge.kt",
+        "bytes": 10666,
+        "sha256": "f10fa7b56779bbb5d347f063fa961b462172ca6e916ce32b26556e4eeb3d1c07"
+      },
+      {
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/MainActivity.kt",
+        "bytes": 2135,
+        "sha256": "2ff99269679e8d63ba96af433db370623a5f0e654978a77bfd97b5b81c7ba1d1"
+      },
+      {
+        "path": "app/ios/Runner.xcodeproj/project.pbxproj",
+        "bytes": 32985,
+        "sha256": "cb6ee3082bba34b3946415b92f7b7006167d0535b3efbeae5424d69d25b8324c"
+      },
+      {
+        "path": "app/ios/Runner/AppDelegate.swift",
+        "bytes": 849,
+        "sha256": "f0595cf79a3efaca51b85895cacc6b9f01f13438fee6f5a3c201f796bb71cb7c"
+      },
+      {
+        "path": "app/ios/Runner/Info.plist",
+        "bytes": 2916,
+        "sha256": "94e2ab712ea1e6882d4c5b77adcc25ec552956dc300bb60e82d6b181780df152"
+      },
+      {
+        "path": "app/ios/Runner/LocationOnceBridge.swift",
+        "bytes": 13055,
+        "sha256": "13de6890dad64e4a12c17d02f3ac32dbd3e9cb11dde8caff12f5ec35ab413ee8"
+      }
+    ],
+    "digest": "7cca8d5e6005c3ff3f6c3a6f2524bd8b523226bc0dbbacaa8c7b1dc28206a426",
+    "R1_manifest_sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894",
+    "Root_type_API_acceptance": {
+      "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/root-type-api-acceptance.json",
+      "bytes": 616,
+      "sha256": "ed85b0c8456de99f36f4ef1038e9c5e3ecdd834432acb1c68ae3568c1556bdc9"
+    },
+    "Kotlin_compile_Swift_parse_typecheck_passed": true,
+    "scene8_device_GPS_accepted": false,
+    "portable396_includes_native": false,
+    "contract": "verify7 public source bodies separately; Linux396 has no native binaries; type/API not device acceptance"
   }
 }

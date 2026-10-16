@@ -38,6 +38,7 @@ import 'chat_batch_selection.dart';
 import 'chat_batch_widgets.dart';
 import 'chat_content_access.dart';
 import 'chat_location_view.dart';
+import 'chat_location_picker_page.dart';
 import 'chat_merged_messages_page.dart';
 import 'chat_call_picker.dart';
 import 'message_media.dart';
@@ -54,12 +55,14 @@ class ChatPage extends ConsumerStatefulWidget {
     this.sourceCurrent,
     this.now,
     this.playbackFactory,
+    this.locationPicker,
   });
   final String conversationId;
   final String? sourceMessageId;
   final bool Function()? sourceCurrent;
   final DateTime Function()? now;
   final ChatAudioPlayback Function(VoidCallback onFailure)? playbackFactory;
+  final LocationPickerDependencies? locationPicker;
   @override
   ConsumerState<ChatPage> createState() => _ChatPageState();
 }
@@ -91,6 +94,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
   bool _fontReadFailed = false;
   int _fontRead = 0, _fontIntent = 0;
   int _emojiIntent = 0;
+  int _locationIntent = 0;
+  final _locationChanges = ValueNotifier<int>(0);
+  bool _locationPickerOpen = false;
+  ModalRoute<dynamic>? _locationPickerRoute;
   int? _emojiPickerTicket;
   Completer<void>? _emojiPickerResumed;
 
@@ -227,6 +234,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
+    if (!_foreground && !_locationPickerOpen) {
+      ++_locationIntent;
+    }
     // The OS picker/permission prompt may background this exact portal. Only
     // its outstanding picker may resume; sending and all other continuations
     // still require foreground and the original owner/CID/route ticket.
@@ -425,6 +435,12 @@ class _ChatPageState extends ConsumerState<ChatPage>
       // If a caller reuses this State, retire its original background binding
       // permanently; never paint/read/admit a new CID through the old owner.
       ++_emojiIntent;
+      ++_locationIntent;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ++_locationChanges.value;
+        }
+      });
       _backgroundRetired = true;
       ++_backgroundRead;
       _background = null;
@@ -435,6 +451,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    ++_locationIntent;
+    _locationChanges.dispose();
     ++_emojiIntent;
     if (_emojiPickerResumed case final resumed?) {
       if (!resumed.isCompleted) {
@@ -809,15 +827,19 @@ class _ChatPageState extends ConsumerState<ChatPage>
                           minimumSize: const Size(44, 44),
                           padding: const EdgeInsets.symmetric(horizontal: 6),
                         ),
-                        onPressed: () => controller.resend(item.id),
+                        onPressed: controller.isUnconfirmedLocation(item.id)
+                            ? _retry
+                            : () => controller.resend(item.id),
                         icon: const Icon(
                           Icons.error_outline,
                           color: AppColors.error,
                           size: 16,
                         ),
-                        label: const Text(
-                          '发送失败，重试',
-                          style: TextStyle(
+                        label: Text(
+                          controller.isUnconfirmedLocation(item.id)
+                              ? '发送未确认，刷新核对'
+                              : '发送失败，重试',
+                          style: const TextStyle(
                             color: AppColors.error,
                             fontSize: 12,
                           ),
@@ -1340,7 +1362,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
                       color: AppColors.secondary,
                     ),
                   ),
-                  ChatMediaActions(controller: controller),
+                  ChatMediaActions(
+                    controller: controller,
+                    onLocation: _locationAction(),
+                  ),
                   if (controller.conversation?.isGroup == true)
                     IconButton(
                       tooltip: '提及群成员',
@@ -1446,6 +1471,106 @@ class _ChatPageState extends ConsumerState<ChatPage>
         ),
       );
     }
+  }
+
+  Future<void> Function() _locationAction() {
+    final repository = controller.repository,
+        session = controller.repository.session;
+    final providerSession = ref.watch(appRuntimeProvider).session;
+    final providerGateway = ref.watch(imGatewayProvider);
+    if (!identical(providerSession, session) ||
+        !identical(providerGateway, repository.gateway)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ++_locationChanges.value;
+        }
+      });
+    }
+    final owner = session.state.credentials,
+        generation = session.state.generation;
+    final issuer = owner?.issuer, tenant = owner?.tenantId;
+    final cid = widget.conversationId, rendered = _locationIntent;
+    final target = controller.conversation;
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    MessageHistoryAccess? cut;
+    try {
+      cut = repository.gateway.historyAccess(
+        repository.generation,
+        conversationId: cid,
+      );
+    } on AppFailure {
+      // The attachment entry may render before the SDK is admitted.
+    }
+    bool ownerCurrent() =>
+        mounted &&
+        controller.usable &&
+        owner != null &&
+        identical(ref.read(appRuntimeProvider).session, session) &&
+        identical(ref.read(imGatewayProvider), repository.gateway) &&
+        identical(session.state.credentials, owner) &&
+        session.state.generation == generation &&
+        owner.issuer == issuer &&
+        owner.tenantId == tenant &&
+        widget.conversationId == cid &&
+        repository.conversationId == cid &&
+        target?.id == cid &&
+        controller.conversation?.userId == target?.userId &&
+        controller.conversation?.groupId == target?.groupId &&
+        controller.conversation?.isGroup == target?.isGroup &&
+        origin?.isActive == true &&
+        navigator.mounted &&
+        identical(origin?.navigator, navigator);
+    return () async {
+      if (!ownerCurrent() ||
+          !_foreground ||
+          rendered != _locationIntent ||
+          origin?.isCurrent != true ||
+          cut == null) {
+        return;
+      }
+      final ticket = ++_locationIntent, access = cut;
+      bool current() {
+        if (!ownerCurrent() ||
+            ticket != _locationIntent ||
+            !(origin?.isCurrent == true ||
+                _locationPickerRoute?.isCurrent == true)) {
+          return false;
+        }
+        try {
+          access.check();
+          return true;
+        } on AppFailure {
+          return false;
+        }
+      }
+
+      if (!current() || controller.conversation?.canSend != true) {
+        return;
+      }
+      focus.unfocus();
+      final dependencies =
+          widget.locationPicker ?? LocationPickerDependencies.deployment();
+      final route = MaterialPageRoute<void>(
+        builder: (_) => ChatLocationPickerPage(
+          controller: controller,
+          access: access,
+          sourceCurrent: current,
+          sourceChanges: _locationChanges,
+          dependencies: dependencies,
+        ),
+      );
+      _locationPickerRoute = route;
+      _locationPickerOpen = true;
+      try {
+        await navigator.push(route);
+      } finally {
+        if (identical(_locationPickerRoute, route)) {
+          _locationPickerRoute = null;
+          _locationPickerOpen = false;
+          ++_locationIntent;
+        }
+      }
+    };
   }
 
   Future<void> _emoji() async {
@@ -1606,7 +1731,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
                       item.mine &&
                       item.delivery == MessageDelivery.sent)
                     'revoke': '撤回消息',
-                  if (!expired && item.delivery == MessageDelivery.failed)
+                  if (!expired &&
+                      item.delivery == MessageDelivery.failed &&
+                      !controller.isUnconfirmedLocation(item.id))
                     'retry': '重新发送',
                   if (item.delivery == MessageDelivery.sent && retainable)
                     'favorite': '收藏',

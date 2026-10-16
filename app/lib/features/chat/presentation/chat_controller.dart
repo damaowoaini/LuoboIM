@@ -10,6 +10,7 @@ import '../data/chat_repository.dart';
 import '../domain/chat_message.dart';
 import '../domain/chat_mention.dart';
 import '../domain/saved_emoji.dart';
+import '../domain/location_pick.dart';
 
 final class ChatController extends ChangeNotifier {
   ChatController(this.repository) {
@@ -114,6 +115,11 @@ final class ChatController extends ChangeNotifier {
   final Map<String, String> _unconfirmedFaces = {};
   bool hasUnconfirmedFace(String entryId) =>
       _unconfirmedFaces.containsKey(entryId);
+  final Map<String, String> _unconfirmedLocations = {};
+  bool isLocationIntentUnconfirmed(String intentId) =>
+      _unconfirmedLocations.containsKey(intentId);
+  bool isUnconfirmedLocation(String messageId) =>
+      _unconfirmedLocations.containsValue(messageId);
   Future<void> _draftTail = Future.value();
 
   bool get usable => _valid && !_disposed && repository.current;
@@ -185,6 +191,7 @@ final class ChatController extends ChangeNotifier {
     for (final item in values) {
       if (item.delivery == MessageDelivery.sent) {
         _unconfirmedFaces.removeWhere((_, id) => id == item.id);
+        _unconfirmedLocations.removeWhere((_, id) => id == item.id);
       }
       if (!_sending.contains(item.id) && !repository.isRemoved(item.id)) {
         merged[item.id] = item;
@@ -427,8 +434,87 @@ final class ChatController extends ChangeNotifier {
     }
   }
 
+  Future<LocationSendResult> sendLocation(
+    LocationPick pick, {
+    String? intentId,
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+  }) async {
+    final intent = intentId ?? pick.requestNonce;
+    if (!usable || preparing || isLocationIntentUnconfirmed(intent)) {
+      return const LocationSendResult(LocationSendKind.notDispatched);
+    }
+    final timeline = _timeline;
+    var dispatched = false;
+    String? messageId;
+    bool current() {
+      try {
+        access.check();
+        checkSource();
+        return usable && timeline == _timeline;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    preparing = true;
+    failure = null;
+    notifyListeners();
+    try {
+      access.check();
+      checkSource();
+      final message = await repository.prepareLocation(
+        pick,
+        access: access,
+        checkSource: checkSource,
+      );
+      messageId = message.id;
+      if (!current()) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+      _merge([message]);
+      final sent = await repository.send(
+        message.id,
+        access: access,
+        checkSource: checkSource,
+        onDispatched: () => dispatched = true,
+      );
+      if (current()) {
+        _merge([sent]);
+      }
+      return LocationSendResult(LocationSendKind.sent, message.id);
+    } catch (error) {
+      if (dispatched && messageId != null) {
+        _unconfirmedLocations[intent] = messageId;
+      }
+      if (current()) {
+        failure = _failure(error);
+        if (messageId != null) {
+          messages = List.unmodifiable(
+            messages.map(
+              (item) => item.id == messageId
+                  ? item.withDelivery(MessageDelivery.failed)
+                  : item,
+            ),
+          );
+        }
+      }
+      return LocationSendResult(
+        dispatched
+            ? LocationSendKind.unconfirmed
+            : LocationSendKind.notDispatched,
+        messageId,
+      );
+    } finally {
+      if (!_disposed) {
+        preparing = false;
+        notifyListeners();
+      }
+    }
+  }
+
   Future<void> resend(String id) async {
-    if (!usable || !_sending.add(id)) return;
+    if (!usable || isUnconfirmedLocation(id) || !_sending.add(id)) return;
     final timeline = _timeline;
     messages = List.unmodifiable(
       messages.map(

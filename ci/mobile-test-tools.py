@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current336 target422/full1104."""
+"""Pure Python CI gate checks, separate from current344 target460/full1142."""
 import copy
 import importlib.util
 import json
@@ -135,12 +135,12 @@ class DescriptorTests(unittest.TestCase):
             with self.assertRaises(ValueError): check.source.descriptor()
 
     def test_historical_cohorts_cannot_alias331(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331'):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current336'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current344'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -242,6 +242,42 @@ class LocationReceiveInventoryTests(unittest.TestCase):
 
     def test_same_count_parent_full_cannot_replace_original_case(self):
         self.rejected_inventory(lambda n: n['parent_full1068'][-1].update(name='forged original full replacement'))
+
+
+class LocationSendInventoryTests(unittest.TestCase):
+    def rejected_inventory(self, change):
+        plan = check.source.descriptor()
+        names = json.loads(check.source.regular(check.source.REPO / plan['required_test_names']['path']))
+        change(names)
+        body = json.dumps(names).encode()
+        plan = copy.deepcopy(plan)
+        plan['required_test_names'].update(bytes=len(body), sha256=check.source.sha(body))
+        with mock.patch.object(check.source, 'regular', return_value=body):
+            with self.assertRaisesRegex(ValueError, 'location send names do not preserve'):
+                check.source.required_names(plan)
+
+    def test_same_count_target_cannot_replace_location_send_case(self):
+        self.rejected_inventory(lambda n: next(r for r in n['current_target460'] if r['name'] == n['new_location_send38'][0]['name']).update(name='forged location send replacement'))
+
+    def test_same_count_parent_full_cannot_replace_original_case(self):
+        self.rejected_inventory(lambda n: n['parent_full1104'][-1].update(name='forged original full replacement'))
+
+
+class LocationSourceCouplingTests(unittest.TestCase):
+    def test_official_webview_archive_cannot_change_under_same_lock(self):
+        plan = copy.deepcopy(check.source.descriptor())
+        lock = check.source.regular(check.source.REPO / 'app/pubspec.lock')
+        check.source.webview_dependency_contract(plan, lock)
+        plan['webview_dependencies']['files'][0]['archive_sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'archive or lock identity differs'):
+            check.source.webview_dependency_contract(plan, lock)
+
+    def test_native_snapshot_rejects_an_unapproved_same_count_path(self):
+        plan = copy.deepcopy(check.source.descriptor())
+        check.source.native_source_contract(plan)
+        plan['native_source_snapshot']['files'][0]['path'] = 'app/ios/Runner/Unapproved.swift'
+        with self.assertRaisesRegex(ValueError, 'native location source snapshot differs'):
+            check.source.native_source_contract(plan)
 
 
 class CleanupTests(unittest.TestCase):

@@ -1,33 +1,29 @@
-# Mobile336 Location109 receipt CI metadata
+# Mobile344 Location109 send CI source
 
-Refs-only successor to current331, requiring the exact R1 selected8 source adoption.
-Standard Location109 now has bounded local card/detail and immutable coordinates
-through both existing copies. No URL from a received description is fetched;
-StageA does not locate, open external maps, select or send a location. Sending and
-map-selection ledger rows are unchanged; StageB remains required delivery.
+Explicit successor to336, bound to final StageB R4 selected14 and nativeR1 source7.
+Linux portable396 = App344 + SDK51 + migration1. Native7 is independently pinned
+and verified as a public-source snapshot; it adds no native binaries to portable396.
 
-Actual local coverage: original36=34PASS/2fixtureERROR (raw retained), then only2
-fixture corrections rerun2PASS. Reuse34 unchanged successes for36 unique coverage.
-All8 changed Dart files have fatal-info analysis0 (first8 + R1changed1 recheck).
-Real merged source route/root privacy/CIDcut/owner/route ABA cases are included.
-23 original SDK widget fixtures and2 reruns each completed4ordered cleanup stages.
-No device/native/real map provider acceptance is inferred.
+Root accepted38 unique targeted cases:15 prior PASS reused + only23 failed cases
+rechecked PASS, with12 unique changed-file analyses clean. Original422/1104 name
+composition stays intact; expected target460/full1142 have not run. CI affected
+checks are DescriptorTests4 + LocationSendInventoryTests2 + LocationSourceCouplingTests2,
+followed by read-only exact-source verification after Root prepares the adoption.
+Old reporter/cleanup/control results are reused; no old complete suite rerun here.
 
-Future target422=parent386+36; full1104=parent1068+36, then strictanalysis0.
-Neither aggregate was run. Parent386/1068 remain unexecuted composition layers.
-All exact old/new successful-name multiplicities are retained, including old saved
-emoji41/background42/font22 layers. The optional search reference stays off:
-full336 context, exactly4 historical source replacements, entry2 only and the
-same1named assertion failure+1old-filter success contract; no loader/timeout/panic.
+V1 actual178-package offline resolution and R1 classification-only proof preserve
+all4 official archive identities. Fresh setup enforces the lockfile and records4
+exact hosted hash receipts, without old generated stamps/cache. Hash metadata is
+not an independent archive-body rehash or a native dependency-graph acceptance.
 
-Workflow remains manual-only with the same read-only permissions/action pins,
-netns,900s phase/process guards,4GiB initial/1GiB continuous/.2s,768MiB cap and
-native4GiB. SDK51+migration1 and174locked dependency blocks are exact. No new
-runtime wrapper or generic cleanup parser. Public authored inventory has no
-check.sh exception. Do not dispatch a full regression per feature or batch.
+Workflow remains manual-only with existing complete reporter, network namespace,
+4GiB initial/1GiB continuous/.2s checks and768MiB cap. After all known issues and
+targeted checks are clean, Root may run the final full regression once. This
+proposal executes no tests/analyze/native, downloads, adoption, push or dispatch.
+Optional search reference retains full344 context/only4 original before-files and
+the exact1 missing-entry failure +1 positive contract; it is disabled by default.
 
-Python39 original cases remain;2 meaningful location composition rejection cases
-are prepared. Root may check8 affected/new cases once (Descriptor4,SavedEmoji2,
-LocationReceive2);33 unchanged cases are reused. Source preparation ran only AST
-and byte/hash comparisons, no CI tests. No product/CI/main/public/ledger adoption
-or cloud dispatch is performed by this proposal.
+Native R1 Kotlin compile/Swift parse/typecheck passed separately. Scene8, real
+permissions/GPS/map/device/currentAPK/iOS runtime remain unaccepted. Android's
+current344 source successor is a separate refs-only proposal with source_ref=null;
+it must refuse activation and is not part of these9 CI payloads.

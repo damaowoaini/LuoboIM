@@ -5,7 +5,7 @@ set -euo pipefail
 cohort=$1
 work=$2
 repo=$(cd -- "$(dirname -- "$0")/.." && pwd -P)
-[[ "$cohort" == current336 ]]
+[[ "$cohort" == current344 ]]
 [[ "$work" == /* && ! -e "$work" && ! -L "$work" ]]
 umask 077
 mkdir -- "$work"
@@ -82,6 +82,26 @@ phase=precache
 "$flutter" precache --linux > "$work/evidence/precache.log" 2>&1
 phase=pub_get
 (cd "$work/source/app" && "$flutter" pub get --enforce-lockfile) > "$work/evidence/pub-get.log" 2>&1
+
+# Pub has already enforced the exact lock; record the four finite official archive identities.
+# The hash receipts are not an independent re-download or a native dependency acceptance.
+phase=webview_archive_metadata
+python3 - "$repo/ci/mobile/inputs.json" "$work" <<'PY'
+import hashlib,json,pathlib,sys
+p=json.loads(pathlib.Path(sys.argv[1]).read_text()); w=pathlib.Path(sys.argv[2]); rows=p['webview_dependencies']['files']
+if len(rows)!=4 or {r['name'] for r in rows}!={'webview_flutter','webview_flutter_android','webview_flutter_platform_interface','webview_flutter_wkwebview'}:
+ raise SystemExit('finite WebView inventory differs')
+evidence=[]
+for row in rows:
+ name=row['name']+'-'+row['version']
+ h=w/'pub-cache/hosted-hashes/pub.dev'/(name+'.sha256')
+ if h.is_symlink() or not h.is_file() or h.read_bytes()!=row['archive_sha256'].encode():
+  raise SystemExit('official WebView archive hash differs')
+ package=w/'pub-cache/hosted/pub.dev'/name
+ if package.is_symlink() or not package.is_dir():raise SystemExit('fresh official WebView package missing')
+ evidence.append(dict(row,hash_file_SHA256=hashlib.sha256(h.read_bytes()).hexdigest()))
+(w/'evidence/webview-archive-metadata.json').write_text(json.dumps({'entries':evidence,'pub_enforce_lockfile':True,'independent_archive_body_rehash':False,'old_cache_copied':False,'native_acceptance':False},indent=2)+'\n')
+PY
 
 # The official sqlite3 hook checks the exact upstream binary hash itself.
 # Seed only its fresh shared output; never copy hook snapshots or stamps.

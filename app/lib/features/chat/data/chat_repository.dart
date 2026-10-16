@@ -15,6 +15,7 @@ import '../domain/chat_batch.dart';
 import '../domain/chat_mention.dart';
 import '../domain/chat_snapshot.dart';
 import '../domain/saved_emoji.dart';
+import '../domain/location_pick.dart';
 import '../domain/chat_search.dart';
 import '../domain/message_privacy.dart';
 import 'message_mapper.dart';
@@ -50,6 +51,8 @@ final class ChatRepository {
   // repository's frozen account generation. This does not rewrite the SDK DB.
   final Set<String> _removedIds = {};
   final Map<String, SavedEmoji> _preparedFaces = {};
+  final Map<String, ({String? userId, String? groupId, bool group})>
+  _preparedLocations = {};
   int _emojiPolicyRevision = 0;
   void invalidateSavedEmojiProofs() {
     ++_emojiPolicyRevision;
@@ -72,6 +75,7 @@ final class ChatRepository {
     _visibleReadQueue.clear();
     _raw.clear();
     _preparedFaces.clear();
+    _preparedLocations.clear();
     _preparedQuoteSources.clear();
     _staged.clear();
   }
@@ -658,6 +662,45 @@ final class ChatRepository {
     }, access: access);
   }
 
+  Future<ChatMessage> prepareLocation(
+    LocationPick pick, {
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+  }) => _run((manager, lease) async {
+    lease.check();
+    checkSource();
+    if (_conversation?.canSend != true) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
+    final original = _conversation!;
+    final description = pick.description;
+    final message = await manager.messageManager.createLocationMessage(
+      latitude: pick.latitude,
+      longitude: pick.longitude,
+      description: description,
+    );
+    lease.check();
+    checkSource();
+    if (_conversation?.canSend != true ||
+        _conversation?.userId != original.userId ||
+        _conversation?.groupId != original.groupId ||
+        _conversation?.isGroup != original.isGroup ||
+        message.contentType != MessageType.location ||
+        message.clientMsgID?.isNotEmpty != true ||
+        message.locationElem?.latitude != pick.latitude ||
+        message.locationElem?.longitude != pick.longitude ||
+        message.locationElem?.description != description) {
+      throw const AppFailure(FailureKind.invalidResponse);
+    }
+    _raw[message.clientMsgID!] = message;
+    _preparedLocations[message.clientMsgID!] = (
+      userId: original.userId,
+      groupId: original.groupId,
+      group: original.isGroup,
+    );
+    return _map(message).withDelivery(MessageDelivery.sending);
+  }, access: access);
+
   Future<ChatMessage> send(
     String id, {
     MessageHistoryAccess? access,
@@ -670,6 +713,13 @@ final class ChatRepository {
     final conversation = _conversation;
     if (message == null || conversation == null || !conversation.canSend) {
       throw const AppFailure(FailureKind.invalidInput);
+    }
+    final locationTarget = _preparedLocations[id];
+    if (locationTarget != null &&
+        (conversation.userId != locationTarget.userId ||
+            conversation.groupId != locationTarget.groupId ||
+            conversation.isGroup != locationTarget.group)) {
+      throw const AppFailure(FailureKind.cancelled);
     }
     final face = _preparedFaces[id];
     if (face != null) {
@@ -945,6 +995,7 @@ final class ChatRepository {
       _removedIds.add(id);
       gateway.privacyLedger.forget([id]);
       _raw.remove(id);
+      _preparedLocations.remove(id);
       _staged.remove(id);
       _visibleReadQueue.remove(id);
       _groupReadMarked.remove(id);
@@ -1340,6 +1391,7 @@ final class ChatRepository {
     _visibleReadQueue.clear();
     _raw.clear();
     _preparedFaces.clear();
+    _preparedLocations.clear();
     _preparedQuoteSources.clear();
     _staged.clear();
     _conversation = null;

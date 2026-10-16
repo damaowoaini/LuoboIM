@@ -10,62 +10,158 @@ import '../../../core/error/app_failure.dart';
 import '../../../design/tokens.dart';
 import '../domain/chat_message.dart';
 import 'chat_controller.dart';
+import 'saved_emoji_sheet.dart' show EmojiPortalGuard;
 
 class ChatMediaActions extends StatefulWidget {
-  const ChatMediaActions({super.key, required this.controller});
+  const ChatMediaActions({
+    super.key,
+    required this.controller,
+    this.onLocation,
+  });
   final ChatController controller;
+  final Future<void> Function()? onLocation;
   @override
   State<ChatMediaActions> createState() => _ChatMediaActionsState();
 }
 
-class _ChatMediaActionsState extends State<ChatMediaActions> {
-  bool _busy = false;
+class _ChatMediaActionsState extends State<ChatMediaActions>
+    with WidgetsBindingObserver {
+  bool _busy = false, _choosing = false, _openingChoice = false;
+  int _locationEpoch = 0;
+  ModalRoute<dynamic>? _choiceRoute;
 
   @override
-  Widget build(BuildContext context) => IconButton(
-    tooltip: '发送附件',
-    onPressed:
-        _busy ||
-            widget.controller.preparing ||
-            !widget.controller.usable ||
-            widget.controller.conversation == null
-        ? null
-        : _choose,
-    icon: _busy
-        ? const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          )
-        : const Icon(Icons.add_circle_outline, color: AppColors.secondary),
-  );
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
 
-  Future<void> _choose() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route?.isActive == true &&
+        route?.isCurrent != true &&
+        !_openingChoice &&
+        _choiceRoute?.isCurrent != true) {
+      ++_locationEpoch;
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) {
+      ++_locationEpoch;
+    } else if (mounted) {
+      // A new explicit foreground click gets a new rendered callback; the
+      // previous background callback remains retired.
+      setState(() {});
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatMediaActions oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.controller, widget.controller)) {
+      ++_locationEpoch;
+    }
+  }
+
+  @override
+  void dispose() {
+    ++_locationEpoch;
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final renderedEpoch = _locationEpoch;
+    return IconButton(
+      tooltip: '发送附件',
+      onPressed:
+          _busy ||
+              widget.controller.preparing ||
+              !widget.controller.usable ||
+              widget.controller.conversation == null
+          ? null
+          : () => _choose(renderedEpoch),
+      icon: _busy
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.add_circle_outline, color: AppColors.secondary),
+    );
+  }
+
+  Future<void> _choose(int renderedEpoch) async {
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    if (_choosing ||
+        renderedEpoch != _locationEpoch ||
+        origin?.isCurrent != true) {
+      return;
+    }
+    final location = widget.onLocation, controller = widget.controller;
+    _choosing = _openingChoice = true;
     final choice = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final entry in const {
-                'images': '从相册选择图片',
-                'camera': '拍照',
-                'video': '从相册选择视频',
-                'recordVideo': '拍摄视频',
-                'files': '选择文件',
-                'voice': '语音消息',
-              }.entries)
-                ListTile(
-                  title: Text(entry.value),
-                  onTap: () => Navigator.pop(context, entry.key),
-                ),
-            ],
+      builder: (context) {
+        _choiceRoute = ModalRoute.of(context);
+        _openingChoice = false;
+        return EmojiPortalGuard(
+          onCovered: () {
+            ++_locationEpoch;
+          },
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final entry in {
+                    'images': '从相册选择图片',
+                    'camera': '拍照',
+                    'video': '从相册选择视频',
+                    'recordVideo': '拍摄视频',
+                    'files': '选择文件',
+                    'voice': '语音消息',
+                    if (location != null) 'location': '位置',
+                  }.entries)
+                    ListTile(
+                      title: Text(entry.value),
+                      onTap: () => Navigator.pop(context, entry.key),
+                    ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
+    if (choice == 'location') {
+      // The sheet Future completes on pop, before its exit animation. Wait
+      // for this exact owned route, never popUntil or choose an arbitrary page.
+      final menu = _choiceRoute;
+      if (menu != null) {
+        await menu.completed;
+      }
+      _choosing = false;
+      if (!mounted ||
+          renderedEpoch != _locationEpoch ||
+          !identical(controller, widget.controller) ||
+          !controller.usable ||
+          origin?.isCurrent != true ||
+          !navigator.mounted ||
+          !identical(origin?.navigator, navigator)) {
+        return;
+      }
+      await location?.call();
+      return;
+    }
+    _choosing = false;
+    _openingChoice = false;
     if (choice == null || !mounted || !widget.controller.usable) return;
     setState(() => _busy = true);
     try {
