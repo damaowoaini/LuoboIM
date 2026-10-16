@@ -130,10 +130,15 @@ def verify():
     if len(c['member_notice']) != 5:
         raise ValueError('exact three existing and two new member-notice source files required')
     apply_layer(c, 'member_notice', 'ci/candidates/group-stage3-member-notice/source/', bodies)
-    if len(bodies) != 1022 or rows(bodies) != c['effective_source'] or digest(rows(bodies)) != c['effective_digest']:
+    if len(bodies) != 1022 or rows(bodies) != c['source1022'] or digest(rows(bodies)) != c['source1022_digest']:
         raise ValueError('source1022 differs')
-    if set(c['packages']) != PACKAGES or sum(len(s['top_tests']) for s in c['packages'].values()) != 226:
-        raise ValueError('complete17package226 source-name contract required')
+    if len(c['callback_policy']) != 2:
+        raise ValueError('exact existing callback and new signed policy test required')
+    apply_layer(c, 'callback_policy', 'ci/candidates/group-stage3-callback-policy/source/', bodies)
+    if len(bodies) != 1023 or rows(bodies) != c['effective_source'] or digest(rows(bodies)) != c['effective_digest']:
+        raise ValueError('source1023 differs')
+    if set(c['packages']) != PACKAGES or sum(len(s['top_tests']) for s in c['packages'].values()) != 229:
+        raise ValueError('complete17package229 source-name contract required')
     for package, spec in c['packages'].items():
         if name(package) != package:
             raise ValueError('canonical package required')
@@ -270,7 +275,7 @@ def run():
         os.environ[key] = str(path)
     os.environ.update(GOTOOLCHAIN='local', GOMAXPROCS='2', GOMEMLIMIT='900MiB', GOWORK='off')
     write(output / 'source.json', {'scope':SCOPE, 'commit':os.environ['GITHUB_SHA'],
-          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1022,
+          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1023,
           'effective_digest':c['effective_digest'], 'go_version':version,
           'generated_public_config_sha256':sha(template), 'no_runtime_adoption':True})
 
