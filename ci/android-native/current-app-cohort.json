@@ -1,0 +1,175 @@
+{
+  "App_full_regression": "current354 source and targeted group-revoke acceptance reported by Root; expected1280 aggregate unrun; no native/device claim",
+  "R12_catalog_SHA256": "db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe",
+  "business_members": 354,
+  "business_rows_digest": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
+  "cohort": "current354-auditable-arm64-production-v1",
+  "controller_inputs": [
+    {
+      "bytes": 4458,
+      "path": ".github/workflows/android-current-debug.yml",
+      "sha256": "c6ea1f44b2653761f27ae6cc04e4de2fef0727094ed5899fa9fc7a9521dfd019"
+    },
+    {
+      "bytes": 3347,
+      "path": "ci/android-native/README-current.md",
+      "sha256": "f76e525808a1401ffd47a1608af49bd20f5b646811555e5b66abdb010a75994c"
+    },
+    {
+      "bytes": 100841,
+      "path": "ci/android-native/current-app-inputs.json",
+      "sha256": "5e76c6201c28762612de349a9be9a09f0701c1038bc386054c049967b6329f54"
+    },
+    {
+      "bytes": 3746,
+      "path": "ci/android-native/current-environment-source.json",
+      "sha256": "f3310bdbec7593947614e704d8985af6a7e1d1dfc8a31dbc8f60699348dc8ce2"
+    },
+    {
+      "bytes": 19684,
+      "path": "ci/android-native/current_app.py",
+      "sha256": "f50f03b98766c7d5d5e0cab673b98e43dec8d33a1973c391989255c75c149ded"
+    },
+    {
+      "bytes": 533,
+      "path": "ci/android-native/netns-current.sh",
+      "sha256": "b7c1f4240b8c7fe1548875727d4a5b129cacd3e40074ee26a59fe4de8311ae2e"
+    },
+    {
+      "bytes": 3136,
+      "path": "ci/android-native/owned-outputs.gradle",
+      "sha256": "601620c8638cc658d1e5a18266fae373cb7fe5c66119fc62da87024fa62c47d6"
+    },
+    {
+      "bytes": 7128,
+      "path": "ci/android-native/test_current_app.py",
+      "sha256": "155dc85bb86ef13e8f37aacf116912cae262a31594ce9ef0f23fd870b857f020"
+    }
+  ],
+  "flutter_environment_sources": [
+    {
+      "bytes": 6531,
+      "path": "packages/flutter_tools/lib/src/base/config.dart",
+      "sha256": "307ce29f4353b1266aeac395363db11466792ed27206ffe0dda778f81c132367"
+    },
+    {
+      "bytes": 3141,
+      "path": "packages/flutter_tools/lib/src/reporting/unified_analytics.dart",
+      "sha256": "0c00849a26def8083855bb76df741f6ce6d1be9dba0b6d3ed956d03728b20710"
+    },
+    {
+      "bytes": 4576,
+      "path": "packages/flutter_tools/lib/src/persistent_tool_state.dart",
+      "sha256": "33f9ad8c1b60140746aafe6b0988c9b18f1779d5a7ee0394f964be46e7ce273b"
+    }
+  ],
+  "latest_dispatch_rule": "This explicit354/ref is immutable; a later App source needs a separately frozen cohort, never a silent alias.",
+  "locked_packages": 178,
+  "mobile_source_declaration_at_ref": {
+    "bytes": 174879,
+    "path": "ci/mobile/inputs.json",
+    "sha256": "5611103e30219d32c3f5bca232cbb38c3606a86dc8c8c9de4772fdcc87a68fab"
+  },
+  "native_source_snapshot": {
+    "Kotlin_compile_Swift_parse_typecheck_passed": true,
+    "R1_manifest_sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894",
+    "Root_type_API_acceptance": {
+      "bytes": 616,
+      "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/root-type-api-acceptance.json",
+      "sha256": "ed85b0c8456de99f36f4ef1038e9c5e3ecdd834432acb1c68ae3568c1556bdc9"
+    },
+    "digest": "7cca8d5e6005c3ff3f6c3a6f2524bd8b523226bc0dbbacaa8c7b1dc28206a426",
+    "files": [
+      {
+        "bytes": 3343,
+        "path": "app/android/app/src/main/AndroidManifest.xml",
+        "sha256": "5a4b4585cfa73575ed82c4e3e32fb9062036c96d0009a674e72ba21d9de78aa6"
+      },
+      {
+        "bytes": 10666,
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/LocationOnceBridge.kt",
+        "sha256": "f10fa7b56779bbb5d347f063fa961b462172ca6e916ce32b26556e4eeb3d1c07"
+      },
+      {
+        "bytes": 2135,
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/MainActivity.kt",
+        "sha256": "2ff99269679e8d63ba96af433db370623a5f0e654978a77bfd97b5b81c7ba1d1"
+      },
+      {
+        "bytes": 32985,
+        "path": "app/ios/Runner.xcodeproj/project.pbxproj",
+        "sha256": "cb6ee3082bba34b3946415b92f7b7006167d0535b3efbeae5424d69d25b8324c"
+      },
+      {
+        "bytes": 849,
+        "path": "app/ios/Runner/AppDelegate.swift",
+        "sha256": "f0595cf79a3efaca51b85895cacc6b9f01f13438fee6f5a3c201f796bb71cb7c"
+      },
+      {
+        "bytes": 2916,
+        "path": "app/ios/Runner/Info.plist",
+        "sha256": "94e2ab712ea1e6882d4c5b77adcc25ec552956dc300bb60e82d6b181780df152"
+      },
+      {
+        "bytes": 13055,
+        "path": "app/ios/Runner/LocationOnceBridge.swift",
+        "sha256": "13de6890dad64e4a12c17d02f3ac32dbd3e9cb11dde8caff12f5ec35ab413ee8"
+      }
+    ],
+    "members": 7,
+    "scene8_device_GPS_accepted": false,
+    "scope": "Android consumes 3 paths; 4 iOS paths preserve exact native7 identity only, not iOS build inputs or acceptance."
+  },
+  "portable_digest": "81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c",
+  "portable_members": 406,
+  "pub_lock_after": {
+    "bytes": 42399,
+    "path": "app/pubspec.lock",
+    "sha256": "0e678e98a6efc7cbb34c6c3a58f8b890171bd443c2b61e6f5ec525853c4f34fa"
+  },
+  "pub_lock_before": {
+    "bytes": 40663,
+    "path": "app/pubspec.lock",
+    "sha256": "dd9f75df4899be9c6aaca509d39e259a14164ce8be7b8ed693860bce7df4b648"
+  },
+  "schema": "luobo.android.current-app.v2",
+  "shared_registry_sha256": "40f81d5ee611afa42e53280b84db15a8118af7e42f9487050463986a86db15a3",
+  "shared_source_identity": "historical257/428 helper validation only; never App source used by this entry",
+  "source_digest": "769bea7065a7de175aff4a12ea95bf0d571bf8919b130c1fde0af0d052f10508",
+  "source_members": 530,
+  "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e",
+  "webview_archive_identities": [
+    {
+      "archive_sha256": "d53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter-4.14.1.tar.gz",
+      "dependency": "direct main",
+      "lock_block_sha256": "d8aa746cb1b38e99a49f8c245dedfad01d44e807545ec27c6b4691c099cd7dfd",
+      "name": "webview_flutter",
+      "version": "4.14.1"
+    },
+    {
+      "archive_sha256": "ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter_android-4.12.0.tar.gz",
+      "dependency": "direct main",
+      "lock_block_sha256": "923c3bd68d0a69502144cf873a7c40d06f3773e38f8af645bc89fe46b0d576ab",
+      "name": "webview_flutter_android",
+      "version": "4.12.0"
+    },
+    {
+      "archive_sha256": "1221c1b12f5278791042f2ec2841743784cf25c5a644e23d6680e5d718824f04",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter_platform_interface-2.15.1.tar.gz",
+      "dependency": "direct dev",
+      "lock_block_sha256": "7f1d1c926540773e6e36f893c57d47aacfbdc7c1c0927b77631696c067ff03e7",
+      "name": "webview_flutter_platform_interface",
+      "version": "2.15.1"
+    },
+    {
+      "archive_sha256": "82648217f537573e1ca9ae9952d3eacedca6ab5aee69dc84445fc763766dcea2",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter_wkwebview-3.25.1.tar.gz",
+      "dependency": "transitive",
+      "lock_block_sha256": "1a4119d3c7d0141b158904b074c01638d33cde30b25755ad2633ca37424033d9",
+      "name": "webview_flutter_wkwebview",
+      "version": "3.25.1"
+    }
+  ]
+}

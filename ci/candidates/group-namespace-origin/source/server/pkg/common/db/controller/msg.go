@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"math"
+	"os"
 	"time"
 
 	"github.com/OpenIMSDK/protocol/constant"
@@ -49,6 +50,20 @@ const (
 	updateKeyMsg = iota
 	updateKeyRevoke
 )
+
+// This lower-layer guard deliberately has no messagedelivery import: that
+// package's real integration tests consume controller, so a reverse dependency
+// would create a Go test import cycle. Keep the exact complete-legacy rule:
+// required, unknown or half-on settings reject before either storage writer.
+func requireLegacyMessageWriterMode() error {
+	mode := os.Getenv("LUOBO_GROUP_HISTORY_WINDOW_V1")
+	epoch := os.Getenv("LUOBO_GROUP_HISTORY_WINDOW_EPOCH")
+	activation := os.Getenv("LUOBO_GROUP_HISTORY_WINDOW_ACTIVATION_SHA256")
+	if (mode == "" || mode == "0") && epoch == "" && activation == "" {
+		return nil
+	}
+	return errors.New("message delivery authority unprepared")
+}
 
 type CommonMsgDatabase interface {
 	// 批量插入消息
@@ -304,7 +319,7 @@ func (db *commonMsgDatabase) BatchInsertBlock(ctx context.Context, conversationI
 }
 
 func (db *commonMsgDatabase) BatchInsertChat2DB(ctx context.Context, conversationID string, msgList []*sdkws.MsgData, currentMaxSeq int64) error {
-	if err := messagedelivery.CheckLegacyMsgTransferHistoryMode(); err != nil {
+	if err := requireLegacyMessageWriterMode(); err != nil {
 		return err
 	}
 	if len(msgList) == 0 {
@@ -394,7 +409,7 @@ func (db *commonMsgDatabase) DelUserDeleteMsgsList(ctx context.Context, conversa
 }
 
 func (db *commonMsgDatabase) BatchInsertChat2Cache(ctx context.Context, conversationID string, msgs []*sdkws.MsgData) (seq int64, isNew bool, err error) {
-	if err := messagedelivery.CheckLegacyMsgTransferHistoryMode(); err != nil {
+	if err := requireLegacyMessageWriterMode(); err != nil {
 		return 0, false, err
 	}
 	currentMaxSeq, err := db.cache.GetMaxSeq(ctx, conversationID)

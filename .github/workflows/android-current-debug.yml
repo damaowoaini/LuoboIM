@@ -1,0 +1,86 @@
+name: Android current354 production dependencies and ARM64 QA APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [current354-auditable-arm64-production-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-current-${{ github.ref }}-${{ inputs.cohort }}
+  cancel-in-progress: false
+
+jobs:
+  production-arm64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ANDROID_COHORT: ${{ inputs.cohort }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select one fresh private parent
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/android-production-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "ANDROID_WORK=$RUNNER_TEMP/android-production-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current354" >> "$GITHUB_ENV"
+      - name: Exact source and shared-library identity with cold20GiB admission
+        run: |
+          python3 -B ci/android-native/current_app.py --cohort "$ANDROID_COHORT" --stage admission --work "$ANDROID_WORK"
+          python3 -B ci/android-native/current_app.py --cohort "$ANDROID_COHORT" --stage readonly
+      - name: Setup fixed tools and current locked packages
+        run: python3 -B ci/android-native/current_app.py --cohort "$ANDROID_COHORT" --stage setup --work "$ANDROID_WORK"
+      - name: Actual fresh ARM64 core bind offline with generated-source evidence
+        run: sudo unshare --net -- bash ci/android-native/netns-current.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" core
+      - name: Two necessary builtin classpath producers without app models or network
+        run: sudo unshare --net -- bash ci/android-native/netns-current.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" preseal
+      - name: Actual current production graph and accepted finite3 source18 consumer
+        run: python3 -B ci/android-native/current_app.py --cohort "$ANDROID_COHORT" --stage gradle-setup --work "$ANDROID_WORK"
+      - name: Original seven fresh-AAR gates and real current354 Debug APK offline
+        run: sudo unshare --net -- bash ci/android-native/netns-current.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" apk
+      - name: Bound exact platform archive publication
+        id: sdk_source_budget
+        if: always()
+        run: python3 -B ci/android-native/sdk_platform_producer.py --archive-upload-admission "$ANDROID_WORK"
+      - name: Keep exact official SDK archives separately
+        if: always() && steps.sdk_source_budget.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current354-platform-sources-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-37.0.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-36.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-35.zip
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve compact raw evidence first
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current354-production-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/activation.json
+            ${{ env.ANDROID_WORK }}/evidence/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve only explicitly labelled newly built public products separately
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current354-production-products-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/artifacts/core-current354-arm64.aar
+            ${{ env.ANDROID_WORK }}/artifacts/core-current354-arm64.build.json
+            ${{ env.ANDROID_WORK }}/artifacts/core-current354-arm64-sources.jar
+            ${{ env.ANDROID_WORK }}/artifacts/luobo-current354-auditable-arm64-debug.apk
+            ${{ env.ANDROID_WORK }}/artifacts/NOTICE-public-core.txt
+            ${{ env.ANDROID_WORK }}/artifacts/job-ca-public.pem
+          retention-days: 14
+          if-no-files-found: warn

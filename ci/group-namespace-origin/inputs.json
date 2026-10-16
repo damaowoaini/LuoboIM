@@ -14,7 +14,7 @@
   "parentCount": 1170,
   "parentDigest": "fe314717ab63da7e21e435264c641984c0c2c42e994cfc8d92c20cb43d4ed3fe",
   "effectiveCount": 1175,
-  "effectiveDigest": "a8e25ee4a63e48300895b5f615f61ad591cd7f527b155f937a096958f8f69270",
+  "effectiveDigest": "da8413685e7ce04648e7c3ac48a694cd214b15f96afdaa6e1d9e34d0701d838a",
   "effectiveSource": [
     {
       "path": "server/.dockerignore",
@@ -3563,8 +3563,8 @@
     },
     {
       "path": "server/pkg/common/db/controller/msg.go",
-      "bytes": 41598,
-      "sha256": "60e947eb8da55b5c3dda8a80ffb43027c226bcfe6560df3c5ba9f876c1a7e4c8"
+      "bytes": 42251,
+      "sha256": "3b7fe26746607d18812e7b38e144aecfea96e9d2348251354571301fce80248b"
     },
     {
       "path": "server/pkg/common/db/controller/msg_deletion_integration_test.go",
@@ -7192,8 +7192,8 @@
     },
     {
       "path": "ci/candidates/group-namespace-origin/source/server/pkg/common/db/controller/msg.go",
-      "bytes": 41598,
-      "sha256": "60e947eb8da55b5c3dda8a80ffb43027c226bcfe6560df3c5ba9f876c1a7e4c8",
+      "bytes": 42251,
+      "sha256": "3b7fe26746607d18812e7b38e144aecfea96e9d2348251354571301fce80248b",
       "target": "server/pkg/common/db/controller/msg.go",
       "mode": "0o644",
       "beforeSHA256": "64a78a24f66eebbf82606baddae8dbd3cc776a60a200b0fbba6d1c9085d4d17d"
@@ -7325,7 +7325,13 @@
     "formatV2ManifestSHA256": "f57eb78638729e5227391e4369a897b1c578b6174582ab5780a8cead48440438",
     "formatReceiptSHA256": "3c6203a6d224e7a0bab421396ccb4b5c515f74c385575329a38c4c3d495c9acf",
     "originalV1ManifestSHA256": "66ba752ba0dd7d9d6256be16ea112480bd258463f9a25fa87a9271a882939f98",
-    "claim": "17 selected V2 Go bodies copied exactly; one gofmt/parser accepted; no Go compiler/test result."
+    "claim": "16 selected format-V2 Go bodies unchanged; controller/msg.go is the isolated R1 source fix and has not been parsed/formatted/compiled/tested. Original V2 formatter evidence is historical only for that changed file.",
+    "buildFixR1": {
+      "parentDigest": "a8e25ee4a63e48300895b5f615f61ad591cd7f527b155f937a096958f8f69270",
+      "change": "Only controller/msg.go: lower private complete-legacy env gate instead of undefined upper package reference; exact same two pre-storage rejection sites. No test/control/name/resource changes.",
+      "parentFailureRun": 38968875708,
+      "scope": "refs-only not Go parsed/compiled/tested yet; original V1/V2 payloads and failure retained"
+    }
   },
   "fixture": "Existing owned Mongo+paired Redis lifecycle only. SQL/private credentials/vendor/Kafka not selected; loopback identity contract is not kernel network isolation.",
   "notDeployable": "Importer, retained origin migration and persisted positive n_ reader incomplete. Bare initializer/raw Accept fixture impact unadapted; CheckNewGroupSeedRuntimeReady and StartTransfer hard fences remain."

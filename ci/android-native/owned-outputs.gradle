@@ -1,0 +1,54 @@
+// Audit only. Do not mutate dependencies, signing config or output paths.
+import groovy.json.JsonOutput
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.security.MessageDigest
+def props=gradle.startParameter.systemPropertiesArgs
+def raw=props['luoboProductionWork']
+def dispatch=props['luoboProductionDispatch']
+if (!(raw instanceof String) || !(dispatch==~/[a-z0-9-]{1,80}/))
+    throw new GradleException('fixed production output audit context required')
+def work=new File(raw)
+if (work.canonicalFile!=work || !work.isDirectory() ||
+        !Files.isDirectory(work.toPath(),LinkOption.NOFOLLOW_LINKS))
+    throw new GradleException('canonical real owned workspace required')
+def inside={ File file ->
+    def value=file.canonicalFile
+    if (value!=file.absoluteFile || !value.toPath().startsWith(work.toPath()))
+        throw new GradleException('tool output outside owned workspace refused')
+    value.path
+}
+def home=inside(new File(System.getProperty('user.home')))
+def tmp=inside(new File(System.getProperty('java.io.tmpdir')))
+def gradleHome=inside(gradle.gradleUserHomeDir)
+if (home!=new File(work,'home').path || tmp!=new File(work,'tmp').path ||
+        !(gradleHome in [new File(work,'gradle-cache').path,new File(work,'selector-gradle-home').path]))
+    throw new GradleException('explicit task JVM/Gradle roots required')
+gradle.projectsEvaluated {
+    def rows=[]
+    gradle.rootProject.allprojects.each { p ->
+        def row=[project:p.path,project_directory:inside(p.projectDir),build_directory:inside(p.layout.buildDirectory.get().asFile)]
+        if (p.plugins.hasPlugin('com.android.application')) {
+            if (p.findProperty('kotlin.compiler.execution.strategy')!='in-process')
+                throw new GradleException('task Kotlin in-process strategy required')
+            def signing=p.extensions.getByName('android').signingConfigs.getByName('debug')
+            def store=signing.storeFile
+            if (!(store instanceof File) || inside(store)!=new File(work,'home/.android/debug.keystore').path)
+                throw new GradleException('actual debug keystore must use owned Android user directory')
+            row.debug_keystore_path=store.path
+            row.keystore_content_or_password_recorded=false
+        }
+        rows.add(row)
+    }
+    def rootKey=MessageDigest.getInstance('SHA-256').digest(gradle.rootProject.projectDir.path.getBytes('UTF-8')).encodeHex().toString()
+    def directory=new File(work,'evidence/current-owned-outputs')
+    directory.mkdirs()
+    if (directory.canonicalFile!=directory) throw new GradleException('owned audit directory alias')
+    def output=new File(directory,dispatch+'-'+rootKey+'.json')
+    if (!output.createNewFile()) throw new GradleException('output audit may not overwrite')
+    output.withOutputStream { stream ->
+        stream.write((JsonOutput.prettyPrint(JsonOutput.toJson([dispatch:dispatch,root:gradle.rootProject.projectDir.path,
+            JVM_user_home:home,JVM_tmp:tmp,Gradle_user_home:gradleHome,projects:rows,audit_only:true]))+'\n').getBytes('UTF-8'))
+        stream.flush();stream.getFD().sync()
+    }
+}

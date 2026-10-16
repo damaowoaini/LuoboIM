@@ -1,0 +1,68 @@
+{
+  "Android": {
+    "API": "ANDROID_USER_HOME is a leaf directory in source; explicit task home/.android. Actual AGP debug storeFile must equal this/debug.keystore in the new read-only model audit.",
+    "reference_commit": "19bdf7910b17e55a5b23d1ca66e0c2621145383d",
+    "scope_limit": "Pinned Android source reference does not prove it is exactly AGP9.1.1 source. Actual selected plugin versions/artifacts remain original provenance checks; model path is checked before tasks, no guessed signing-path success.",
+    "source": "https://android.googlesource.com/platform/tools/base/+/19bdf7910b17e55a5b23d1ca66e0c2621145383d/common/src/main/java/com/android/prefs/AbstractAndroidLocations.kt",
+    "source_SHA256": "bc75d6ca385019779ace409b89ba73b78fe199bb69adb73ac56373af6445b93d"
+  },
+  "Dart": {
+    "not_snapshot_code_SHA_claim": true,
+    "sources": [
+      {
+        "path": "dartdev.dart",
+        "sha256": "16b7c67b2dadd2e9ebd1978a8618dbd6180866089d109d825b7e40da0641d1b0",
+        "url": "https://raw.githubusercontent.com/dart-lang/sdk/3.13.5/pkg/dartdev/lib/dartdev.dart"
+      },
+      {
+        "path": "dart-unified_analytics.dart",
+        "sha256": "09e54af2a6d45771fb78bd0c255af846e6ae15ed30bc2e1fa689d98318f0b38e",
+        "url": "https://raw.githubusercontent.com/dart-lang/sdk/3.13.5/pkg/dartdev/lib/src/unified_analytics.dart"
+      }
+    ],
+    "version": "3.13.5"
+  },
+  "Flutter": {
+    "commit": "abaf9c523780a608bd46686fd5e53740a07077f8",
+    "config": "Config._configPath prefers existing HOME .flutter_<name> over XDG; failclosed preflight on known files/aliases. New owned XDG_CONFIG_HOME is used otherwise.",
+    "files": [
+      {
+        "bytes": 6531,
+        "path": "packages/flutter_tools/lib/src/base/config.dart",
+        "sha256": "307ce29f4353b1266aeac395363db11466792ed27206ffe0dda778f81c132367"
+      },
+      {
+        "bytes": 3141,
+        "path": "packages/flutter_tools/lib/src/reporting/unified_analytics.dart",
+        "sha256": "0c00849a26def8083855bb76df741f6ce6d1be9dba0b6d3ed956d03728b20710"
+      },
+      {
+        "bytes": 4576,
+        "path": "packages/flutter_tools/lib/src/persistent_tool_state.dart",
+        "sha256": "33f9ad8c1b60140746aafe6b0988c9b18f1779d5a7ee0394f964be46e7ce273b"
+      }
+    ],
+    "telemetry": "fixed reporting/unified_analytics.dart returns NoOp before Analytics when FLUTTER_SUPPRESS_ANALYTICS=true; Dart3.13.5 dartdev/createUnifiedAnalytics similarly short-circuits."
+  },
+  "Gradle": {
+    "configuration": "GRADLE_USER_HOME explicit; JAVA_TOOL_OPTIONS supplies task user.home/tmp and disables PerfData; actual new init script audits these properties before tasks.",
+    "distribution_SHA256": "17f277867f6914d61b1aa02efab1ba7bb439ad652ca485cd8ca6842fccec6e43",
+    "sources": [
+      {
+        "bytes": 3816,
+        "path": "Gradle-BuildLayoutParameters.java",
+        "sha256": "6a2bc7eb2e801aa0aafd9ee69502cc8cc86bd691b1a0d9500f9cda9a86adb617"
+      },
+      {
+        "bytes": 9475,
+        "path": "Gradle-DaemonParameters.java",
+        "sha256": "ac78df3a9f68bb4a1a0e85c777f808c50f23c0273d4434e09bbfc7b0d4e0202c"
+      }
+    ],
+    "version": "9.3.1"
+  },
+  "HOME": "Actual HOME retained; inherited legacy env is validated intent only, replaced explicitly at s.run dispatch, never global monkeypatch.",
+  "Kotlin": "Existing exact -Pkotlin.compiler.execution.strategy=in-process is retained and checked on actual Android application model; JVM user.home/tmp and task Gradle cache bound outputs. No daemon/cache success claimed before actual Gradle.",
+  "local_actions": "Only bounded official source text reads and local source copies, no tool/dependency archive download, tests or native execution.",
+  "state": "source_read_only_native_unrun"
+}
