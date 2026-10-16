@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "candidateManifestSHA256": "7357c7582b98a8dd08cccf58de901215576b69efa2acedf6bb770dd30ad97031",
+  "current": [
+    {
+      "path": "server/internal/rpc/group/group.go",
+      "bytes": 55105,
+      "sha256": "2945a1857f8abba846a7a634ddc85c0f7032d57d47b1e7e5ad7e5d08942f80bc"
+    },
+    {
+      "path": "server/internal/rpc/group/join_applicant_authorization_test.go",
+      "bytes": 9075,
+      "sha256": "be5bf78937d7a4aaefce62afa8de60ca7af76e36f84aa247bfbc61312cc05ae6"
+    }
+  ],
+  "supporting": [
+    {
+      "path": "server/pkg/authverify/token.go",
+      "sha256": "86e758dc4ce5886f94b21ff11c14396bdc929f51c38f7803a3b4effdc53e9283",
+      "bytes": 3423
+    },
+    {
+      "path": "server/pkg/rpcclient/user.go",
+      "sha256": "d540c9182bef354fb8f3af8ab7ce37bb70dc05c702a797eadc08d15ac7ebe0f3",
+      "bytes": 6348
+    },
+    {
+      "path": "server/internal/api/group.go",
+      "sha256": "5b341486e56c421165844884f7516ba0ba3b6aa80ce6b5a8949c64bc55a868fc",
+      "bytes": 4364
+    },
+    {
+      "path": "server/internal/rpc/group/callback.go",
+      "sha256": "17e6c628cf39a150865c5f0f8673f6baeddd5d84e7aa672505c70bd4f3f03104",
+      "bytes": 15353
+    },
+    {
+      "path": "server/pkg/common/http/http_client.go",
+      "sha256": "c49d1153e20a04549a1cdc370543a1b4d90a99f92a63bb242cec46453397acf5",
+      "bytes": 5312
+    },
+    {
+      "path": "server/pkg/protocol/group/group.pb.go",
+      "sha256": "d62b9f6634b96a11b3919d83398a2b92000fdbce01aa0c3d12d5bd24f123a002",
+      "bytes": 254685
+    },
+    {
+      "path": "server/internal/rpc/group/member_edit_authorization_test.go",
+      "sha256": "b0b7689a286c0467acbf5e049dca4d5c2551c9626dd7ccb3ab7a11a2c90825c2",
+      "bytes": 15754
+    }
+  ],
+  "before": {
+    "path": "ci/candidates/group-join-applicant/before/group.go",
+    "bytes": 55005,
+    "sha256": "37a505dec983125f8135148938cbf662e4b410b5a5995897087fa12fd2aeff21"
+  },
+  "before_context": "Fresh after checkout with exactly original b53 group.go restored. Shared tests call actual JoinGroup and real UserRpcClient adapter with bounded fake DB/Redis and signed loopback callback; no real Mongo/Redis. Nil-request robustness is after-only and cannot count as baseline RED.",
+  "shared": {
+    "run_regex": "^TestJoinGroup(RejectsForeignApplicantBeforeDependencies|PreservesSelfAndTrustedManagerAdmission|PreservesAuthorizedLookupFailure)$",
+    "expected_top_tests": [
+      "TestJoinGroupRejectsForeignApplicantBeforeDependencies",
+      "TestJoinGroupPreservesSelfAndTrustedManagerAdmission",
+      "TestJoinGroupPreservesAuthorizedLookupFailure"
+    ],
+    "expected_failing_assertion_leaves": [
+      "TestJoinGroupRejectsForeignApplicantBeforeDependencies/ordinary-foreign",
+      "TestJoinGroupRejectsForeignApplicantBeforeDependencies/group-admin-is-not-configured-manager",
+      "TestJoinGroupRejectsForeignApplicantBeforeDependencies/missing-actor",
+      "TestJoinGroupRejectsForeignApplicantBeforeDependencies/missing-applicant",
+      "TestJoinGroupRejectsForeignApplicantBeforeDependencies/manager-missing-applicant"
+    ],
+    "mandatory_positive_controls": [
+      "TestJoinGroupPreservesSelfAndTrustedManagerAdmission",
+      "TestJoinGroupPreservesAuthorizedLookupFailure"
+    ],
+    "expected_before_counts": {
+      "top_pass": 2,
+      "top_fail": 1,
+      "sub_pass": 3,
+      "sub_fail": 5
+    },
+    "expected_after_counts": {
+      "top_pass": 3,
+      "sub_pass": 8
+    },
+    "required_failure_evidence": [
+      "unauthorized applicant crossed entry boundary:",
+      "userLookups=1",
+      "groupReads=1",
+      "memberReads=1",
+      "callbacks=1",
+      "historyReads=1",
+      "writes=1",
+      "synthetic join writer admission sentinel"
+    ]
+  },
+  "full_after_expected": {
+    "top_pass": 18,
+    "sub_pass": 43
+  },
+  "actualLocalTests": 0
+}

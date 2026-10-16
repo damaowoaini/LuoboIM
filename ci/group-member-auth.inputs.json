@@ -4,8 +4,8 @@
   "current": [
     {
       "path": "server/internal/rpc/group/group.go",
-      "bytes": 55005,
-      "sha256": "37a505dec983125f8135148938cbf662e4b410b5a5995897087fa12fd2aeff21"
+      "bytes": 55105,
+      "sha256": "2945a1857f8abba846a7a634ddc85c0f7032d57d47b1e7e5ad7e5d08942f80bc"
     },
     {
       "path": "server/internal/rpc/group/member_edit_authorization.go",
@@ -65,5 +65,12 @@
       "TestSetGroupMemberInfoPreservesLegitimateWriteAdmission",
       "TestSetGroupMemberInfoCallbackPreservesLegalBodyChanges"
     ]
+  },
+  "additiveSuccessor": {
+    "reason": "JoinGroup applicant check only; original role shared assertions and old baseline whole group.go unchanged",
+    "originInputsSHA256": "7d13538fc6ca32d88aa01bcc75a503316c86286cae5c8c2633670bc2c45298d7",
+    "originRoleCandidateManifestSHA256": "bb0e3bb5ef1e40980c3ee7381ecff4d9e6fc048d5812caa57e0fbb3b46e30dde",
+    "joinCandidateManifestSHA256": "7357c7582b98a8dd08cccf58de901215576b69efa2acedf6bb770dd30ad97031",
+    "joinProductionGuardOnly": true
   }
 }

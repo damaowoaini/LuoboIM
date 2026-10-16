@@ -852,6 +852,9 @@ func (s *groupServer) GroupApplicationResponse(ctx context.Context, req *pbgroup
 
 func (s *groupServer) JoinGroup(ctx context.Context, req *pbgroup.JoinGroupReq) (resp *pbgroup.JoinGroupResp, err error) {
 	defer log.ZInfo(ctx, "JoinGroup.Return")
+	if err := authverify.CheckAccessV3(ctx, req.GetInviterUserID()); err != nil {
+		return nil, err
+	}
 	user, err := s.User.GetUserInfo(ctx, req.InviterUserID)
 	if err != nil {
 		return nil, err
