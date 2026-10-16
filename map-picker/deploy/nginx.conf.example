@@ -1,0 +1,25 @@
+# Replace the dedicated host/certificate paths before loading this configuration.
+# Keep the map origin separate from the authenticated IM site.
+server {
+    listen 443 ssl;
+    server_name map.example.invalid;
+    ssl_certificate /etc/luobo-map/tls/fullchain.pem;
+    ssl_certificate_key /etc/luobo-map/tls/private-key.pem;
+    client_max_body_size 1k;
+
+    # No request query, location, key, cookie or provider payload in access logs.
+    access_log off;
+    error_log /dev/null;
+    location / {
+        proxy_pass http://127.0.0.1:8089;
+        proxy_set_header Host map.example.invalid;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header Origin $http_origin;
+        proxy_set_header Cookie "";
+        proxy_set_header Authorization "";
+        proxy_read_timeout 12s;
+        proxy_connect_timeout 2s;
+        proxy_max_temp_file_size 0;
+        proxy_buffering off;
+    }
+}

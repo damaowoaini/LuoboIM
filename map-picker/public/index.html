@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>选择位置 · 萝卜对话</title>
+  <link rel="stylesheet" href="/picker/picker.css">
+  <script src="/picker/picker.js" defer></script>
+</head>
+<body>
+  <main>
+    <form id="search" role="search">
+      <label class="sr-only" for="query">搜索地点</label>
+      <input id="query" type="search" maxlength="128" placeholder="搜索地点" autocomplete="off">
+      <button type="submit">搜索</button>
+    </form>
+    <p id="status" role="status" aria-live="polite">正在准备地图…</p>
+    <div id="map" aria-label="地图，可点击或拖动选择位置"></div>
+    <div id="results" aria-label="地点搜索结果"></div>
+    <div class="label-row">
+      <label for="name">位置名称（可选）</label>
+      <input id="name" maxlength="128" placeholder="地图选点" autocomplete="off">
+    </div>
+    <p class="hint">点击或拖动地图选点。定位和发送请使用上方按钮。</p>
+  </main>
+</body>
+</html>

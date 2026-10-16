@@ -7,9 +7,9 @@
       "sha256": "182855f49a8fb55b27896e26f4618480fd42b478c0d384bc1e5ef452fb49188c"
     },
     {
-      "bytes": 15466,
+      "bytes": 17605,
       "path": "apple_core.py",
-      "sha256": "6b0aa8736dc1c2996758cb40c4996fe6d14fd787ecbed92ebf67a29b12d81520"
+      "sha256": "66713a790710cfe3fc1229e22499fcc3226975c39a322214ea3d6c079691a0ff"
     },
     {
       "bytes": 7030,
@@ -57,9 +57,9 @@
       "sha256": "16e8d94e0ee0c0b20dcb813210a2d12e32e288033b767db4e2ce0e4b89ba9ae2"
     },
     {
-      "bytes": 15939,
+      "bytes": 20212,
       "path": "test_cloud.py",
-      "sha256": "daf9b8b19e18f0f5ceaeae153e4bd308f6c69d10829204fa411a3454b87fd296"
+      "sha256": "769aba14492aa839d99765c33f950365ecd4c5dceda34e76b383b1d825935286"
     },
     {
       "bytes": 4782,

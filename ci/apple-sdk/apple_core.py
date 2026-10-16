@@ -42,6 +42,43 @@ def read(path, limit=256*1024**2, single=True):
     return body
 
 
+def runtime_host_tool_paths(value):
+    base = Path(value['developer'])/'Toolchains/XcodeDefault.xctoolchain/usr/bin'
+    return {value['aliases'].get(str(base/name), str(base/name))
+            for name in ('swiftc', 'clang', 'ld', 'lipo', 'ar', 'llvm-nm', 'otool')}
+
+
+def verify_runtime_host_tool(row, limit=512*1024**2):
+    # Only inputs()'s fixed official Xcode tools use this path; source read() stays bounded at 256MiB.
+    if (row.get('official_system_hardlink') is not True or not 0 < limit <= 512*1024**2
+            or type(row['bytes']) is not int or not 0 < row['bytes'] <= limit):
+        raise ValueError('bounded official runtime host tool required')
+    path = Path(row['path'])
+    if path.resolve(strict=True) != path:
+        raise ValueError('canonical runtime host tool required')
+    identity = lambda s: (s.st_dev, s.st_ino, s.st_size, s.st_mode, s.st_nlink,
+                          s.st_uid, s.st_gid, s.st_mtime_ns, s.st_ctime_ns)
+    with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as f:
+        before = os.fstat(f.fileno())
+        if not stat.S_ISREG(before.st_mode) or before.st_size != row['bytes']:
+            raise ValueError('runtime host tool size/type differs')
+        total = 0; actual = hashlib.sha256()
+        while True:
+            block = f.read(min(1024**2, limit-total+1))
+            if not block:
+                break
+            total += len(block)
+            if total > limit:
+                raise ValueError('runtime host tool cap exceeded')
+            actual.update(block)
+        after = os.fstat(f.fileno())
+        if (identity(before) != identity(after) or identity(after) != identity(path.lstat())
+                or path.resolve(strict=True) != path):
+            raise ValueError('runtime host tool changed while reading')
+    if total != row['bytes'] or actual.hexdigest() != row['sha256']:
+        raise ValueError('runtime host tool exact pin differs')
+
+
 def sync(path):
     fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY)
     try:
@@ -94,7 +131,11 @@ def inputs():
     for alias, target in value['aliases'].items():
         if Path(alias).resolve(strict=True) != Path(target):
             raise ValueError('fixed official tool alias changed')
+    host_tools = runtime_host_tool_paths(value)
     for row in value['pins']:
+        if row.get('official_system_hardlink') is True and row['path'] in host_tools:
+            verify_runtime_host_tool(row)
+            continue
         body = read(row['path'], single=not row.get('official_system_hardlink', False))
         if len(body) != row['bytes'] or digest(body) != row['sha256']:
             raise ValueError('borrowed input pin mismatch: '+row['path'])

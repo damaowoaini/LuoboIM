@@ -209,4 +209,77 @@ class CommandStreams(unittest.TestCase):
             self.assertEqual(json.loads((root/'evidence/source-object.result.json').read_text()),dict(exit_code=7))
 
 
+class RuntimeHostTools(unittest.TestCase):
+    def tool(self, root, body=b'bounded synthetic tool bytes'):
+        import hashlib
+        p=root/'tool';p.write_bytes(body)
+        return p,dict(path=str(p),bytes=len(body),sha256=hashlib.sha256(body).hexdigest(),official_system_hardlink=True)
+
+    def test_stream_verifies_tool_over_injected_legacy_bound_without_raising_source_bound(self):
+        import apple_core
+        with tempfile.TemporaryDirectory() as value:
+            root=Path(value).resolve();p,row=self.tool(root,b'x'*(3*1024**2))
+            with self.assertRaisesRegex(ValueError,'bounded regular single-link'):
+                apple_core.read(p,limit=2*1024**2)
+            self.assertIsNone(apple_core.verify_runtime_host_tool(row,limit=4*1024**2))
+            self.assertEqual(apple_core.read.__defaults__,(256*1024**2,True))
+
+    def test_tool_size_hash_and_absolute_cap_reject(self):
+        import apple_core
+        with tempfile.TemporaryDirectory() as value:
+            root=Path(value).resolve();p,row=self.tool(root,b'x'*64)
+            with self.assertRaisesRegex(ValueError,'bounded official runtime'):
+                apple_core.verify_runtime_host_tool(row,limit=32)
+            with self.assertRaisesRegex(ValueError,'exact pin differs'):
+                apple_core.verify_runtime_host_tool(dict(row,sha256='0'*64),limit=128)
+            with self.assertRaisesRegex(ValueError,'size/type differs'):
+                apple_core.verify_runtime_host_tool(dict(row,bytes=63),limit=128)
+            with self.assertRaisesRegex(ValueError,'bounded official runtime'):
+                apple_core.verify_runtime_host_tool(row,limit=512*1024**2+1)
+
+    def test_stream_rejects_actual_same_fd_mutation_and_path_replacement(self):
+        import apple_core
+        for action in ['mutate','replace']:
+            with self.subTest(action=action),tempfile.TemporaryDirectory() as value:
+                root=Path(value).resolve();p,row=self.tool(root,b'x'*64)
+                real_sha256=apple_core.hashlib.sha256
+                class ChangedDuringHash:
+                    def __init__(self):
+                        self.actual=real_sha256();self.changed=False
+                    def update(self,body):
+                        self.actual.update(body)
+                        if not self.changed:
+                            self.changed=True
+                            if action=='mutate':
+                                with p.open('r+b') as f:
+                                    f.write(b'y');f.flush();os.fsync(f.fileno())
+                            else:
+                                q=root/'replacement';q.write_bytes(p.read_bytes());q.replace(p)
+                    def hexdigest(self):
+                        return self.actual.hexdigest()
+                with patch.object(apple_core.hashlib,'sha256',side_effect=ChangedDuringHash):
+                    with self.assertRaisesRegex(ValueError,'changed while reading'):
+                        apple_core.verify_runtime_host_tool(row,limit=128)
+
+    def test_role_canonical_and_original_official_hardlink_boundary(self):
+        import apple_core
+        with tempfile.TemporaryDirectory() as value:
+            root=Path(value).resolve();p,row=self.tool(root)
+            link=root/'link';link.symlink_to(p)
+            with self.assertRaisesRegex(ValueError,'canonical runtime'):
+                apple_core.verify_runtime_host_tool(dict(row,path=str(link)),limit=128)
+            os.link(p,root/'hard')
+            with self.assertRaisesRegex(ValueError,'bounded regular single-link'):
+                apple_core.read(p)
+            with self.assertRaisesRegex(ValueError,'bounded official runtime'):
+                apple_core.verify_runtime_host_tool(dict(row,official_system_hardlink=False),limit=128)
+            self.assertIsNone(apple_core.verify_runtime_host_tool(row,limit=128))
+            developer=root/'Developer';base=developer/'Toolchains/XcodeDefault.xctoolchain/usr/bin'
+            fixed=str(base/'swift-frontend')
+            paths=apple_core.runtime_host_tool_paths(dict(developer=str(developer),aliases={str(base/'swiftc'):fixed}))
+            self.assertIn(fixed,paths)
+            self.assertNotIn(str(p),paths)
+            self.assertEqual(len(paths),7)
+
+
 if __name__=='__main__':unittest.main()
