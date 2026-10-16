@@ -1,4 +1,4 @@
-// Explicit observed-r10 resolver; original resolve.gradle remains immutable.
+// Explicit finite R12 consumer; original R10 and resolve.gradle remain immutable.
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import java.security.MessageDigest
@@ -268,6 +268,38 @@ def checkModule = { group, module, v ->
         throw new GradleException('dynamic dependency version refused')
     }
 }
+// BEGIN independent R12 consumer. The two existing -D values already bind the
+// whole presealed document in main and included builds. Neither graph nor
+// configuration name can mint a new source catalog.
+def richField = catalog.accepted_R12_rich_consumer
+if (richField == null || richField.keySet() !=
+        (['catalog_sha256','catalog_base64','script_sha256','script_base64'] as Set) ||
+        richField.catalog_sha256 != 'db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe' ||
+        richField.script_sha256 != '9ba3305baf5339321f5b5bfbd75c0708aeb3d8b2e25d67c7407926965556058f')
+    throw new GradleException('independent rich catalog/script identity refused')
+def richBytes = Base64.decoder.decode(richField.catalog_base64)
+def richScript = Base64.decoder.decode(richField.script_base64)
+if (richBytes.length > 128*1024 || richScript.length > 32*1024 ||
+        digestBytes(richBytes) != richField.catalog_sha256 || digestBytes(richScript) != richField.script_sha256)
+    throw new GradleException('independent rich source bytes differ')
+def richSource = new JsonSlurper().parseText(new String(richBytes,'UTF-8'))
+def richFactory = new GroovyShell(getClass().classLoader).evaluate(new String(richScript,'UTF-8'))
+def richGate = richFactory(owned,richSource,localRef,fileDigest,richField.catalog_sha256)
+def richPhase = gradle.startParameter.taskNames == ['assembleDebug'] ? 'apk' : 'metadata'
+def richWrite = { p,c ->
+    def proof = richGate.audit(p,c)
+    def directory = new File(owned,'evidence/rich-consumed/'+richPhase)
+    Files.createDirectories(directory.toPath())
+    if (directory.canonicalFile != directory || Files.getOwner(directory.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal)
+        throw new GradleException('owned rich report directory required')
+    def out = new File(directory,c.name+'.json')
+    def stream = Files.newOutputStream(out.toPath(),java.nio.file.StandardOpenOption.CREATE_NEW,
+                                       java.nio.file.StandardOpenOption.WRITE)
+    try { stream.write((JsonOutput.toJson(proof)+'\n').getBytes('UTF-8')) } finally { stream.close() }
+    def sync = new FileOutputStream(out,true)
+    try { sync.getFD().sync() } finally { sync.close() }
+}
+// END independent R12 consumer.
 def selectorIdentity = { selector ->
     if (selector instanceof ProjectComponentSelector) {
         return [kind:'project', identity:selector.displayName, buildPath:selector.buildPath,
@@ -300,6 +332,10 @@ gradle.beforeProject { p ->
     p.repositories.whenObjectAdded(checkRepo)
     p.buildscript.repositories.whenObjectAdded(checkRepo)
     [p.configurations,p.buildscript.configurations].each { configs -> configs.all { c ->
+        if (richGate.scoped(p,c)) {
+            c.incoming.beforeResolve { richGate.declarations(p,c) }
+            c.incoming.afterResolve { richWrite(p,c) }
+        }
         // Official Gradle9.3.1 DependencySubstitutions covers transitive
         // dependencies and retains the actual requested selector type.
         c.resolutionStrategy.dependencySubstitution.all { d ->
@@ -307,7 +343,8 @@ gradle.beforeProject { p ->
             logger.lifecycle('LUOBO_SELECTOR_REQUEST ' + JsonOutput.toJson(
                     [project:p.path, configuration:c.name, requested:requested]))
             if (d.requested instanceof ModuleComponentSelector) {
-                checkModule(d.requested.group, d.requested.module, d.requested.version)
+                if (richGate.isRich(d.requested.versionConstraint)) richGate.requested(p,c,d.requested)
+                else checkModule(d.requested.group, d.requested.module, d.requested.version)
             }
             // No coordinate exemption and no useTarget/version substitution.
         }

@@ -40,8 +40,12 @@ class SelectorSourceTests(unittest.TestCase):
                 return log
             catalog = (root / 'evidence/classpath-preseal/catalog.json', '1' * 64)
             with patch.object(observed.classpaths, 'verified_catalog', return_value=catalog), \
-                    patch.object(observed.parent.Job, 'cmd', fake_command):
+                    patch.object(observed.parent.Job, 'cmd', fake_command), \
+                    patch.object(observed.rich_consumer, 'bind_origins') as rich_binding, \
+                    patch.object(observed.rich_fixture, 'run') as rich_controls:
                 job.gradle_prepare()
+            rich_binding.assert_called_once_with(root, observed.HERE, s.write_json)
+            rich_controls.assert_called_once_with(job, observed.HERE)
             self.assertEqual(len(calls), 1)
             expected = list(original)
             expected[expected.index('-I') + 1] = observed.HERE / 'resolve-observed.gradle'

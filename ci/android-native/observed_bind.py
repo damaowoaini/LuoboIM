@@ -19,11 +19,13 @@ import run as parent
 import support as s
 import sdk_platform_producer as sdk_sources
 import verify_inputs
+import rich_consumer
+import rich_fixture
 
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r10-complete-finite-official-platform-classpath'
+REVISION = 'root-r13-accepted-R12-finite-rich-consumer-r1'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 
@@ -89,6 +91,16 @@ class Job(parent.Job):
             catalog_before = classpaths.verified_catalog(self.w)
             args = list(args) + ['-DluoboClasspathCatalog=' + str(catalog_before[0]),
                                 '-DluoboClasspathCatalogSha256=' + catalog_before[1]]
+        elif label == 'assemble-debug':
+            if (list(map(str,args)) != list(map(str,self.gradle('assembleDebug')))
+                    or cwd != self.w/'source/app/android' or env != parent.environment(self.w,True)
+                    or timeout != 1800 or reject is not None or stdin is not None):
+                raise ValueError('fixed final APK rich consumer dispatch required')
+            rich_consumer.require_origin_binding(self.w,HERE)
+            catalog_before = classpaths.verified_catalog(self.w)
+            args = list(args)+['-I',HERE/'resolve-observed.gradle',
+                '-DluoboClasspathCatalog='+str(catalog_before[0]),
+                '-DluoboClasspathCatalogSha256='+catalog_before[1]]
         if label in (sdk_sources.TAMPER_LABEL, sdk_sources.SYSTEM_TAMPER_LABEL):
             sdk_sources.require_fault_dispatch(self, args, cwd, env, timeout, reject, stdin,
                                                HERE / 'resolve-observed.gradle', catalog_before, label)
@@ -98,7 +110,12 @@ class Job(parent.Job):
                      sdk_sources.tamper_for_control(self.w, selectors.jar_bytes())
                      if label == sdk_sources.TAMPER_LABEL else nullcontext())
             with fault:
-                return super().cmd(args, cwd, env, label, timeout, reject, stdin)
+                result = super().cmd(args, cwd, env, label, timeout, reject, stdin)
+                if label == 'assemble-debug':
+                    consumed = rich_consumer.check_apk_reports(self.w,HERE)
+                    s.write_json(self.w/'evidence/rich-apk-consumed.json',{'actual_configurations':consumed,
+                        'unused_configurations_not_claimed':True,'catalog_sha256':rich_consumer.CATALOG_SHA})
+                return result
         finally:
             if catalog_before is not None and classpaths.verified_catalog(self.w) != catalog_before:
                 raise ValueError('independent catalog changed during Gradle dispatch')
@@ -111,6 +128,8 @@ class Job(parent.Job):
             result = super().gradle_prepare()
             if self._typed_resolver_dispatch is not True:
                 raise ValueError('inherited dependency dispatch was not observed')
+            rich_consumer.bind_origins(self.w,HERE,s.write_json)
+            rich_fixture.run(self,HERE)
             return result
         finally:
             self._typed_resolver_dispatch = None

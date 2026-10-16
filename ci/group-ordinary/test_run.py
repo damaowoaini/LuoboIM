@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fourteen pure controller gates; no Go, Docker, DB or source1118 materialization."""
+"""Seventeen pure controller gates; no Go, Docker, DB or source1126 materialization."""
 import hashlib
 import importlib.util
 import json
@@ -328,6 +328,88 @@ class ControllerTests(unittest.TestCase):
                     self.assertFalse(SUBJECT.audit(changed, 0, short, spec)['accepted'])
                     missing = [e for e in events if e.get('Test', '').split('/', 1)[0] != name]
                     self.assertFalse(SUBJECT.audit(missing, 0, short, spec)['accepted'])
+
+
+    def role_fixture_synthetic(self):
+        before, after, approved = {}, {}, []
+        for path, edits in SUBJECT.ROLE_FIXTURE_EDITS.items():
+            body = ('synthetic prefix\n' + '\nsynthetic separator\n'.join(old for old, new in edits)
+                    + '\nsynthetic suffix\n').encode()
+            before[path] = body
+            after[path] = SUBJECT.role_fixture_after(path, body)
+            approved.append({'path':path, 'beforeSHA256':SUBJECT.sha(body),
+                             'afterSHA256':SUBJECT.sha(after[path])})
+        return {'role_fixture_adaptations':approved}, before, after
+
+    def test_role_fixture_only_exact_four_reviewed_transforms_can_change(self):
+        contract, before, after = self.role_fixture_synthetic()
+        approved = SUBJECT.role_fixture_map(contract, before, after)
+        self.assertEqual(len(approved), 4)
+        self.assertEqual(len(SUBJECT.exact_delta(before, after, approved)), 4)
+        for mutation in ('other-after-byte', 'wrong-before', 'missing-path', 'foreign-path'):
+            changed = json.loads(json.dumps(contract))
+            b, a = dict(before), dict(after)
+            path = next(iter(before))
+            if mutation == 'other-after-byte':
+                a[path] += b'\nunreviewed function body\n'
+                changed['role_fixture_adaptations'][0]['afterSHA256'] = SUBJECT.sha(a[path])
+            elif mutation == 'wrong-before':
+                b[path] += b'changed parent'
+            elif mutation == 'missing-path':
+                changed['role_fixture_adaptations'].pop()
+            else:
+                changed['role_fixture_adaptations'][0]['path'] = 'server/unrelated_test.go'
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                SUBJECT.role_fixture_map(changed, b, a)
+        with self.assertRaises(ValueError):
+            SUBJECT.exact_delta(before, after)
+
+    def test_old_custody_keeps_original_hash_except_exact_reviewed_fixtures(self):
+        contract, before, after = self.role_fixture_synthetic()
+        approved = SUBJECT.role_fixture_map(contract, before, after)
+        for path, body in before.items():
+            row = {'path':path, 'sha256':SUBJECT.sha(body)}
+            self.assertTrue(SUBJECT.test_custody(row, after, approved))
+            self.assertFalse(SUBJECT.test_custody(row, after, {}))
+            changed = dict(after);changed[path] += b'changed assertion'
+            self.assertFalse(SUBJECT.test_custody(row, changed, approved))
+        row = {'path':'server/unchanged_test.go', 'sha256':SUBJECT.sha(b'unchanged')}
+        self.assertTrue(SUBJECT.test_custody(row, {row['path']:b'unchanged'}, approved))
+        self.assertFalse(SUBJECT.test_custody(row, {row['path']:b'changed'}, approved))
+
+    def test_role_nine_mongo_four_http_three_owner_leaves_and_timeout_cannot_skip(self):
+        inputs = json.loads(Path(__file__).with_name('inputs.json').read_text())
+        SUBJECT.role_required(inputs)
+        mandatory = inputs['mandatory_role_effects']
+        self.assertEqual((len(mandatory['group']),len(mandatory['subcases'])), (9,7))
+        for short, names in (
+            ('internal/rpc/group', mandatory['group'] + mandatory['subcases']),
+            ('internal/groupeffects', [mandatory['timeout']]),
+        ):
+            spec = inputs['packages'][short]
+            package = SUBJECT.PREFIX + short
+            events = []
+            for test in spec['top_tests']:
+                events.append({'Package':package, 'Action':'run', 'Test':test})
+                for leaf in spec['required_leaves']:
+                    if leaf.startswith(test + '/'):
+                        events.extend([{'Package':package, 'Action':'run', 'Test':leaf},
+                                       {'Package':package, 'Action':'pass', 'Test':leaf}])
+                events.append({'Package':package, 'Action':'pass', 'Test':test})
+            events.append({'Package':package, 'Action':'pass'})
+            self.assertTrue(SUBJECT.audit(events, 0, short, spec)['accepted'])
+            for name in names:
+                missing = [dict(e) for e in events if e.get('Test') != name]
+                self.assertFalse(SUBJECT.audit(missing, 0, short, spec)['accepted'], name)
+                skipped = [dict(e) for e in events]
+                for event in skipped:
+                    if event.get('Test') == name and event['Action'] == 'pass':
+                        event['Action'] = 'skip'
+                self.assertFalse(SUBJECT.audit(skipped, 0, short, spec)['accepted'], name)
+        changed = json.loads(json.dumps(inputs))
+        changed['mandatory_role_effects']['subcases'].pop()
+        with self.assertRaises(ValueError):
+            SUBJECT.role_required(changed)
 
 if __name__ == '__main__':
     unittest.main()

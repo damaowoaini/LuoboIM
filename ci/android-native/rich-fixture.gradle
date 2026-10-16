@@ -1,0 +1,43 @@
+// Test-only builtin project. Production never reads this control catalog.
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+import java.nio.file.Files
+import org.gradle.api.artifacts.component.ModuleComponentSelector
+
+def dir=gradle.startParameter.currentDir.canonicalFile
+// Fixed files are created and pinned by rich_fixture.prepare before any model.
+def spec=new JsonSlurper().parse(new File(dir,'control-catalog.json'))
+def lib=new File(dir,'rich-consumer.gradle')
+def digest={ f -> MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString() }
+if (digest(lib)!=spec.library_sha256) throw new GradleException('control library changed')
+def factory=new GroovyShell(getClass().classLoader).evaluate(lib)
+def owned=dir.parentFile.parentFile
+// This local Maven body is synthetic, not accepted R12 artifact provenance.
+def local={ f ->
+    if (f.canonicalFile!=f.absoluteFile || !f.toPath().startsWith(owned.toPath()) ||
+            Files.isSymbolicLink(f.toPath()) || !f.isFile()) throw new GradleException('control file unsafe')
+    [bytes:f.length(),sha256:digest(f)]
+}
+def gate=factory(owned,spec,local,digest,'synthetic-control-only')
+gradle.beforeProject { p ->
+    p.configurations.all { c ->
+        if (gate.scoped(p,c)) c.incoming.beforeResolve { gate.declarations(p,c) }
+        c.resolutionStrategy.dependencySubstitution.all { d ->
+            if (!(d.requested instanceof ModuleComponentSelector)) throw new GradleException('control module only')
+            if (gate.isRich(d.requested.versionConstraint)) gate.requested(p,c,d.requested)
+        }
+    }
+}
+gradle.projectsEvaluated {
+    gradle.rootProject.tasks.register('checkRichConsumer') {
+        doLast {
+            def app=gradle.rootProject.project(':app')
+            def result=spec.configurations.collect { c -> gate.audit(app,app.configurations.getByName(c.name)) }
+            def output=new File(dir,'actual-controls.json')
+            if (output.exists()) throw new GradleException('fresh control output required')
+            output.text=JsonOutput.toJson(result)+'\n'
+            new FileOutputStream(output,true).withCloseable { it.getFD().sync() }
+        }
+    }
+}

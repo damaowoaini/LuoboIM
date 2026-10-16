@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "ordinary_source1118_full28_packages_no_runtime_adoption",
+  "scope": "ordinary_source1126_full28_packages_no_runtime_adoption",
   "parent_runner": {
     "path": "ci/group-stage3/run.py",
     "bytes": 18503,
@@ -1360,6 +1360,11 @@
       "sha256": "9b439b120532776f768c481d3988200850940740fddf9e95c804e803949624c3"
     },
     {
+      "path": "server/internal/groupauthority/role_notice.go",
+      "bytes": 11622,
+      "sha256": "d1b4ea04e70b7d3b99bfb728efeae795fb17c815a6f060595f4a48e37cbc6172"
+    },
+    {
       "path": "server/internal/groupauthority/transaction.go",
       "bytes": 5994,
       "sha256": "0e8f524828eed42d24b4d9a40089039f5991432526aef686c40c2d3b12eefaf9"
@@ -1416,8 +1421,8 @@
     },
     {
       "path": "server/internal/groupeffects/callback_dispatch.go",
-      "bytes": 7435,
-      "sha256": "087325bfe9af6e19640da2aac10d452a6e16bca6040a2ebec8df28dcc25549de"
+      "bytes": 8260,
+      "sha256": "eca559a09487a5571a042d374a0fbe8f55d98748a040ac4863a833bf4d706c00"
     },
     {
       "path": "server/internal/groupeffects/callback_dispatch_test.go",
@@ -1461,13 +1466,23 @@
     },
     {
       "path": "server/internal/groupeffects/notification_delivery.go",
-      "bytes": 8700,
-      "sha256": "fc40e6645265491676771d6e755dc9fb1919df190861f22481722ed56a015e98"
+      "bytes": 8802,
+      "sha256": "c886684cf16a935c14c7134286f75035a55e04299b8cb9b33583d6b728fad433"
+    },
+    {
+      "path": "server/internal/groupeffects/role_notification.go",
+      "bytes": 7691,
+      "sha256": "7beaebb2fcb22a78d5069e9b0ecf152f4f461f2faae7400099b8cc62ab2b7842"
+    },
+    {
+      "path": "server/internal/groupeffects/role_notification_test.go",
+      "bytes": 456,
+      "sha256": "0fc69b2d6d520f4c693412b358dd7349090518b973450ceaedd969d3d2a390ab"
     },
     {
       "path": "server/internal/groupeffects/store.go",
-      "bytes": 16665,
-      "sha256": "429a589d30e7bc29d74050e70087389cb4dbac79d88b9dbf4d304e51dba21848"
+      "bytes": 17332,
+      "sha256": "3e897ee5c27da253358e27a1589e59b80ba63a13d3deda8c674224cee21bd7d7"
     },
     {
       "path": "server/internal/groupeffects/types.go",
@@ -2436,13 +2451,13 @@
     },
     {
       "path": "server/internal/rpc/group/authority_rpc_barrier_integration_test.go",
-      "bytes": 12169,
-      "sha256": "32cb0f548b1d0645de9de6302787228993925054b98f622ce836f92bf0898194"
+      "bytes": 12282,
+      "sha256": "1d81f3fcdb6e00bed0b0fde64124b3791c0cadf6c92a647ee0b581d15de67972"
     },
     {
       "path": "server/internal/rpc/group/authority_rpc_mongo_fixture_test.go",
-      "bytes": 3910,
-      "sha256": "2d1b05128f08af5ba9685fa968fe500a9d6d75095210e1a9365366015851658b"
+      "bytes": 4046,
+      "sha256": "ea1b937b5dbf6545b1789f04a5a838c2d62eb415370fa9a8f54fb54d89ff2995"
     },
     {
       "path": "server/internal/rpc/group/cache.go",
@@ -2471,8 +2486,8 @@
     },
     {
       "path": "server/internal/rpc/group/group.go",
-      "bytes": 64313,
-      "sha256": "b10faad9ae102c2b39e915d8d70cfb1f84b12939c069622a50468f664a5dce12"
+      "bytes": 63513,
+      "sha256": "e8cf9ee968177c419a4c654c84e6e7851f31192823ab95f565ef0e167a09e591"
     },
     {
       "path": "server/internal/rpc/group/group_intent_test.go",
@@ -2486,8 +2501,8 @@
     },
     {
       "path": "server/internal/rpc/group/group_member_notice_mutation_integration_test.go",
-      "bytes": 16689,
-      "sha256": "48c923fb7667b982c113d7654fa218f8ff586453a62184284790e801cde765be"
+      "bytes": 16773,
+      "sha256": "57e5bc555f54e5c7f29dea85a516f9a0b0c9671c5b9aa8ee7e5ade66664b3b1b"
     },
     {
       "path": "server/internal/rpc/group/group_mutation.go",
@@ -2501,13 +2516,23 @@
     },
     {
       "path": "server/internal/rpc/group/group_notice_mutation.go",
-      "bytes": 10325,
-      "sha256": "4693c99730116c4247797412de8566cba0b873952f973d382941c7b2d170cf70"
+      "bytes": 10736,
+      "sha256": "dd094f5279ec1c6f9fb554656cc9c920259d9a6630f4edf6e21c1dacc665f3e9"
     },
     {
       "path": "server/internal/rpc/group/group_notice_mutation_integration_test.go",
-      "bytes": 18869,
-      "sha256": "8eb8dcfcdcf29f35af0a07f77d43a1e83d18fd17c61735a4f9b14cdd8618ed1a"
+      "bytes": 18953,
+      "sha256": "1b7fa771bc7c6d68f505b1b8b6a77ff357997f8c04227559d74c024c2caac552"
+    },
+    {
+      "path": "server/internal/rpc/group/group_role_effects.go",
+      "bytes": 14516,
+      "sha256": "c1973d4853908c8ee7a0b000b8d9af82870fefdfe20bcfd0d615fce6b41d1951"
+    },
+    {
+      "path": "server/internal/rpc/group/group_role_effects_integration_test.go",
+      "bytes": 17412,
+      "sha256": "65547f9e905a26d72ee2136ab5fce0e55d986e369b36472dd5580a1a9d4d9c2e"
     },
     {
       "path": "server/internal/rpc/group/group_state_authority_test.go",
@@ -2563,6 +2588,21 @@
       "path": "server/internal/rpc/group/removal_callback_policy_test.go",
       "bytes": 5790,
       "sha256": "4bf2405ec0c4274dbf946ed5e4431de4df64eef14964e5ae52c4f85ea121367c"
+    },
+    {
+      "path": "server/internal/rpc/group/role_effects_legacy_fixture_test.go",
+      "bytes": 5027,
+      "sha256": "a47954e3e00597a4827fb5bfebd7cadaf1683e91c75cd3f21ce19d638675ea5d"
+    },
+    {
+      "path": "server/internal/rpc/group/role_effects_mongo_fixture_test.go",
+      "bytes": 4058,
+      "sha256": "7ec273f9cdc49ccc62ea5f183bd30e41cf57e6d3a20c8b11de811522baa14eb7"
+    },
+    {
+      "path": "server/internal/rpc/group/role_notice_authority_integration_test.go",
+      "bytes": 2979,
+      "sha256": "3f1a2682a8e37f9d1bf7f6a7c3c0524d3eee0280346c912d959032f44df0a73c"
     },
     {
       "path": "server/internal/rpc/group/state_notice_admission_fixture_test.go",
@@ -6723,10 +6763,18 @@
     "server/internal/push/durable_offline_callback.go": 420,
     "server/internal/push/durable_offline_callback_owned.go": 420,
     "server/internal/push/durable_offline_callback_owned_test.go": 420,
-    "server/internal/push/durable_offline_callback_test.go": 420
+    "server/internal/push/durable_offline_callback_test.go": 420,
+    "server/internal/groupauthority/role_notice.go": 420,
+    "server/internal/groupeffects/role_notification.go": 420,
+    "server/internal/groupeffects/role_notification_test.go": 420,
+    "server/internal/rpc/group/group_role_effects.go": 420,
+    "server/internal/rpc/group/group_role_effects_integration_test.go": 420,
+    "server/internal/rpc/group/role_effects_legacy_fixture_test.go": 420,
+    "server/internal/rpc/group/role_effects_mongo_fixture_test.go": 420,
+    "server/internal/rpc/group/role_notice_authority_integration_test.go": 420
   },
-  "effective_count": 1118,
-  "effective_digest": "9a5de074346bc3db865e6bb02a9a1b77c25ea9ab93c45ce6ce1115ad70b47327",
+  "effective_count": 1126,
+  "effective_digest": "aa5c01aa4b19df6560e3121252828868b54352574cc6feda6498e7b92772c3f9",
   "delta": [
     {
       "target": "server/cmd/tools/ordinary-alias-receipts/backend.go",
@@ -6841,6 +6889,42 @@
       "beforeSHA256": "83999f5f03236a7b4764bc64d28d196e0447e0badb1b3970ef26ebd68fc6b34e",
       "sha256": "79f2e2bfbc8173d58bd5d720b41368ae9349cbc110f5e1d117e6c4b2003eee91",
       "bytes": 2935
+    },
+    {
+      "target": "server/internal/groupauthority/role_notice.go",
+      "beforeSHA256": null,
+      "sha256": "d1b4ea04e70b7d3b99bfb728efeae795fb17c815a6f060595f4a48e37cbc6172",
+      "bytes": 11622
+    },
+    {
+      "target": "server/internal/groupeffects/callback_dispatch.go",
+      "beforeSHA256": "087325bfe9af6e19640da2aac10d452a6e16bca6040a2ebec8df28dcc25549de",
+      "sha256": "eca559a09487a5571a042d374a0fbe8f55d98748a040ac4863a833bf4d706c00",
+      "bytes": 8260
+    },
+    {
+      "target": "server/internal/groupeffects/notification_delivery.go",
+      "beforeSHA256": "fc40e6645265491676771d6e755dc9fb1919df190861f22481722ed56a015e98",
+      "sha256": "c886684cf16a935c14c7134286f75035a55e04299b8cb9b33583d6b728fad433",
+      "bytes": 8802
+    },
+    {
+      "target": "server/internal/groupeffects/role_notification.go",
+      "beforeSHA256": null,
+      "sha256": "7beaebb2fcb22a78d5069e9b0ecf152f4f461f2faae7400099b8cc62ab2b7842",
+      "bytes": 7691
+    },
+    {
+      "target": "server/internal/groupeffects/role_notification_test.go",
+      "beforeSHA256": null,
+      "sha256": "0fc69b2d6d520f4c693412b358dd7349090518b973450ceaedd969d3d2a390ab",
+      "bytes": 456
+    },
+    {
+      "target": "server/internal/groupeffects/store.go",
+      "beforeSHA256": "429a589d30e7bc29d74050e70087389cb4dbac79d88b9dbf4d304e51dba21848",
+      "sha256": "3e897ee5c27da253358e27a1589e59b80ba63a13d3deda8c674224cee21bd7d7",
+      "bytes": 17332
     },
     {
       "target": "server/internal/meetingbooking/capability_list_test.go",
@@ -7341,6 +7425,72 @@
       "bytes": 17994
     },
     {
+      "target": "server/internal/rpc/group/authority_rpc_barrier_integration_test.go",
+      "beforeSHA256": "32cb0f548b1d0645de9de6302787228993925054b98f622ce836f92bf0898194",
+      "sha256": "1d81f3fcdb6e00bed0b0fde64124b3791c0cadf6c92a647ee0b581d15de67972",
+      "bytes": 12282
+    },
+    {
+      "target": "server/internal/rpc/group/authority_rpc_mongo_fixture_test.go",
+      "beforeSHA256": "2d1b05128f08af5ba9685fa968fe500a9d6d75095210e1a9365366015851658b",
+      "sha256": "ea1b937b5dbf6545b1789f04a5a838c2d62eb415370fa9a8f54fb54d89ff2995",
+      "bytes": 4046
+    },
+    {
+      "target": "server/internal/rpc/group/group.go",
+      "beforeSHA256": "b10faad9ae102c2b39e915d8d70cfb1f84b12939c069622a50468f664a5dce12",
+      "sha256": "e8cf9ee968177c419a4c654c84e6e7851f31192823ab95f565ef0e167a09e591",
+      "bytes": 63513
+    },
+    {
+      "target": "server/internal/rpc/group/group_member_notice_mutation_integration_test.go",
+      "beforeSHA256": "48c923fb7667b982c113d7654fa218f8ff586453a62184284790e801cde765be",
+      "sha256": "57e5bc555f54e5c7f29dea85a516f9a0b0c9671c5b9aa8ee7e5ade66664b3b1b",
+      "bytes": 16773
+    },
+    {
+      "target": "server/internal/rpc/group/group_notice_mutation.go",
+      "beforeSHA256": "4693c99730116c4247797412de8566cba0b873952f973d382941c7b2d170cf70",
+      "sha256": "dd094f5279ec1c6f9fb554656cc9c920259d9a6630f4edf6e21c1dacc665f3e9",
+      "bytes": 10736
+    },
+    {
+      "target": "server/internal/rpc/group/group_notice_mutation_integration_test.go",
+      "beforeSHA256": "8eb8dcfcdcf29f35af0a07f77d43a1e83d18fd17c61735a4f9b14cdd8618ed1a",
+      "sha256": "1b7fa771bc7c6d68f505b1b8b6a77ff357997f8c04227559d74c024c2caac552",
+      "bytes": 18953
+    },
+    {
+      "target": "server/internal/rpc/group/group_role_effects.go",
+      "beforeSHA256": null,
+      "sha256": "c1973d4853908c8ee7a0b000b8d9af82870fefdfe20bcfd0d615fce6b41d1951",
+      "bytes": 14516
+    },
+    {
+      "target": "server/internal/rpc/group/group_role_effects_integration_test.go",
+      "beforeSHA256": null,
+      "sha256": "65547f9e905a26d72ee2136ab5fce0e55d986e369b36472dd5580a1a9d4d9c2e",
+      "bytes": 17412
+    },
+    {
+      "target": "server/internal/rpc/group/role_effects_legacy_fixture_test.go",
+      "beforeSHA256": null,
+      "sha256": "a47954e3e00597a4827fb5bfebd7cadaf1683e91c75cd3f21ce19d638675ea5d",
+      "bytes": 5027
+    },
+    {
+      "target": "server/internal/rpc/group/role_effects_mongo_fixture_test.go",
+      "beforeSHA256": null,
+      "sha256": "7ec273f9cdc49ccc62ea5f183bd30e41cf57e6d3a20c8b11de811522baa14eb7",
+      "bytes": 4058
+    },
+    {
+      "target": "server/internal/rpc/group/role_notice_authority_integration_test.go",
+      "beforeSHA256": null,
+      "sha256": "3f1a2682a8e37f9d1bf7f6a7c3c0524d3eee0280346c912d959032f44df0a73c",
+      "bytes": 2979
+    },
+    {
       "target": "server/internal/rpc/msg/server.go",
       "beforeSHA256": "96b2e27c55dc1207005f66dd5a5463119462bf0fc02b7b6fbb96e0e1ac7968d7",
       "sha256": "314a55bf327db760d47b5d6ef5eda635103e4718091cce3f9189a9512bc67f71",
@@ -7525,12 +7675,15 @@
         "TestGroupEffectsMongoReadinessRejectsLossyOrUnknownCatalog",
         "TestGroupEffectsMongoRejectsScopeAndLostSchemaWithoutImplicitCreate",
         "TestNotificationCannotEscapeGroupOrBecomeUserMessage",
+        "TestRoleCallbackTimeoutPreservesLegacyClientCap",
         "TestStorageFailurePreservesTransactionLabelsWithoutDriverDetails",
         "TestTypedCallbackRejectsForeignCommandGroupAndDuplicateJSON",
         "TestUnknownConfirmationRequiresExactRevisionPayloadAndIndependentEvidence"
       ],
       "allowed_legacy_skips": [],
-      "required_leaves": [],
+      "required_leaves": [
+        "TestRoleCallbackTimeoutPreservesLegacyClientCap"
+      ],
       "full_package": true,
       "compileOnly": false
     },
@@ -7850,6 +8003,15 @@
         "TestRemovalCallbacksAuthenticationDenialNeverContinues",
         "TestRemovalCallbacksDisabledRemainNoIOWhenQuitEnabled",
         "TestRemovalCallbacksUseOwnFailurePolicyInsteadOfQuit",
+        "TestRoleEffectsCommittedRevocationFencesDelayedMemberBatch",
+        "TestRoleEffectsCrossGroupBatchIsAtomicAndReadScopeDoesNotWidenWrites",
+        "TestRoleEffectsKnownCommitCacheFailureReturnsACKAndRetainsAfter",
+        "TestRoleEffectsQueueFailureRollsBackBothGroupsAndCacheJobs",
+        "TestRoleEffectsRetryKeepsCommandAndBeforeCallbackRunsOnce",
+        "TestRoleEffectsSelfProfileAndRoleAssignmentContract",
+        "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay",
+        "TestRoleEffectsTransferPreservesOldOwnerSuccessorRoleAndOneOwner",
+        "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary",
         "TestSetGroupMemberInfoCallbackCannotElevateOrdinary",
         "TestSetGroupMemberInfoCallbackPreservesLegalBodyChanges",
         "TestSetGroupMemberInfoInvalidActorOrRequestNeverWrites",
@@ -7934,6 +8096,22 @@
         "TestRemovalCallbacksUseOwnFailurePolicyInsteadOfQuit/kick/own-continue-quit-on",
         "TestRemovalCallbacksUseOwnFailurePolicyInsteadOfQuit/kick/own-stop-quit-off",
         "TestRemovalCallbacksUseOwnFailurePolicyInsteadOfQuit/kick/own-stop-quit-on",
+        "TestRoleEffectsCommittedRevocationFencesDelayedMemberBatch",
+        "TestRoleEffectsCrossGroupBatchIsAtomicAndReadScopeDoesNotWidenWrites",
+        "TestRoleEffectsKnownCommitCacheFailureReturnsACKAndRetainsAfter",
+        "TestRoleEffectsQueueFailureRollsBackBothGroupsAndCacheJobs",
+        "TestRoleEffectsRetryKeepsCommandAndBeforeCallbackRunsOnce",
+        "TestRoleEffectsSelfProfileAndRoleAssignmentContract",
+        "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay",
+        "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/ack",
+        "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/legacy-failed-continue",
+        "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/permission-still-blocks",
+        "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/unknown-blocks",
+        "TestRoleEffectsTransferPreservesOldOwnerSuccessorRoleAndOneOwner",
+        "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary",
+        "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary/expired-owner",
+        "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary/non-owner",
+        "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary/ordinary-owner",
         "TestSetGroupMemberInfoInvalidActorOrRequestNeverWrites/duplicate-edit",
         "TestSetGroupMemberInfoInvalidActorOrRequestNeverWrites/empty-actor",
         "TestSetGroupMemberInfoInvalidActorOrRequestNeverWrites/empty-group",
@@ -8304,8 +8482,8 @@
       ]
     }
   },
-  "expected_top_source_inventory": 428,
-  "expected_required_pass": 421,
+  "expected_top_source_inventory": 438,
+  "expected_required_pass": 431,
   "allowed_legacy_skip_count": 7,
   "dependencies": [
     {
@@ -8349,7 +8527,8 @@
     "Managed offline worker start/stop/drain and every required-mode reader factory CheckReady.",
     "Executable owned inspect/confirm proof-file tooling, not only Store helper methods.",
     "Legal offline callbacks and Getui/JPush, Seq0/modifier/ordinary allocator/read floor/migration scopes still required; unsupported dependency must reject startup rather than silently disable functionality.",
-    "Whole cloud compile/test/vet results are still pending; this source composition is not proof of runtime reliability."
+    "Whole cloud compile/test/vet results are still pending; this source composition is not proof of runtime reliability.",
+    "source1126/full28/438 anticipated only; new roles targeted24top42sub locally, full regression not run; action-aware notification receiver not yet assembled; no runtime adoption"
   ],
   "overlay": [
     {
@@ -8503,6 +8682,54 @@
       "sha256": "79f2e2bfbc8173d58bd5d720b41368ae9349cbc110f5e1d117e6c4b2003eee91",
       "mode": "0o644",
       "beforeSHA256": "83999f5f03236a7b4764bc64d28d196e0447e0badb1b3970ef26ebd68fc6b34e"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/groupauthority/role_notice.go",
+      "target": "server/internal/groupauthority/role_notice.go",
+      "mode": "0o644",
+      "bytes": 11622,
+      "sha256": "d1b4ea04e70b7d3b99bfb728efeae795fb17c815a6f060595f4a48e37cbc6172",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/groupeffects/callback_dispatch.go",
+      "target": "server/internal/groupeffects/callback_dispatch.go",
+      "mode": "0o644",
+      "bytes": 8260,
+      "sha256": "eca559a09487a5571a042d374a0fbe8f55d98748a040ac4863a833bf4d706c00",
+      "beforeSHA256": "087325bfe9af6e19640da2aac10d452a6e16bca6040a2ebec8df28dcc25549de"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/groupeffects/notification_delivery.go",
+      "target": "server/internal/groupeffects/notification_delivery.go",
+      "mode": "0o644",
+      "bytes": 8802,
+      "sha256": "c886684cf16a935c14c7134286f75035a55e04299b8cb9b33583d6b728fad433",
+      "beforeSHA256": "fc40e6645265491676771d6e755dc9fb1919df190861f22481722ed56a015e98"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/groupeffects/role_notification.go",
+      "target": "server/internal/groupeffects/role_notification.go",
+      "mode": "0o644",
+      "bytes": 7691,
+      "sha256": "7beaebb2fcb22a78d5069e9b0ecf152f4f461f2faae7400099b8cc62ab2b7842",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/groupeffects/role_notification_test.go",
+      "target": "server/internal/groupeffects/role_notification_test.go",
+      "mode": "0o644",
+      "bytes": 456,
+      "sha256": "0fc69b2d6d520f4c693412b358dd7349090518b973450ceaedd969d3d2a390ab",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/groupeffects/store.go",
+      "target": "server/internal/groupeffects/store.go",
+      "mode": "0o644",
+      "bytes": 17332,
+      "sha256": "3e897ee5c27da253358e27a1589e59b80ba63a13d3deda8c674224cee21bd7d7",
+      "beforeSHA256": "429a589d30e7bc29d74050e70087389cb4dbac79d88b9dbf4d304e51dba21848"
     },
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/meetingbooking/capability_list_test.go",
@@ -9167,6 +9394,94 @@
       "sha256": "838934cb5d2481c759e4d23a7c76c5512ce8b35158a1a61e5243723434661c86",
       "mode": "0o644",
       "beforeSHA256": "e2719cf513a38da861703cbc6425a38b56213c2750087bb2e14cffa7be56ef33"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/authority_rpc_barrier_integration_test.go",
+      "target": "server/internal/rpc/group/authority_rpc_barrier_integration_test.go",
+      "mode": "0o644",
+      "bytes": 12282,
+      "sha256": "1d81f3fcdb6e00bed0b0fde64124b3791c0cadf6c92a647ee0b581d15de67972",
+      "beforeSHA256": "32cb0f548b1d0645de9de6302787228993925054b98f622ce836f92bf0898194"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/authority_rpc_mongo_fixture_test.go",
+      "target": "server/internal/rpc/group/authority_rpc_mongo_fixture_test.go",
+      "mode": "0o644",
+      "bytes": 4046,
+      "sha256": "ea1b937b5dbf6545b1789f04a5a838c2d62eb415370fa9a8f54fb54d89ff2995",
+      "beforeSHA256": "2d1b05128f08af5ba9685fa968fe500a9d6d75095210e1a9365366015851658b"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/group.go",
+      "target": "server/internal/rpc/group/group.go",
+      "mode": "0o644",
+      "bytes": 63513,
+      "sha256": "e8cf9ee968177c419a4c654c84e6e7851f31192823ab95f565ef0e167a09e591",
+      "beforeSHA256": "b10faad9ae102c2b39e915d8d70cfb1f84b12939c069622a50468f664a5dce12"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/group_member_notice_mutation_integration_test.go",
+      "target": "server/internal/rpc/group/group_member_notice_mutation_integration_test.go",
+      "mode": "0o644",
+      "bytes": 16773,
+      "sha256": "57e5bc555f54e5c7f29dea85a516f9a0b0c9671c5b9aa8ee7e5ade66664b3b1b",
+      "beforeSHA256": "48c923fb7667b982c113d7654fa218f8ff586453a62184284790e801cde765be"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/group_notice_mutation.go",
+      "target": "server/internal/rpc/group/group_notice_mutation.go",
+      "mode": "0o644",
+      "bytes": 10736,
+      "sha256": "dd094f5279ec1c6f9fb554656cc9c920259d9a6630f4edf6e21c1dacc665f3e9",
+      "beforeSHA256": "4693c99730116c4247797412de8566cba0b873952f973d382941c7b2d170cf70"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/group_notice_mutation_integration_test.go",
+      "target": "server/internal/rpc/group/group_notice_mutation_integration_test.go",
+      "mode": "0o644",
+      "bytes": 18953,
+      "sha256": "1b7fa771bc7c6d68f505b1b8b6a77ff357997f8c04227559d74c024c2caac552",
+      "beforeSHA256": "8eb8dcfcdcf29f35af0a07f77d43a1e83d18fd17c61735a4f9b14cdd8618ed1a"
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/group_role_effects.go",
+      "target": "server/internal/rpc/group/group_role_effects.go",
+      "mode": "0o644",
+      "bytes": 14516,
+      "sha256": "c1973d4853908c8ee7a0b000b8d9af82870fefdfe20bcfd0d615fce6b41d1951",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/group_role_effects_integration_test.go",
+      "target": "server/internal/rpc/group/group_role_effects_integration_test.go",
+      "mode": "0o644",
+      "bytes": 17412,
+      "sha256": "65547f9e905a26d72ee2136ab5fce0e55d986e369b36472dd5580a1a9d4d9c2e",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/role_effects_legacy_fixture_test.go",
+      "target": "server/internal/rpc/group/role_effects_legacy_fixture_test.go",
+      "mode": "0o644",
+      "bytes": 5027,
+      "sha256": "a47954e3e00597a4827fb5bfebd7cadaf1683e91c75cd3f21ce19d638675ea5d",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/role_effects_mongo_fixture_test.go",
+      "target": "server/internal/rpc/group/role_effects_mongo_fixture_test.go",
+      "mode": "0o644",
+      "bytes": 4058,
+      "sha256": "7ec273f9cdc49ccc62ea5f183bd30e41cf57e6d3a20c8b11de811522baa14eb7",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/rpc/group/role_notice_authority_integration_test.go",
+      "target": "server/internal/rpc/group/role_notice_authority_integration_test.go",
+      "mode": "0o644",
+      "bytes": 2979,
+      "sha256": "3f1a2682a8e37f9d1bf7f6a7c3c0524d3eee0280346c912d959032f44df0a73c",
+      "beforeSHA256": null
     },
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/rpc/msg/server.go",
@@ -10079,7 +10394,7 @@
       "afterSHA256": "3171ffa41a7c2b4d0604ecf10e4f32c0f32b0ba044d03f2f78d8087a00ce2dd2"
     }
   ],
-  "physical_before_effective_digest": "95524e744797410a62aa9cdd1f8a390d6d68dbe1ba1439784c4f5512772635ff",
+  "physical_before_effective_digest": "4c03d1121f396d54a1eaf11b61d0d45f26c6af08b941dea2fc7f20631b490c87",
   "physical_before_contract": {
     "onlyProductRestore": [
       "kafka_alias_vendor.go",
@@ -12144,5 +12459,54 @@
     "TestKafkaOfflineCallbackMongoWholeOriginalCandidateIsFrozenOnceAcrossPages"
   ],
   "mandatory_callback_worker_http": "TestManagedOfflineMongoPrivateFactoryWorkerAndRealCallbackHTTPStayInOneBoundLifecycle",
-  "mandatory_callback_cli_lineage": "TestCallbackOperatorNonemptyLineageInspectJSONIsConfirmableAndStaleReceiptStillRejects"
+  "mandatory_callback_cli_lineage": "TestCallbackOperatorNonemptyLineageInspectJSONIsConfirmableAndStaleReceiptStillRejects",
+  "role_fixture_adaptations": [
+    {
+      "path": "server/internal/rpc/group/authority_rpc_barrier_integration_test.go",
+      "beforeSHA256": "32cb0f548b1d0645de9de6302787228993925054b98f622ce836f92bf0898194",
+      "afterSHA256": "1d81f3fcdb6e00bed0b0fde64124b3791c0cadf6c92a647ee0b581d15de67972",
+      "meaning": "exact reviewed runtime initialization / local URI contract / three revoked-action+one legitimate duty assertions; all other bytes unchanged"
+    },
+    {
+      "path": "server/internal/rpc/group/authority_rpc_mongo_fixture_test.go",
+      "beforeSHA256": "2d1b05128f08af5ba9685fa968fe500a9d6d75095210e1a9365366015851658b",
+      "afterSHA256": "ea1b937b5dbf6545b1789f04a5a838c2d62eb415370fa9a8f54fb54d89ff2995",
+      "meaning": "exact reviewed runtime initialization / local URI contract / three revoked-action+one legitimate duty assertions; all other bytes unchanged"
+    },
+    {
+      "path": "server/internal/rpc/group/group_member_notice_mutation_integration_test.go",
+      "beforeSHA256": "48c923fb7667b982c113d7654fa218f8ff586453a62184284790e801cde765be",
+      "afterSHA256": "57e5bc555f54e5c7f29dea85a516f9a0b0c9671c5b9aa8ee7e5ade66664b3b1b",
+      "meaning": "exact reviewed runtime initialization / local URI contract / three revoked-action+one legitimate duty assertions; all other bytes unchanged"
+    },
+    {
+      "path": "server/internal/rpc/group/group_notice_mutation_integration_test.go",
+      "beforeSHA256": "8eb8dcfcdcf29f35af0a07f77d43a1e83d18fd17c61735a4f9b14cdd8618ed1a",
+      "afterSHA256": "1b7fa771bc7c6d68f505b1b8b6a77ff357997f8c04227559d74c024c2caac552",
+      "meaning": "exact reviewed runtime initialization / local URI contract / three revoked-action+one legitimate duty assertions; all other bytes unchanged"
+    }
+  ],
+  "mandatory_role_effects": {
+    "group": [
+      "TestRoleEffectsCommittedRevocationFencesDelayedMemberBatch",
+      "TestRoleEffectsCrossGroupBatchIsAtomicAndReadScopeDoesNotWidenWrites",
+      "TestRoleEffectsKnownCommitCacheFailureReturnsACKAndRetainsAfter",
+      "TestRoleEffectsQueueFailureRollsBackBothGroupsAndCacheJobs",
+      "TestRoleEffectsRetryKeepsCommandAndBeforeCallbackRunsOnce",
+      "TestRoleEffectsSelfProfileAndRoleAssignmentContract",
+      "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay",
+      "TestRoleEffectsTransferPreservesOldOwnerSuccessorRoleAndOneOwner",
+      "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary"
+    ],
+    "subcases": [
+      "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/ack",
+      "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/legacy-failed-continue",
+      "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/permission-still-blocks",
+      "TestRoleEffectsTransferCallbackOrderingAndUnknownNoReplay/unknown-blocks",
+      "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary/expired-owner",
+      "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary/non-owner",
+      "TestRoleNoticeActualMongoOrdinaryOwnerAndLatestRoleBoundary/ordinary-owner"
+    ],
+    "timeout": "TestRoleCallbackTimeoutPreservesLegacyClientCap"
+  }
 }

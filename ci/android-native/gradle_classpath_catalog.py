@@ -8,6 +8,7 @@ import stat
 import run as parent
 import support as s
 import sdk_platform_producer as sdk_sources
+import rich_consumer
 
 GRADLE_ZIP = '17f277867f6914d61b1aa02efab1ba7bb439ad652ca485cd8ca6842fccec6e43'
 JDK_ARCHIVE = '3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e'
@@ -127,7 +128,8 @@ def seal(job, here):
         'reviewed_generator_source_metadata_sha256': s.sha(here / 'gradle-producer-sources.json'),
         'reviewed_generator_sources': reviewed_sources,
         'application_or_fixture_parsed_before_producer': False,
-        'SDK_platform_sources': sdk_proof}
+        'SDK_platform_sources': sdk_proof,
+        'accepted_R12_rich_consumer': rich_consumer.embedded(here)}
     path = work / ROOT / 'catalog.json'
     s.write_json(path, catalog)
     s.write_json(work / ROOT / 'complete.json', {'state': 'passed', 'catalog': {
