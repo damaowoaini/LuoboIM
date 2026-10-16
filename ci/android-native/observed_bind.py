@@ -21,7 +21,7 @@ import verify_inputs
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r7-independent-builtin-classpath-producer'
+REVISION = 'root-r8-inherited-system-argument-catalog-binding'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 
@@ -65,13 +65,14 @@ class Job(parent.Job):
             catalog_before = classpaths.verified_catalog(self.w)
             changed = list(args)
             changed[changed.index('-I') + 1] = HERE / 'resolve-observed.gradle'
-            changed += ['-PluoboClasspathCatalog=' + str(catalog_before[0]),
-                        '-PluoboClasspathCatalogSha256=' + catalog_before[1]]
+            changed += ['-DluoboClasspathCatalog=' + str(catalog_before[0]),
+                        '-DluoboClasspathCatalogSha256=' + catalog_before[1]]
             s.write_json(self.w / 'evidence/observed-resolver-dispatch.json', {
                 'controller_revision': REVISION, 'original_argv': list(map(str, args)),
                 'derived_argv': list(map(str, changed)),
-                'only_changes': ['-I value', 'two fixed independently produced catalog properties'],
+                'only_changes': ['-I value', 'two fixed independently produced system-property arguments'],
                 'catalog_sha256': catalog_before[1],
+                'binding_source': 'StartParameter.systemPropertiesArgs',
                 'original_resolver_sha256': s.sha(parent.HERE / 'resolve.gradle'),
                 'derived_resolver_sha256': s.sha(HERE / 'resolve-observed.gradle')})
             self._typed_resolver_dispatch = True
@@ -82,8 +83,8 @@ class Job(parent.Job):
             if not (self.w / classpaths.ROOT).exists():
                 classpaths.seal(self, HERE)
             catalog_before = classpaths.verified_catalog(self.w)
-            args = list(args) + ['-PluoboClasspathCatalog=' + str(catalog_before[0]),
-                                '-PluoboClasspathCatalogSha256=' + catalog_before[1]]
+            args = list(args) + ['-DluoboClasspathCatalog=' + str(catalog_before[0]),
+                                '-DluoboClasspathCatalogSha256=' + catalog_before[1]]
         try:
             return super().cmd(args, cwd, env, label, timeout, reject, stdin)
         finally:

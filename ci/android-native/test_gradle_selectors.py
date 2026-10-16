@@ -45,8 +45,8 @@ class SelectorSourceTests(unittest.TestCase):
             self.assertEqual(len(calls), 1)
             expected = list(original)
             expected[expected.index('-I') + 1] = observed.HERE / 'resolve-observed.gradle'
-            expected += ['-PluoboClasspathCatalog=' + str(catalog[0]),
-                         '-PluoboClasspathCatalogSha256=' + catalog[1]]
+            expected += ['-DluoboClasspathCatalog=' + str(catalog[0]),
+                         '-DluoboClasspathCatalogSha256=' + catalog[1]]
             self.assertEqual(calls[0], (expected, root / 'source/app/android',
                 observed.parent.environment(root, False), 'gradle-dependency-setup', 1800, None, None))
             self.assertEqual(job.verify.call_count, 2)

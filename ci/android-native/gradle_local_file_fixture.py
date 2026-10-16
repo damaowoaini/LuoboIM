@@ -1,4 +1,4 @@
-"""Three real Gradle local-file controls; preparation/check only, no runner."""
+"""Preserve three local-file controls; add real inherited-catalog control."""
 import base64
 import json
 from pathlib import Path
@@ -36,7 +36,7 @@ plugins { id 'java-library' }
 repositories { maven { url = uri('m2') } }
 // The separately pinned resolver authenticates these exact bytes before this
 // build script runs. No file first seen in this app/fixture model is enrolled.
-def catalog = new JsonSlurper().parse(file(findProperty('luoboClasspathCatalog')))
+def catalog = new JsonSlurper().parse(file(gradle.startParameter.getSystemPropertiesArgs()['luoboClasspathCatalog']))
 def approved = new File(System.getenv('ANDROID_NATIVE_WORK'),
     catalog.reports.selector.notations.LOCAL_GROOVY.files[0].path)
 """
@@ -61,10 +61,12 @@ def approved = new File(System.getenv('ANDROID_NATIVE_WORK'),
     s.write_json(root / 'prepared-local-files.json', {'state': 'prepared_not_executed',
         'cases': result, 'original12_unchanged': True, 'Gradle_processes': 3,
         'producer_is_separate_first_builtin_models': True})
-    return result
+    return result + prepare_included(work)
 
 
 def check(case, log, captured):
+    if case.get('included_catalog_contract'):
+        return check_included(case, log, captured)
     work = Path(case['cwd']).parents[2]
     catalog_path, catalog_sha = producer.verified_catalog(work)
     catalog = producer.read_json(work, catalog_path)
@@ -100,3 +102,66 @@ def check(case, log, captured):
             raise ValueError('file/project control lost external fixed artifact audit')
         proof['real_files_builtin_project_and_module_all_verified'] = True
     return proof
+
+
+def prepare_included(work):
+    """Builtin Java projects only; this function never starts Gradle."""
+    case = Path(work) / 'evidence/selector-controls/included-build-catalog'
+    if case.exists() or case.is_symlink():
+        raise ValueError('fresh included-build catalog control required')
+    s.mkdir(case / 'evidence')
+    s.put(case / 'settings.gradle', b"rootProject.name = 'catalog-parent'\nincludeBuild('included')\n")
+    s.put(case / 'build.gradle', b"plugins { id 'java-library' }\n"
+        b"dependencies { api 'fixture.composite:included:1.0' }\n")
+    s.put(case / 'included/settings.gradle', b"rootProject.name = 'included'\n")
+    s.put(case / 'included/build.gradle', b"plugins { id 'java-library' }\n"
+        b"group = 'fixture.composite'\nversion = '1.0'\n")
+    s.put(case / 'gradle.properties', b'org.gradle.daemon=false\norg.gradle.parallel=false\n')
+    row = {'label': 'included-build-catalog', 'cwd': str(case), 'variant_contract': True,
+        'local_file_contract': True, 'included_catalog_contract': True,
+        'expected_rejection': None, 'actual_expected_init_directories': [
+            'evidence/selector-controls/included-build-catalog',
+            'evidence/selector-controls/included-build-catalog/included']}
+    s.write_json(case / 'input.json', row)
+    s.write_json(case.parent / 'prepared-included-catalog.json', {
+        'state': 'prepared_not_executed', 'case': row, 'original15_preserved': True,
+        'Gradle_processes': 1, 'builtin_java_only_no_external_repository': True})
+    return [row]
+
+
+def check_included(case, log, captured):
+    """Requires actual nested model, literal digest and complete real outputs."""
+    work = Path(case['cwd']).parents[2]
+    _, catalog_sha = producer.verified_catalog(work)
+    if set(captured) != set(original.OUTPUTS):
+        raise ValueError('included control requires complete actual artifact/graph/project outputs')
+    text = Path(log).read_text(errors='replace')
+    bindings = [json.loads(line.split('LUOBO_CATALOG_BINDING ', 1)[1])
+                for line in text.splitlines() if 'LUOBO_CATALOG_BINDING ' in line]
+    for directory in case['actual_expected_init_directories']:
+        if not any(x.get('state') == 'catalog_bytes_bound'
+                   and x.get('source') == 'StartParameter.systemPropertiesArgs'
+                   and x.get('current_directory_owned_relative') == directory
+                   and x.get('catalog_sha256') == catalog_sha
+                   and x.get('checks') and all(v is True for v in x['checks'].values())
+                   for x in bindings):
+            raise ValueError('main and actual included initialization must bind same full producer SHA')
+    base = Path(case['cwd']) / 'evidence'
+    artifacts, selections, projects = [producer.read_json(work, base / n) for n in original.OUTPUTS]
+    if not projects or not all(x.get('canonicalOwned') is True for x in projects):
+        raise ValueError('included control lacks canonical owned source check')
+    def from_included(selected):
+        return (selected.get('kind') == 'project' and selected.get('projectPath') == ':'
+                and selected.get('buildTreePath') == ':included')
+    if not any(x.get('requested', {}).get('kind') == 'module'
+               and x['requested'].get('group') == 'fixture.composite'
+               and x['requested'].get('module') == 'included'
+               and x['requested'].get('version') == '1.0'
+               and from_included(x.get('selected', {})) for x in selections):
+        raise ValueError('actual included project was not selected for fixed module dependency')
+    if not any(from_included(x.get('selected', {}))
+               and x.get('deferred_to_actual_APK_compile') is True for x in artifacts):
+        raise ValueError('included project artifact deferral must retain real graph identity')
+    return {'actual_main_and_included_init_directories': case['actual_expected_init_directories'],
+        'same_full_independent_catalog_sha256': catalog_sha,
+        'actual_included_project_selected': True, 'real_Gradle_success_required': True}

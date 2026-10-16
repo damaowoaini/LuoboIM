@@ -1,4 +1,4 @@
-// Explicit observed-r7 resolver; original resolve.gradle remains immutable.
+// Explicit observed-r8 resolver; original resolve.gradle remains immutable.
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import java.security.MessageDigest
@@ -28,18 +28,45 @@ def fileDigest = { file ->
     h.digest().encodeHex().toString()
 }
 def catalogPath = new File(owned, 'evidence/classpath-preseal/catalog.json')
-def properties = gradle.startParameter.projectProperties
+// Included builds inherit this exact -D map (StartParameter.newBuild), not -P.
+// Do not read ambient System properties or fall back to environment values.
+def properties = gradle.startParameter.getSystemPropertiesArgs()
 def expectedCatalogSha = properties['luoboClasspathCatalogSha256']
-if (properties['luoboClasspathCatalog'] != catalogPath.path || !(expectedCatalogSha ==~ /[0-9a-f]{64}/) ||
-        catalogPath.canonicalFile != catalogPath ||
-        !Files.isRegularFile(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS) ||
-        Files.getOwner(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal ||
-        Files.getAttribute(catalogPath.toPath(), 'unix:nlink', LinkOption.NOFOLLOW_LINKS) != 1 ||
-        catalogPath.length() > 2 * 1024 * 1024)
-    throw new GradleException('fixed owned producer catalog and literal SHA required')
+def gate = [literal_path_exact:properties['luoboClasspathCatalog'] == catalogPath.path,
+    literal_sha_syntax:expectedCatalogSha instanceof String && expectedCatalogSha ==~ /[0-9a-f]{64}/,
+    canonical:false, regular:false, same_owner:false, single_link:false,
+    length_bounded:false, full_sha_equal:false]
+def directoryRef = null
+try {
+    def directory = gradle.startParameter.currentDir.canonicalFile
+    if (directory.toPath().startsWith(owned.toPath()))
+        directoryRef = owned.toPath().relativize(directory.toPath()).toString().take(1024)
+} catch (Exception ignored) { /* diagnostic only; no admission fallback */ }
+def gateError = null
+try {
+    gate.canonical = catalogPath.canonicalFile == catalogPath
+    gate.regular = Files.isRegularFile(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS)
+    gate.same_owner = Files.getOwner(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS) == ownedPrincipal
+    gate.single_link = Files.getAttribute(catalogPath.toPath(), 'unix:nlink', LinkOption.NOFOLLOW_LINKS) == 1
+    gate.length_bounded = catalogPath.length() > 0 && catalogPath.length() <= 2 * 1024 * 1024
+} catch (Exception error) { gateError = error }
+def gateDiagnostic = { state ->
+    def detail = [state:state, source:'StartParameter.systemPropertiesArgs',
+        current_directory_owned_relative:directoryRef, checks:gate]
+    if (gate.full_sha_equal) detail.catalog_sha256 = expectedCatalogSha
+    if (gateError != null) detail.io_error_class = gateError.getClass().name.take(256)
+    logger.lifecycle('LUOBO_CATALOG_BINDING ' + JsonOutput.toJson(detail))
+}
+if (gateError != null || gate.findAll { key,value -> key != 'full_sha_equal' }.values().any { !it }) {
+    gateDiagnostic('refused')
+    throw new GradleException('fixed owned producer catalog and literal SHA required', gateError)
+}
 def catalogBytes = Files.readAllBytes(catalogPath.toPath())
-if (digestBytes(catalogBytes) != expectedCatalogSha)
+gate.full_sha_equal = digestBytes(catalogBytes) == expectedCatalogSha
+if (!gate.full_sha_equal) {
+    gateDiagnostic('refused')
     throw new GradleException('independent producer catalog SHA differs')
+}
 def catalog = new JsonSlurper().parseText(new String(catalogBytes, 'UTF-8'))
 def notationNames = ['GRADLE_API', 'LOCAL_GROOVY', 'GRADLE_TEST_KIT'] as Set
 if (catalog.schema != 1 || catalog.Gradle != '9.3.1' ||
@@ -64,6 +91,7 @@ catalog.reports.each { name, report ->
         }
     }
 }
+gateDiagnostic('catalog_bytes_bound')
 def localRef = { File original ->
     def file = original.canonicalFile
     if (file != original.absoluteFile || !file.toPath().startsWith(owned.toPath()) ||

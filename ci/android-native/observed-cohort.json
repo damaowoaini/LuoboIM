@@ -16,8 +16,8 @@
     },
     {
       "path": ".github/workflows/android-observed-debug.yml",
-      "bytes": 3195,
-      "sha256": "9b1391fe18f54ae08800a9e544a26e64ade8409a7d868b1671b58ea35e967324"
+      "bytes": 3223,
+      "sha256": "42c5dff6265dbe2cc625a292d4af3c621d9a82fa62c277d6661c1878de670d44"
     },
     {
       "path": "ci/android-native/audit.py",
@@ -61,8 +61,8 @@
     },
     {
       "path": "ci/android-native/gradle_local_file_fixture.py",
-      "bytes": 6310,
-      "sha256": "0b5c3e772d8142acd7b1037a283b62ff202c27aa5b8a833718ec460243ac5588"
+      "bytes": 10561,
+      "sha256": "42d98753f46fed243bb84e3162cd44cf71bd98250eb2f8080b946fa72568ae5a"
     },
     {
       "path": "ci/android-native/gradle_selector_fixture.py",
@@ -101,8 +101,8 @@
     },
     {
       "path": "ci/android-native/observed_bind.py",
-      "bytes": 25032,
-      "sha256": "f2a2691fa1cef814c24e9d18485134577cc0f60d7f8a9856e2c4b3a60bed2130"
+      "bytes": 25115,
+      "sha256": "359bc7e44b5badf2fc56360fd35937fcf098efcea5a03f0d41c91958ecf9d1e8"
     },
     {
       "path": "ci/android-native/preseal-classpaths.gradle",
@@ -121,8 +121,8 @@
     },
     {
       "path": "ci/android-native/resolve-observed.gradle",
-      "bytes": 19301,
-      "sha256": "9bbbe3c88f56421c9f31e8684dfabc4b4409c7ac8d241152cf77670c82867fb1"
+      "bytes": 20825,
+      "sha256": "4bf59b169dba452ba57be1574e2e266ba8ad42f8f5a8ad347e536e5edca34967"
     },
     {
       "path": "ci/android-native/resolve.gradle",
@@ -152,7 +152,7 @@
     {
       "path": "ci/android-native/test_gradle_selectors.py",
       "bytes": 7906,
-      "sha256": "a2a1b65364bd5262adcffb0b37c1c7b982e9d5a86ed530fc881d85365d80c4c8"
+      "sha256": "9c637263fb3503d76702215362206cd05b79741ece6c72006e599ec01bb68cfc"
     },
     {
       "path": "ci/android-native/test_tools.py",
@@ -213,5 +213,5 @@
   "members": 428,
   "old427_r1_r2_immutable": true,
   "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true,
-  "controller_revision": "root-r7-independent-builtin-classpath-producer"
+  "controller_revision": "root-r8-inherited-system-argument-catalog-binding"
 }
