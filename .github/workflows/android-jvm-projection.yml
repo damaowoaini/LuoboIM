@@ -1,0 +1,57 @@
+name: Independent JVM context finite3 source18 projection
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [android-rich-jvm-context-projection-r1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-jvm-projection-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  source18-projection:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select independent fresh private workspace
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/jvm-context-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "JVM_PROJECTION_WORK=$RUNNER_TEMP/jvm-context-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/projection" >> "$GITHUB_ENV"
+      - name: Verify exact new controller and original source authority
+        run: python3 -B ci/android-jvm-projection/run.py --cohort android-rich-jvm-context-projection-r1 --stage readonly
+      - name: Actual complete source18 JVM projection through original finite broker
+        run: python3 -B ci/android-jvm-projection/run.py --cohort android-rich-jvm-context-projection-r1 --stage acquire --work "$JVM_PROJECTION_WORK"
+      - name: Complete graph re-resolution offline with only namespace loopback
+        run: sudo unshare --net -- bash ci/android-jvm-projection/offline.sh "$(id -un)" "$GITHUB_WORKSPACE" "$JVM_PROJECTION_WORK"
+      - name: Bound independent source body artifact collection
+        id: source_upload
+        if: always()
+        run: python3 -B ci/android-jvm-projection/run.py --cohort android-rich-jvm-context-projection-r1 --stage upload-admission --work "$JVM_PROJECTION_WORK"
+      - name: Preserve small exact graphs metadata HTTP and resource raw
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-jvm-projection-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.JVM_PROJECTION_WORK }}/evidence/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve actual captured module binary bodies separately
+        if: always() && steps.source_upload.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-jvm-projection-bodies-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.JVM_PROJECTION_WORK }}/body-cache/artifacts/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn

@@ -1,5 +1,17 @@
 import '../../../core/privacy/message_privacy.dart';
 
+/// SDK strong hints stay distinct: announcement4 is never an @ recipient.
+enum ConversationHint { none, atMe, atAll, atAllAtMe, announcement, unknown }
+
+ConversationHint conversationHint(int? raw) => switch (raw ?? 0) {
+  0 => ConversationHint.none,
+  1 => ConversationHint.atMe,
+  2 => ConversationHint.atAll,
+  3 => ConversationHint.atAllAtMe,
+  4 => ConversationHint.announcement,
+  _ => ConversationHint.unknown,
+};
+
 final class Conversation {
   const Conversation({
     required this.id,
@@ -16,6 +28,7 @@ final class Conversation {
     this.groupId,
     this.draft = '',
     this.mentions = false,
+    this.groupHint = ConversationHint.none,
     this.privacy,
   });
 
@@ -41,6 +54,7 @@ final class Conversation {
   final String? groupId;
   final String draft;
   final bool mentions;
+  final ConversationHint groupHint;
 
   Conversation withoutMessagePreview() => Conversation(
     id: id,
@@ -57,5 +71,6 @@ final class Conversation {
     groupId: groupId,
     draft: draft,
     mentions: mentions,
+    groupHint: groupHint,
   );
 }

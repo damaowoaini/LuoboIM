@@ -5,7 +5,7 @@ set -euo pipefail
 cohort=$1
 work=$2
 repo=$(cd -- "$(dirname -- "$0")/.." && pwd -P)
-[[ "$cohort" == current354 ]]
+[[ "$cohort" == current359 ]]
 [[ "$work" == /* && ! -e "$work" && ! -L "$work" ]]
 real_user_home=$(python3 - "$repo" "$(id -un)" <<'PYHOME'
 import importlib.util,pathlib,sys

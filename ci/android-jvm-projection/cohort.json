@@ -1,0 +1,158 @@
+{
+  "accepted_context_local2": {
+    "bytes": 7927,
+    "path": "references/integration/android-rich-jvm-context-r1-candidate-20261017/targeted-result.json",
+    "sha256": "51c22103e16c43c605684824abdbc0c2a24e03d7504c1a15b0d289ec1b11e11f"
+  },
+  "borrowed_functions": [
+    "prior.admission/source_state/verify_graph/evidence_rows/command/load_parent/upload_admission",
+    "original broker parser/Recorder/Central/Broker",
+    "Job.tool only, no Job.source/verify or parent CLI/stages",
+    "native support Budget/I-O/download/unpack/run and netns only"
+  ],
+  "cohort": "android-rich-jvm-context-projection-r1",
+  "files": [
+    {
+      "bytes": 2654,
+      "path": ".github/workflows/android-jvm-projection.yml",
+      "sha256": "83e8e002b9dac8fe52d4e1bdb96c77b64d50959b4268b26e500a1654b2265c53"
+    },
+    {
+      "bytes": 2173,
+      "path": "ci/android-jvm-projection/README.md",
+      "sha256": "674a6d447c8cbf43bd873349e2ba302ce1ffda7edbe7aafc32d5a3f7624c0199"
+    },
+    {
+      "bytes": 624,
+      "path": "ci/android-jvm-projection/offline.sh",
+      "sha256": "aa97edef98b6d6f364782eec3dac3badadc46e330dfe49e0ffcc77f32728c4f5"
+    },
+    {
+      "bytes": 137916,
+      "path": "ci/android-jvm-projection/original-graph.json",
+      "sha256": "9c1a08f41f9cb50ab563b40d8abe7d94d8595b194451f6ef1ad34111216d8f36"
+    },
+    {
+      "bytes": 9107,
+      "path": "ci/android-jvm-projection/producer.gradle",
+      "sha256": "8f4c7e5661e33637d0c8f24b8b50314b4c532c3118ee29e02c992637aa7425cf"
+    },
+    {
+      "bytes": 20078,
+      "path": "ci/android-jvm-projection/run.py",
+      "sha256": "2d328a4db3be7a1ddbbc43cc5372c1acacbe569c268e81d34c0f04a72485c761"
+    },
+    {
+      "bytes": 6167,
+      "path": "ci/android-jvm-projection/test_projection.py",
+      "sha256": "b0f896f803eac3aee235c654130d93aac6f8cb0cd0fb4f09787098d7cc79e57e"
+    },
+    {
+      "bytes": 21259,
+      "path": "ci/android-version-probe/run.py",
+      "sha256": "72a57601d15ec2ff7150778fc56520b654767a02a1faba5085cf3eaaf1e35605"
+    },
+    {
+      "bytes": 30290,
+      "path": "ci/android-version-probe/broker.py",
+      "sha256": "0615c47d401ca697455589303c3149ea740d4126736d1e335b51f4c9e9a64f2c"
+    },
+    {
+      "bytes": 12548,
+      "path": "ci/android-version-probe/inputs.json",
+      "sha256": "9d66add1f0b6a4fee8979406002f86de9afac37b4f097b486445543ef71f96d0"
+    },
+    {
+      "bytes": 40513,
+      "path": "ci/android-version-probe/fixtures/kotlinx-coroutines-core-1.8.0.module",
+      "sha256": "144eecd5365de3e30d7b46226c058051e39955b5c189e31fa4c7cffb99d620ba"
+    },
+    {
+      "bytes": 4278,
+      "path": "ci/android-version-probe/fixtures/kotlinx-coroutines-core-jvm-1.8.0.module",
+      "sha256": "ff6a22da40040938751db0ae21177e76517dbf126a76796f5426727bf76c1228"
+    },
+    {
+      "bytes": 10081,
+      "path": "ci/android-native/rich_consumer.py",
+      "sha256": "2084090e1f6e126f4c7cc9f7877a64f3c7a4832d2237bef2f85c81a8d1059955"
+    },
+    {
+      "bytes": 63745,
+      "path": "ci/android-native/rich-catalog.json",
+      "sha256": "db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe"
+    },
+    {
+      "bytes": 42548,
+      "path": "ci/android-native/run.py",
+      "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
+    },
+    {
+      "bytes": 11876,
+      "path": "ci/android-native/support.py",
+      "sha256": "818ed812deab20b25d4e8352f7d31b637039c0a881c8fc0fa070bc2ce1ea8fbd"
+    },
+    {
+      "bytes": 8531,
+      "path": "ci/android-native/audit.py",
+      "sha256": "1edf23b5ce32258e3e37d7af615b672e764de8193540aaa7de8a6fc03888d974"
+    },
+    {
+      "bytes": 2962,
+      "path": "ci/android-native/verify_inputs.py",
+      "sha256": "266a89fe31cbd9c40aa566a8f8f1404d9a04fed2a9a736a6cafac7e9142eede5"
+    },
+    {
+      "bytes": 8078,
+      "path": "ci/android-native/toolchain.json",
+      "sha256": "13cdeeb22b003d24714525c7de483446d8e0e0eed23200c4f54df1badd2251bd"
+    }
+  ],
+  "native_execution": false,
+  "never_called": [
+    "prior.readonly/execute/environment/main",
+    "historical offline.sh",
+    "native CLI/setup/core/Gradle/Apk stages"
+  ],
+  "new_context_source_sha256": "8f4c7e5661e33637d0c8f24b8b50314b4c532c3118ee29e02c992637aa7425cf",
+  "new_metadata": {
+    "POM_increments": {
+      "observed_first_config": 12,
+      "source_predicted_second_config_unrun": 4
+    },
+    "actual_new_variant_acceptance": false,
+    "context": "org.gradle.jvm-ecosystem/9.3.1",
+    "declarations_and_roots_exact": true,
+    "four_key_variant_identity_exact": true,
+    "original_attributes_exact": true,
+    "raw_display_is_separate_nonaccepted_proposal": true,
+    "selected_ID_filename_bytes_SHA18_exact": true,
+    "two_GMM_variants_exact": true
+  },
+  "old_catalog_sha256": "db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe",
+  "original_R12_root_acceptance": {
+    "bytes": 9391,
+    "path": "references/integration/native-r12-targeted-20261016/root-acceptance.json",
+    "sha256": "eb04d89f0a57bbbfefd3eaf7f052487a62ece2cb3d5cbcc1682e1a21e3d3c714"
+  },
+  "original_complete_graph": {
+    "bytes": 137916,
+    "path": "ci/android-jvm-projection/original-graph.json",
+    "sha256": "9c1a08f41f9cb50ab563b40d8abe7d94d8595b194451f6ef1ad34111216d8f36"
+  },
+  "parent_source_manifest": {
+    "bytes": 6158,
+    "path": "references/integration/android-rich-jvm-projection-candidate-20261017/candidate-manifest.json",
+    "sha256": "9473f26a8b3ef0623d9689fe5d1dcc8c4f63746cb49d7f5bbaafa49a62a2a9ee"
+  },
+  "resource": {
+    "actual_gradle_command_timeout_seconds": 900,
+    "cold_bytes": 8589934592,
+    "floor_bytes": 1073741824,
+    "owned_cap_bytes": 4294967296,
+    "phase_bytes": 4294967296,
+    "poll_seconds": 0.2
+  },
+  "schema": 1,
+  "state": "source_only_R1_strict_four_key_variants_new3_unrun"
+}

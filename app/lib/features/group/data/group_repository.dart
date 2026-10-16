@@ -92,6 +92,8 @@ final class GroupRepository {
           joined: joined,
           me: me,
           announcement: group.notification ?? '',
+          announcementUpdatedAt: group.notificationUpdateTime ?? 0,
+          announcementPublisherId: group.notificationUserID ?? '',
           introduction: group.introduction ?? '',
           verification: group.needVerification ?? 0,
           hideMemberProfiles: group.lookMemberInfo == 1,
@@ -452,8 +454,11 @@ final class GroupRepository {
   Future<String> conversation(String id, {bool Function()? isCurrent}) async {
     void check() {
       access.check();
-      if (isCurrent?.call() == false) throw const AppFailure(FailureKind.cancelled);
+      if (isCurrent?.call() == false) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
     }
+
     check();
     final current = await profile(id);
     check();
@@ -463,10 +468,12 @@ final class GroupRepository {
     return _sdk((manager) async {
       check();
       final value = await manager.conversationManager.getOneConversation(
-        sourceID: id, sessionType: current.summary.sessionType,
+        sourceID: id,
+        sessionType: current.summary.sessionType,
       );
       check();
-      if (value.conversationID.isEmpty || value.groupID != id ||
+      if (value.conversationID.isEmpty ||
+          value.groupID != id ||
           value.conversationType != current.summary.sessionType) {
         throw const AppFailure(FailureKind.invalidResponse);
       }
@@ -474,23 +481,30 @@ final class GroupRepository {
     });
   }
 
-  Future<CreatedGroup> createRecord(String name, List<String> userIds, {
+  Future<CreatedGroup> createRecord(
+    String name,
+    List<String> userIds, {
     String? avatar,
     bool Function()? isCurrent,
     void Function()? onDispatched,
   }) async {
     final owner = access.credentials;
-    final ids = List<String>.unmodifiable(userIds
-      .where((id) => id.isNotEmpty && id != owner.userId).toSet());
+    final ids = List<String>.unmodifiable(
+      userIds.where((id) => id.isNotEmpty && id != owner.userId).toSet(),
+    );
     final title = name.trim();
     void check() {
       access.check();
-      if (!identical(access.session.state.credentials, owner) || isCurrent?.call() == false) {
+      if (!identical(access.session.state.credentials, owner) ||
+          isCurrent?.call() == false) {
         throw const AppFailure(FailureKind.cancelled);
       }
     }
+
     check();
-    if (ids.length < 2 || title.isEmpty || title.characters.length > maximumCreationNameLength ||
+    if (ids.length < 2 ||
+        title.isEmpty ||
+        title.characters.length > maximumCreationNameLength ||
         (avatar != null && secureMediaUri(avatar) == null)) {
       throw const AppFailure(FailureKind.invalidInput);
     }
@@ -501,12 +515,17 @@ final class GroupRepository {
       onDispatched?.call();
       check();
       final group = await manager.groupManager.createGroup(
-        groupInfo: GroupInfo(groupID: '', groupName: title,
-          faceURL: avatar, groupType: GroupType.work),
+        groupInfo: GroupInfo(
+          groupID: '',
+          groupName: title,
+          faceURL: avatar,
+          groupType: GroupType.work,
+        ),
         memberUserIDs: ids,
       );
       check();
-      if (group.groupID.isEmpty || group.groupType != GroupType.work ||
+      if (group.groupID.isEmpty ||
+          group.groupType != GroupType.work ||
           (group.ownerUserID != null && group.ownerUserID != owner.userId)) {
         throw const AppFailure(FailureKind.invalidResponse);
       }
@@ -516,13 +535,19 @@ final class GroupRepository {
 
   // Existing callers remain compatible. The new editor uses createRecord so
   // it never loses the accepted groupID when opening its conversation fails.
-  Future<String> create(String name, List<String> userIds, {String? avatar}) async {
+  Future<String> create(
+    String name,
+    List<String> userIds, {
+    String? avatar,
+  }) async {
     final group = await createRecord(name, userIds, avatar: avatar);
-    return _sdk((manager) async => (await manager.conversationManager.getOneConversation(
-      sourceID: group.id, sessionType: group.sessionType,
-    )).conversationID);
+    return _sdk(
+      (manager) async => (await manager.conversationManager.getOneConversation(
+        sourceID: group.id,
+        sessionType: group.sessionType,
+      )).conversationID,
+    );
   }
-
 }
 
 GroupMember mapGroupMember(GroupMembersInfo member) => GroupMember(

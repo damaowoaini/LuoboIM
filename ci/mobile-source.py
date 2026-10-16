@@ -2,8 +2,8 @@
 """Verify minimal pinned source; optionally copy it to a new CI-only tree.
 
 No local task archive, mutable reference directory, native SDK binary or old
-generated cache is an input. Current354 must already be adopted in the checkout.
-The optional reference is full354 with exactly four pinned historical search baseline files.
+generated cache is an input. Current359 must already be adopted in the checkout.
+The optional reference is full359 with exactly four pinned historical search baseline files.
 """
 import argparse
 import hashlib
@@ -22,6 +22,12 @@ GROUP_REVOKE_ANALYSIS_PATHS = ['lib/features/chat/data/chat_repository.dart', 'l
 CARD_REVOKE_BEFORE3 = [{'path': 'app/lib/features/chat/data/chat_repository.dart', 'bytes': 50484, 'sha256': '4c1dfa2d10ca21f2d6ac302dacc5aeb1c9b897f9923c2ef5a4219165d1e2efdb'}, {'path': 'app/lib/features/chat/presentation/chat_controller.dart', 'bytes': 22967, 'sha256': 'd8a9e14bc26a25eb86c88dbffc95a04e7ff5463e7629021571f3e8274a1297c9'}, {'path': 'app/lib/features/chat/presentation/chat_page.dart', 'bytes': 87839, 'sha256': '08869981fe618ef7661fb120b96de5f017c6439c9dac32f2ff3fcc269526fb4b'}]
 CARD_TEST_PATHS = ['test/features/chat/chat_card_model_test.dart', 'test/features/chat/chat_card_repository_test.dart', 'test/features/chat/chat_card_workflow_test.dart']
 CARD_ANALYSIS_PATHS = ['lib/design/components/feedback.dart', 'lib/features/chat/data/chat_repository.dart', 'lib/features/chat/data/message_mapper.dart', 'lib/features/chat/domain/chat_card.dart', 'lib/features/chat/domain/chat_message.dart', 'lib/features/chat/presentation/chat_card_picker_page.dart', 'lib/features/chat/presentation/chat_card_view.dart', 'lib/features/chat/presentation/chat_controller.dart', 'lib/features/chat/presentation/chat_media_actions.dart', 'lib/features/chat/presentation/chat_page.dart', 'lib/features/contacts/data/contacts_repository.dart', 'lib/features/contacts/presentation/user_profile_page.dart', 'lib/features/group/data/group_repository.dart', 'test/features/chat/chat_card_fixture.dart', 'test/features/chat/chat_card_model_test.dart', 'test/features/chat/chat_card_repository_test.dart', 'test/features/chat/chat_card_workflow_test.dart']
+ANNOUNCEMENT_TEST_PATHS = ['test/features/chat/group_announcement_store_test.dart', 'test/features/chat/group_announcement_workflow_test.dart']
+ANNOUNCEMENT_ANALYSIS_PATHS = ['lib/features/chat/data/group_announcement_store.dart', 'lib/features/chat/presentation/chat_page.dart', 'lib/features/chat/presentation/group_announcement_panel.dart', 'lib/features/conversation/data/conversation_repository.dart', 'lib/features/conversation/domain/conversation.dart', 'lib/features/group/data/group_repository.dart', 'lib/features/group/domain/group.dart', 'lib/providers.dart', 'test/features/chat/group_announcement_fixture.dart', 'test/features/chat/group_announcement_store_test.dart', 'test/features/chat/group_announcement_workflow_test.dart']
+ANNOUNCEMENT_BEFORE6 = [{'bytes': 98364, 'path': 'app/lib/features/chat/presentation/chat_page.dart', 'sha256': '6c48c1224cb98870a38ada5e7b0c05dc944321a762bbda19cc40f38c42a68590'}, {'bytes': 7335, 'path': 'app/lib/features/conversation/data/conversation_repository.dart', 'sha256': '005dd617e6bbdb8f5597bca03934d5b4fa66bae9845333ca14401c795745de0f'}, {'bytes': 1424, 'path': 'app/lib/features/conversation/domain/conversation.dart', 'sha256': 'b089eb93ec54af4020ee4e618cab69d104a9984c6a380da6e03098632203eeb3'}, {'bytes': 18412, 'path': 'app/lib/features/group/data/group_repository.dart', 'sha256': '80d74efba7edff2eac89171757b0cf345d63c60ef4347af07ebb5725cb0e3207'}, {'bytes': 1541, 'path': 'app/lib/features/group/domain/group.dart', 'sha256': '46f1c047de1130d4de0939de656e25214e0d7f57d0ded56f92a53be5b4eebbfc'}, {'bytes': 7441, 'path': 'app/lib/providers.dart', 'sha256': 'd56739337d0a4bebdfed496c6e2f2a6f7a3164be4177623de48c81520014ea73'}]
+ANNOUNCEMENT_NEW5 = ['app/lib/features/chat/data/group_announcement_store.dart', 'app/lib/features/chat/presentation/group_announcement_panel.dart', 'app/test/features/chat/group_announcement_fixture.dart', 'app/test/features/chat/group_announcement_store_test.dart', 'app/test/features/chat/group_announcement_workflow_test.dart']
+ANNOUNCEMENT_NAMES24 = ['SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity', 'fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain', 'acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group', 'preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key', 'queued preference dispatch rechecks its original source before physical acknowledgement', 'an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner', 'actual group chat opens a fresh ordinary-member announcement and its own detail stays readable', 'acknowledged announcement close survives a new real chat route while a republished version appears again', 'a preferences failure retains the visible announcement until one explicit retry is acknowledged', 'a delayed versionA dismissal never consumes a newly loaded versionB', 'a genuine at-me hint does not create an announcement from historical group text', 'failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement', 'fresh duplicate group metadata withdraws the announcement before any acknowledgement', 'fresh foreign group metadata withdraws the announcement before any acknowledgement', 'fresh left group metadata withdraws the announcement before any acknowledgement', 'original owner replacement withdraws an open announcement and rejects its retained close callback', 'original issuer replacement withdraws an open announcement and rejects its retained close callback', 'original tenant replacement withdraws an open announcement and rejects its retained close callback', 'owner replacement while original group metadata waits prevents its next real member lookup', 'a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement', 'foreign coverage retires only the old owned announcement and a new explicit read remains usable', 'foreground loss immediately rejects the old callback and the next frame withdraws announcement text', 'sameCID metadata refresh preserves composer draft and never consumes genuine strong hints', 'muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior']
+
 WEBVIEW = {
     'webview_flutter': ('4.14.1', 'd53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111', 'direct main'),
     'webview_flutter_android': ('4.12.0', 'ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688', 'direct main'),
@@ -111,17 +117,17 @@ def native_source_contract(plan):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v18'
-            or plan['current354']['members'] != 354
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v19'
+            or plan['current359']['members'] != 359
             or plan['sdk_portable']['members'] != 51
-            or plan['portable_members'] != {'current354': 406}
-            or plan['current354']['expected_target_tests'] != 58
-            or plan['current354']['expected_full_tests'] != 1280
-            or plan['current354']['target_paths'] != GROUP_REVOKE_TEST_PATHS
-            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344', 'current351'))):
-        raise ValueError('current354 schema v18 inventory differs; no historical aliases')
+            or plan['portable_members'] != {'current359': 411}
+            or plan['current359']['expected_target_tests'] != 24
+            or plan['current359']['expected_full_tests'] != 1304
+            or plan['current359']['target_paths'] != ANNOUNCEMENT_TEST_PATHS
+            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344', 'current351', 'current354'))):
+        raise ValueError('current359 schema v19 inventory differs; no historical aliases')
     reference = plan['reference_entry']
-    if (reference['working_cohort'] != 'current354' or reference['members'] != 354
+    if (reference['working_cohort'] != 'current359' or reference['members'] != 359
             or reference['default_enabled'] is not False
             or len(reference['replacement_files']) != 4
             or len({row['path'] for row in reference['replacement_files']}) != 4
@@ -129,25 +135,26 @@ def descriptor():
             or reference['expected_visible_tests'] != 2
             or reference['expected_assertion_failures'] != 1
             or reference['expected_passed'] != 1 or reference['expected_child_exit'] != 1):
-        raise ValueError('reference entry must be the explicit two-test full354 variant')
+        raise ValueError('reference entry must be the explicit two-test full359 variant')
     native_source_contract(plan)
+    announcement_contract(plan)
     card_contract(plan)
     group_revoke_contract(plan)
     return plan
 
 
 def load_sources(cohort):
-    if cohort != 'current354':
-        raise ValueError('schema v18 supports current354 only; historical cohorts are not aliases')
+    if cohort != 'current359':
+        raise ValueError('schema v19 supports current359 only; historical cohorts are not aliases')
     plan = descriptor()
     selected = {}
-    for row in plan['current354']['files']:
+    for row in plan['current359']['files']:
         name = row['path']
         if name in selected or not name.startswith('app/'):
             raise ValueError('duplicate or out-of-scope current source')
         selected[name] = check(regular(REPO / safe_name(name)), row)
-    if len(selected) != 354 or source_digest(selected) != plan['current354']['source_digest']:
-        raise ValueError('current354 aggregate differs')
+    if len(selected) != 359 or source_digest(selected) != plan['current359']['source_digest']:
+        raise ValueError('current359 aggregate differs')
     actual = set()
     for prefix in ('app/lib', 'app/test', 'app/tool'):
         for directory, dirs, names in os.walk(REPO / prefix, followlinks=False):
@@ -180,7 +187,7 @@ def load_sources(cohort):
 
 
 def reference_sources(plan, files):
-    """Full406 portable closure; only the four named App source bodies differ."""
+    """Full411 portable closure; only the four named App source bodies differ."""
     result = dict(files)
     baseline = plan['reference_entry']
     for row in baseline['replacement_files']:
@@ -189,8 +196,8 @@ def reference_sources(plan, files):
             raise ValueError('reference replacement outside original production files')
         result[name] = check(regular(REPO / baseline['baseline_prefix'] / name), row)
     authored = {name: body for name, body in result.items() if name.startswith('app/')}
-    if len(authored) != 354 or source_digest(authored) != baseline['reference_source_digest']:
-        raise ValueError('reference is not the exact full354 variant')
+    if len(authored) != 359 or source_digest(authored) != baseline['reference_source_digest']:
+        raise ValueError('reference is not the exact full359 variant')
     return result
 
 
@@ -200,7 +207,7 @@ def required_names(plan):
     if item['path'] != 'ci/mobile/required-test-names.json':
         raise ValueError('required test names path differs')
     value = json.loads(check(regular(REPO / safe_name(item['path'])), item))
-    if value['schema'] != 'luobo.mobile.required-successful-names.v14' or value['cohort'] != 'current354':
+    if value['schema'] != 'luobo.mobile.required-successful-names.v15' or value['cohort'] != 'current359':
         raise ValueError('required test names identity differs')
     for key, expected in [('parent_full922', 922), ('new_next_unread29', 29),
                           ('parent_target281', 281), ('parent_target303', 303), ('parent_target345', 345), ('parent_target386', 386), ('current_target422', 422), ('new_location_receive36', 36), ('parent_full1068', 1068), ('new_saved_emoji41', 41), ('parent_full1027', 1027),
@@ -213,7 +220,8 @@ def required_names(plan):
                           ('current_target460', 460), ('parent_target460', 460),
                           ('parent_full1142', 1142), ('new_chat_card80', 80),
                           ('current_target540', 540), ('parent_full1222', 1222),
-                          ('new_group_revoke58', 58), ('current_full1280', 1280)]:
+                          ('new_group_revoke58', 58), ('current_full1280', 1280),
+                          ('new_announcement24', 24), ('current_full1304', 1304)]:
         entries = value[key]
         if (not isinstance(entries, list) or len({r['name'] for r in entries}) != len(entries)
                 or any(not isinstance(r['name'], str) or not r['name']
@@ -259,6 +267,9 @@ def required_names(plan):
     if (value['parent_full1222'] != sorted(value['current_full1222'], key=lambda r: r['name'])
             or value['current_full1280'] != sorted(value['parent_full1222'] + value['new_group_revoke58'], key=lambda r: r['name'])):
         raise ValueError('group revoke names do not preserve exact parent names')
+    if value['current_full1304'] != sorted(value['current_full1280'] + value['new_announcement24'], key=lambda r: r['name']):
+        raise ValueError('announcement names do not preserve exact parent names')
+    announcement_contract(plan, value)
     group_revoke_contract(plan, value)
     card_contract(plan, value)
     cleanup_contract(plan, value)
@@ -304,10 +315,51 @@ def next_unread_contract(plan, names):
     return contract
 
 
+def announcement_contract(plan, names=None):
+    contract = plan['announcement']
+    selected = contract['selected_files']
+    inventory = {r['path']: r for r in plan['current359']['files']}
+    lineage = contract['lineage']
+    if (contract['test_paths'] != ANNOUNCEMENT_TEST_PATHS
+            or contract['analysis_paths'] != ANNOUNCEMENT_ANALYSIS_PATHS
+            or len(selected) != 11 or len({r['path'] for r in selected}) != 11
+            or {r['path'] for r in selected} != {'app/' + p for p in ANNOUNCEMENT_ANALYSIS_PATHS}
+            or any(r != inventory.get(r['path']) for r in selected)
+            or lineage['parent_cohort'] != 'current354'
+            or lineage['parent_ref'] != 'ff7bc1f588f935d6315ad0211e68e15e58cd037e'
+            or lineage['parent_source_digest'] != '113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c'
+            or [r['before'] for r in lineage['replacements']] != ANNOUNCEMENT_BEFORE6
+            or any(r['before']['path'] != r['after']['path'] or r['after'] != inventory.get(r['after']['path']) for r in lineage['replacements'])
+            or lineage['new_paths'] != ANNOUNCEMENT_NEW5
+            or contract['new_names'] != ANNOUNCEMENT_NAMES24
+            or contract['widget_names'] != ANNOUNCEMENT_NAMES24[6:]
+            or contract['unit_names'] != ANNOUNCEMENT_NAMES24[:6]
+            or contract['widget_markers'] != ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end']
+            or (names is not None and sorted(contract['new_names']) != sorted(r['name'] for r in names['new_announcement24']))):
+        raise ValueError('announcement source/names/lineage/cleanup inventory differs')
+    return contract
+
+
+def announcement_parent_inventory(plan):
+    """Reverse only the accepted eleven-file delta for historical351/354 contracts."""
+    contract = announcement_contract(plan)
+    inventory = {r['path']: r for r in plan['current359']['files']}
+    for replacement in contract['lineage']['replacements']:
+        before = replacement['before']
+        inventory[before['path']] = before
+    for name in contract['lineage']['new_paths']:
+        del inventory[name]
+    digest = sha(json.dumps(sorted(inventory.values(), key=lambda r: r['path']),
+                            ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode())
+    if len(inventory) != 354 or digest != contract['lineage']['parent_source_digest']:
+        raise ValueError('announcement historical current354 parent differs')
+    return inventory
+
+
 def card_contract(plan, names=None):
     contract = plan['chat_card']
     selected = contract['selected_files']
-    inventory = {r['path']: r for r in plan['current354']['files']}
+    inventory = announcement_parent_inventory(plan)
     lineage = contract['current_source_lineage']
     replacements = lineage['replacements']
     if (lineage['historical_cohort'] != 'current351'
@@ -341,7 +393,7 @@ def card_contract(plan, names=None):
 def group_revoke_contract(plan, names=None):
     contract = plan['group_revoke']
     selected = contract['selected_files']
-    inventory = {r['path']: r for r in plan['current354']['files']}
+    inventory = announcement_parent_inventory(plan)
     groups = [contract['repository_names'], contract['widget_names']]
     union = [name for group in groups for name in group]
     if (contract['product_manifest_sha256'] != '88f56b2c18547415c3001e3693d0f42095b1c7b0d74005a3b4799906565cf60e'
@@ -388,7 +440,7 @@ def materialize(output, cohort):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cohort', choices=('current354',), required=True)
+    p.add_argument('--cohort', choices=('current359',), required=True)
     p.add_argument('--output', type=Path, help='explicit fresh output; omitted means readonly')
     args = p.parse_args()
     if args.output:

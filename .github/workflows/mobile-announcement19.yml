@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          ref: a45daef88c28927910023f911d15a39a070c9989 # immutable actual historical354-helper/359-overlay context
       - name: Linux tester runtime libraries
         run: |
           sudo apt-get update

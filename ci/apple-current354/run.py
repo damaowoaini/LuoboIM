@@ -20,6 +20,7 @@ import zipfile
 
 import consume
 import packaging
+import pod_selector
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
@@ -57,11 +58,14 @@ def metadata():
     return lane, spec, plugins
 
 
-def env(work, pod):
+def env(work, selected):
     work = Path(work)
+    pod = pod_selector.recheck(selected, Path(os.environ['HOME']))
+    ruby = Path(selected['ruby']['path'])
     # No inherited credentials/proxies/Java/Ruby options, no HOME reassignment.
     e = {k: os.environ[k] for k in ['HOME', 'USER', 'LOGNAME'] if k in os.environ}
-    e.update(PATH=str(work/'flutter/bin')+':'+str(pod.parent)+':/usr/bin:/bin',
+    e.update(PATH=str(work/'flutter/bin')+':'+str(pod.parent)+':'+str(ruby.parent)+':/usr/bin:/bin',
+             GEM_HOME=selected['gem_root'], GEM_PATH=selected['gem_root'],
              LANG='en_US.UTF-8', CI='true', TMPDIR=str(work/'tmp'),
              DEVELOPER_DIR='/Applications/Xcode_16.4.app/Contents/Developer',
              PUB_CACHE=str(work/'pub-cache'), XDG_CONFIG_HOME=str(work/'config'),
@@ -275,16 +279,19 @@ def host_snapshot(original, host):
     return rows
 
 
-def pod_tool_sources(work, pod, e, lane):
+def pod_tool_sources(work, selected, e, lane):
+    pod = pod_selector.recheck(selected, Path(e['HOME']))
     # Read the selected preinstalled script's interpreter, never install a gem or use user gems.
     header = pod.read_bytes().splitlines()[0].decode('ascii')
     if not header.startswith('#!/') or len(header.split()) != 1:
         raise ValueError('absolute preinstalled CocoaPods Ruby interpreter required')
     ruby = Path(header[2:]).resolve(strict=True)
-    if not str(ruby).startswith('/opt/homebrew/'):
+    if ruby != Path(selected['ruby']['path']) or not str(ruby).startswith('/opt/homebrew/'):
         raise ValueError('preinstalled Homebrew Ruby source required')
     program = """require 'json';require 'cocoapods';abort 'pod version' unless Pod::VERSION=='1.16.2';puts JSON.generate({ruby:RUBY_VERSION,ruby_binary:RbConfig.ruby,gems:Gem.loaded_specs.values.map{|s|{name:s.name,version:s.version.to_s,path:s.full_gem_path}}})"""
     source = json.loads(command(work, 'pod-source', [ruby, '-e', program], work, e))
+    if Path(source['ruby_binary']).resolve(strict=True) != ruby:
+        raise ValueError('selected Ruby differs from actual gem interpreter')
     rows = []
     for gem in source['gems']:
         root = Path(gem['path']).resolve(strict=True)
@@ -308,17 +315,29 @@ def pod_tool_sources(work, pod, e, lane):
            'ruby_binary': {'path': str(ruby), 'bytes': ruby.stat().st_size, 'sha256': sha(ruby)},
            'gems': rows, 'preinstalled_source_first_observation': True,
            'source_provenance_Root_acceptance': False})
+    pod_selector.recheck(selected, Path(e['HOME']))
+
+
+def selected_pod(work):
+    raw = packaging.regular(work/'evidence/selected-cocoapods.json', 64*1024)
+    acquired = json.loads(packaging.regular(work/'evidence/acquire-complete.json'))
+    if acquired.get('selected_cocoapods_sha256') != packaging.sha(raw):
+        raise ValueError('original acquired CocoaPods selection differs')
+    selected = json.loads(raw)
+    pod_selector.recheck(selected, Path(os.environ['HOME']))
+    return selected
 
 
 def acquire(work, lane, spec, plugins):
-    pod = Path('/opt/homebrew/bin/pod').resolve(strict=True)
-    if not pod.is_file(): raise ValueError('preinstalled exact CocoaPods tool required')
-    e = env(work, pod)
+    selected = pod_selector.select(Path(os.environ['HOME']))
+    record(work/'evidence/selected-cocoapods.json', selected)
+    pod = pod_selector.recheck(selected, Path(os.environ['HOME']))
+    e = env(work, selected)
     for name in ['tmp', 'cache', 'config', 'cocoapods', 'cocoapods/repos', 'cocoapods/cache', 'spm', 'origins']:
         mkdir(work/name)
     if command(work, 'pod-version', [pod, '--version'], work, e) != b'1.16.2\n':
         raise ValueError('preinstalled CocoaPods1.16.2 required; no gem install')
-    pod_tool_sources(work, pod, e, lane)
+    pod_tool_sources(work, selected, e, lane)
     source_stage(work, spec, e)
     reuse_core(work, lane, spec)
     host = load(REPO/'ci/apple-host-tool/run.py', 'app354_host_tool')
@@ -355,7 +374,9 @@ def acquire(work, lane, spec, plugins):
                      for i in z.infolist() if not i.is_dir()]
         origins.append(proof)
     record(work/'evidence/native-origin-acquisition.json', {'objects': origins, 'Root_acceptance': False})
+    pod_selector.recheck(selected, Path(e['HOME']))
     record(work/'evidence/acquire-complete.json', {'identity': IDENTITY,
+           'selected_cocoapods_sha256': sha(work/'evidence/selected-cocoapods.json'),
            'source_ref': spec['source_ref'], 'accepted_host': host_before,
            'original_core17': spec['core17'], 'no_Go_or_bind': True})
 
@@ -366,7 +387,8 @@ def resolve(work, lane, spec, plugins):
     acquired = json.loads(packaging.regular(work/'evidence/acquire-complete.json'))
     if acquired['identity'] != IDENTITY or acquired['source_ref'] != spec['source_ref']:
         raise ValueError('acquisition identity differs')
-    e = env(work, Path('/opt/homebrew/bin/pod').resolve(strict=True))
+    selected = selected_pod(work)
+    e = env(work, selected)
     configuration = json.loads(packaging.regular(work/'source/app/.dart_tool/package_config.json'))
     base = (work/'source/app/.dart_tool/package_config.json').as_uri()
     roots = {p['name']: Path(urllib.parse.unquote(urllib.parse.urlsplit(
@@ -420,6 +442,7 @@ def resolve(work, lane, spec, plugins):
     derived_project = packaging.regular(work/'source'/project)
     put(work/'evidence/generated-project.before.pbxproj', original_project)
     put(work/'evidence/generated-project.after.pbxproj', derived_project)
+    pod_selector.recheck(selected, Path(e['HOME']))
     metadata()
     resolution = {'identity': IDENTITY, 'source_ref': spec['source_ref'],
            'source_digest': spec['source_digest'], 'source_members': 472, 'plugin_graph': graph_proof,
@@ -438,12 +461,13 @@ def resolve(work, lane, spec, plugins):
 def package(work, lane, spec):
     # Current descriptor contains null; this check runs before any native command.
     resolution = packaging.require_approval(lane, packaging.regular(work/'evidence/catalogue.json'))
-    pod = Path('/opt/homebrew/bin/pod').resolve(strict=True)
-    e = env(work, pod)
+    selected = selected_pod(work)
+    e = env(work, selected)
     before = capture(work, 'before-App')
     for kind, argv in packaging.app_commands(work, lane['xcodebuild']):
         command(work, 'App-'+kind, argv, work/'source/app/ios', e)
     after = capture(work, 'after-App')
+    pod_selector.recheck(selected, Path(e['HOME']))
     record(work/'evidence/App-compile-results.json', {'identity': IDENTITY,
            'native_resolution_source_ref': resolution['source_ref'],
            'before_snapshot_trees': len(before), 'after_snapshot_trees': len(after),
@@ -457,7 +481,9 @@ def profile(work, stage):
     if stage in {'acquire', 'resolve'}:
         text += '(allow network-outbound (remote ip "*:443") (remote ip "*:53") (literal "/private/var/run/mDNSResponder"))'
     protected = ['acquire.sb', 'resolve.sb', 'package.sb', 'activation.json']
-    if stage != 'acquire': protected += ['original-source', 'raw', 'products', 'origins', 'engine']
+    if stage != 'acquire':
+        protected += ['original-source', 'raw', 'products', 'origins', 'engine',
+                      'evidence/selected-cocoapods.json', 'evidence/acquire-complete.json']
     for p in protected:
         text += '(deny file-write* (subpath '+json.dumps(str(work/p))+'))'
     return text.encode()

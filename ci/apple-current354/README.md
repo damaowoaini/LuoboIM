@@ -12,4 +12,10 @@ WebRTC150.7871.01 独立固定 release ZIP/SHA，与实际 SPM WebRTC.xcframewor
 
 `package` 已列出真实 device+simulator arm64、min15、unsigned Xcode 构建命令；`lane.json.approved_native_resolution=null` 在任何命令前硬拒绝，workflow 也没有包装选项。首次解析输出独立 catalogue，保完整原件，catalogue 剔除仅本轮 inode/时间身份，保来源、全锁、工具体身份和实际生成编译源。下一受审 successor 必须绑定该 catalogue 完整 SHA、Root 验收回执，重新获取/解析后精确匹配方能禁网包装；不能依赖已销毁的上一个云工作区。启用前还须补齐实际 App embedding/所有插件资产审计。当前不能把编译命令存在当成已可发布的 App，更不包含签名、安装、GPS/RTC、设备或服务操作。
 
-预算为待审估算：冷20GiB、阶段4GiB起跑，持续1GiB/.2s、全 owned16GiB、每段1800s；复用单 process-group guard，不清共享缓存。原件、失败日志和来源不得回收凑量。新6纯控制仅准备，未执行；旧 R7/R10 与原 consumer 原件不重测、不改身份。
+预算为待审估算：冷20GiB、阶段4GiB起跑，持续1GiB/.2s、全 owned16GiB、每段1800s；复用单 process-group guard，不清共享缓存。原件、失败日志和来源不得回收凑量。原包装6与consumer3纯控制已由Root实际通过且源码未改，复用旧结果；本R1新增2个工具选择纯控制仅准备、未执行。旧 R7/R10 原件不重测、不改身份。
+
+R1 只修 preinstalled Pod 入口发现：有限读取 `/opt/homebrew/bin/pod` 与官方镜像兼容入口 `/usr/local/bin/pod`，不执行 `which`、不扫描 PATH/HOME。两别名若指向同一 canonical 文件可接受，指向两个不同文件、断链、未知布局或用户路径则拒绝。仅接受 Homebrew Ruby gem `bin/pod` 或 CocoaPods formula `libexec/bin/pod`，脚本绝对 Ruby shebang 必须解析为受控 Homebrew Ruby；原 CocoaPods1.16.2 和 config.rb SHA 不放宽。官方镜像源码证明兼容入口的设计，未证明本次 runner 上实际安装版本。
+
+首次 acquire 在任何 Pod 调用前记录 `evidence/selected-cocoapods.json`，固定 canonical 脚本/Ruby 的内容、mode、dev/inode 和系统 gem root；GEM_HOME/GEM_PATH 仅该系统 gem root，HOME 原值不改，用户 gem/RUBYOPT 不继承。acquire 完成绑定 receipt SHA；resolve/package 仅读原 receipt 并重新核对，绝不重新挑另一工具，后两阶段 sandbox 禁止改 selection/acquire receipt。PATH 只含 task Flutter、已选 Pod/Ruby 目录及系统基础目录。加载 gems 仍逐源码保留并拒用户/未知来源。首次工具源记录不等于 Root 原生来源验收。
+
+R1 保持 current354/472/178/20、ff7bc1f 与 `approved_native_resolution=null`；不转成未来公告359，不安装任何 gem/brew，不启签名或包装。源码准备未运行2新控制、Ruby/Pod、readonly或云任务。

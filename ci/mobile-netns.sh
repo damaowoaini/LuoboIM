@@ -7,7 +7,7 @@ repo=$2
 work=$3
 cohort=$4
 validation_mode=$5
-[[ "$validation_mode" == group-revoke-58 || "$validation_mode" == full-regression ]]
+[[ "$validation_mode" == full-regression ]]
 reference_args=()
 if [[ $# == 6 ]]; then
   [[ $6 == reference-before-entry && "$validation_mode" == full-regression ]] || exit 2

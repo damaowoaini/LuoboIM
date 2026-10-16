@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.required-successful-names.v14",
-  "cohort": "current354",
+  "schema": "luobo.mobile.required-successful-names.v15",
+  "cohort": "current359",
   "parent_full922": [
     {
       "name": "/login stays scrollable at 320pt and 200% text",
@@ -64557,5 +64557,5329 @@
       "name": "wrong typed known payload fields fall back without string coercion",
       "count": 1
     }
-  ]
+  ],
+  "new_announcement24": [
+    {
+      "name": "SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity",
+      "count": 1
+    },
+    {
+      "name": "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "count": 1
+    },
+    {
+      "name": "a genuine at-me hint does not create an announcement from historical group text",
+      "count": 1
+    },
+    {
+      "name": "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "count": 1
+    },
+    {
+      "name": "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "count": 1
+    },
+    {
+      "name": "acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group",
+      "count": 1
+    },
+    {
+      "name": "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "count": 1
+    },
+    {
+      "name": "an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner",
+      "count": 1
+    },
+    {
+      "name": "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "count": 1
+    },
+    {
+      "name": "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "count": 1
+    },
+    {
+      "name": "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "count": 1
+    },
+    {
+      "name": "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain",
+      "count": 1
+    },
+    {
+      "name": "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior",
+      "count": 1
+    },
+    {
+      "name": "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "count": 1
+    },
+    {
+      "name": "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "count": 1
+    },
+    {
+      "name": "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "count": 1
+    },
+    {
+      "name": "owner replacement while original group metadata waits prevents its next real member lookup",
+      "count": 1
+    },
+    {
+      "name": "preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key",
+      "count": 1
+    },
+    {
+      "name": "queued preference dispatch rechecks its original source before physical acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "count": 1
+    }
+  ],
+  "current_full1304": [
+    {
+      "name": "/login stays scrollable at 320pt and 200% text",
+      "count": 1
+    },
+    {
+      "name": "/register stays scrollable at 320pt and 200% text",
+      "count": 1
+    },
+    {
+      "name": "/reset stays scrollable at 320pt and 200% text",
+      "count": 1
+    },
+    {
+      "name": "10000 records fit; 10001 restore completely from two independent files",
+      "count": 1
+    },
+    {
+      "name": "360 by 640 with large text keeps selection confirmation partial results and exit reachable",
+      "count": 1
+    },
+    {
+      "name": "360px large text card selection confirmation and received detail remain usable without overflow",
+      "count": 1
+    },
+    {
+      "name": "ACK without canonical change stays unconfirmed and a nonhost cannot dispatch a host-only mutation",
+      "count": 1
+    },
+    {
+      "name": "CID clear begun after dispatch blocks unknown late IDs before privacy observe",
+      "count": 1
+    },
+    {
+      "name": "CID clear keeps unrelated hits but rejects its old snapshot selection",
+      "count": 1
+    },
+    {
+      "name": "CSV protects formulas and quotes multiline values; TXT keeps original content",
+      "count": 1
+    },
+    {
+      "name": "EditableText rendering and selection always address the same visible string",
+      "count": 1
+    },
+    {
+      "name": "ID conflicts retain both contents, including note and todo with equal IDs",
+      "count": 1
+    },
+    {
+      "name": "IME composition overlapping a token removes binding and insertion never interrupts active composition",
+      "count": 1
+    },
+    {
+      "name": "LiveKit logging starts safely from the library default and suppresses private records",
+      "count": 1
+    },
+    {
+      "name": "PIN native bridge declares exact algorithm inputs and returns only its derived bytes",
+      "count": 1
+    },
+    {
+      "name": "PIN persistence failure cannot display an enabled lock or consume existing credentials",
+      "count": 1
+    },
+    {
+      "name": "QR group request confirmation covered and returned dispatches no join",
+      "count": 1
+    },
+    {
+      "name": "SDK deletion before the unread reply retires the original CID and never redirects to its shifted row index",
+      "count": 1
+    },
+    {
+      "name": "SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity",
+      "count": 1
+    },
+    {
+      "name": "SDK paging, drafts, read and preference mutations preserve the exact conversation target",
+      "count": 1
+    },
+    {
+      "name": "SDK unread changes retire a pending next-unread request before refresh debounce",
+      "count": 1
+    },
+    {
+      "name": "SQLite commit with frozen body precedes the first actual HTTP request",
+      "count": 1
+    },
+    {
+      "name": "SQLite prepare failure never dispatches and does not invent a replacement UUID",
+      "count": 1
+    },
+    {
+      "name": "URL-looking card names and exact UIDs remain literal text identity hints",
+      "count": 1
+    },
+    {
+      "name": "URL-looking received labels remain plain text and never become a URL request or link action",
+      "count": 1
+    },
+    {
+      "name": "UTF8 and escaped JSON limits produce only independently readable files",
+      "count": 1
+    },
+    {
+      "name": "Unicode creation limit counts emoji and combining graphemes rather than UTF16 units",
+      "count": 1
+    },
+    {
+      "name": "a Navigator fullscreen route disposes unknown-time media on expired without its parent rebuilding",
+      "count": 1
+    },
+    {
+      "name": "a Navigator fullscreen route disposes unknown-time media on owner-ended without its parent rebuilding",
+      "count": 1
+    },
+    {
+      "name": "a bounded timeout cancels the detached request without exposing credentials in its result",
+      "count": 1
+    },
+    {
+      "name": "a captured recovery callback after its actual panel unmounts cannot dispatch a retry",
+      "count": 1
+    },
+    {
+      "name": "a captured recovery callback cannot borrow a replacement controller on the same retained element",
+      "count": 1
+    },
+    {
+      "name": "a captured recovery callback cannot dispatch after its ID leaves the live panel while the element remains mounted",
+      "count": 1
+    },
+    {
+      "name": "a clear waiting for an already dispatched operation never dispatches after its access lease locks",
+      "count": 1
+    },
+    {
+      "name": "a cleared original cut cannot borrow a new lease for card preparation",
+      "count": 1
+    },
+    {
+      "name": "a concurrent unlock cannot treat the busy reservation as successful verification",
+      "count": 1
+    },
+    {
+      "name": "a confirmation from an old account cannot clear after sign-out",
+      "count": 1
+    },
+    {
+      "name": "a cross-observation cycle or over-deep remembered graph fails closed",
+      "count": 1
+    },
+    {
+      "name": "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "count": 1
+    },
+    {
+      "name": "a false success acknowledgement never counts as a completed mutation",
+      "count": 1
+    },
+    {
+      "name": "a favorite reference is ordinary while capacity is available but cannot bypass an unrecordable private source at capacity",
+      "count": 1
+    },
+    {
+      "name": "a filesystem failure leaves the original path intact and never reports export success",
+      "count": 1
+    },
+    {
+      "name": "a foreign route and return retires the old inbox callback but a new menu action remains usable",
+      "count": 1
+    },
+    {
+      "name": "a frozen history cut invalidated before preparation cannot borrow a new lease",
+      "count": 1
+    },
+    {
+      "name": "a genuine at-me hint does not create an announcement from historical group text",
+      "count": 1
+    },
+    {
+      "name": "a host patch preserves explicit false and omits every unchanged setting",
+      "count": 1
+    },
+    {
+      "name": "a known-expired quote cannot be recreated as a new native message after the editor was opened",
+      "count": 1
+    },
+    {
+      "name": "a late history response after delete cannot restore UI or quote cache",
+      "count": 1
+    },
+    {
+      "name": "a late history response after revoke cannot restore UI or quote cache",
+      "count": 1
+    },
+    {
+      "name": "a late latest-history refresh cannot overwrite the selected original-message timeline",
+      "count": 1
+    },
+    {
+      "name": "a late native ACK after an actual operation timeout cannot mutate the frozen unknown receipt or resume the remaining batch",
+      "count": 1
+    },
+    {
+      "name": "a late native response is discarded across lock and unlock, while a fresh explicit operation works",
+      "count": 1
+    },
+    {
+      "name": "a late old-tenant logout response cannot replace a newly queued session",
+      "count": 1
+    },
+    {
+      "name": "a late read-metadata response after delete cannot restore the message",
+      "count": 1
+    },
+    {
+      "name": "a late read-metadata response after revoke cannot restore the message",
+      "count": 1
+    },
+    {
+      "name": "a late source lookup after delete cannot recreate an actionable snapshot",
+      "count": 1
+    },
+    {
+      "name": "a late source lookup after revoke cannot recreate an actionable snapshot",
+      "count": 1
+    },
+    {
+      "name": "a later login supersedes the old one and native operations stay ordered",
+      "count": 1
+    },
+    {
+      "name": "a merge send with unknown ACK is terminal in the picker and a second tap cannot repeat it",
+      "count": 1
+    },
+    {
+      "name": "a muted administrator is not denied moderation by message send admission",
+      "count": 1
+    },
+    {
+      "name": "a new private root at-message without a private quote remains a lawful new send",
+      "count": 1
+    },
+    {
+      "name": "a newly composed private root without a quote remains sendable",
+      "count": 1
+    },
+    {
+      "name": "a pending lookup cannot publish after the actual contacts provider is replaced",
+      "count": 1
+    },
+    {
+      "name": "a permitted friend request still dispatches to the exact account",
+      "count": 1
+    },
+    {
+      "name": "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "count": 1
+    },
+    {
+      "name": "a private second source learned during first native ACK stops all remaining deletion dispatch",
+      "count": 1
+    },
+    {
+      "name": "a provisional to missed transition invalidates an old filter cursor instead of losing a page",
+      "count": 1
+    },
+    {
+      "name": "a quarantined record on a later page rejects every export format and removes partial output",
+      "count": 1
+    },
+    {
+      "name": "a readable legacy call summary is excluded before moderation capture and dispatch",
+      "count": 1
+    },
+    {
+      "name": "a readiness refresh suspends booking writes and its late old owner reply cannot reactivate them",
+      "count": 1
+    },
+    {
+      "name": "a real background transition locks and foreground does not silently restore protected content",
+      "count": 1
+    },
+    {
+      "name": "a remounted repository cannot turn observed private into retainable after metadata omission",
+      "count": 1
+    },
+    {
+      "name": "a reopened writer offsets revisions and keeps known connection facts and original sequence",
+      "count": 1
+    },
+    {
+      "name": "a repository and item from the previous account cannot mutate a newly logged-in account",
+      "count": 1
+    },
+    {
+      "name": "a retained enabled confirm cannot survive an actual group member event",
+      "count": 1
+    },
+    {
+      "name": "a retained location card callback cannot reopen after route ABA but a new explicit click can",
+      "count": 1
+    },
+    {
+      "name": "a retained main meeting schedule action cannot navigate after its original account signs out",
+      "count": 1
+    },
+    {
+      "name": "a retained meeting schedule action stays retired after a foreign route covers it",
+      "count": 1
+    },
+    {
+      "name": "a retained meeting schedule action stays retired after a foreign route returns",
+      "count": 1
+    },
+    {
+      "name": "a retained original account card callback cannot acquire the new account history lease",
+      "count": 1
+    },
+    {
+      "name": "a retained preclear card callback cannot open a fresh history lease after clear",
+      "count": 1
+    },
+    {
+      "name": "a retired UI delete transaction rolls back and preserves the visible record",
+      "count": 1
+    },
+    {
+      "name": "a reused target CID whose recipient changes during create cannot receive the merge",
+      "count": 1
+    },
+    {
+      "name": "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "a saved old row callback after foreign route ABA cannot renew its view ticket while a new click works",
+      "count": 1
+    },
+    {
+      "name": "a second confirmation for clear cannot renew an invalidated CID lease",
+      "count": 1
+    },
+    {
+      "name": "a second confirmation for delete cannot renew an invalidated CID lease",
+      "count": 1
+    },
+    {
+      "name": "a selected member leaving during creation rejects the result before it can be sent",
+      "count": 1
+    },
+    {
+      "name": "a shared conversation clear waits for unseen history from another repository and rejects its late cache",
+      "count": 1
+    },
+    {
+      "name": "a single display-only forwarded at-message keeps original identity and inherited private expiry",
+      "count": 1
+    },
+    {
+      "name": "a slow save blocks dismissing the editor until the durable write completes",
+      "count": 1
+    },
+    {
+      "name": "a source becoming private while native quote creation waits cannot complete a retainable draft",
+      "count": 1
+    },
+    {
+      "name": "a source retention denial after the first chunk removes the generated attachment and forbids later bytes",
+      "count": 1
+    },
+    {
+      "name": "a staged history operation must check its original access lease before a later write",
+      "count": 1
+    },
+    {
+      "name": "a successful ACK with unchanged authoritative value cannot report save success",
+      "count": 1
+    },
+    {
+      "name": "a superseded account never dispatches a clear for its replacement",
+      "count": 1
+    },
+    {
+      "name": "a superseded source lookup cannot issue its next history request or replace a newer source",
+      "count": 1
+    },
+    {
+      "name": "a synchronous repeated old shortcut callback pushes only one search page",
+      "count": 1
+    },
+    {
+      "name": "a synchronous second create cannot dispatch while the first actual transport call is pending",
+      "count": 1
+    },
+    {
+      "name": "a terminal refill callback captured before owner retirement cannot unlock or navigate another scope",
+      "count": 1
+    },
+    {
+      "name": "a timed-out native login is quarantined until it settles and is torn down again",
+      "count": 1
+    },
+    {
+      "name": "a withdrawn administrator role is re-read before a mutation",
+      "count": 1
+    },
+    {
+      "name": "accepted create through chat expansion recovers only conversation read without another create",
+      "count": 1
+    },
+    {
+      "name": "accepted create with conversation failure retries only its exact owned group read",
+      "count": 1
+    },
+    {
+      "name": "accepted incoming media completion and duplicate remote endings create exactly one terminal record",
+      "count": 1
+    },
+    {
+      "name": "account directories and native login use tenant endpoints and private logs disabled",
+      "count": 1
+    },
+    {
+      "name": "account exit while selecting a destination cancels forwarding before any write dispatch",
+      "count": 1
+    },
+    {
+      "name": "account invalidation cancels an in-flight upload without completing it",
+      "count": 1
+    },
+    {
+      "name": "account invalidation during export deletes its partial file and cannot export the next account",
+      "count": 1
+    },
+    {
+      "name": "accounts use different durable databases and stale sessions cannot read or write",
+      "count": 1
+    },
+    {
+      "name": "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "count": 1
+    },
+    {
+      "name": "acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group",
+      "count": 1
+    },
+    {
+      "name": "active write cannot be replaced by concurrent resolve or retry",
+      "count": 1
+    },
+    {
+      "name": "actor withdraws management before dispatch and no target gets kicked",
+      "count": 1
+    },
+    {
+      "name": "actual ChatPage does no source reads when the initial source ticket is already false",
+      "count": 1
+    },
+    {
+      "name": "actual ChatPage valid selection normally starts and locates exact source",
+      "count": 1
+    },
+    {
+      "name": "actual Location109 ChatPage card opens full local detail without fetching the legacy URL or locating",
+      "count": 1
+    },
+    {
+      "name": "actual Mine entry reaches the registered personal QR display",
+      "count": 1
+    },
+    {
+      "name": "actual OpenIM MethodChannel adapter account change makes old transport unable to send call actions",
+      "count": 1
+    },
+    {
+      "name": "actual OpenIM MethodChannel adapter late invite after cancellation compensates without starting media",
+      "count": 1
+    },
+    {
+      "name": "actual OpenIM MethodChannel adapter native callback maps sanitized immutable metadata and its generation",
+      "count": 1
+    },
+    {
+      "name": "actual OpenIM MethodChannel adapter rejects substituted room credentials before media creation",
+      "count": 1
+    },
+    {
+      "name": "actual SDK Location109 maps a typed projection without mutating the standard wire",
+      "count": 1
+    },
+    {
+      "name": "actual SDK conversation preview does not disclose private body or revive after its metadata disappears",
+      "count": 1
+    },
+    {
+      "name": "actual atText quote is private while opaque custom payload remains uninterpreted",
+      "count": 1
+    },
+    {
+      "name": "actual attachment card entry searches the complete friend list beyond forty and confirms exact identities",
+      "count": 1
+    },
+    {
+      "name": "actual attachment location entry with missing deployment config performs no map GPS or send",
+      "count": 1
+    },
+    {
+      "name": "actual attachment manual map selection sends one standard109 and returns only its own picker",
+      "count": 1
+    },
+    {
+      "name": "actual booking routes cannot open a journal before consent",
+      "count": 1
+    },
+    {
+      "name": "actual booking routes cannot open a journal before login",
+      "count": 1
+    },
+    {
+      "name": "actual chat acknowledged same owner preference changes its message scale without changing messages",
+      "count": 1
+    },
+    {
+      "name": "actual chat background settings sheet covered and returned cannot revive its retained row callback",
+      "count": 1
+    },
+    {
+      "name": "actual chat emoji button exposes saved image library while keeping Unicode insertion",
+      "count": 1
+    },
+    {
+      "name": "actual chat font cancel preserves both message scale and the composer draft",
+      "count": 1
+    },
+    {
+      "name": "actual chat font settings sheet foreign coverage retires its retained row callback",
+      "count": 1
+    },
+    {
+      "name": "actual chat immediately hides a saved background when its original account is invalidated",
+      "count": 1
+    },
+    {
+      "name": "actual chat settings opens font preview and acknowledged save changes real message geometry",
+      "count": 1
+    },
+    {
+      "name": "actual chat settings opens gallery background preview and ACK changes only the real message viewport",
+      "count": 1
+    },
+    {
+      "name": "actual chat switching to another exact CID while gallery is open cannot write either conversation or pop the new chat",
+      "count": 1
+    },
+    {
+      "name": "actual cleared profile respects original ID clipboard retention permission",
+      "count": 1
+    },
+    {
+      "name": "actual complete friend reread rejects blacklisted selection before native card creation",
+      "count": 1
+    },
+    {
+      "name": "actual complete friend reread rejects blocked duplicate selection before native card creation",
+      "count": 1
+    },
+    {
+      "name": "actual complete friend reread rejects duplicate selection before native card creation",
+      "count": 1
+    },
+    {
+      "name": "actual complete friend reread rejects nested mismatch selection before native card creation",
+      "count": 1
+    },
+    {
+      "name": "actual complete friend reread rejects no longer friend selection before native card creation",
+      "count": 1
+    },
+    {
+      "name": "actual complete friend reread rejects removed selection before native card creation",
+      "count": 1
+    },
+    {
+      "name": "actual contact conversation accepts only the exact ordinary single target",
+      "count": 1
+    },
+    {
+      "name": "actual contact conversation rejects empty CID response before returning a navigation target",
+      "count": 1
+    },
+    {
+      "name": "actual contact conversation rejects group response before returning a navigation target",
+      "count": 1
+    },
+    {
+      "name": "actual contact conversation rejects type response before returning a navigation target",
+      "count": 1
+    },
+    {
+      "name": "actual contact conversation rejects user response before returning a navigation target",
+      "count": 1
+    },
+    {
+      "name": "actual copy control and Clipboard dispatch respect private=false",
+      "count": 1
+    },
+    {
+      "name": "actual copy control and Clipboard dispatch respect private=true",
+      "count": 1
+    },
+    {
+      "name": "actual descendants consult remembered identity and an old quote reacts to later private metadata",
+      "count": 1
+    },
+    {
+      "name": "actual editor permits 128 Unicode graphemes accepted by real create repository",
+      "count": 1
+    },
+    {
+      "name": "actual editor validates before any intent dispatch and retains persistent field labels",
+      "count": 1
+    },
+    {
+      "name": "actual favorite copy/title/detail share remembered expired policy despite omitted snapshot flags",
+      "count": 1
+    },
+    {
+      "name": "actual favorite copy/title/detail share remembered ordinary policy despite omitted snapshot flags",
+      "count": 1
+    },
+    {
+      "name": "actual favorite copy/title/detail share remembered private policy despite omitted snapshot flags",
+      "count": 1
+    },
+    {
+      "name": "actual favorite repository rejects a remembered private snapshot without editing or forwarding it",
+      "count": 1
+    },
+    {
+      "name": "actual gateway operation entry checks the source again before any native contact lookup",
+      "count": 1
+    },
+    {
+      "name": "actual group admission refuses actor left group and never invents server support",
+      "count": 1
+    },
+    {
+      "name": "actual group admission refuses dismissed group and never invents server support",
+      "count": 1
+    },
+    {
+      "name": "actual group admission refuses legacy session type and never invents server support",
+      "count": 1
+    },
+    {
+      "name": "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "count": 1
+    },
+    {
+      "name": "actual group event retires a captured old authority even before its next read",
+      "count": 1
+    },
+    {
+      "name": "actual group profile outside the group preserves read-only metadata without a self lookup",
+      "count": 1
+    },
+    {
+      "name": "actual group profile preserves exact role 100 in the original group",
+      "count": 1
+    },
+    {
+      "name": "actual group profile preserves exact role 20 in the original group",
+      "count": 1
+    },
+    {
+      "name": "actual group profile preserves exact role 60 in the original group",
+      "count": 1
+    },
+    {
+      "name": "actual group profile rejects duplicate group instead of lending a management role",
+      "count": 1
+    },
+    {
+      "name": "actual group profile rejects duplicate self instead of lending a management role",
+      "count": 1
+    },
+    {
+      "name": "actual group profile rejects foreign group instead of lending a management role",
+      "count": 1
+    },
+    {
+      "name": "actual group profile rejects foreign self actor instead of lending a management role",
+      "count": 1
+    },
+    {
+      "name": "actual group profile rejects foreign self group instead of lending a management role",
+      "count": 1
+    },
+    {
+      "name": "actual group profile rejects missing self instead of lending a management role",
+      "count": 1
+    },
+    {
+      "name": "actual group profile rejects unknown role instead of lending a management role",
+      "count": 1
+    },
+    {
+      "name": "actual inbox more menu exposes an accessible next unread entry without replacing existing actions",
+      "count": 1
+    },
+    {
+      "name": "actual incoming ring timer freezes a known missed outcome rather than a cold-start guess",
+      "count": 1
+    },
+    {
+      "name": "actual location card and scrollable full detail remain usable at 360px with large text",
+      "count": 1
+    },
+    {
+      "name": "actual long press group moderation inspects roles then confirms one standard revoke",
+      "count": 1
+    },
+    {
+      "name": "actual merged child card detail stays valid under its own route and withdraws after original CID clear",
+      "count": 1
+    },
+    {
+      "name": "actual merger descendants retain Location109 and root privacy",
+      "count": 1
+    },
+    {
+      "name": "actual next unread menu reaches the end then wraps to the original CID without opening chat",
+      "count": 1
+    },
+    {
+      "name": "actual normal image message menu has a separate add saved emoji action and keeps ordinary favorite",
+      "count": 1
+    },
+    {
+      "name": "actual normal profile respects original ID clipboard retention permission",
+      "count": 1
+    },
+    {
+      "name": "actual ordinary contact profile respects original ID clipboard retention permission",
+      "count": 1
+    },
+    {
+      "name": "actual ordinary single owner message keeps its existing revoke channel",
+      "count": 1
+    },
+    {
+      "name": "actual outgoing coordinator lifecycle persists a terminal call and monotonic duration across wall clock rollback",
+      "count": 1
+    },
+    {
+      "name": "actual private profile respects original ID clipboard retention permission",
+      "count": 1
+    },
+    {
+      "name": "actual production inbox and contacts scanner entries resolve registered QR routes",
+      "count": 1
+    },
+    {
+      "name": "actual provider and native signaling codec feed the owner SQLite recorder without opening its page",
+      "count": 1
+    },
+    {
+      "name": "actual reused ChatPage State immediately removes the former CID background and never renews it after CID ABA",
+      "count": 1
+    },
+    {
+      "name": "actual reused ChatPage State rejects an old CID read that finishes after widget CID replacement",
+      "count": 1
+    },
+    {
+      "name": "actual role read failure stays an error and explicit retry remains read only until confirmation",
+      "count": 1
+    },
+    {
+      "name": "actual route guard refuses a missing or mismatched global ticket and preserves ordinary deep links",
+      "count": 1
+    },
+    {
+      "name": "actual search hides private body before deadline and reacts to learned expiry without another search",
+      "count": 1
+    },
+    {
+      "name": "actual self message menu keeps ordinary single chat revoke usable",
+      "count": 1
+    },
+    {
+      "name": "actual settings UI enables a confirmed PIN and cancelling another dialog changes nothing",
+      "count": 1
+    },
+    {
+      "name": "actual standard revoke admin removes an ordinary sender with exact CID and original sender",
+      "count": 1
+    },
+    {
+      "name": "actual standard revoke notification withdraws an open source without dispatching a second revoke",
+      "count": 1
+    },
+    {
+      "name": "actual standard revoke owner removes an administrator sender with exact CID and original sender",
+      "count": 1
+    },
+    {
+      "name": "actual standard revoke owner removes an ordinary sender with exact CID and original sender",
+      "count": 1
+    },
+    {
+      "name": "address book preserves remarks and filters friends on a small large-text screen",
+      "count": 1
+    },
+    {
+      "name": "admin can select ordinary members but not self or peer admin",
+      "count": 1
+    },
+    {
+      "name": "admin role rejects peer admin before dispatch but continues ordinary target",
+      "count": 1
+    },
+    {
+      "name": "administrators cannot moderate another administrator or themselves",
+      "count": 1
+    },
+    {
+      "name": "after unknown ACK a new explicitly opened picker can send a new selection while the original bubble cannot replay",
+      "count": 1
+    },
+    {
+      "name": "all 12 favorite endpoints keep the IM domain token and fixed owner; omitted fields remain absent",
+      "count": 1
+    },
+    {
+      "name": "all acknowledged requests remove only their own timeline IDs and report requests rather than physical erasure",
+      "count": 1
+    },
+    {
+      "name": "all and missed tabs render distinct actual coordinator outcomes with stable peer identity",
+      "count": 1
+    },
+    {
+      "name": "all failures use the validated fallback",
+      "count": 1
+    },
+    {
+      "name": "all four visibility codes remain distinct and restricted audiences cannot silently become public",
+      "count": 1
+    },
+    {
+      "name": "all is a group identity and UID prefixes never select the wrong account",
+      "count": 1
+    },
+    {
+      "name": "all is explicit and counts once alongside individual recipients up to the pinned10 limit",
+      "count": 1
+    },
+    {
+      "name": "all known summaries preserve full original protocol JSON",
+      "count": 1
+    },
+    {
+      "name": "already dispatched card ACK after foreign coverage cannot pop that route or replay",
+      "count": 1
+    },
+    {
+      "name": "ambiguous phone results cannot select their first account",
+      "count": 1
+    },
+    {
+      "name": "ambiguous server acknowledgement does not become a retryable cancellation failure",
+      "count": 1
+    },
+    {
+      "name": "ambiguous server acknowledgement does not become a retryable password failure",
+      "count": 1
+    },
+    {
+      "name": "an ACK without native read metadata does not fabricate a deadline from isRead or sendTime",
+      "count": 1
+    },
+    {
+      "name": "an actual detail target replacement rejects the captured old cancel callback",
+      "count": 1
+    },
+    {
+      "name": "an actual lost reply freezes the original editor and exposes recovery without second creation",
+      "count": 1
+    },
+    {
+      "name": "an actual merged location stays viewable in its owned detail until original clear retires it",
+      "count": 1
+    },
+    {
+      "name": "an actual merged location stays viewable in its owned detail until original expire retires it",
+      "count": 1
+    },
+    {
+      "name": "an actual merged location stays viewable in its owned detail until original foreign-cover retires it",
+      "count": 1
+    },
+    {
+      "name": "an actual merged location stays viewable in its owned detail until original revoke retires it",
+      "count": 1
+    },
+    {
+      "name": "an actual merged location stays viewable in its owned detail until original source-pop retires it",
+      "count": 1
+    },
+    {
+      "name": "an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner",
+      "count": 1
+    },
+    {
+      "name": "an already open copy portal cannot borrow a new clear lease",
+      "count": 1
+    },
+    {
+      "name": "an already open copy portal cannot borrow a new owner lease",
+      "count": 1
+    },
+    {
+      "name": "an already pushed merge viewer removes child bodies when a child is later known expired",
+      "count": 1
+    },
+    {
+      "name": "an already pushed merge viewer removes child bodies when its owner ends",
+      "count": 1
+    },
+    {
+      "name": "an exact ID miss is empty and never falls back to phone",
+      "count": 1
+    },
+    {
+      "name": "an exact ordinary profile with explicit allow policy remains usable",
+      "count": 1
+    },
+    {
+      "name": "an explicit insertion inside ordinary text gains a visible boundary with matching caret and wire range",
+      "count": 1
+    },
+    {
+      "name": "an invalid owner or item is rejected before any backup is returned",
+      "count": 1
+    },
+    {
+      "name": "an old OS picker result cannot import into the replacement account",
+      "count": 1
+    },
+    {
+      "name": "an old async action is rejected after unlock but a new explicit action gets a fresh lease",
+      "count": 1
+    },
+    {
+      "name": "an old clear confirmation cannot delete replacement-account todos",
+      "count": 1
+    },
+    {
+      "name": "an old immutable lease remains invalid after the clear ACK and a new lease can explicitly reload",
+      "count": 1
+    },
+    {
+      "name": "an open favorite editor discards its text when shared privacy changes",
+      "count": 1
+    },
+    {
+      "name": "an open location detail hides the original owner coordinates on account replacement",
+      "count": 1
+    },
+    {
+      "name": "an open location detail hides the original owner coordinates on issuer replacement",
+      "count": 1
+    },
+    {
+      "name": "an open location detail hides the original owner coordinates on tenant replacement",
+      "count": 1
+    },
+    {
+      "name": "an open location detail withdraws its coordinates after original clear without renewing its lease",
+      "count": 1
+    },
+    {
+      "name": "an open location detail withdraws its coordinates after original clear-all without renewing its lease",
+      "count": 1
+    },
+    {
+      "name": "an open location detail withdraws its coordinates after original expire without renewing its lease",
+      "count": 1
+    },
+    {
+      "name": "an open location detail withdraws its coordinates after original revoke without renewing its lease",
+      "count": 1
+    },
+    {
+      "name": "an open moderation confirm withdraws after original issuer replacement",
+      "count": 1
+    },
+    {
+      "name": "an open moderation confirm withdraws after original owner replacement",
+      "count": 1
+    },
+    {
+      "name": "an open moderation confirm withdraws after original tenant replacement",
+      "count": 1
+    },
+    {
+      "name": "an open personal page retains its repository while native storage is slow",
+      "count": 1
+    },
+    {
+      "name": "an open received card detail withdraws after original expire without granting a new profile lease",
+      "count": 1
+    },
+    {
+      "name": "an open received card detail withdraws after original revoke without granting a new profile lease",
+      "count": 1
+    },
+    {
+      "name": "an unannounced downgrade is denied by the final real role lookup after an enabled confirm",
+      "count": 1
+    },
+    {
+      "name": "an uncertain create never retries and keeps a generic receipt without raw native text",
+      "count": 1
+    },
+    {
+      "name": "an undrained storage failure is observable from awaited close rather than an unhandled provider future",
+      "count": 1
+    },
+    {
+      "name": "an unknown revoke locks only its original CID and message while a different explicit target can complete",
+      "count": 1
+    },
+    {
+      "name": "an unrelated owner and explicit logout never wait for another owners policy write",
+      "count": 1
+    },
+    {
+      "name": "another account and selected line retain the same issuer tenant scope",
+      "count": 1
+    },
+    {
+      "name": "another business identity cannot authorize the requested profile",
+      "count": 1
+    },
+    {
+      "name": "app-lock deep link before consent never accesses local policy or biometric platform",
+      "count": 1
+    },
+    {
+      "name": "app-lock deep link before login never accesses local policy or biometric platform",
+      "count": 1
+    },
+    {
+      "name": "applied recovery opens actual detail read and never treats the old receipt body as current detail",
+      "count": 1
+    },
+    {
+      "name": "arbitrary websites, app links, credentials and lookalike brands never decode as discovery",
+      "count": 1
+    },
+    {
+      "name": "at all requires current owner or admin role100",
+      "count": 1
+    },
+    {
+      "name": "at all requires current owner or admin role20",
+      "count": 1
+    },
+    {
+      "name": "at all requires current owner or admin role60",
+      "count": 1
+    },
+    {
+      "name": "at sign inside a stable UID maps the exact longest identity rather than a suffix nickname or account",
+      "count": 1
+    },
+    {
+      "name": "at with quote preserves actual quote identity and private descendant guard",
+      "count": 1
+    },
+    {
+      "name": "attempt connected and terminal events survive a real SQLite close and reopen",
+      "count": 1
+    },
+    {
+      "name": "audience never silently becomes public; selected users and groups remain explicit",
+      "count": 1
+    },
+    {
+      "name": "authenticated requests cannot follow redirects or escape their API root",
+      "count": 1
+    },
+    {
+      "name": "authentication without an issued pair and saved-session restore do not revoke an unrelated session",
+      "count": 1
+    },
+    {
+      "name": "authoritative group hideMemberProfiles blocks a received card without trusting payload group claims",
+      "count": 1
+    },
+    {
+      "name": "avatar remains optional and creation needs no storage request",
+      "count": 1
+    },
+    {
+      "name": "batch deletion requires a second explicit confirmation and cancelling submits nothing",
+      "count": 1
+    },
+    {
+      "name": "biometric enable requires the configured PIN and persists only a completed challenge",
+      "count": 1
+    },
+    {
+      "name": "biometric response must match the exact request ID, never a nonempty reset or success string",
+      "count": 1
+    },
+    {
+      "name": "booking discovery cannot activate writes from a media capability contract",
+      "count": 1
+    },
+    {
+      "name": "booking discovery cannot activate writes from a missing capability contract",
+      "count": 1
+    },
+    {
+      "name": "booking discovery cannot activate writes from a owner capability contract",
+      "count": 1
+    },
+    {
+      "name": "booking discovery cannot activate writes from a token capability contract",
+      "count": 1
+    },
+    {
+      "name": "booking discovery cannot activate writes from a version capability contract",
+      "count": 1
+    },
+    {
+      "name": "booking view requires exact owner, full typed payload and no media identifier fallback",
+      "count": 1
+    },
+    {
+      "name": "both ChatMessage copies preserve typed location and original privacy",
+      "count": 1
+    },
+    {
+      "name": "both historical formats are typed and require current service confirmation",
+      "count": 1
+    },
+    {
+      "name": "bounded card parser rejects ambiguous or unsafe identities and labels",
+      "count": 1
+    },
+    {
+      "name": "bounded metadata capacity fails closed without discarding existing tombstones",
+      "count": 1
+    },
+    {
+      "name": "business profile failure cannot silently grant friend permission",
+      "count": 1
+    },
+    {
+      "name": "busy changes while the owned redial sheet is open stop a second native call",
+      "count": 1
+    },
+    {
+      "name": "cached ordinary profile policy cannot authorize the new card source without fresh exact hydration",
+      "count": 1
+    },
+    {
+      "name": "call history and owned actions remain scrollable and accessible at 320 by 568 with large text",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle a locked incoming call cannot request capture permission but can still be rejected",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle background stops camera and does not automatically resume capture",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle duplicate, expired and other-device invites never reopen capture",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle incoming permission-plugin failure rejects the pending invitation",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle late media connection after hangup is closed and never published",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle media publication failure after acceptance hangs up instead of cancelling an accepted call",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle ordinary local locking preserves an established audio session and allows its hangup",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle outgoing permission-plugin failure never cancels a call that was not dispatched",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle outgoing room stays muted until peer accepts, then captures and closes once",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle permission cancelled while pending never dispatches signaling or capture",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle permission denial rejects the incoming call without connecting",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle permission success arriving after a lock and unlock cannot start the old outgoing call",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle ring timeout rejects once and never starts native media",
+      "count": 1
+    },
+    {
+      "name": "call lifecycle session invalidates immediately and stops existing native media",
+      "count": 1
+    },
+    {
+      "name": "call901 states and durations are readable while opaque data is retained",
+      "count": 1
+    },
+    {
+      "name": "camera torch and exact real user profile require explicit confirmation",
+      "count": 1
+    },
+    {
+      "name": "cancel dialog dismissal is zero write and confirmation carries exact ID/version/intent",
+      "count": 1
+    },
+    {
+      "name": "canceling an owned menu and reopening keeps the legitimate shortcut usable",
+      "count": 1
+    },
+    {
+      "name": "canceling the actual search switch confirmation preserves the typed filter and performs no full read",
+      "count": 1
+    },
+    {
+      "name": "cancellation sends only captured self credentials and digest, with optional MFA",
+      "count": 1
+    },
+    {
+      "name": "cancelled OS picker and cancelled preview permit explicit retry without upload",
+      "count": 1
+    },
+    {
+      "name": "cancelled OS picker preserves metadata and releases pending",
+      "count": 1
+    },
+    {
+      "name": "cancelled and system lockout have fixed safe messages without raw native details",
+      "count": 1
+    },
+    {
+      "name": "cancelled delete preserves its row while confirmed delete is durable and never hangs up a call",
+      "count": 1
+    },
+    {
+      "name": "cancelling a busy batch invalidates the original lease and prevents all requests after the in-flight ACK",
+      "count": 1
+    },
+    {
+      "name": "cancelling after the first chunk removes the file and never returns partial content",
+      "count": 1
+    },
+    {
+      "name": "cancelling confirmation preserves selection and dispatches nothing",
+      "count": 1
+    },
+    {
+      "name": "cancelling source sheet invokes neither picker nor storage and preserves draft",
+      "count": 1
+    },
+    {
+      "name": "cancelling the explicit all-history confirmation dispatches nothing",
+      "count": 1
+    },
+    {
+      "name": "candidate rejects oversize controls URLs and invalid Unicode while keeping boundary text",
+      "count": 1
+    },
+    {
+      "name": "candidate rejects stale namespace sequence actions nested JSON and invalid coordinate ranges",
+      "count": 1
+    },
+    {
+      "name": "card delivery and local media clones preserve the original typed identity",
+      "count": 1
+    },
+    {
+      "name": "certificates bind WSS, participant, room, grant and short expiry",
+      "count": 1
+    },
+    {
+      "name": "changed totals abort export rather than delivering a file falsely labeled complete",
+      "count": 1
+    },
+    {
+      "name": "chat background 360 wide at large text keeps gallery default and save reachable without overflow",
+      "count": 1
+    },
+    {
+      "name": "chat background ACK after foreign coverage never pops the covering route or applies a new account target",
+      "count": 1
+    },
+    {
+      "name": "chat background FIFO rechecks a queued view before its physical file replacement",
+      "count": 1
+    },
+    {
+      "name": "chat background a real issuer replacement hides the editor and rejects a late gallery result",
+      "count": 1
+    },
+    {
+      "name": "chat background a real tenant replacement hides the editor and rejects a late gallery result",
+      "count": 1
+    },
+    {
+      "name": "chat background absent is distinct from a durable copied image after the picker original disappears",
+      "count": 1
+    },
+    {
+      "name": "chat background acknowledged default removes only its exact predecessor and persists across reopen",
+      "count": 1
+    },
+    {
+      "name": "chat background actual gallery selection stages a preview but cancel never commits or deletes the picker original",
+      "count": 1
+    },
+    {
+      "name": "chat background already dispatched pointer ACK remains bound to the old account after replacement",
+      "count": 1
+    },
+    {
+      "name": "chat background atomic metadata failure preserves the old pointer image and picker source for explicit retry",
+      "count": 1
+    },
+    {
+      "name": "chat background closing during the OS picker prevents later staging metadata or foreign route pop",
+      "count": 1
+    },
+    {
+      "name": "chat background damaged metadata editor disables gallery and saves default only after explicit user choice",
+      "count": 1
+    },
+    {
+      "name": "chat background default preview cancel preserves the previous persisted image",
+      "count": 1
+    },
+    {
+      "name": "chat background delayed support-directory read cannot adopt a newly logged in owner",
+      "count": 1
+    },
+    {
+      "name": "chat background exact CID namespace isolates different conversations including opaque path characters",
+      "count": 1
+    },
+    {
+      "name": "chat background explicit save ACK makes a durable copy and closes exactly its owned editor",
+      "count": 1
+    },
+    {
+      "name": "chat background failed default save retains the old image until an explicit acknowledged retry",
+      "count": 1
+    },
+    {
+      "name": "chat background feature-directory symlink fails closed without touching its target",
+      "count": 1
+    },
+    {
+      "name": "chat background file digest corruption is not reported as an empty successful read",
+      "count": 1
+    },
+    {
+      "name": "chat background foreign route ABA retires an existing save but a fresh explicit editor remains usable",
+      "count": 1
+    },
+    {
+      "name": "chat background gallery cancellation keeps the acknowledged previous image unchanged",
+      "count": 1
+    },
+    {
+      "name": "chat background invalid gallery bytes show a retryable error without losing the old preview",
+      "count": 1
+    },
+    {
+      "name": "chat background invalid stored path is an error and never authorizes outside file deletion",
+      "count": 1
+    },
+    {
+      "name": "chat background malformed bytes allow a distinct default-only intent without enabling ordinary image save",
+      "count": 1
+    },
+    {
+      "name": "chat background missing persistent image stays an explicit error and default requires a successful commit",
+      "count": 1
+    },
+    {
+      "name": "chat background oversized malformed record is recoverable by exact streamed raw digest without assuming empty",
+      "count": 1
+    },
+    {
+      "name": "chat background raw-byte repair ticket refuses a changed malformed record until a new explicit read",
+      "count": 1
+    },
+    {
+      "name": "chat background repair UI cannot overwrite bytes that changed after its read but a new explicit read works",
+      "count": 1
+    },
+    {
+      "name": "chat background repair ticket cannot be borrowed by another CID or a newly logged in owner",
+      "count": 1
+    },
+    {
+      "name": "chat background repeated completed rename failures do not accumulate owned image copies",
+      "count": 1
+    },
+    {
+      "name": "chat background same UID remains isolated after a real issuer owner replacement",
+      "count": 1
+    },
+    {
+      "name": "chat background same UID remains isolated after a real tenant owner replacement",
+      "count": 1
+    },
+    {
+      "name": "chat background source symlink is rejected without deleting either link or original",
+      "count": 1
+    },
+    {
+      "name": "chat background synchronous save double taps dispatch only one physical pointer replacement",
+      "count": 1
+    },
+    {
+      "name": "chat background two editors cannot overwrite an acknowledged newer revision with a stale draft",
+      "count": 1
+    },
+    {
+      "name": "chat background unknown ACK after actual rename never deletes the image now owned by its pointer",
+      "count": 1
+    },
+    {
+      "name": "chat font 360 wide editor at large OS and app size keeps preview and save usable",
+      "count": 1
+    },
+    {
+      "name": "chat font OS failure is distinct from absent data and a later explicit retry remains usable",
+      "count": 1
+    },
+    {
+      "name": "chat font absent preferences use standard and an acknowledged save survives a new reader",
+      "count": 1
+    },
+    {
+      "name": "chat font actual editor cancel preserves its stored factor without an OS write",
+      "count": 1
+    },
+    {
+      "name": "chat font an already dispatched write remains on its frozen key after logout",
+      "count": 1
+    },
+    {
+      "name": "chat font composes nonlinear OS scaling once even for a nested quoted body",
+      "count": 1
+    },
+    {
+      "name": "chat font delayed read cannot adopt the owner that logs in afterward",
+      "count": 1
+    },
+    {
+      "name": "chat font foreign route ABA never renews the old save but a new explicit editor works",
+      "count": 1
+    },
+    {
+      "name": "chat font initial read failure stays an error until an explicit read succeeds",
+      "count": 1
+    },
+    {
+      "name": "chat font invalid stored factor 0.0 does not become a successful standard read",
+      "count": 1
+    },
+    {
+      "name": "chat font invalid stored factor Infinity does not become a successful standard read",
+      "count": 1
+    },
+    {
+      "name": "chat font invalid stored factor NaN does not become a successful standard read",
+      "count": 1
+    },
+    {
+      "name": "chat font queued save rechecks its original view before physical preferences dispatch",
+      "count": 1
+    },
+    {
+      "name": "chat font same UID remains isolated when its issuer changes",
+      "count": 1
+    },
+    {
+      "name": "chat font same UID remains isolated when its tenant changes",
+      "count": 1
+    },
+    {
+      "name": "chat font save rejects synchronous double taps and retains a failed draft for an explicit retry",
+      "count": 1
+    },
+    {
+      "name": "chat font visible editor and retained save retire on a real issuer owner replacement",
+      "count": 1
+    },
+    {
+      "name": "chat font visible editor and retained save retire on a real tenant owner replacement",
+      "count": 1
+    },
+    {
+      "name": "chat long press forwards one original message after explicit destination confirmation",
+      "count": 1
+    },
+    {
+      "name": "chat restores a draft and sends through the real method codec without overflow at large text",
+      "count": 1
+    },
+    {
+      "name": "chat search uses the native codec and selects an original message at large text",
+      "count": 1
+    },
+    {
+      "name": "clear during an owned confirmation invalidates its original cut and retained action",
+      "count": 1
+    },
+    {
+      "name": "clear during the real group profile await prevents subsequent group SDK reads and stale card content",
+      "count": 1
+    },
+    {
+      "name": "clear during the requestFriend inner profile await prevents the real final addFriend dispatch",
+      "count": 1
+    },
+    {
+      "name": "clear uses the original native session once and rejects concurrent replay",
+      "count": 1
+    },
+    {
+      "name": "clear waits for old native history and never commits its late cache/UI response",
+      "count": 1
+    },
+    {
+      "name": "clear while actual message read is pending cannot lend a later history cut",
+      "count": 1
+    },
+    {
+      "name": "clear while source lookup waits prevents the first native delete and unknown IDs cannot be submitted afterward",
+      "count": 1
+    },
+    {
+      "name": "clearing another CID preserves the admitted original location detail",
+      "count": 1
+    },
+    {
+      "name": "clearing the original conversation retires map callbacks without acquiring a new cut",
+      "count": 1
+    },
+    {
+      "name": "click received explicit @AtAllTag routes by UID and all opens the group rather than a guessed user",
+      "count": 1
+    },
+    {
+      "name": "click received explicit @bob routes by UID and all opens the group rather than a guessed user",
+      "count": 1
+    },
+    {
+      "name": "close awaits already frozen SQLite events after owner sealing and does not publish old completion to a new owner",
+      "count": 1
+    },
+    {
+      "name": "closing an old handle cannot erase or deactivate a newer account binding",
+      "count": 1
+    },
+    {
+      "name": "closing during native start cancels a late recording and removes its source",
+      "count": 1
+    },
+    {
+      "name": "code login sends email and never enters a session with missing tokens",
+      "count": 1
+    },
+    {
+      "name": "cold restore waits outside the SDK FIFO and explicit logout cancels it without connecting",
+      "count": 1
+    },
+    {
+      "name": "comment deletion uses owner, comment author or reply recipient; other viewers never send deletion",
+      "count": 1
+    },
+    {
+      "name": "comment failure keeps the draft and reply target, and successful retry refreshes detail",
+      "count": 1
+    },
+    {
+      "name": "complete account ID resolves through exact ID lookup",
+      "count": 1
+    },
+    {
+      "name": "complete friend and joined-group sources are not capped to the inbox or first40",
+      "count": 1
+    },
+    {
+      "name": "completed cleanup preserves notes and incomplete todos",
+      "count": 1
+    },
+    {
+      "name": "completed export retains a live source guard until explicit OS sharing and discards on rejection",
+      "count": 1
+    },
+    {
+      "name": "concurrent submit sends one HTTP write and creates one durable row",
+      "count": 1
+    },
+    {
+      "name": "confirmed gallery selection uses real signed upload then exact group metadata",
+      "count": 1
+    },
+    {
+      "name": "confirmed records retain minimum proof and erase draft content from logical rows",
+      "count": 1
+    },
+    {
+      "name": "connection callback exposes a safe failure and no native body",
+      "count": 1
+    },
+    {
+      "name": "consent write failure is visible without resetting the router or opening SDK",
+      "count": 1
+    },
+    {
+      "name": "contact picker excludes existing members and enables confirmation only after choosing someone",
+      "count": 1
+    },
+    {
+      "name": "contact result uses actual profile hydration rather than incomplete search payload",
+      "count": 1
+    },
+    {
+      "name": "content already hidden at expiry cannot reappear when the device clock moves backwards",
+      "count": 1
+    },
+    {
+      "name": "controller clears meeting metadata immediately when its owner generation is invalidated",
+      "count": 1
+    },
+    {
+      "name": "conversation list projection shares the custom summary decoder",
+      "count": 1
+    },
+    {
+      "name": "conversation metadata wait cannot renew the original create view",
+      "count": 1
+    },
+    {
+      "name": "correct exact release opens readiness via a normal read, while a foreign issuer cannot activate",
+      "count": 1
+    },
+    {
+      "name": "corrupt journal records fail closed without deleting or dispatching",
+      "count": 1
+    },
+    {
+      "name": "corrupt legacy strings remain recoverable but cannot partially import",
+      "count": 1
+    },
+    {
+      "name": "corrupt policy fails closed before SDK connection without deleting saved credentials",
+      "count": 1
+    },
+    {
+      "name": "covering the actual owned popup then returning does not revive its old choice",
+      "count": 1
+    },
+    {
+      "name": "create ACK retains the exact group before any conversation read",
+      "count": 1
+    },
+    {
+      "name": "created group recovery rejects a foreign conversation response instead of navigating it",
+      "count": 1
+    },
+    {
+      "name": "creating a work group preserves unique other members and the group session type",
+      "count": 1
+    },
+    {
+      "name": "current HTTP authority wins over stale SDK role data and every authorization read uses only frozen IM token",
+      "count": 1
+    },
+    {
+      "name": "current ordinary group member sees a full QR and can explicitly share PNG",
+      "count": 1
+    },
+    {
+      "name": "cursor ownership filter and limits are validated before reading the database",
+      "count": 1
+    },
+    {
+      "name": "custom data does not manufacture OpenIM privacy metadata",
+      "count": 1
+    },
+    {
+      "name": "database ownership metadata refuses opening another account file under a new account key",
+      "count": 1
+    },
+    {
+      "name": "default access construction, attachment and unused disposal perform no storage or native I/O",
+      "count": 1
+    },
+    {
+      "name": "default category cannot be renamed or deleted and page/batch bounds fail before network",
+      "count": 1
+    },
+    {
+      "name": "default category is rendered once without mutation controls and category creation keeps invalid input",
+      "count": 1
+    },
+    {
+      "name": "definitive not-applied recovery offers explicit refill without replaying or generating a second intent",
+      "count": 1
+    },
+    {
+      "name": "definitive resolve tombstone survives restart and prevents late same-UUID submit",
+      "count": 1
+    },
+    {
+      "name": "delayed old-account response is discarded and its screen cannot mutate the new account",
+      "count": 1
+    },
+    {
+      "name": "delete withdraws selected IDs and old confirmation permanently",
+      "count": 1
+    },
+    {
+      "name": "deleting an active record does not hang up and its later real terminal event cannot resurrect it",
+      "count": 1
+    },
+    {
+      "name": "deleting the previous anchor CID uses the real current viewport anchor on a new explicit cycle",
+      "count": 1
+    },
+    {
+      "name": "deletion and history tombstones survive later metadata-only refill",
+      "count": 1
+    },
+    {
+      "name": "denied microphone permission keeps the sheet actionable without starting capture",
+      "count": 1
+    },
+    {
+      "name": "denied native GPS preserves manual map choice and remains explicitly retryable",
+      "count": 1
+    },
+    {
+      "name": "direct detail has an explicit list route and authoritative read even with no navigation back stack",
+      "count": 1
+    },
+    {
+      "name": "direct favorite API entry rejects private root and quoted content before HTTP without blocking normal encrypted messages",
+      "count": 1
+    },
+    {
+      "name": "direct new-route normal create opens an authoritative detail without needing any page to pop",
+      "count": 1
+    },
+    {
+      "name": "direct-URL face data stays compatible",
+      "count": 1
+    },
+    {
+      "name": "dismissed group exposes no batch management entry",
+      "count": 1
+    },
+    {
+      "name": "dismissed group fails discovery and display instead of showing an old code",
+      "count": 1
+    },
+    {
+      "name": "dismissed group has no avatar action",
+      "count": 1
+    },
+    {
+      "name": "dismissed or nonmember group display fails closed with an explicit retry",
+      "count": 1
+    },
+    {
+      "name": "dispatched ACK after a foreign cover cannot pop that route or send twice",
+      "count": 1
+    },
+    {
+      "name": "dispatched native1002 stays unknown across same-owner repositories and only permits reads",
+      "count": 1
+    },
+    {
+      "name": "double admission dispatches once and unknown ACK cannot create or resend a second message",
+      "count": 1
+    },
+    {
+      "name": "draft writes are serialized so an older slow save cannot overwrite newer input",
+      "count": 1
+    },
+    {
+      "name": "drafts already queued before clear cannot become new SDK writes after the head settles",
+      "count": 1
+    },
+    {
+      "name": "duplicate IDs are rejected across parts while note and todo IDs may match",
+      "count": 1
+    },
+    {
+      "name": "duplicate SDK identity is rejected before business authorization",
+      "count": 1
+    },
+    {
+      "name": "duplicate clear joins one dispatch, invalidates previews/search/raw cache and leaves unrelated profile work available",
+      "count": 1
+    },
+    {
+      "name": "duplicate page IDs and invalid counters are not shown as successful empty state",
+      "count": 1
+    },
+    {
+      "name": "duplicate selection rejects before any kick",
+      "count": 1
+    },
+    {
+      "name": "durable delete tombstone blocks already queued connected and terminal events after reopen",
+      "count": 1
+    },
+    {
+      "name": "earliest actual private descendant expires its quote without inspecting opaque custom text",
+      "count": 1
+    },
+    {
+      "name": "editing a pending lookup discards the previous query response",
+      "count": 1
+    },
+    {
+      "name": "editing inside a selected mention drops the ping rather than reinterpreting its new name",
+      "count": 1
+    },
+    {
+      "name": "editing preserves already recorded invitees and opaque Ex while cancellation has no old body",
+      "count": 1
+    },
+    {
+      "name": "edits before a mention shift its range in UTF16 without changing its stable recipient",
+      "count": 1
+    },
+    {
+      "name": "elapsed monotonic time advances a private deadline despite wall rollback and remount",
+      "count": 1
+    },
+    {
+      "name": "email and verification-code login actually send the selected fields",
+      "count": 1
+    },
+    {
+      "name": "email reset and OTP purposes preserve their distinct contracts",
+      "count": 1
+    },
+    {
+      "name": "embedded original all opens only its original group",
+      "count": 1
+    },
+    {
+      "name": "embedded original all without original group is display-only and never opens target group",
+      "count": 1
+    },
+    {
+      "name": "emoji data cannot become a local, executable, insecure or credential-bearing media URL",
+      "count": 1
+    },
+    {
+      "name": "empty and small exports remain a single ordinary version1 archive",
+      "count": 1
+    },
+    {
+      "name": "empty media and out-of-range voice duration never reach native message creation",
+      "count": 1
+    },
+    {
+      "name": "empty release catalog returns unsupported with real SQLite and no authenticated network dispatch",
+      "count": 1
+    },
+    {
+      "name": "empty, oversized and missing selections do not request a signed form",
+      "count": 1
+    },
+    {
+      "name": "empty, oversized, control, path and encoded delimiter IDs are rejected",
+      "count": 1
+    },
+    {
+      "name": "entry read settling under the actual recovery dialog clears internal loading when that dialog closes",
+      "count": 1
+    },
+    {
+      "name": "equal client IDs in different CIDs remain two navigation identities",
+      "count": 1
+    },
+    {
+      "name": "equal tenant ID on another auth issuer and equal issuer on another tenant are rejected",
+      "count": 1
+    },
+    {
+      "name": "escaped braces in a valid flat JSON label do not count as nesting",
+      "count": 1
+    },
+    {
+      "name": "exact ID response with a substituted account does not fall back to phone",
+      "count": 1
+    },
+    {
+      "name": "exact lookup ignores same-ID foreign-CID records and cannot renew a cleared cut",
+      "count": 1
+    },
+    {
+      "name": "exact membership rejects duplicate actor without treating an absent sender as ordinary",
+      "count": 1
+    },
+    {
+      "name": "exact membership rejects foreign group without treating an absent sender as ordinary",
+      "count": 1
+    },
+    {
+      "name": "exact membership rejects foreign member without treating an absent sender as ordinary",
+      "count": 1
+    },
+    {
+      "name": "exact membership rejects left sender without treating an absent sender as ordinary",
+      "count": 1
+    },
+    {
+      "name": "exact membership rejects missing actor without treating an absent sender as ordinary",
+      "count": 1
+    },
+    {
+      "name": "existing contacts single and multi selection remain available multiple=false",
+      "count": 1
+    },
+    {
+      "name": "existing contacts single and multi selection remain available multiple=true",
+      "count": 1
+    },
+    {
+      "name": "existing create convenience wrapper retains normal group and conversation behavior",
+      "count": 1
+    },
+    {
+      "name": "existing explicitly named inbox filter remains available",
+      "count": 1
+    },
+    {
+      "name": "existing name and announcement callers keep optional-guard compatibility",
+      "count": 1
+    },
+    {
+      "name": "existing private favorite snapshots cannot expose forwarding while ordinary encrypted snapshots can",
+      "count": 1
+    },
+    {
+      "name": "exit during native forward creation fences the later send dispatch",
+      "count": 1
+    },
+    {
+      "name": "expired caller view dispatches neither create nor its admission callback",
+      "count": 1
+    },
+    {
+      "name": "expired credentials trigger logout while account lock does not",
+      "count": 1
+    },
+    {
+      "name": "expiry observed before rollback cannot resurrect after remount and metadata omission",
+      "count": 1
+    },
+    {
+      "name": "expiry starts at a known read timestamp and changes exactly at the duration boundary",
+      "count": 1
+    },
+    {
+      "name": "explicit clear uses empty-string presence, including an unsafe legacy avatar",
+      "count": 1
+    },
+    {
+      "name": "explicit current position requests once converts WGS84 once and still waits for native confirmation",
+      "count": 1
+    },
+    {
+      "name": "explicit phone mode resolves only its unique phone owner",
+      "count": 1
+    },
+    {
+      "name": "explicit removal leaves visible text ordinary and new selections can be made after it",
+      "count": 1
+    },
+    {
+      "name": "explicit selection uses stable UID, current authoritative nickname and exact native AtText contract through final send",
+      "count": 1
+    },
+    {
+      "name": "explicit zero candidate creates bounded standard GCJ02 description without URLs or nonce",
+      "count": 1
+    },
+    {
+      "name": "explicitly switching to all conversations finds a hidden-by-filter unread and retains the search draft for reopening",
+      "count": 1
+    },
+    {
+      "name": "export all reads every server page instead of the 30 loaded rows, and preserves wire content and categories",
+      "count": 1
+    },
+    {
+      "name": "export discards previously written rows when their shared source becomes private during a later page",
+      "count": 1
+    },
+    {
+      "name": "extending the name into an ordinary word revokes its old binding",
+      "count": 1
+    },
+    {
+      "name": "external file opening is retention and respects private=false",
+      "count": 1
+    },
+    {
+      "name": "external file opening is retention and respects private=true",
+      "count": 1
+    },
+    {
+      "name": "failed authoritative hydration shows retry without opening a partial card",
+      "count": 1
+    },
+    {
+      "name": "failed booking discovery preserves an unknown intent and blocks retries until a fresh valid read",
+      "count": 1
+    },
+    {
+      "name": "failed consent persistence leaves privacy gating closed",
+      "count": 1
+    },
+    {
+      "name": "failed contacts show an explicit read-only retry rather than an empty-state success",
+      "count": 1
+    },
+    {
+      "name": "failed durable save keeps the draft on screen and allows retry",
+      "count": 1
+    },
+    {
+      "name": "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "count": 1
+    },
+    {
+      "name": "failed line change reconnects the original line and retains credentials",
+      "count": 1
+    },
+    {
+      "name": "failed metadata saves retain the draft and successful retry is the only path that closes the editor",
+      "count": 1
+    },
+    {
+      "name": "failed next page keeps results and retries that same page without raw error text",
+      "count": 1
+    },
+    {
+      "name": "failed resolve retains original intent and private draft until authoritative proof",
+      "count": 1
+    },
+    {
+      "name": "failed retirement keeps only an observable generic failure while a replacement owner records normally",
+      "count": 1
+    },
+    {
+      "name": "failed secure save cannot leave an authenticated session",
+      "count": 1
+    },
+    {
+      "name": "failed sends retain the SDK message ID and retry without creating a duplicate",
+      "count": 1
+    },
+    {
+      "name": "failed status read releases admission and only explicit retry can continue",
+      "count": 1
+    },
+    {
+      "name": "fast failed mirror does not defeat a later successful source",
+      "count": 1
+    },
+    {
+      "name": "favorite chooser exposes stable user/group identity and only searches displayed names or account IDs",
+      "count": 1
+    },
+    {
+      "name": "favorite forwarding refuses during create changes after the confirmed lease",
+      "count": 1
+    },
+    {
+      "name": "favorite forwarding refuses history clear changes after the confirmed lease",
+      "count": 1
+    },
+    {
+      "name": "favorite forwarding refuses source denial changes after the confirmed lease",
+      "count": 1
+    },
+    {
+      "name": "favorite forwarding refuses target identity changes after the confirmed lease",
+      "count": 1
+    },
+    {
+      "name": "favorite snapshot retains protocol identity, sequence, custom and privacy metadata",
+      "count": 1
+    },
+    {
+      "name": "favorites filters are scrollable at large text; batch deletion requires explicit confirmation",
+      "count": 1
+    },
+    {
+      "name": "feed stays usable at large text and deletes only after confirmation",
+      "count": 1
+    },
+    {
+      "name": "file read followed by foreign-route ABA cannot late-open OS; a new explicit click works",
+      "count": 1
+    },
+    {
+      "name": "filtered exports carry the requested category without confusing it with all categories",
+      "count": 1
+    },
+    {
+      "name": "final actual role reread refuses a downgrade after confirmation inspection",
+      "count": 1
+    },
+    {
+      "name": "final admission boundary rechecks a revoked caller before native create",
+      "count": 1
+    },
+    {
+      "name": "final send rechecks the actual quote source after creation, even when native omits quote metadata",
+      "count": 1
+    },
+    {
+      "name": "first PIN enable finishing after a background derive remains locked on return",
+      "count": 1
+    },
+    {
+      "name": "first PIN enable finishing after a background write remains locked on return",
+      "count": 1
+    },
+    {
+      "name": "first QR delivered before camera start acknowledgement is not silently lost",
+      "count": 1
+    },
+    {
+      "name": "first terminal rejects both older and forged higher connected revisions",
+      "count": 1
+    },
+    {
+      "name": "five failed attempts persist cooldown across a new coordinator and reject before another derivation",
+      "count": 1
+    },
+    {
+      "name": "five real tabs expose complete sources and exact IDs on a small large-text screen",
+      "count": 1
+    },
+    {
+      "name": "forced expiry cleans locally without creating a remote user logout",
+      "count": 1
+    },
+    {
+      "name": "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "count": 1
+    },
+    {
+      "name": "foreground loss retires moderation synchronously and withdraws its confirm on the next frame",
+      "count": 1
+    },
+    {
+      "name": "foreign author or mismatched source IDs fail closed and invalid pagination does not request",
+      "count": 1
+    },
+    {
+      "name": "foreign cover retires an owned detail and its retained close cannot pop the foreign route",
+      "count": 1
+    },
+    {
+      "name": "foreign coverage and ABA cannot revive the original retained card confirmation",
+      "count": 1
+    },
+    {
+      "name": "foreign coverage and return retire old confirm while a new explicit moderation still works",
+      "count": 1
+    },
+    {
+      "name": "foreign coverage of an owned redial sheet retires its sensitive content and does not revive the old choice",
+      "count": 1
+    },
+    {
+      "name": "foreign coverage of the actual attachment popup cannot renew its location choice on return",
+      "count": 1
+    },
+    {
+      "name": "foreign coverage of the owned friend-reason dialog retires its retained submit without a new action",
+      "count": 1
+    },
+    {
+      "name": "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "count": 1
+    },
+    {
+      "name": "foreign covering route and return permanently retire the old picker and its retained send callback",
+      "count": 1
+    },
+    {
+      "name": "foreign group member IDs duplicate records missing roles or missing status never authorize a native ping",
+      "count": 1
+    },
+    {
+      "name": "foreign navigation ABA cannot revive a pending picker but new selection works",
+      "count": 1
+    },
+    {
+      "name": "foreign navigation permanently retires pending preflight but permits a new explicit click",
+      "count": 1
+    },
+    {
+      "name": "foreign owner and malformed list never become visible empty success",
+      "count": 1
+    },
+    {
+      "name": "foreign owner in malformed create ACK is not accepted as an owned group",
+      "count": 1
+    },
+    {
+      "name": "foreign route ABA permanently retires an already open card detail and its retained retry",
+      "count": 1
+    },
+    {
+      "name": "foreign route coverage and return cannot revive a dispatched unread view but a new explicit action can work",
+      "count": 1
+    },
+    {
+      "name": "foreign route covering own preview modal invalidates old confirmation after ABA",
+      "count": 1
+    },
+    {
+      "name": "foreign route covering own source modal invalidates old confirmation after ABA",
+      "count": 1
+    },
+    {
+      "name": "foreign route covering the owned confirmation then returning does not revive it",
+      "count": 1
+    },
+    {
+      "name": "foreign route over owned preview permanently rejects its old approval",
+      "count": 1
+    },
+    {
+      "name": "foreign service and arbitrary URL cause no profile or external navigation",
+      "count": 1
+    },
+    {
+      "name": "foreign-route ABA during image decode retires that intent but a new scan works",
+      "count": 1
+    },
+    {
+      "name": "forward chooser distinguishes duplicate names by stable account and group IDs through confirmation",
+      "count": 1
+    },
+    {
+      "name": "forward creation cannot renew its lease and send an old snapshot after clear",
+      "count": 1
+    },
+    {
+      "name": "forward recipient lookup excludes internal conversation IDs",
+      "count": 1
+    },
+    {
+      "name": "forward strips local paths, retains extensions and sends a new native identity",
+      "count": 1
+    },
+    {
+      "name": "forwarding at-text to a different-membership group preserves original metadata in a standard non-pinging single merge",
+      "count": 1
+    },
+    {
+      "name": "forwarding at-text to a singlechat preserves original metadata in a standard non-pinging single merge",
+      "count": 1
+    },
+    {
+      "name": "forwarding stops when refreshed destination identity differs from the confirmed account",
+      "count": 1
+    },
+    {
+      "name": "fractional and malformed read values cannot suppress an earlier valid attached read",
+      "count": 1
+    },
+    {
+      "name": "fresh actor and target roles after awaited lookup override stale UI",
+      "count": 1
+    },
+    {
+      "name": "fresh actual member roles reject administrator targeting owner before revoke dispatch",
+      "count": 1
+    },
+    {
+      "name": "fresh actual member roles reject conflicting equal owners before revoke dispatch",
+      "count": 1
+    },
+    {
+      "name": "fresh actual member roles reject equal administrators before revoke dispatch",
+      "count": 1
+    },
+    {
+      "name": "fresh actual member roles reject ordinary actor before revoke dispatch",
+      "count": 1
+    },
+    {
+      "name": "fresh actual member roles reject unknown actor role before revoke dispatch",
+      "count": 1
+    },
+    {
+      "name": "fresh actual member roles reject unknown sender role before revoke dispatch",
+      "count": 1
+    },
+    {
+      "name": "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "fresh exact source rejects changed CID before native revoke",
+      "count": 1
+    },
+    {
+      "name": "fresh exact source rejects changed duplicate message before native revoke",
+      "count": 1
+    },
+    {
+      "name": "fresh exact source rejects changed kind before native revoke",
+      "count": 1
+    },
+    {
+      "name": "fresh exact source rejects changed message ID before native revoke",
+      "count": 1
+    },
+    {
+      "name": "fresh exact source rejects changed metadata group before native revoke",
+      "count": 1
+    },
+    {
+      "name": "fresh exact source rejects changed sender before native revoke",
+      "count": 1
+    },
+    {
+      "name": "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "fresh role withdrawal after preview starts no upload",
+      "count": 1
+    },
+    {
+      "name": "fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain",
+      "count": 1
+    },
+    {
+      "name": "fresh target promotion produces an explicit rejection then continues allowed item",
+      "count": 1
+    },
+    {
+      "name": "friend read errors remain errors and explicit retry is mutually exclusive and read only",
+      "count": 1
+    },
+    {
+      "name": "friend remarks survive mapping and blocked friends stay out of the address book",
+      "count": 1
+    },
+    {
+      "name": "friend shortcut uses exact ID and real profile hydration without a phone fallback or automatic request",
+      "count": 1
+    },
+    {
+      "name": "friend submission rechecks current target policy before native mutation",
+      "count": 1
+    },
+    {
+      "name": "frozen ordered IDs each get exactly one singleton kick and individual ACK",
+      "count": 1
+    },
+    {
+      "name": "full native message JSON remains unchanged and embedded local paths never become playable media",
+      "count": 1
+    },
+    {
+      "name": "gallery cancel and no code have explicit non-success states",
+      "count": 1
+    },
+    {
+      "name": "gallery legacy code exposes current service confirmation and cancel is read only",
+      "count": 1
+    },
+    {
+      "name": "generic native failure safely classifies configuration: x509",
+      "count": 1
+    },
+    {
+      "name": "generic native failure safely classifies network: dial tcp",
+      "count": 1
+    },
+    {
+      "name": "generic native failure safely classifies network: lookup private.invalid",
+      "count": 1
+    },
+    {
+      "name": "generic native failure safely classifies timeout: TLS handshake timeout",
+      "count": 1
+    },
+    {
+      "name": "generic native failure safely classifies timeout: request failed",
+      "count": 1
+    },
+    {
+      "name": "generic native failure safely classifies unknown: database internal failure",
+      "count": 1
+    },
+    {
+      "name": "global DND uses the real SDK boundary2 and0 and reads native self option",
+      "count": 1
+    },
+    {
+      "name": "global clear drains an already-dispatched search without teaching late IDs to the ledger",
+      "count": 1
+    },
+    {
+      "name": "global clear permanently invalidates old query even after ACK",
+      "count": 1
+    },
+    {
+      "name": "global clear removes result and old selection after ACK without auto search",
+      "count": 1
+    },
+    {
+      "name": "global incoming card rejects without permissions or media; hidden on the full call page",
+      "count": 1
+    },
+    {
+      "name": "global is one untruncated request and includes hidden CID outside the loaded inbox",
+      "count": 1
+    },
+    {
+      "name": "group chat settings does not masquerade as single-chat expansion",
+      "count": 1
+    },
+    {
+      "name": "group composer opens a stable-ID member picker on360px large text and does not ping by handwritten name",
+      "count": 1
+    },
+    {
+      "name": "group discovery reaches real group page and only explicit request sends joinSource4",
+      "count": 1
+    },
+    {
+      "name": "group flags keep prohibition semantics and booleans serialize to SDK status 1",
+      "count": 1
+    },
+    {
+      "name": "group hydration never accepts the first foreign group record",
+      "count": 1
+    },
+    {
+      "name": "group read count survives optimistic delivery and staged-media mapping",
+      "count": 1
+    },
+    {
+      "name": "group receipts follow viewport and exclude unheard voice messages",
+      "count": 1
+    },
+    {
+      "name": "group restrictions keep explicit prohibition labels and dismissing requires confirmation",
+      "count": 1
+    },
+    {
+      "name": "group result reaches actual group detail and rechecks membership",
+      "count": 1
+    },
+    {
+      "name": "group shortcut performs complete exact SDK lookup and opens the real group detail without joining",
+      "count": 1
+    },
+    {
+      "name": "group-only inbox selection cannot silently open one-to-one chat",
+      "count": 1
+    },
+    {
+      "name": "handwritten @ nickname never creates native mention metadata",
+      "count": 1
+    },
+    {
+      "name": "handwritten or pasted nickname and even UID text remain ordinary without a selected binding",
+      "count": 1
+    },
+    {
+      "name": "hint summaries never mutate native message type or authority fields",
+      "count": 1
+    },
+    {
+      "name": "historical at-sign UID survives authoritative membership and native codec through final send",
+      "count": 1
+    },
+    {
+      "name": "historical moderation with missing time still uses exact fresh roles and original source",
+      "count": 1
+    },
+    {
+      "name": "historical moderation with over two minutes time still uses exact fresh roles and original source",
+      "count": 1
+    },
+    {
+      "name": "historical moderation with zero time still uses exact fresh roles and original source",
+      "count": 1
+    },
+    {
+      "name": "historical stable UID containing at sign remains selectable and preserves exact wire identity",
+      "count": 1
+    },
+    {
+      "name": "history clear invalidates a delayed member check before create and settles it before native clear",
+      "count": 1
+    },
+    {
+      "name": "history is converted to domain data and marked read once per latest incoming message",
+      "count": 1
+    },
+    {
+      "name": "home menu reaches meeting management through the exact protected route and shows disabled media",
+      "count": 1
+    },
+    {
+      "name": "host close requires authoritative disappearance and guest close never dispatches",
+      "count": 1
+    },
+    {
+      "name": "host media restrictions need authoritative readback and never admit a guest or screen-share dispatch",
+      "count": 1
+    },
+    {
+      "name": "image error releases busy and a later explicit selection may be decoded",
+      "count": 1
+    },
+    {
+      "name": "in-flight mutation is single-flight and cannot repopulate state after logout",
+      "count": 1
+    },
+    {
+      "name": "inbox add friend opens the real ID lookup and normal back preserves inbox state",
+      "count": 1
+    },
+    {
+      "name": "inbox exposes a real accessible group creation entry and reaches selection",
+      "count": 1
+    },
+    {
+      "name": "inbox preserves explicit verification preflight for status=0 without native create",
+      "count": 1
+    },
+    {
+      "name": "inbox preserves explicit verification preflight for status=2 without native create",
+      "count": 1
+    },
+    {
+      "name": "inbox preserves explicit verification preflight for status=3 without native create",
+      "count": 1
+    },
+    {
+      "name": "inbox search group opens the real group lookup without changing existing menu actions",
+      "count": 1
+    },
+    {
+      "name": "inbox searches real SDK results and confirms before deleting records on a small large-text screen",
+      "count": 1
+    },
+    {
+      "name": "inbox selected friends reach accepted editor and one exact native group intent",
+      "count": 1
+    },
+    {
+      "name": "inbox shortcuts and the group lookup remain usable at 320 by 568 with large text",
+      "count": 1
+    },
+    {
+      "name": "incoming and outgoing friend requests keep the other user and only incoming pending can be handled",
+      "count": 1
+    },
+    {
+      "name": "incoming full-page actions remain usable on a small screen at large text",
+      "count": 1
+    },
+    {
+      "name": "incoming permission failure and other-device handling are explicit non-missed outcomes",
+      "count": 1
+    },
+    {
+      "name": "incorrect PIN preserves locked restore and consumes a durable attempt; correct PIN connects once",
+      "count": 1
+    },
+    {
+      "name": "independent issuers and route paths cannot share SDK or personal-data namespaces",
+      "count": 1
+    },
+    {
+      "name": "initial expired selection dispatches zero metadata history or read receipt",
+      "count": 1
+    },
+    {
+      "name": "initial mark-read already dispatched does not publish staged history after selection loss",
+      "count": 1
+    },
+    {
+      "name": "insert and delete changes reject existing pagination cursors",
+      "count": 1
+    },
+    {
+      "name": "interaction count read preserves list, explicit clear sends both and cannot race an active page",
+      "count": 1
+    },
+    {
+      "name": "invalid MFA, empty password and stale access do not dispatch",
+      "count": 1
+    },
+    {
+      "name": "invalid UTC duration, duplicate invitees and UTF8 title bounds fail before any SDK work",
+      "count": 1
+    },
+    {
+      "name": "invalid actual SDK location keeps its kind but has no actionable coordinate payload",
+      "count": 1
+    },
+    {
+      "name": "invalid actual native Card108 identity is rejected before send",
+      "count": 1
+    },
+    {
+      "name": "invalid archive leaves existing contents untouched",
+      "count": 1
+    },
+    {
+      "name": "invalid draft or insecure avatar is rejected before native dispatch",
+      "count": 1
+    },
+    {
+      "name": "invalid envelopes never become a successful operation",
+      "count": 1
+    },
+    {
+      "name": "invalid image fails before signed upload and can be explicitly reselected",
+      "count": 1
+    },
+    {
+      "name": "invalid image fails in real decoder before signed storage and leaves creation draft",
+      "count": 1
+    },
+    {
+      "name": "invalid names, URL credentials/fragments, enum and future birth never leave device",
+      "count": 1
+    },
+    {
+      "name": "invalid native Location message is rejected before any send",
+      "count": 1
+    },
+    {
+      "name": "invalid schedule keeps the draft and does not request room creation",
+      "count": 1
+    },
+    {
+      "name": "invalid text, image URL and paging never dispatch",
+      "count": 1
+    },
+    {
+      "name": "issuer and accountKey isolate identical user IDs and request UUIDs",
+      "count": 1
+    },
+    {
+      "name": "issuer tenant replacement hides legacy dialog without popping a covering route",
+      "count": 1
+    },
+    {
+      "name": "known expiry hides content and disposes an open media child instead of claiming native deletion",
+      "count": 1
+    },
+    {
+      "name": "known-expired body is hidden and its menu cannot copy reply collect or forward cached content",
+      "count": 1
+    },
+    {
+      "name": "known-issued pair is exactly revoked when native connection fails",
+      "count": 1
+    },
+    {
+      "name": "known910 through913 explain historical relationship and group hints",
+      "count": 1
+    },
+    {
+      "name": "large SQLite backups restore every part to a confirmed owner exactly once",
+      "count": 1
+    },
+    {
+      "name": "large address books build visible rows on demand and still search the complete friend list",
+      "count": 1
+    },
+    {
+      "name": "late HTTP results are cancelled on account invalidation, with separate chat and IM tokens",
+      "count": 1
+    },
+    {
+      "name": "late actual native ACK settles the started operation without refreshing a retired view",
+      "count": 1
+    },
+    {
+      "name": "late authoritative profile after account switch withdraws all old card content",
+      "count": 1
+    },
+    {
+      "name": "late biometric success cannot unlock another owner after logout and login",
+      "count": 1
+    },
+    {
+      "name": "late camera failure keeps explicit stop then restart available",
+      "count": 1
+    },
+    {
+      "name": "late cancellation acknowledgement neither clears a newer account nor announces stale success",
+      "count": 1
+    },
+    {
+      "name": "late confirmed password response never signs out a newer account or shows stale success",
+      "count": 1
+    },
+    {
+      "name": "late conversation after navigation ABA cannot navigate but explicit retry is read only",
+      "count": 1
+    },
+    {
+      "name": "late conversation lookup cannot enter a session whose generation ended before native disconnect",
+      "count": 1
+    },
+    {
+      "name": "late create ACK after navigation ABA cannot start conversation or revive submit",
+      "count": 1
+    },
+    {
+      "name": "late custom history cannot enter a session that has ended",
+      "count": 1
+    },
+    {
+      "name": "late exact conversation resolution after source clear cannot navigate away from the current profile route",
+      "count": 1
+    },
+    {
+      "name": "late first ACK after group navigation cannot send second or show old progress",
+      "count": 1
+    },
+    {
+      "name": "late group conversation read cannot borrow a reentered group route",
+      "count": 1
+    },
+    {
+      "name": "late mutation cannot refresh or leak data into the next account",
+      "count": 1
+    },
+    {
+      "name": "late native card creation after picker exit cannot send or pop the chat",
+      "count": 1
+    },
+    {
+      "name": "late native creation after picker exit never proceeds to an SDK send",
+      "count": 1
+    },
+    {
+      "name": "late old-account reply is cancelled without changing the newer account",
+      "count": 1
+    },
+    {
+      "name": "late search and inbox pages cannot bring back message text or previews",
+      "count": 1
+    },
+    {
+      "name": "late successful revoke ACK does not pop a foreign route or claim the dispatched write was cancelled",
+      "count": 1
+    },
+    {
+      "name": "late user conversation read after foreign route ABA never pushes a chat",
+      "count": 1
+    },
+    {
+      "name": "late verified reply cannot open selection after replacement issuer",
+      "count": 1
+    },
+    {
+      "name": "late verified reply cannot open selection after replacement owner",
+      "count": 1
+    },
+    {
+      "name": "late verified reply cannot open selection after replacement tenant",
+      "count": 1
+    },
+    {
+      "name": "latest accepted avatar selection wins before create; late old error=false",
+      "count": 1
+    },
+    {
+      "name": "latest accepted avatar selection wins before create; late old error=true",
+      "count": 1
+    },
+    {
+      "name": "latest accepted upload wins before metadata; old fails=false",
+      "count": 1
+    },
+    {
+      "name": "latest accepted upload wins before metadata; old fails=true",
+      "count": 1
+    },
+    {
+      "name": "latest conversation send denial blocks a retained valid candidate before native creation",
+      "count": 1
+    },
+    {
+      "name": "latest no longer joined group state rejects a retained card confirmation before any SDK create",
+      "count": 1
+    },
+    {
+      "name": "latest original group preventMemberFriends denies a retained card application after fresh policy read",
+      "count": 1
+    },
+    {
+      "name": "latest refresh wins, pages deduplicate and a failed refresh retries page one",
+      "count": 1
+    },
+    {
+      "name": "latest role withdrawal prevents avatar metadata",
+      "count": 1
+    },
+    {
+      "name": "leaving an edited note asks before discarding",
+      "count": 1
+    },
+    {
+      "name": "leaving during a delayed initial SQLite open cannot publish old rows or errors into the inbox",
+      "count": 1
+    },
+    {
+      "name": "leaving registration during config request never creates an account later",
+      "count": 1
+    },
+    {
+      "name": "leaving the page while picker waits prevents staging and upload",
+      "count": 1
+    },
+    {
+      "name": "leaving the scan page before gallery returns dispatches no decoder",
+      "count": 1
+    },
+    {
+      "name": "legacy JSON displays bounded name and addr and ignores its URL and duplicate coordinates",
+      "count": 1
+    },
+    {
+      "name": "legacy custom call901 summaries do not become ordinary read receipts",
+      "count": 1
+    },
+    {
+      "name": "legacy custom emoji902 maps to a sticker without rewriting the custom envelope",
+      "count": 1
+    },
+    {
+      "name": "legacy defaults, seconds compatibility bounds, malformed and overflow values are explicit",
+      "count": 1
+    },
+    {
+      "name": "legacy empty topics retain host fallback and an unchanged past start can be edited without moving the meeting",
+      "count": 1
+    },
+    {
+      "name": "legacy endpoints use chat token and frozen actor, with server-resolved feed friends",
+      "count": 1
+    },
+    {
+      "name": "legacy helper produces an unowned archive accepted by the actual importer",
+      "count": 1
+    },
+    {
+      "name": "legacy plaintext remains local readable text with control and bidi characters removed",
+      "count": 1
+    },
+    {
+      "name": "legacy records without issuer never automatically reopen ambiguous unscoped caches",
+      "count": 1
+    },
+    {
+      "name": "legacy service consent precedes real hydration and exact profile confirmation",
+      "count": 1
+    },
+    {
+      "name": "lifecycle pause stops camera and an old capture callback cannot navigate after resume",
+      "count": 1
+    },
+    {
+      "name": "line switching and a local PIN unlock never count as a fresh server login for PIN recovery",
+      "count": 1
+    },
+    {
+      "name": "literal draft JSON never grants an unselected recipient when the editor reopens",
+      "count": 1
+    },
+    {
+      "name": "live learned private expiry hides body and does not need another native search",
+      "count": 1
+    },
+    {
+      "name": "load-more failure keeps previous rows and retries the failed page",
+      "count": 1
+    },
+    {
+      "name": "loaded favorite list withdraws subtitle and tags together with the title after a privacy update",
+      "count": 1
+    },
+    {
+      "name": "loading history and clearing conversation badge never marks unseen group messages",
+      "count": 1
+    },
+    {
+      "name": "local logout invalidates immediately, clears storage before remote acknowledgement and coalesces duplicate calls",
+      "count": 1
+    },
+    {
+      "name": "local paths, insecure attachments, unsupported video batches and empty drafts never publish",
+      "count": 1
+    },
+    {
+      "name": "local-path-only attachment cannot be forwarded or uploaded",
+      "count": 1
+    },
+    {
+      "name": "location accepts explicitly supplied zero and both inclusive geographic limits",
+      "count": 1
+    },
+    {
+      "name": "location bounds description fields key count and wrong text types without truncating identity",
+      "count": 1
+    },
+    {
+      "name": "location rejects missing nonfinite and out of range coordinates",
+      "count": 1
+    },
+    {
+      "name": "lock and unlock preserve the server generation and connection but old interactive leases never revive",
+      "count": 1
+    },
+    {
+      "name": "locked content and its semantic label are removed; an incorrect PIN never restores them",
+      "count": 1
+    },
+    {
+      "name": "locked user work is refused while the explicit background-safe signaling path remains usable",
+      "count": 1
+    },
+    {
+      "name": "login failures clear the native session even when logout itself fails",
+      "count": 1
+    },
+    {
+      "name": "logout during a membership read stops the following moderation request",
+      "count": 1
+    },
+    {
+      "name": "logout during a slow response cancels the old download and cannot write into the next account",
+      "count": 1
+    },
+    {
+      "name": "logout during transaction rolls every imported row and marker back",
+      "count": 1
+    },
+    {
+      "name": "logout immediately clears favorite selection and late data, old repository cannot dispatch after another account signs in",
+      "count": 1
+    },
+    {
+      "name": "logout immediately removes chat contents and disables pending work",
+      "count": 1
+    },
+    {
+      "name": "logout invalidates pending authentication and never saves its result",
+      "count": 1
+    },
+    {
+      "name": "logout seals old events before delayed permissions return and cold provisional remains unknown",
+      "count": 1
+    },
+    {
+      "name": "logout while checking members cannot borrow a later session to create or send",
+      "count": 1
+    },
+    {
+      "name": "logout while resolved confirmation is visible removes prior profile content",
+      "count": 1
+    },
+    {
+      "name": "logout while video inspection is pending rejects the old result and removes its staged files",
+      "count": 1
+    },
+    {
+      "name": "long press enters bounded checkbox mode with count and cancel on360 large text",
+      "count": 1
+    },
+    {
+      "name": "long press of an incoming group avatar inserts only that authoritative account mention",
+      "count": 1
+    },
+    {
+      "name": "long supplementary-character nickname is a bounded snapshot and does not block reporting its ID",
+      "count": 1
+    },
+    {
+      "name": "lookup failure keeps a visible explicit read retry and never falls back to another namespace",
+      "count": 1
+    },
+    {
+      "name": "lost HTTP ACK after server commit recovers after closing and reopening SQLite",
+      "count": 1
+    },
+    {
+      "name": "lost acknowledgement never retries and definite rejection is retained",
+      "count": 1
+    },
+    {
+      "name": "lost reply freezes original UUID; actual SQLite receipt recovery does not create again",
+      "count": 1
+    },
+    {
+      "name": "lost submit ACK is recovered by the same owner-scoped receipt without resubmitting",
+      "count": 1
+    },
+    {
+      "name": "main meeting schedule uses the booking route and never falls back when its journal is unavailable",
+      "count": 1
+    },
+    {
+      "name": "malformed and insecure config cannot produce a usable line",
+      "count": 1
+    },
+    {
+      "name": "malformed arrays nonflat objects and excessively nested JSON are rejected before projection",
+      "count": 1
+    },
+    {
+      "name": "malformed global structure is an error rather than a successful empty search: {\"totalCount\":1,\"searchResultItems\":[{\"conversationID\":\"\",\"messageCount\":1,\"messageList\":[]}]}",
+      "count": 1
+    },
+    {
+      "name": "malformed global structure is an error rather than a successful empty search: {\"totalCount\":1}",
+      "count": 1
+    },
+    {
+      "name": "malformed native card never leaks an untrusted nickname through previews",
+      "count": 1
+    },
+    {
+      "name": "malformed or excessively nested privacy metadata cannot be treated as shareable",
+      "count": 1
+    },
+    {
+      "name": "malformed or media-bearing responses preserve unknown state and private draft",
+      "count": 1
+    },
+    {
+      "name": "malformed or oversized custom data stays opaque with a safe fallback",
+      "count": 1
+    },
+    {
+      "name": "malformed received card has no profile action or received faceURL request",
+      "count": 1
+    },
+    {
+      "name": "malformed verification status is an error instead of approval",
+      "count": 1
+    },
+    {
+      "name": "manual incoming decline is explicit and is never classified as missed",
+      "count": 1
+    },
+    {
+      "name": "manual reselection while one native fix is pending wins over its late response",
+      "count": 1
+    },
+    {
+      "name": "manual scrolling cancels an admitted pending unread seek and its late reply cannot take the scroll position back",
+      "count": 1
+    },
+    {
+      "name": "map readiness gates native GPS and opening the real location entry never locates automatically",
+      "count": 1
+    },
+    {
+      "name": "map selection native controls and errors remain usable at360px with large text",
+      "count": 1
+    },
+    {
+      "name": "mapper preserves exact private flag, both read timestamps and duration through copies without inventing a countdown",
+      "count": 1
+    },
+    {
+      "name": "media URL mapping rejects executable and credential-bearing values",
+      "count": 1
+    },
+    {
+      "name": "media browse never asks unsupported native keyword search and filters wrong types",
+      "count": 1
+    },
+    {
+      "name": "meeting deep link cannot initialize SDK before login",
+      "count": 1
+    },
+    {
+      "name": "meeting deep link cannot initialize SDK before privacy consent",
+      "count": 1
+    },
+    {
+      "name": "meeting list and details remain readable at large text without pretending media admission is enabled",
+      "count": 1
+    },
+    {
+      "name": "meeting905 is readable without manufacturing a join action or URL",
+      "count": 1
+    },
+    {
+      "name": "merge reuses one stable-ID destination picker and generic count confirmation without copying bodies into its dialog",
+      "count": 1
+    },
+    {
+      "name": "metadata error releases admission and never auto-replays unknown result",
+      "count": 1
+    },
+    {
+      "name": "metadata pending admits no new picker then permits explicit selection after ACK",
+      "count": 1
+    },
+    {
+      "name": "metadata validates UTF8 lengths and malformed timestamps rather than failing during UI rendering",
+      "count": 1
+    },
+    {
+      "name": "metadata-only retry keeps known private and hidden tombstone facts",
+      "count": 1
+    },
+    {
+      "name": "mismatched action and update target receipts do not finalize a draft",
+      "count": 1
+    },
+    {
+      "name": "mismatched detail IDs and foreign or duplicate statistics categories fail closed",
+      "count": 1
+    },
+    {
+      "name": "missing HTTP authority refuses real mentions but keeps ordinary text available",
+      "count": 1
+    },
+    {
+      "name": "missing bootstrap reports configuration error, not a demo service",
+      "count": 1
+    },
+    {
+      "name": "missing friend policy cannot silently grant friend permission",
+      "count": 1
+    },
+    {
+      "name": "missing receipt remains unknown and never starts another submission",
+      "count": 1
+    },
+    {
+      "name": "missing required invitation does not send OTP or start cooldown",
+      "count": 1
+    },
+    {
+      "name": "mutating original form arrays cannot change durable retry bytes",
+      "count": 1
+    },
+    {
+      "name": "muted admin keeps management avatar action",
+      "count": 1
+    },
+    {
+      "name": "muted admin moderation is usable at360 large text with real44px confirmation controls",
+      "count": 1
+    },
+    {
+      "name": "muted admin retains batch management entry",
+      "count": 1
+    },
+    {
+      "name": "muted administrator can remove an ordinary target",
+      "count": 1
+    },
+    {
+      "name": "muted administrator retains avatar management without send permission",
+      "count": 1
+    },
+    {
+      "name": "muted owner can remove another admin without canSend admission",
+      "count": 1
+    },
+    {
+      "name": "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior",
+      "count": 1
+    },
+    {
+      "name": "native delete callback removes visible and quote caches immediately and prevents stale source retention",
+      "count": 1
+    },
+    {
+      "name": "native expiry reports its generation once and stops accepting callbacks",
+      "count": 1
+    },
+    {
+      "name": "native fix requires exact request WGS84 recent time and valid accuracy",
+      "count": 1
+    },
+    {
+      "name": "native history codec exposes legacy text and meeting summaries",
+      "count": 1
+    },
+    {
+      "name": "native merge dropping an extension fails closed before send instead of silently losing protocol data",
+      "count": 1
+    },
+    {
+      "name": "native payload failures are mapped to safe errors and progress does not reload the inbox",
+      "count": 1
+    },
+    {
+      "name": "native permission failure stays typed and exposes no raw platform message",
+      "count": 1
+    },
+    {
+      "name": "navigation away and back cannot revive an in-flight avatar intent",
+      "count": 1
+    },
+    {
+      "name": "nested audio active playback stops after root clear",
+      "count": 1
+    },
+    {
+      "name": "nested audio active playback stops after root exit",
+      "count": 1
+    },
+    {
+      "name": "nested audio active playback stops after root expiry",
+      "count": 1
+    },
+    {
+      "name": "nested audio active playback stops after root revoke",
+      "count": 1
+    },
+    {
+      "name": "nested audio late setUrl cannot start after root clear",
+      "count": 1
+    },
+    {
+      "name": "nested audio late setUrl cannot start after root exit",
+      "count": 1
+    },
+    {
+      "name": "nested audio late setUrl cannot start after root expiry",
+      "count": 1
+    },
+    {
+      "name": "nested audio late setUrl cannot start after root revoke",
+      "count": 1
+    },
+    {
+      "name": "nested file export uses combined portal policy for ordinary",
+      "count": 1
+    },
+    {
+      "name": "nested file export uses combined portal policy for private-root",
+      "count": 1
+    },
+    {
+      "name": "nested file export uses combined portal policy for private-sibling",
+      "count": 1
+    },
+    {
+      "name": "nested merge projection has a global bounded node budget and keeps known private descendants denied",
+      "count": 1
+    },
+    {
+      "name": "nested merger preserves each standard108 identity without treating ex as a child message",
+      "count": 1
+    },
+    {
+      "name": "nested private metadata and deleted or wrong-type results never reveal ordinary summaries",
+      "count": 1
+    },
+    {
+      "name": "new URI refuses unknown or duplicated fields, userinfo, port and fragment",
+      "count": 1
+    },
+    {
+      "name": "new durable RTC events mark a loaded snapshot stale and explicit refresh reads the new record",
+      "count": 1
+    },
+    {
+      "name": "new expiry facts retire an enabled moderation action immediately and on the next frame",
+      "count": 1
+    },
+    {
+      "name": "new location configuration requires deployment HTTPS fixed picker and explicit valid center",
+      "count": 1
+    },
+    {
+      "name": "new owner or actual session is independent, and old projections never consult the new owner",
+      "count": 1
+    },
+    {
+      "name": "new owner pending read never exposes prior owner rows",
+      "count": 1
+    },
+    {
+      "name": "new personal and group codes preserve exact Unicode IDs without credentials",
+      "count": 1
+    },
+    {
+      "name": "new private facts remove selection immediately instead of retaining a static body snapshot",
+      "count": 1
+    },
+    {
+      "name": "new query drops deferred old results and never renews their ticket",
+      "count": 1
+    },
+    {
+      "name": "new same-account epoch rejects late ACK and does not clear another intent",
+      "count": 1
+    },
+    {
+      "name": "new search wins over a late previous query",
+      "count": 1
+    },
+    {
+      "name": "newer search read wins without late old-page list refill",
+      "count": 1
+    },
+    {
+      "name": "next unread admission rejects a quarantined CID instead of replacing the original cut with a fresh lease",
+      "count": 1
+    },
+    {
+      "name": "next unread complete empty snapshot differs from a native read failure",
+      "count": 1
+    },
+    {
+      "name": "next unread cycles the complete ordered inbox including muted rows and wraps by CID",
+      "count": 1
+    },
+    {
+      "name": "next unread does not advance its CID anchor until actual row reveal succeeds",
+      "count": 1
+    },
+    {
+      "name": "next unread handles a single unread and a complete all-read inbox without changing counts",
+      "count": 1
+    },
+    {
+      "name": "next unread issuer replacement cannot adopt an old in-flight native snapshot",
+      "count": 1
+    },
+    {
+      "name": "next unread keeps the original query ticket through a delayed native reply",
+      "count": 1
+    },
+    {
+      "name": "next unread original CID revision prevents private preview observation after a concurrent clear",
+      "count": 1
+    },
+    {
+      "name": "next unread prevents concurrent complete reads while allowing a later explicit new intent",
+      "count": 1
+    },
+    {
+      "name": "next unread reads the entire SDK inbox beyond forty and preserves muted ordering without writes",
+      "count": 1
+    },
+    {
+      "name": "next unread rejects duplicate conversation identities rather than claiming a complete cycle",
+      "count": 1
+    },
+    {
+      "name": "next unread replaces an older paginated response without allowing its late append to corrupt the snapshot",
+      "count": 1
+    },
+    {
+      "name": "next unread source cannot renew its owner after real logout and login starts",
+      "count": 1
+    },
+    {
+      "name": "next unread tenant replacement cannot adopt an old in-flight native snapshot",
+      "count": 1
+    },
+    {
+      "name": "no routes, credentials or SDK are touched before explicit privacy consent",
+      "count": 1
+    },
+    {
+      "name": "nonlocation messages cannot acquire an injected location and ordinary text is unchanged",
+      "count": 1
+    },
+    {
+      "name": "nonmember may inspect group discovery but cannot publish its QR",
+      "count": 1
+    },
+    {
+      "name": "normal detail pageless editor update pops only that editor and the existing parent rereads detail",
+      "count": 1
+    },
+    {
+      "name": "normal file detail rereads exact source and may open, private file stays restricted",
+      "count": 1
+    },
+    {
+      "name": "normal list-create-detail-list navigation rereads the authoritative list and displays the newly saved row",
+      "count": 1
+    },
+    {
+      "name": "normal multi friend flow reaches actual group editor and avatar entry without creating",
+      "count": 1
+    },
+    {
+      "name": "not-found and failed receipt queries keep the real editor frozen with the same original UUID",
+      "count": 1
+    },
+    {
+      "name": "nullable settings remain unknown and malformed flags, cross-owner or duplicate rooms fail closed",
+      "count": 1
+    },
+    {
+      "name": "numeric account ID cannot select another phone owner",
+      "count": 1
+    },
+    {
+      "name": "old chat settings tile cannot start selection with replacement owner repositories",
+      "count": 1
+    },
+    {
+      "name": "old confirmation after a foreign overlay returns cannot open a profile",
+      "count": 1
+    },
+    {
+      "name": "old confirmation cannot dispatch against a new owner even when the visible conversation ID is reused",
+      "count": 1
+    },
+    {
+      "name": "old dedicated selector callback cannot acquire another account for its fixed peer",
+      "count": 1
+    },
+    {
+      "name": "old dedicated selector callback cannot survive route ABA while current explicit selection works",
+      "count": 1
+    },
+    {
+      "name": "old entry callback cannot acquire a fresh route turn after ABA surface=CreationSurface.chat",
+      "count": 1
+    },
+    {
+      "name": "old entry callback cannot acquire a fresh route turn after ABA surface=CreationSurface.inbox",
+      "count": 1
+    },
+    {
+      "name": "old file action callback after issuer and tenant switch dispatches no source read or external open",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after actor replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after issuer replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "old inbox shortcut callback after tenant replacement cannot navigate under the new owner",
+      "count": 1
+    },
+    {
+      "name": "old missing lists and protobuf string timestamps retain text while unsafe media stays unrenderable",
+      "count": 1
+    },
+    {
+      "name": "old repositories cannot read or mutate the next account",
+      "count": 1
+    },
+    {
+      "name": "old repository cannot acquire a fresh issuer tenant or owner after rotation",
+      "count": 1
+    },
+    {
+      "name": "old selected people and submit closure cannot acquire replacement owner repositories",
+      "count": 1
+    },
+    {
+      "name": "old selector submit cannot revive after foreign navigation ABA while new click remains usable",
+      "count": 1
+    },
+    {
+      "name": "old session check stops every continuation before accessing another owner",
+      "count": 1
+    },
+    {
+      "name": "old999 selection bound is preserved without dispatching a stale view",
+      "count": 1
+    },
+    {
+      "name": "one confirmed request disables actions and reports ACK without physical-deletion claim",
+      "count": 1
+    },
+    {
+      "name": "only a genuine incoming remote cancellation before acceptance appears in missed",
+      "count": 1
+    },
+    {
+      "name": "only incoming pending requests offer handling, rejecting needs an explicit dialog submission",
+      "count": 1
+    },
+    {
+      "name": "only native capabilities true enables biometric availability; no truthy or absent defaults",
+      "count": 1
+    },
+    {
+      "name": "only the captured chat endpoint and exact IM token pair are sent; no platform-wide logout",
+      "count": 1
+    },
+    {
+      "name": "only visible incoming successful group messages send coalesced receipts and failed ACK remains retryable",
+      "count": 1
+    },
+    {
+      "name": "opaque custom data is not interpreted as OpenIM privacy metadata",
+      "count": 1
+    },
+    {
+      "name": "open card confirmation withdraws sensitive names after original issuer changes",
+      "count": 1
+    },
+    {
+      "name": "open card confirmation withdraws sensitive names after original owner changes",
+      "count": 1
+    },
+    {
+      "name": "open card confirmation withdraws sensitive names after original tenant changes",
+      "count": 1
+    },
+    {
+      "name": "open picker withdraws candidate after original issuer changes and ignores late page messages",
+      "count": 1
+    },
+    {
+      "name": "open picker withdraws candidate after original owner changes and ignores late page messages",
+      "count": 1
+    },
+    {
+      "name": "open picker withdraws candidate after original tenant changes and ignores late page messages",
+      "count": 1
+    },
+    {
+      "name": "opened favorite detail withdraws its body when chat later learns private metadata without refetch",
+      "count": 1
+    },
+    {
+      "name": "opening an old forwarding screen after account switch never initializes or lists the new account SDK",
+      "count": 1
+    },
+    {
+      "name": "opening an old private favorite forwarding screen cannot list recipients or dispatch SDK work",
+      "count": 1
+    },
+    {
+      "name": "opening interactions reads the count, clearing requires confirmation and preserves posts",
+      "count": 1
+    },
+    {
+      "name": "optional avatar keeps ordinary explicit creation and opens the accepted group",
+      "count": 1
+    },
+    {
+      "name": "ordinary background without an owned GPS permission request retires the location intent",
+      "count": 1
+    },
+    {
+      "name": "ordinary contact profile without a message source keeps its normal friend request and dialog behavior",
+      "count": 1
+    },
+    {
+      "name": "ordinary encrypted messages remain quotable and sendable",
+      "count": 1
+    },
+    {
+      "name": "ordinary favorite forwarding still reaches exactly the confirmed account once",
+      "count": 1
+    },
+    {
+      "name": "ordinary legacy URL favorites without a native message identity stay usable",
+      "count": 1
+    },
+    {
+      "name": "ordinary member cannot edit group avatar",
+      "count": 1
+    },
+    {
+      "name": "ordinary member has no batch management entry",
+      "count": 1
+    },
+    {
+      "name": "ordinary message and contacts tab navigation remains available without reading or marking unread",
+      "count": 1
+    },
+    {
+      "name": "ordinary muted member can display a current group code without manager permission",
+      "count": 1
+    },
+    {
+      "name": "ordinary single chat cannot revoke the other participant through the repository",
+      "count": 1
+    },
+    {
+      "name": "ordinary single chats and encrypted messages are not burn-after-reading",
+      "count": 1
+    },
+    {
+      "name": "ordinary single-member menu and explicit removal confirmation remain available",
+      "count": 1
+    },
+    {
+      "name": "original conversation clear retires the actual picker confirmation before native create",
+      "count": 1
+    },
+    {
+      "name": "original favorite-face JSON exposes its HTTPS image and preserves protocol data",
+      "count": 1
+    },
+    {
+      "name": "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "count": 1
+    },
+    {
+      "name": "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "count": 1
+    },
+    {
+      "name": "original single-user removal API remains callable",
+      "count": 1
+    },
+    {
+      "name": "original source ticket survives normal start but stops second stage when withdrawn during find",
+      "count": 1
+    },
+    {
+      "name": "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "count": 1
+    },
+    {
+      "name": "out of range received Location109 shows unavailable without an actionable location",
+      "count": 1
+    },
+    {
+      "name": "outgoing cancellation and locally denied permissions stay in all without inventing missed calls",
+      "count": 1
+    },
+    {
+      "name": "oversized and other top-level custom namespaces stay opaque",
+      "count": 1
+    },
+    {
+      "name": "own paged receipts decode legacy evidence and discard unsafe images; foreign ownership is rejected",
+      "count": 1
+    },
+    {
+      "name": "owned profile dialog withdraws its old identity and reason after issuer rotation",
+      "count": 1
+    },
+    {
+      "name": "owned profile dialog withdraws its old identity and reason after owner rotation",
+      "count": 1
+    },
+    {
+      "name": "owned profile dialog withdraws its old identity and reason after tenant rotation",
+      "count": 1
+    },
+    {
+      "name": "owned system permission lifecycle can resume the same one-shot without granting a web GPS action",
+      "count": 1
+    },
+    {
+      "name": "owner has a visible existing-group avatar action",
+      "count": 1
+    },
+    {
+      "name": "owner must transfer before leaving and cannot transfer to self",
+      "count": 1
+    },
+    {
+      "name": "owner replacement removes old confirmation details and its retained delete callback cannot affect either owner",
+      "count": 1
+    },
+    {
+      "name": "owner replacement retires both a dispatched page read and retained old message-tab callbacks",
+      "count": 1
+    },
+    {
+      "name": "owner replacement while confirmation is open dispatches zero old intents",
+      "count": 1
+    },
+    {
+      "name": "owner replacement while original group metadata waits prevents its next real member lookup",
+      "count": 1
+    },
+    {
+      "name": "owner sees explicit batch removal entry",
+      "count": 1
+    },
+    {
+      "name": "owner switch after first dispatch cannot process second or write progress to new view",
+      "count": 1
+    },
+    {
+      "name": "owner switch while gallery waits cannot dispatch image decode or profile read",
+      "count": 1
+    },
+    {
+      "name": "paging de-duplicates overlap and retains the first search time boundary",
+      "count": 1
+    },
+    {
+      "name": "partial deletion displays ACK unknown and unattempted counts without a false all-success message",
+      "count": 1
+    },
+    {
+      "name": "partial failure retains invalidation, does not auto reload and never replays the destructive request",
+      "count": 1
+    },
+    {
+      "name": "partial update sends one requested field, preserves login identities and avatar",
+      "count": 1
+    },
+    {
+      "name": "password change retains self owner and separate chat credential, only legacy digests travel",
+      "count": 1
+    },
+    {
+      "name": "password form at1.6 text scale validates mismatch without submitting",
+      "count": 1
+    },
+    {
+      "name": "password wire representation stays compatible without sending plaintext",
+      "count": 1
+    },
+    {
+      "name": "past millisecond personal mute no longer denies an ordinary member mention",
+      "count": 1
+    },
+    {
+      "name": "pending and failed revocation retain original cause and honest cleanup warning",
+      "count": 1
+    },
+    {
+      "name": "pending and malformed acknowledgements are never presented as completed revocations",
+      "count": 1
+    },
+    {
+      "name": "pending cleanup is distinct; other owner, malformed or unfamiliar success remains unconfirmed",
+      "count": 1
+    },
+    {
+      "name": "pending create admits no second submit or picker and retains one native intent",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue after issuer replacement",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue after owner replacement",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue after tenant replacement",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue in a replacement issuer",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue in a replacement owner",
+      "count": 1
+    },
+    {
+      "name": "pending picker cannot continue in a replacement tenant",
+      "count": 1
+    },
+    {
+      "name": "per-CID clear invalidates old selection and cannot be renewed by a later reload",
+      "count": 1
+    },
+    {
+      "name": "permission denial keeps gallery available and permanent denial offers settings retry",
+      "count": 1
+    },
+    {
+      "name": "persistence retry reuses frozen local events without repeating native dialing",
+      "count": 1
+    },
+    {
+      "name": "persistent cancellation version floor blocks a stale scheduled receipt after restart",
+      "count": 1
+    },
+    {
+      "name": "personal code renders the authoritative exact ID with no credential payload",
+      "count": 1
+    },
+    {
+      "name": "personal code requires exact authoritative self identity",
+      "count": 1
+    },
+    {
+      "name": "personal mute at the exact server millisecond boundary still rejects before native creation",
+      "count": 1
+    },
+    {
+      "name": "personal mute uses milliseconds and follows current owner exemption role100",
+      "count": 1
+    },
+    {
+      "name": "personal mute uses milliseconds and follows current owner exemption role20",
+      "count": 1
+    },
+    {
+      "name": "personal mute uses milliseconds and follows current owner exemption role60",
+      "count": 1
+    },
+    {
+      "name": "picker files are copied into the account and retained for upload retry with one SDK ID",
+      "count": 1
+    },
+    {
+      "name": "post-commit callback failure and an absent original are never relabeled as an ACK",
+      "count": 1
+    },
+    {
+      "name": "post-dispatch native error 10005 is unknown, not rollback proof or batch retry",
+      "count": 1
+    },
+    {
+      "name": "post-dispatch native error 1002 is unknown, not rollback proof or batch retry",
+      "count": 1
+    },
+    {
+      "name": "preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key",
+      "count": 1
+    },
+    {
+      "name": "preview cancellation cleans staging but preserves picker original",
+      "count": 1
+    },
+    {
+      "name": "primary inbox entry reaches the mounted complete global search",
+      "count": 1
+    },
+    {
+      "name": "privacy gate and idle exit never construct or invoke the SDK",
+      "count": 1
+    },
+    {
+      "name": "private atquote cannot dispatch native quote creation or send",
+      "count": 1
+    },
+    {
+      "name": "private facts learned first from a favorite actual message survive mismatched source IDs in later favorites and omitted chat metadata",
+      "count": 1
+    },
+    {
+      "name": "private facts learned while confirmation is open invalidate that exact intent before any deletion",
+      "count": 1
+    },
+    {
+      "name": "private facts learned while the at-forward merge is created still block final send",
+      "count": 1
+    },
+    {
+      "name": "private merge cannot dispatch native quote creation or send",
+      "count": 1
+    },
+    {
+      "name": "private message has an honest warning and no collection or forwarding action",
+      "count": 1
+    },
+    {
+      "name": "private metadata and earliest deadline cannot be erased or extended",
+      "count": 1
+    },
+    {
+      "name": "private quote cannot dispatch native quote creation or send",
+      "count": 1
+    },
+    {
+      "name": "private root cannot dispatch native quote creation or send",
+      "count": 1
+    },
+    {
+      "name": "private root, quoted and merged messages cannot leave through snapshots or old favorite forwarding",
+      "count": 1
+    },
+    {
+      "name": "private source learned before confirmation prevents all native merge creation",
+      "count": 1
+    },
+    {
+      "name": "process restart after prepared uses receipt first and never automatically resends",
+      "count": 1
+    },
+    {
+      "name": "production WebView host preserves healthy picker channels for subresource HTTP errors and fails only its exact main document",
+      "count": 1
+    },
+    {
+      "name": "production booking discovery reads the current IM contract and saves only an explicit durable intent",
+      "count": 1
+    },
+    {
+      "name": "production contact route  preserves safe ID default and explicit phone mode",
+      "count": 1
+    },
+    {
+      "name": "production contact route ?kind=unknown preserves safe ID default and explicit phone mode",
+      "count": 1
+    },
+    {
+      "name": "production inbox more menu reaches actual durable call history and back retains the inbox",
+      "count": 1
+    },
+    {
+      "name": "production measured seek stops after its original view ticket retires during an actual scroll animation",
+      "count": 1
+    },
+    {
+      "name": "production provider graph keeps privacy gating without a runtime dependency loop",
+      "count": 1
+    },
+    {
+      "name": "production router keeps a same-CID query and metadata update on the existing anchored page and draft",
+      "count": 1
+    },
+    {
+      "name": "production router preserves unique page identity for repeated CID and A B A imperative pushes",
+      "count": 1
+    },
+    {
+      "name": "production router replaces a different CID and retires the owned group creation stack after read retry",
+      "count": 1
+    },
+    {
+      "name": "production runtime and gateway providers complete password login through native codec",
+      "count": 1
+    },
+    {
+      "name": "production saved-session restore and token-expiry callbacks do not read back through gateway Ref",
+      "count": 1
+    },
+    {
+      "name": "profile fits small viewport at1.6 text scale and remains scrollable",
+      "count": 1
+    },
+    {
+      "name": "progress after first ACK arrives before the second ACK and never duplicates dispatch",
+      "count": 1
+    },
+    {
+      "name": "provider configuration error keeps native actions disabled and explicit reload discards old document messages",
+      "count": 1
+    },
+    {
+      "name": "provider disposed during real delayed OS-path read never opens the file or publishes a controller",
+      "count": 1
+    },
+    {
+      "name": "provider failure keeps safe retry feedback without automatic resubmission",
+      "count": 1
+    },
+    {
+      "name": "public user hydration rejects a mismatched native ID",
+      "count": 1
+    },
+    {
+      "name": "query cancellation after dispatch rejects response without mapping it",
+      "count": 1
+    },
+    {
+      "name": "query change discards a slow earlier search and keeps only the latest query",
+      "count": 1
+    },
+    {
+      "name": "queued preference dispatch rechecks its original source before physical acknowledgement",
+      "count": 1
+    },
+    {
+      "name": "queued send creation settles before same-conversation clear while another conversation remains usable",
+      "count": 1
+    },
+    {
+      "name": "quote and delete preserve identifiers; deletion happens only after the API succeeds",
+      "count": 1
+    },
+    {
+      "name": "quote becoming private while the member check is pending blocks native creation",
+      "count": 1
+    },
+    {
+      "name": "quote summaries use the same custom decoder without copying opaque data",
+      "count": 1
+    },
+    {
+      "name": "read ACK is followed by native scoped metadata re-read instead of inventing the private read timestamp",
+      "count": 1
+    },
+    {
+      "name": "read failure is an explicit storage error and a later explicit retry can recover",
+      "count": 1
+    },
+    {
+      "name": "read metadata already in native cannot refill the raw cache after clear",
+      "count": 1
+    },
+    {
+      "name": "reader filters preserve wire0 read/1 unread and return domain data with safe avatars",
+      "count": 1
+    },
+    {
+      "name": "ready and fixed error state cannot carry native actions or provider error details",
+      "count": 1
+    },
+    {
+      "name": "real MethodChannel one-shot sends only exact request contract and cleans its own id",
+      "count": 1
+    },
+    {
+      "name": "real Mine entry opens lock settings and locking retires its old PIN modal before fresh navigation",
+      "count": 1
+    },
+    {
+      "name": "real PNG selection and signed upload reaches exact create faceURL",
+      "count": 1
+    },
+    {
+      "name": "real QR painter exports a decodable PNG with an opaque white quiet zone",
+      "count": 1
+    },
+    {
+      "name": "real SDK Card108 group sends exact confirmed friend and original recipient",
+      "count": 1
+    },
+    {
+      "name": "real SDK Card108 single sends exact confirmed friend and original recipient",
+      "count": 1
+    },
+    {
+      "name": "real SDK Location109 group sends original recipient and exact GCJ02 wire",
+      "count": 1
+    },
+    {
+      "name": "real SDK Location109 single sends original recipient and exact GCJ02 wire",
+      "count": 1
+    },
+    {
+      "name": "real SQLite prepare failure is zero HTTP, and explicit recovery persists the same held UUID before querying",
+      "count": 1
+    },
+    {
+      "name": "real SessionCoordinator owner replacement during member IO prevents revoke and drains the original call",
+      "count": 1
+    },
+    {
+      "name": "real complaint DTO uses self chat credential and legacy group/evidence contract",
+      "count": 1
+    },
+    {
+      "name": "real dismissed-group callback withdraws QR and blocks an already rendering share",
+      "count": 1
+    },
+    {
+      "name": "real doubletap dispatches once and native unknown offers only read review even after reopen",
+      "count": 1
+    },
+    {
+      "name": "real group detail shows its QR entry only for active membership",
+      "count": 1
+    },
+    {
+      "name": "real history audio redial dispatches the exact stored peer through RtcCoordinator once",
+      "count": 1
+    },
+    {
+      "name": "real history video redial dispatches the exact stored peer through RtcCoordinator once",
+      "count": 1
+    },
+    {
+      "name": "real message tab double tap reveals the muted unread beyond the first SDK page at large text",
+      "count": 1
+    },
+    {
+      "name": "real native delete callback prevents a late snapshot refill",
+      "count": 1
+    },
+    {
+      "name": "real native revoke callback prevents a late snapshot refill",
+      "count": 1
+    },
+    {
+      "name": "real private root still masks every known custom conversation preview",
+      "count": 1
+    },
+    {
+      "name": "real production seek reveals a variable-height sliver target by measured geometry rather than an average height",
+      "count": 1
+    },
+    {
+      "name": "real source-bound UserProfilePage permits an explicitly confirmed current-policy friend request",
+      "count": 1
+    },
+    {
+      "name": "receipt mismatch and definite rejection cannot report success or resubmit",
+      "count": 1
+    },
+    {
+      "name": "received card renders no network image and explicit profile lookup uses the exact SDK and business UID",
+      "count": 1
+    },
+    {
+      "name": "received explicitly supplied zero coordinates remain actionable",
+      "count": 1
+    },
+    {
+      "name": "received links require actual UID metadata and exact wire occurrences, never a guessed nickname",
+      "count": 1
+    },
+    {
+      "name": "redirects are revalidated and a downgrade or embedded credentials never reach the network",
+      "count": 1
+    },
+    {
+      "name": "refresh filter revision drops a real delayed old page and cannot regress current rows",
+      "count": 1
+    },
+    {
+      "name": "registration preflight failure leaves draft editable without submitting",
+      "count": 1
+    },
+    {
+      "name": "registration uncertain response 1001 freezes draft and only explicitly logs in",
+      "count": 1
+    },
+    {
+      "name": "registration uncertain response 1002 freezes draft and only explicitly logs in",
+      "count": 1
+    },
+    {
+      "name": "registration uncertain response 500 freezes draft and only explicitly logs in",
+      "count": 1
+    },
+    {
+      "name": "registration uncertain response null freezes draft and only explicitly logs in",
+      "count": 1
+    },
+    {
+      "name": "rejects out-of-contract read timestamp 1 without inventing a deadline",
+      "count": 1
+    },
+    {
+      "name": "rejects out-of-contract read timestamp 123 without inventing a deadline",
+      "count": 1
+    },
+    {
+      "name": "rejects out-of-contract read timestamp 4102444800001 without inventing a deadline",
+      "count": 1
+    },
+    {
+      "name": "rejects out-of-contract read timestamp 4102444801 without inventing a deadline",
+      "count": 1
+    },
+    {
+      "name": "rejects out-of-contract read timestamp 946684799 without inventing a deadline",
+      "count": 1
+    },
+    {
+      "name": "rejects out-of-contract read timestamp 946684799999 without inventing a deadline",
+      "count": 1
+    },
+    {
+      "name": "releasing while permission is pending never starts the microphone",
+      "count": 1
+    },
+    {
+      "name": "remark matching and user/group ID namespaces remain distinct",
+      "count": 1
+    },
+    {
+      "name": "remote initiation time is part of an immutable claim rather than a second room identity",
+      "count": 1
+    },
+    {
+      "name": "removing a conversation keeps messages unless the destructive method is explicitly selected",
+      "count": 1
+    },
+    {
+      "name": "removing entry route during preflight cannot reopen selection or feedback on blank page",
+      "count": 1
+    },
+    {
+      "name": "render completing after owner issuer and tenant switch never starts OS sharing",
+      "count": 1
+    },
+    {
+      "name": "reopened group draft explains lost bindings and sends plain text without an implicit ping",
+      "count": 1
+    },
+    {
+      "name": "reopening a plain draft preserves every character but requires new explicit recipient selection",
+      "count": 1
+    },
+    {
+      "name": "repeated exit is idempotent and old listener generations cannot enter a new account",
+      "count": 1
+    },
+    {
+      "name": "repeated same-query submit while loading does not duplicate native scans",
+      "count": 1
+    },
+    {
+      "name": "repeating one selected member creates multiple visible tokens but only one wire recipient",
+      "count": 1
+    },
+    {
+      "name": "repository replacement refreshes visible account data",
+      "count": 1
+    },
+    {
+      "name": "reset preserves email and returns to login only after success",
+      "count": 1
+    },
+    {
+      "name": "resolve an applied create does not implicitly cancel the scheduled booking",
+      "count": 1
+    },
+    {
+      "name": "resolve found false is unconfirmed rather than local cancellation",
+      "count": 1
+    },
+    {
+      "name": "restart with an inflight claim still resolves missing receipt before explicit same-byte retry",
+      "count": 1
+    },
+    {
+      "name": "resume immediately rechecks known expiry even when the background clock advanced without Dart timers",
+      "count": 1
+    },
+    {
+      "name": "retained child sanitizer strips local paths recursively but retains keyVersion quote and opaque extension values",
+      "count": 1
+    },
+    {
+      "name": "retentionBlocked is strict, defaults false and discards all content even if a response accidentally includes it",
+      "count": 1
+    },
+    {
+      "name": "retirement during actual native create prevents the subsequent remote send",
+      "count": 1
+    },
+    {
+      "name": "retirement during real friend reread prevents both local create and SDK send",
+      "count": 1
+    },
+    {
+      "name": "retiring the captured owner clears an open editor and leaves no callable save",
+      "count": 1
+    },
+    {
+      "name": "return from new editor retains fixed peer and additional selection for explicit editing",
+      "count": 1
+    },
+    {
+      "name": "returning before creation preserves selected people for explicit editing",
+      "count": 1
+    },
+    {
+      "name": "reusing the actual editor State for a different target hides the original draft and blocks its save",
+      "count": 1
+    },
+    {
+      "name": "revoke withdraws selected IDs and old confirmation permanently",
+      "count": 1
+    },
+    {
+      "name": "role loss after creation and before final send also blocks every retry",
+      "count": 1
+    },
+    {
+      "name": "role withdrawal while confirming reports no dispatched removals",
+      "count": 1
+    },
+    {
+      "name": "role withdrawn during an already started upload prevents metadata",
+      "count": 1
+    },
+    {
+      "name": "route ABA during render cannot share and later explicit export is usable",
+      "count": 1
+    },
+    {
+      "name": "safe avatar storage drops signed credentials and rejects excessive identity data",
+      "count": 1
+    },
+    {
+      "name": "same CID metadata refresh keeps the manual selection and original valid history cut",
+      "count": 1
+    },
+    {
+      "name": "same CID metadata refresh preserves the current friend query and selected identity",
+      "count": 1
+    },
+    {
+      "name": "same CID title unread and empty metadata refresh preserves the original moderation view",
+      "count": 1
+    },
+    {
+      "name": "same ChatPage State CID ABA cannot renew its original enabled confirmation",
+      "count": 1
+    },
+    {
+      "name": "same ChatPage State CID ABA cannot renew the old card confirmation or history cut",
+      "count": 1
+    },
+    {
+      "name": "same ChatPage State CID ABA retires its original picker and clears the old candidate",
+      "count": 1
+    },
+    {
+      "name": "same UUID with different content is rejected before HTTP and never overwrites a draft",
+      "count": 1
+    },
+    {
+      "name": "same clientID private facts conservatively affect both CIDs rather than leaking a body",
+      "count": 1
+    },
+    {
+      "name": "same contact route changed to group mode invalidates an already dispatched ID reply without reissuing it",
+      "count": 1
+    },
+    {
+      "name": "same display names retain distinct card UIDs and empty names show the complete UID",
+      "count": 1
+    },
+    {
+      "name": "same mounted page switching group rejects old picker result",
+      "count": 1
+    },
+    {
+      "name": "same mounted screen changing group cannot confirm old target list",
+      "count": 1
+    },
+    {
+      "name": "same nickname friend selection and cancellation preserve the original picker without creating a message",
+      "count": 1
+    },
+    {
+      "name": "same owner conversation metadata refresh preserves an admitted location detail",
+      "count": 1
+    },
+    {
+      "name": "same owner unread metadata refresh does not retire a legitimate inbox shortcut",
+      "count": 1
+    },
+    {
+      "name": "same owner unrelated metadata refresh does not erase the chosen IDs",
+      "count": 1
+    },
+    {
+      "name": "same room with a conflicting inviter cannot create a second history row",
+      "count": 1
+    },
+    {
+      "name": "same user ID from different issuers uses separate policy owners and random salts",
+      "count": 1
+    },
+    {
+      "name": "same user on a different issuer and tenant cannot reuse old controller or selection",
+      "count": 1
+    },
+    {
+      "name": "same-account OS picker confirmation still imports once",
+      "count": 1
+    },
+    {
+      "name": "same-account clear confirmation still deletes completed todos",
+      "count": 1
+    },
+    {
+      "name": "same-name targets retain exact visible UID and individually acknowledged results",
+      "count": 1
+    },
+    {
+      "name": "same-owner fresh login and logout do not wait for an old native derivation",
+      "count": 1
+    },
+    {
+      "name": "same-owner login reads behind an old in-flight PIN replacement write",
+      "count": 1
+    },
+    {
+      "name": "same-room duplicate invitation does not terminate the active record while a different room records busy separately",
+      "count": 1
+    },
+    {
+      "name": "same-scope scan frames cannot duplicate an already resolving target",
+      "count": 1
+    },
+    {
+      "name": "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "count": 1
+    },
+    {
+      "name": "saved canonical profile preserves an explicit pending IM projection outcome",
+      "count": 1
+    },
+    {
+      "name": "saved emoji a clear invalidates the captured proof and never renews its history lease",
+      "count": 1
+    },
+    {
+      "name": "saved emoji actual 360 large text library controls and grid remain reachable without overflow",
+      "count": 1
+    },
+    {
+      "name": "saved emoji actual ChatPage system picker resumes after legitimate inactive paused lifecycle and can save",
+      "count": 1
+    },
+    {
+      "name": "saved emoji actual gallery private staging upload ACK and list save keep picker original",
+      "count": 1
+    },
+    {
+      "name": "saved emoji ambiguous duplicated source response cannot authorize display or forwarding",
+      "count": 1
+    },
+    {
+      "name": "saved emoji clearing another source CID hides its existing image without renewing the original proof",
+      "count": 1
+    },
+    {
+      "name": "saved emoji damaged metadata is an explicit error and never an empty successful list",
+      "count": 1
+    },
+    {
+      "name": "saved emoji definite preference failure preserves the old list and permits explicit retry",
+      "count": 1
+    },
+    {
+      "name": "saved emoji deleting list entries never removes picker originals or other feature files",
+      "count": 1
+    },
+    {
+      "name": "saved emoji foreign route return cannot revive an already opened sheet callback",
+      "count": 1
+    },
+    {
+      "name": "saved emoji gallery cancellation makes no library write upload or message",
+      "count": 1
+    },
+    {
+      "name": "saved emoji gallery multi selection persists every acknowledged image in order without sending",
+      "count": 1
+    },
+    {
+      "name": "saved emoji gallery uploads complete animated GIF bytes as image gif and renders a real animated provider",
+      "count": 1
+    },
+    {
+      "name": "saved emoji identical IDs in another CID never substitute a matching source URL",
+      "count": 1
+    },
+    {
+      "name": "saved emoji known receipt retry cannot consume another upload nonce after concurrent list changes",
+      "count": 1
+    },
+    {
+      "name": "saved emoji known upload ACK retries only preferences without a second physical POST",
+      "count": 1
+    },
+    {
+      "name": "saved emoji late view retirement after Face creation prevents final native send",
+      "count": 1
+    },
+    {
+      "name": "saved emoji lost local ACK is read back exactly and never blindly replayed",
+      "count": 1
+    },
+    {
+      "name": "saved emoji lost upload reply remains visible and reread never uploads again",
+      "count": 1
+    },
+    {
+      "name": "saved emoji multi upload keeps confirmed first result and stops remaining images at unknown second ACK",
+      "count": 1
+    },
+    {
+      "name": "saved emoji owner change during real picker rejects staging upload and late sheet projection",
+      "count": 1
+    },
+    {
+      "name": "saved emoji owner replacement during exact source lookup prevents later Face creation",
+      "count": 1
+    },
+    {
+      "name": "saved emoji pending receipt requires the same nonce and explicit ending does not send",
+      "count": 1
+    },
+    {
+      "name": "saved emoji pending upload stores only opaque nonce and cannot start another upload",
+      "count": 1
+    },
+    {
+      "name": "saved emoji persisted final receipt reopens and deduplicates without a picker path or credential",
+      "count": 1
+    },
+    {
+      "name": "saved emoji preserves existing conversation cannot send admission before Face creation",
+      "count": 1
+    },
+    {
+      "name": "saved emoji private and timed message pictures never become reusable library references",
+      "count": 1
+    },
+    {
+      "name": "saved emoji queued write rechecks its original owner and closed store rejects new work",
+      "count": 1
+    },
+    {
+      "name": "saved emoji real GIF staging is explicit opt in and preserves both animated frames",
+      "count": 1
+    },
+    {
+      "name": "saved emoji real signed uploader after physical POST reports failure without claiming no upload",
+      "count": 1
+    },
+    {
+      "name": "saved emoji real signed uploader source gate blocks physical POST after form await",
+      "count": 1
+    },
+    {
+      "name": "saved emoji rejects malformed actual Face response before native send",
+      "count": 1
+    },
+    {
+      "name": "saved emoji same user remains isolated across real issuer and tenant logins",
+      "count": 1
+    },
+    {
+      "name": "saved emoji selection deletion persists while unrelated items remain sendable on reopen",
+      "count": 1
+    },
+    {
+      "name": "saved emoji source reference is exact CID ID and URL rather than a reusable URL fallback",
+      "count": 1
+    },
+    {
+      "name": "saved emoji source view invalid before preparation dispatches neither Face nor message",
+      "count": 1
+    },
+    {
+      "name": "saved emoji stale editor revision cannot overwrite a newer acknowledged list",
+      "count": 1
+    },
+    {
+      "name": "saved emoji unknown send never creates a second Face and explicit failed bubble retry keeps original ID",
+      "count": 1
+    },
+    {
+      "name": "saved emoji uses actual SDK Face index minus one with exact URL dimensions and frozen recipient",
+      "count": 1
+    },
+    {
+      "name": "saved tenant session reconnects even when bootstrap sources are unavailable",
+      "count": 1
+    },
+    {
+      "name": "schedule uses Unix seconds, verifies canonical metadata and never joins media or exposes certificates",
+      "count": 1
+    },
+    {
+      "name": "scope accountKey must bind the exact issuer tenant and user before DB access",
+      "count": 1
+    },
+    {
+      "name": "sealing releases the old credential reference before a blocked original SQLite queue finishes draining",
+      "count": 1
+    },
+    {
+      "name": "search codec freezes conversation and time; foreign/deleted results do not escape",
+      "count": 1
+    },
+    {
+      "name": "search in a separately mounted repository cannot retain unseen results crossing the same conversation clear",
+      "count": 1
+    },
+    {
+      "name": "search uses chat token, pagination and allowAddFriend=0 means denied",
+      "count": 1
+    },
+    {
+      "name": "section errors are not empty success and explicit retry keeps other sections",
+      "count": 1
+    },
+    {
+      "name": "secure-write failure cleans local SDK before waiting for exact remote revocation",
+      "count": 1
+    },
+    {
+      "name": "selected mention draft remains readable exact plain text in SDK storage and inbox preview",
+      "count": 1
+    },
+    {
+      "name": "selection is bounded20, ID-only and cancel invalidates its original confirmation",
+      "count": 1
+    },
+    {
+      "name": "selection replacement removes every overlapping mention and does not retain a ghost ID",
+      "count": 1
+    },
+    {
+      "name": "selection survives normal searches and includes both frozen exact UIDs at confirmation",
+      "count": 1
+    },
+    {
+      "name": "selection withdrawn during initial history cannot merge or mark read",
+      "count": 1
+    },
+    {
+      "name": "selection withdrawn while metadata waits cannot start a fresh history or mark-read lease",
+      "count": 1
+    },
+    {
+      "name": "self-only typed profile uses chat token, rejects a foreign returned identity",
+      "count": 1
+    },
+    {
+      "name": "sender datum markers stay explicit and unrecognized or omitted markers stay unknown",
+      "count": 1
+    },
+    {
+      "name": "separate likes and comments on the same post remain separate interaction records",
+      "count": 1
+    },
+    {
+      "name": "sequential batch stops after one ACK then one unknown and never uses local-only fallback or submits the third",
+      "count": 1
+    },
+    {
+      "name": "serialized metadata and private descendants preserve the retention boundary",
+      "count": 1
+    },
+    {
+      "name": "server retention denial survives omitted flags and repository remount by favorite identity without hiding ordinary chat",
+      "count": 1
+    },
+    {
+      "name": "server retention denial survives omitted flags and repository remount by source identity without hiding ordinary chat",
+      "count": 1
+    },
+    {
+      "name": "server-isolated detail exposes only metadata and explicit delete without content editing sharing downloading or forwarding",
+      "count": 1
+    },
+    {
+      "name": "server-isolated favorites cannot be edited or batch-edited after reading, but explicit deletion remains possible",
+      "count": 1
+    },
+    {
+      "name": "server-triggered local signout and a newer account do not cancel frozen old response or acquire new tokens",
+      "count": 1
+    },
+    {
+      "name": "session invalidation after SQL mutation rolls the entire local transaction back",
+      "count": 1
+    },
+    {
+      "name": "session invalidation after create dispatch hides its draft and permits safe exit",
+      "count": 1
+    },
+    {
+      "name": "session invalidation after real dispatch clears UI and prevents its late result from returning",
+      "count": 1
+    },
+    {
+      "name": "session invalidation clears visible conversations and rejects a late response",
+      "count": 1
+    },
+    {
+      "name": "session invalidation during real native create cannot issue a created receipt",
+      "count": 1
+    },
+    {
+      "name": "session invalidation immediately empties state and late reply does not refill",
+      "count": 1
+    },
+    {
+      "name": "settings fits small viewport at1.6 text scale and remains scrollable",
+      "count": 1
+    },
+    {
+      "name": "settings preserves a pending profile projection result",
+      "count": 1
+    },
+    {
+      "name": "shared DAG projection is memoized and later leaf privacy still reaches old ancestors",
+      "count": 1
+    },
+    {
+      "name": "show more is deterministic local snapshot paging with zero extra SDK requests",
+      "count": 1
+    },
+    {
+      "name": "sign out between receipt batches prevents further write dispatch",
+      "count": 1
+    },
+    {
+      "name": "sign out discards a late result and an old search cannot dispatch in a new account",
+      "count": 1
+    },
+    {
+      "name": "signed multipart streams bytes without app tokens and completes only after provider success",
+      "count": 1
+    },
+    {
+      "name": "signout between authoritative read and write prevents the later SDK mutation",
+      "count": 1
+    },
+    {
+      "name": "signout clears and disables an already open invitation dialog",
+      "count": 1
+    },
+    {
+      "name": "signout erases the stale editor draft and prevents the old page from submitting",
+      "count": 1
+    },
+    {
+      "name": "signout removes meeting list and discards an old native list response without returning from login",
+      "count": 1
+    },
+    {
+      "name": "signout while meeting editor is open clears the old route and cannot submit",
+      "count": 1
+    },
+    {
+      "name": "signout while meeting invite is open clears the old route and cannot submit",
+      "count": 1
+    },
+    {
+      "name": "single chat fixes peer plus implicit owner and adds only explicitly selected others",
+      "count": 1
+    },
+    {
+      "name": "single chat settings exposes its real expansion entry with the current peer",
+      "count": 1
+    },
+    {
+      "name": "single friend selection keeps the original single chat capability",
+      "count": 1
+    },
+    {
+      "name": "single-file export refuses a record count its own importer cannot restore",
+      "count": 1
+    },
+    {
+      "name": "slow old success write cannot overwrite a new failed attempt across lock and resume",
+      "count": 1
+    },
+    {
+      "name": "small large text editor keeps stable member IDs and creation action reachable",
+      "count": 1
+    },
+    {
+      "name": "small large-text form requires a reason and keeps draft without dispatch",
+      "count": 1
+    },
+    {
+      "name": "small large-text form requires acknowledgement and explicit confirmation; cancel sends nothing",
+      "count": 1
+    },
+    {
+      "name": "small large-text group entry and stable selection remain usable surface=CreationSurface.chat",
+      "count": 1
+    },
+    {
+      "name": "small large-text group entry and stable selection remain usable surface=CreationSurface.inbox",
+      "count": 1
+    },
+    {
+      "name": "small large-text scanner keeps errors and all available actions usable",
+      "count": 1
+    },
+    {
+      "name": "source becoming private during native creation cannot dispatch the prepared merge",
+      "count": 1
+    },
+    {
+      "name": "source body changing after native merge creation fails its fresh fingerprint rather than forwarding an old snapshot",
+      "count": 1
+    },
+    {
+      "name": "source changing to private during confirmation is rejected before native creation or send",
+      "count": 1
+    },
+    {
+      "name": "source clear while create waits invalidates the original selection across source and destination CIDs",
+      "count": 1
+    },
+    {
+      "name": "source history late return cannot commit, while a later explicit normal intent remains usable",
+      "count": 1
+    },
+    {
+      "name": "source lookup is scoped to its conversation and reports a missing source",
+      "count": 1
+    },
+    {
+      "name": "source lookup requires the exact message, conversation and type rather than a partial keyword match",
+      "count": 1
+    },
+    {
+      "name": "source retirement during actual native creation prevents subsequent SDK send",
+      "count": 1
+    },
+    {
+      "name": "source retirement during actual roles prevents the subsequent native mutation",
+      "count": 1
+    },
+    {
+      "name": "source retirement during authoritative business policy prevents final addFriend dispatch",
+      "count": 1
+    },
+    {
+      "name": "source retirement during exact SDK profile prevents the business lookup and friend mutation",
+      "count": 1
+    },
+    {
+      "name": "source sheet cancellation never invokes OS picker or upload",
+      "count": 1
+    },
+    {
+      "name": "stable admission sequence pages all records without relying on end dates",
+      "count": 1
+    },
+    {
+      "name": "stable recorder creates a fresh exact owner binding after actor login replacement",
+      "count": 1
+    },
+    {
+      "name": "stable recorder creates a fresh exact owner binding after issuer login replacement",
+      "count": 1
+    },
+    {
+      "name": "stable recorder creates a fresh exact owner binding after tenant login replacement",
+      "count": 1
+    },
+    {
+      "name": "staged image uses private owner directory and cleanup preserves picker source",
+      "count": 1
+    },
+    {
+      "name": "stale form, matching passwords, unsupported lengths and controls cannot dispatch",
+      "count": 1
+    },
+    {
+      "name": "stale session cannot copy a new private image",
+      "count": 1
+    },
+    {
+      "name": "stale token errors cannot log a newer session out",
+      "count": 1
+    },
+    {
+      "name": "standard107 nested custom summaries keep the original joint privacy",
+      "count": 1
+    },
+    {
+      "name": "standard107 projects all20 ordinary child types and rejects retaining a truncated larger remote merge",
+      "count": 1
+    },
+    {
+      "name": "standard107 to different-membership group sorts original createTime and preserves full children without repinging",
+      "count": 1
+    },
+    {
+      "name": "standard107 to singlechat sorts original createTime and preserves full children without repinging",
+      "count": 1
+    },
+    {
+      "name": "standard108 maps a typed exact UID hint and discards received faceURL and ex actions",
+      "count": 1
+    },
+    {
+      "name": "statistics export records the owner and UTC period definition without reading message pages",
+      "count": 1
+    },
+    {
+      "name": "statistics show every type and category at large text, keep UTC periods explicit, and refresh safely when empty",
+      "count": 1
+    },
+    {
+      "name": "storage failure releases picker and permits a new explicit upload without automatic retry",
+      "count": 1
+    },
+    {
+      "name": "storage read error is not presented as empty and only explicit retry recovers",
+      "count": 1
+    },
+    {
+      "name": "streams every byte to a safe account-owned file without sending either service token",
+      "count": 1
+    },
+    {
+      "name": "successfully retired owners do not accumulate across repeated real logins and the new pipeline stays writable",
+      "count": 1
+    },
+    {
+      "name": "superseded authentication revokes its frozen old pair and preserves newer login",
+      "count": 1
+    },
+    {
+      "name": "superseding an in-flight initialization cancels before native login",
+      "count": 1
+    },
+    {
+      "name": "supported save confirms only completed file writes while cancel remains silent",
+      "count": 1
+    },
+    {
+      "name": "supported save rechecks the captured owner after OS destination selection",
+      "count": 1
+    },
+    {
+      "name": "switching reader tab ignores delayed previous-tab response",
+      "count": 1
+    },
+    {
+      "name": "synchronous admission blocks a second repository while the original revoke is pending",
+      "count": 1
+    },
+    {
+      "name": "synchronous card admission and unknown ACK lock only the original intent and bubble",
+      "count": 1
+    },
+    {
+      "name": "synchronous repeated export tap dispatches only one render and share",
+      "count": 1
+    },
+    {
+      "name": "synchronous repeated inbox callback admits one read and no automatic create",
+      "count": 1
+    },
+    {
+      "name": "tag903 sound is explicitly a summary without claiming audio support",
+      "count": 1
+    },
+    {
+      "name": "tag903 text uses the actual legacy textElem payload",
+      "count": 1
+    },
+    {
+      "name": "tenant credentials validate domains and account cache is tenant scoped",
+      "count": 1
+    },
+    {
+      "name": "terminal receipt cannot regress a newer locally verified cancellation after restart",
+      "count": 1
+    },
+    {
+      "name": "text creation already in native settles before clear and cannot dispatch its queued send",
+      "count": 1
+    },
+    {
+      "name": "text expansion preserves hidden CID and exact original-message selection",
+      "count": 1
+    },
+    {
+      "name": "the attempt is reserved before a delayed derivation and background cancellation cannot restore its budget",
+      "count": 1
+    },
+    {
+      "name": "the earliest valid authoritative root or attachment read wins across both representations",
+      "count": 1
+    },
+    {
+      "name": "the real lock screen keeps logout clickable during slow native PIN verification",
+      "count": 1
+    },
+    {
+      "name": "the21st visible checkbox tap keeps20 selected and displays the legacy limit",
+      "count": 1
+    },
+    {
+      "name": "three notification switches retain legacy1-enabled2-disabled and confirm authoritative read",
+      "count": 1
+    },
+    {
+      "name": "timed-out clear/native work cannot be admitted by a new global query",
+      "count": 1
+    },
+    {
+      "name": "transport errors retain an uncertain result instead of fabricating a remote refusal",
+      "count": 1
+    },
+    {
+      "name": "truncated bodies remove partial files instead of reporting a completed download",
+      "count": 1
+    },
+    {
+      "name": "twenty-item pages continue once and no-progress pages stop with an explicit error",
+      "count": 1
+    },
+    {
+      "name": "two account SQLite files with the same peer and room remain separate",
+      "count": 1
+    },
+    {
+      "name": "typing a new filter retires an already dispatched complete read before any old result can scroll",
+      "count": 1
+    },
+    {
+      "name": "typing immediately retires old row callback before debounce dispatch",
+      "count": 1
+    },
+    {
+      "name": "unaddressed expired and group invitations do not become legacy single-call history",
+      "count": 1
+    },
+    {
+      "name": "unavailable or old-account snapshot cannot be collected under a new account",
+      "count": 1
+    },
+    {
+      "name": "unavailable share is not reported as saved or shared and explicit retry works",
+      "count": 1
+    },
+    {
+      "name": "uncertain publication preserves draft and blocks automatic or repeated submission",
+      "count": 1
+    },
+    {
+      "name": "unconfirmed target cannot bypass the batch guard through its single removal menu",
+      "count": 1
+    },
+    {
+      "name": "unexpected provider status closes response and never commits metadata",
+      "count": 1
+    },
+    {
+      "name": "unknown card ACK blocks the original bubble but a new explicit picker can send a new card",
+      "count": 1
+    },
+    {
+      "name": "unknown commit leaves draft, disables repeat submission and offers own receipts",
+      "count": 1
+    },
+    {
+      "name": "unknown create never replays and offers only an explicit group-list check",
+      "count": 1
+    },
+    {
+      "name": "unknown create through the new inbox entry remains frozen and cannot create twice",
+      "count": 1
+    },
+    {
+      "name": "unknown custom messages retain their description and complete protocol data",
+      "count": 1
+    },
+    {
+      "name": "unknown dispatched result stops remainder, is visible, and cannot silently replay",
+      "count": 1
+    },
+    {
+      "name": "unknown location ACK is visible and the original retry paths do not replay the message",
+      "count": 1
+    },
+    {
+      "name": "unknown native result remains honest and is never automatically replayed",
+      "count": 1
+    },
+    {
+      "name": "unknown read time leaves private inline media viewable but denies every retention operation",
+      "count": 1
+    },
+    {
+      "name": "unknown response is explicit and not automatically retried; definite rejection remains an error",
+      "count": 1
+    },
+    {
+      "name": "unknown904 and future vendor types retain the existing opaque fallback",
+      "count": 1
+    },
+    {
+      "name": "unowned legacy data requires explicit ownership and import is idempotent after edits",
+      "count": 1
+    },
+    {
+      "name": "unpaginated oversized lists never become a truncated complete success",
+      "count": 1
+    },
+    {
+      "name": "unrecognized enterprise per-user DTO is not fabricated success",
+      "count": 1
+    },
+    {
+      "name": "unsafe storage targets and credential-carrying provider headers never upload",
+      "count": 1
+    },
+    {
+      "name": "unsettled native work times out without dispatching clear or pretending it was cancelled",
+      "count": 1
+    },
+    {
+      "name": "unsupported booking endpoint remains unknown without SDK immediate-create fallback",
+      "count": 1
+    },
+    {
+      "name": "unsupported or malformed response does not turn read failure into successful empty or SDK fallback",
+      "count": 1
+    },
+    {
+      "name": "unsupported or oversized image does not leave a staged private copy",
+      "count": 1
+    },
+    {
+      "name": "unsupported release reads local pending only and never dispatches list or a write",
+      "count": 1
+    },
+    {
+      "name": "unsupported service is visible instead of a successful empty list and cannot create",
+      "count": 1
+    },
+    {
+      "name": "verified card starts its exact user conversation through the real production router",
+      "count": 1
+    },
+    {
+      "name": "verified durable receipt permits only the frozen identical submission retry",
+      "count": 1
+    },
+    {
+      "name": "video metadata is rounded to seconds and the thumbnail remains account scoped",
+      "count": 1
+    },
+    {
+      "name": "view invalidation while current role read waits never dispatches metadata",
+      "count": 1
+    },
+    {
+      "name": "view lost during role read prevents native dispatch and remaining requests",
+      "count": 1
+    },
+    {
+      "name": "viewable private location remains readable locally while retention and external actions stay unavailable",
+      "count": 1
+    },
+    {
+      "name": "visible Unicode token and exact UTF16 range project to legacy UID only at frozen send time",
+      "count": 1
+    },
+    {
+      "name": "wire booleans cannot be forged by string or number coercion and milliseconds are not Unix seconds",
+      "count": 1
+    },
+    {
+      "name": "wrong authoritative profile ID is rejected and explicit retry can query the original identity",
+      "count": 1
+    },
+    {
+      "name": "wrong typed known payload fields fall back without string coercion",
+      "count": 1
+    }
+  ],
+  "historical_current354_labels": {
+    "cohort": "current354",
+    "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e",
+    "keys": [
+      "current_full1280"
+    ],
+    "meaning": "Expected full1280 was never a fresh full run; new source359 full1304 is also expected only. All old names/provenance remain exact."
+  }
 }

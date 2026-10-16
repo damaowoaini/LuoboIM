@@ -326,7 +326,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full354 tree; restore exact after4 even if the reference fails."""
+    """Separate full359 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -397,8 +397,8 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after354_and_primary_source_reverified',
-                    'source_digest': plan['current354']['source_digest'],
+                   {'state': 'after359_and_primary_source_reverified',
+                    'source_digest': plan['current359']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
 
 
@@ -503,17 +503,11 @@ def next_unread_cleanup_summary(text, contract):
 
 
 def validation_plan(plan, mode, reference=False):
-    if mode not in ('group-revoke-58', 'full-regression') or type(reference) is not bool:
-        raise ValueError('unsupported validation mode/reference')
-    if reference and mode != 'full-regression':
-        raise ValueError('reference entry requires explicit full-regression mode')
-    group = source.group_revoke_contract(plan)
-    if mode == 'group-revoke-58':
-        return {'test_label': 'group-revoke58', 'expected': 58,
-                'test_paths': list(group['test_paths']), 'names_key': 'new_group_revoke58',
-                'analysis_paths': list(group['analysis_paths'])}
-    return {'test_label': 'full1280', 'expected': plan['current354']['expected_full_tests'],
-            'test_paths': [], 'names_key': 'current_full1280', 'analysis_paths': None}
+    if mode != 'full-regression' or type(reference) is not bool:
+        raise ValueError('current359 permits only explicit final full-regression')
+    source.announcement_contract(plan)
+    return {'test_label': 'full1304', 'expected': plan['current359']['expected_full_tests'],
+            'test_paths': [], 'names_key': 'current_full1304', 'analysis_paths': None}
 
 
 def card_cleanup_summary(text, contract):
@@ -597,7 +591,41 @@ def group_revoke_cleanup_summary(text, contract):
     return dict(counts, exact_owned_four_marker_sequences=True)
 
 
-def run(work, cohort, reference=False, validation_mode='group-revoke-58'):
+def announcement_cleanup_summary(text, contract):
+    starts, sequences = {}, {}
+    prefix = 'group_announcement_cleanup '
+    for line in text.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if event.get('type') == 'testStart':
+            identity = event['test']['id']
+            if identity in starts:
+                raise ValueError('announcement cleanup duplicate test start')
+            starts[identity] = event['test'].get('name')
+        if event.get('type') != 'print' or not isinstance(event.get('message'), str):
+            continue
+        if event['message'].startswith(prefix):
+            identity = event.get('testID')
+            if identity not in starts or starts[identity] not in contract['widget_names']:
+                raise ValueError('announcement cleanup foreign test')
+            sequences.setdefault(identity, []).append(event['message'][len(prefix):])
+    actual = []
+    for identity, sequence in sequences.items():
+        name = starts[identity]
+        if name in actual or sequence != contract['widget_markers']:
+            raise ValueError('announcement cleanup missing/duplicate/out-of-order tail')
+        actual.append(name)
+    if Counter(actual) != Counter(contract['widget_names']):
+        raise ValueError('announcement cleanup owned fixtures differ')
+    return {'owned_widgets': len(actual), 'ordered_events': sum(map(len, sequences.values())),
+            'unit_cases_without_SDK_claim': len(contract['unit_names'])}
+
+
+def run(work, cohort, reference=False, validation_mode='full-regression'):
     # Invalid mode/reference combinations fail before namespace or child work.
     validation_plan(source.descriptor(), validation_mode, reference)
     prove_namespace()
@@ -633,6 +661,8 @@ def run(work, cohort, reference=False, validation_mode='group-revoke-58'):
                     and re.search(r'RenderFlex.*overflow|was not hit-testable|Warning: A call to tester\.(?:tap|longPress)', str(event.get('message', '')))):
                 raise ValueError('UI warnings retained; group revoke not accepted')
         if validation_mode == 'full-regression':
+            counts['announcement_cleanup'] = announcement_cleanup_summary(text, source.announcement_contract(plan, required))
+            write_json(work / 'evidence' / (label + '.announcement-cleanup.json'), counts['announcement_cleanup'])
             counts['card_cleanup'] = card_cleanup_summary(text, source.card_contract(plan, required))
             write_json(work / 'evidence' / (label + '.card-cleanup.json'), counts['card_cleanup'])
             counts['parent_cleanup'] = call_records_cleanup_summary(text, source.cleanup_contract(plan, required))
@@ -685,10 +715,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current354',), required=True)
+    p.add_argument('--cohort', choices=('current359',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full354 variant; exactly one entry assertion fails and one old filter passes')
-    p.add_argument('--validation-mode', choices=('group-revoke-58', 'full-regression'), default='group-revoke-58')
+                   help='explicit full359 variant; exactly one entry assertion fails and one old filter passes')
+    p.add_argument('--validation-mode', choices=('full-regression',), default='full-regression')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')

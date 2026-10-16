@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current354 focused58/full1280."""
+"""Pure Python CI gate checks, separate from current359 final explicit full1304."""
 import copy
 import importlib.util
 import json
@@ -134,13 +134,13 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical_cohorts_cannot_alias354(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344', 'current351'):
+    def test_historical_cohorts_cannot_alias359(self):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344', 'current351', 'current354'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current354'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current359'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -382,26 +382,25 @@ class CardInventoryTests(unittest.TestCase):
 
 
 class ValidationModeTests(unittest.TestCase):
-    def test_focused_runs_only_new58_and_selected6_analysis(self):
+    def test_current359_rejects_focused_historical_targets(self):
         plan = check.source.descriptor()
-        phase = check.validation_plan(plan, 'group-revoke-58')
-        self.assertEqual((phase['expected'], phase['names_key']), (58, 'new_group_revoke58'))
-        self.assertEqual(phase['test_paths'], plan['group_revoke']['test_paths'])
-        self.assertEqual(phase['analysis_paths'], plan['group_revoke']['analysis_paths'])
-        self.assertEqual((len(phase['test_paths']), len(phase['analysis_paths'])), (2, 6))
+        for mode in ['group-revoke-58', 'chat-card-80', 'target540', 'announcement-24']:
+            with self.subTest(mode=mode), self.assertRaises(ValueError):
+                check.validation_plan(plan, mode)
 
-    def test_full_has_only_full1280_without_a_repeated_historical540_prerequisite(self):
+    def test_full_has_only_full1304_without_a_repeated_historical_target_prerequisite(self):
         phase = check.validation_plan(check.source.descriptor(), 'full-regression', True)
-        self.assertEqual(phase, {'test_label': 'full1280', 'expected': 1280,
-                                'test_paths': [], 'names_key': 'current_full1280',
+        self.assertEqual(phase, {'test_label': 'full1304', 'expected': 1304,
+                                'test_paths': [], 'names_key': 'current_full1304',
                                 'analysis_paths': None})
 
-    def test_reference_or_unknown_mode_cannot_dispatch_under_focused_default(self):
+    def test_reference_is_explicit_boolean_and_unknown_modes_cannot_dispatch(self):
         plan = check.source.descriptor()
-        for mode, reference in [('group-revoke-58', True), ('target540', False), ('chat-card-80', False), ('group-revoke-58', 1)]:
-            with self.subTest(mode=mode, reference=reference):
-                with self.assertRaises(ValueError):
-                    check.validation_plan(plan, mode, reference)
+        self.assertEqual(check.validation_plan(plan, 'full-regression', False)['expected'], 1304)
+        for mode, reference in [('group-revoke-58', True), ('target540', False),
+                                ('chat-card-80', False), ('full-regression', 1)]:
+            with self.subTest(mode=mode, reference=reference), self.assertRaises(ValueError):
+                check.validation_plan(plan, mode, reference)
 
 
 class CardCleanupTests(unittest.TestCase):
@@ -510,6 +509,48 @@ class RealHomeTests(unittest.TestCase):
         self.assertEqual(os.environ.get('HOME'), actual_home)
         self.assertIn('HOME="$real_user_home"', (check.REPO / 'ci/mobile-netns.sh').read_text())
         self.assertNotIn('export HOME=', (check.REPO / 'ci/mobile-setup.sh').read_text())
+
+
+class AnnouncementCurrentTests(unittest.TestCase):
+    def test_exact_new24_and_reversible354_lineage_preserve_historical_names_and_sources(self):
+        plan = check.source.descriptor()
+        names = check.source.required_names(plan)
+        contract = check.source.announcement_contract(plan, names)
+        self.assertEqual((len(contract['new_names']), len(contract['widget_names']),
+                          len(contract['unit_names'])), (24, 18, 6))
+        self.assertEqual(len(check.source.announcement_parent_inventory(plan)), 354)
+        for field in ['new_paths', 'replacements']:
+            changed = copy.deepcopy(plan)
+            if field == 'new_paths':
+                changed['announcement']['lineage'][field][0] = 'app/lib/forged.dart'
+            else:
+                changed['announcement']['lineage'][field][0]['before']['sha256'] = '0' * 64
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                check.source.announcement_contract(changed)
+        for key in ['current_full1280', 'new_announcement24', 'current_full1304']:
+            changed = copy.deepcopy(names); changed[key][0]['name'] = 'same-count forged announcement'
+            body = json.dumps(changed).encode(); altered = copy.deepcopy(plan)
+            altered['required_test_names'].update(bytes=len(body), sha256=check.source.sha(body))
+            with self.subTest(key=key), mock.patch.object(check.source, 'regular', return_value=body):
+                with self.assertRaises(ValueError):
+                    check.source.required_names(altered)
+
+    def test_announcement_full_cleanup_requires_each_original_owned_tail_without_unit_claim(self):
+        contract = check.source.descriptor()['announcement']
+        events = []
+        for identity, name in enumerate(contract['widget_names']):
+            events.append({'type': 'testStart', 'test': {'id': identity, 'name': name}})
+            events += [{'type': 'print', 'testID': identity,
+                        'message': 'group_announcement_cleanup ' + marker}
+                       for marker in contract['widget_markers']]
+        text = lambda values: '\n'.join(map(json.dumps, values))
+        self.assertEqual(check.announcement_cleanup_summary(text(events), contract),
+                         {'owned_widgets': 18, 'ordered_events': 72, 'unit_cases_without_SDK_claim': 6})
+        foreign = copy.deepcopy(events); foreign[-1]['testID'] = 999
+        reversed_tail = copy.deepcopy(events); reversed_tail[-1], reversed_tail[-2] = reversed_tail[-2], reversed_tail[-1]
+        for altered in [events[:-1], events + [events[-1]], foreign, reversed_tail]:
+            with self.subTest(events=altered), self.assertRaises(ValueError):
+                check.announcement_cleanup_summary(text(altered), contract)
 
 
 if __name__ == '__main__':

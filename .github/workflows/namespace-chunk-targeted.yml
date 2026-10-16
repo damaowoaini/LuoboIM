@@ -1,0 +1,87 @@
+name: Read-only namespace chunk and resumable progress targeted fourteen
+
+# New13top33sub + affected old CLIInspect1top3sub only. Historical DB suites/seed/namespace/CID and full lanes unchanged.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: namespace-chunk-target14-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  target14:
+    name: Untrusted chunk/progress / exact fourteen tops and thirty-six subs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+      LUOBO_NAMESPACE_INVENTORY_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+      LUOBO_NAMESPACE_INVENTORY_TEST_REDIS_URL: 'redis://127.0.0.1:36379/15'
+      LUOBO_NAMESPACE_INVENTORY_TEST_REPLICA_SET: 'luoboIntegration'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety and exact formatted1197 source; three new pure controls must be reviewed and run locally once before adoption
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/namespace-chunk/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Four GiB admission before any owned fixture
+        run: |
+          python3 -B - <<'PYCODE'
+          import json, os
+          from pathlib import Path
+          free = os.statvfs(os.environ['RUNNER_TEMP'])
+          value = free.f_bavail * free.f_frsize
+          Path('ci-results').mkdir(exist_ok=True)
+          record = {'freeBytes': value, 'minimumInitialBytes': 4 * 1024**3, 'accepted': value >= 4 * 1024**3}
+          with Path('ci-results/namespace-chunk-bootstrap.json').open('x') as out:
+              json.dump(record, out); out.write('\n'); out.flush(); os.fsync(out.fileno())
+          if not record['accepted']:
+              raise SystemExit('4GiB bootstrap floor; fixtures not started')
+          PYCODE
+      - name: Prepare exact owned ephemeral Mongo and paired Redis
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/namespace-chunk-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/namespace-chunk-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval .2 \
+            -- bash ci/backend-integration.sh prepare
+      - name: Only two packages / new thirteen plus affected CLI one / exact14top36sub under guards
+        run: python3 -B ci/namespace-chunk/run.py
+      - name: Always collect owned Mongo and Redis residuals
+        if: always()
+        run: |
+          bash ci/backend-integration.sh collect
+          python3 -B ci/namespace-chunk/run.py --check-residuals
+      - name: Always remove only exact run owned Mongo and Redis containers
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve explicit public evidence only
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: namespace-chunk-target14-${{ github.run_id }}
+          path: |
+            ci-results/namespace-chunk/
+            ci-results/namespace-chunk-bootstrap.json
+            ci-results/namespace-chunk-prepare.log
+            ci-results/namespace-chunk-prepare.resource.json
+            ci-results/backend-integration/
+          if-no-files-found: warn
+          retention-days: 14

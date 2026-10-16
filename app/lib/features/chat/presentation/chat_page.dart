@@ -22,6 +22,7 @@ import '../../conversation/data/conversation_repository.dart';
 import '../data/chat_repository.dart';
 import '../data/chat_reading_preferences.dart';
 import 'chat_font_size_page.dart';
+import 'group_announcement_panel.dart';
 import 'saved_emoji_sheet.dart';
 import '../data/chat_background_store.dart';
 import 'chat_background_page.dart';
@@ -596,6 +597,22 @@ class _ChatPageState extends ConsumerState<ChatPage>
             constraints: const BoxConstraints(maxWidth: 900),
             child: Column(
               children: [
+                if (controller.conversation?.isGroup == true &&
+                    (controller.conversation?.groupId?.isNotEmpty ?? false))
+                  ChatReadingTextScale(
+                    factor: _fontFactor,
+                    child: GroupAnnouncementPanel(
+                      repository: controller.repository,
+                      conversationId: widget.conversationId,
+                      groupId: controller.conversation!.groupId!,
+                      hint: controller.conversation!.groupHint,
+                      sourceCurrent: () =>
+                          mounted &&
+                          controller.repository.current &&
+                          controller.repository.conversationId ==
+                              widget.conversationId,
+                    ),
+                  ),
                 if (controller.sourceMessageId != null)
                   MaterialBanner(
                     content: const Text('正在查看来源消息'),

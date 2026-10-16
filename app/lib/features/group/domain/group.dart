@@ -44,6 +44,8 @@ final class GroupProfile {
     required this.joined,
     required this.me,
     required this.announcement,
+    this.announcementUpdatedAt = 0,
+    this.announcementPublisherId = '',
     required this.introduction,
     required this.verification,
     required this.hideMemberProfiles,
@@ -53,6 +55,8 @@ final class GroupProfile {
   final bool joined;
   final GroupMember? me;
   final String announcement;
+  final int announcementUpdatedAt;
+  final String announcementPublisherId;
   final String introduction;
   final int verification;
   final bool hideMemberProfiles;

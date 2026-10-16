@@ -1,45 +1,49 @@
 {
-  "schema": "luobo.mobile354.group-revoke.preparation.v1",
-  "state": "source_only_frozen_no_CI_controls_or_readonly_or_materialization_or_cloud_execution",
-  "parent": {
-    "cohort": "current351",
-    "ref": "50ff7d3d705c52775bf37840e6bef10fa2a55ae0",
-    "inputs": {
-      "path": "ci/mobile/inputs.json",
-      "bytes": 166634,
-      "sha256": "f09379c90e329ab507e5457da942c7e9447648507cfeeb44a09dc81f19c1b55a"
+  "accepted_announcement": {
+    "Root_receipt": {
+      "bytes": 845,
+      "path": "references/integration/mobile-announcement19-cloud-run-38980897102/root-acceptance.json",
+      "sha256": "87d01529bdce4e31df55dfa789c1b5528c7102fec49a355af7b6f27707505bc6"
     },
-    "source_digest": "fc2644ca9333596900be65f95fe0250f2d2106bb8429bc8f2f595c501bb2aba6",
-    "portable_digest": "3e87bd5ae01e2b9ee24b483981585820ab1b1e9745ba7cad66a42c0f8bb40ed9"
+    "actual19": 19,
+    "analysis_new2_prior9": 11,
+    "device_service": false,
+    "fresh26": false,
+    "portable411": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3",
+    "prior7_reused": 7,
+    "source359": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+    "unique26": 26
   },
-  "product_manifest": {
-    "path": "references/integration/mobile-group-message-revoke-v3-candidate-20261017/candidate-manifest.json",
-    "bytes": 7232,
-    "sha256": "88f56b2c18547415c3001e3693d0f42095b1c7b0d74005a3b4799906565cf60e"
+  "actual_new_checks": 0,
+  "historical_context": "Original26/19 sources/payload/inputs unchanged; their two workflow checkout refs fixed to exact a45daef88c28927910023f911d15a39a070c9989, whose mainApp354/helpers match their pins. Historical50ff target5 unchanged.",
+  "lineage": "Card351 historical17+351→354 three-chat pins stay exact; reversible354→359 announcement6replace+5new verifies current overlap. Revoke354 six pins stay exact; current359 ChatPage is separate explicit overlap.",
+  "modes": {
+    "automatic_pure_or_tests": false,
+    "default_reference": false,
+    "full_count": 1304,
+    "full_reference": "Explicit boolean true only, four original bodies and exact1assertfail1positive.",
+    "full_status": "expected_only_unrun",
+    "only": "full-regression",
+    "targeted_prerequisite": null
   },
-  "selected6_source": "Use immutable V3 after bytes; no product change in this CI candidate.",
-  "source354_digest": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
-  "portable406_digest": "81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c",
-  "reference354_digest": "3c7c332f5ad7381dc7099ec98885bb82ab96b6224328976f81e9747650c0317d",
-  "accepted_cloud_target5": {
-    "path": "references/integration/mobile-group-revoke-cloud-run-38966287079/root-acceptance.json",
-    "bytes": 5081,
-    "sha256": "18833a9cfc0078478ba8b29e9a8de63a73fce00470f3b95abc02a8e762893032"
+  "native": "Current354 Android530/iOS472 remain independent;535/477 only metadata future plan. No source359 publishedref or native consumer created here. approval=null oldApple selector separate.",
+  "parent": {
+    "cohort": "current354",
+    "inputs_pin": {
+      "bytes": 174879,
+      "path": "ci/mobile/inputs.json",
+      "sha256": "5611103e30219d32c3f5bca232cbb38c3606a86dc8c8c9de4772fdcc87a68fab"
+    },
+    "portable406": "81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c",
+    "source354": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
+    "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e"
   },
-  "coverage": "60 unique targeted cases across local first59 and V3 cloud5, not a fresh60 run; new58 plus directly affected old2. Native/service not accepted.",
-  "historical_aggregates": "target540/card80/full1222 metadata and old frozen pins retain current351/50ff provenance. New 3chat lineage is explicit.",
-  "manual_modes": {
-    "default": "group-revoke-58",
-    "focused": "only2 new test files58, then6 selected analyses; not run during this preparation",
-    "full": "one full1280 then whole strict analysis, only at final acceptance; no540/58 prerequisite",
-    "reference": "full+explicit reference only; full354 context4 original replacements, exactly entry2 assertion1fail/filter1pass"
-  },
-  "expected_unrun": {
-    "focused": 58,
-    "full": 1280
-  },
-  "unchanged": "178 dependency identities/archive hashes, SDK51+migration1, native snapshot, toolchain, strict inventory zero exceptions, netns/4GiB cold/1GiB continuous/.2/768MiB/900s, event/footer/names/source/final failure wins gates.",
-  "HOME": "Only new formal setup and netns keep canonical real account HOME; XDG/TMP/PUB_CACHE remain owned. Historical50ff workflow remains explicit old source.",
-  "PG_evidence_limit": "Existing guard child exit and resource evidence retained; no new independent process-group-absence claim.",
-  "actual_new_checks": 0
+  "portable411": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3",
+  "prior_evidence": "Actual scoped19 +7 exact prior tests =26unique;2new +9 reused analyses=11. No fresh26/full1304/device/service claim.",
+  "reference359": "b29cd5d87f9309b5a78d1cf84120a0cc7710f5aa2b80613d970ca02f201c5989",
+  "schema": "luobo.mobile359.announcement.formal-preparation.v1",
+  "selected11": "Exact accepted final product/test bytes, no formatter/business delta.",
+  "source359": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+  "state": "frozen_source_only_no_execution_or_adoption",
+  "unchanged": "178lock/SDK51/migration1/native7/toolchain/networknamespace/strictinventory/noexceptions/HOME/4GiBcold/floor1GiB/.2/768MiB/guard/machine/oldnames/cleanup"
 }

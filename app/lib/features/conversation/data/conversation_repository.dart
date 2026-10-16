@@ -56,32 +56,42 @@ final class ConversationRepository {
 
   /// One complete SDK inbox snapshot, independent of the UI's loaded pages.
   /// The original owner/history/CID cut is retained through subsequent layout.
-  Future<UnreadConversationSnapshot> unreadSnapshot({required bool Function() sourceCurrent}) {
+  Future<UnreadConversationSnapshot> unreadSnapshot({
+    required bool Function() sourceCurrent,
+  }) {
     final epoch = generation;
     final owner = session.state.credentials;
     final interactive = session.interactiveRevision;
     final history = gateway.historyAccess(epoch);
     final revisions = gateway.conversationHistorySnapshot;
     void check() {
-      if (!current || !sourceCurrent() || owner == null ||
+      if (!current ||
+          !sourceCurrent() ||
+          owner == null ||
           !identical(session.state.credentials, owner) ||
           !session.isInteractiveCurrent(epoch, interactive)) {
         throw const AppFailure(FailureKind.cancelled);
       }
       history.check();
     }
+
     bool cidCurrent(String id) {
       try {
         check();
-        if (id.isEmpty || id.length > 512 || gateway.isConversationHistoryClearing(id) ||
+        if (id.isEmpty ||
+            id.length > 512 ||
+            gateway.isConversationHistoryClearing(id) ||
             gateway.conversationHistoryRevision(id) != (revisions[id] ?? 0)) {
           return false;
         }
         // Admission only; never substitute this for the original cut above.
         gateway.historyAccess(epoch, conversationId: id).check();
         return true;
-      } on AppFailure { return false; }
+      } on AppFailure {
+        return false;
+      }
     }
+
     check();
     return gateway.runForHistory(epoch, (manager, access) async {
       check();
@@ -90,16 +100,24 @@ final class ConversationRepository {
       final seen = <String>{};
       final mapped = <Conversation>[];
       for (final item in result) {
-        if (item.conversationID.isEmpty || item.conversationID.length > 512 ||
+        if (item.conversationID.isEmpty ||
+            item.conversationID.length > 512 ||
             !seen.add(item.conversationID)) {
           throw const AppFailure(FailureKind.invalidResponse);
         }
         final allowed = cidCurrent(item.conversationID);
-        mapped.add(allowed ? mapConversation(item, ledger: gateway.privacyLedger)
-            : mapConversation(item, includePreview: false));
+        mapped.add(
+          allowed
+              ? mapConversation(item, ledger: gateway.privacyLedger)
+              : mapConversation(item, includePreview: false),
+        );
       }
       check();
-      return UnreadConversationSnapshot(List.unmodifiable(mapped), check, cidCurrent);
+      return UnreadConversationSnapshot(
+        List.unmodifiable(mapped),
+        check,
+        cidCurrent,
+      );
     }, access: history);
   }
 
@@ -184,7 +202,8 @@ Conversation mapConversation(
     userId: item.userID,
     groupId: item.groupID,
     draft: item.draftText ?? '',
-    mentions: (item.groupAtType ?? 0) != 0,
+    mentions: const {1, 2, 3}.contains(item.groupAtType),
+    groupHint: conversationHint(item.groupAtType),
   );
 }
 

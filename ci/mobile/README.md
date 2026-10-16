@@ -1,30 +1,40 @@
-# Mobile354 group revoke CI
+# Mobile359 formal source baseline
 
-Portable406 = App354 + SDK51 + migration1. Adopt the immutable V3 six files
-atomically with this CI successor. Current main/public App351 is not changed by
-this preparation. The original Card17 pins stay historical; explicit three-file
-before351→V3 lineage permits only those current chat replacements.
+Portable411 = App359 + SDK51 + migration1. Adopt the exact accepted announcement11
+with this formal source successor. The 178 package/archive identities and native7
+snapshot stay unchanged. Current Android354/530 and iOS354/472 remain historical
+native identities; projected535/477 do not create native acceptance or new refs.
 
-Manual default `group-revoke-58` runs the two new test files (exact40 repository
-plus18 widget successful names), then six selected strict analyses. It does not
-rerun old2/Card80/target540. Focused cleanup requires each test's own four ordered
-markers. UI tap/overflow warnings fail. New58 and full1280 are unrun CI expectations.
-Accepted targeted evidence is the local first59 plus cloud5 union60, not fresh60.
+This manual workflow permits only explicit final `full-regression`: full1304 once
+then whole strict analysis. No repeated540, group58, announcement26 or other
+focused prerequisite, and no automatic/duplicate Python controls in the workflow.
+Do not dispatch full until all known issues are fixed and targeted checks pass.
+Full1304 is expected only, not executed. Optional search reference remains full+
+explicit boolean only:359 context, exactly4 original replacements, entry2 exactly
+1 real assertion failure +1 old filter positive. Default reference is off.
 
-`full-regression` runs full1280 once followed by whole strict analysis, with all
-old1222+new58 names, old Card/call-record/NextUnread and new moderation cleanup.
-There is no540 or58 prerequisite. Use it only at final acceptance. Optional search
-reference remains full+explicit only:354 compile context with4 original replacements,
-entry2 exactly1 real assertion failure+1 filter positive; not historical full257.
+All old required names/count arrays and evidence remain historical, including
+Card351/target540, groupRevoke354 and expected1280. Exact new24 are added to1280
+for expected1304. Actual announcement evidence is scoped19 plus7 previous exact
+successes, and2 new plus9 reused analyses. This is26 unique cases, not fresh26.
+No rerun is needed for that accepted targeted evidence. Full future evidence must
+still prove all exact1304 names, true footer/no skip/error/hidden failure, original
+parent/Card/revoke/NextUnread cleanup, and18 announcement four-marker tails.
+The6 announcement store tests do not claim SDK cleanup. UI warnings fail.
 
-Historical target540/Card80/full1222 arrays keep their original identities. The
-old isolated target5 workflow explicitly checks out50ff7d3d705c52775bf37840e6bef10fa2a55ae0;
-its351 helperpins and six payload bytes remain unchanged. It never uses354 helpers.
+Historical Card17 and351→354 three-chat replacements are unchanged. Exact reversible
+announcement354→359 lineage adds only6 replacements and5 new files. Historical
+Card/revoke contracts validate the restored exact354 parent, while the loader
+strictly checks actual359 bodies; old green identities are not silently renamed.
 
-Setup preserves actual HOME and rejects mismatch; netns derives the non-root user's
-canonical owned HOME. XDG/TMP/pubcache remain fresh task paths. No credentials are
-forwarded. Other resource/network/toolchain/178lock/SDK/native/inventory gates stay
-unchanged. `app/tool/check.sh` remains private-only, with zero public exceptions.
-Child exit/resource evidence does not prove independent PG absence. Device/service
-acceptance is separate. No CI checks, readonly CLI, materialization, Flutter or cloud
-run occurred in this preparation. Proposed narrow Python controls are in the plan.
+Original announcement26/19 payloads/controllers/inputs remain byte exact. Their
+manual workflows explicitly checkout actual a45daef88c28927910023f911d15a39a070c9989,
+so their exact354 helper pins keep working after the formal baseline advances.
+Original isolated group-revoke5 continues fixed50ff. These are historical replays,
+not new full359 or native results.
+
+Real HOME, setup-only networking, offline netns,4GiB cold/1GiB continuous/.2/768MiB,
+official Flutter/Dart, strict authored inventory,178 lock, source/tool fingerprints,
+SDK51 and migration1 are preserved. No private helper inventory exception is added.
+This candidate executed no controls/readonly/materialization/Flutter/cloud. Root
+will review and run only the listed11 affected old+2 new pure controls once.

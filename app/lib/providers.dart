@@ -25,8 +25,17 @@ import 'core/storage/secure_credential_store.dart';
 import 'core/tenant/session_coordinator.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/chat/data/chat_reading_preferences.dart';
+import 'features/chat/data/group_announcement_store.dart';
 import 'features/chat/data/chat_background_store.dart';
 import 'features/chat/data/saved_emoji_store.dart';
+
+final groupAnnouncementStoreProvider = Provider<GroupAnnouncementStore>((ref) {
+  final store = GroupAnnouncementStore();
+  ref.onDispose(() {
+    unawaited(store.close());
+  });
+  return store;
+});
 
 final savedEmojiStoreProvider = Provider<SavedEmojiStore>((ref) {
   final store = SavedEmojiStore();
