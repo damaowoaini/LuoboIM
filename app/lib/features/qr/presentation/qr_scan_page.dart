@@ -42,6 +42,8 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with WidgetsBindingObse
   bool current(int token) => owns(token) && foreground && ModalRoute.of(context)?.isCurrent == true;
   void redraw() {
     WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) setState(() {}); });
+    // A platform/session notification may arrive while no frame is scheduled.
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
   void retire() {
     ++epoch; running = false;
@@ -221,7 +223,7 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with WidgetsBindingObse
     if (!current(token)) return false;
     final visible = ValueNotifier(true);
     confirmationActive = visible;
-    ownedDialog = true;
+    setState(() => ownedDialog = true);
     try {
       return await showDialog<bool>(context: context, builder: (dialogContext) => Consumer(
         builder: (dialogContext, dialogRef, _) {
@@ -245,7 +247,8 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with WidgetsBindingObse
         }));
     } finally {
       if (identical(confirmationActive, visible)) confirmationActive = null;
-      ownedDialog = false;
+      if (mounted) { setState(() => ownedDialog = false); }
+      else { ownedDialog = false; }
       visible.dispose();
     }
   }
@@ -291,7 +294,9 @@ class _QrScanPageState extends ConsumerState<QrScanPage> with WidgetsBindingObse
             const Text('扫描个人或群二维码；识别后请核对资料'),
             if (failure != null) Padding(padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(failure!, textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.error))),
-            if (busy) const LinearProgressIndicator(),
+            // Waiting for an explicit confirmation is not an active read.
+            // Keep busy/ownedDialog admission guards, without animating behind it.
+            if (busy && !ownedDialog) const LinearProgressIndicator(),
             Wrap(spacing: 12, runSpacing: 8, alignment: WrapAlignment.center, children: [
               OutlinedButton.icon(onPressed: valid && !busy ? gallery : null,
                 icon: const Icon(Icons.photo_library_outlined), label: const Text('从图片识别')),

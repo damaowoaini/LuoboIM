@@ -21,7 +21,7 @@ void main() {
       await f.mount(tester);
       expect(find.text('确认个人资料'), findsOneWidget);
       expect(f.business.calls('getUsersInfo'), 1);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
   testWidgets('camera torch and exact real user profile require explicit confirmation', (tester) async {
@@ -31,13 +31,13 @@ void main() {
       expect(f.platform.permissionCalls, 1); expect(f.platform.camera.starts, 1);
       await tester.tap(find.text('手电筒')); await tester.pump();
       expect(f.platform.camera.torches, 1);
-      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await tester.pumpAndSettle();
+      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await f.settle(tester);
       expect(find.text('确认个人资料'), findsOneWidget);
       expect(find.text('ID：bob'), findsOneWidget);
       expect(find.byType(UserProfilePage), findsNothing);
       expect(f.business.calls('getUsersInfo'), greaterThan(0));
       expect(f.business.calls('addFriend'), 0); expect(f.business.calls('joinGroup'), 0);
-      await tester.tap(find.text('查看资料')); await tester.pumpAndSettle();
+      await tester.tap(find.text('查看资料')); await f.settle(tester);
       expect(find.byType(UserProfilePage), findsOneWidget);
       expect(f.router!.routerDelegate.currentConfiguration.uri.path, '/contacts/user/bob');
       expect(tester.takeException(), isNull);
@@ -49,10 +49,10 @@ void main() {
       await f.mount(tester);
       f.platform.pick = () async => XFile('/owned-selected-image.png');
       f.platform.camera.image = (_) async => ['com.jrtxa.wanfeng/addFriend/bob'];
-      await tester.tap(find.text('从图片识别')); await tester.pumpAndSettle();
+      await tester.tap(find.text('从图片识别')); await f.settle(tester);
       expect(find.textContaining('旧版二维码'), findsOneWidget);
       expect(f.business.calls('getUsersInfo'), 0);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
       expect(find.byType(UserProfilePage), findsNothing);
       expect(f.platform.camera.images, 1); expect(f.business.calls('addFriend'), 0);
     } finally { await f.close(tester); }
@@ -61,12 +61,12 @@ void main() {
     final f = QrFlowFixture();
     try {
       await f.mount(tester);
-      f.platform.camera.emit('com.jrtxa.wanfeng/addFriend/bob'); await tester.pumpAndSettle();
+      f.platform.camera.emit('com.jrtxa.wanfeng/addFriend/bob'); await f.settle(tester);
       expect(f.business.calls('getUsersInfo'), 0);
-      await tester.tap(find.text('在当前服务查找')); await tester.pumpAndSettle();
+      await tester.tap(find.text('在当前服务查找')); await f.settle(tester);
       expect(f.business.calls('getUsersInfo'), greaterThan(0));
       expect(find.text('确认个人资料'), findsOneWidget);
-      await tester.tap(find.text('查看资料')); await tester.pumpAndSettle();
+      await tester.tap(find.text('查看资料')); await f.settle(tester);
       expect(find.byType(UserProfilePage), findsOneWidget); expect(f.business.calls('addFriend'), 0);
     } finally { await f.close(tester); }
   });
@@ -74,12 +74,12 @@ void main() {
     final f = QrFlowFixture();
     try {
       await f.mount(tester);
-      f.platform.camera.emit('https://untrusted.example.com/'); await tester.pumpAndSettle();
+      f.platform.camera.emit('https://untrusted.example.com/'); await f.settle(tester);
       expect(find.textContaining('不是萝卜对话'), findsOneWidget);
       expect(f.business.calls('getUsersInfo'), 0);
-      await tester.tap(find.text('开始扫描')); await tester.pumpAndSettle();
+      await tester.tap(find.text('开始扫描')); await f.settle(tester);
       final code = f.code(QrInviteKind.user, 'bob').replaceAll(RegExp(r'space=[0-9a-f]+'), 'space=${List.filled(64, '0').join()}');
-      f.platform.camera.emit(code); await tester.pumpAndSettle();
+      f.platform.camera.emit(code); await f.settle(tester);
       expect(find.textContaining('来自其他服务'), findsOneWidget);
       expect(f.business.calls('getUsersInfo'), 0);
     } finally { await f.close(tester); }
@@ -90,10 +90,10 @@ void main() {
       await f.mount(tester);
       expect(f.platform.camera.starts, 0);
       expect(find.text('从图片识别'), findsOneWidget);
-      await tester.tap(find.text('打开系统设置')); await tester.pumpAndSettle();
+      await tester.tap(find.text('打开系统设置')); await f.settle(tester);
       expect(f.platform.settingsCalls, 1);
       f.platform.permission = QrCameraPermission.granted;
-      await tester.tap(find.text('开始扫描')); await tester.pumpAndSettle();
+      await tester.tap(find.text('开始扫描')); await f.settle(tester);
       expect(f.platform.camera.starts, 1);
     } finally { await f.close(tester); }
   });
@@ -102,10 +102,10 @@ void main() {
     try {
       await f.mount(tester);
       f.platform.pick = () async => null;
-      await tester.tap(find.text('从图片识别')); await tester.pumpAndSettle();
+      await tester.tap(find.text('从图片识别')); await f.settle(tester);
       expect(f.platform.camera.images, 0); expect(f.business.calls('getUsersInfo'), 0);
       f.platform.pick = () async => XFile('/owned-empty.png');
-      await tester.tap(find.text('从图片识别')); await tester.pumpAndSettle();
+      await tester.tap(find.text('从图片识别')); await f.settle(tester);
       expect(find.text('没有识别到二维码'), findsOneWidget);
       expect(find.byType(UserProfilePage), findsNothing);
     } finally { await f.close(tester); }
@@ -117,7 +117,7 @@ void main() {
       final pick = f.business.defer<XFile?>(null); f.platform.pick = () => pick.future;
       await tester.tap(find.text('从图片识别')); await tester.pump();
       await tester.runAsync(f.business.rotateOwner); await tester.pump();
-      pick.complete(XFile('/old-account.png')); await tester.pumpAndSettle();
+      pick.complete(XFile('/old-account.png')); await f.settle(tester);
       expect(f.platform.camera.images, 0); expect(f.business.calls('getUsersInfo'), 0);
       expect(find.byType(AlertDialog), findsNothing);
     } finally { await f.close(tester); }
@@ -131,24 +131,24 @@ void main() {
       await tester.tap(find.text('从图片识别')); await tester.pump();
       expect(f.platform.camera.images, 1);
       await f.coverAndReturn(tester);
-      image.complete([f.code(QrInviteKind.user, 'bob')]); await tester.pumpAndSettle();
+      image.complete([f.code(QrInviteKind.user, 'bob')]); await f.settle(tester);
       expect(f.business.calls('getUsersInfo'), 0); expect(find.byType(AlertDialog), findsNothing);
-      await tester.tap(find.text('开始扫描')); await tester.pumpAndSettle();
-      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await tester.pumpAndSettle();
+      await tester.tap(find.text('开始扫描')); await f.settle(tester);
+      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await f.settle(tester);
       expect(find.text('确认个人资料'), findsOneWidget);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
   testWidgets('old confirmation after a foreign overlay returns cannot open a profile', (tester) async {
     final f = QrFlowFixture();
     try {
       await f.mount(tester);
-      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await tester.pumpAndSettle();
+      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await f.settle(tester);
       final confirm = tester.widget<FilledButton>(find.widgetWithText(FilledButton, '查看资料')).onPressed!;
       await f.coverAndReturn(tester);
       confirm(); await tester.pump();
       expect(find.byType(UserProfilePage), findsNothing);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
       expect(f.business.calls('addFriend'), 0);
     } finally { await f.close(tester); }
   });
@@ -156,11 +156,11 @@ void main() {
     final f = QrFlowFixture();
     try {
       await f.mount(tester); final old = f.platform.camera.listener!;
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused); await tester.pump();
-      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed); await tester.pump();
-      old([f.code(QrInviteKind.user, 'bob')]); await tester.pumpAndSettle();
+      f.pause(tester); await tester.pump();
+      f.resume(tester); await tester.pump();
+      old([f.code(QrInviteKind.user, 'bob')]); await f.settle(tester);
       expect(f.platform.camera.stops, greaterThan(0)); expect(f.business.calls('getUsersInfo'), 0);
-      await tester.tap(find.text('开始扫描')); await tester.pumpAndSettle();
+      await tester.tap(find.text('开始扫描')); await f.settle(tester);
       expect(f.platform.camera.starts, 2);
     } finally { await f.close(tester); }
   });
@@ -169,14 +169,14 @@ void main() {
     try {
       await f.mount(tester);
       f.business.pending = (call) => call.method == 'isJoinGroup' ? Future.value('false') : null;
-      f.platform.camera.emit(f.code(QrInviteKind.group, 'group-a')); await tester.pumpAndSettle();
+      f.platform.camera.emit(f.code(QrInviteKind.group, 'group-a')); await f.settle(tester);
       expect(f.business.calls('joinGroup'), 0);
-      await tester.tap(find.text('查看资料')); await tester.pumpAndSettle();
+      await tester.tap(find.text('查看资料')); await f.settle(tester);
       expect(find.byType(GroupPage), findsOneWidget);
       expect(tester.widget<GroupPage>(find.byType(GroupPage)).joinSource, 4);
-      await tester.tap(find.text('申请加入群聊')); await tester.pumpAndSettle();
+      await tester.tap(find.text('申请加入群聊')); await f.settle(tester);
       await tester.enterText(find.byType(TextField), '扫码核对后的申请');
-      await tester.tap(find.text('确定')); await tester.pumpAndSettle();
+      await tester.tap(find.text('确定')); await f.settle(tester);
       final calls = f.business.sdk.calls.where((c) => c.method == 'joinGroup').toList();
       expect(calls, hasLength(1));
       expect((calls.single.arguments as Map)['joinSource'], 4);
@@ -194,9 +194,9 @@ void main() {
       onCodes([f.code(QrInviteKind.user, 'bob')]); await tester.pump();
       expect(f.business.calls('getUsersInfo'), 1);
       response.complete(jsonEncode([{'publicInfo': {'userID': 'bob', 'nickname': '同名'}}]));
-      await tester.pumpAndSettle();
+      await f.settle(tester);
       expect(find.text('确认个人资料'), findsOneWidget);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
   testWidgets('small large-text scanner keeps errors and all available actions usable', (tester) async {
@@ -214,15 +214,15 @@ void main() {
     try {
       await f.mount(tester);
       f.business.pending = (call) => call.method == 'getUsersInfo' ? Future.value('[]') : null;
-      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await tester.pumpAndSettle();
+      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await f.settle(tester);
       expect(find.textContaining('无法核验二维码'), findsOneWidget);
       expect(find.byType(UserProfilePage), findsNothing);
       expect(find.text('查看资料'), findsNothing);
       f.business.pending = null;
-      await tester.tap(find.text('开始扫描')); await tester.pumpAndSettle();
-      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await tester.pumpAndSettle();
+      await tester.tap(find.text('开始扫描')); await f.settle(tester);
+      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await f.settle(tester);
       expect(find.text('确认个人资料'), findsOneWidget);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
   testWidgets('image error releases busy and a later explicit selection may be decoded', (tester) async {
@@ -231,12 +231,12 @@ void main() {
       await f.mount(tester);
       f.platform.pick = () async => XFile('/owned-selected.png');
       f.platform.camera.image = (_) async => throw StateError('OS decoder unavailable');
-      await tester.tap(find.text('从图片识别')); await tester.pumpAndSettle();
+      await tester.tap(find.text('从图片识别')); await f.settle(tester);
       expect(find.textContaining('图片识别失败'), findsOneWidget);
       f.platform.camera.image = (_) async => [f.code(QrInviteKind.user, 'bob')];
-      await tester.tap(find.text('从图片识别')); await tester.pumpAndSettle();
+      await tester.tap(find.text('从图片识别')); await f.settle(tester);
       expect(find.text('确认个人资料'), findsOneWidget);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
   testWidgets('leaving the scan page before gallery returns dispatches no decoder', (tester) async {
@@ -246,7 +246,7 @@ void main() {
       final pick = f.business.defer<XFile?>(null); f.platform.pick = () => pick.future;
       await tester.tap(find.text('从图片识别')); await tester.pump();
       f.router!.go('/qr/me'); await tester.pump(const Duration(milliseconds: 400));
-      pick.complete(XFile('/old-page.png')); await tester.pumpAndSettle();
+      pick.complete(XFile('/old-page.png')); await f.settle(tester);
       expect(f.platform.camera.images, 0); expect(f.platform.camera.disposals, 1);
       expect(find.text('确认个人资料'), findsNothing);
     } finally { await f.close(tester); }
@@ -257,28 +257,28 @@ void main() {
       await f.mount(tester);
       expect(f.platform.camera.starts, 1);
       expect(find.text('重新扫描').hitTestable(), findsOneWidget);
-      f.platform.camera.previewError!(); await tester.pumpAndSettle();
+      f.platform.camera.previewError!(); await f.settle(tester);
       expect(find.textContaining('相机暂不可用'), findsOneWidget);
       expect(find.text('开始扫描').hitTestable(), findsOneWidget);
       final stopped = f.platform.camera.stops;
-      await tester.tap(find.text('开始扫描')); await tester.pumpAndSettle();
+      await tester.tap(find.text('开始扫描')); await f.settle(tester);
       expect(f.platform.camera.starts, 2);
       expect(f.platform.camera.stops, greaterThan(stopped));
-      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await tester.pumpAndSettle();
+      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await f.settle(tester);
       expect(find.text('确认个人资料'), findsOneWidget);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
   testWidgets('logout while resolved confirmation is visible removes prior profile content', (tester) async {
     final f = QrFlowFixture();
     try {
       await f.mount(tester);
-      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await tester.pumpAndSettle();
+      f.platform.camera.emit(f.code(QrInviteKind.user, 'bob')); await f.settle(tester);
       expect(find.text('ID：bob'), findsOneWidget);
       final oldConfirm = tester.widget<FilledButton>(find.widgetWithText(FilledButton, '查看资料')).onPressed!;
       final reads = f.business.calls('getUsersInfo');
       await tester.runAsync(() => f.business.sdk.session.signOut(revoke: false));
-      await tester.pumpAndSettle();
+      await f.settle(tester);
       expect(find.text('ID：bob'), findsNothing);
       expect(find.text('确认个人资料'), findsNothing);
       expect(find.text('本次扫描已失效'), findsOneWidget);
@@ -286,29 +286,29 @@ void main() {
       expect(find.byType(UserProfilePage), findsNothing);
       expect(f.business.calls('getUsersInfo'), reads);
       expect(f.business.calls('addFriend'), 0); expect(f.business.calls('joinGroup'), 0);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
   testWidgets('issuer tenant replacement hides legacy dialog without popping a covering route', (tester) async {
     final f = QrFlowFixture();
     try {
       await f.mount(tester);
-      f.platform.camera.emit('com.jrtxa.wanfeng/addFriend/bob'); await tester.pumpAndSettle();
+      f.platform.camera.emit('com.jrtxa.wanfeng/addFriend/bob'); await f.settle(tester);
       expect(find.text('ID：bob'), findsOneWidget);
       final oldConfirm = tester.widget<FilledButton>(find.widgetWithText(FilledButton, '在当前服务查找')).onPressed!;
       final nav = tester.state<NavigatorState>(find.byType(Navigator).last);
       unawaited(nav.push<void>(MaterialPageRoute(builder: (_) => const Scaffold(body: Text('foreign-owned-page')))));
       await tester.pump(const Duration(milliseconds: 400));
-      await tester.runAsync(f.business.rotateOwner); await tester.pumpAndSettle();
+      await tester.runAsync(f.business.rotateOwner); await f.settle(tester);
       expect(find.text('foreign-owned-page'), findsOneWidget);
       expect(find.text('ID：bob', skipOffstage: false), findsNothing);
       oldConfirm(); await tester.pump();
       expect(find.text('foreign-owned-page'), findsOneWidget);
       expect(f.business.calls('getUsersInfo'), 0); expect(f.business.calls('joinGroup'), 0);
-      nav.pop(); await tester.pumpAndSettle();
+      nav.pop(); await f.settle(tester);
       expect(find.text('本次扫描已失效'), findsOneWidget);
       expect(find.text('ID：bob'), findsNothing);
-      await tester.tap(find.text('取消')); await tester.pumpAndSettle();
+      await tester.tap(find.text('取消')); await f.settle(tester);
     } finally { await f.close(tester); }
   });
 

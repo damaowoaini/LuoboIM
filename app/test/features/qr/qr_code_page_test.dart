@@ -31,13 +31,13 @@ void main() {
     try {
       await f.mount(tester, initial: '/qr/group/group-a');
       final render = f.business.defer<Uint8List>(Uint8List(0)); f.platform.render = (_) => render.future;
-      await tester.tap(find.text('分享二维码')); await tester.pump();
+      await f.tapVisible(tester, find.text('分享二维码')); await tester.pump();
       f.business.groups[0]['status'] = 2;
       await tester.runAsync(() => f.business.sdk.callback(ListenerType.groupListener, {
         'type': 'onGroupDismissed', 'data': jsonEncode(f.business.groups[0]),
       }));
       await tester.pump(); await tester.pump();
-      render.complete(Uint8List(8)); await tester.pumpAndSettle();
+      render.complete(Uint8List(8)); await f.settle(tester);
       expect(find.byType(QrImageView), findsNothing); expect(f.platform.shares, 0);
       expect(find.textContaining('无法核验群资料'), findsOneWidget);
     } finally { await f.close(tester); }
@@ -51,7 +51,7 @@ void main() {
       ])) : null;
       await f.mount(tester, initial: '/qr/group/group-a');
       expect(find.byType(QrImageView), findsOneWidget);
-      await tester.tap(find.text('分享二维码')); await tester.pumpAndSettle();
+      await f.tapVisible(tester, find.text('分享二维码')); await f.settle(tester);
       expect(f.platform.renders, 1); expect(f.platform.shares, 1);
       expect(find.text('二维码已分享'), findsOneWidget);
     } finally { await f.close(tester); }
@@ -72,11 +72,11 @@ void main() {
     final f = QrFlowFixture(); f.platform.shareResult = QrExportResult.unavailable;
     try {
       await f.mount(tester, initial: '/qr/me');
-      await tester.tap(find.text('分享二维码')); await tester.pumpAndSettle();
+      await f.tapVisible(tester, find.text('分享二维码')); await f.settle(tester);
       expect(find.textContaining('无法分享图片'), findsOneWidget);
       expect(find.text('二维码已分享'), findsNothing);
       f.platform.shareResult = QrExportResult.completed;
-      await tester.tap(find.text('分享二维码')); await tester.pumpAndSettle();
+      await f.tapVisible(tester, find.text('分享二维码')); await f.settle(tester);
       expect(f.platform.shares, 2); expect(find.text('二维码已分享'), findsOneWidget);
     } finally { await f.close(tester); }
   });
@@ -89,7 +89,7 @@ void main() {
       final action = tester.widget<FilledButton>(find.widgetWithText(FilledButton, '分享二维码')).onPressed!;
       action(); action(); await tester.pump();
       expect(f.platform.renders, 1);
-      render.complete(Uint8List.fromList([137, 80, 78, 71])); await tester.pumpAndSettle();
+      render.complete(Uint8List.fromList([137, 80, 78, 71])); await f.settle(tester);
       expect(f.platform.shares, 1);
     } finally { await f.close(tester); }
   });
@@ -98,9 +98,9 @@ void main() {
     try {
       await f.mount(tester, initial: '/qr/me');
       final render = f.business.defer<Uint8List>(Uint8List(0)); f.platform.render = (_) => render.future;
-      await tester.tap(find.text('分享二维码')); await tester.pump();
+      await f.tapVisible(tester, find.text('分享二维码')); await tester.pump();
       await tester.runAsync(f.business.rotateOwner); await tester.pump();
-      render.complete(Uint8List(8)); await tester.pumpAndSettle();
+      render.complete(Uint8List(8)); await f.settle(tester);
       expect(f.platform.shares, 0); expect(find.text('二维码已分享'), findsNothing);
       expect(find.byType(QrImageView), findsNothing);
     } finally { await f.close(tester); }
@@ -110,12 +110,12 @@ void main() {
     try {
       await f.mount(tester, initial: '/qr/me');
       final render = f.business.defer<Uint8List>(Uint8List(0)); f.platform.render = (_) => render.future;
-      await tester.tap(find.text('分享二维码')); await tester.pump();
+      await f.tapVisible(tester, find.text('分享二维码')); await tester.pump();
       await f.coverAndReturn(tester);
-      render.complete(Uint8List(8)); await tester.pumpAndSettle();
+      render.complete(Uint8List(8)); await f.settle(tester);
       expect(f.platform.shares, 0);
       f.platform.render = null;
-      await tester.tap(find.text('分享二维码')); await tester.pumpAndSettle();
+      await f.tapVisible(tester, find.text('分享二维码')); await f.settle(tester);
       expect(f.platform.shares, 1);
     } finally { await f.close(tester); }
   });
@@ -124,10 +124,10 @@ void main() {
     try {
       await f.mount(tester, initial: '/qr/me');
       final choice = f.business.defer<bool>(false); f.platform.saveChoice = () => choice.future;
-      await tester.tap(find.text('保存图片')); await tester.pump();
+      await f.tapVisible(tester, find.text('保存图片')); await tester.pump();
       expect(f.platform.saves, 1);
       await tester.runAsync(f.business.rotateOwner); await tester.pump();
-      choice.complete(true); await tester.pumpAndSettle();
+      choice.complete(true); await f.settle(tester);
       expect(f.platform.writes, 0); expect(find.text('二维码已保存'), findsNothing);
     } finally { await f.close(tester); }
   });
@@ -136,10 +136,10 @@ void main() {
     try {
       await f.mount(tester, initial: '/qr/me');
       f.platform.saveChoice = () async => false;
-      await tester.tap(find.text('保存图片')); await tester.pumpAndSettle();
+      await f.tapVisible(tester, find.text('保存图片')); await f.settle(tester);
       expect(f.platform.writes, 0); expect(find.text('二维码已保存'), findsNothing);
       f.platform.saveChoice = () async => true;
-      await tester.tap(find.text('保存图片')); await tester.pumpAndSettle();
+      await f.tapVisible(tester, find.text('保存图片')); await f.settle(tester);
       expect(f.platform.writes, 1); expect(find.text('二维码已保存'), findsOneWidget);
     } finally { await f.close(tester); }
   });

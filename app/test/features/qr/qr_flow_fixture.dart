@@ -82,21 +82,68 @@ final class QrFlowFixture {
   final platform = TestQrPlatform();
   late QrRepository repository;
   GoRouter? router;
+  final _sdkInFlight = <Future<void>>{};
   Future<void> start() async {
     await business.start();
     repository = QrRepository(business.repository.access, business.contacts,
       business.groupRepository, MineRepository(business.sdk.gateway, business.sdk.session.state.generation));
     business.sdk.overrideCall = (call) async {
-      final custom = business.pending?.call(call);
-      if (custom != null) return await custom;
-      if (call.method == 'getOneConversation') {
-        final args = call.arguments as Map;
-        return jsonEncode(SdkHarness.conversation(id: args['sessionType'] == 1 ? cidA : 'group-group-a',
-          group: args['sessionType'] != 1));
-      }
-      return business.respond(call);
+      final reply = () async {
+        final custom = business.pending?.call(call);
+        if (custom != null) return await custom;
+        if (call.method == 'getOneConversation') {
+          final args = call.arguments as Map;
+          return jsonEncode(SdkHarness.conversation(id: args['sessionType'] == 1 ? cidA : 'group-group-a',
+            group: args['sessionType'] != 1));
+        }
+        return business.respond(call);
+      }();
+      // Observe completion only. The real MethodChannel reply/error still goes
+      // unchanged to the production SDK/repository, never a success fallback.
+      final observed = reply.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+      _sdkInFlight.add(observed);
+      unawaited(observed.whenComplete(() => _sdkInFlight.remove(observed)));
+      return await reply;
     };
   }
+  Future<void> settle(WidgetTester tester) async {
+    await tester.pump();
+    var drained = false;
+    await tester.runAsync(() async {
+      for (var turn = 0; turn < 12; turn++) {
+        final pending = _sdkInFlight.toList(growable: false);
+        if (pending.isEmpty) { drained = true; return; }
+        await Future.wait(pending).timeout(const Duration(seconds: 20));
+      }
+      throw StateError('QR fixture native reply chain did not finish');
+    });
+    if (!drained) throw StateError('QR fixture real async drain failed');
+    // Meaningful pending IO is explicitly awaited above. A persistent UI
+    // animation still fails; no observer/exception or product guard is removed.
+    await tester.pumpAndSettle(timeout: const Duration(seconds: 5));
+  }
+  void pause(WidgetTester tester) {
+    final binding = tester.binding;
+    if (binding.lifecycleState == null || binding.lifecycleState == AppLifecycleState.detached) {
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    }
+    if (binding.lifecycleState == AppLifecycleState.resumed) binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    if (binding.lifecycleState == AppLifecycleState.inactive) binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    if (binding.lifecycleState == AppLifecycleState.hidden) binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+  }
+  void resume(WidgetTester tester) {
+    final binding = tester.binding;
+    if (binding.lifecycleState == AppLifecycleState.paused) binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+    if (binding.lifecycleState == AppLifecycleState.hidden) binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    if (binding.lifecycleState != AppLifecycleState.resumed) binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+  }
+  Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+    final scrollable = find.descendant(of: find.byType(ListView).last, matching: find.byType(Scrollable)).first;
+    await tester.scrollUntilVisible(finder, 80, scrollable: scrollable);
+    await tester.pump();
+    await tester.tap(finder);
+  }
+
   String code(QrInviteKind kind, String id) => QrInvite.encode(kind: kind, subjectId: id,
       credentials: business.sdk.session.state.credentials!);
   Future<void> mount(WidgetTester tester, {String initial = '/qr/scan', bool productionRouter = false,
@@ -132,7 +179,7 @@ final class QrFlowFixture {
     ], child: productionRouter ? _ProductionRouterHost(theme) : MaterialApp.router(routerConfig: router,
       theme: theme, builder: (context, child) => MediaQuery(data: MediaQuery.of(context)
         .copyWith(textScaler: TextScaler.linear(1.6)), child: child!))));
-    await tester.pumpAndSettle();
+    await settle(tester);
   }
   Future<void> coverAndReturn(WidgetTester tester) async {
     final nav = tester.state<NavigatorState>(find.byType(Navigator).last);
@@ -144,10 +191,10 @@ final class QrFlowFixture {
     // Retire capture/export intents without disposing the provider-owned
     // runtime in fakeAsync. The shared r3 cleanup then settles SDK before
     // unmount, preserving the real lifecycle and complete cleanup contract.
-    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    pause(tester);
     await tester.pump();
     try { await business.close(tester); }
-    finally { tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed); }
+    finally { resume(tester); }
   }
 }
 
