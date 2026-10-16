@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "ordinary_source1100_full27_packages_no_runtime_adoption",
+  "scope": "ordinary_source1118_full28_packages_no_runtime_adoption",
   "parent_runner": {
     "path": "ci/group-stage3/run.py",
     "bytes": 18503,
@@ -9,7 +9,7 @@
   "parent_inputs": {
     "path": "ci/group-stage3/inputs.json",
     "bytes": 1142755,
-    "sha256": "2f1aa3aa2622f9c2158d258a4f44be581323b029403c7350419da4eb4a1cccba"
+    "sha256": "eae319b7a57755e71813e8f26f5c5234ec575a7299fdf4d581de0bf9b571cb3b"
   },
   "parent_count": 1023,
   "parent_digest": "8e57566c2869a24bcdfaf6cf4f47adc14a1e30dd9a0db99d398464cec2036f06",
@@ -303,6 +303,41 @@
       "path": "server/cmd/tools/ordinary-alias-receipts/main_test.go",
       "bytes": 11866,
       "sha256": "3256d2ee9e78d79ea9803b5956058d125c9d969c3413c22730834e2c1ac0b911"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-callback-receipts/backend.go",
+      "bytes": 2987,
+      "sha256": "2483a2b406cad0e633f5ba24b2f92ce012c23d18117f29ff44577670ea7b623b"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-callback-receipts/decode.go",
+      "bytes": 822,
+      "sha256": "9e76b928eee25bbe074716db3e179e2160edc9705fdfa56e5f2c53cb80bf3b37"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-callback-receipts/input.go",
+      "bytes": 7521,
+      "sha256": "5816ec51ab997c5464524028cab8a204016b92ca8d7be52fe083350d33afeecc"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-callback-receipts/journal.go",
+      "bytes": 3224,
+      "sha256": "dd4cf2ffe10819b995ae043dafa43e46ff9ad3999bf4f8e3e3c294602add8c2e"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-callback-receipts/lineage_test.go",
+      "bytes": 2762,
+      "sha256": "6ba5e00881a8e313474bcd02b46d590e53d4804baad165bc974948c8bc4a31b9"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-callback-receipts/main.go",
+      "bytes": 8839,
+      "sha256": "72f3a2cf40f4e654fb570492e29699aa3fe36b54fe704f01552d6b73e25a10a1"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-callback-receipts/main_test.go",
+      "bytes": 8620,
+      "sha256": "d77cdd7eeb233d45fe95d19ac7acc936192610cec6a5ec8871a312c967dc1f9c"
     },
     {
       "path": "server/cmd/tools/ordinary-device-receipts/backend.go",
@@ -1521,8 +1556,8 @@
     },
     {
       "path": "server/internal/messagedelivery/kafka_alias_vendor.go",
-      "bytes": 12002,
-      "sha256": "5f80a075d03836b1ddb45e85c5f7c8995057fbf3faec02c3f5fcbbab5a0cf5f8"
+      "bytes": 13525,
+      "sha256": "420d55ef6ff479a31a1401217f4f723af09f233840d56e035daaafd9f1c92f79"
     },
     {
       "path": "server/internal/messagedelivery/kafka_alias_vendor_integration_test.go",
@@ -1541,8 +1576,8 @@
     },
     {
       "path": "server/internal/messagedelivery/kafka_fcm_devices.go",
-      "bytes": 17002,
-      "sha256": "2815648c23dfac4262ebe515b4bc2977660fc6854b7a15486008bc32ac9fe3b4"
+      "bytes": 18870,
+      "sha256": "e9ab3a91c6e17ca00d22faeca0aadd1b6409b34cb3312e7dd8b1ce84b6e7b435"
     },
     {
       "path": "server/internal/messagedelivery/kafka_fcm_devices_integration_test.go",
@@ -1561,8 +1596,33 @@
     },
     {
       "path": "server/internal/messagedelivery/kafka_offline.go",
-      "bytes": 12867,
-      "sha256": "0735d71f87a41f3124fe4a3edddac5e1021b9cb7b57c7d64443d32b986553a7a"
+      "bytes": 15050,
+      "sha256": "85f7f08e621cc18767e38b6cd2b6358f3bcf4c7c2c5af02715eae8aa76d3770f"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_offline_callback.go",
+      "bytes": 26036,
+      "sha256": "68b9242f0ce5a02a943a9f32b7a01d6aa9ae67653199162a826c362961eb80e5"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_offline_callback_integration_test.go",
+      "bytes": 21971,
+      "sha256": "434f029f5e135600af0b00ffb31fe944cf78547cc0a3950a9c24fd59bbf97181"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_offline_callback_r1_fixture_test.go",
+      "bytes": 6232,
+      "sha256": "bef3cbdb6350b22cfc77ca76d385e747e7b8ba3c25c3b3362ebb26fe813f6bb5"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_offline_callback_reprepare_integration_test.go",
+      "bytes": 8760,
+      "sha256": "3d9d354ca7d7214f50925596e86cf06fb9c6ad9c9c78449fc4a9abc1676793e8"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_offline_callback_test.go",
+      "bytes": 1754,
+      "sha256": "0aaaf487affc40e4d3edebe978d4b0f644ba14c879345b0dfa87b4e22dd7ef36"
     },
     {
       "path": "server/internal/messagedelivery/kafka_offline_readiness.go",
@@ -1621,8 +1681,8 @@
     },
     {
       "path": "server/internal/messagedelivery/kafka_vendor.go",
-      "bytes": 18965,
-      "sha256": "fd12b9f83bf3144efc3380fead01325fa4e0eb20f3fe1b95dfb3ace64f60dd94"
+      "bytes": 21673,
+      "sha256": "3171ffa41a7c2b4d0604ecf10e4f32c0f32b0ba044d03f2f78d8087a00ce2dd2"
     },
     {
       "path": "server/internal/messagedelivery/kafka_vendor_confirmation_integration_test.go",
@@ -1686,8 +1746,8 @@
     },
     {
       "path": "server/internal/messagedelivery/projection.go",
-      "bytes": 9946,
-      "sha256": "153437cb6d2459849b42bc58e87dc40776b3123e5f16315176681118fee06701"
+      "bytes": 10921,
+      "sha256": "52010d9e3a929f7b31c596792649c6e433616d56953f3f8f6eba2adc636aa9e9"
     },
     {
       "path": "server/internal/messagedelivery/projection_redis_fixture_test.go",
@@ -1716,8 +1776,8 @@
     },
     {
       "path": "server/internal/messagedelivery/visibility.go",
-      "bytes": 11205,
-      "sha256": "3e34d768a6f3d25876750dc2e1b049e5ca30d0b507b8f5ea835ed2e71a6127c0"
+      "bytes": 11852,
+      "sha256": "0299d0c60e59bf58dc8bd529da982831325749cdff5fe1167db123f2d1578820"
     },
     {
       "path": "server/internal/messagedelivery/visibility_integration_test.go",
@@ -1905,9 +1965,19 @@
       "sha256": "669b3ce844f7bd56fe92773f60cfc891a7cbcf0ac7e21bc28e576af8027eb71e"
     },
     {
+      "path": "server/internal/msgtransfer/durable_offline_callback_integration_test.go",
+      "bytes": 17158,
+      "sha256": "eb319975a5818be2313766bde81eea2b8d17bdb5ceed38a33dc3d579b9c2572b"
+    },
+    {
+      "path": "server/internal/msgtransfer/durable_offline_callback_optional_test.go",
+      "bytes": 8605,
+      "sha256": "7202e18e7190eec6ebe32ed1923f32107d5383913caaf1985e168bdcf33b84b9"
+    },
+    {
       "path": "server/internal/msgtransfer/durable_owned_offline_runtime.go",
-      "bytes": 6968,
-      "sha256": "7d3c7c8a702bd0f6483a8babd8ce52d55354bbce973494996d89e6ef064cb2ff"
+      "bytes": 9209,
+      "sha256": "d747d31559527737fdb4a8abbf8e0b6301cdb8f14897ec330f29e1fc66e53204"
     },
     {
       "path": "server/internal/msgtransfer/durable_owned_offline_runtime_test.go",
@@ -2025,6 +2095,26 @@
       "sha256": "ed741caa610eb50a59768dba2c0ca104c570677d558fb482b88a3079b645a033"
     },
     {
+      "path": "server/internal/push/durable_offline_callback.go",
+      "bytes": 8134,
+      "sha256": "5cbb48f3856d2985573befeba27f4352442dfac27a42b417d9d1ad5d6a09afe5"
+    },
+    {
+      "path": "server/internal/push/durable_offline_callback_owned.go",
+      "bytes": 7579,
+      "sha256": "77f0cba3ddad50d04e94b6942c82c9520039469c003f6c7f190a8eb3345e36ea"
+    },
+    {
+      "path": "server/internal/push/durable_offline_callback_owned_test.go",
+      "bytes": 5989,
+      "sha256": "ae5fb5ea0fb55cd9b0ac34ec4ac41948360e0b2915dd7a99ce36b8784d1bc558"
+    },
+    {
+      "path": "server/internal/push/durable_offline_callback_test.go",
+      "bytes": 3348,
+      "sha256": "9968e3460cab798a17895a4526445aba04470027db3ec35c619bd13887d425f1"
+    },
+    {
       "path": "server/internal/push/durable_online.go",
       "bytes": 10087,
       "sha256": "2bc33803fef4e74fd58adfcf290e074bb5acc39117b7a18866eb7aae5f346543"
@@ -2036,8 +2126,8 @@
     },
     {
       "path": "server/internal/push/offlinepush/aliasvendor/kafka_adapter.go",
-      "bytes": 3976,
-      "sha256": "ed41d566fa0e4af00762e6ae4d92c198f5b770ce1a67b27e9b3ca3e45d87561b"
+      "bytes": 5285,
+      "sha256": "6b98fa12a359f2fe60f8bb52eb303214825124c2b3f385ea69aa3e0a8a7fe853"
     },
     {
       "path": "server/internal/push/offlinepush/aliasvendor/owned_input_file.go",
@@ -2096,8 +2186,8 @@
     },
     {
       "path": "server/internal/push/offlinepush/fcm/kafka_http_v1.go",
-      "bytes": 8439,
-      "sha256": "3c9e07e5f38ccccbeacc286e8ad7140d7270ccfdb80db21072e786475462303b"
+      "bytes": 10330,
+      "sha256": "5916fec60649fd665cf1f70099a4a7725231dd2b1709475d51b31096bc15e1d2"
     },
     {
       "path": "server/internal/push/offlinepush/fcm/owned_credentials_file.go",
@@ -6615,10 +6705,28 @@
     "server/tools/yamlfmt/go.sum": 420,
     "server/tools/yamlfmt/yamlfmt.go": 420,
     "server/tools/yamlfmt/yamlfmt_test.go": 420,
-    "server/internal/meetingbooking/capability_list_test.go": 420
+    "server/internal/meetingbooking/capability_list_test.go": 420,
+    "server/cmd/tools/ordinary-callback-receipts/backend.go": 420,
+    "server/cmd/tools/ordinary-callback-receipts/decode.go": 420,
+    "server/cmd/tools/ordinary-callback-receipts/input.go": 420,
+    "server/cmd/tools/ordinary-callback-receipts/journal.go": 420,
+    "server/cmd/tools/ordinary-callback-receipts/lineage_test.go": 420,
+    "server/cmd/tools/ordinary-callback-receipts/main.go": 420,
+    "server/cmd/tools/ordinary-callback-receipts/main_test.go": 420,
+    "server/internal/messagedelivery/kafka_offline_callback.go": 420,
+    "server/internal/messagedelivery/kafka_offline_callback_integration_test.go": 420,
+    "server/internal/messagedelivery/kafka_offline_callback_r1_fixture_test.go": 420,
+    "server/internal/messagedelivery/kafka_offline_callback_reprepare_integration_test.go": 420,
+    "server/internal/messagedelivery/kafka_offline_callback_test.go": 420,
+    "server/internal/msgtransfer/durable_offline_callback_integration_test.go": 420,
+    "server/internal/msgtransfer/durable_offline_callback_optional_test.go": 420,
+    "server/internal/push/durable_offline_callback.go": 420,
+    "server/internal/push/durable_offline_callback_owned.go": 420,
+    "server/internal/push/durable_offline_callback_owned_test.go": 420,
+    "server/internal/push/durable_offline_callback_test.go": 420
   },
-  "effective_count": 1100,
-  "effective_digest": "fa6d7eb1a1c4fba7ab9a99456652d7b397adeee26ac2b316d2f368b0319e0f88",
+  "effective_count": 1118,
+  "effective_digest": "9a5de074346bc3db865e6bb02a9a1b77c25ea9ab93c45ce6ce1115ad70b47327",
   "delta": [
     {
       "target": "server/cmd/tools/ordinary-alias-receipts/backend.go",
@@ -6649,6 +6757,48 @@
       "beforeSHA256": null,
       "sha256": "3256d2ee9e78d79ea9803b5956058d125c9d969c3413c22730834e2c1ac0b911",
       "bytes": 11866
+    },
+    {
+      "target": "server/cmd/tools/ordinary-callback-receipts/backend.go",
+      "beforeSHA256": null,
+      "sha256": "2483a2b406cad0e633f5ba24b2f92ce012c23d18117f29ff44577670ea7b623b",
+      "bytes": 2987
+    },
+    {
+      "target": "server/cmd/tools/ordinary-callback-receipts/decode.go",
+      "beforeSHA256": null,
+      "sha256": "9e76b928eee25bbe074716db3e179e2160edc9705fdfa56e5f2c53cb80bf3b37",
+      "bytes": 822
+    },
+    {
+      "target": "server/cmd/tools/ordinary-callback-receipts/input.go",
+      "beforeSHA256": null,
+      "sha256": "5816ec51ab997c5464524028cab8a204016b92ca8d7be52fe083350d33afeecc",
+      "bytes": 7521
+    },
+    {
+      "target": "server/cmd/tools/ordinary-callback-receipts/journal.go",
+      "beforeSHA256": null,
+      "sha256": "dd4cf2ffe10819b995ae043dafa43e46ff9ad3999bf4f8e3e3c294602add8c2e",
+      "bytes": 3224
+    },
+    {
+      "target": "server/cmd/tools/ordinary-callback-receipts/lineage_test.go",
+      "beforeSHA256": null,
+      "sha256": "6ba5e00881a8e313474bcd02b46d590e53d4804baad165bc974948c8bc4a31b9",
+      "bytes": 2762
+    },
+    {
+      "target": "server/cmd/tools/ordinary-callback-receipts/main.go",
+      "beforeSHA256": null,
+      "sha256": "72f3a2cf40f4e654fb570492e29699aa3fe36b54fe704f01552d6b73e25a10a1",
+      "bytes": 8839
+    },
+    {
+      "target": "server/cmd/tools/ordinary-callback-receipts/main_test.go",
+      "beforeSHA256": null,
+      "sha256": "d77cdd7eeb233d45fe95d19ac7acc936192610cec6a5ec8871a312c967dc1f9c",
+      "bytes": 8620
     },
     {
       "target": "server/cmd/tools/ordinary-device-receipts/backend.go",
@@ -6719,8 +6869,8 @@
     {
       "target": "server/internal/messagedelivery/kafka_alias_vendor.go",
       "beforeSHA256": null,
-      "sha256": "5f80a075d03836b1ddb45e85c5f7c8995057fbf3faec02c3f5fcbbab5a0cf5f8",
-      "bytes": 12002
+      "sha256": "420d55ef6ff479a31a1401217f4f723af09f233840d56e035daaafd9f1c92f79",
+      "bytes": 13525
     },
     {
       "target": "server/internal/messagedelivery/kafka_alias_vendor_integration_test.go",
@@ -6743,8 +6893,8 @@
     {
       "target": "server/internal/messagedelivery/kafka_fcm_devices.go",
       "beforeSHA256": null,
-      "sha256": "2815648c23dfac4262ebe515b4bc2977660fc6854b7a15486008bc32ac9fe3b4",
-      "bytes": 17002
+      "sha256": "e9ab3a91c6e17ca00d22faeca0aadd1b6409b34cb3312e7dd8b1ce84b6e7b435",
+      "bytes": 18870
     },
     {
       "target": "server/internal/messagedelivery/kafka_fcm_devices_integration_test.go",
@@ -6767,8 +6917,38 @@
     {
       "target": "server/internal/messagedelivery/kafka_offline.go",
       "beforeSHA256": null,
-      "sha256": "0735d71f87a41f3124fe4a3edddac5e1021b9cb7b57c7d64443d32b986553a7a",
-      "bytes": 12867
+      "sha256": "85f7f08e621cc18767e38b6cd2b6358f3bcf4c7c2c5af02715eae8aa76d3770f",
+      "bytes": 15050
+    },
+    {
+      "target": "server/internal/messagedelivery/kafka_offline_callback.go",
+      "beforeSHA256": null,
+      "sha256": "68b9242f0ce5a02a943a9f32b7a01d6aa9ae67653199162a826c362961eb80e5",
+      "bytes": 26036
+    },
+    {
+      "target": "server/internal/messagedelivery/kafka_offline_callback_integration_test.go",
+      "beforeSHA256": null,
+      "sha256": "434f029f5e135600af0b00ffb31fe944cf78547cc0a3950a9c24fd59bbf97181",
+      "bytes": 21971
+    },
+    {
+      "target": "server/internal/messagedelivery/kafka_offline_callback_r1_fixture_test.go",
+      "beforeSHA256": null,
+      "sha256": "bef3cbdb6350b22cfc77ca76d385e747e7b8ba3c25c3b3362ebb26fe813f6bb5",
+      "bytes": 6232
+    },
+    {
+      "target": "server/internal/messagedelivery/kafka_offline_callback_reprepare_integration_test.go",
+      "beforeSHA256": null,
+      "sha256": "3d9d354ca7d7214f50925596e86cf06fb9c6ad9c9c78449fc4a9abc1676793e8",
+      "bytes": 8760
+    },
+    {
+      "target": "server/internal/messagedelivery/kafka_offline_callback_test.go",
+      "beforeSHA256": null,
+      "sha256": "0aaaf487affc40e4d3edebe978d4b0f644ba14c879345b0dfa87b4e22dd7ef36",
+      "bytes": 1754
     },
     {
       "target": "server/internal/messagedelivery/kafka_offline_readiness.go",
@@ -6839,8 +7019,8 @@
     {
       "target": "server/internal/messagedelivery/kafka_vendor.go",
       "beforeSHA256": null,
-      "sha256": "fd12b9f83bf3144efc3380fead01325fa4e0eb20f3fe1b95dfb3ace64f60dd94",
-      "bytes": 18965
+      "sha256": "3171ffa41a7c2b4d0604ecf10e4f32c0f32b0ba044d03f2f78d8087a00ce2dd2",
+      "bytes": 21673
     },
     {
       "target": "server/internal/messagedelivery/kafka_vendor_confirmation_integration_test.go",
@@ -6881,8 +7061,8 @@
     {
       "target": "server/internal/messagedelivery/projection.go",
       "beforeSHA256": "37856d9f25a6eaa7336580c04463df94d289075b31db33c99ad393ec1cca7ee6",
-      "sha256": "153437cb6d2459849b42bc58e87dc40776b3123e5f16315176681118fee06701",
-      "bytes": 9946
+      "sha256": "52010d9e3a929f7b31c596792649c6e433616d56953f3f8f6eba2adc636aa9e9",
+      "bytes": 10921
     },
     {
       "target": "server/internal/messagedelivery/sequence.go",
@@ -6893,8 +7073,8 @@
     {
       "target": "server/internal/messagedelivery/visibility.go",
       "beforeSHA256": "2f5a3718ff9cc0e9c2ed37211cdadd8bace19086c463026641500aaac56ed75c",
-      "sha256": "3e34d768a6f3d25876750dc2e1b049e5ca30d0b507b8f5ea835ed2e71a6127c0",
-      "bytes": 11205
+      "sha256": "0299d0c60e59bf58dc8bd529da982831325749cdff5fe1167db123f2d1578820",
+      "bytes": 11852
     },
     {
       "target": "server/internal/msgtransfer/durable_fcm_offline_runtime.go",
@@ -6975,10 +7155,22 @@
       "bytes": 3057
     },
     {
+      "target": "server/internal/msgtransfer/durable_offline_callback_integration_test.go",
+      "beforeSHA256": null,
+      "sha256": "eb319975a5818be2313766bde81eea2b8d17bdb5ceed38a33dc3d579b9c2572b",
+      "bytes": 17158
+    },
+    {
+      "target": "server/internal/msgtransfer/durable_offline_callback_optional_test.go",
+      "beforeSHA256": null,
+      "sha256": "7202e18e7190eec6ebe32ed1923f32107d5383913caaf1985e168bdcf33b84b9",
+      "bytes": 8605
+    },
+    {
       "target": "server/internal/msgtransfer/durable_owned_offline_runtime.go",
       "beforeSHA256": null,
-      "sha256": "7d3c7c8a702bd0f6483a8babd8ce52d55354bbce973494996d89e6ef064cb2ff",
-      "bytes": 6968
+      "sha256": "d747d31559527737fdb4a8abbf8e0b6301cdb8f14897ec330f29e1fc66e53204",
+      "bytes": 9209
     },
     {
       "target": "server/internal/msgtransfer/durable_owned_offline_runtime_test.go",
@@ -7011,6 +7203,30 @@
       "bytes": 6792
     },
     {
+      "target": "server/internal/push/durable_offline_callback.go",
+      "beforeSHA256": null,
+      "sha256": "5cbb48f3856d2985573befeba27f4352442dfac27a42b417d9d1ad5d6a09afe5",
+      "bytes": 8134
+    },
+    {
+      "target": "server/internal/push/durable_offline_callback_owned.go",
+      "beforeSHA256": null,
+      "sha256": "77f0cba3ddad50d04e94b6942c82c9520039469c003f6c7f190a8eb3345e36ea",
+      "bytes": 7579
+    },
+    {
+      "target": "server/internal/push/durable_offline_callback_owned_test.go",
+      "beforeSHA256": null,
+      "sha256": "ae5fb5ea0fb55cd9b0ac34ec4ac41948360e0b2915dd7a99ce36b8784d1bc558",
+      "bytes": 5989
+    },
+    {
+      "target": "server/internal/push/durable_offline_callback_test.go",
+      "beforeSHA256": null,
+      "sha256": "9968e3460cab798a17895a4526445aba04470027db3ec35c619bd13887d425f1",
+      "bytes": 3348
+    },
+    {
       "target": "server/internal/push/durable_online.go",
       "beforeSHA256": "19831f50bb2c8094fbe5049d6e35c62dd64bb5d1e83d9a3a46319de7c73125cb",
       "sha256": "2bc33803fef4e74fd58adfcf290e074bb5acc39117b7a18866eb7aae5f346543",
@@ -7019,8 +7235,8 @@
     {
       "target": "server/internal/push/offlinepush/aliasvendor/kafka_adapter.go",
       "beforeSHA256": null,
-      "sha256": "ed41d566fa0e4af00762e6ae4d92c198f5b770ce1a67b27e9b3ca3e45d87561b",
-      "bytes": 3976
+      "sha256": "6b98fa12a359f2fe60f8bb52eb303214825124c2b3f385ea69aa3e0a8a7fe853",
+      "bytes": 5285
     },
     {
       "target": "server/internal/push/offlinepush/aliasvendor/owned_input_file.go",
@@ -7085,8 +7301,8 @@
     {
       "target": "server/internal/push/offlinepush/fcm/kafka_http_v1.go",
       "beforeSHA256": null,
-      "sha256": "3c9e07e5f38ccccbeacc286e8ad7140d7270ccfdb80db21072e786475462303b",
-      "bytes": 8439
+      "sha256": "5916fec60649fd665cf1f70099a4a7725231dd2b1709475d51b31096bc15e1d2",
+      "bytes": 10330
     },
     {
       "target": "server/internal/push/offlinepush/fcm/owned_credentials_file.go",
@@ -7344,6 +7560,19 @@
         "TestKafkaIntakeMongoFrozenSourceReplayCannotRefreezeRosterOrRevivePlaintext",
         "TestKafkaIntakeMongoOrdinaryAndStoredNotificationUseSameContendedCounter",
         "TestKafkaIntakeMongoSilentNotificationKeepsSeqZeroAndNoHistoryCounter",
+        "TestKafkaOfflineCallbackDecisionPreservesLegacyNilEmptyAndInfoSemantics",
+        "TestKafkaOfflineCallbackMongoActualWorkerConsumesOneFrozenDecisionAndErasesPrivateOutput",
+        "TestKafkaOfflineCallbackMongoClearAfterAttemptNeverPersistsLatePrivateResponse",
+        "TestKafkaOfflineCallbackMongoClearWinsBeforeAttemptCommit",
+        "TestKafkaOfflineCallbackMongoContinueAndRejectedAreDistinctDurableDecisions",
+        "TestKafkaOfflineCallbackMongoForeignResponseNeverGrantsSupplierPermission",
+        "TestKafkaOfflineCallbackMongoKnownZeroHTTPReprepareOnlyNarrowsAndRetainsOldRequestReceipt",
+        "TestKafkaOfflineCallbackMongoLostCommitACKDoesNotGrantHTTPAfterRestart",
+        "TestKafkaOfflineCallbackMongoRetryRevisionOverflowRefusesBeforeAnyReplacement",
+        "TestKafkaOfflineCallbackMongoUnknownCannotBorrowNarrowedSnapshot",
+        "TestKafkaOfflineCallbackMongoUnknownRestartAndOperatorCASNeverReplayOriginalHTTP",
+        "TestKafkaOfflineCallbackMongoWholeOriginalCandidateIsFrozenOnceAcrossPages",
+        "TestKafkaOfflineCallbackOutputDigestBindsSelectionReplacementAndInfo",
         "TestKafkaOnlineMongoPolicyWorkerKeepsKnownOfflineRoutingSeparateFromLostResponse",
         "TestKafkaOnlineMongoRejectsWrongPolicyAndFinalVisibilityLossBeforeTransport",
         "TestKafkaPhysicalPermitMongoClearBeforeFinalAdmissionNeverGrantsPOST",
@@ -7382,9 +7611,30 @@
       ],
       "allowed_legacy_skips": [],
       "required_leaves": [
-        "TestMembershipRemovalNeverGuessesMissingSchemaOwnerOrMalformedWindow/schema",
+        "TestKafkaOfflineCallbackDecisionPreservesLegacyNilEmptyAndInfoSemantics",
+        "TestKafkaOfflineCallbackMongoActualWorkerConsumesOneFrozenDecisionAndErasesPrivateOutput",
+        "TestKafkaOfflineCallbackMongoClearAfterAttemptNeverPersistsLatePrivateResponse",
+        "TestKafkaOfflineCallbackMongoClearWinsBeforeAttemptCommit",
+        "TestKafkaOfflineCallbackMongoContinueAndRejectedAreDistinctDurableDecisions",
+        "TestKafkaOfflineCallbackMongoContinueAndRejectedAreDistinctDurableDecisions/rejected",
+        "TestKafkaOfflineCallbackMongoContinueAndRejectedAreDistinctDurableDecisions/unknown",
+        "TestKafkaOfflineCallbackMongoForeignResponseNeverGrantsSupplierPermission",
+        "TestKafkaOfflineCallbackMongoKnownZeroHTTPReprepareOnlyNarrowsAndRetainsOldRequestReceipt",
+        "TestKafkaOfflineCallbackMongoKnownZeroHTTPReprepareOnlyNarrowsAndRetainsOldRequestReceipt/pending-confirmed/member-leave",
+        "TestKafkaOfflineCallbackMongoKnownZeroHTTPReprepareOnlyNarrowsAndRetainsOldRequestReceipt/pending-confirmed/owner-clear",
+        "TestKafkaOfflineCallbackMongoKnownZeroHTTPReprepareOnlyNarrowsAndRetainsOldRequestReceipt/pending-not-dispatched/member-leave",
+        "TestKafkaOfflineCallbackMongoKnownZeroHTTPReprepareOnlyNarrowsAndRetainsOldRequestReceipt/pending-not-dispatched/owner-clear",
+        "TestKafkaOfflineCallbackMongoLostCommitACKDoesNotGrantHTTPAfterRestart",
+        "TestKafkaOfflineCallbackMongoRetryRevisionOverflowRefusesBeforeAnyReplacement",
+        "TestKafkaOfflineCallbackMongoRetryRevisionOverflowRefusesBeforeAnyReplacement/9223372036854775805",
+        "TestKafkaOfflineCallbackMongoRetryRevisionOverflowRefusesBeforeAnyReplacement/9223372036854775806",
+        "TestKafkaOfflineCallbackMongoUnknownCannotBorrowNarrowedSnapshot",
+        "TestKafkaOfflineCallbackMongoUnknownRestartAndOperatorCASNeverReplayOriginalHTTP",
+        "TestKafkaOfflineCallbackMongoWholeOriginalCandidateIsFrozenOnceAcrossPages",
+        "TestKafkaOfflineCallbackOutputDigestBindsSelectionReplacementAndInfo",
+        "TestMembershipRemovalNeverGuessesMissingSchemaOwnerOrMalformedWindow/closed-field",
         "TestMembershipRemovalNeverGuessesMissingSchemaOwnerOrMalformedWindow/owner",
-        "TestMembershipRemovalNeverGuessesMissingSchemaOwnerOrMalformedWindow/closed-field"
+        "TestMembershipRemovalNeverGuessesMissingSchemaOwnerOrMalformedWindow/schema"
       ],
       "full_package": true,
       "compileOnly": false
@@ -7399,12 +7649,14 @@
         "TestGroupEffectPlanHasStableSeparateBranchIdentityAndNoBorrowedData",
         "TestGroupEffectPlanPreservesExistingNotificationSplit",
         "TestGroupEffectPlanRejectsForeignOrCorruptDurableEffect",
+        "TestManagedOfflineMongoPrivateFactoryWorkerAndRealCallbackHTTPStayInOneBoundLifecycle",
         "TestManagedOrdinaryKafkaReadinessPrecedesConsumerAndHasOwnDeadline",
         "TestManagedOrdinaryKafkaStopRetainsOneCloseAcrossUnconfirmedDeadline",
         "TestManagedOrdinaryKafkaUnknownSourceStopsWithoutLosingFailureOnCleanShutdown",
         "TestOwnedKafkaPolicyKeepsCallbackTriStateAndRejectsUnknownVendor",
         "TestOwnedKafkaPolicyPreservesEnabledCallbackAndVendorBindingsAcrossConfigChanges",
         "TestOwnedOfflineDrainFileDurablyBindsSummaryAndNeverClobbersExistingReceipt",
+        "TestOwnedOfflineOptionalCallbackFactoryNeverBoxesNilAcrossCurrentAndRetainedVendors",
         "TestOwnedOfflineRuntimeConstructsMixedAliasAndNoneWithoutDBOrProviderDispatch",
         "TestOwnedOfflineRuntimeRejectsMissingPrivateMaterialAndCurrentMetadataMismatch",
         "TestOwnedOfflineWorkerCloseErrorAndDuplicatePolicyNeverCreateDrainAuthority",
@@ -7417,7 +7669,12 @@
       "allowed_legacy_skips": [
         "TestActualKafkaMongoFailureRetainsOffsetAndCacheUntilRecovery"
       ],
-      "required_leaves": [],
+      "required_leaves": [
+        "TestManagedOfflineMongoPrivateFactoryWorkerAndRealCallbackHTTPStayInOneBoundLifecycle",
+        "TestOwnedOfflineOptionalCallbackFactoryNeverBoxesNilAcrossCurrentAndRetainedVendors",
+        "TestOwnedOfflineOptionalCallbackFactoryNeverBoxesNilAcrossCurrentAndRetainedVendors/disabled-current-enabled-retained",
+        "TestOwnedOfflineOptionalCallbackFactoryNeverBoxesNilAcrossCurrentAndRetainedVendors/enabled-current-disabled-retained"
+      ],
       "full_package": true,
       "compileOnly": false
     },
@@ -7431,10 +7688,25 @@
         "TestKafkaPushCallbackEndpointFreezesExactOwnedPolicyAndContinuationMode",
         "TestKafkaPushCallbackPreservesLegacyOnlineDTOsAndContentExtraction",
         "TestKafkaPushCallbackRequestUsesOriginalSigningContractWithoutReplayableBody",
-        "TestKafkaPushCallbackResponseSeparatesSemanticRejectionFromUnknownTransport"
+        "TestKafkaPushCallbackResponseSeparatesSemanticRejectionFromUnknownTransport",
+        "TestOfflineCallbackBodyUsesOriginalCompleteLegacyDTO",
+        "TestOfflineCallbackParserAmbiguousNestedOutputIsUnknown",
+        "TestOfflineCallbackParserKeepsLegacyEmptyOverrideInfoAndRejection",
+        "TestOwnedOfflineCallbackLoaderBindsActualCurrentAndRetainedMaterialWithoutNetwork",
+        "TestOwnedOfflineCallbackMissingForeignChangedOrPublicFileRejects"
       ],
       "allowed_legacy_skips": [],
-      "required_leaves": [],
+      "required_leaves": [
+        "TestOfflineCallbackBodyUsesOriginalCompleteLegacyDTO",
+        "TestOfflineCallbackParserAmbiguousNestedOutputIsUnknown",
+        "TestOfflineCallbackParserKeepsLegacyEmptyOverrideInfoAndRejection",
+        "TestOwnedOfflineCallbackLoaderBindsActualCurrentAndRetainedMaterialWithoutNetwork",
+        "TestOwnedOfflineCallbackMissingForeignChangedOrPublicFileRejects",
+        "TestOwnedOfflineCallbackMissingForeignChangedOrPublicFileRejects/foreign-db",
+        "TestOwnedOfflineCallbackMissingForeignChangedOrPublicFileRejects/missing",
+        "TestOwnedOfflineCallbackMissingForeignChangedOrPublicFileRejects/missing-retained",
+        "TestOwnedOfflineCallbackMissingForeignChangedOrPublicFileRejects/wrong-pin"
+      ],
       "full_package": true,
       "compileOnly": false
     },
@@ -7489,8 +7761,8 @@
         "TestFCMHTTPV1OwnedCredentialsBindActualMaterialAndNeverDiscoverOrAuthenticateAtConstruction/foreign-token-uri",
         "TestFCMHTTPV1OwnedCredentialsBindActualMaterialAndNeverDiscoverOrAuthenticateAtConstruction/metadata-discovery",
         "TestFCMHTTPV1OwnedCredentialsBindActualMaterialAndNeverDiscoverOrAuthenticateAtConstruction/wrong-key",
-        "TestFCMOwnedRegistryRejectsAmbiguousFieldsDuplicatesAndForeignBindings/database",
         "TestFCMOwnedRegistryRejectsAmbiguousFieldsDuplicatesAndForeignBindings/case-alias",
+        "TestFCMOwnedRegistryRejectsAmbiguousFieldsDuplicatesAndForeignBindings/database",
         "TestFCMOwnedRegistryRejectsAmbiguousFieldsDuplicatesAndForeignBindings/duplicate-nested",
         "TestFCMOwnedRegistryRejectsAmbiguousFieldsDuplicatesAndForeignBindings/duplicate-policy",
         "TestFCMOwnedRegistryRejectsAmbiguousFieldsDuplicatesAndForeignBindings/foreign-policy"
@@ -7897,22 +8169,22 @@
       "full_package": true,
       "allowed_legacy_skips": [],
       "required_leaves": [
-        "TestAliasHTTPValidProviderAcceptanceUsesOneRequestAndDoesNotClaimDeviceDelivery/getui",
-        "TestAliasHTTPValidProviderAcceptanceUsesOneRequestAndDoesNotClaimDeviceDelivery/jpush",
-        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/lost-ack",
-        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/jpush-error-case",
-        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/jpush-duplicate",
-        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/jpush-wrong-correlation",
+        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/getui-extra-task",
         "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/getui-nested-duplicate",
         "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/getui-unknown-status",
-        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/getui-extra-task",
         "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/getui-wrong-code-case",
-        "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/duplicate",
+        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/jpush-duplicate",
+        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/jpush-error-case",
+        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/jpush-wrong-correlation",
+        "TestAliasHTTPAmbiguousOrLostResponseNeverRetriesOrClaimsAcceptance/lost-ack",
+        "TestAliasHTTPValidProviderAcceptanceUsesOneRequestAndDoesNotClaimDeviceDelivery/getui",
+        "TestAliasHTTPValidProviderAcceptanceUsesOneRequestAndDoesNotClaimDeviceDelivery/jpush",
         "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/case",
+        "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/credential-on-none",
+        "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/duplicate",
         "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/foreign-epoch",
         "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/missing-current",
-        "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/repeated-entry",
-        "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/credential-on-none"
+        "TestAliasOwnedRegistryRejectsNestedAmbiguityForeignEpochAndMissingCurrent/repeated-entry"
       ],
       "expected_sub": 16,
       "top_tests": [
@@ -7930,17 +8202,17 @@
       "full_package": true,
       "allowed_legacy_skips": [],
       "required_leaves": [
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-vendor",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-protocol",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-body",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-request-id",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/attempt",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/request",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/instance",
         "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/active-worker",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/open-pools",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/attempt",
         "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/different-policy",
-        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/duplicate-policy"
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/duplicate-policy",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-body",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-protocol",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-request-id",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/foreign-vendor",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/instance",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/open-pools",
+        "TestOrdinaryAliasOperatorForeignProofAndUndrainedInstanceRejectBeforeConnection/request"
       ],
       "expected_sub": 11,
       "top_tests": [
@@ -8001,10 +8273,39 @@
       ],
       "full_package": true,
       "compileOnly": false
+    },
+    "cmd/tools/ordinary-callback-receipts": {
+      "full_package": true,
+      "allowed_legacy_skips": [],
+      "required_leaves": [
+        "TestCallbackOperatorDefaultInspectIsReadOnlyAndDisconnectIsChecked",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/active",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/attempt",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/body",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/foreign-instance",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/input",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/policy",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/pools",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject/response",
+        "TestCallbackOperatorKnownCommitIsNotRolledBackByLocalCleanup",
+        "TestCallbackOperatorNonemptyLineageInspectJSONIsConfirmableAndStaleReceiptStillRejects",
+        "TestCallbackOperatorStaleExpectedCannotBorrowNewerRecord",
+        "TestCallbackOperatorUnknownConfirmIsDurableOnceAndNeverAutoReplayed"
+      ],
+      "expected_sub": 8,
+      "top_tests": [
+        "TestCallbackOperatorDefaultInspectIsReadOnlyAndDisconnectIsChecked",
+        "TestCallbackOperatorForeignResponseProofAndActiveInstanceReject",
+        "TestCallbackOperatorKnownCommitIsNotRolledBackByLocalCleanup",
+        "TestCallbackOperatorNonemptyLineageInspectJSONIsConfirmableAndStaleReceiptStillRejects",
+        "TestCallbackOperatorStaleExpectedCannotBorrowNewerRecord",
+        "TestCallbackOperatorUnknownConfirmIsDurableOnceAndNeverAutoReplayed"
+      ]
     }
   },
-  "expected_top_source_inventory": 402,
-  "expected_required_pass": 395,
+  "expected_top_source_inventory": 428,
+  "expected_required_pass": 421,
   "allowed_legacy_skip_count": 7,
   "dependencies": [
     {
@@ -8025,7 +8326,7 @@
     {
       "path": "ci/group-stage3/inputs.json",
       "bytes": 1142755,
-      "sha256": "2f1aa3aa2622f9c2158d258a4f44be581323b029403c7350419da4eb4a1cccba"
+      "sha256": "eae319b7a57755e71813e8f26f5c5234ec575a7299fdf4d581de0bf9b571cb3b"
     },
     {
       "path": "ci/group-effects/resource_guard.py",
@@ -8039,8 +8340,8 @@
     },
     {
       "path": ".github/workflows/group-stage3-source.yml",
-      "bytes": 2962,
-      "sha256": "46556ba5d35fc59c20ceec350cada7b91a9915b05e5865735afd2b75a3a24592"
+      "bytes": 2444,
+      "sha256": "cc84bf396672cc9e52302ba9033858d75446735fa1234ee023ffc211d9065e2b"
     }
   ],
   "limitations": [
@@ -8088,6 +8389,62 @@
       "target": "server/cmd/tools/ordinary-alias-receipts/main_test.go",
       "bytes": 11866,
       "sha256": "3256d2ee9e78d79ea9803b5956058d125c9d969c3413c22730834e2c1ac0b911",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-callback-receipts/backend.go",
+      "target": "server/cmd/tools/ordinary-callback-receipts/backend.go",
+      "bytes": 2987,
+      "sha256": "2483a2b406cad0e633f5ba24b2f92ce012c23d18117f29ff44577670ea7b623b",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-callback-receipts/decode.go",
+      "target": "server/cmd/tools/ordinary-callback-receipts/decode.go",
+      "bytes": 822,
+      "sha256": "9e76b928eee25bbe074716db3e179e2160edc9705fdfa56e5f2c53cb80bf3b37",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-callback-receipts/input.go",
+      "target": "server/cmd/tools/ordinary-callback-receipts/input.go",
+      "bytes": 7521,
+      "sha256": "5816ec51ab997c5464524028cab8a204016b92ca8d7be52fe083350d33afeecc",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-callback-receipts/journal.go",
+      "target": "server/cmd/tools/ordinary-callback-receipts/journal.go",
+      "bytes": 3224,
+      "sha256": "dd4cf2ffe10819b995ae043dafa43e46ff9ad3999bf4f8e3e3c294602add8c2e",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-callback-receipts/lineage_test.go",
+      "target": "server/cmd/tools/ordinary-callback-receipts/lineage_test.go",
+      "bytes": 2762,
+      "sha256": "6ba5e00881a8e313474bcd02b46d590e53d4804baad165bc974948c8bc4a31b9",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-callback-receipts/main.go",
+      "target": "server/cmd/tools/ordinary-callback-receipts/main.go",
+      "bytes": 8839,
+      "sha256": "72f3a2cf40f4e654fb570492e29699aa3fe36b54fe704f01552d6b73e25a10a1",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/cmd/tools/ordinary-callback-receipts/main_test.go",
+      "target": "server/cmd/tools/ordinary-callback-receipts/main_test.go",
+      "bytes": 8620,
+      "sha256": "d77cdd7eeb233d45fe95d19ac7acc936192610cec6a5ec8871a312c967dc1f9c",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -8182,8 +8539,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_alias_vendor.go",
       "target": "server/internal/messagedelivery/kafka_alias_vendor.go",
-      "bytes": 12002,
-      "sha256": "5f80a075d03836b1ddb45e85c5f7c8995057fbf3faec02c3f5fcbbab5a0cf5f8",
+      "bytes": 13525,
+      "sha256": "420d55ef6ff479a31a1401217f4f723af09f233840d56e035daaafd9f1c92f79",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -8214,8 +8571,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_fcm_devices.go",
       "target": "server/internal/messagedelivery/kafka_fcm_devices.go",
-      "bytes": 17002,
-      "sha256": "2815648c23dfac4262ebe515b4bc2977660fc6854b7a15486008bc32ac9fe3b4",
+      "bytes": 18870,
+      "sha256": "e9ab3a91c6e17ca00d22faeca0aadd1b6409b34cb3312e7dd8b1ce84b6e7b435",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -8246,8 +8603,48 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_offline.go",
       "target": "server/internal/messagedelivery/kafka_offline.go",
-      "bytes": 12867,
-      "sha256": "0735d71f87a41f3124fe4a3edddac5e1021b9cb7b57c7d64443d32b986553a7a",
+      "bytes": 15050,
+      "sha256": "85f7f08e621cc18767e38b6cd2b6358f3bcf4c7c2c5af02715eae8aa76d3770f",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_offline_callback.go",
+      "target": "server/internal/messagedelivery/kafka_offline_callback.go",
+      "bytes": 26036,
+      "sha256": "68b9242f0ce5a02a943a9f32b7a01d6aa9ae67653199162a826c362961eb80e5",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_offline_callback_integration_test.go",
+      "target": "server/internal/messagedelivery/kafka_offline_callback_integration_test.go",
+      "bytes": 21971,
+      "sha256": "434f029f5e135600af0b00ffb31fe944cf78547cc0a3950a9c24fd59bbf97181",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_offline_callback_r1_fixture_test.go",
+      "target": "server/internal/messagedelivery/kafka_offline_callback_r1_fixture_test.go",
+      "bytes": 6232,
+      "sha256": "bef3cbdb6350b22cfc77ca76d385e747e7b8ba3c25c3b3362ebb26fe813f6bb5",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_offline_callback_reprepare_integration_test.go",
+      "target": "server/internal/messagedelivery/kafka_offline_callback_reprepare_integration_test.go",
+      "bytes": 8760,
+      "sha256": "3d9d354ca7d7214f50925596e86cf06fb9c6ad9c9c78449fc4a9abc1676793e8",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_offline_callback_test.go",
+      "target": "server/internal/messagedelivery/kafka_offline_callback_test.go",
+      "bytes": 1754,
+      "sha256": "0aaaf487affc40e4d3edebe978d4b0f644ba14c879345b0dfa87b4e22dd7ef36",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -8342,8 +8739,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_vendor.go",
       "target": "server/internal/messagedelivery/kafka_vendor.go",
-      "bytes": 18965,
-      "sha256": "fd12b9f83bf3144efc3380fead01325fa4e0eb20f3fe1b95dfb3ace64f60dd94",
+      "bytes": 21673,
+      "sha256": "3171ffa41a7c2b4d0604ecf10e4f32c0f32b0ba044d03f2f78d8087a00ce2dd2",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -8398,8 +8795,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/projection.go",
       "target": "server/internal/messagedelivery/projection.go",
-      "bytes": 9946,
-      "sha256": "153437cb6d2459849b42bc58e87dc40776b3123e5f16315176681118fee06701",
+      "bytes": 10921,
+      "sha256": "52010d9e3a929f7b31c596792649c6e433616d56953f3f8f6eba2adc636aa9e9",
       "mode": "0o644",
       "beforeSHA256": "37856d9f25a6eaa7336580c04463df94d289075b31db33c99ad393ec1cca7ee6"
     },
@@ -8414,8 +8811,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/visibility.go",
       "target": "server/internal/messagedelivery/visibility.go",
-      "bytes": 11205,
-      "sha256": "3e34d768a6f3d25876750dc2e1b049e5ca30d0b507b8f5ea835ed2e71a6127c0",
+      "bytes": 11852,
+      "sha256": "0299d0c60e59bf58dc8bd529da982831325749cdff5fe1167db123f2d1578820",
       "mode": "0o644",
       "beforeSHA256": "2f5a3718ff9cc0e9c2ed37211cdadd8bace19086c463026641500aaac56ed75c"
     },
@@ -8524,10 +8921,26 @@
       "beforeSHA256": null
     },
     {
+      "path": "ci/candidates/group-ordinary/source/server/internal/msgtransfer/durable_offline_callback_integration_test.go",
+      "target": "server/internal/msgtransfer/durable_offline_callback_integration_test.go",
+      "bytes": 17158,
+      "sha256": "eb319975a5818be2313766bde81eea2b8d17bdb5ceed38a33dc3d579b9c2572b",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/msgtransfer/durable_offline_callback_optional_test.go",
+      "target": "server/internal/msgtransfer/durable_offline_callback_optional_test.go",
+      "bytes": 8605,
+      "sha256": "7202e18e7190eec6ebe32ed1923f32107d5383913caaf1985e168bdcf33b84b9",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
       "path": "ci/candidates/group-ordinary/source/server/internal/msgtransfer/durable_owned_offline_runtime.go",
       "target": "server/internal/msgtransfer/durable_owned_offline_runtime.go",
-      "bytes": 6968,
-      "sha256": "7d3c7c8a702bd0f6483a8babd8ce52d55354bbce973494996d89e6ef064cb2ff",
+      "bytes": 9209,
+      "sha256": "d747d31559527737fdb4a8abbf8e0b6301cdb8f14897ec330f29e1fc66e53204",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -8572,6 +8985,38 @@
       "beforeSHA256": null
     },
     {
+      "path": "ci/candidates/group-ordinary/source/server/internal/push/durable_offline_callback.go",
+      "target": "server/internal/push/durable_offline_callback.go",
+      "bytes": 8134,
+      "sha256": "5cbb48f3856d2985573befeba27f4352442dfac27a42b417d9d1ad5d6a09afe5",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/push/durable_offline_callback_owned.go",
+      "target": "server/internal/push/durable_offline_callback_owned.go",
+      "bytes": 7579,
+      "sha256": "77f0cba3ddad50d04e94b6942c82c9520039469c003f6c7f190a8eb3345e36ea",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/push/durable_offline_callback_owned_test.go",
+      "target": "server/internal/push/durable_offline_callback_owned_test.go",
+      "bytes": 5989,
+      "sha256": "ae5fb5ea0fb55cd9b0ac34ec4ac41948360e0b2915dd7a99ce36b8784d1bc558",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
+      "path": "ci/candidates/group-ordinary/source/server/internal/push/durable_offline_callback_test.go",
+      "target": "server/internal/push/durable_offline_callback_test.go",
+      "bytes": 3348,
+      "sha256": "9968e3460cab798a17895a4526445aba04470027db3ec35c619bd13887d425f1",
+      "mode": "0o644",
+      "beforeSHA256": null
+    },
+    {
       "path": "ci/candidates/group-ordinary/source/server/internal/push/durable_online.go",
       "target": "server/internal/push/durable_online.go",
       "bytes": 10087,
@@ -8582,8 +9027,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/push/offlinepush/aliasvendor/kafka_adapter.go",
       "target": "server/internal/push/offlinepush/aliasvendor/kafka_adapter.go",
-      "bytes": 3976,
-      "sha256": "ed41d566fa0e4af00762e6ae4d92c198f5b770ce1a67b27e9b3ca3e45d87561b",
+      "bytes": 5285,
+      "sha256": "6b98fa12a359f2fe60f8bb52eb303214825124c2b3f385ea69aa3e0a8a7fe853",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -8670,8 +9115,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/push/offlinepush/fcm/kafka_http_v1.go",
       "target": "server/internal/push/offlinepush/fcm/kafka_http_v1.go",
-      "bytes": 8439,
-      "sha256": "3c9e07e5f38ccccbeacc286e8ad7140d7270ccfdb80db21072e786475462303b",
+      "bytes": 10330,
+      "sha256": "5916fec60649fd665cf1f70099a4a7725231dd2b1709475d51b31096bc15e1d2",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -9617,24 +10062,24 @@
       "target": "server/internal/messagedelivery/kafka_alias_vendor.go",
       "bytes": 10839,
       "sha256": "cfd9624e5ed33af3c34d37915da6789fc2a52d8a64e7f57a2985f756fbcea336",
-      "afterSHA256": "5f80a075d03836b1ddb45e85c5f7c8995057fbf3faec02c3f5fcbbab5a0cf5f8"
+      "afterSHA256": "420d55ef6ff479a31a1401217f4f723af09f233840d56e035daaafd9f1c92f79"
     },
     {
       "path": "ci/candidates/group-ordinary/before-physical/server/internal/messagedelivery/kafka_fcm_devices.go",
       "target": "server/internal/messagedelivery/kafka_fcm_devices.go",
       "bytes": 15644,
       "sha256": "dda71e9cc47c1561e6918a6ea67a0733ef3735de3ce9e48325188f010829cef6",
-      "afterSHA256": "2815648c23dfac4262ebe515b4bc2977660fc6854b7a15486008bc32ac9fe3b4"
+      "afterSHA256": "e9ab3a91c6e17ca00d22faeca0aadd1b6409b34cb3312e7dd8b1ce84b6e7b435"
     },
     {
       "path": "ci/candidates/group-ordinary/before-physical/server/internal/messagedelivery/kafka_vendor.go",
       "target": "server/internal/messagedelivery/kafka_vendor.go",
       "bytes": 17595,
       "sha256": "dbbefedc5eb20fbed53143ddb1611149e7ec9e6f2820262df445868f2da8dce7",
-      "afterSHA256": "fd12b9f83bf3144efc3380fead01325fa4e0eb20f3fe1b95dfb3ace64f60dd94"
+      "afterSHA256": "3171ffa41a7c2b4d0604ecf10e4f32c0f32b0ba044d03f2f78d8087a00ce2dd2"
     }
   ],
-  "physical_before_effective_digest": "7c77ebed3319e8bf895eea8c815c4cbbea66d5c8d8cdd380a325fff8eb84b1eb",
+  "physical_before_effective_digest": "95524e744797410a62aa9cdd1f8a390d6d68dbe1ba1439784c4f5512772635ff",
   "physical_before_contract": {
     "onlyProductRestore": [
       "kafka_alias_vendor.go",
@@ -10672,5 +11117,1032 @@
       "bytes": 3502,
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
-  ]
+  ],
+  "inherited1100_test_files": [
+    {
+      "path": "server/cmd/tools/group-effect-recovery/main_test.go",
+      "bytes": 6587,
+      "sha256": "5c3f97851437187a4827cd70f34fd8281e9da5b7db7c66e37503f22dac915348"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-alias-receipts/main_test.go",
+      "bytes": 11866,
+      "sha256": "3256d2ee9e78d79ea9803b5956058d125c9d969c3413c22730834e2c1ac0b911"
+    },
+    {
+      "path": "server/cmd/tools/ordinary-device-receipts/main_test.go",
+      "bytes": 11415,
+      "sha256": "42ba17a45e193890cd8fba2acf62c4155f043dfd539ff4de2b6cd68602ec9868"
+    },
+    {
+      "path": "server/internal/admincapability/guard_test.go",
+      "bytes": 10736,
+      "sha256": "64e2b36047498be0dee07d13b57ae51061244f55622ba2774a9296e69ba03085"
+    },
+    {
+      "path": "server/internal/admincutover/cutover_test.go",
+      "bytes": 2635,
+      "sha256": "6df2ffde6f419e3451928648acadf13fbb1a2cf297e7cf393c75a15aca9666ab"
+    },
+    {
+      "path": "server/internal/adminpreview/codec_test.go",
+      "bytes": 1569,
+      "sha256": "543a9e3e1cbc8955d19a77652cc1a7e7e9c8e380d577db511e954d1d743af165"
+    },
+    {
+      "path": "server/internal/adminpreview/service_test.go",
+      "bytes": 7954,
+      "sha256": "c311de55e295e7592cc6c4c38551c31a6088e23f68b752593a999d16234f1730"
+    },
+    {
+      "path": "server/internal/adminpreview/storage_integration_test.go",
+      "bytes": 7139,
+      "sha256": "806f951a056ed4622f9d033b69fe70185b6011b50380da0ccf59103bbd648948"
+    },
+    {
+      "path": "server/internal/api/admin_preview_integration_test.go",
+      "bytes": 8152,
+      "sha256": "5abd3333f3f807643ce6ef8291dd5751ee92108e91f89bf1b457026f95fba33a"
+    },
+    {
+      "path": "server/internal/api/evidence_url_test.go",
+      "bytes": 1615,
+      "sha256": "704e3d3ed816c4005dcc3773fd75b02a1db9d86778cb13fd5d897e0347ba5d7a"
+    },
+    {
+      "path": "server/internal/api/evidence_verification_test.go",
+      "bytes": 5926,
+      "sha256": "2eccceaf535adb87c503d406598c12a33ce1464c3cff83039530ee4c8a86f646"
+    },
+    {
+      "path": "server/internal/api/favorite_integration_test.go",
+      "bytes": 4344,
+      "sha256": "fd1dd7cb2ca0f58b792af9630af36d77fdb5a0b72ed668858a2774bd9403ad12"
+    },
+    {
+      "path": "server/internal/api/favorite_source_test.go",
+      "bytes": 8162,
+      "sha256": "eb61c1a21e9a5c32a2e820e684bd455d438099c0dc5d62beb286e4f153c9c14e"
+    },
+    {
+      "path": "server/internal/api/meeting_booking_test.go",
+      "bytes": 16345,
+      "sha256": "859846e47f24aa5519c763766a80147f976322c262646c115235bdc2ac84788d"
+    },
+    {
+      "path": "server/internal/api/registration_proof_test.go",
+      "bytes": 7857,
+      "sha256": "af78de84531cf3c2c0f8195c2c7d27a993b4ec3c258817adefe91587ec9a10f7"
+    },
+    {
+      "path": "server/internal/api/retention_policy_test.go",
+      "bytes": 2742,
+      "sha256": "6e17fdb96df0af9889d34fff4338e67856ad467ad851be1d54222146258ce7a6"
+    },
+    {
+      "path": "server/internal/api/service_integration_fixture_test.go",
+      "bytes": 2084,
+      "sha256": "40c8e65164f4a825b9717ec244ffc864b5d1a72131328e76333efd527c2f9b54"
+    },
+    {
+      "path": "server/internal/api/session_logout_integration_test.go",
+      "bytes": 5729,
+      "sha256": "19ee0ae02a473f63d1e8488e252eeebf011953094bff07f3ba79055a2987f157"
+    },
+    {
+      "path": "server/internal/favorite/mongo_integration_test.go",
+      "bytes": 9815,
+      "sha256": "601649caeac0d41f321ad54fc91bad18ac52e0a35fb9b2b3e965a6696c3ea0e8"
+    },
+    {
+      "path": "server/internal/favorite/retention_test.go",
+      "bytes": 8006,
+      "sha256": "8080e80e4af83a61770fdec811934368af98e3ea1addd9f3f9da316ecf1cdaba"
+    },
+    {
+      "path": "server/internal/groupauthority/authority_test.go",
+      "bytes": 6232,
+      "sha256": "4e1edb1885f75c54b73ae431bbebb04fb7dc4f4c321940bf6157cd49abab0823"
+    },
+    {
+      "path": "server/internal/groupauthority/barrier_adapter_test.go",
+      "bytes": 478,
+      "sha256": "66f862838d62ee91f9eeec523f77f7f1ed195a450fb7ece3afb9c0adb5869aa6"
+    },
+    {
+      "path": "server/internal/groupauthority/barrier_integration_test.go",
+      "bytes": 4996,
+      "sha256": "445d2eb30d8542d241df475cb09b534d581761b9d6add94c37f1aca50be7e1a7"
+    },
+    {
+      "path": "server/internal/groupauthority/membership_boundary_scope_test.go",
+      "bytes": 590,
+      "sha256": "ae82b90e26c37090dea0c2fb7a796b49bf5e12dfc4d77533908ce27eedb0a81e"
+    },
+    {
+      "path": "server/internal/groupauthority/mongo_fixture_test.go",
+      "bytes": 5046,
+      "sha256": "239a4c6d51ccf97cebe039235fd769a6915fb8bddf3e98b30b19f2fbc1b4d4ea"
+    },
+    {
+      "path": "server/internal/groupauthority/mongo_integration_test.go",
+      "bytes": 21136,
+      "sha256": "c3da81413361c3366d318454be13cea116e4e89ec8efcdd7fddbcdaeda6ed9c3"
+    },
+    {
+      "path": "server/internal/groupauthority/notice_scope_test.go",
+      "bytes": 2287,
+      "sha256": "f586f95c9207a601e12892651af71f2eb6600e9a619a10a7c07a796c39adf626"
+    },
+    {
+      "path": "server/internal/groupauthority/recovery_test.go",
+      "bytes": 1187,
+      "sha256": "770ec5ff4005c3d0b69daa9ed4335c01bbb78eba60c8256be70070a12e09691c"
+    },
+    {
+      "path": "server/internal/groupauthority/transaction_test.go",
+      "bytes": 8708,
+      "sha256": "3b195e0cce39a6f6a0227977b4688b1844a25fab466da06fff5291bea00829c2"
+    },
+    {
+      "path": "server/internal/groupcleanup/mongo_fixture_test.go",
+      "bytes": 7841,
+      "sha256": "3a68ffd2c046699d30e72c68c77eaa92483ede18bcc18d2453578a8509abfec6"
+    },
+    {
+      "path": "server/internal/groupcleanup/mongo_integration_test.go",
+      "bytes": 6602,
+      "sha256": "eb6fc5346fe57f421da508a9b07eddb40087c33d95838d8d18db409c9590ba7c"
+    },
+    {
+      "path": "server/internal/groupcleanup/types_test.go",
+      "bytes": 3580,
+      "sha256": "8f6d79bc9581ea2dbca44b6dfb51095013af92b06327f3833ba49ce9946e375a"
+    },
+    {
+      "path": "server/internal/groupdelivery/activation_test.go",
+      "bytes": 3738,
+      "sha256": "8f867e1cf25725dc103c05565957b1fa27e7b27f1f4ba98427ef1ac54c1c96fa"
+    },
+    {
+      "path": "server/internal/groupeffects/callback_dispatch_test.go",
+      "bytes": 2691,
+      "sha256": "dbe698261e2d83cf820b57029be31adde0e9932650e0d39c8a3f51574823dc99"
+    },
+    {
+      "path": "server/internal/groupeffects/callback_http_integration_test.go",
+      "bytes": 6558,
+      "sha256": "12d7ce8860112d6ea061efa5d5a03628e47a31d59c0622d5b20ce22a5e997949"
+    },
+    {
+      "path": "server/internal/groupeffects/catalog_integration_test.go",
+      "bytes": 1487,
+      "sha256": "0e2cb8082bbba324b89de14302e7b587676867c16ea54570c93d686728d46ce1"
+    },
+    {
+      "path": "server/internal/groupeffects/mongo_fixture_test.go",
+      "bytes": 4608,
+      "sha256": "643b8147224861f0c22d579a9ab1d19ea6fd36323d449ca1c09a9d0c062a815d"
+    },
+    {
+      "path": "server/internal/groupeffects/mongo_integration_test.go",
+      "bytes": 7682,
+      "sha256": "5712bec8bf74396fd83b9f1cd43c075aa9d2664ff3c06e665ab1aa850dfe3bcb"
+    },
+    {
+      "path": "server/internal/groupeffects/mongo_wire_fault_test.go",
+      "bytes": 4398,
+      "sha256": "b05e81a70ca6eee57556c364c853bc835c4ce29335fdb8e18b2810870498cd27"
+    },
+    {
+      "path": "server/internal/groupeffects/types_test.go",
+      "bytes": 7936,
+      "sha256": "6328390adfccb73bd91fd2b7ee1ccdc1b415e937d42babb9bdc183f71b7f6583"
+    },
+    {
+      "path": "server/internal/meetingbooking/capability_list_test.go",
+      "bytes": 3792,
+      "sha256": "ebb871c28a35d4b697a26078a73b9f25e2e4163d9fdaea26840764d00475d2db"
+    },
+    {
+      "path": "server/internal/meetingbooking/indexes_test.go",
+      "bytes": 21190,
+      "sha256": "b44ed146cf4a158664a1d8a180909c2b7eb8a296874e331057ab999a25c8f1f1"
+    },
+    {
+      "path": "server/internal/meetingbooking/integrity_test.go",
+      "bytes": 2131,
+      "sha256": "c77a21defde118b4b472d230ecbc73701974fa2d3c313098eb0dae68f701484e"
+    },
+    {
+      "path": "server/internal/meetingbooking/mongo_integration_test.go",
+      "bytes": 12829,
+      "sha256": "eb3a7f31cb1423c47438940a3eb27b56059b26233f800956813cd5889e2aba34"
+    },
+    {
+      "path": "server/internal/meetingbooking/service_test.go",
+      "bytes": 14031,
+      "sha256": "174a27ceccacebf000a25a5290325d525acfee2d35896e8301d0f98390f2de00"
+    },
+    {
+      "path": "server/internal/messagedelivery/commit_wire_integration_test.go",
+      "bytes": 6236,
+      "sha256": "eab3732a0be8046501d284a50b1df2e8bbac1d000d0d91cb15805abaeb3be378"
+    },
+    {
+      "path": "server/internal/messagedelivery/group_accept_integration_test.go",
+      "bytes": 7810,
+      "sha256": "48f9da7c10ef8e21906399ea0227a1ccef01da8896ff2f0b2e593a20bdaeb5d0"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_alias_vendor_integration_test.go",
+      "bytes": 9151,
+      "sha256": "5acf6c15ea481b72574a2afb01d7c706969a20af13a614dbe8378650e9dfd468"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_fcm_devices_integration_test.go",
+      "bytes": 11144,
+      "sha256": "4729efb640bcb2a2f1c74d98d85b7a37850b2ceb5e475764e75964f7aedd9b09"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_intake_integration_test.go",
+      "bytes": 16913,
+      "sha256": "0dea5a26c200f1057bea5cac54352fc60fe4ad8555162acbf9e0c6039f00ffd5"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_offline_readiness_integration_test.go",
+      "bytes": 2044,
+      "sha256": "31f78500c0625806fe87c16836f8686df95e74ec2fc84ef4d0b70a551de5685d"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_online_integration_test.go",
+      "bytes": 4596,
+      "sha256": "08d2ce2097fc4f0f10aed6d9c7e8d02d0c0b96238b403d770f0b98a53700e0c1"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_physical_permit_integration_test.go",
+      "bytes": 15004,
+      "sha256": "9f316214c218ef815decb36ffc9c6abbf996ac27643946bfb7b2c68da09ad2e9"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_push_callback_integration_test.go",
+      "bytes": 8776,
+      "sha256": "2920a00211d0a0b05ad9ad1f260b6b50ce5194c51e6c1570188e7ecee782eca7"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_recipients_test.go",
+      "bytes": 3226,
+      "sha256": "5f15415f22cc4dd0f5a7322e03cb3188b64bd8a99f480006507c803153c5e696"
+    },
+    {
+      "path": "server/internal/messagedelivery/kafka_vendor_confirmation_integration_test.go",
+      "bytes": 5500,
+      "sha256": "0605c4b9342f4bdc4414528a18ec7c3e86289ebc4a0bcf80ddc51abe6a1e4317"
+    },
+    {
+      "path": "server/internal/messagedelivery/membership_boundary_integration_test.go",
+      "bytes": 12216,
+      "sha256": "30cf799fd1f86f7c5dcb9a8bb9c6429e75bd76874cec34675ed9d827db97e939"
+    },
+    {
+      "path": "server/internal/messagedelivery/membership_boundary_test.go",
+      "bytes": 2682,
+      "sha256": "482507e8f8c93086e9b2c8514835dd30e55ec1f918114c3ed02520efef9b6623"
+    },
+    {
+      "path": "server/internal/messagedelivery/membership_reader_integration_test.go",
+      "bytes": 4309,
+      "sha256": "7646c1cc8f69bbb561f50558836db32eedc6f5bbf1afac43d574213345ffb7a9"
+    },
+    {
+      "path": "server/internal/messagedelivery/membership_reader_test.go",
+      "bytes": 1365,
+      "sha256": "fb00cf2ba61891a4b96d9ce3975b3e9e0997b2b7a5350baaff69b1ac6bb88dbe"
+    },
+    {
+      "path": "server/internal/messagedelivery/mongo_fixture_test.go",
+      "bytes": 6542,
+      "sha256": "b759fc0a83fdae653314728e32140be522b622e7f8ec8bc4b469cb1b5b1a31dd"
+    },
+    {
+      "path": "server/internal/messagedelivery/mongo_integration_test.go",
+      "bytes": 13124,
+      "sha256": "87f5d75e593c4bfc8a930f0db3f8a3865f9d2e06f0c6c555a5d552c194a25f8c"
+    },
+    {
+      "path": "server/internal/messagedelivery/online_integration_test.go",
+      "bytes": 5556,
+      "sha256": "88ad8b13f27eec4a480be513a6a96a9b0e8ca61a1c5e381f466774921e82dc95"
+    },
+    {
+      "path": "server/internal/messagedelivery/projection_redis_fixture_test.go",
+      "bytes": 3371,
+      "sha256": "0c2c1afe48ad1973e1f4b19a09ea69ddb6fd859e6aa9f91eae213e1cdaa416b6"
+    },
+    {
+      "path": "server/internal/messagedelivery/sequence_test.go",
+      "bytes": 4128,
+      "sha256": "6368963c351d3713731eb682e1fa0e7e268027af97283109044f7860fe35f885"
+    },
+    {
+      "path": "server/internal/messagedelivery/visibility_integration_test.go",
+      "bytes": 11758,
+      "sha256": "b97eb52627b3df590321729f074873ccf1d7e2ba19777113f4d02b46c981bd16"
+    },
+    {
+      "path": "server/internal/msggateway/client_message_access_test.go",
+      "bytes": 1973,
+      "sha256": "e0ee59bb0e8420a9e080784af5c6b1c57585b5bdb5aa69fee27ab5926f67b1ea"
+    },
+    {
+      "path": "server/internal/msggateway/compressor_test.go",
+      "bytes": 2618,
+      "sha256": "d54f9771e2b3609508592549ac4e950cca2b9bc86a2827212767d10bb0088c6e"
+    },
+    {
+      "path": "server/internal/msggateway/listen_address_test.go",
+      "bytes": 736,
+      "sha256": "2ccbc4d7a61fa3658d7d57d6c0df1dd4f3ceec136cebf16a9d6b4e3fc052d90d"
+    },
+    {
+      "path": "server/internal/msggateway/platform_compatibility_test.go",
+      "bytes": 1704,
+      "sha256": "46afc906f6e63e047cbb5eece583ecb267382d44a491526b5bee83dab24f3121"
+    },
+    {
+      "path": "server/internal/msggateway/session_registration_test.go",
+      "bytes": 5093,
+      "sha256": "be716bc42b3f0bad7a2a322849d209b0a44c1be5ad731421c56167fea515c3c3"
+    },
+    {
+      "path": "server/internal/msggateway/signaling_wire_test.go",
+      "bytes": 1673,
+      "sha256": "80b50d2a78de9cc943a2b6c28b72b51de74fa2ed6ac348e2d2fdb91ee145a47d"
+    },
+    {
+      "path": "server/internal/msggateway/token_logout_test.go",
+      "bytes": 3717,
+      "sha256": "097e548e448bbc09b3319f1eec745b66e398397fc613d6d657a3f2110c04991f"
+    },
+    {
+      "path": "server/internal/msggateway/user_map_security_test.go",
+      "bytes": 1345,
+      "sha256": "58a4bd94a9950a0180a93b549f51c70b7b80c1ec8c1e7a280c56296969441e65"
+    },
+    {
+      "path": "server/internal/msgtransfer/durable_kafka_intake_test.go",
+      "bytes": 8434,
+      "sha256": "8e97479841406ffa704d16f29ab185ce1088c5731e54301d54181d11da6fcc8b"
+    },
+    {
+      "path": "server/internal/msgtransfer/durable_kafka_lifecycle_test.go",
+      "bytes": 5266,
+      "sha256": "52c80b568339241f39543370354ad4ab3326d788e61cf0dec41adf9c993edac1"
+    },
+    {
+      "path": "server/internal/msgtransfer/durable_kafka_offline_drain_test.go",
+      "bytes": 1391,
+      "sha256": "41134d0fda9546b0ded9764d162d5bd42c63fb259d6e4c3beb52bb6626c15e25"
+    },
+    {
+      "path": "server/internal/msgtransfer/durable_kafka_offline_worker_test.go",
+      "bytes": 7425,
+      "sha256": "64cea63fa60cd518641bd6c3f9f1fd4c4905c32458c9de74c7ea20aebcd38513"
+    },
+    {
+      "path": "server/internal/msgtransfer/durable_kafka_policy_test.go",
+      "bytes": 3057,
+      "sha256": "669b3ce844f7bd56fe92773f60cfc891a7cbcf0ac7e21bc28e576af8027eb71e"
+    },
+    {
+      "path": "server/internal/msgtransfer/durable_owned_offline_runtime_test.go",
+      "bytes": 6645,
+      "sha256": "084692dcb2f7ab8923a574187606bfceb6e1532929000ada1a0aaa483b7a12c3"
+    },
+    {
+      "path": "server/internal/msgtransfer/group_effect_branches_test.go",
+      "bytes": 4462,
+      "sha256": "9f3fcf203b439d506bda0224dfc7fde9a9657fcdd6a3aa3f48e1bea7d7b4b929"
+    },
+    {
+      "path": "server/internal/msgtransfer/group_effect_reliability_test.go",
+      "bytes": 1876,
+      "sha256": "418d99f983edc9f2a7aa3aecfe5fd02a0ad7b785f2baecbafc652f683c8ae82b"
+    },
+    {
+      "path": "server/internal/msgtransfer/mongo_persistence_test.go",
+      "bytes": 4157,
+      "sha256": "6ff730bdbfc5b4d153c9176c2d3f0f3c16b710a3f20dfdd7b7d49b67bfca0c38"
+    },
+    {
+      "path": "server/internal/msgtransfer/persistence_integration_test.go",
+      "bytes": 6770,
+      "sha256": "d2e014c95810e0cca5b1a37d6d6e3ef57645f7e6a3bdc627c157167398c50f04"
+    },
+    {
+      "path": "server/internal/objectverify/evidence_test.go",
+      "bytes": 9888,
+      "sha256": "6aba6bbd40a915f228a7921c872179e656c791da2d480953487ec72055472186"
+    },
+    {
+      "path": "server/internal/objectverify/rpc_test.go",
+      "bytes": 8113,
+      "sha256": "cef0d96e5e6b677d15cf74bca29fea6352b1b9429670f704410fc7d7c421ab55"
+    },
+    {
+      "path": "server/internal/objectverify/storage_integration_test.go",
+      "bytes": 5096,
+      "sha256": "617734c040311c318eb5bc9e4ee4a95570bad6749f15c7ed3123698493611adf"
+    },
+    {
+      "path": "server/internal/push/durable_kafka_callback_test.go",
+      "bytes": 6792,
+      "sha256": "ed741caa610eb50a59768dba2c0ca104c570677d558fb482b88a3079b645a033"
+    },
+    {
+      "path": "server/internal/push/durable_online_test.go",
+      "bytes": 11201,
+      "sha256": "a2cbb686db175d9fce756764c8fc7b0fb1b63f56a7ba4fcbc63a7da1f06cf92e"
+    },
+    {
+      "path": "server/internal/push/offlinepush/aliasvendor/owned_input_test.go",
+      "bytes": 6765,
+      "sha256": "063e97ad2bbb7f5224defe2089e15f1da906520b6b8fad31df2447528b499646"
+    },
+    {
+      "path": "server/internal/push/offlinepush/aliasvendor/transport_test.go",
+      "bytes": 7768,
+      "sha256": "7d8a27436b275062a7639773df5ee2a32922fb553258aa072f6278cbe1a45e2c"
+    },
+    {
+      "path": "server/internal/push/offlinepush/fcm/http_v1_credentials_test.go",
+      "bytes": 3199,
+      "sha256": "1d853bd13ddd453042f5a21de93cdab96bae5cef3bd4a3d6590849f688f1d837"
+    },
+    {
+      "path": "server/internal/push/offlinepush/fcm/http_v1_test.go",
+      "bytes": 12827,
+      "sha256": "be0bb23a799071c27cb4ca1370b1aae027b70682fe13f2fd87eb03280585362e"
+    },
+    {
+      "path": "server/internal/push/offlinepush/fcm/owned_credentials_file_test.go",
+      "bytes": 7411,
+      "sha256": "8c59c8e5e1b22f52c63f1ccee0fe58ce98a4ebfdcf05ca1b78310eb7d776db74"
+    },
+    {
+      "path": "server/internal/retention/engine_test.go",
+      "bytes": 2296,
+      "sha256": "08be0f56f2e9cf62277aa3fb94593f3d59d119826ab4892642e703abba1a0d5c"
+    },
+    {
+      "path": "server/internal/retention/mongo_integration_test.go",
+      "bytes": 26355,
+      "sha256": "a3a1042a7bb332f05452fbb06e75116767bdacf3d11cd2ceaa17ffc4029f0c5d"
+    },
+    {
+      "path": "server/internal/retention/plan_test.go",
+      "bytes": 9955,
+      "sha256": "39502364144e44c9be4535a5d300023b5517e0d4eb7461872144c22d24cf18a3"
+    },
+    {
+      "path": "server/internal/rpc/auth/logout_security_test.go",
+      "bytes": 1843,
+      "sha256": "15e46f3948d7b6929bc1bfe9931d39f9e3cbd92692d8dfbf4762910f8bdda615"
+    },
+    {
+      "path": "server/internal/rpc/conversation/identity_security_test.go",
+      "bytes": 3395,
+      "sha256": "d92b7bd48b93251daf851810f83ffad425c6109cf45a1fb1f2d6cd3f63b3e636"
+    },
+    {
+      "path": "server/internal/rpc/conversation/lifecycle_identity_test.go",
+      "bytes": 5597,
+      "sha256": "480e1d110dd0a866ca656a6815e634fbd628d0dfcc2b3299b8eb4abeb81c72eb"
+    },
+    {
+      "path": "server/internal/rpc/conversation/summary_compatibility_test.go",
+      "bytes": 3408,
+      "sha256": "42f140756f5a7355582d30f4e88d9105bc1308475e607aa1d272a324140a6a8b"
+    },
+    {
+      "path": "server/internal/rpc/encryption/aes_test.go",
+      "bytes": 1080,
+      "sha256": "ae8ada6794cd2a756a108d2e44d527fbf4fef5ca9ccf51453c96842d22626976"
+    },
+    {
+      "path": "server/internal/rpc/encryption/encryption_security_test.go",
+      "bytes": 5549,
+      "sha256": "d4ae5112b19c5751940e50142a18590798252304afb08b906ba1ad0252e87b74"
+    },
+    {
+      "path": "server/internal/rpc/group/authority_admission_fixture_test.go",
+      "bytes": 1389,
+      "sha256": "c5d785865746193b0ea3c3833cea981cee09a66655559b6c8195a3b9257de13f"
+    },
+    {
+      "path": "server/internal/rpc/group/authority_rpc_barrier_integration_test.go",
+      "bytes": 12169,
+      "sha256": "32cb0f548b1d0645de9de6302787228993925054b98f622ce836f92bf0898194"
+    },
+    {
+      "path": "server/internal/rpc/group/authority_rpc_mongo_fixture_test.go",
+      "bytes": 3910,
+      "sha256": "2d1b05128f08af5ba9685fa968fe500a9d6d75095210e1a9365366015851658b"
+    },
+    {
+      "path": "server/internal/rpc/group/group_intent_test.go",
+      "bytes": 920,
+      "sha256": "064f79054a94526188bc1f1aed0758edbb352deab0f72cf9f92babef2f2211d2"
+    },
+    {
+      "path": "server/internal/rpc/group/group_member_notice_mutation_integration_test.go",
+      "bytes": 16689,
+      "sha256": "48c923fb7667b982c113d7654fa218f8ff586453a62184284790e801cde765be"
+    },
+    {
+      "path": "server/internal/rpc/group/group_notice_commit_contract_integration_test.go",
+      "bytes": 2721,
+      "sha256": "f489c44c7beeb5b7995e6ead56277688007d38c8e6a4491bc3785796cf4dc907"
+    },
+    {
+      "path": "server/internal/rpc/group/group_notice_mutation_integration_test.go",
+      "bytes": 18869,
+      "sha256": "8eb8dcfcdcf29f35af0a07f77d43a1e83d18fd17c61735a4f9b14cdd8618ed1a"
+    },
+    {
+      "path": "server/internal/rpc/group/group_state_authority_test.go",
+      "bytes": 9998,
+      "sha256": "0edf7aa60cd8d56e5074b8a2bd6e14b492df8ce7d11360c6b2ec07e41047cfb0"
+    },
+    {
+      "path": "server/internal/rpc/group/join_applicant_authorization_test.go",
+      "bytes": 9112,
+      "sha256": "a0ee8479aff7226f441b8a93e8ec038748062a9d8f93ef10ba6ced2933fbb70b"
+    },
+    {
+      "path": "server/internal/rpc/group/managed_start_test.go",
+      "bytes": 1720,
+      "sha256": "b4482bc21aa7a945fd59cef5ecbfb747407bd719d9a38d994b35c6a008d92fd1"
+    },
+    {
+      "path": "server/internal/rpc/group/member_callback_switch_test.go",
+      "bytes": 2776,
+      "sha256": "18a86a08e3e0d972d357400ebbd2bd4af8a8d40d4492a9337b6196ec263c03a2"
+    },
+    {
+      "path": "server/internal/rpc/group/member_edit_authorization_test.go",
+      "bytes": 15763,
+      "sha256": "501012c9bb486b3d152a00d735f1d7fd5fdaa13a46f5f92a87ebd2d6ed3bf880"
+    },
+    {
+      "path": "server/internal/rpc/group/member_search_test.go",
+      "bytes": 6484,
+      "sha256": "ed0669973c5aee81c4f18fa2d485ac5af78c701d93b98df96e3d54d419b01188"
+    },
+    {
+      "path": "server/internal/rpc/group/notice_actor_profile_test.go",
+      "bytes": 2906,
+      "sha256": "8b4d3740d829e324fabc253c56869b17a02bfbadce3c7bce791ee24d452b6c17"
+    },
+    {
+      "path": "server/internal/rpc/group/removal_callback_policy_test.go",
+      "bytes": 5790,
+      "sha256": "4bf2405ec0c4274dbf946ed5e4431de4df64eef14964e5ae52c4f85ea121367c"
+    },
+    {
+      "path": "server/internal/rpc/group/state_notice_admission_fixture_test.go",
+      "bytes": 1301,
+      "sha256": "d15cb8ab3e993cc1cf412949f4bbc178e7fcce7013c45f25281d9017813708b1"
+    },
+    {
+      "path": "server/internal/rpc/msg/deletion_access_test.go",
+      "bytes": 6670,
+      "sha256": "7beebe010c11b70127b62e1740147eb939cae37ced4bf1c328e1b2601a2d8486"
+    },
+    {
+      "path": "server/internal/rpc/msg/group_callback_authorization_test.go",
+      "bytes": 10173,
+      "sha256": "6968098c27843952539d637df431848e01c2ba90c2410d234b44b555e93a50b7"
+    },
+    {
+      "path": "server/internal/rpc/msg/group_read_security_test.go",
+      "bytes": 6555,
+      "sha256": "fe3e75ec07aeffe55d13d5ea431c363c895330b825a5bce7b6af39179e91c6a6"
+    },
+    {
+      "path": "server/internal/rpc/msg/group_send_authorization_test.go",
+      "bytes": 5237,
+      "sha256": "3031a94a8f2020a72243816eb69ad298d7912609d9ba84f639c2dbe5b7008ac8"
+    },
+    {
+      "path": "server/internal/rpc/msg/notification_access_test.go",
+      "bytes": 1862,
+      "sha256": "e65ebee7dbadc6b81f3ae4f135aea69708a4d82e2ca55da137b88d8b85be79be"
+    },
+    {
+      "path": "server/internal/rpc/rtc/admin_auth_test.go",
+      "bytes": 2282,
+      "sha256": "5adfd60fe102d1c12bf37200180231067a80aafeaef08ffae3859a1c44551bc9"
+    },
+    {
+      "path": "server/internal/rpc/rtc/delivery_wire_test.go",
+      "bytes": 2495,
+      "sha256": "4acfee521a89db2d7d0efd4a45c2adf0ad7314ddb19f21323a5d32cecb23ce92"
+    },
+    {
+      "path": "server/internal/rpc/rtc/media_test.go",
+      "bytes": 6283,
+      "sha256": "992e0b50beb51c2667eb221c74e0f5db487b99b2a8c0f1d87e4479e5adf823e4"
+    },
+    {
+      "path": "server/internal/rpc/rtc/rpc_transport_integration_test.go",
+      "bytes": 5524,
+      "sha256": "1b16b56cdc8c499d10c4282ed440316734e11d80c07d4afaadc2c6e216193e6a"
+    },
+    {
+      "path": "server/internal/rpc/rtc/rtc_integration_test.go",
+      "bytes": 22348,
+      "sha256": "7351ecddb64a4abaa5ff10647e64ac4df94aca9a74eb077e0d3b58a110d49ebd"
+    },
+    {
+      "path": "server/internal/rpc/third/evidence_url_test.go",
+      "bytes": 746,
+      "sha256": "7f246dfe40fee565ce64b2c704cef312b69a9ddfea14d38c3cfad976b64beaf8"
+    },
+    {
+      "path": "server/internal/rpc/third/form_reserved_test.go",
+      "bytes": 5873,
+      "sha256": "b910dda20f91ffb76d713f906ca2a21ca0baaa98569f99819c1d30d5f966deb9"
+    },
+    {
+      "path": "server/internal/rpc/third/upload_intent_test.go",
+      "bytes": 3368,
+      "sha256": "1b0913f1e84fdea3155160c7524ad6b508309936e6f2858c8f18fd7a4e50e381"
+    },
+    {
+      "path": "server/internal/rpc/user/bootstrap_test.go",
+      "bytes": 1041,
+      "sha256": "c7dfb0430bee96cfb3b5d67abf760f95cdc5480a0816cdc3d1d9ad402a1ef480"
+    },
+    {
+      "path": "server/internal/rpc/user/command_auth_test.go",
+      "bytes": 1357,
+      "sha256": "1f577fb7405398241ff99e8d41f4325b60ea374c389ab302263c9bbe7aa31eb1"
+    },
+    {
+      "path": "server/internal/rpc/user/command_crud_test.go",
+      "bytes": 5135,
+      "sha256": "12606fbdd860f6f68f7d7d36d77486848993c75b67c7d7f6fa74f18a456f4ef5"
+    },
+    {
+      "path": "server/internal/rpc/user/registration_proof_test.go",
+      "bytes": 10441,
+      "sha256": "0ad43227a179a270e339045edc1e5e64f69e9e1e629a306e2ade0b4a088710c1"
+    },
+    {
+      "path": "server/internal/sessionlogout/service_integration_test.go",
+      "bytes": 4115,
+      "sha256": "b3620ce858c93b1493c7166e89f88a770d4790460737d89e13b2c1ab3dbe2584"
+    },
+    {
+      "path": "server/internal/tools/cron_task_test.go",
+      "bytes": 3014,
+      "sha256": "4475641961b2fdd967e02bc1ae977551d039f4c231ce9022807c83fe56ad52e2"
+    },
+    {
+      "path": "server/internal/visibilitymigration/migrate_integration_test.go",
+      "bytes": 7298,
+      "sha256": "07f0025804e576047023cce097a5ccd309c14ad3dad23381c0eb01d0f887d3a5"
+    },
+    {
+      "path": "server/pkg/common/cmd/msg_gateway_test.go",
+      "bytes": 1637,
+      "sha256": "4b0423be998bfc428ae4ac76459f59550fd2a1c5e06f27d4f3589663217f7777"
+    },
+    {
+      "path": "server/pkg/common/config/parse_test.go",
+      "bytes": 2742,
+      "sha256": "2b32e162dc359eade59c01e76e7ab76b0e136a26efe0fbe76b934303d16c8363"
+    },
+    {
+      "path": "server/pkg/common/config/secret_guard_test.go",
+      "bytes": 379,
+      "sha256": "fcec660f354b3e4462531b54d401cd7cfb3b7191b2f966b2e555dbd620df2137"
+    },
+    {
+      "path": "server/pkg/common/convert/msg_key_version_test.go",
+      "bytes": 525,
+      "sha256": "b35222bd10799f6ccd11050193a7315a469393af5acc8504faa8be4335675162"
+    },
+    {
+      "path": "server/pkg/common/convert/user_test.go",
+      "bytes": 2270,
+      "sha256": "20d69b1d1b677e70602c5afe858a633e9155286b5385f348dbab6d55ba009b1b"
+    },
+    {
+      "path": "server/pkg/common/db/cache/encryption_integration_test.go",
+      "bytes": 3419,
+      "sha256": "92aa1c52a7f1831ce6687183aa1fef1644e7774ea1b3d6a8b7203ca9b6ce0d7e"
+    },
+    {
+      "path": "server/pkg/common/db/cache/group_authority_invalidator_integration_test.go",
+      "bytes": 3868,
+      "sha256": "dd363114f869c1d78e872049c27bfba3e9b6794217b0ba77133be9df87a4e06c"
+    },
+    {
+      "path": "server/pkg/common/db/cache/group_authority_invalidator_test.go",
+      "bytes": 1399,
+      "sha256": "bac084a0a4cef86e044478d3d10dd17ab6526b83b7abeed09909064036a63cf2"
+    },
+    {
+      "path": "server/pkg/common/db/cache/msg_floor_monotonic_integration_test.go",
+      "bytes": 5409,
+      "sha256": "7004c9a943fca23e22cf6b99a58a434b9402863a668b678c8eae495ca9ea8978"
+    },
+    {
+      "path": "server/pkg/common/db/cache/msg_test.go",
+      "bytes": 11772,
+      "sha256": "7f0f2099834a4601e7dd38a66a010d6b3b05b5402d996dd4e5bea86a88681d0f"
+    },
+    {
+      "path": "server/pkg/common/db/cache/ordinary_badge_integration_test.go",
+      "bytes": 7705,
+      "sha256": "b5f301e76fdff29ba64c38f7d14a261819c2266ac605b804ff7c9cf638762442"
+    },
+    {
+      "path": "server/pkg/common/db/cache/token_security_test.go",
+      "bytes": 1643,
+      "sha256": "9151032bec63e1d34c444993843141de3421a7dad397906b1b736c02d77c7404"
+    },
+    {
+      "path": "server/pkg/common/db/cache/token_session_test.go",
+      "bytes": 2099,
+      "sha256": "adf1481a46a81b2e36dc8667c9fde0edc76aac74926d61a9b874a1764138dc04"
+    },
+    {
+      "path": "server/pkg/common/db/controller/auth_session_test.go",
+      "bytes": 1549,
+      "sha256": "1b84295ba407bc46159f2475e6ec67950ee5a38fc97a43873f482ea11ff719f9"
+    },
+    {
+      "path": "server/pkg/common/db/controller/group_member_permission_test.go",
+      "bytes": 1604,
+      "sha256": "15d4e2287a00b0a25d6322868c10fbc524edc4ec9e2dab6df5e4422b229ac9cd"
+    },
+    {
+      "path": "server/pkg/common/db/controller/msg_deletion_integration_test.go",
+      "bytes": 7917,
+      "sha256": "03190574dab7b0b107a83405a3cf6992d3193165f9be896a6f14bccd82e62a09"
+    },
+    {
+      "path": "server/pkg/common/db/controller/msg_floor_integration_test.go",
+      "bytes": 10657,
+      "sha256": "7c6f73631d5cba6dbe4a576ca081d2bce7fca900f2613b162b80004e6d16a741"
+    },
+    {
+      "path": "server/pkg/common/db/controller/msg_group_receipt_integration_test.go",
+      "bytes": 11403,
+      "sha256": "23295b623717a31b4cfe357e01c0716ed7afe417c2cc2346b4dfc60b0be0271a"
+    },
+    {
+      "path": "server/pkg/common/db/controller/msg_membership_window_test.go",
+      "bytes": 5825,
+      "sha256": "e7e4e8a3754251edf5925849ed4297f37e6587b7406076f828b507e9c7f3a5a9"
+    },
+    {
+      "path": "server/pkg/common/db/controller/msg_seq_access_test.go",
+      "bytes": 3479,
+      "sha256": "8fc6b40f5ffc18c64fba39169b824a0157d93770bb29e07d4b7c7756c4420e3c"
+    },
+    {
+      "path": "server/pkg/common/db/controller/msg_test.go",
+      "bytes": 5474,
+      "sha256": "e0b06d67bbf0c01e03332e224afe6c6071f807420036c915e3bfc91511f21cb5"
+    },
+    {
+      "path": "server/pkg/common/db/controller/s3_owner_test.go",
+      "bytes": 4924,
+      "sha256": "502fbca260dbc696c140f5dba4c7ea5785d7b936a92af9d0671d3132237e95ae"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/bootstrap_integration_test.go",
+      "bytes": 2167,
+      "sha256": "6080f62100e3ad4a46f396bdbf1b8b5d25a76afa8f316b94ab8f8c254a00da81"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/command_integration_test.go",
+      "bytes": 6134,
+      "sha256": "30c10b4004fd6f9f14b6db3c0ab580a5ee4df986c9e6a3393fc7db66ae8cc645"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/command_security_test.go",
+      "bytes": 3729,
+      "sha256": "ec144ebe963fe8be20c5a884fccc47f96aaaa1b3b3e04dfbbf74c7855712004c"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/group_authority_state_test.go",
+      "bytes": 1094,
+      "sha256": "bc3dd28967c25ca076bb536caa50bd7bdcaaffd9d8460dbad28044bfb6e8f818"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/group_member_exact_search_test.go",
+      "bytes": 9467,
+      "sha256": "3a23d72eb8cd9ad7aba1c32743f45017409416e02bfa9b34258b79dbed50d3ff"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/group_member_permission_test.go",
+      "bytes": 2407,
+      "sha256": "11402395d32c9f8fa023fc73140d149156853bff5ccaa138320967ac07105e83"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/membership_scope_fixture_test.go",
+      "bytes": 4496,
+      "sha256": "276690bdd48b1f94e8fbfb44e3c65161a40f9aae8123bbd7916d0740ec995fe8"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/object_atomic_owner_test.go",
+      "bytes": 6544,
+      "sha256": "70c097d70e506b4e9ecb2cb3bb6a7cf130c81a23b447531678d73b6c22234489"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/object_owner_test.go",
+      "bytes": 1365,
+      "sha256": "e405563349afd0bb7eb1cd1b51e0d60f30b7c12d9708130fcd6a25b14fdd3c1b"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/registration_proof_integration_test.go",
+      "bytes": 9854,
+      "sha256": "2ff0ca7ffb8296f572a1c066b8eb7005d674316a038d8fc4a5d5e9cf49b1c3bd"
+    },
+    {
+      "path": "server/pkg/common/db/mongotx/mongo_integration_test.go",
+      "bytes": 3453,
+      "sha256": "479ad33c9f9cc1561509063bd3eeb82e9a9849b00b2872773407a9f3c92e11ba"
+    },
+    {
+      "path": "server/pkg/common/db/s3/cont/intent_test.go",
+      "bytes": 9763,
+      "sha256": "2fd6b080bd601285da08b3d9d8288c2d532c3f6f813a629cff288eaa483a9b7e"
+    },
+    {
+      "path": "server/pkg/common/db/s3/cont/owner_dedup_test.go",
+      "bytes": 12771,
+      "sha256": "8cf063c1df072bfea5b403dba4b296a1e06851ed5bbfafd8bf85e97e9e227813"
+    },
+    {
+      "path": "server/pkg/common/db/s3/cont/reserved_test.go",
+      "bytes": 783,
+      "sha256": "f7b42910baa3dd58f7ab87c59a6a166636937c8b14f25c5085d5e03e14a306f9"
+    },
+    {
+      "path": "server/pkg/common/db/s3/intent/completion_integration_test.go",
+      "bytes": 7126,
+      "sha256": "9ea9d8296ba9046326bd9681b8c63184c8baf0e0cce7ba7a3486716ca767b518"
+    },
+    {
+      "path": "server/pkg/common/db/s3/intent/completion_test.go",
+      "bytes": 4367,
+      "sha256": "04dd2f0aab238b4a93037dc651628e3bd0c64fc85e4cf53dd2b2d5a04e7b0af7"
+    },
+    {
+      "path": "server/pkg/common/db/s3/minio/policy_test.go",
+      "bytes": 805,
+      "sha256": "1f21bc025d9383a433b6520b4ea549a6b8973e1eec39b840a8c3e0b3d38e245d"
+    },
+    {
+      "path": "server/pkg/common/db/unrelation/admin_search_test.go",
+      "bytes": 3150,
+      "sha256": "693c82a941e12743b8b4c0da859e5d8dce8b9b9ee530e3c42f3d1ab91caaf1d1"
+    },
+    {
+      "path": "server/pkg/common/discoveryregister/discoveryregister_test.go",
+      "bytes": 1107,
+      "sha256": "14c39c7ad206af0856fb5c9a62d695ca6b2f3af00b902318a55d59069c29afc4"
+    },
+    {
+      "path": "server/pkg/common/discoveryregister/zookeeper/start_order_integration_test.go",
+      "bytes": 2830,
+      "sha256": "98a0c1ab48e20e8692681530605183715d94229ea535955544346e7cf79822f9"
+    },
+    {
+      "path": "server/pkg/common/http/callback_security_test.go",
+      "bytes": 2433,
+      "sha256": "35eba90dadae1e1c276c54efe942f4567f7cee91bdbdba1db93b11c6b27fd5f6"
+    },
+    {
+      "path": "server/pkg/common/http/http_client_test.go",
+      "bytes": 3992,
+      "sha256": "f7e184059cb1a2846fada6391e00b28426a905d730ddeff72935b3546897a093"
+    },
+    {
+      "path": "server/pkg/common/prommetrics/prommetrics_test.go",
+      "bytes": 2222,
+      "sha256": "4c97acf401e18fa47ede38b5ce1d42ce19257b49aebb042d4328441444878e94"
+    },
+    {
+      "path": "server/pkg/common/registrationproof/ex_test.go",
+      "bytes": 5945,
+      "sha256": "c1876e7fd109da905b1b3043e3346398ab70bd30bcd60ba73f77c4b10d01a2db"
+    },
+    {
+      "path": "server/pkg/common/registrationproof/rpc_test.go",
+      "bytes": 9529,
+      "sha256": "931350395ad3b09128df339eeed904570294b2b68122020cdc20116274cff2d6"
+    },
+    {
+      "path": "server/pkg/common/rpcmiddleware/rpc_test.go",
+      "bytes": 2591,
+      "sha256": "69cc3b7bc8e30d008d3c1137f696c58052e575b6b425d854dda3f66fdeed7262"
+    },
+    {
+      "path": "server/pkg/common/serviceauth/proof_test.go",
+      "bytes": 2867,
+      "sha256": "e281780bc5ed9f2bae668022ca6d218c672943cfb7ac950a1b35529a561ec4c4"
+    },
+    {
+      "path": "server/pkg/common/startrpc/managed_test.go",
+      "bytes": 1512,
+      "sha256": "ef1d83b1191a11463efe35c9f7e84de418fc25d956009aa288ea59a2d9e0be56"
+    },
+    {
+      "path": "server/pkg/common/startrpc/start_test.go",
+      "bytes": 1954,
+      "sha256": "b947a0871c4cb6fa7385c303e04d867ead11b6b08938271646e8dca34f0f6613"
+    },
+    {
+      "path": "server/pkg/common/version/client_version_test.go",
+      "bytes": 880,
+      "sha256": "57b2aa02edc78c3bc9373fb9c42563804c1efd2f451708db86ac6741da09e053"
+    },
+    {
+      "path": "server/pkg/msgprocessor/conversation_test.go",
+      "bytes": 7288,
+      "sha256": "2bb7f8c7c2e829f6b70586f753f853a279734c2ab16f6884c9f8a75801643d66"
+    },
+    {
+      "path": "server/pkg/msgprocessor/storage_branches_test.go",
+      "bytes": 2950,
+      "sha256": "0a4b3e26cbc18b1403846705f9e5debdeb01da3f1875fe0597c22ff46e9f6003"
+    },
+    {
+      "path": "server/pkg/rpcclient/notification_transport_test.go",
+      "bytes": 1994,
+      "sha256": "568d4463e9dfd1c63007fb5a2928cf59f668333f00504ca71c4267a09648d471"
+    },
+    {
+      "path": "server/test/e2e/e2e_test.go",
+      "bytes": 1204,
+      "sha256": "22ab15d05f6aa1c4084abebf32b0b27b4b65c8f03d9bab132352c3e31b82d33a"
+    },
+    {
+      "path": "server/test/e2e/framework/config/config_test.go",
+      "bytes": 2385,
+      "sha256": "368a437c0ffbc2748009dff52b3be930bee24b89efbc2861775cfd153deb6d05"
+    },
+    {
+      "path": "server/test/e2e/framework/ginkgowrapper/ginkgowrapper_test.go",
+      "bytes": 631,
+      "sha256": "f65190e59b8f3969cac9573c0a9d5d3f34a04f9a78f224d01a36fd59d1b98c87"
+    },
+    {
+      "path": "server/test/typecheck/typecheck_test.go",
+      "bytes": 2969,
+      "sha256": "5ccdd74d4f0ec40f7888a2c24b03d1b04bac5a534657067abd9e3c5e37049c04"
+    },
+    {
+      "path": "server/tools/component/component_test.go",
+      "bytes": 2088,
+      "sha256": "308b323c962f2133301ae60f2c893a82f2290676cd946435cb1e367763f7658d"
+    },
+    {
+      "path": "server/tools/ncpu/ncpu_test.go",
+      "bytes": 863,
+      "sha256": "9d89b0c9b8de77b29a31201eeb77bc37657013078e23730b7bbc3e5b5233ad39"
+    },
+    {
+      "path": "server/tools/openim-web/openim-web_test.go",
+      "bytes": 1778,
+      "sha256": "415847665405d5c401f9d4ee42ee321c1ed01b78e698a3441c5fdf96c9239f2d"
+    },
+    {
+      "path": "server/tools/yamlfmt/yamlfmt_test.go",
+      "bytes": 3502,
+      "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
+    }
+  ],
+  "mandatory_callback_mongo": [
+    "TestKafkaOfflineCallbackMongoActualWorkerConsumesOneFrozenDecisionAndErasesPrivateOutput",
+    "TestKafkaOfflineCallbackMongoClearAfterAttemptNeverPersistsLatePrivateResponse",
+    "TestKafkaOfflineCallbackMongoClearWinsBeforeAttemptCommit",
+    "TestKafkaOfflineCallbackMongoContinueAndRejectedAreDistinctDurableDecisions",
+    "TestKafkaOfflineCallbackMongoForeignResponseNeverGrantsSupplierPermission",
+    "TestKafkaOfflineCallbackMongoKnownZeroHTTPReprepareOnlyNarrowsAndRetainsOldRequestReceipt",
+    "TestKafkaOfflineCallbackMongoLostCommitACKDoesNotGrantHTTPAfterRestart",
+    "TestKafkaOfflineCallbackMongoRetryRevisionOverflowRefusesBeforeAnyReplacement",
+    "TestKafkaOfflineCallbackMongoUnknownCannotBorrowNarrowedSnapshot",
+    "TestKafkaOfflineCallbackMongoUnknownRestartAndOperatorCASNeverReplayOriginalHTTP",
+    "TestKafkaOfflineCallbackMongoWholeOriginalCandidateIsFrozenOnceAcrossPages"
+  ],
+  "mandatory_callback_worker_http": "TestManagedOfflineMongoPrivateFactoryWorkerAndRealCallbackHTTPStayInOneBoundLifecycle",
+  "mandatory_callback_cli_lineage": "TestCallbackOperatorNonemptyLineageInspectJSONIsConfirmableAndStaleReceiptStillRejects"
 }

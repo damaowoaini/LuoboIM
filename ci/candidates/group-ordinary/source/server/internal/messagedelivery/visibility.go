@@ -141,7 +141,7 @@ func (s *Store) MutateMessageVisibility(ctx context.Context, db *mongo.Database,
 }
 
 func onlineClaimFields() bson.M {
-	return bson.M{"online_claim": "", "online_instance": "", "online_lease_until": "", "offline_claim":"", "offline_instance":"", "offline_lease_until":""}
+	return bson.M{"online_claim": "", "online_instance": "", "online_lease_until": "", "offline_claim": "", "offline_instance": "", "offline_lease_until": ""}
 }
 
 // Only the duty is retired: history visibility belongs to the original writer.
@@ -156,6 +156,32 @@ func (s *Store) retirePayload(ctx context.Context, filter bson.M) error {
 	} else if !errors.Is(err, mongo.ErrNoDocuments) {
 		return err
 	}
+	cur, err := s.db.Collection(Effects).Find(ctx, filter, options.Find().SetProjection(bson.M{"branch_id": 1}))
+	if err != nil {
+		return err
+	}
+	for cur.Next(ctx) {
+		var r struct {
+			Branch string `bson:"branch_id"`
+		}
+		if err := cur.Decode(&r); err != nil {
+			_ = cur.Close(ctx)
+			return err
+		}
+		if !validUUID(r.Branch) {
+			_ = cur.Close(ctx)
+			return ErrConflict
+		}
+		if err := s.eraseOfflineCallback(ctx, r.Branch); err != nil {
+			_ = cur.Close(ctx)
+			return err
+		}
+	}
+	readErr := cur.Err()
+	closeErr := cur.Close(ctx)
+	if readErr != nil || closeErr != nil {
+		return errors.Join(readErr, closeErr)
+	}
 	unset := onlineClaimFields()
 	for _, field := range []string{"payload", "recipients", "online_acks", "visibility_denied"} {
 		unset[field] = ""
@@ -166,7 +192,7 @@ func (s *Store) retirePayload(ctx context.Context, filter bson.M) error {
 	for field := range unset {
 		unsetFields = append(unsetFields, field)
 	}
-	_, err := s.db.Collection(Effects).UpdateMany(ctx, filter, bson.A{
+	_, err = s.db.Collection(Effects).UpdateMany(ctx, filter, bson.A{
 		bson.M{"$set": bson.M{"hidden": true, "visibility_revoked": true, "push_pending": false, "online_pending": false, "offline_pending": false, "sender_read_pending": false, "state": bson.M{"$cond": bson.A{bson.M{"$ifNull": bson.A{"$max_pending", false}}, "ready", "done"}}, "revision": bson.M{"$add": bson.A{"$revision", int64(1)}}}},
 		bson.M{"$unset": unsetFields},
 	})
@@ -254,8 +280,12 @@ func (s *Store) RefreshVisibility(ctx context.Context, branchID string) error {
 			denied[hash([]byte(f.UserID))] = true
 		}
 		membershipDenied, err := s.membershipPage(tx, d.CID, page, d.Seq)
-		if err != nil { return err }
-		for uid := range membershipDenied { denied[hash([]byte(uid))] = true }
+		if err != nil {
+			return err
+		}
+		for uid := range membershipDenied {
+			denied[hash([]byte(uid))] = true
+		}
 		for _, uid := range slot.DelList {
 			denied[hash([]byte(uid))] = true
 		}
@@ -290,12 +320,18 @@ func (s *Store) RefreshVisibility(ctx context.Context, branchID string) error {
 // The remaining read->socket interval requires the planned gateway-side
 // admission/drain protocol; this WIP does NOT claim linearizable remote erase.
 func (a *onlineAttempt) checkOnlineClaim(ctx context.Context, targets []string) error {
-	if a == nil || a.store == nil || len(targets) == 0 { return ErrInvalid }
+	if a == nil || a.store == nil || len(targets) == 0 {
+		return ErrInvalid
+	}
 	allowed := make(map[string]bool, len(a.targets))
-	for _, uid := range a.targets { allowed[uid] = true }
+	for _, uid := range a.targets {
+		allowed[uid] = true
+	}
 	seen := make(map[string]bool, len(targets))
 	for _, uid := range targets {
-		if !allowed[uid] || seen[uid] { return ErrInvalid }
+		if !allowed[uid] || seen[uid] {
+			return ErrInvalid
+		}
 		seen[uid] = true
 	}
 	current, cancel := context.WithTimeout(ctx, 2*time.Second)
@@ -308,7 +344,11 @@ func (a *onlineAttempt) checkOnlineClaim(ctx context.Context, targets []string) 
 		return ErrConflict
 	}
 	denied, err := a.store.membershipPage(current, d.CID, targets, d.Seq)
-	if err != nil { return err }
-	if len(denied) != 0 { return ErrConflict }
+	if err != nil {
+		return err
+	}
+	if len(denied) != 0 {
+		return ErrConflict
+	}
 	return nil
 }

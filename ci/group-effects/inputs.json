@@ -4782,8 +4782,8 @@
   "controller_inputs": [
     {
       "path": ".github/workflows/group-effects.yml",
-      "bytes": 2613,
-      "sha256": "67a9b4abf114a6eb5a4f354a8b0dca4eb0221ddb5d07d3b5c791852585847413"
+      "bytes": 2419,
+      "sha256": "68c58a3a32226b8f32639e1d0fd202a123c3389d9f7b1d8005f05af840d368bf"
     },
     {
       "path": "ci/backend-integration.json",

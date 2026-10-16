@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Thirteen pure controller gates; no Go, Docker, DB or source1100 materialization."""
+"""Fourteen pure controller gates; no Go, Docker, DB or source1118 materialization."""
 import hashlib
 import importlib.util
 import json
@@ -280,10 +280,10 @@ class ControllerTests(unittest.TestCase):
                 missing = [event for event in events if event.get('Test') != test]
                 self.assertFalse(SUBJECT.audit(missing, 0, short, spec)['accepted'])
 
-    def test_compile_collects_all_27_packages_including_booking_without_tests(self):
+    def test_compile_collects_all_28_packages_including_booking_and_callback_without_tests(self):
         inputs = json.loads(Path(__file__).with_name('inputs.json').read_text())
         packages = list(inputs['packages'])
-        self.assertEqual(len(packages), 27)
+        self.assertEqual(len(packages), 28)
         self.assertIn('internal/meetingbooking', packages)
         calls = []
         def command(package, args, phase, timeout):
@@ -296,8 +296,38 @@ class ControllerTests(unittest.TestCase):
         codes = SUBJECT.compile_packages(packages, command)
         self.assertEqual(calls, packages)
         self.assertEqual(codes['internal/meetingbooking'], 1)
-        self.assertEqual(sum(code == 0 for code in codes.values()), 26)
+        self.assertEqual(sum(code == 0 for code in codes.values()), 27)
 
+
+    def test_callback_mongo_worker_and_lineage_cannot_be_missing_or_skipped(self):
+        inputs = json.loads(Path(__file__).with_name('inputs.json').read_text())
+        self.assertEqual(len(inputs['mandatory_callback_mongo']), 11)
+        required = {'internal/messagedelivery':inputs['mandatory_callback_mongo'],
+                    'internal/msgtransfer':[inputs['mandatory_callback_worker_http']],
+                    'cmd/tools/ordinary-callback-receipts':[inputs['mandatory_callback_cli_lineage']]}
+        for short, names in required.items():
+            spec = inputs['packages'][short]
+            package = SUBJECT.PREFIX + short
+            events = []
+            for test in spec['top_tests']:
+                events.append({'Package':package, 'Action':'run', 'Test':test})
+                for leaf in spec['required_leaves']:
+                    if leaf.startswith(test + '/'):
+                        events.extend([{'Package':package, 'Action':'run', 'Test':leaf},
+                                       {'Package':package, 'Action':'pass', 'Test':leaf}])
+                state = 'skip' if test in spec['allowed_legacy_skips'] else 'pass'
+                events.append({'Package':package, 'Action':state, 'Test':test})
+            events.append({'Package':package, 'Action':'pass'})
+            self.assertTrue(SUBJECT.audit(events, 0, short, spec)['accepted'])
+            for name in names:
+                with self.subTest(case=name):
+                    changed = [dict(e) for e in events]
+                    for e in changed:
+                        if e.get('Test') == name and e['Action'] == 'pass':
+                            e['Action'] = 'skip'
+                    self.assertFalse(SUBJECT.audit(changed, 0, short, spec)['accepted'])
+                    missing = [e for e in events if e.get('Test', '').split('/', 1)[0] != name]
+                    self.assertFalse(SUBJECT.audit(missing, 0, short, spec)['accepted'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -10,7 +10,7 @@
   "receiver_inputs": {
     "path": "ci/group-receiver/inputs.json",
     "bytes": 202448,
-    "sha256": "af78907465cbafe8943545ec602264cc8c3915e7d8b77a9ca10da84090000fc3",
+    "sha256": "00d8e6944c26fb1ea6dba590fb92c0035b58af1093ec7b4e5579f1247f2728de",
     "mode": "0o644"
   },
   "parent989_digest": "79d670e5fcf45d7f276caed8fd70d852b18431845fb4a0cc5ebc217438f3a6c9",
@@ -11003,8 +11003,8 @@
     },
     {
       "path": ".github/workflows/group-stage3-source.yml",
-      "bytes": 2962,
-      "sha256": "46556ba5d35fc59c20ceec350cada7b91a9915b05e5865735afd2b75a3a24592",
+      "bytes": 2444,
+      "sha256": "cc84bf396672cc9e52302ba9033858d75446735fa1234ee023ffc211d9065e2b",
       "mode": "0o644"
     },
     {

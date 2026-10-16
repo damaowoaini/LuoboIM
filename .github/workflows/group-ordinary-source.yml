@@ -1,4 +1,4 @@
-name: Group ordinary isolated source1100
+name: Group ordinary isolated source1118
 
 # Run full regression once after the known issues are fixed and targeted checks pass.
 on:
@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   source-regressions:
-    name: Full27 packages / source only
+    name: Full28 packages / source only
     runs-on: ubuntu-24.04
     timeout-minutes: 70
     env:
@@ -48,7 +48,7 @@ jobs:
             --record "$GITHUB_WORKSPACE/ci-results/group-ordinary-prepare.resource.json" \
             --min-free-mib 1024 --timeout 600 --poll-interval 0.2 \
             -- bash ci/backend-integration.sh prepare
-      - name: Compile, all full-package race tests and all27 vet
+      - name: Compile, all full-package race tests and all28 vet
         run: python3 -B ci/group-ordinary/run.py
       - name: Always collect exact fixture residuals
         if: always()

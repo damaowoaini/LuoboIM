@@ -66,60 +66,67 @@ type Projection interface {
 }
 
 type offlineRouteProof struct {
-	ResponseSHA256 string `bson:"response_sha256"`
-	Required bool `bson:"required"`
-	BackgroundWebPC bool `bson:"background_web_pc"`
+	ResponseSHA256  string `bson:"response_sha256"`
+	Required        bool   `bson:"required"`
+	BackgroundWebPC bool   `bson:"background_web_pc"`
 }
 
 type deliveryDuty struct {
-	CallbackRevision int64 `bson:"callback_revision"`
-	VendorRevision int64 `bson:"vendor_revision"`
-	OfflineCursor int64 `bson:"offline_cursor"`
-	OfflineSettled int64 `bson:"offline_settled"`
-	OfflineAttempts int64 `bson:"offline_attempts"`
-	OfflineClaim string `bson:"offline_claim"`
-	OfflineInstance string `bson:"offline_instance"`
-	OfflineLeaseUntil time.Time `bson:"offline_lease_until"`
-	SourceOperationID string `bson:"source_operation_id"`
-	OfflineRouting map[string]offlineRouteProof `bson:"offline_routing"`
-	ProducerVersion string `bson:"producer_version"`
-	PolicySHA string `bson:"policy_sha256"`
-	ID                string            `bson:"_id"`
-	Epoch             string            `bson:"epoch"`
-	SourceID          string            `bson:"source_id"`
-	BranchID          string            `bson:"branch_id"`
-	CID               string            `bson:"conversation_id"`
-	InputSHA          string            `bson:"input_sha256"`
-	PayloadSHA        string            `bson:"payload_sha256"`
-	Payload           []byte            `bson:"payload"`
-	Recipients        []string          `bson:"recipients"`
-	Sender            string            `bson:"sender_id"`
-	Seq               int64             `bson:"seq"`
-	Persist           bool              `bson:"persist"`
-	Hidden            bool              `bson:"hidden"`
-	MaxPending        bool              `bson:"max_pending"`
-	SenderReadPending bool              `bson:"sender_read_pending"`
-	PushPending       bool              `bson:"push_pending"`
-	State             string            `bson:"state"`
-	Revision          int64             `bson:"revision"`
-	OnlineCursor      int64             `bson:"online_cursor"`
-	OnlineClaim       string            `bson:"online_claim"`
-	OnlineInstance    string            `bson:"online_instance"`
-	OnlineLeaseUntil  time.Time         `bson:"online_lease_until"`
-	OnlineAttempts    int64             `bson:"online_attempts"`
-	RecipientCount    int64             `bson:"recipient_count"`
-	OnlinePending     bool              `bson:"online_pending"`
-	OfflinePending    bool              `bson:"offline_pending"`
-	OnlineACKs        map[string]string `bson:"online_acks"`
-	VisibilityDenied  []string          `bson:"visibility_denied"`
+	OfflineCallbackFrozen bool                         `bson:"offline_callback_frozen"`
+	CallbackRevision      int64                        `bson:"callback_revision"`
+	VendorRevision        int64                        `bson:"vendor_revision"`
+	OfflineCursor         int64                        `bson:"offline_cursor"`
+	OfflineSettled        int64                        `bson:"offline_settled"`
+	OfflineAttempts       int64                        `bson:"offline_attempts"`
+	OfflineClaim          string                       `bson:"offline_claim"`
+	OfflineInstance       string                       `bson:"offline_instance"`
+	OfflineLeaseUntil     time.Time                    `bson:"offline_lease_until"`
+	SourceOperationID     string                       `bson:"source_operation_id"`
+	OfflineRouting        map[string]offlineRouteProof `bson:"offline_routing"`
+	ProducerVersion       string                       `bson:"producer_version"`
+	PolicySHA             string                       `bson:"policy_sha256"`
+	ID                    string                       `bson:"_id"`
+	Epoch                 string                       `bson:"epoch"`
+	SourceID              string                       `bson:"source_id"`
+	BranchID              string                       `bson:"branch_id"`
+	CID                   string                       `bson:"conversation_id"`
+	InputSHA              string                       `bson:"input_sha256"`
+	PayloadSHA            string                       `bson:"payload_sha256"`
+	Payload               []byte                       `bson:"payload"`
+	Recipients            []string                     `bson:"recipients"`
+	Sender                string                       `bson:"sender_id"`
+	Seq                   int64                        `bson:"seq"`
+	Persist               bool                         `bson:"persist"`
+	Hidden                bool                         `bson:"hidden"`
+	MaxPending            bool                         `bson:"max_pending"`
+	SenderReadPending     bool                         `bson:"sender_read_pending"`
+	PushPending           bool                         `bson:"push_pending"`
+	State                 string                       `bson:"state"`
+	Revision              int64                        `bson:"revision"`
+	OnlineCursor          int64                        `bson:"online_cursor"`
+	OnlineClaim           string                       `bson:"online_claim"`
+	OnlineInstance        string                       `bson:"online_instance"`
+	OnlineLeaseUntil      time.Time                    `bson:"online_lease_until"`
+	OnlineAttempts        int64                        `bson:"online_attempts"`
+	RecipientCount        int64                        `bson:"recipient_count"`
+	OnlinePending         bool                         `bson:"online_pending"`
+	OfflinePending        bool                         `bson:"offline_pending"`
+	OnlineACKs            map[string]string            `bson:"online_acks"`
+	VisibilityDenied      []string                     `bson:"visibility_denied"`
 }
 
 func (s *Store) readDuty(ctx context.Context, branchID string) (deliveryDuty, error) {
-	d,err:=s.readDutyRecord(ctx,branchID)
-	if err!=nil{return deliveryDuty{},err}
+	d, err := s.readDutyRecord(ctx, branchID)
+	if err != nil {
+		return deliveryDuty{}, err
+	}
 	// The old dispatch/project worker cannot consume a policy-aware duty.
-	if d.ProducerVersion!="" || d.PolicySHA!=""{if !s.kafkaRecoveryAuthorized(ctx,d){return deliveryDuty{},ErrUnprepared}}
-	return d,nil
+	if d.ProducerVersion != "" || d.PolicySHA != "" {
+		if !s.kafkaRecoveryAuthorized(ctx, d) {
+			return deliveryDuty{}, ErrUnprepared
+		}
+	}
+	return d, nil
 }
 
 // Visibility mutation needs to parse and redact every recognized duty even
@@ -133,20 +140,30 @@ func (s *Store) readDutyRecord(ctx context.Context, branchID string) (deliveryDu
 	if err := s.db.Collection(Effects).FindOne(ctx, bson.M{"_id": key(s.epoch, "branch", branchID)}).Decode(&d); err != nil {
 		return d, err
 	}
-	if d.ProducerVersion!="" || d.PolicySHA!=""{
-		if d.ProducerVersion!="ordinary-kafka-v1" || !validSHA(d.PolicySHA){return deliveryDuty{},ErrUnprepared}
-		if _,err:=s.readKafkaPolicy(ctx,d.PolicySHA);err!=nil{return deliveryDuty{},err}
+	if d.ProducerVersion != "" || d.PolicySHA != "" {
+		if d.ProducerVersion != "ordinary-kafka-v1" || !validSHA(d.PolicySHA) {
+			return deliveryDuty{}, ErrUnprepared
+		}
+		if _, err := s.readKafkaPolicy(ctx, d.PolicySHA); err != nil {
+			return deliveryDuty{}, err
+		}
 	}
-	if d.CallbackRevision<0 || d.CallbackRevision>=math.MaxInt64 || d.SourceOperationID!="" && !identity(d.SourceOperationID){return deliveryDuty{},ErrConflict}
-	if d.VendorRevision<0 || d.VendorRevision>=math.MaxInt64 || d.OfflineCursor<0 || d.OfflineCursor>d.RecipientCount || d.OfflineSettled<0 || d.OfflineSettled>d.RecipientCount || d.OfflineAttempts<0{return deliveryDuty{},ErrConflict}
-	if d.OfflineClaim!="" && (!validUUID(d.OfflineClaim) || !validUUID(d.OfflineInstance) || d.OfflineLeaseUntil.IsZero()) || d.OfflineClaim=="" && (d.OfflineInstance!="" || !d.OfflineLeaseUntil.IsZero()){return deliveryDuty{},ErrConflict}
+	if d.CallbackRevision < 0 || d.CallbackRevision >= math.MaxInt64 || d.SourceOperationID != "" && !identity(d.SourceOperationID) {
+		return deliveryDuty{}, ErrConflict
+	}
+	if d.VendorRevision < 0 || d.VendorRevision >= math.MaxInt64 || d.OfflineCursor < 0 || d.OfflineCursor > d.RecipientCount || d.OfflineSettled < 0 || d.OfflineSettled > d.RecipientCount || d.OfflineAttempts < 0 {
+		return deliveryDuty{}, ErrConflict
+	}
+	if d.OfflineClaim != "" && (!validUUID(d.OfflineClaim) || !validUUID(d.OfflineInstance) || d.OfflineLeaseUntil.IsZero()) || d.OfflineClaim == "" && (d.OfflineInstance != "" || !d.OfflineLeaseUntil.IsZero()) {
+		return deliveryDuty{}, ErrConflict
+	}
 	if d.ID != key(s.epoch, "branch", branchID) || d.Epoch != s.epoch || d.BranchID != branchID || !validUUID(d.SourceID) || !identity(d.CID) || !identity(d.Sender) || !validSHA(d.InputSHA) || !validSHA(d.PayloadSHA) || d.Revision < 1 || d.Revision >= math.MaxInt64 || d.Persist && d.Seq < 1 || !d.Persist && d.Seq != 0 || d.Hidden && d.PushPending || d.OnlineCursor < 0 || d.OnlineCursor > d.RecipientCount || d.RecipientCount < 0 || d.RecipientCount > 50000 || d.State != "ready" && d.State != "done" {
 		return deliveryDuty{}, ErrConflict
 	}
 	if len(d.Payload) > 0 && hash(d.Payload) != d.PayloadSHA {
 		return deliveryDuty{}, ErrConflict
 	}
-	if d.PushPending && (d.ProducerVersion=="" && !d.Persist || len(d.Payload) == 0 || len(d.Recipients) == 0) {
+	if d.PushPending && (d.ProducerVersion == "" && !d.Persist || len(d.Payload) == 0 || len(d.Recipients) == 0) {
 		return deliveryDuty{}, ErrUnprepared
 	}
 	if d.OnlinePending && !d.PushPending || d.OfflinePending && !d.PushPending || len(d.Recipients) > 0 && int64(len(d.Recipients)) != d.RecipientCount {
@@ -155,7 +172,11 @@ func (s *Store) readDutyRecord(ctx context.Context, branchID string) (deliveryDu
 	if d.OnlineClaim != "" && (!validUUID(d.OnlineClaim) || !validUUID(d.OnlineInstance) || d.OnlineLeaseUntil.IsZero()) || d.OnlineClaim == "" && (d.OnlineInstance != "" || !d.OnlineLeaseUntil.IsZero()) {
 		return deliveryDuty{}, ErrConflict
 	}
-	for uidHash,route:=range d.OfflineRouting{if !validSHA(uidHash) || !validSHA(route.ResponseSHA256){return deliveryDuty{},ErrConflict}}
+	for uidHash, route := range d.OfflineRouting {
+		if !validSHA(uidHash) || !validSHA(route.ResponseSHA256) {
+			return deliveryDuty{}, ErrConflict
+		}
+	}
 	for i, uid := range d.Recipients {
 		if !identity(uid) || i > 0 && uid <= d.Recipients[i-1] {
 			return deliveryDuty{}, ErrConflict

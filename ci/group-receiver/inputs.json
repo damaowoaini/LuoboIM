@@ -3,7 +3,7 @@
   "scope": "durable_group_receiver_stage2_mechanisms_only_no_RPC_or_runtime_adoption",
   "parent_inputs": {
     "path": "ci/group-effects/inputs.json",
-    "sha256": "7b3a619bf2247ba50ae8f0bfb4f743edda03af85148e069f10bdce6957525a46",
+    "sha256": "046891723001613337231fb993e79183f83a80aa9a4bd5f544b4e2f943a531ec",
     "base_count": 927,
     "foundation_count": 12,
     "effects_count": 15,
