@@ -91,6 +91,8 @@ final class NextUnreadFixture {
     throw TestFailure('Expected bounded actual unread view/route');
   }
   Future<void> ready(WidgetTester tester, Finder finder) async {
+    await until(tester, () => finder.evaluate().length == 1 &&
+      finder.hitTestable().evaluate().length == 1);
     final route = ModalRoute.of(tester.element(finder));
     if (route == null) throw TestFailure('Expected owned route');
     await until(tester, () => route.isCurrent &&

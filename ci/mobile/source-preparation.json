@@ -1,8 +1,8 @@
 {
   "schema": "luobo.mobile.source-preparation.v10",
-  "state": "current309_next_unread_meeting_fixture_r2_cleanup_print_r3_pending_cloud",
-  "source309_digest": "c4b3e68ed16fd2f25ec8497c86675d41b277d75eaa97b23e5ee5c34b521563ed",
-  "portable361_digest": "0b6c63b68bdab1398dbbff372a3757673d2fc4398a64f8dbf8e00d01aefc1f86",
+  "state": "current309_next_unread_ready_fixture_r4_pending_cloud",
+  "source309_digest": "f7bc63903e7c1638f2a8753131b8a32588a9cc0535686fd4df8677b962385bbb",
+  "portable361_digest": "74ddbcee72da1760dfccc3447ed458090745840808772d9b6ff7db691808cf9d",
   "next_unread_candidate": {
     "path": "references/integration/mobile-next-unread-r5-parent-candidate/candidate-manifest.json",
     "bytes": 15696,
@@ -14,9 +14,9 @@
     "sha256": "fbc9d6423f26f34f41e4c1a6d5b4592f9503ccb8c66ffabf0f42cef67a9ec3cb"
   },
   "combined_vector": {
-    "path": "references/integration/mobile309-cleanup-print-r3-candidate/effective-source-vector.json",
-    "bytes": 58082,
-    "sha256": "e0f3dfa304486685ff2d8fdfaa20793a2428f462729fb99f0a50035cea2dad01"
+    "path": "references/integration/mobile309-next-unread-ready-r4-candidate/effective-source-vector.json",
+    "bytes": 58081,
+    "sha256": "cdca6e664179ab6fd788dd43f33153babaed1f747e0f5de1209a4e679d616cc4"
   },
   "source_delta": {
     "next_unread9": 9,
@@ -441,5 +441,26 @@
     "scope": "Exact four print -> debugPrintSynchronously plus explicit foundation show import; messages/ordering/await/cleanup/name/count contracts unchanged.",
     "production_changed": 0,
     "actual_Dart_tests": 0
+  },
+  "ready_fixture_r4": {
+    "manifest": {
+      "path": "references/integration/mobile309-next-unread-ready-r4-candidate/candidate-manifest.json",
+      "bytes": 2455,
+      "sha256": "3ea461dadef3b05f5c6f8d52c0b366285350d910b278f2c4fb07c741a9cdb90e"
+    },
+    "scope": "Bounded unfiltered finder exactlyone AND hitTestable exactlyone before originaltester.element/ownedroute animationbarrier",
+    "all_names_expect_bodies_unchanged": true,
+    "actual_Dart_tests": 0
+  },
+  "actual_parent_R2_R3": {
+    "commit": "358b87307e096e4708d8996dbc51688d2d7efba6",
+    "run": 38910383268,
+    "job": 117004422061,
+    "agent": {
+      "path": "references/integration/cloud-mobile-ci/run-38910383268-agent/verification.json",
+      "bytes": 6228,
+      "sha256": "ba8e2b1b703a4aeb5ff4a659eb668d94aa66850c2e59d703a4b921c3057c84df"
+    },
+    "actual": "273completed272PASS1ERROR/26hiddenPASS/0skipfalsefooter;old234+meeting10allPASS;full955/analyze notstarted"
   }
 }

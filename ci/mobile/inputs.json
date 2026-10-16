@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v10",
-  "state": "current309_next_unread_meeting_fixture_r2_cleanup_print_r3_pending_cloud",
+  "state": "current309_next_unread_ready_fixture_r4_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -72,6 +72,11 @@
       "path": "references/integration/mobile309-cleanup-print-r3-candidate/candidate-manifest.json",
       "bytes": 2784,
       "sha256": "e9dd7755bf031faf0aba3a84d2bd580dd175bdfcdc4b4c937129c9cfedf74570"
+    },
+    "next_unread_ready_fixture_r4": {
+      "path": "references/integration/mobile309-next-unread-ready-r4-candidate/candidate-manifest.json",
+      "bytes": 2455,
+      "sha256": "3ea461dadef3b05f5c6f8d52c0b366285350d910b278f2c4fb07c741a9cdb90e"
     }
   },
   "toolchain": {
@@ -351,7 +356,7 @@
     "current309": 361
   },
   "portable_digests": {
-    "current309": "0b6c63b68bdab1398dbbff372a3757673d2fc4398a64f8dbf8e00d01aefc1f86"
+    "current309": "74ddbcee72da1760dfccc3447ed458090745840808772d9b6ff7db691808cf9d"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -762,6 +767,17 @@
         "sha256": "769d4bccf67997fe1ebef72488cd542aceaaee6af09d432304550f6b2e30f1fc"
       },
       "actual": "target273 completed265PASS8ERROR/26hiddenPASS/falsefooter;old234+oldmeeting6allPASS;Next24/5,newmeeting1/3;cleanup11Next+35/14+76safe6exact;126.972child1noresourcegate;full955/analyze notstarted"
+    },
+    "current309_R2_R3_failure": {
+      "commit": "358b87307e096e4708d8996dbc51688d2d7efba6",
+      "run": 38910383268,
+      "job": 117004422061,
+      "agent": {
+        "path": "references/integration/cloud-mobile-ci/run-38910383268-agent/verification.json",
+        "bytes": 6228,
+        "sha256": "ba8e2b1b703a4aeb5ff4a659eb668d94aa66850c2e59d703a4b921c3057c84df"
+      },
+      "actual": "273completed272PASS1ERROR/26hiddenPASS/0skipfalsefooter;old234+meeting10allPASS;full955/analyze notstarted"
     }
   },
   "reference_entry": {
@@ -769,7 +785,7 @@
     "default_enabled": false,
     "working_cohort": "current309",
     "members": 309,
-    "reference_source_digest": "e530ee57f195200537368a31c043045a35865afef1434b6b48ca40c89e4e5888",
+    "reference_source_digest": "f83f2e02e2fc2bd9c3b41a8bedba70ed945145061fe0df4d7f4d7cafe4c70539",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -1289,7 +1305,7 @@
   },
   "current309": {
     "members": 309,
-    "source_digest": "c4b3e68ed16fd2f25ec8497c86675d41b277d75eaa97b23e5ee5c34b521563ed",
+    "source_digest": "f7bc63903e7c1638f2a8753131b8a32588a9cc0535686fd4df8677b962385bbb",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -2453,8 +2469,8 @@
       },
       {
         "path": "app/test/features/conversation/next_unread_fixture.dart",
-        "bytes": 7465,
-        "sha256": "47937979d092f7dd5e42ca086cf458cef8dfde72bb58ce5ee53099bd58b63faf"
+        "bytes": 7580,
+        "sha256": "d281d38cc15716fff7fd6ddbcad10484470f0b1f3b91a1d7626b6f4ecec5aac0"
       },
       {
         "path": "app/test/features/conversation/next_unread_page_test.dart",
