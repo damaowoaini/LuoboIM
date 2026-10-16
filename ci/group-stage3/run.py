@@ -115,10 +115,15 @@ def verify():
     if len(bodies) != 1016 or rows(bodies) != c['source1016'] or digest(rows(bodies)) != c['source1016_digest']:
         raise ValueError('pre-fixture source1016 differs')
     apply_layer(c, 'fixture', 'ci/candidates/group-stage3-fixture/source/', bodies)
-    if len(bodies) != 1017 or rows(bodies) != c['effective_source'] or digest(rows(bodies)) != c['effective_digest']:
+    if len(bodies) != 1017 or rows(bodies) != c['fixture_source1017'] or digest(rows(bodies)) != c['fixture_source1017_digest']:
         raise ValueError('source1017 differs')
-    if set(c['packages']) != PACKAGES or sum(len(s['top_tests']) for s in c['packages'].values()) != 214:
-        raise ValueError('complete17package214 source-name contract required')
+    if len(c['repair']) != 4:
+        raise ValueError('exact two production and two new test repair files required')
+    apply_layer(c, 'repair', 'ci/candidates/group-stage3-fix/source/', bodies)
+    if len(bodies) != 1019 or rows(bodies) != c['effective_source'] or digest(rows(bodies)) != c['effective_digest']:
+        raise ValueError('source1019 differs')
+    if set(c['packages']) != PACKAGES or sum(len(s['top_tests']) for s in c['packages'].values()) != 217:
+        raise ValueError('complete17package217 source-name contract required')
     for package, spec in c['packages'].items():
         if name(package) != package:
             raise ValueError('canonical package required')
@@ -255,7 +260,7 @@ def run():
         os.environ[key] = str(path)
     os.environ.update(GOTOOLCHAIN='local', GOMAXPROCS='2', GOMEMLIMIT='900MiB', GOWORK='off')
     write(output / 'source.json', {'scope':SCOPE, 'commit':os.environ['GITHUB_SHA'],
-          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1017,
+          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1019,
           'effective_digest':c['effective_digest'], 'go_version':version,
           'generated_public_config_sha256':sha(template), 'no_runtime_adoption':True})
 
