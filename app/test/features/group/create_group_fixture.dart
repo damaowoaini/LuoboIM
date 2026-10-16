@@ -39,6 +39,7 @@ final class CreationFixture {
   final creates = <Map<String, dynamic>>[];
   final providerBodies = <List<int>>[];
   final providerRequests = <RequestOptions>[];
+  int nativeCreatesInFlight = 0;
   Future<void> Function()? createReply;
   Future<String> Function()? conversationReply;
   Future<void> Function(int index)? uploadReply;
@@ -65,10 +66,15 @@ final class CreationFixture {
             {'friendInfo': {'userID': m.id, 'nickname': m.name}}]);
         case 'createGroup':
           creates.add(Map<String, dynamic>.from(args));
-          await createReply?.call();
-          return jsonEncode({'groupID': 'created-group', 'groupType': 2,
-            'groupName': (args['groupInfo'] as Map)['groupName'],
-            'ownerUserID': base.sdk.userId, 'memberCount': 3});
+          nativeCreatesInFlight++;
+          try {
+            await createReply?.call();
+            return jsonEncode({'groupID': 'created-group', 'groupType': 2,
+              'groupName': (args['groupInfo'] as Map)['groupName'],
+              'ownerUserID': base.sdk.userId, 'memberCount': 3});
+          } finally {
+            nativeCreatesInFlight--;
+          }
         case 'getOneConversation':
           if (conversationReply != null) return await conversationReply!();
           final group = args['sessionType'] != 1;
@@ -113,7 +119,29 @@ final class CreationFixture {
   }
   Future<void> frame(WidgetTester tester) => avatar_tools.routeFrame(tester);
   Future<void> until(WidgetTester tester, bool Function() condition) => avatar_tools.until(tester, condition);
+  Future<void> readyRoute(WidgetTester tester, Finder page) async {
+    final route = ModalRoute.of(tester.element(page));
+    if (route == null) throw TestFailure('Expected actual route for fixture action');
+    await until(tester, () => route.isCurrent &&
+      (route.animation == null || route.animation!.status == AnimationStatus.completed));
+  }
+  Future<void> removedRoute(WidgetTester tester, TransitionRoute<dynamic> route) async {
+    var removed = false;
+    unawaited(route.completed.then<void>((_) { removed = true; }));
+    await until(tester, () => removed);
+  }
+  Future<void> backFromCreation(WidgetTester tester) async {
+    final page = find.byType(CreateGroupPage);
+    await readyRoute(tester, page);
+    final route = ModalRoute.of(tester.element(page))!;
+    // Both selector and editor own real AppBars. The current page's actual
+    // BackButton is the intended action, not a document-wide tooltip lookup.
+    await tester.tap(find.descendant(of: page, matching: find.byType(BackButton)).hitTestable());
+    await removedRoute(tester, route);
+  }
   Future<void> tap(WidgetTester tester, String text) async {
+    final page = find.byType(CreateGroupPage);
+    if (page.evaluate().isNotEmpty) await readyRoute(tester, page);
     final finder = text == '创建群聊' || text == '重试打开会话'
       ? find.widgetWithText(FilledButton, text) : find.text(text);
     final list = find.byType(ListView);
@@ -125,6 +153,7 @@ final class CreationFixture {
     await tester.tap(finder); await frame(tester);
   }
   Future<void> preview(WidgetTester tester) async {
+    await readyRoute(tester, find.byType(CreateGroupPage));
     final pick = find.byKey(const ValueKey('create-group-avatar'));
     expect(pick, findsOneWidget);
     await tester.ensureVisible(pick); await tester.pump();
@@ -145,8 +174,10 @@ final class CreationFixture {
   });
   Future<void> coverAndReturn(WidgetTester tester) async {
     final nav = tester.state<NavigatorState>(find.byType(Navigator).last);
-    unawaited(nav.push<void>(MaterialPageRoute(builder: (_) => const Scaffold(body: Text('foreign-route')))));
-    await frame(tester); nav.pop(); await frame(tester);
+    final foreign = MaterialPageRoute<void>(builder: (_) => const Scaffold(body: Text('foreign-route')));
+    unawaited(nav.push<void>(foreign));
+    await frame(tester); await readyRoute(tester, find.text('foreign-route'));
+    nav.pop(); await removedRoute(tester, foreign);
   }
   Future<void> replaceOwner() async {
     await base.signInOther(user: 'other');
@@ -159,9 +190,28 @@ final class CreationFixture {
     container.invalidate(contactsRepositoryProvider);
   }
   Future<void> close(WidgetTester tester) async {
+    debugPrint('creation_fixture_cleanup release.begin');
     for (final settle in pending) { settle(); }
-    await base.close(tester);
-    router?.dispose();
+    try {
+      // Advance native mock continuations in their widget zone before waiting
+      // for actual filesystem/SDK teardown in runAsync's real zone.
+      try {
+        await until(tester, () => nativeCreatesInFlight == 0);
+        debugPrint('creation_fixture_cleanup native.drained');
+      } finally {
+        await tester.runAsync(() async {
+          debugPrint('creation_fixture_cleanup sdk.begin');
+          base.api.close();
+          await base.sdk.dispose().timeout(const Duration(seconds: 20));
+          debugPrint('creation_fixture_cleanup sdk.end');
+        });
+      }
+    } finally {
+      debugPrint('creation_fixture_cleanup unmount.begin');
+      await tester.pumpWidget(const SizedBox.shrink()); await tester.pump();
+      debugPrint('creation_fixture_cleanup unmount.end');
+      router?.dispose(); base.body.dispose();
+    }
   }
 }
 

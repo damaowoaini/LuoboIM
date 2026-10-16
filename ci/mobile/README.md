@@ -22,3 +22,11 @@ Public authored inventory has zero exceptions. Local-only app/tool/check.sh rema
 ## Creation fixture r3 import correction (pending)
 
 First287 run38872382676 completed the original QR/search97 successfully, with3 new creation-suite compiler/load errors and11 successful hidden loads. The37 creation business cases, full822 and analyze did not start. The fixture omitted the actual defining library for tenantApiProvider. R3 adds only that import, showing that symbol; production and all37 test names/expectations are unchanged. Full134/822 exact-name and zero-issue analysis gates remain mandatory. Original282 acceptance and the complete failed raw artifact remain history.
+
+## 创建群头像夹具 r4
+
+保留 r3 的原始 134 专项 130 通过 / 4 错误（新 37 项为 33 通过 / 4 错误），900 秒 phase timeout 使 child0 仍按失败处理；完整 822 与分析未开始。
+
+本修订仅 3 个夹具/测试文件：限定当前真实编辑页的返回按钮；以实际路由 animation/completed 等待可交互与退场；退出序列在同一 runAsync 真实区创建并等待，明确创建已进入/释放/有界 drain，SDK 完成后卸载。四个旧错误分开记录，Unicode 是前一超时后的 runAsync 级联，不作为独立产品失败。产品、原 37 名称及全部 expect 表达式、SDK harness、runner、依赖与资源门禁均不变。
+
+新 287 / 339 字节向量显式绑定 r4。仍须原 target134 → full822 → 严格 analyze0，以及旧 785 名称多重集和新 37 名称；没有新增已通过声明，正式云测待执行。

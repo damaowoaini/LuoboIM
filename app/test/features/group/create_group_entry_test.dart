@@ -37,7 +37,7 @@ void main() {
     final f = CreationFixture();
     try {
       await f.mount(tester, entry: true); await select(tester, f);
-      await tester.pageBack(); await f.frame(tester);
+      await f.backFromCreation(tester);
       expect(find.byType(SelectContactsPage), findsOneWidget);
       expect(tester.widgetList<CheckboxListTile>(find.byType(CheckboxListTile)).where((x) => x.value == true), hasLength(2));
       await tester.tap(find.byType(CheckboxListTile).at(1)); await tester.pump();

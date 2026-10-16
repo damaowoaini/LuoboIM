@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v5",
-  "state": "current287_creation_fixture_r3_provider_import_pending_cloud",
+  "state": "current287_creation_fixture_r4_route_async_pending_cloud",
   "parent_required": {
     "git_commit": "b52da23f1255f04d21dc1caf6b5950b736287bd2",
     "actual_run": 38870107437,
@@ -18,8 +18,8 @@
     "native_or_service_acceptance": false
   },
   "candidate_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39",
-  "source287_digest": "acf5cbefab90ba54c71a4b15fb78aad42d5943ecaf9f241290d864363335c516",
-  "portable339_digest": "822208d964e26907182bc4bd326dda9c34c205513b18f9fbff6635aa66daa593",
+  "source287_digest": "289a7e494b124c3cf4d7c73149be2c59b8d9db70c751d5dbfd1ef662bc33b1a5",
+  "portable339_digest": "934021c7dd6f664e879fdc99b32fa044e7b3396f9a4b90f3a1c06f746a4c80f1",
   "selected_delta": {
     "files": 9,
     "existing": 4,
@@ -57,5 +57,20 @@
     "root_cause": "Fixture omitted actual tenantApiProvider defining library import; no new product assertion executed",
     "accepted": false
   },
-  "source_revision": "r3 fixture-only missing provider import. All37 names/assertions, old785+target134 names, runner/completion/resource/network gates unchanged."
+  "source_revision": "r4 fixture-only3: exact actual route animation/completed barriers; serialized signOut created+awaited in same runAsync real zone; bounded native drain/SDK-first teardown and finegrain markers. Original37 names/expect expressions and old785+134+822 names unchanged; no product/SDK harness/runner/resource changes.",
+  "fixture_r4_manifest_sha256": "39e79136cf20e253d170d070f248208cd34ceedaa931f29ab380e7fac7e88370",
+  "current287_fixture_r3_actual_failure": {
+    "git_commit": "1eba065c3ac75b193c2658e8250b67e109df8955",
+    "run": 38873223930,
+    "job": 116882037204,
+    "source_digest": "acf5cbefab90ba54c71a4b15fb78aad42d5943ecaf9f241290d864363335c516",
+    "portable_digest": "822208d964e26907182bc4bd326dda9c34c205513b18f9fbff6635aa66daa593",
+    "verification_sha256": "40a9745ac9683bc6afa3ee8e0b6cfa200c7c3651ab5314ea89f0bbba0cbafa98",
+    "artifact_sha256": "7ccf5d5ca831067d5b7d9b28b0abf9fa3e58694635249d7f55218c46859c9914",
+    "actual": "target134:130PASS4ERROR; parent97 allPASS; new37:33PASS4ERROR;14hiddenPASS;full822/analyze notstarted",
+    "resource": "900.121s phase_timeout latched; child0 afterTERM is not accepted",
+    "classification": "135 document-global Back lookup ambiguity;166 incomplete route removal/tap source risk;174 fake/real zone serialized signOut hypothesis;175 reentrant runAsync cascade, not independent Unicode productFAIL",
+    "accepted": false
+  },
+  "actual_creation_Dart_tests_scope": "This r4 revision; prior r3 new37 attempted:33PASS4ERROR, preserved above."
 }

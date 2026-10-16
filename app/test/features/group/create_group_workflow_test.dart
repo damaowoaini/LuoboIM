@@ -123,7 +123,9 @@ void main() {
     try {
       await f.mount(tester); await f.preview(tester); await f.coverAndReturn(tester);
       expect(find.text('本次选择已失效'), findsOneWidget); expect(find.text('使用'), findsNothing);
-      await tester.tap(find.text('关闭')); await f.frame(tester);
+      final overlay = ModalRoute.of(tester.element(find.text('关闭')))!;
+      await f.readyRoute(tester, find.text('关闭'));
+      await tester.tap(find.text('关闭')); await f.removedRoute(tester, overlay);
       expect(f.providerBodies, isEmpty); expect(f.creates, isEmpty);
       await f.upload(tester); expect(f.providerBodies, hasLength(1));
     } finally { await f.close(tester); }
@@ -222,8 +224,8 @@ void main() {
     }
   });
   testWidgets('session invalidation after create dispatch hides its draft and permits safe exit', (tester) async {
+    final entered = Completer<void>();
     final done = Completer<void>();
-    Future<void>? rotation;
     try {
       await f.mount(tester);
       // Give the actual creation route a predecessor without replacing its
@@ -234,20 +236,34 @@ void main() {
       await tester.tap(find.byType(CheckboxListTile).at(0)); await tester.pump();
       await tester.tap(find.byType(CheckboxListTile).at(1)); await tester.pump();
       await tester.tap(find.widgetWithText(TextButton, '确定 (2)')); await f.frame(tester);
-      f.createReply = () => done.future;
+      f.createReply = () async { entered.complete(); await done.future; };
       await f.tap(tester, '创建群聊'); await f.until(tester, () => f.creates.length == 1);
-      rotation = f.base.sdk.session.signOut(revoke: false); await f.frame(tester);
+      await f.until(tester, () => entered.isCompleted);
+      debugPrint('creation_safe_exit create.entered');
+      await tester.runAsync(() async {
+        // Create and await this serialized operation in the same real zone.
+        // A fake-zone Completer must not be awaited while its pumps are paused.
+        debugPrint('creation_safe_exit signout.begin');
+        await f.base.sdk.session.signOut(revoke: false).timeout(const Duration(seconds: 20));
+        debugPrint('creation_safe_exit signout.end');
+      });
+      await f.frame(tester);
       expect(find.text('会话已变化，请返回后重新选择成员'), findsOneWidget);
       expect(find.text('ID：bob'), findsNothing); expect(find.byType(TextField), findsNothing);
       final context = tester.element(find.text('会话已变化，请返回后重新选择成员'));
+      final route = ModalRoute.of(context)!;
       expect(await Navigator.of(context).maybePop(), isTrue); await f.frame(tester);
+      await f.removedRoute(tester, route);
       expect(find.text('会话已变化，请返回后重新选择成员'), findsNothing);
-      done.complete(); await tester.runAsync(() => rotation!); await f.frame(tester);
+      debugPrint('creation_safe_exit route.removed');
+      done.complete();
+      debugPrint('creation_safe_exit create.released');
+      await f.until(tester, () => f.nativeCreatesInFlight == 0); await tester.pump();
+      debugPrint('creation_safe_exit create.returned');
       expect(f.creates, hasLength(1));
       expect(f.base.sdk.calls.where((c) => c.method == 'getOneConversation'), isEmpty);
     } finally {
       if (!done.isCompleted) done.complete();
-      if (rotation != null) await tester.runAsync(() => rotation!);
       await f.close(tester);
     }
   });
