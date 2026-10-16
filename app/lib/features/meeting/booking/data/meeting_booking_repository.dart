@@ -175,6 +175,7 @@ final class MeetingBookingRepository {
     int pageSize = 40,
     String cursor = '',
     bool includeCancelled = false,
+    bool requireCapability = false,
   }) async {
     if (pageSize < 1 || pageSize > 100 || cursor.length > 2048) {
       throw const BookingLocalFailure(BookingLocalFailureKind.invalid);
@@ -188,6 +189,17 @@ final class MeetingBookingRepository {
       }),
     );
     scope.check();
+    // The immutable tenant transport and original scope bind this metadata to
+    // the current authenticated owner. It describes a protocol, never grants
+    // server authorization; every later write still uses its normal ACL.
+    if (requireCapability &&
+        (raw['contract'] != 'luobo-owner-booking' ||
+            raw['contractVersion'] is! int || raw['contractVersion'] != 1 ||
+            raw['ownerUserID'] != scope.owner || raw['replaySafe'] != true ||
+            raw['mediaReady'] != false ||
+            {'token', 'joinToken', 'roomID', 'liveURL', 'certificate'}.any(raw.containsKey))) {
+      throw const BookingLocalFailure(BookingLocalFailureKind.invalid);
+    }
     final rows = raw['bookings'],
         more = raw['hasMore'],
         next = raw['nextCursor'];

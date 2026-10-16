@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v10",
-  "state": "current309_next_unread_ready_fixture_r4_pending_cloud",
+  "schema": "luobo.mobile.portable-ci-inputs.v11",
+  "state": "current310_booking_capability_R4_parent_prepared_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -73,10 +73,27 @@
       "bytes": 2784,
       "sha256": "e9dd7755bf031faf0aba3a84d2bd580dd175bdfcdc4b4c937129c9cfedf74570"
     },
-    "next_unread_ready_fixture_r4": {
-      "path": "references/integration/mobile309-next-unread-ready-r4-candidate/candidate-manifest.json",
-      "bytes": 2455,
-      "sha256": "3ea461dadef3b05f5c6f8d52c0b366285350d910b278f2c4fb07c741a9cdb90e"
+    "booking_capability_v1": {
+      "path": "references/integration/meeting-booking-capability-v1-candidate/candidate-manifest.json",
+      "bytes": 5535,
+      "sha256": "8748f020710df3f5382dcf5d5cebb972238e3771f40174523c1c749870e1a330"
+    },
+    "booking_capability_CI_parent_rebase": {
+      "old_CI_manifest": {
+        "path": "references/integration/mobile310-booking-capability-ci-candidate/ci-adoption-manifest.json",
+        "bytes": 8184,
+        "sha256": "489b3c5187dad1de06ee8429f5ea18071a885bf0c9279af6442ed75c1ab402c5"
+      },
+      "accepted309": {
+        "path": "references/integration/cloud-mobile-ci/run-38911518860-agent/root-acceptance.json",
+        "bytes": 6378,
+        "sha256": "a8110fe0899cdfe0b9759b5b9435632ceec8d415bb5b9486b5b75a3cc96ac742"
+      },
+      "current_inputs_before": {
+        "path": "Newchat-openim/ci/mobile/inputs.json",
+        "bytes": 126110,
+        "sha256": "4e1ddd0ff227ca421010fb00f937414bd3d130ca100fb0dddec6490d215e34a5"
+      }
     }
   },
   "toolchain": {
@@ -353,10 +370,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current309": 361
+    "current310": 362
   },
   "portable_digests": {
-    "current309": "74ddbcee72da1760dfccc3447ed458090745840808772d9b6ff7db691808cf9d"
+    "current310": "948cc2098d5af06fa9c4a910e7db1f1affb91280ae70fd58545edabfa206664e"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -768,24 +785,28 @@
       },
       "actual": "target273 completed265PASS8ERROR/26hiddenPASS/falsefooter;old234+oldmeeting6allPASS;Next24/5,newmeeting1/3;cleanup11Next+35/14+76safe6exact;126.972child1noresourcegate;full955/analyze notstarted"
     },
-    "current309_R2_R3_failure": {
-      "commit": "358b87307e096e4708d8996dbc51688d2d7efba6",
-      "run": 38910383268,
-      "job": 117004422061,
-      "agent": {
-        "path": "references/integration/cloud-mobile-ci/run-38910383268-agent/verification.json",
-        "bytes": 6228,
-        "sha256": "ba8e2b1b703a4aeb5ff4a659eb668d94aa66850c2e59d703a4b921c3057c84df"
+    "current309_R4_accepted_parent": {
+      "commit": "e5d2410f095dab391c8ccc3b226b7b8b6988cdfb",
+      "run": 38911518860,
+      "job": 117008268019,
+      "root_acceptance": {
+        "path": "references/integration/cloud-mobile-ci/run-38911518860-agent/root-acceptance.json",
+        "bytes": 6378,
+        "sha256": "a8110fe0899cdfe0b9759b5b9435632ceec8d415bb5b9486b5b75a3cc96ac742"
       },
-      "actual": "273completed272PASS1ERROR/26hiddenPASS/0skipfalsefooter;old234+meeting10allPASS;full955/analyze notstarted"
+      "source309": "f7bc63903e7c1638f2a8753131b8a32588a9cc0535686fd4df8677b962385bbb",
+      "portable361": "74ddbcee72da1760dfccc3447ed458090745840808772d9b6ff7db691808cf9d",
+      "actual": "273PASS+26hidden/full955PASS+121hidden/strictanalyze0;allrequiredname multisets/cleanup exact;0errors0skip0warning;3resource child0/nogate",
+      "public_HEAD_context": "3bf70123f0a8a05eb63f952f75486a3f1a96b9d6",
+      "non_mobile_HEAD_change": "Only native8 changed after accepted mobile commit; all13 mobile/CI before and full309/SDK51 checked in bothtrees."
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current309",
-    "members": 309,
-    "reference_source_digest": "f83f2e02e2fc2bd9c3b41a8bedba70ed945145061fe0df4d7f4d7cafe4c70539",
+    "working_cohort": "current310",
+    "members": 310,
+    "reference_source_digest": "9569162a8fc1d672a32850672a3e6e3a1e0dbaab036f3c3c4e87bca66f5d0341",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -846,8 +867,8 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 306554,
-    "sha256": "9aa6fc04a0445e87eb7692aff2e108e67d9ad66e2bd397526e3a386f6c7720b0"
+    "bytes": 466993,
+    "sha256": "f4f515b2f0b6d86deb87a67f55359ff0fcbf3d09bf8a877a86d6bc3825b6d053"
   },
   "call_records_cleanup": {
     "named_fixtures": [
@@ -1303,9 +1324,65 @@
     ],
     "meaning": "Source enumeration;future raw validation per visible testID/name.15SQLite tests have realframework-awaited teardown,not syntheticcloseprints.76oldcreation instances are independent parentacceptedR1raw count;not guessed100."
   },
-  "current309": {
-    "members": 309,
-    "source_digest": "f7bc63903e7c1638f2a8753131b8a32588a9cc0535686fd4df8677b962385bbb",
+  "next_unread_cleanup": {
+    "fixture_names": [
+      "actual inbox more menu exposes an accessible next unread entry without replacing existing actions",
+      "ordinary message and contacts tab navigation remains available without reading or marking unread",
+      "real message tab double tap reveals the muted unread beyond the first SDK page at large text",
+      "actual next unread menu reaches the end then wraps to the original CID without opening chat",
+      "canceling the actual search switch confirmation preserves the typed filter and performs no full read",
+      "explicitly switching to all conversations finds a hidden-by-filter unread and retains the search draft for reopening",
+      "typing a new filter retires an already dispatched complete read before any old result can scroll",
+      "manual scrolling cancels an admitted pending unread seek and its late reply cannot take the scroll position back",
+      "foreign route coverage and return cannot revive a dispatched unread view but a new explicit action can work",
+      "SDK deletion before the unread reply retires the original CID and never redirects to its shifted row index",
+      "owner replacement retires both a dispatched page read and retained old message-tab callbacks"
+    ],
+    "markers": [
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ],
+    "unit_names": [
+      "next unread reads the entire SDK inbox beyond forty and preserves muted ordering without writes",
+      "next unread complete empty snapshot differs from a native read failure",
+      "next unread rejects duplicate conversation identities rather than claiming a complete cycle",
+      "next unread keeps the original query ticket through a delayed native reply",
+      "next unread source cannot renew its owner after real logout and login starts",
+      "next unread original CID revision prevents private preview observation after a concurrent clear",
+      "next unread admission rejects a quarantined CID instead of replacing the original cut with a fresh lease",
+      "next unread issuer replacement cannot adopt an old in-flight native snapshot",
+      "next unread tenant replacement cannot adopt an old in-flight native snapshot",
+      "next unread cycles the complete ordered inbox including muted rows and wraps by CID",
+      "next unread does not advance its CID anchor until actual row reveal succeeds",
+      "next unread handles a single unread and a complete all-read inbox without changing counts",
+      "next unread prevents concurrent complete reads while allowing a later explicit new intent",
+      "SDK unread changes retire a pending next-unread request before refresh debounce",
+      "next unread replaces an older paginated response without allowing its late append to corrupt the snapshot",
+      "deleting the previous anchor CID uses the real current viewport anchor on a new explicit cycle"
+    ],
+    "geometry_names": [
+      "real production seek reveals a variable-height sliver target by measured geometry rather than an average height",
+      "production measured seek stops after its original view ticket retires during an actual scroll animation"
+    ],
+    "source_counts": {
+      "SDK_fixture11": 11,
+      "unit16": 16,
+      "geometry2": 2
+    },
+    "SDK_storage_tail": "next_unread_cleanup sdk.end follows awaited closeUnit -> SdkHarness.dispose: real SessionCoordinator.dispose, gateway.dispose, then owned support directory recursive delete. No additional own SQLite database exists in this feature.",
+    "sdk_dispose_primary": {
+      "path": "Newchat-openim/app/test/core/im/sdk_harness.dart",
+      "bytes": 8228,
+      "sha256": "be8ecae48cdd344757a9b4a9e3805272dbb43e84fa35657ea460bee983ed5b56"
+    },
+    "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
+    "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
+  },
+  "current310": {
+    "members": 310,
+    "source_digest": "a346e7204c0418a821bee7d8bcd02313cea1df4bc506d5f39a07dbe87464501e",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1789,8 +1866,8 @@
       },
       {
         "path": "app/lib/features/meeting/booking/booking_providers.dart",
-        "bytes": 4926,
-        "sha256": "c33d2d652ae0facaef20f14a7f715a321360da2dcd57e000fcfd2a3e860ac524"
+        "bytes": 5289,
+        "sha256": "221396ce22834c2ebecfe2ecaf97760e98077f94fcaf80e9bd6d2ab343d70f98"
       },
       {
         "path": "app/lib/features/meeting/booking/data/booking_contract.dart",
@@ -1804,8 +1881,8 @@
       },
       {
         "path": "app/lib/features/meeting/booking/data/meeting_booking_repository.dart",
-        "bytes": 6805,
-        "sha256": "8d47526b7cdcaae39828871e102af24cccc2ec7b1bacc2c6c66b73c5ed11ec76"
+        "bytes": 7525,
+        "sha256": "2d5eac85f84e079fa50c332239741b405affe3252ed5df55e57c4ee6b3b081c0"
       },
       {
         "path": "app/lib/features/meeting/booking/data/tenant_booking_adapter.dart",
@@ -1819,8 +1896,8 @@
       },
       {
         "path": "app/lib/features/meeting/booking/presentation/booking_controller.dart",
-        "bytes": 8472,
-        "sha256": "7aaf133ac51e4e75333fa188c38ac427be600d2b3127026fc75f4046e34a582f"
+        "bytes": 8894,
+        "sha256": "c50d96748917dfd1423b2363dfd8ac7f9a2d23d6dca748210f9817ac1f00be8e"
       },
       {
         "path": "app/lib/features/meeting/booking/presentation/booking_detail_page.dart",
@@ -2598,6 +2675,11 @@
         "sha256": "7b8e7a686f28e19cb2eeb92b580180089363e4fe3c9c81a42b90077c815a1e11"
       },
       {
+        "path": "app/test/features/meeting/booking/booking_capability_discovery_test.dart",
+        "bytes": 9638,
+        "sha256": "b8affa2a5679b9ea76e31d4bc18cffeeb7d560c4f9a8d2a6b6b44132bd48749a"
+      },
+      {
         "path": "app/test/features/meeting/booking/booking_controller_test.dart",
         "bytes": 5235,
         "sha256": "e55817903a681499adad4b7e25f7915a653dc6b967c70788ff5b5a105a302411"
@@ -2853,8 +2935,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 273,
-    "expected_full_tests": 955,
+    "expected_target_tests": 281,
+    "expected_full_tests": 963,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -2872,63 +2954,8 @@
       "test/features/conversation/next_unread_repository_test.dart",
       "test/features/conversation/next_unread_controller_test.dart",
       "test/features/conversation/next_unread_page_test.dart",
-      "test/features/meeting/meeting_routes_test.dart"
+      "test/features/meeting/meeting_routes_test.dart",
+      "test/features/meeting/booking/booking_capability_discovery_test.dart"
     ]
-  },
-  "next_unread_cleanup": {
-    "fixture_names": [
-      "actual inbox more menu exposes an accessible next unread entry without replacing existing actions",
-      "ordinary message and contacts tab navigation remains available without reading or marking unread",
-      "real message tab double tap reveals the muted unread beyond the first SDK page at large text",
-      "actual next unread menu reaches the end then wraps to the original CID without opening chat",
-      "canceling the actual search switch confirmation preserves the typed filter and performs no full read",
-      "explicitly switching to all conversations finds a hidden-by-filter unread and retains the search draft for reopening",
-      "typing a new filter retires an already dispatched complete read before any old result can scroll",
-      "manual scrolling cancels an admitted pending unread seek and its late reply cannot take the scroll position back",
-      "foreign route coverage and return cannot revive a dispatched unread view but a new explicit action can work",
-      "SDK deletion before the unread reply retires the original CID and never redirects to its shifted row index",
-      "owner replacement retires both a dispatched page read and retained old message-tab callbacks"
-    ],
-    "markers": [
-      "sdk.begin",
-      "sdk.end",
-      "unmount.begin",
-      "unmount.end"
-    ],
-    "unit_names": [
-      "next unread reads the entire SDK inbox beyond forty and preserves muted ordering without writes",
-      "next unread complete empty snapshot differs from a native read failure",
-      "next unread rejects duplicate conversation identities rather than claiming a complete cycle",
-      "next unread keeps the original query ticket through a delayed native reply",
-      "next unread source cannot renew its owner after real logout and login starts",
-      "next unread original CID revision prevents private preview observation after a concurrent clear",
-      "next unread admission rejects a quarantined CID instead of replacing the original cut with a fresh lease",
-      "next unread issuer replacement cannot adopt an old in-flight native snapshot",
-      "next unread tenant replacement cannot adopt an old in-flight native snapshot",
-      "next unread cycles the complete ordered inbox including muted rows and wraps by CID",
-      "next unread does not advance its CID anchor until actual row reveal succeeds",
-      "next unread handles a single unread and a complete all-read inbox without changing counts",
-      "next unread prevents concurrent complete reads while allowing a later explicit new intent",
-      "SDK unread changes retire a pending next-unread request before refresh debounce",
-      "next unread replaces an older paginated response without allowing its late append to corrupt the snapshot",
-      "deleting the previous anchor CID uses the real current viewport anchor on a new explicit cycle"
-    ],
-    "geometry_names": [
-      "real production seek reveals a variable-height sliver target by measured geometry rather than an average height",
-      "production measured seek stops after its original view ticket retires during an actual scroll animation"
-    ],
-    "source_counts": {
-      "SDK_fixture11": 11,
-      "unit16": 16,
-      "geometry2": 2
-    },
-    "SDK_storage_tail": "next_unread_cleanup sdk.end follows awaited closeUnit -> SdkHarness.dispose: real SessionCoordinator.dispose, gateway.dispose, then owned support directory recursive delete. No additional own SQLite database exists in this feature.",
-    "sdk_dispose_primary": {
-      "path": "Newchat-openim/app/test/core/im/sdk_harness.dart",
-      "bytes": 8228,
-      "sha256": "be8ecae48cdd344757a9b4a9e3805272dbb43e84fa35657ea460bee983ed5b56"
-    },
-    "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
-    "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
   }
 }

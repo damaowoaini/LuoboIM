@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Eleven pure controller gates; no Go, Docker, DB or source1099 materialization."""
+"""Thirteen pure controller gates; no Go, Docker, DB or source1100 materialization."""
 import hashlib
 import importlib.util
 import json
@@ -253,6 +253,51 @@ class ControllerTests(unittest.TestCase):
             actual = SUBJECT.audit_physical_before(changed, 1)
             self.assertEqual(actual['failed_tests'], SUBJECT.audit_physical_before(events, 1)['failed_tests'])
             self.assertFalse(actual['accepted'], fault)
+
+
+    def test_booking_whole_inventory_requires_all_old_eight_and_new_mongo(self):
+        inputs = json.loads(Path(__file__).with_name('inputs.json').read_text())
+        short = 'internal/meetingbooking'
+        spec = inputs['packages'][short]
+        mandatory = inputs['mandatory_booking_mongo']
+        self.assertEqual(len(spec['top_tests']), 31)
+        self.assertEqual(len(mandatory), 9)
+        self.assertEqual(spec['required_leaves'], mandatory)
+        package = SUBJECT.PREFIX + short
+        events = []
+        for test in spec['top_tests']:
+            events.extend([{'Package':package, 'Action':'run', 'Test':test},
+                           {'Package':package, 'Action':'pass', 'Test':test}])
+        events.append({'Package':package, 'Action':'pass'})
+        self.assertTrue(SUBJECT.audit(events, 0, short, spec)['accepted'])
+        for test in mandatory:
+            with self.subTest(mongo=test):
+                skipped = [dict(event) for event in events]
+                for event in skipped:
+                    if event.get('Test') == test and event['Action'] == 'pass':
+                        event['Action'] = 'skip'
+                self.assertFalse(SUBJECT.audit(skipped, 0, short, spec)['accepted'])
+                missing = [event for event in events if event.get('Test') != test]
+                self.assertFalse(SUBJECT.audit(missing, 0, short, spec)['accepted'])
+
+    def test_compile_collects_all_27_packages_including_booking_without_tests(self):
+        inputs = json.loads(Path(__file__).with_name('inputs.json').read_text())
+        packages = list(inputs['packages'])
+        self.assertEqual(len(packages), 27)
+        self.assertIn('internal/meetingbooking', packages)
+        calls = []
+        def command(package, args, phase, timeout):
+            calls.append(package)
+            self.assertEqual(phase, 'compile')
+            self.assertEqual(timeout, 900)
+            self.assertEqual(args[:-1], ['go', 'test', '-mod=readonly', '-p=1', '-race', '-json', '-run', '^$'])
+            self.assertEqual(args[-1], './' + package)
+            return None, 1 if package == 'internal/meetingbooking' else 0
+        codes = SUBJECT.compile_packages(packages, command)
+        self.assertEqual(calls, packages)
+        self.assertEqual(codes['internal/meetingbooking'], 1)
+        self.assertEqual(sum(code == 0 for code in codes.values()), 26)
+
 
 if __name__ == '__main__':
     unittest.main()

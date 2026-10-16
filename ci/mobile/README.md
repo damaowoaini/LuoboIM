@@ -1,3 +1,28 @@
+# Future Mobile310 booking capability CI (R4-parent rebase, prepared only)
+
+Parent309 is independently accepted run38911518860/commite5d2410:273PASS,955PASS,
+strictanalysis0; exact old922+Next29+meeting4 names,0errors/skip/warnings and all
+cleanup sequences. Root receipt a8110fe0 binds this evidence. PublicHEAD3bf70123
+only adds native8; all13 before paths/full309/SDK51 match both trees.
+
+This successor preserves prior310CI489b and original capabilitymanifest8748
+without byte changes. The exact4App after bodies remain referenced originals;
+only their base309 fixture/provenance and computed310/362/reference vectors
+are updated.5controller/config bodies are byte-identical to prior310 draft.
+Expected target281=accepted273+the new8-case file; full963=accepted955+8,
+strictanalysis0. These new281/963 and8 are prepared,not executed or accepted.
+
+Same35Python/9guardAST+bothcleanup parsers,174dependencies/SDK51/migration1,
+officialtoolchain,4GiBadmission/1GiB.2/cap768MiB/900s/netns/fullcompletion and
+exactsuccessname gates remain. No new controller branch or reference phase.
+New8tests register awaited journal/provider/API/session/ownedfolder teardown.
+No main/public apply,dispatch,rereun,cancel,localFlutter/Dart/DB/pubget/build.
+Scheduling descriptions never grant media/serverauthorization or prove runtime
+deployment/device acceptance. Defaultoff original searchreference still has
+exactfourhistoricalreplacements and strict1namedassertFAIL1oldfilterPASS.
+
+## Accepted parent309 historical documentation
+
 # Mobile309 fixture R2 (prepared, not run)
 
 R1 run38907998095 naturally failed after all273 visible tests finished:265PASS

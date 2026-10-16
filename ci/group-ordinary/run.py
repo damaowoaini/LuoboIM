@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Isolated source1099 full26-package validation; no ordinary runtime adoption."""
+"""Isolated source1100 full27-package validation; no ordinary runtime adoption."""
 import argparse
 from collections import Counter
 import hashlib
@@ -14,11 +14,11 @@ import sys
 
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = REPO / 'ci/group-ordinary/inputs.json'
-SCOPE = 'ordinary_source1099_full26_packages_no_runtime_adoption'
+SCOPE = 'ordinary_source1100_full27_packages_no_runtime_adoption'
 PREFIX = 'github.com/openimsdk/open-im-server/v3/'
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 REDIS = 'redis://127.0.0.1:36379/15'
-PACKAGES = {'internal/groupeffects', 'internal/groupdelivery', 'internal/push/offlinepush/fcm', 'internal/rpc/group', 'internal/groupcleanup', 'pkg/common/startrpc', 'internal/api', 'internal/groupauthority', 'pkg/common/db/controller', 'internal/tools', 'internal/push/offlinepush', 'internal/rpc/msg', 'pkg/common/cmd', 'internal/msgtransfer', 'pkg/common/db/unrelation', 'internal/retention', 'cmd/openim-rpc/openim-rpc-group', 'pkg/common/db/table/relation', 'pkg/common/db/mgo', 'pkg/common/db/cache', 'internal/push', 'internal/messagedelivery', 'pkg/msgprocessor', 'cmd/tools/ordinary-device-receipts', 'internal/push/offlinepush/aliasvendor', 'cmd/tools/ordinary-alias-receipts'}
+PACKAGES = {'internal/groupeffects', 'internal/groupdelivery', 'internal/push/offlinepush/fcm', 'internal/rpc/group', 'internal/groupcleanup', 'pkg/common/startrpc', 'internal/api', 'internal/groupauthority', 'pkg/common/db/controller', 'internal/tools', 'internal/push/offlinepush', 'internal/rpc/msg', 'pkg/common/cmd', 'internal/msgtransfer', 'pkg/common/db/unrelation', 'internal/retention', 'cmd/openim-rpc/openim-rpc-group', 'pkg/common/db/table/relation', 'pkg/common/db/mgo', 'pkg/common/db/cache', 'internal/push', 'internal/messagedelivery', 'pkg/msgprocessor', 'cmd/tools/ordinary-device-receipts', 'internal/push/offlinepush/aliasvendor', 'cmd/tools/ordinary-alias-receipts', 'internal/meetingbooking'}
 LEGACY_SKIPS = {
     'pkg/common/db/controller': {'Test_BatchInsertChat2DB', 'Test_Insert', 'Test_Revoke',
                                  'Test_FindBySeq', 'TestName'},
@@ -111,13 +111,13 @@ def exact_delta(parent, bodies):
 
 def verify():
     c = json.loads(regular(INPUTS))
-    if (c['schema'] != 1 or c['scope'] != SCOPE or c['effective_count'] != 1099
-            or c['parent_count'] != 1023 or c['expected_top_source_inventory'] != 371
-            or c['expected_required_pass'] != 364 or c['allowed_legacy_skip_count'] != 7
+    if (c['schema'] != 1 or c['scope'] != SCOPE or c['effective_count'] != 1100
+            or c['parent_count'] != 1023 or c['expected_top_source_inventory'] != 402
+            or c['expected_required_pass'] != 395 or c['allowed_legacy_skip_count'] != 7
             or c['parent_runner']['path'] != 'ci/group-stage3/run.py'
             or c['parent_inputs']['path'] != 'ci/group-stage3/inputs.json'
-            or len(c['overlay']) != 93):
-        raise ValueError('exact source1099 full-package contract required')
+            or len(c['overlay']) != 96):
+        raise ValueError('exact source1100 full-package contract required')
     for row in c['dependencies']:
         pinned(row)
     pinned(c['parent_inputs'])
@@ -126,14 +126,14 @@ def verify():
     if len(old) != 1023 or parent['effective_digest'] != c['parent_digest']:
         raise ValueError('accepted source1023 differs')
     bodies = apply_overlay(c, dict(old))
-    if (len(bodies) != 1099 or rows(bodies) != c['effective_source']
+    if (len(bodies) != 1100 or rows(bodies) != c['effective_source']
             or digest(rows(bodies)) != c['effective_digest']
             or exact_delta(old, bodies) != c['delta']):
         raise ValueError('complete source or before delta differs')
-    if set(c['packages']) != PACKAGES or len(PACKAGES) != 26:
-        raise ValueError('complete26package contract required')
-    if sum(len(s['top_tests']) for s in c['packages'].values()) != 371:
-        raise ValueError('full371 source-name inventory required')
+    if set(c['packages']) != PACKAGES or len(PACKAGES) != 27:
+        raise ValueError('complete27package contract required')
+    if sum(len(s['top_tests']) for s in c['packages'].values()) != 402:
+        raise ValueError('full402 source-name inventory required')
     for package, spec in c['packages'].items():
         if name(package) != package or spec['full_package'] is not True:
             raise ValueError('full canonical package required')
@@ -161,6 +161,20 @@ def verify():
     if (len(mandatory) != 9 or len(set(mandatory)) != 9
             or any(t not in c['packages']['internal/messagedelivery']['top_tests'] for t in mandatory)):
         raise ValueError('exact9 new real Mongo cases required')
+    booking = c['packages']['internal/meetingbooking']
+    expected_booking_mongo = ['TestBookingCapabilityMongoMissingIndexesCannotAdvertiseOrRepairReadiness', 'TestBookingMongoBookingNeverCreatesRTCOrMediaState', 'TestBookingMongoConcurrentIntentAndLostACKRecovery', 'TestBookingMongoMissingIndexesCannotCreateStateUntilExplicitPreparation', 'TestBookingMongoResolveAgainstDelayedCreate', 'TestBookingMongoTenantAndOwnerQueriesNeverCross', 'TestBookingMongoTransactionRollbackUsesActualSession', 'TestBookingMongoUnsafePartialIndexIsNotRepairedByRuntimeOrOperator', 'TestBookingMongoUpdateCancelCASAndMinimalReceipt']
+    if (booking['allowed_legacy_skips'] or len(booking['top_tests']) != 31
+            or c['mandatory_booking_mongo'] != expected_booking_mongo
+            or booking['required_leaves'] != expected_booking_mongo
+            or not set(expected_booking_mongo) <= set(booking['top_tests'])):
+        raise ValueError('exact8 inherited plus1 capability Mongo cases required')
+    inherited = c['inherited1099_test_files']
+    if (len(inherited) != 201 or len({r['path'] for r in inherited}) != len(inherited)
+            or any(not r['path'].endswith('_test.go') for r in inherited)):
+        raise ValueError('complete source1099 test custody required')
+    for row in inherited:
+        if row['path'] not in bodies or sha(bodies[row['path']]) != row['sha256']:
+            raise ValueError('source1099 test body differs')
     previous = dict(bodies)
     wanted_before = {'server/internal/messagedelivery/' + n for n in
                      ('kafka_alias_vendor.go', 'kafka_vendor.go', 'kafka_fcm_devices.go')}
@@ -347,14 +361,14 @@ def run():
                     os.environ['GITHUB_RUN_ID'] + ':' + os.environ['GITHUB_RUN_ATTEMPT'],
                     os.environ['GITHUB_SHA']], check=True, timeout=20)
     temporary = Path(os.environ['RUNNER_TEMP'])
-    work = temporary / 'group-ordinary-source1099'
+    work = temporary / 'group-ordinary-source1100'
     if not temporary.is_absolute() or temporary.resolve() != temporary or work.exists():
         raise ValueError('fresh canonical work path required')
     fs = os.statvfs(temporary)
     if fs.f_bavail * fs.f_frsize < 4 * 1024 ** 3:
         raise ValueError('4GiB bootstrap floor required')
     work.mkdir(mode=0o700)
-    output = REPO / 'ci-results/group-ordinary-source1099'
+    output = REPO / 'ci-results/group-ordinary-source1100'
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     for target, body in bodies.items():
         path = work / target
@@ -373,7 +387,7 @@ def run():
         os.environ[key] = str(path)
     os.environ.update(GOTOOLCHAIN='local', GOMAXPROCS='2', GOMEMLIMIT='900MiB', GOWORK='off')
     write(output / 'source.json', {'scope':SCOPE, 'commit':os.environ['GITHUB_SHA'],
-          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1099,
+          'inputs_sha256':sha(regular(INPUTS)), 'effective_source_count':1100,
           'effective_digest':c['effective_digest'], 'go_version':version,
           'generated_public_config_sha256':sha(template), 'no_runtime_adoption':True})
 
@@ -407,7 +421,7 @@ def run():
         'tests_started':False, 'vet_started':False})
     if any(code != 0 for code in compile_codes.values()):
         raise ValueError('compile failed; complete raw diagnostics retained; no tests or vet')
-    # Separate full1099 source context; only3 products are restored. The same
+    # Separate full1100 source context; only3 products are restored. The same
     # new Mongo test file is byte-identical, not a missing-helper compile RED.
     before_work = work / 'before-physical'
     before_work.mkdir(mode=0o700)
@@ -462,14 +476,14 @@ def run():
     counts = Counter()
     for summary in summaries.values():
         counts.update(summary['counts'])
-    if counts.get('top_pass', 0) != 364 or counts.get('top_skip', 0) != 7 or counts.get('sub_skip', 0) != 0:
-        raise ValueError('exact364 mandatory PASS and7 old top SKIP required')
+    if counts.get('top_pass', 0) != 395 or counts.get('top_skip', 0) != 7 or counts.get('sub_skip', 0) != 0:
+        raise ValueError('exact395 mandatory PASS and7 old top SKIP required')
     write(output / 'summary.json', {'state':'passed_full_source_packages_only', 'scope':SCOPE,
           'effective_digest':c['effective_digest'], 'counts':dict(counts),
           'packages':summaries, 'vet_exit':{p:0 for p in packages},
           'final_free_bytes':final_free,
           'legacy_skips_are_not_integration_passes':True, 'no_runtime_adoption':True})
-    print('Ordinary source1099 full26-package validation complete; runtime remains unadopted.')
+    print('Ordinary source1100 full27-package validation complete; runtime remains unadopted.')
 
 
 if __name__ == '__main__':
@@ -479,7 +493,7 @@ if __name__ == '__main__':
     try:
         if args.verify:
             verify()
-            print('Ordinary exact source1099 verified; no Go/DB execution.')
+            print('Ordinary exact source1100 verified; no Go/DB execution.')
         else:
             run()
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError):

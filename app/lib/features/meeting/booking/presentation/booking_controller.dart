@@ -10,15 +10,15 @@ import '../domain/booking_view.dart';
 enum BookingAvailability { unsupported, checking, ready, unavailable }
 
 final class BookingController extends ChangeNotifier {
-  BookingController(this.repository, {required bool released,
+  BookingController(this.repository, {required bool released, bool requireCapability = false,
     DateTime Function()? now, Stream<int>? invalidations, Stream<int>? accessChanges})
     : availability = released ? BookingAvailability.checking : BookingAvailability.unsupported,
-      _released = released, now = now ?? DateTime.now {
+      _released = released, _requireCapability = requireCapability, now = now ?? DateTime.now {
     _invalidations = invalidations?.listen((_) => retire());
     _accessChanges = accessChanges?.listen((_) => retire());
   }
   final MeetingBookingRepository repository;
-  final bool _released;
+  final bool _released, _requireCapability;
   final DateTime Function() now;
   StreamSubscription<int>? _invalidations, _accessChanges;
   BookingAvailability availability;
@@ -61,9 +61,12 @@ final class BookingController extends ChangeNotifier {
     if (!usable || !_released) return;
     if (cancelled != null) includeCancelled = cancelled;
     final request = ++_request, filter = includeCancelled;
-    loading = true; notice = null; _emit();
+    loading = true; notice = null;
+    if (_requireCapability) availability = BookingAvailability.checking;
+    _emit();
     try {
-      final page = await repository.list(includeCancelled: filter);
+      final page = await repository.list(includeCancelled: filter,
+        requireCapability: _requireCapability);
       if (!usable || request != _request) return;
       final parsed = page.records.map((r) => OwnerBookingView.fromRecord(r, repository.scope.owner)).toList();
       if (page.hasMore && (page.nextCursor == null || page.nextCursor!.length > 512)) {
@@ -83,7 +86,8 @@ final class BookingController extends ChangeNotifier {
     final request = ++_request, cursor = _cursor, filter = includeCancelled;
     loading = true; _emit();
     try {
-      final page = await repository.list(cursor: cursor, includeCancelled: filter);
+      final page = await repository.list(cursor: cursor, includeCancelled: filter,
+        requireCapability: _requireCapability);
       if (!usable || request != _request) return;
       if (page.hasMore && (page.nextCursor == cursor || page.nextCursor == null || page.nextCursor!.length > 512)) {
         throw const BookingLocalFailure(BookingLocalFailureKind.invalid);
@@ -97,7 +101,10 @@ final class BookingController extends ChangeNotifier {
         combined[raw.id] = row;
       }
       records = List.unmodifiable(combined.values); hasMore = page.hasMore; _cursor = page.nextCursor ?? '';
-    } catch (_) { if (usable && request == _request) notice = '后续预约暂时无法加载，请重新刷新核对。'; }
+    } catch (_) { if (usable && request == _request) {
+      if (_requireCapability) availability = BookingAvailability.unavailable;
+      notice = '后续预约暂时无法加载，请重新刷新核对。';
+    } }
     finally { if (usable && request == _request) { loading = false; _emit(); } }
   }
   Future<OwnerBookingView?> detail(String id) async {
@@ -129,7 +136,8 @@ final class BookingController extends ChangeNotifier {
     }
   }
   Future<BookingReceipt?> recover(String id, {bool retry = false, bool resolve = false}) async {
-    if (!usable || !_released || _busy.contains('intent:$id')) return null;
+    if (!usable || !_released || _busy.contains('intent:$id') ||
+        (_requireCapability && (retry || resolve) && !canWrite)) return null;
     final key = 'intent:$id'; _busy.add(key); notice = null; _emit();
     try {
       // A local prepare failure may leave only this mounted controller's frozen

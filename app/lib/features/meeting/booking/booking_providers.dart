@@ -22,9 +22,12 @@ final class BookingReleaseCapability {
     tenantId == api.access.credentials.tenantId && imBase == api.im.base.toString();
 }
 
-// Release-owned exact catalog, intentionally empty. No URL parameter, form,
-// server error text or legacy room can activate booking writes.
-final bookingReleaseCatalogProvider = Provider<List<BookingReleaseCapability>>((_) => const []);
+// Production discovers the versioned owner-bound contract through an ordinary
+// authenticated List read. A successful empty list without that contract cannot
+// activate writes. An explicit release catalog remains an offline rollout
+// override: [] denies all network; exact entries retain the legacy release path.
+// Neither URL/form input, error text, nor a legacy media room is a capability.
+final bookingReleaseCatalogProvider = Provider<List<BookingReleaseCapability>?>((_) => null);
 final bookingDatabaseFactoryProvider = Provider<DatabaseFactory>((_) => databaseFactory);
 final bookingPrivatePathProvider = Provider<Future<String> Function(String)>((_) => bookingPrivatePath);
 
@@ -67,7 +70,9 @@ final bookingControllerProvider = FutureProvider.autoDispose<BookingController>(
   final api = ref.watch(tenantApiProvider);
   if (api == null) throw const AppFailure(FailureKind.sessionExpired);
   final access = api.access, credentials = access.credentials;
-  final released = ref.watch(bookingReleaseCatalogProvider).any((entry) => entry.matches(api));
+  final catalog = ref.watch(bookingReleaseCatalogProvider);
+  final discover = catalog == null;
+  final released = catalog == null || catalog.any((entry) => entry.matches(api));
   final factory = ref.watch(bookingDatabaseFactoryProvider);
   final pathLoader = ref.watch(bookingPrivatePathProvider);
   var disposed = false;
@@ -97,7 +102,7 @@ final bookingControllerProvider = FutureProvider.autoDispose<BookingController>(
     check(); final path = await pathLoader(credentials.accountKey); check();
     repository = await openTenantBookingRepository(api, factory, path, checkAlive: check);
     check();
-    controller = BookingController(repository, released: released,
+    controller = BookingController(repository, released: released, requireCapability: discover,
       invalidations: access.session.invalidations, accessChanges: access.session.accessChanges);
     await controller.start(); check(); return controller;
   } catch (_) {
