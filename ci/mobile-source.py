@@ -87,8 +87,8 @@ def load_sources(cohort):
     if cohort == 'booking-custom249':
         overlay = plan['candidate249']['overlay']
         before = plan['candidate249']['before']
-        if len(overlay) != 22 or len(before) != 3:
-            raise ValueError('exact22 overlay/3 replacements required')
+        if len(overlay) != 23 or len(before) != 4:
+            raise ValueError('exact23 overlay/4 replacements required')
         expected = {r['path'] for r in overlay}
         root = REPO / 'ci/mobile/candidate'
         actual = {str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()}

@@ -277,4 +277,43 @@ void main() {
       await harness.dispose();
     }
   });
+
+  test('late conversation lookup cannot enter a session whose generation ended before native disconnect', () async {
+    final harness = SdkHarness();
+    final entered = Completer<void>();
+    final returned = Completer<String>();
+    await harness.start();
+    final repository = ChatRepository(
+      gateway: harness.gateway,
+      session: harness.session,
+      conversationId: 'sg_fixture',
+    );
+    final generation = harness.session.state.generation;
+    final nativeLease = harness.gateway.historyAccess(generation, conversationId: 'sg_fixture');
+    harness.overrideCall = (call) async {
+      if (call.method == 'getMultipleConversation') {
+        entered.complete();
+        return returned.future;
+      }
+      return harness.respond(call);
+    };
+    try {
+      final conversation = repository.conversation();
+      final rejected = expectLater(conversation, throwsA(isA<AppFailure>()));
+      await entered.future.timeout(const Duration(seconds: 2));
+      final exit = harness.session.signOut();
+      expect(harness.session.acceptsEvent(generation), isFalse);
+      // signOut invalidates its generation synchronously; the native SDK's
+      // disconnect is still queued. Do not rely solely on its later fence.
+      expect(nativeLease.check, returnsNormally);
+      returned.complete(jsonEncode([SdkHarness.conversation(id: 'sg_fixture', group: true)]));
+      await rejected;
+      await exit;
+      expect(repository.current, isFalse);
+    } finally {
+      if (!returned.isCompleted) returned.complete('[]');
+      repository.clear();
+      await harness.dispose();
+    }
+  });
 }

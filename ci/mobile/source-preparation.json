@@ -1,5 +1,5 @@
 {
-  "state": "candidate_v6_source_prepared_actual_local21_pass_current548_cloud_verified_Linux75_full623_pending",
+  "state": "candidate_v7_read_scope_source_prepared_local3_pass_current548_cloud_verified_Linux76_full624_pending",
   "own_files": [
     {
       "path": ".github/workflows/mobile-ci.yml",
@@ -24,7 +24,7 @@
     {
       "path": "ci/mobile-source.py",
       "bytes": 6675,
-      "sha256": "c1f786fb92a8fbe95af61390bc3ee568338664e32260e452cd72127fc720db57"
+      "sha256": "c016e9ca2afdce16f839c387513e70ea15651a044aeb179cd4c90c7f6c180709"
     },
     {
       "path": "ci/mobile-test-tools.py",
@@ -33,13 +33,18 @@
     },
     {
       "path": "ci/mobile/README.md",
-      "bytes": 5790,
-      "sha256": "78869bbd5165d8305c0c2b8cdb59f3e67bbc096b44abc758b17d8b102ff28bda"
+      "bytes": 6201,
+      "sha256": "baccb8fa9880be2227175dcd469ad47b4b55419268f0c1ed9f948a946f3fa2bd"
     },
     {
       "path": "ci/mobile/candidate/app/lib/app.dart",
       "bytes": 18789,
       "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
+    },
+    {
+      "path": "ci/mobile/candidate/app/lib/features/chat/data/chat_repository.dart",
+      "bytes": 38493,
+      "sha256": "377b0185655ab8c34bc0b5e97167c261c4f3ae85dfa939ebf4bd6602497d42f6"
     },
     {
       "path": "ci/mobile/candidate/app/lib/features/chat/data/message_mapper.dart",
@@ -108,8 +113,8 @@
     },
     {
       "path": "ci/mobile/candidate/app/test/features/chat/legacy_custom_summary_test.dart",
-      "bytes": 10937,
-      "sha256": "d94a6361f190f4d25fc8eeb524650bcfb12e938f88caf952d4296508a7819185"
+      "bytes": 12544,
+      "sha256": "7f2f6c94c654c00a3a0bed9fd512368608acf15ecdb44e637b8d3df2e7bfec51"
     },
     {
       "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_controller_test.dart",
@@ -148,11 +153,11 @@
     },
     {
       "path": "ci/mobile/inputs.json",
-      "bytes": 66364,
-      "sha256": "bc320d298b55bc08bd859db15ddf7352502efe1b23bcef46a917b9cd56c0b159"
+      "bytes": 68139,
+      "sha256": "f625f28cdb237746e972c3a3d09408614bdd64ab8dfba9092b57c34f631155e9"
     }
   ],
-  "aggregate_sha256": "a0b09f34c106778c0b2c72bb1d55de0dc07d70e1167767c83b7029e25a4c28cf",
+  "aggregate_sha256": "89013c619c45f45cca5cd9052563751188dd9f3aa5d920389dca9395161789ee",
   "no_product_edits": false,
   "native_acceptance": false,
   "ci_followup": {
@@ -210,5 +215,20 @@
     "preserved_original_pages": 17,
     "added_negative_cases": 2,
     "old_run38848168319": "candidate incomplete, not accepted; artifacts preserved"
+  },
+  "candidate_revision_v7": {
+    "prior_receipt_sha256": "3b4d1bf07f47cc92eb4c83dcae65cc7d2cd841a2832def375bda12c65c40b8f3",
+    "manifest_sha256": "ab1f74de46e0268a6a5db2c47dabf217ba07762a1ef1e260add0831d15feb6b8",
+    "local_receipt_sha256": "526fa992549973b995b6218bc03bb3e1a396bbee8c95fbed39a081478200a2ae",
+    "current_product230_unchanged": true,
+    "new_product_candidate_only": "ChatRepository read result/session lease guards; no run/send/ACK change",
+    "source249_digest": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
+    "overlay23_before4": true,
+    "actual_local": "2assertionRED+ordinarytext positive ->3PASS",
+    "new_cloud_expected": {
+      "target": 76,
+      "full": 624,
+      "analyze": "pending"
+    }
   }
 }

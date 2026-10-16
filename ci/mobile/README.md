@@ -7,15 +7,19 @@
 | job | 业务源码 | 可移植输入 | 实际验证要求 |
 | --- | ---: | ---: | --- |
 | `current230` | 230 | 282 | 完整 548 项 + analyze |
-| `booking-custom249` | 249 | 301 | 预约 59 + 自定义消息 16 项，再完整 623 项 + analyze |
+| `booking-custom249` | 249 | 301 | 预约 59 + 自定义消息 17 项，再完整 624 项 + analyze |
 
-548 已在 Linux 云运行 `38845582450` 和 `38848168319` 完整通过，分析零问题。
+548 已在 Linux 云运行 `38845582450`、`38848168319`、`38851458094` 完整通过，分析零问题。
 候选原v1/v2运行失败和未完成记录保留：原pages编译/route清理问题修后，v2在
 pages实际操作等待中900秒超时，只有2项通过，没有执行完整621或analyze。
 当前v6修正真实I/O与widget时钟夹具，且修复正常确认时Stateless Widget替换导致
 resolve被误拒的候选产品guard；保留17原页面用例，新增同element换controller和
 ID已不显示的2个负例。本机macOS实际19页面+2路由=21项通过、0跳过；
-新的Linux目标75与完整623/analyze仍待本轮云运行，未采用到current230。
+v6 Linux目标75已完整执行74通过/1断言失败，未启动full623/analyze；该失败暴露
+会话generation同步失效、native disconnect仍排队时的迟到history读取。v7产品只
+补history/conversation返回与缓存写前的原session+history lease检查，不改发送ACK；
+原失败用例逐字保留，新增会话读取回归。本机精确2RED+1普通文本正控→3PASS。
+当前v7 Linux目标76与完整624/analyze仍待验证，未采用到current230。
 只有进程退出0、唯一success reporter footer、完整预期计数和资源门禁共同通过才算成功。
 
 ## 上传范围
@@ -27,7 +31,7 @@ ID已不显示的2个负例。本机macOS实际19页面+2路由=21项通过、0�
   和 fixture messenger 源文件，共 51 个；分析 `tool/fixture_main.dart` 需要后者，
   但 CI 不启动该入口。
 - `migration/legacy_personal_export/legacy_personal_export.dart`，2,942 B。
-- `ci/mobile/candidate/` 的 22 个原封候选文件：替换 3 个路径、新增 19 个。
+- `ci/mobile/candidate/` 的 23 个已锁定候选文件：替换 4 个路径、新增 19 个。
   materializer 校验 before，既不覆盖 checkout，也不读取本机 `references/`。
 
 282/301 是这次可移植源码闭包；它们不是原 356/375 原生 QA 闭包。原生工程、
@@ -76,10 +80,10 @@ bootstrap 与 phase 初始可用磁盘至少 4 GiB；实际验证每 0.2 秒检�
 
 工作流只上传 `evidence/`：版本、source/SQLite receipt、setup/测试/分析原日志、
 完整测试计数和资源记录；不上传整个工作树、依赖缓存或设备数据。
-`ci/mobile-test-tools.py` 另有 6 个工具单元用例，不计入 548/75/623。
+`ci/mobile-test-tools.py` 另有 6 个工具单元用例，不计入 548/76/624。
 
-下面是可复用入口。6 个工具用例及 current230 云流程已执行，不代表 v6 候选
-的 75/623 已完成：
+下面是可复用入口。6 个工具用例及 current230 云流程已执行，不代表 v7 候选
+的 76/624 已完成：
 
 ```sh
 python3 ci/mobile-test-tools.py

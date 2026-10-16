@@ -38,6 +38,12 @@
       "local_verification_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
       "historical_failed_run38848168319": "current548 passed; candidate2passed then incomplete900s phase_timeout. Preserved artifacts.",
       "new_claim": "local Mac21 only; pending Linux75/full623/analyze"
+    },
+    "candidate_revision_v7": {
+      "manifest_sha256": "ab1f74de46e0268a6a5db2c47dabf217ba07762a1ef1e260add0831d15feb6b8",
+      "local_verification_sha256": "526fa992549973b995b6218bc03bb3e1a396bbee8c95fbed39a081478200a2ae",
+      "previous_cloud_run38851458094": "current548/analyze passed; target75 complete74PASS1assertFAIL, full623/analyze not started",
+      "cloud76_full624": "pending"
     }
   },
   "toolchain": {
@@ -1472,9 +1478,9 @@
   },
   "candidate249": {
     "members": 249,
-    "source_digest": "f703de845481101f7450fb78f89293b13f87b6e267e1e2ee6d02323395a7a8d1",
-    "expected_target_tests": 75,
-    "expected_full_tests": 623,
+    "source_digest": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
+    "expected_target_tests": 76,
+    "expected_full_tests": 624,
     "before": {
       "app/lib/app.dart": {
         "bytes": 18016,
@@ -1487,6 +1493,10 @@
       "app/lib/features/chat/data/message_mapper.dart": {
         "bytes": 11113,
         "sha256": "5b4308b06b0a743525a9596689f2bbe76f4506ad1fe8c7f374bce56825900475"
+      },
+      "app/lib/features/chat/data/chat_repository.dart": {
+        "bytes": 38366,
+        "sha256": "66538ea6813f8f910923511bdd5bc4385c0f9dd4425b6d5ed4fb86fba1426fad"
       }
     },
     "overlay": [
@@ -1494,6 +1504,11 @@
         "path": "app/lib/app.dart",
         "bytes": 18789,
         "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
+      },
+      {
+        "path": "app/lib/features/chat/data/chat_repository.dart",
+        "bytes": 38493,
+        "sha256": "377b0185655ab8c34bc0b5e97167c261c4f3ae85dfa939ebf4bd6602497d42f6"
       },
       {
         "path": "app/lib/features/chat/data/message_mapper.dart",
@@ -1562,8 +1577,8 @@
       },
       {
         "path": "app/test/features/chat/legacy_custom_summary_test.dart",
-        "bytes": 10937,
-        "sha256": "d94a6361f190f4d25fc8eeb524650bcfb12e938f88caf952d4296508a7819185"
+        "bytes": 12544,
+        "sha256": "7f2f6c94c654c00a3a0bed9fd512368608acf15ecdb44e637b8d3df2e7bfec51"
       },
       {
         "path": "app/test/features/meeting/booking/booking_controller_test.dart",
@@ -1632,6 +1647,22 @@
       "source_manifest_sha256": "b4fda331ed8c535139d39b0938d095b607a4950be6eefb35e2e807ca702f7ae7",
       "local_receipt_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
       "cloud75_full623": "pending"
+    },
+    "revision_v7": {
+      "parent_public_commit": "76c02e6848940455e13729fa0ae601610d435ebe",
+      "parent_inputs_sha256": "bc320d298b55bc08bd859db15ddf7352502efe1b23bcef46a917b9cd56c0b159",
+      "parent_source249_digest": "f703de845481101f7450fb78f89293b13f87b6e267e1e2ee6d02323395a7a8d1",
+      "new_overlay_members": 23,
+      "replacements": 4,
+      "members_unchanged": 249,
+      "added_tests": 1,
+      "current_product_230_unchanged": true,
+      "fix": "Check same SessionCoordinator and original MessageHistoryAccess before late history mapping,conversation mapping/cacheassignment; no_run/send/ACK change",
+      "original_failure_test": "verbatim preserved",
+      "local_actual": "2read-race assertions RED+1ordinary positive ->3PASS; no full624",
+      "cloud76_full624": "pending",
+      "manifest_sha256": "ab1f74de46e0268a6a5db2c47dabf217ba07762a1ef1e260add0831d15feb6b8",
+      "local_verification_sha256": "526fa992549973b995b6218bc03bb3e1a396bbee8c95fbed39a081478200a2ae"
     }
   },
   "portable_members": {
