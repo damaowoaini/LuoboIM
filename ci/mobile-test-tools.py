@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current323 target345/full1027."""
+"""Pure Python CI gate checks, separate from current331 target386/full1068."""
 import copy
 import importlib.util
 import json
@@ -134,13 +134,13 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical_cohorts_cannot_alias323(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316'):
+    def test_historical_cohorts_cannot_alias331(self):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current323'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current331'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -200,10 +200,29 @@ class BackgroundInventoryTests(unittest.TestCase):
                 check.source.required_names(plan)
 
     def test_same_count_target_cannot_replace_background_case(self):
-        self.rejected_inventory(lambda n: n['current_target345'][-1].update(name='forged same-count replacement'))
+        self.rejected_inventory(lambda n: n['parent_target345'][-1].update(name='forged same-count replacement'))
 
     def test_same_count_parent_full_cannot_replace_original_case(self):
         self.rejected_inventory(lambda n: n['parent_full985'][-1].update(name='forged old-case replacement'))
+
+
+class SavedEmojiInventoryTests(BackgroundInventoryTests):
+    def rejected_inventory(self, change):
+        plan = check.source.descriptor()
+        names = json.loads(check.source.regular(check.source.REPO / plan['required_test_names']['path']))
+        change(names)
+        body = json.dumps(names).encode()
+        plan = copy.deepcopy(plan)
+        plan['required_test_names'].update(bytes=len(body), sha256=check.source.sha(body))
+        with mock.patch.object(check.source, 'regular', return_value=body):
+            with self.assertRaisesRegex(ValueError, 'saved emoji names do not preserve'):
+                check.source.required_names(plan)
+
+    def test_same_count_target_cannot_replace_background_case(self):
+        self.rejected_inventory(lambda n: n['current_target386'][-1].update(name='forged saved-emoji replacement'))
+
+    def test_same_count_parent_full_cannot_replace_original_case(self):
+        self.rejected_inventory(lambda n: n['parent_full1027'][-1].update(name='forged parent replacement'))
 
 
 class CleanupTests(unittest.TestCase):

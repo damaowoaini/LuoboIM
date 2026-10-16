@@ -14,6 +14,7 @@ import '../domain/chat_message.dart';
 import '../domain/chat_batch.dart';
 import '../domain/chat_mention.dart';
 import '../domain/chat_snapshot.dart';
+import '../domain/saved_emoji.dart';
 import '../domain/chat_search.dart';
 import '../domain/message_privacy.dart';
 import 'message_mapper.dart';
@@ -48,6 +49,12 @@ final class ChatRepository {
   // A late native snapshot cannot undo a removal already observed in this
   // repository's frozen account generation. This does not rewrite the SDK DB.
   final Set<String> _removedIds = {};
+  final Map<String, SavedEmoji> _preparedFaces = {};
+  int _emojiPolicyRevision = 0;
+  void invalidateSavedEmojiProofs() {
+    ++_emojiPolicyRevision;
+  }
+
   bool isRemoved(String id) => _removedIds.contains(id);
   final Map<String, ({String path, String? thumbnail})> _staged = {};
   static int _mediaSerial = 0;
@@ -64,6 +71,7 @@ final class ChatRepository {
     _groupReadMarked.clear();
     _visibleReadQueue.clear();
     _raw.clear();
+    _preparedFaces.clear();
     _preparedQuoteSources.clear();
     _staged.clear();
   }
@@ -452,6 +460,204 @@ final class ChatRepository {
     }
   }
 
+  /// A reference is intentionally different from a gallery-owned upload receipt.
+  /// The existing favorite snapshot contract supplies the original retention gate.
+  Future<SavedEmoji> savedEmojiFromMessage(
+    String id, {
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+    void Function(void Function())? onProof,
+  }) async {
+    access.check();
+    checkSource();
+    await favoriteSnapshot(id);
+    access.check();
+    checkSource();
+    final raw = _raw[id];
+    if (raw == null) {
+      throw const AppFailure(FailureKind.invalidInput);
+    }
+    final item = _map(raw);
+    _requireEmojiSource(item);
+    final Map data;
+    if (item.kind == ChatMessageKind.image) {
+      final picture =
+          raw.pictureElem?.sourcePicture ?? raw.pictureElem?.bigPicture;
+      data = {'width': picture?.width, 'height': picture?.height};
+    } else {
+      final face = raw.faceElem?.data;
+      if (face == null) {
+        throw const AppFailure(FailureKind.invalidInput);
+      }
+      final decoded = jsonDecode(face);
+      if (decoded is! Map) {
+        throw const AppFailure(FailureKind.invalidInput);
+      }
+      data = decoded;
+    }
+    if (data['width'] is! int || data['height'] is! int || item.media == null) {
+      throw const AppFailure(FailureKind.invalidInput);
+    }
+    final entry = SavedEmoji(
+      url: item.media!,
+      width: data['width'] as int,
+      height: data['height'] as int,
+      source: SavedEmojiSource(conversationId, id),
+    );
+    final proof = await savedEmojiProof(
+      entry,
+      access: access,
+      checkSource: checkSource,
+    );
+    proof();
+    onProof?.call(proof);
+    return entry;
+  }
+
+  void _requireEmojiSource(ChatMessage item) {
+    if (!const {
+          ChatMessageKind.image,
+          ChatMessageKind.sticker,
+        }.contains(item.kind) ||
+        item.delivery != MessageDelivery.sent ||
+        item.privacy.expiresAtMilliseconds != null ||
+        item.privacy.containsPrivateContent ||
+        !item.privacy.inspectionComplete ||
+        !item.privacy.canRetainAt(now())) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
+  }
+
+  /// Returns the exact cut/policy proof used for one rendered item. No fresh
+  /// lease is acquired by the returned callback after a clear or route change.
+  Future<void Function()> savedEmojiProof(
+    SavedEmoji entry, {
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+  }) {
+    access.check();
+    checkSource();
+    final reference = entry.source;
+    final policyRevision = _emojiPolicyRevision;
+    final sourceCut = reference == null
+        ? null
+        : gateway.historyAccess(
+            generation,
+            conversationId: reference.conversationId,
+          );
+    return _run((manager, lease) async {
+      ChatMessage? original;
+      void check() {
+        access.check();
+        checkSource();
+        sourceCut?.check();
+        if (reference != null && policyRevision != _emojiPolicyRevision) {
+          throw const AppFailure(FailureKind.cancelled);
+        }
+        if (original != null) {
+          _requireEmojiSource(original);
+          if (!gateway.privacyLedger.lookup(original.id).canRetainAt(now())) {
+            throw const AppFailure(FailureKind.permissionDenied);
+          }
+          if (reference?.conversationId == conversationId &&
+              isRemoved(original.id)) {
+            throw const AppFailure(FailureKind.permissionDenied);
+          }
+        }
+      }
+
+      check();
+      if (reference != null) {
+        final policies = await manager.conversationManager
+            .getMultipleConversation(
+              conversationIDList: [reference.conversationId],
+            );
+        check();
+        final exact = policies
+            .where((p) => p.conversationID == reference.conversationId)
+            .toList();
+        if (exact.length != 1 ||
+            exact.single.isPrivateChat == true ||
+            exact.single.isMsgDestruct == true) {
+          throw const AppFailure(FailureKind.permissionDenied);
+        }
+        final result = await manager.messageManager.findMessageList(
+          searchParams: [
+            SearchParams(
+              conversationID: reference.conversationId,
+              clientMsgIDList: [reference.messageId],
+            ),
+          ],
+        );
+        check();
+        final matches = [
+          for (final group in [
+            ...?result.findResultItems,
+            ...?result.searchResultItems,
+          ])
+            if (group.conversationID == reference.conversationId)
+              for (final raw in group.messageList ?? <Message>[])
+                if (raw.clientMsgID == reference.messageId) raw,
+        ];
+        if (matches.length != 1 ||
+            matches.single.status != MessageStatus.succeeded) {
+          throw const AppFailure(FailureKind.permissionDenied);
+        }
+        final raw = matches.single;
+        // Observe only after the original CID cut has been rechecked.
+        original = mapMessage(
+          raw,
+          _userId,
+          privacy: gateway.privacyLedger.observe(
+            reference.conversationId,
+            raw.toJson(),
+            now: now(),
+          ),
+        );
+        if (original.media != entry.url) {
+          throw const AppFailure(FailureKind.permissionDenied);
+        }
+        check();
+      }
+      return check;
+    }, access: access);
+  }
+
+  Future<ChatMessage> prepareSavedEmoji(
+    SavedEmoji entry, {
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+  }) async {
+    final proof = await savedEmojiProof(
+      entry,
+      access: access,
+      checkSource: checkSource,
+    );
+    proof();
+    return _run((manager, lease) async {
+      proof();
+      if (_conversation?.canSend != true) {
+        throw const AppFailure(FailureKind.permissionDenied);
+      }
+      final data = jsonEncode(entry.faceData);
+      final message = await manager.messageManager.createFaceMessage(
+        index: -1,
+        data: data,
+      );
+      proof();
+      if (message.clientMsgID?.isNotEmpty != true ||
+          message.contentType != MessageType.customFace ||
+          message.faceElem?.index != -1 ||
+          message.faceElem?.data != data) {
+        throw const AppFailure(FailureKind.invalidResponse);
+      }
+      final id = message.clientMsgID!;
+      _raw[id] = message;
+      _preparedFaces[id] = entry;
+      return _map(message).withDelivery(MessageDelivery.sending);
+    }, access: access);
+  }
+
   Future<ChatMessage> send(
     String id, {
     MessageHistoryAccess? access,
@@ -464,6 +670,15 @@ final class ChatRepository {
     final conversation = _conversation;
     if (message == null || conversation == null || !conversation.canSend) {
       throw const AppFailure(FailureKind.invalidInput);
+    }
+    final face = _preparedFaces[id];
+    if (face != null) {
+      final proof = await savedEmojiProof(
+        face,
+        access: access,
+        checkSource: checkSource ?? () {},
+      );
+      proof();
     }
     final mentioned = message.atTextElem?.atUserList ?? const <String>[];
     if (mentioned.isNotEmpty) {
@@ -1124,6 +1339,7 @@ final class ChatRepository {
     _groupReadMarked.clear();
     _visibleReadQueue.clear();
     _raw.clear();
+    _preparedFaces.clear();
     _preparedQuoteSources.clear();
     _staged.clear();
     _conversation = null;

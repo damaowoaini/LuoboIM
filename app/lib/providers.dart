@@ -26,15 +26,25 @@ import 'core/tenant/session_coordinator.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/chat/data/chat_reading_preferences.dart';
 import 'features/chat/data/chat_background_store.dart';
+import 'features/chat/data/saved_emoji_store.dart';
+
+final savedEmojiStoreProvider = Provider<SavedEmojiStore>((ref) {
+  final store = SavedEmojiStore();
+  ref.onDispose(store.dispose);
+  return store;
+});
 
 final chatReadingStoreProvider = Provider<ChatReadingPreferencesStore>((ref) {
-  final store = ChatReadingPreferencesStore(); // Preferences platform remains lazy.
+  final store =
+      ChatReadingPreferencesStore(); // Preferences platform remains lazy.
   ref.onDispose(store.dispose);
   return store;
 });
 
 final chatBackgroundStoreProvider = Provider<ChatBackgroundStore>((ref) {
-  final store = ChatBackgroundStore(supportDirectory: ref.read(imSupportDirectoryProvider));
+  final store = ChatBackgroundStore(
+    supportDirectory: ref.read(imSupportDirectoryProvider),
+  );
   ref.onDispose(store.dispose);
   return store;
 });

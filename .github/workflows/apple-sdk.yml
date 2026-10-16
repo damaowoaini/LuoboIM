@@ -1,0 +1,83 @@
+name: Apple SDK-only auditable ARM64 bind and link
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: SDK-only; no App, signing, simulator boot or device acceptance
+        required: true
+        type: choice
+        options: [apple-sdk-only-cloud-arm64-r1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apple-sdk-${{ github.ref }}-${{ inputs.cohort }}
+  cancel-in-progress: false
+
+jobs:
+  sdk-arm64:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      APPLE_COHORT: ${{ inputs.cohort }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select existing Python and one fresh root
+        run: |
+          umask 077
+          python="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
+          test -x "$python"
+          test "$(uname -m)" = arm64
+          echo "APPLE_PYTHON=$python" >> "$GITHUB_ENV"
+          echo "APPLE_WORK=$RUNNER_TEMP/luobo-apple-sdk-r1" >> "$GITHUB_ENV"
+      - name: Verify exact portable public source closure
+        run: '"$APPLE_PYTHON" -B ci/apple-sdk/cloud.py --cohort "$APPLE_COHORT" --stage readonly'
+      - name: Acquire only fixed Go, engine, public core and checksum-verified modules
+        run: '"$APPLE_PYTHON" -B ci/apple-sdk/cloud.py --cohort "$APPLE_COHORT" --stage setup --work "$APPLE_WORK"'
+      - name: Actual offline device and simulator bind plus Swift/ObjC link
+        run: '"$APPLE_PYTHON" -B ci/apple-sdk/cloud.py --cohort "$APPLE_COHORT" --stage build --work "$APPLE_WORK"'
+      - name: Preserve bounded raw sources, locks, receipts and binary audits
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-sdk-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.APPLE_WORK }}/activation.json
+            ${{ env.APPLE_WORK }}/*-resource.json
+            ${{ env.APPLE_WORK }}/*-raw.log
+            ${{ env.APPLE_WORK }}/evidence/
+            ${{ env.APPLE_WORK }}/setup/controller/inputs.json
+            ${{ env.APPLE_WORK }}/setup/controller/manifest.json
+            ${{ env.APPLE_WORK }}/setup/prefetch/evidence/
+            ${{ env.APPLE_WORK }}/setup/prefetch/core/go.mod
+            ${{ env.APPLE_WORK }}/setup/prefetch/core/go.sum
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/evidence/
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/prepared.json
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/core/go.mod
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/core/go.sum
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/*-passed.json
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/OpenIMCore.xcframework/Info.plist
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/OpenIMCore.xcframework/*/*.framework/Info.plist
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/link/*/core-audit.json
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/link/*/linked-binary-audit.json
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/link/*/outputs.json
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Retain public official archives and newly built SDK products separately
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-sdk-products-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.APPLE_WORK }}/setup/archives/
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/OpenIMCore.xcframework/
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/link/*/libflutter_openim_sdk.dylib
+            ${{ env.APPLE_WORK }}/.qa/apple-cloud-1/link/*/probe
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn

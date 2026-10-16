@@ -21,6 +21,7 @@ import '../../conversation/data/conversation_repository.dart';
 import '../data/chat_repository.dart';
 import '../data/chat_reading_preferences.dart';
 import 'chat_font_size_page.dart';
+import 'saved_emoji_sheet.dart';
 import '../data/chat_background_store.dart';
 import 'chat_background_page.dart';
 import '../domain/chat_message.dart';
@@ -88,6 +89,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
   double _fontFactor = defaultChatFontFactor;
   bool _fontReadFailed = false;
   int _fontRead = 0, _fontIntent = 0;
+  int _emojiIntent = 0;
+  int? _emojiPickerTicket;
+  Completer<void>? _emojiPickerResumed;
 
   late final ChatBackgroundPreferences _backgroundPreferences;
   StreamSubscription<ChatBackgroundChange>? _backgroundChanges;
@@ -97,7 +101,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
   bool _backgroundReadFailed = false;
   int _backgroundRead = 0;
   bool _backgroundRetired = false;
-  bool get _backgroundCurrent => !_backgroundRetired && _backgroundPreferences.current &&
+  bool get _backgroundCurrent =>
+      !_backgroundRetired &&
+      _backgroundPreferences.current &&
       _backgroundPreferences.conversationId == widget.conversationId &&
       controller.repository.conversationId == widget.conversationId;
   Future<void> _loadBackground() async {
@@ -105,7 +111,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
     try {
       final value = await _backgroundPreferences.read();
       if (!mounted || ticket != _backgroundRead || !_backgroundCurrent) return;
-      setState(() { _background = value.unavailable ? null : value.image; _backgroundReadFailed = value.unavailable; });
+      setState(() {
+        _background = value.unavailable ? null : value.image;
+        _backgroundReadFailed = value.unavailable;
+      });
     } catch (_) {
       if (!mounted || ticket != _backgroundRead || !_backgroundCurrent) return;
       setState(() => _backgroundReadFailed = true);
@@ -116,14 +125,20 @@ class _ChatPageState extends ConsumerState<ChatPage>
     final ticket = ++_fontRead;
     try {
       final factor = await _readingPreferences.read();
-      if (!mounted || ticket != _fontRead || !_readingPreferences.current) return;
-      setState(() { _fontFactor = factor; _fontReadFailed = false; });
+      if (!mounted || ticket != _fontRead || !_readingPreferences.current) {
+        return;
+      }
+      setState(() {
+        _fontFactor = factor;
+        _fontReadFailed = false;
+      });
     } catch (_) {
-      if (!mounted || ticket != _fontRead || !_readingPreferences.current) return;
+      if (!mounted || ticket != _fontRead || !_readingPreferences.current) {
+        return;
+      }
       setState(() => _fontReadFailed = true);
     }
   }
-
 
   @override
   void initState() {
@@ -149,39 +164,58 @@ class _ChatPageState extends ConsumerState<ChatPage>
       ),
     );
     _readingPreferences = ChatReadingPreferences(
-      ref.read(chatReadingStoreProvider), controller.repository.session);
+      ref.read(chatReadingStoreProvider),
+      controller.repository.session,
+    );
     _readingChanges = _readingPreferences.store.changes.listen((change) {
-      if (!mounted || !_readingPreferences.current ||
+      if (!mounted ||
+          !_readingPreferences.current ||
           change.accountKey != _readingPreferences.accountKey) {
         return;
       }
       ++_fontRead; // An older initial read cannot overwrite this acknowledged save.
-      setState(() { _fontFactor = change.factor; _fontReadFailed = false; });
+      setState(() {
+        _fontFactor = change.factor;
+        _fontReadFailed = false;
+      });
     });
     unawaited(_loadReadingPreferences());
-    _backgroundPreferences = ChatBackgroundPreferences(ref.read(chatBackgroundStoreProvider),
-      controller.repository.session, widget.conversationId);
+    _backgroundPreferences = ChatBackgroundPreferences(
+      ref.read(chatBackgroundStoreProvider),
+      controller.repository.session,
+      widget.conversationId,
+    );
     _backgroundChanges = _backgroundPreferences.store.changes.listen((change) {
-      if (!mounted || !_backgroundCurrent ||
+      if (!mounted ||
+          !_backgroundCurrent ||
           change.accountKey != _backgroundPreferences.accountKey ||
           change.conversationId != widget.conversationId) {
         return;
       }
       ++_backgroundRead;
-      setState(() { _background = change.snapshot.image; _backgroundReadFailed = false; });
+      setState(() {
+        _background = change.snapshot.image;
+        _backgroundReadFailed = false;
+      });
     });
-    _backgroundInvalidations = controller.repository.session.invalidations.listen((_) {
-      ++_backgroundRead;
-      if (mounted) setState(() => _background = null);
-    });
+    _backgroundInvalidations = controller.repository.session.invalidations
+        .listen((_) {
+          ++_backgroundRead;
+          if (mounted) setState(() => _background = null);
+        });
     void backgroundOwnerChanged() {
       if (mounted && !_backgroundCurrent) {
         ++_backgroundRead;
         setState(() => _background = null);
       }
     }
-    _backgroundAccess = controller.repository.session.accessChanges.listen((_) => backgroundOwnerChanged());
-    _backgroundSessions = controller.repository.session.changes.listen((_) => backgroundOwnerChanged());
+
+    _backgroundAccess = controller.repository.session.accessChanges.listen(
+      (_) => backgroundOwnerChanged(),
+    );
+    _backgroundSessions = controller.repository.session.changes.listen(
+      (_) => backgroundOwnerChanged(),
+    );
     unawaited(_loadBackground());
     selection = ChatBatchSelection(controller)..addListener(_changed);
     controller.addListener(_changed);
@@ -192,6 +226,23 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
+    // The OS picker/permission prompt may background this exact portal. Only
+    // its outstanding picker may resume; sending and all other continuations
+    // still require foreground and the original owner/CID/route ticket.
+    if (!_foreground && _emojiPickerTicket != _emojiIntent) {
+      ++_emojiIntent;
+    }
+    if (!_foreground && _emojiPickerTicket == _emojiIntent) {
+      _emojiPickerResumed ??= Completer<void>();
+    }
+    if (_foreground) {
+      if (_emojiPickerResumed case final resumed?) {
+        if (!resumed.isCompleted) {
+          resumed.complete();
+        }
+        _emojiPickerResumed = null;
+      }
+    }
     _readSignature = '';
     if (_foreground) {
       _scheduleVisibleReads();
@@ -271,17 +322,31 @@ class _ChatPageState extends ConsumerState<ChatPage>
   }
 
   Future<void> _start() async {
-    bool initialCurrent() => mounted && (widget.sourceCurrent == null ||
-        _routeVisible && widget.sourceCurrent!());
+    bool initialCurrent() =>
+        mounted &&
+        (widget.sourceCurrent == null ||
+            _routeVisible && widget.sourceCurrent!());
     if (!initialCurrent()) return;
-    await controller.start(isCurrent: widget.sourceCurrent == null ? null : initialCurrent);
+    await controller.start(
+      isCurrent: widget.sourceCurrent == null ? null : initialCurrent,
+    );
     final id = widget.sourceMessageId;
-    if (id == null || !mounted || !controller.usable || widget.sourceCurrent?.call() == false) return;
+    if (id == null ||
+        !mounted ||
+        !controller.usable ||
+        widget.sourceCurrent?.call() == false) {
+      return;
+    }
     await _locateSource(id, sourceCurrent: widget.sourceCurrent);
   }
 
-  Future<void> _locateSource(String id, {bool Function()? sourceCurrent}) async {
-    bool current() => mounted && controller.usable &&
+  Future<void> _locateSource(
+    String id, {
+    bool Function()? sourceCurrent,
+  }) async {
+    bool current() =>
+        mounted &&
+        controller.usable &&
         (sourceCurrent == null || _routeVisible && sourceCurrent());
     if (!current()) return;
     try {
@@ -358,6 +423,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
       // The production router normally creates a CID-keyed fresh ChatPage.
       // If a caller reuses this State, retire its original background binding
       // permanently; never paint/read/admit a new CID through the old owner.
+      ++_emojiIntent;
       _backgroundRetired = true;
       ++_backgroundRead;
       _background = null;
@@ -368,7 +434,14 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    ++_fontRead; ++_fontIntent;
+    ++_emojiIntent;
+    if (_emojiPickerResumed case final resumed?) {
+      if (!resumed.isCompleted) {
+        resumed.complete();
+      }
+    }
+    ++_fontRead;
+    ++_fontIntent;
     unawaited(_readingChanges?.cancel());
     ++_backgroundRead;
     unawaited(_backgroundChanges?.cancel());
@@ -510,68 +583,70 @@ class _ChatPageState extends ConsumerState<ChatPage>
                   child: ChatBackgroundSurface(
                     image: _backgroundCurrent ? _background : null,
                     child: controller.loading && controller.messages.isEmpty
-                      ? const Center(child: CircularProgressIndicator())
-                      : controller.messages.isEmpty
-                      ? Center(
-                          child: Text(
-                            controller.conversation == null
-                                ? '暂时无法加载会话'
-                                : '还没有消息，开始聊天吧',
-                            style: const TextStyle(color: AppColors.secondary),
-                          ),
-                        )
-                      : NotificationListener<ScrollNotification>(
-                          onNotification: (notification) {
-                            _scheduleVisibleReads();
-                            if (notification.metrics.extentAfter < 200) {
-                              unawaited(controller.loadOlder());
-                            }
-                            return false;
-                          },
-                          child: ListView.builder(
-                            key: _viewportKey,
-                            controller: scroll,
-                            reverse: true,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 16,
+                        ? const Center(child: CircularProgressIndicator())
+                        : controller.messages.isEmpty
+                        ? Center(
+                            child: Text(
+                              controller.conversation == null
+                                  ? '暂时无法加载会话'
+                                  : '还没有消息，开始聊天吧',
+                              style: const TextStyle(
+                                color: AppColors.secondary,
+                              ),
                             ),
-                            itemCount:
-                                controller.messages.length +
-                                (controller.hasMore ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (index == controller.messages.length) {
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: controller.loadingOlder
-                                        ? const CircularProgressIndicator()
-                                        : TextButton(
-                                            onPressed: controller.loadOlder,
-                                            child: const Text('加载更早的消息'),
-                                          ),
-                                  ),
-                                );
+                          )
+                        : NotificationListener<ScrollNotification>(
+                            onNotification: (notification) {
+                              _scheduleVisibleReads();
+                              if (notification.metrics.extentAfter < 200) {
+                                unawaited(controller.loadOlder());
                               }
-                              final item =
-                                  controller.messages[controller
-                                          .messages
-                                          .length -
-                                      1 -
-                                      index];
-                              return ColoredBox(
-                                key: _rowKeys.putIfAbsent(
-                                  item.id,
-                                  GlobalKey.new,
-                                ),
-                                color: item.id == controller.sourceMessageId
-                                    ? const Color(0xffdbeafe)
-                                    : Colors.transparent,
-                                child: _message(item),
-                              );
+                              return false;
                             },
+                            child: ListView.builder(
+                              key: _viewportKey,
+                              controller: scroll,
+                              reverse: true,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 16,
+                              ),
+                              itemCount:
+                                  controller.messages.length +
+                                  (controller.hasMore ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == controller.messages.length) {
+                                  return Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: controller.loadingOlder
+                                          ? const CircularProgressIndicator()
+                                          : TextButton(
+                                              onPressed: controller.loadOlder,
+                                              child: const Text('加载更早的消息'),
+                                            ),
+                                    ),
+                                  );
+                                }
+                                final item =
+                                    controller.messages[controller
+                                            .messages
+                                            .length -
+                                        1 -
+                                        index];
+                                return ColoredBox(
+                                  key: _rowKeys.putIfAbsent(
+                                    item.id,
+                                    GlobalKey.new,
+                                  ),
+                                  color: item.id == controller.sourceMessageId
+                                      ? const Color(0xffdbeafe)
+                                      : Colors.transparent,
+                                  child: _message(item),
+                                );
+                              },
+                            ),
                           ),
-                        ),
                   ),
                 ),
                 if (selection.active || selection.busy)
@@ -806,8 +881,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
     ChatMessage item, {
     ChatMessage? portal,
     bool Function()? portalCurrent,
-  }) => ChatReadingTextScale(factor: _fontFactor,
-      child: _readingContent(item, portal: portal, portalCurrent: portalCurrent));
+  }) => ChatReadingTextScale(
+    factor: _fontFactor,
+    child: _readingContent(item, portal: portal, portalCurrent: portalCurrent),
+  );
 
   Widget _readingContent(
     ChatMessage item, {
@@ -1350,66 +1427,96 @@ class _ChatPageState extends ConsumerState<ChatPage>
     }
   }
 
-  Future<void> _emoji() => showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    builder: (context) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children:
-              [
-                    '😀',
-                    '😊',
-                    '🥰',
-                    '😎',
-                    '😂',
-                    '😭',
-                    '👍',
-                    '🙏',
-                    '❤️',
-                    '🎉',
-                    '🌹',
-                    '🤝',
-                    '🤔',
-                    '😴',
-                    '👋',
-                    '🔥',
-                    '👏',
-                    '💪',
-                    '✨',
-                    '🥳',
-                  ]
-                  .map(
-                    (emoji) => IconButton(
-                      tooltip: emoji,
-                      onPressed: () {
-                        final selection = input.selection;
-                        final start = selection.isValid
-                            ? selection.start
-                            : input.text.length;
-                        final end = selection.isValid
-                            ? selection.end
-                            : input.text.length;
-                        input.value = TextEditingValue(
-                          text: input.text.replaceRange(start, end, emoji),
-                          selection: TextSelection.collapsed(
-                            offset: start + emoji.length,
-                          ),
-                        );
-                        Navigator.pop(context);
-                        focus.requestFocus();
-                      },
-                      icon: Text(emoji, style: const TextStyle(fontSize: 26)),
-                    ),
-                  )
-                  .toList(),
-        ),
-      ),
-    ),
-  );
+  Future<void> _emoji() async {
+    if (!mounted || !controller.usable) {
+      return;
+    }
+    final cid = widget.conversationId, ticket = ++_emojiIntent;
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    ModalRoute<dynamic>? sheet;
+    late final MessageHistoryAccess cut;
+    try {
+      cut = controller.repository.gateway.historyAccess(
+        controller.repository.generation,
+        conversationId: cid,
+      );
+    } on AppFailure {
+      return;
+    }
+    bool current() {
+      if (!mounted ||
+          !_foreground ||
+          !controller.usable ||
+          ticket != _emojiIntent ||
+          widget.conversationId != cid ||
+          controller.repository.conversationId != cid ||
+          origin?.isActive != true ||
+          !navigator.mounted ||
+          !identical(origin?.navigator, navigator) ||
+          !(origin?.isCurrent == true || sheet?.isCurrent == true)) {
+        return false;
+      }
+      try {
+        cut.check();
+        return true;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    focus.unfocus();
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        sheet ??= ModalRoute.of(sheetContext);
+        return SavedEmojiSheet(
+          controller: controller,
+          sourceCurrent: current,
+          withOwnedPicker: (pick) async {
+            if (!current()) {
+              throw const AppFailure(FailureKind.cancelled);
+            }
+            _emojiPickerTicket = ticket;
+            try {
+              await pick();
+              if (!_foreground) {
+                final resumed = _emojiPickerResumed ??= Completer<void>();
+                await resumed.future.timeout(
+                  const Duration(seconds: 10),
+                  onTimeout: () => throw const AppFailure(FailureKind.timeout),
+                );
+              }
+              if (!current()) {
+                throw const AppFailure(FailureKind.cancelled);
+              }
+            } finally {
+              if (_emojiPickerTicket == ticket) {
+                _emojiPickerTicket = null;
+              }
+            }
+          },
+          insertUnicode: (emoji) {
+            if (!current() || sheet?.isCurrent != true) {
+              return;
+            }
+            final selection = input.selection;
+            final start = selection.isValid
+                ? selection.start
+                : input.text.length;
+            final end = selection.isValid ? selection.end : input.text.length;
+            input.value = TextEditingValue(
+              text: input.text.replaceRange(start, end, emoji),
+              selection: TextSelection.collapsed(offset: start + emoji.length),
+            );
+            navigator.pop();
+            focus.requestFocus();
+          },
+        );
+      },
+    );
+  }
 
   bool _acceptsPortal(MessageHistoryAccess lease) {
     if (!mounted || !controller.usable) return false;
@@ -1433,36 +1540,72 @@ class _ChatPageState extends ConsumerState<ChatPage>
     } on AppFailure {
       return;
     }
+    final emojiTicket = ++_emojiIntent, emojiCid = widget.conversationId;
+    final emojiOrigin = ModalRoute.of(context),
+        emojiNavigator = Navigator.of(context);
+    bool emojiCurrent() {
+      if (!mounted ||
+          !_foreground ||
+          !controller.usable ||
+          emojiTicket != _emojiIntent ||
+          widget.conversationId != emojiCid ||
+          repository.conversationId != emojiCid ||
+          emojiOrigin?.isCurrent != true ||
+          !emojiNavigator.mounted) {
+        return false;
+      }
+      try {
+        lease.check();
+        repository.requireRetention(item.id);
+        return true;
+      } on AppFailure {
+        return false;
+      }
+    }
+
     final expired = !repository.canView(item);
     final retainable = repository.canRetain(item);
     final action = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final entry in <String, String>{
-                if (retainable) 'copy': '复制文字',
-                if (retainable) 'reply': '引用回复',
-                if (item.canForward && retainable) 'forward': '转发到聊天',
-                if (!expired &&
-                    item.mine &&
-                    item.delivery == MessageDelivery.sent)
-                  'revoke': '撤回消息',
-                if (!expired && item.delivery == MessageDelivery.failed)
-                  'retry': '重新发送',
-                if (item.delivery == MessageDelivery.sent && retainable)
-                  'favorite': '收藏',
-                'delete': '删除消息',
-                if (selection.eligible(item)) 'multiple': '多选消息',
-              }.entries)
-                ListTile(
-                  title: Text(entry.value),
-                  onTap: () => Navigator.pop(context, entry.key),
-                ),
-            ],
+      builder: (context) => EmojiPortalGuard(
+        onCovered: () {
+          ++_emojiIntent;
+        },
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final entry in <String, String>{
+                  if (retainable) 'copy': '复制文字',
+                  if (retainable) 'reply': '引用回复',
+                  if (item.canForward && retainable) 'forward': '转发到聊天',
+                  if (!expired &&
+                      item.mine &&
+                      item.delivery == MessageDelivery.sent)
+                    'revoke': '撤回消息',
+                  if (!expired && item.delivery == MessageDelivery.failed)
+                    'retry': '重新发送',
+                  if (item.delivery == MessageDelivery.sent && retainable)
+                    'favorite': '收藏',
+                  if (retainable &&
+                      item.delivery == MessageDelivery.sent &&
+                      item.privacy.expiresAtMilliseconds == null &&
+                      const {
+                        ChatMessageKind.image,
+                        ChatMessageKind.sticker,
+                      }.contains(item.kind))
+                    'savedEmoji': '加入常用表情',
+                  'delete': '删除消息',
+                  if (selection.eligible(item)) 'multiple': '多选消息',
+                }.entries)
+                  ListTile(
+                    title: Text(entry.value),
+                    onTap: () => Navigator.pop(context, entry.key),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1473,7 +1616,13 @@ class _ChatPageState extends ConsumerState<ChatPage>
     } on AppFailure {
       return;
     }
-    if (const {'copy', 'reply', 'forward', 'favorite'}.contains(action) &&
+    if (const {
+          'copy',
+          'reply',
+          'forward',
+          'favorite',
+          'savedEmoji',
+        }.contains(action) &&
         !repository.canRetain(item)) {
       _notice(item.privacy.notice ?? '此消息暂不能保留');
       return;
@@ -1484,6 +1633,52 @@ class _ChatPageState extends ConsumerState<ChatPage>
       return;
     }
     switch (action) {
+      case 'savedEmoji':
+        if (!emojiCurrent()) {
+          return;
+        }
+        try {
+          final store = ref.read(savedEmojiStoreProvider);
+          final owner = SessionAccess(repository.session);
+          void Function()? permit;
+          final entry = await repository.savedEmojiFromMessage(
+            item.id,
+            access: lease,
+            checkSource: () {
+              if (!emojiCurrent()) {
+                throw const AppFailure(FailureKind.cancelled);
+              }
+            },
+            onProof: (proof) {
+              permit = proof;
+            },
+          );
+          bool retainCurrent() {
+            if (!emojiCurrent() || permit == null) {
+              return false;
+            }
+            try {
+              permit!();
+              return true;
+            } on AppFailure {
+              return false;
+            }
+          }
+
+          if (!retainCurrent()) {
+            return;
+          }
+          final previous = await store.read(owner, current: retainCurrent);
+          if (!retainCurrent()) {
+            return;
+          }
+          await store.add(owner, previous, entry, current: retainCurrent);
+          if (emojiCurrent()) _notice('已加入常用表情');
+        } catch (error) {
+          if (emojiCurrent()) {
+            _notice(error is AppFailure ? error.message : '加入常用表情失败，请重试');
+          }
+        }
       case 'multiple':
         selection.begin(item);
       case 'copy':
@@ -1700,9 +1895,15 @@ class _ChatPageState extends ConsumerState<ChatPage>
     final fontOrigin = ModalRoute.of(context);
     final fontNavigator = Navigator.of(context);
     ModalRoute<dynamic>? fontSheet;
-    bool fontCurrent() => mounted && !_leaving && fontTicket == _fontIntent &&
+    bool fontCurrent() =>
+        mounted &&
+        !_leaving &&
+        fontTicket == _fontIntent &&
         _readingPreferences.current &&
-        identical(controller.repository.session.state.credentials, creationOwner) &&
+        identical(
+          controller.repository.session.state.credentials,
+          creationOwner,
+        ) &&
         controller.repository.conversationId == widget.conversationId &&
         controller.conversation?.id == item.id;
 
@@ -1711,92 +1912,128 @@ class _ChatPageState extends ConsumerState<ChatPage>
       showDragHandle: true,
       builder: (context) => ChatFontRouteGuard(
         onRoute: (route) => fontSheet = route,
-        onCovered: () { ++_fontIntent; },
+        onCovered: () {
+          ++_fontIntent;
+        },
         child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!item.isGroup && item.userId != null && item.userId!.isNotEmpty &&
-                item.userId != creationOwner?.userId)
-              GroupCreationAction(
-                key: ValueKey('expand-group-${item.id}'),
-                peer: Contact(id: item.userId!, name: item.title, avatar: item.avatar),
-                asListTile: true,
-                sourceCurrent: () => _acceptsPortal(lease) &&
-                  identical(controller.repository.session.state.credentials, creationOwner) &&
-                  controller.conversation?.id == item.id &&
-                  controller.conversation?.userId == item.userId &&
-                  controller.conversation?.isGroup == false,
-              ),
-            ListTile(
-              title: Text(item.isGroup ? '群资料与成员' : '联系人资料'),
-              onTap: () => Navigator.pop(context, 'details'),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!item.isGroup &&
+                    item.userId != null &&
+                    item.userId!.isNotEmpty &&
+                    item.userId != creationOwner?.userId)
+                  GroupCreationAction(
+                    key: ValueKey('expand-group-${item.id}'),
+                    peer: Contact(
+                      id: item.userId!,
+                      name: item.title,
+                      avatar: item.avatar,
+                    ),
+                    asListTile: true,
+                    sourceCurrent: () =>
+                        _acceptsPortal(lease) &&
+                        identical(
+                          controller.repository.session.state.credentials,
+                          creationOwner,
+                        ) &&
+                        controller.conversation?.id == item.id &&
+                        controller.conversation?.userId == item.userId &&
+                        controller.conversation?.isGroup == false,
+                  ),
+                ListTile(
+                  title: Text(item.isGroup ? '群资料与成员' : '联系人资料'),
+                  onTap: () => Navigator.pop(context, 'details'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: const Text('查找聊天记录'),
+                  onTap: () => Navigator.pop(context, 'search'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.text_fields),
+                  title: const Text('聊天字号'),
+                  subtitle: _fontReadFailed
+                      ? const Text('字号读取失败，打开后可重试')
+                      : null,
+                  onTap: () {
+                    final route = fontSheet, navigator = fontSheet?.navigator;
+                    if (fontCurrent() &&
+                        route?.isCurrent == true &&
+                        route?.isActive == true &&
+                        navigator != null &&
+                        navigator.mounted) {
+                      navigator.pop('font');
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.wallpaper_outlined),
+                  title: const Text('聊天背景'),
+                  subtitle: _backgroundReadFailed
+                      ? const Text('背景读取失败，打开后可重试')
+                      : null,
+                  onTap: () {
+                    final route = fontSheet, navigator = fontSheet?.navigator;
+                    if (fontCurrent() &&
+                        _backgroundCurrent &&
+                        route?.isCurrent == true &&
+                        route?.isActive == true &&
+                        navigator != null &&
+                        navigator.mounted) {
+                      navigator.pop('background');
+                    }
+                  },
+                ),
+                ListTile(
+                  title: Text(item.pinned ? '取消置顶' : '置顶会话'),
+                  onTap: () => Navigator.pop(context, 'pin'),
+                ),
+                ListTile(
+                  title: Text(item.muted ? '关闭免打扰' : '开启免打扰'),
+                  onTap: () => Navigator.pop(context, 'mute'),
+                ),
+                ListTile(
+                  title: const Text(
+                    '清空聊天记录',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                  onTap: () => Navigator.pop(context, 'clear'),
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.search),
-              title: const Text('查找聊天记录'),
-              onTap: () => Navigator.pop(context, 'search'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.text_fields),
-              title: const Text('聊天字号'),
-              subtitle: _fontReadFailed ? const Text('字号读取失败，打开后可重试') : null,
-              onTap: () {
-                final route = fontSheet, navigator = fontSheet?.navigator;
-                if (fontCurrent() && route?.isCurrent == true && route?.isActive == true &&
-                    navigator != null && navigator.mounted) {
-                  navigator.pop('font');
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.wallpaper_outlined),
-              title: const Text('聊天背景'),
-              subtitle: _backgroundReadFailed ? const Text('背景读取失败，打开后可重试') : null,
-              onTap: () {
-                final route = fontSheet, navigator = fontSheet?.navigator;
-                if (fontCurrent() && _backgroundCurrent &&
-                    route?.isCurrent == true && route?.isActive == true &&
-                    navigator != null && navigator.mounted) {
-                  navigator.pop('background');
-                }
-              },
-            ),
-            ListTile(
-              title: Text(item.pinned ? '取消置顶' : '置顶会话'),
-              onTap: () => Navigator.pop(context, 'pin'),
-            ),
-            ListTile(
-              title: Text(item.muted ? '关闭免打扰' : '开启免打扰'),
-              onTap: () => Navigator.pop(context, 'mute'),
-            ),
-            ListTile(
-              title: const Text(
-                '清空聊天记录',
-                style: TextStyle(color: AppColors.error),
-              ),
-              onTap: () => Navigator.pop(context, 'clear'),
-            ),
-          ],
           ),
         ),
-      )),
+      ),
     );
     if (action == 'font' || action == 'background') {
       final sheet = fontSheet;
       if (sheet != null) await sheet.completed;
-      if (!mounted || !fontCurrent() || fontOrigin == null || !fontOrigin.isCurrent ||
-          !fontOrigin.isActive || !fontNavigator.mounted ||
+      if (!mounted ||
+          !fontCurrent() ||
+          fontOrigin == null ||
+          !fontOrigin.isCurrent ||
+          !fontOrigin.isActive ||
+          !fontNavigator.mounted ||
           !identical(fontOrigin.navigator, fontNavigator)) {
         return;
       }
       if (action == 'background' && !_backgroundCurrent) return;
-      await fontNavigator.push<void>(MaterialPageRoute<void>(
-        builder: (_) => action == 'background'
-          ? ChatBackgroundPage(preferences: _backgroundPreferences,
-              sourceCurrent: () => fontCurrent() && _backgroundCurrent, fontFactor: _fontFactor)
-          : ChatFontSizePage(preferences: _readingPreferences, sourceCurrent: fontCurrent)));
+      await fontNavigator.push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => action == 'background'
+              ? ChatBackgroundPage(
+                  preferences: _backgroundPreferences,
+                  sourceCurrent: () => fontCurrent() && _backgroundCurrent,
+                  fontFactor: _fontFactor,
+                )
+              : ChatFontSizePage(
+                  preferences: _readingPreferences,
+                  sourceCurrent: fontCurrent,
+                ),
+        ),
+      );
       return;
     }
     if (action == null || !mounted || !_acceptsPortal(lease)) return;

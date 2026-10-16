@@ -32,7 +32,7 @@ final class ImageStager {
   final SessionAccess access;
   static final _random = Random.secure();
 
-  Future<StagedImage> prepare(String path) async {
+  Future<StagedImage> prepare(String path, {bool allowGif = false}) async {
     access.check();
     File? staged;
     ui.ImmutableBuffer? buffer;
@@ -48,13 +48,14 @@ final class ImageStager {
           .firstMatch(path)
           ?.group(0)
           ?.toLowerCase();
-      final contentType = const {
+      final contentType = <String, String>{
         '.jpg': 'image/jpeg',
         '.jpeg': 'image/jpeg',
         '.png': 'image/png',
         '.webp': 'image/webp',
         '.heic': 'image/heic',
         '.heif': 'image/heif',
+        if (allowGif) '.gif': 'image/gif',
       }[extension];
       if (contentType == null || extension == null) {
         throw const AppFailure(FailureKind.invalidInput);

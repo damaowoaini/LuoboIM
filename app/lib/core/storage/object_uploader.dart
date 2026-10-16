@@ -53,8 +53,14 @@ final class ObjectUploader {
     String extension = '',
     String group = 'moments',
     void Function(double fraction)? progress,
+    void Function()? checkSource,
   }) async {
-    _check();
+    void check() {
+      _check();
+      checkSource?.call();
+    }
+
+    check();
     if (!RegExp(r'^[a-z]+/[a-zA-Z0-9.+-]+$').hasMatch(contentType) ||
         !RegExp(r'^(\.[a-zA-Z0-9]{1,10})?$').hasMatch(extension) ||
         !RegExp(r'^[a-z][a-z0-9_-]{0,31}$').hasMatch(group)) {
@@ -66,7 +72,7 @@ final class ObjectUploader {
     } on FileSystemException {
       throw const AppFailure(FailureKind.localStorage);
     }
-    _check();
+    check();
     if (size < 1 || size > 100 * 1024 * 1024) {
       throw const AppFailure(FailureKind.invalidInput);
     }
@@ -82,7 +88,7 @@ final class ObjectUploader {
       'contentType': contentType,
       'group': group,
     });
-    _check();
+    check();
     final upload = _map(raw);
     final url = _url(upload['url']);
     final id = upload['id'], fileKey = upload['file'];
@@ -138,7 +144,7 @@ final class ObjectUploader {
     } on FileSystemException {
       throw const AppFailure(FailureKind.localStorage);
     }
-    _check();
+    check();
     final cancel = CancelToken();
     _pending.add(cancel);
     ResponseBody? providerBody;
@@ -162,7 +168,7 @@ final class ObjectUploader {
         },
       );
       providerBody = response.data;
-      _check();
+      check();
       final codes = upload['successCodes'] as List;
       if (codes.isEmpty ||
           codes.any((value) => value is! int) ||
@@ -171,14 +177,14 @@ final class ObjectUploader {
       }
       // Storage success bodies are unused; close the stream without retaining
       // arbitrary provider HTML/XML or evaluating it as application content.
-      _check();
+      check();
       final complete = _map(
         await api.im.post('object/complete_form_data', {'id': id}),
       );
-      _check();
+      check();
       return _url(complete['url']);
     } on DioException catch (error) {
-      _check();
+      check();
       throw switch (error.type) {
         DioExceptionType.cancel => const AppFailure(FailureKind.cancelled),
         DioExceptionType.connectionTimeout ||

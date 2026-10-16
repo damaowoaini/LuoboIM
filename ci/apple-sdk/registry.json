@@ -1,0 +1,81 @@
+{
+  "App_cohort": null,
+  "files": [
+    {
+      "bytes": 2766,
+      "path": "README.md",
+      "sha256": "182855f49a8fb55b27896e26f4618480fd42b478c0d384bc1e5ef452fb49188c"
+    },
+    {
+      "bytes": 15466,
+      "path": "apple_core.py",
+      "sha256": "6b0aa8736dc1c2996758cb40c4996fe6d14fd787ecbed92ebf67a29b12d81520"
+    },
+    {
+      "bytes": 7030,
+      "path": "apple_observer.py",
+      "sha256": "8565cfbe3ef3be3172aa3a49ab4f73f4611c4af37179c4ab00c3602f1621331b"
+    },
+    {
+      "bytes": 22645,
+      "path": "cloud.py",
+      "sha256": "940091a2250b9a2a22a0ba0fc750e155c9d6b75fa6f73f1053cc9b69366c52ab"
+    },
+    {
+      "bytes": 7950,
+      "path": "core_binary.py",
+      "sha256": "76c87f6e12678f4588636793995245330e6022d8a6340ace285486b3ba36f1f9"
+    },
+    {
+      "bytes": 10010,
+      "path": "flutter-engine-members.json",
+      "sha256": "158e949f65cf4162f5d17552cb90bc2035f7fee669ef71ff11c7afd45549411d"
+    },
+    {
+      "bytes": 6828,
+      "path": "link_probe.py",
+      "sha256": "996e9173dc747c23d099a8502cd3bb218b95edb40dfccc6dcd3dc499c720e614"
+    },
+    {
+      "bytes": 2318,
+      "path": "portable-inputs.json",
+      "sha256": "78721e112fd42003e849006f4b6787f3507f88174e239a405789c2c1a3a56628"
+    },
+    {
+      "bytes": 17261,
+      "path": "public-source-inputs.json",
+      "sha256": "8770858bde72e2d152ad3daf3036fad9e2365e9cb17665cfce764c9710766178"
+    },
+    {
+      "bytes": 7394,
+      "path": "resource_dual.py",
+      "sha256": "d1d872e0c2b394d73549f0ed071c457ee5019c41b90277c748c328b0219e7718"
+    },
+    {
+      "bytes": 4941,
+      "path": "test_apple.py",
+      "sha256": "16e8d94e0ee0c0b20dcb813210a2d12e32e288033b767db4e2ce0e4b89ba9ae2"
+    },
+    {
+      "bytes": 11789,
+      "path": "test_cloud.py",
+      "sha256": "b5843c42af57c9c31951729aabdd4af80f786e875843f86f21acdc791120a937"
+    },
+    {
+      "bytes": 4782,
+      "path": "test_core_binary.py",
+      "sha256": "adf3afe10404a5668439f1c283616fd4af0620e0a7313acc49b9c502af41a01d"
+    }
+  ],
+  "identity": "apple-sdk-only-cloud-arm64-r1",
+  "old_R1_manifest_sha256": "e487450690b3bb6091ffa5d498aeb21a507f8818617722ffc0084eb6516d7b32",
+  "repository_files": [
+    {
+      "bytes": 3866,
+      "path": ".github/workflows/apple-sdk.yml",
+      "sha256": "f9c1e2c99379e8d8f3b5ec3b5fc7998320e71cde71c2954f4ed1cf71b2b72816"
+    }
+  ],
+  "schema": "luobo.apple-sdk.cloud-registry.v1",
+  "underlying_SDK_cohort": "auditable-sdk-apple-arm64-v1"
+}

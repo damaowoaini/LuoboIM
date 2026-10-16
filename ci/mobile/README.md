@@ -1,31 +1,28 @@
-# Mobile323 chat background CI metadata
+# Mobile331 saved emoji CI metadata
 
-This draft overlays the frozen9 background source/fixture files onto316.
-Root verified42 unique cases:27 unaffected initial successes reused plus15
-explicit rerun successes, with0skip/error in that rerun. The first42 run's
-29PASS/13ERROR and its repaired fixture history remain evidence. Final9
-changed files have zero fatal-info analysis using the recorded targeted checks.
-This is source/widget acceptance; real picker/device/private-storage lifecycle
-and native/service acceptance remain pending.
+This refs-only proposal follows original323. SavedEmoji R1 adds9 product changes
+and5 test/fixture files:41 new cases plus8 directly affected existing stager/upload
+cases have49 unique local targeted successes. Initial49=35PASS/14ERROR and
+follow-up14=5PASS/9ERROR are preserved; final11PASS plus38 unaffected successes
+are reused. Actual product correction preserves an unknown-upload prompt during
+result reload; Tab/PNG CRC/real IconButton fixes are separate fixture history.
+Changed14 Dart files have targeted fatal-info analysis0. System picker/GIF and
+Face native bridge/device/tenant-service acceptance remain pending.
 
-Future target345=original303+background42; full1027=original985+background42,
-then strictanalysis0. Neither combined run was executed. Parent303/985 is the
-retained composed name layer (cloud281/963 and localfont22), not an accepted
-combined full run. Required42 names come from Root's actual acceptance record.
-All previous visible-success names and multiplicities remain mandatory.
+Future target386=original345+41; full1068=original1027+41, then strictanalysis0.
+Neither was run. Original345/1027 are historical composed expected-name layers,
+not an accepted full checkpoint. Old8 shared-core checks are already in full;
+they are not8 new cases. All exact old/new success-name multiplicities remain.
 
-Manual-only workflow_dispatch, read-only permissions, action SHAs, setup/network
-namespace, process-group/resource gates and always-artifact preservation stay.
-No full per feature/batch: run one final full after all known issues are fixed
-and targeted checks are clean. This draft does not apply, dispatch or push.
+Keep manual-only workflow_dispatch, original read-only permissions/action pins,
+network namespace/900s phase/process group guards,4GiB initial,1GiB dynamic,
+.2s polling,768MiB allocation,174locked dependencies/SDK51+migration1. No new
+runtime wrapper or generic cleanup parser. No full-per-feature/batch; one final
+complete regression only after known fixes and targeted checks are clean.
 
-The original35 Python cases remain;2 small inventory-composition negatives are
-added. Only changed Descriptor4 and new2 need local targeted execution here.
-The11 protected guard/parser ASTs,35 recorder/14unmount,76creation/safe6 and
-11Next cleanup contracts remain unchanged. Background actual logs prove22
-initial widget fixtures and affected-rerun six-stage awaited teardown; its real
-fixture source remains in CI, without an additional generic cleanup parser.
-174locked dependencies,SDK51+migration1/toolchain/native gate stay exact.
-Same4GiB initial/1GiB dynamic/.2s/768MiB/900s controls. Optional reference stays
-default-off:4 pinned search baseline bodies in full323, entry2 only, strict
-1namedassertFAIL+1oldfilterPASS. Public inventory has no check.sh exception.
+Original37 Python cases remain (35prior+2background). Two rejection cases check
+new source/name composition. Changed Descriptor4,2background key-mapping and2new rejection cases passed
+(8targeted Python checks);31other checks are reused. Protected11ASTs are exact. Optional reference stays default
+off:full331 with only4 historical search files replaced; entry2 must retain
+1named assertion failure plus1old-filter success, no loader error/timeout/panic.
+Public strict source inventory has no private check.sh exception.

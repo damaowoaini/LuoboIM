@@ -1,0 +1,256 @@
+{
+  "engine": "deb287481e3ce9468f3434937ced4240a70539ca",
+  "files": [
+    {
+      "bytes": 41445760,
+      "path": "ios-arm64/Flutter.framework/Flutter",
+      "sha256": "758cfe1366fc95cb745ab6349fb32e5de2131c4c0cb9ba203da519e4e2e64374"
+    },
+    {
+      "bytes": 921,
+      "path": "ios-arm64/Flutter.framework/Headers/Flutter.h",
+      "sha256": "c1f5b26a03d82c2451dbec13b8645bb56df3df3d80592f98171ba204e15d4a36"
+    },
+    {
+      "bytes": 2283,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterAppDelegate.h",
+      "sha256": "ebf60356f3456e2054548d873f08674ea2cdb5d7518d7530a328b5e81d867ba3"
+    },
+    {
+      "bytes": 3761,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterBinaryMessenger.h",
+      "sha256": "1170e4e2dfbba82a724246abfaaf561ea63d6dc2bc7b2a210b0195b41261332f"
+    },
+    {
+      "bytes": 1724,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterCallbackCache.h",
+      "sha256": "d21f7ebcae4afabf26a13b221817ecebe4ccf50a20d3cf5a7c7032de06dcc035"
+    },
+    {
+      "bytes": 18414,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterChannels.h",
+      "sha256": "920d7de42def64b88e9fc29e150532ec3a15b80f55643a6aa012d59fae2e19a2"
+    },
+    {
+      "bytes": 15290,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterCodecs.h",
+      "sha256": "672aa51d8b996e915ebd57a7cbd59d974ad51604bbb33232b2c4a20b269a7853"
+    },
+    {
+      "bytes": 3914,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterDartProject.h",
+      "sha256": "53cabfd086edf6ae0ed8732c09d530213b49753c7c2e3865c7ed1a63cddf1fab"
+    },
+    {
+      "bytes": 21724,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterEngine.h",
+      "sha256": "29528cda49a2619ac88f2a31be72b314af4e543918315dfaf11e5622c200742a"
+    },
+    {
+      "bytes": 4755,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterEngineGroup.h",
+      "sha256": "4aacef231a815c427753d2c9df6842117b2b1f63f5ea0ba643e810c7a3dd95fe"
+    },
+    {
+      "bytes": 3927,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterHeadlessDartRunner.h",
+      "sha256": "9e6663669bc5097af281fe14f5a3e4362f15708edc2f902d03e098e6e51620bd"
+    },
+    {
+      "bytes": 536,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterHourFormat.h",
+      "sha256": "43848b1528212ffe441493f22e0ecf362f49ff1a645557f3ae8d15422407b6b6"
+    },
+    {
+      "bytes": 1823,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterMacros.h",
+      "sha256": "79b0551d265c52701b378851718ab7b6db7afbecf561b73c2954988554e80f99"
+    },
+    {
+      "bytes": 1966,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterPlatformViews.h",
+      "sha256": "d1a53db8ce90729ce6669b8560e6e3f5d1a51849132a8c0f304449410745d8fe"
+    },
+    {
+      "bytes": 19326,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterPlugin.h",
+      "sha256": "349bc734c4eec7babf27b476f7c7a3bcfa01f4b0114bfbc7eae8ed9b09947838"
+    },
+    {
+      "bytes": 5318,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h",
+      "sha256": "f8f327fb94838f655de9153c09022dfc9625dd3fbc0e1a7b1c89aa033a1ca0d9"
+    },
+    {
+      "bytes": 893,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterSceneDelegate.h",
+      "sha256": "1bdbab65e137d7695d6b391e3ffeecbadd2dda103795f72ec47452b8b9a3fa06"
+    },
+    {
+      "bytes": 8387,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterSceneLifeCycle.h",
+      "sha256": "b4d90b84efbe3ce2f8db38397e312fe7f0c97d0ad7bbca8763a24b6ebf2d2217"
+    },
+    {
+      "bytes": 2263,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterTexture.h",
+      "sha256": "25ca4de1af6cbfac729e50f7462eb5d4de72f87a2ea545a9da1cab21707f23c6"
+    },
+    {
+      "bytes": 10734,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterViewController.h",
+      "sha256": "e2336e4d76c2899c2aa71d253a64dd292183b3ebaba237681a95ce2bac09a9a5"
+    },
+    {
+      "bytes": 1076,
+      "path": "ios-arm64/Flutter.framework/Info.plist",
+      "sha256": "97bc153e729ad85f3d0c8203a445a9e1dbb2bd58c6d24911a7c089c027d66ba5"
+    },
+    {
+      "bytes": 95,
+      "path": "ios-arm64/Flutter.framework/Modules/module.modulemap",
+      "sha256": "d158eb891a59ec065968fff498c00f3093e18ba2e8301e0c857ccbe63db8b46b"
+    },
+    {
+      "bytes": 845,
+      "path": "ios-arm64/Flutter.framework/PrivacyInfo.xcprivacy",
+      "sha256": "9f95d7e7862a4b56b66ed926bd6d622d2a6545a827d19847278b438d571d4212"
+    },
+    {
+      "bytes": 7070,
+      "path": "ios-arm64/Flutter.framework/_CodeSignature/CodeResources",
+      "sha256": "e8f892c17976e52ba51740fa329954e4045720daf11295a42f46b9e9b5f45531"
+    },
+    {
+      "bytes": 864880,
+      "path": "ios-arm64/Flutter.framework/icudtl.dat",
+      "sha256": "325a86063d26334c2eabe1743cea073b612540fbf3d8fc2ef0b5708e3763a8c7"
+    },
+    {
+      "bytes": 87642928,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Flutter",
+      "sha256": "ef99d01ad721b16f3427b6cf521808e5156673ff555c27a7094454ebb29941b0"
+    },
+    {
+      "bytes": 921,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/Flutter.h",
+      "sha256": "c1f5b26a03d82c2451dbec13b8645bb56df3df3d80592f98171ba204e15d4a36"
+    },
+    {
+      "bytes": 2283,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterAppDelegate.h",
+      "sha256": "ebf60356f3456e2054548d873f08674ea2cdb5d7518d7530a328b5e81d867ba3"
+    },
+    {
+      "bytes": 3761,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterBinaryMessenger.h",
+      "sha256": "1170e4e2dfbba82a724246abfaaf561ea63d6dc2bc7b2a210b0195b41261332f"
+    },
+    {
+      "bytes": 1724,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterCallbackCache.h",
+      "sha256": "d21f7ebcae4afabf26a13b221817ecebe4ccf50a20d3cf5a7c7032de06dcc035"
+    },
+    {
+      "bytes": 18414,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterChannels.h",
+      "sha256": "920d7de42def64b88e9fc29e150532ec3a15b80f55643a6aa012d59fae2e19a2"
+    },
+    {
+      "bytes": 15290,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterCodecs.h",
+      "sha256": "672aa51d8b996e915ebd57a7cbd59d974ad51604bbb33232b2c4a20b269a7853"
+    },
+    {
+      "bytes": 3914,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterDartProject.h",
+      "sha256": "53cabfd086edf6ae0ed8732c09d530213b49753c7c2e3865c7ed1a63cddf1fab"
+    },
+    {
+      "bytes": 21724,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterEngine.h",
+      "sha256": "29528cda49a2619ac88f2a31be72b314af4e543918315dfaf11e5622c200742a"
+    },
+    {
+      "bytes": 4755,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterEngineGroup.h",
+      "sha256": "4aacef231a815c427753d2c9df6842117b2b1f63f5ea0ba643e810c7a3dd95fe"
+    },
+    {
+      "bytes": 3927,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterHeadlessDartRunner.h",
+      "sha256": "9e6663669bc5097af281fe14f5a3e4362f15708edc2f902d03e098e6e51620bd"
+    },
+    {
+      "bytes": 536,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterHourFormat.h",
+      "sha256": "43848b1528212ffe441493f22e0ecf362f49ff1a645557f3ae8d15422407b6b6"
+    },
+    {
+      "bytes": 1823,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterMacros.h",
+      "sha256": "79b0551d265c52701b378851718ab7b6db7afbecf561b73c2954988554e80f99"
+    },
+    {
+      "bytes": 1966,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterPlatformViews.h",
+      "sha256": "d1a53db8ce90729ce6669b8560e6e3f5d1a51849132a8c0f304449410745d8fe"
+    },
+    {
+      "bytes": 19326,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterPlugin.h",
+      "sha256": "349bc734c4eec7babf27b476f7c7a3bcfa01f4b0114bfbc7eae8ed9b09947838"
+    },
+    {
+      "bytes": 5318,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h",
+      "sha256": "f8f327fb94838f655de9153c09022dfc9625dd3fbc0e1a7b1c89aa033a1ca0d9"
+    },
+    {
+      "bytes": 893,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterSceneDelegate.h",
+      "sha256": "1bdbab65e137d7695d6b391e3ffeecbadd2dda103795f72ec47452b8b9a3fa06"
+    },
+    {
+      "bytes": 8387,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterSceneLifeCycle.h",
+      "sha256": "b4d90b84efbe3ce2f8db38397e312fe7f0c97d0ad7bbca8763a24b6ebf2d2217"
+    },
+    {
+      "bytes": 2263,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterTexture.h",
+      "sha256": "25ca4de1af6cbfac729e50f7462eb5d4de72f87a2ea545a9da1cab21707f23c6"
+    },
+    {
+      "bytes": 10734,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterViewController.h",
+      "sha256": "e2336e4d76c2899c2aa71d253a64dd292183b3ebaba237681a95ce2bac09a9a5"
+    },
+    {
+      "bytes": 1076,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Info.plist",
+      "sha256": "97bc153e729ad85f3d0c8203a445a9e1dbb2bd58c6d24911a7c089c027d66ba5"
+    },
+    {
+      "bytes": 95,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Modules/module.modulemap",
+      "sha256": "d158eb891a59ec065968fff498c00f3093e18ba2e8301e0c857ccbe63db8b46b"
+    },
+    {
+      "bytes": 845,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/PrivacyInfo.xcprivacy",
+      "sha256": "9f95d7e7862a4b56b66ed926bd6d622d2a6545a827d19847278b438d571d4212"
+    },
+    {
+      "bytes": 7070,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/_CodeSignature/CodeResources",
+      "sha256": "e8f892c17976e52ba51740fa329954e4045720daf11295a42f46b9e9b5f45531"
+    },
+    {
+      "bytes": 864880,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/icudtl.dat",
+      "sha256": "325a86063d26334c2eabe1743cea073b612540fbf3d8fc2ef0b5708e3763a8c7"
+    }
+  ],
+  "origin": "Apple R1 previously fixed original framework inputs; no binary uploaded"
+}

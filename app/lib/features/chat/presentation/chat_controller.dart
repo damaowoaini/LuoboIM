@@ -9,12 +9,16 @@ import '../../conversation/domain/conversation.dart';
 import '../data/chat_repository.dart';
 import '../domain/chat_message.dart';
 import '../domain/chat_mention.dart';
+import '../domain/saved_emoji.dart';
 
 final class ChatController extends ChangeNotifier {
   ChatController(this.repository) {
     _events = repository.gateway.events.listen((event) {
       if (event.generation != repository.generation || !repository.current) {
         return;
+      }
+      if (event.kind == ImEventKind.conversationsChanged) {
+        repository.invalidateSavedEmojiProofs();
       }
       if (event.kind == ImEventKind.historyInvalidated ||
           event.kind == ImEventKind.conversationHistoryInvalidated &&
@@ -107,6 +111,9 @@ final class ChatController extends ChangeNotifier {
   String? _lastReadId;
   final Map<String, int> progress = {};
   final Set<String> _sending = {};
+  final Map<String, String> _unconfirmedFaces = {};
+  bool hasUnconfirmedFace(String entryId) =>
+      _unconfirmedFaces.containsKey(entryId);
   Future<void> _draftTail = Future.value();
 
   bool get usable => _valid && !_disposed && repository.current;
@@ -149,7 +156,10 @@ final class ChatController extends ChangeNotifier {
         await _markRead();
       } else {
         // Initial search content remains staged while automatic reads settle.
-        final updated = await _markRead(isCurrent: current, source: page.messages);
+        final updated = await _markRead(
+          isCurrent: current,
+          source: page.messages,
+        );
         if (!current() || timeline != _timeline) return;
         conversation = metadata;
         draft = metadata.draft;
@@ -173,6 +183,9 @@ final class ChatController extends ChangeNotifier {
   void _merge(Iterable<ChatMessage> values) {
     final merged = {for (final item in messages) item.id: item};
     for (final item in values) {
+      if (item.delivery == MessageDelivery.sent) {
+        _unconfirmedFaces.removeWhere((_, id) => id == item.id);
+      }
       if (!_sending.contains(item.id) && !repository.isRemoved(item.id)) {
         merged[item.id] = item;
       }
@@ -287,10 +300,15 @@ final class ChatController extends ChangeNotifier {
       await repository.markRead();
       if (!current() || timeline != _timeline) return const [];
       final privateIds = values
-          .where((item) => !item.mine && item.privacy.isPrivateChat == true &&
-              (item.privacy.messageReadAtMilliseconds ?? 0) <= 0 &&
-              (item.privacy.attachmentReadAtMilliseconds ?? 0) <= 0)
-          .map((item) => item.id).toList();
+          .where(
+            (item) =>
+                !item.mine &&
+                item.privacy.isPrivateChat == true &&
+                (item.privacy.messageReadAtMilliseconds ?? 0) <= 0 &&
+                (item.privacy.attachmentReadAtMilliseconds ?? 0) <= 0,
+          )
+          .map((item) => item.id)
+          .toList();
       List<ChatMessage> updated = const [];
       if (privateIds.isNotEmpty) {
         updated = await repository.refreshReadMetadata(privateIds);
@@ -333,6 +351,82 @@ final class ChatController extends ChangeNotifier {
     }
   }
 
+  Future<SavedEmojiSendOutcome> sendSavedEmoji(
+    SavedEmoji entry, {
+    required MessageHistoryAccess access,
+    required void Function() checkSource,
+  }) async {
+    if (!usable || preparing || hasUnconfirmedFace(entry.id)) {
+      return SavedEmojiSendOutcome.notDispatched;
+    }
+    bool current() {
+      try {
+        access.check();
+        checkSource();
+        return usable;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    final timeline = _timeline;
+    var dispatched = false;
+    String? messageId;
+    preparing = true;
+    failure = null;
+    notifyListeners();
+    try {
+      access.check();
+      checkSource();
+      final message = await repository.prepareSavedEmoji(
+        entry,
+        access: access,
+        checkSource: checkSource,
+      );
+      messageId = message.id;
+      access.check();
+      checkSource();
+      if (!usable || timeline != _timeline) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+      _merge([message]);
+      final sent = await repository.send(
+        message.id,
+        access: access,
+        checkSource: checkSource,
+        onDispatched: () {
+          dispatched = true;
+        },
+      );
+      if (current() && timeline == _timeline) _merge([sent]);
+      return SavedEmojiSendOutcome.sent;
+    } catch (error) {
+      if (dispatched && messageId != null) {
+        _unconfirmedFaces[entry.id] = messageId;
+      }
+      if (current() && timeline == _timeline) {
+        failure = _failure(error);
+        if (messageId != null) {
+          messages = List.unmodifiable(
+            messages.map(
+              (m) => m.id == messageId
+                  ? m.withDelivery(MessageDelivery.failed)
+                  : m,
+            ),
+          );
+        }
+      }
+      return dispatched
+          ? SavedEmojiSendOutcome.unconfirmed
+          : SavedEmojiSendOutcome.notDispatched;
+    } finally {
+      if (!_disposed) {
+        preparing = false;
+        notifyListeners();
+      }
+    }
+  }
+
   Future<void> resend(String id) async {
     if (!usable || !_sending.add(id)) return;
     final timeline = _timeline;
@@ -345,6 +439,7 @@ final class ChatController extends ChangeNotifier {
     notifyListeners();
     try {
       final sent = await repository.send(id);
+      _unconfirmedFaces.removeWhere((_, value) => value == id);
       if (!usable || timeline != _timeline) return;
       _sending.remove(id);
       _merge([sent]);

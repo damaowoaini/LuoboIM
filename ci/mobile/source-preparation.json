@@ -1,76 +1,44 @@
 {
-  "schema": "luobo.mobile.source-preparation.v13",
-  "state": "current323_chat_background_targeted42_verified_final_regression_pending",
-  "source323_digest": "841373cda757789d6709d0a55879cd9ba0914bd53955513a3ed7a30088c26ed1",
-  "portable375_digest": "d344e39862531a7c4c52f0aad4519f166c540336bee40c75a03da15c28871b3c",
-  "reference323_digest": "c23f7f42b3e82148787245c16dfd7a7df2cc6d7200e022e1a46dd7d41ff63dfd",
+  "schema": "luobo.mobile331.saved-emoji.preparation.v1",
+  "state": "refs_ci_metadata_only_targeted49_passed_no_full",
+  "source331_digest": "169caadc4e446184a3621f69ec2a06a142df2fb6a075fb26517fc43ca768cf5f",
+  "portable383_digest": "493d22158347b50773db20750872ed6b5ec881e4c716d016cc2d291f695d4ee7",
+  "reference331_digest": "c9a7aa28e58acedd2d8357ecb6a09125cb146f4a4bd2d568c49a6e96c9b6c894",
   "effective_vector": {
-    "path": "references/integration/mobile323-background-ci-candidate/effective-source-vector.json",
-    "bytes": 131312,
-    "sha256": "df747455d76412d6b0b518ef6dc09d2cd32fa371d05e19c45759a619cdd7550e"
+    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/effective-source-vector.json",
+    "bytes": 134321,
+    "sha256": "5b8c88765429ab3bd9c9c1fff6ca8e15b1dd185828662bb358b76fcd4f2bc132"
   },
   "parent_preparation": {
-    "path": "references/integration/mobile323-background-ci-candidate/before/ci/mobile/source-preparation.json",
-    "bytes": 3462,
-    "sha256": "7911b374798f352da79b45f803b3188a0d8bb477b7de5f82d857d75a0f79ee07"
+    "path": "references/integration/mobile331-saved-emoji-ci-candidate/before/ci/mobile/source-preparation.json",
+    "bytes": 4162,
+    "sha256": "4a908ec4ee9a45dcbc346c4beedcdcac9875b4fc88cd6b26d9573f06ea2a50ec"
   },
-  "background_final": {
-    "path": "references/integration/mobile-chat-background-final-candidate/candidate-manifest.json",
-    "bytes": 6283,
-    "sha256": "4ac70a70ad92f59ae5cba5a05c00fb03f4fe7c72b96f82607ae17c1b891c9764"
+  "saved_emoji_r1": {
+    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/candidate-manifest.json",
+    "bytes": 16473,
+    "sha256": "37dc6ee8998ba458326cd8de26b7a4fecb9457f18a463b5ccee8e56b85a007b1"
   },
-  "actual_background_targeted": {
-    "root_final_manifest": {
-      "path": "references/integration/mobile-chat-background-final-candidate/candidate-manifest.json",
-      "bytes": 6283,
-      "sha256": "4ac70a70ad92f59ae5cba5a05c00fb03f4fe7c72b96f82607ae17c1b891c9764"
-    },
-    "root_targeted_acceptance": {
-      "path": "references/integration/mobile-chat-background-final-candidate/targeted-acceptance.json",
-      "bytes": 8713,
-      "sha256": "cec3beeddbcb7f07f5b2ddf8e12be007176965a069000e1149a6c05a74c9197f"
-    },
-    "first42_log": {
-      "path": "references/integration/mobile-background-local-20261016/tests-first.log",
-      "bytes": 67300,
-      "sha256": "5030c6960fba2f25a1adf1c1c882b558beeaf48575e5913728d5d419536f65d4"
-    },
-    "rerun15_log": {
-      "path": "references/integration/mobile-background-local-20261016/tests-fixture-r2.log",
-      "bytes": 22554,
-      "sha256": "3f707ce09dadfea18dc7f371a071d6bb15d42825f334d869613dfbdc0b108dc6"
-    },
-    "first42_passed": 29,
-    "first42_errors_retained": 13,
-    "unaffected_success_reused": 27,
-    "targeted_rerun_passed": 15,
-    "aggregate_unique_passed": 42,
-    "skipped": 0,
-    "combined_full_executed": false,
-    "initial_widget_fixture_instances": 22,
-    "actual_cleanup_markers": [
-      "drain.begin",
-      "drain.end",
-      "sdk.begin",
-      "sdk.end",
-      "unmount.begin",
-      "unmount.end"
-    ],
-    "root_final9_changed_file_analysis": "zero issues by reused clean checks plus targeted braces/fixture rechecks",
-    "rerun_elapsed_seconds": 16.803,
-    "rerun_min_free_bytes": 3274522624
+  "targeted_actual": {
+    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/verification-result.json",
+    "bytes": 27224,
+    "sha256": "477c8701b230e0999c0890cd9b4fb005a05c3ea2f3e6de1b82f8cc21f9660b27"
   },
-  "parent316_history": "Original281/963 business cloud PASS; font22 local targeted PASS and booking controller targeted analysis0. Composed303/985 never executed, retained as exact expected-name layer.",
   "expected_not_actual": {
-    "target345": 345,
-    "full1027": 1027,
+    "target386": 386,
+    "full1068": 1068,
     "strict_analysis": 0
   },
-  "names": "Actual Root42 plus exact previous303/985 composed inventories; all previous row multiplicities preserved. Hidden loader cannot replace visible success.",
-  "cleanup": "Existing35recorder/14unmount,76creation/safe6 and11Next parsers/AST unchanged; final background fixture retains awaited six-stage teardown. Root actual first42 and rerun15 logs prove exact fixture sequences. No new cleanup parser.",
-  "control": "Original35Python checks preserved;2new composition-rejection checks. Only changed Descriptor4+new2 are run in this proposal.11protectedAST/4GiB admission/1GiB .2/cap768MiB/900s/netns/native gate/SDK51+migration1/174lockeddeps unchanged.",
-  "execution_policy": "Manual-only workflow preserved. No full per feature/batch; one final full after all known issues fixed and targeted checks clean. No dispatch or full execution.",
-  "reference": "Default-off full323 with exact4 original historical search replacements; only entry2 strict1namedassertFAIL1oldfilterPASS.",
-  "public_inventory": "Zero private-helper exceptions; privatecheck.sh stays private and public absent.",
-  "native_or_service_acceptance": false
+  "parent323_history": "345/1027 composed expected-only; actual last cloud281/963 + local font22/background42 retained. No final full run here.",
+  "names": "exact original345/1027 composition layers +41 actual new successes. Old8 direct core cases stay in full, not counted as new41.",
+  "cleanup": "Original35recorder/14unmount,76creation/safe6,11Next AST/contracts unchanged. SavedEmoji14 widget fixtures each6ordered markers;2 entry ChatFont fixtures each4markers;25 units await SDK teardown. No generic new cleanup runner.",
+  "control": "Manual workflow_dispatch only; original37Python cases preserved (35prior+2background),2saved-emoji composition rejection cases appended. Changed Descriptor4,2existing background key-mapping and2new composition cases targeted here;8PASS total,31other checks not rerun. Protected11AST/networknamespace/resource/native/174deps/SDK51+migration1 unchanged.",
+  "public_inventory": "Strict source331/portable383, no check.sh exception. Private701B helper remains private.",
+  "execution_policy": "No per-feature full. One final full after known issues fixed and targeted checks clean. No dispatch/push/adoption by this proposal.",
+  "native_device_service_acceptance": false,
+  "root_targeted_acceptance": {
+    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/root-targeted-acceptance.json",
+    "bytes": 692,
+    "sha256": "7652a5c7b9f3e9205e4c8cf44db340c64f60e4d253967bad4e554eb6709f2a37"
+  }
 }

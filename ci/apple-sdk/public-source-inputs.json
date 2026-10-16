@@ -1,0 +1,477 @@
+{
+  "App_sources": 0,
+  "files": [
+    {
+      "bytes": 511,
+      "path": "packages/flutter_openim_sdk/ios/Classes/BaseCallback.swift",
+      "role": "bridge actual BaseCallback.swift",
+      "sha256": "b884523efd1fb1bebeefd6af93ab488399b06b21de111dbfcd950a723264e4b1"
+    },
+    {
+      "bytes": 466,
+      "path": "packages/flutter_openim_sdk/ios/Classes/CommonUtil.swift",
+      "role": "bridge actual CommonUtil.swift",
+      "sha256": "ddb4f29bd968d53203f6a7c682d2f133a743724a54bd290bb7908099f364f95a"
+    },
+    {
+      "bytes": 94,
+      "path": "packages/flutter_openim_sdk/ios/Classes/FlutterOpenimSdkPlugin.h",
+      "role": "bridge actual FlutterOpenimSdkPlugin.h",
+      "sha256": "1e03fe1b956b3181921ceefd6e37485f55c228c1b7522c77356cf1de932c179a"
+    },
+    {
+      "bytes": 627,
+      "path": "packages/flutter_openim_sdk/ios/Classes/FlutterOpenimSdkPlugin.m",
+      "role": "bridge actual FlutterOpenimSdkPlugin.m",
+      "sha256": "50cf8e363ea68990ea7510ec1c9cc817c7b312cbf64f3b86694313dac7a35581"
+    },
+    {
+      "bytes": 714,
+      "path": "packages/flutter_openim_sdk/ios/Classes/JsonUtil.swift",
+      "role": "bridge actual JsonUtil.swift",
+      "sha256": "6f8b101fbfb9efd8397c435b91a4832a62402229f5394c2ac6439743788412b4"
+    },
+    {
+      "bytes": 2518,
+      "path": "packages/flutter_openim_sdk/ios/Classes/LocalVideoTools.swift",
+      "role": "bridge actual LocalVideoTools.swift",
+      "sha256": "3e9c3e13331672864f751a0ef6f9f4edd278d0fd77d2dccb762f1aeab5c5d07d"
+    },
+    {
+      "bytes": 1121,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/BaseServiceManager.swift",
+      "role": "bridge actual Module/BaseServiceManager.swift",
+      "sha256": "6e59425d8f920ba4f5524fa6ab6c1ae0417965693f6dc45c596d784586978c0d"
+    },
+    {
+      "bytes": 10466,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/ConversationManager.swift",
+      "role": "bridge actual Module/ConversationManager.swift",
+      "sha256": "49ddb295b4f2a1286f7af2b16fe2a7cc08ef7e07a79e18d60505afc5cb45236d"
+    },
+    {
+      "bytes": 6976,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/FriendshipManager.swift",
+      "role": "bridge actual Module/FriendshipManager.swift",
+      "sha256": "bd63727d716d313ca40d162b8b117f0ff13ed830a2a4db8ab38d5da5a2413d9e"
+    },
+    {
+      "bytes": 12572,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/GroupManager.swift",
+      "role": "bridge actual Module/GroupManager.swift",
+      "sha256": "f1f489d48037afd2769b1b75203715880f4a8c726fe5e478d899251f99af7231"
+    },
+    {
+      "bytes": 10011,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/IMManager.swift",
+      "role": "bridge actual Module/IMManager.swift",
+      "sha256": "55ac72020c4cee66e6174586397a7e74c894ba1501fc12e9d2db5356c9df1993"
+    },
+    {
+      "bytes": 22991,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/MessageManager.swift",
+      "role": "bridge actual Module/MessageManager.swift",
+      "sha256": "a19dec948f08700fe87cda8ca682fe2f6a1255820175c90f5f6723edab1de91f"
+    },
+    {
+      "bytes": 3000,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/OrganizationManager.swift",
+      "role": "bridge actual Module/OrganizationManager.swift",
+      "sha256": "010f19b25746567b8644880fbc283dc4ae6b9b3e5124d9735094ab4af612b74f"
+    },
+    {
+      "bytes": 8203,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/SignalingManager.swift",
+      "role": "bridge actual Module/SignalingManager.swift",
+      "sha256": "7b163f0f32b34cfad0efdca58ece6ce8321a787e52b49d05353117b3c3dc3433"
+    },
+    {
+      "bytes": 3767,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/UserManager.swift",
+      "role": "bridge actual Module/UserManager.swift",
+      "sha256": "0ce567a7adf147d30b4fb9041dbc12a411443b0b0438914c4a509a6e134f8124"
+    },
+    {
+      "bytes": 1898,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/WorkMomentsManager.swift",
+      "role": "bridge actual Module/WorkMomentsManager.swift",
+      "sha256": "5db2df5d8f6def2bee430a4821a091c0c1375ab3ba3fe98e0523ee79b911053b"
+    },
+    {
+      "bytes": 15306,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Reachability.swift",
+      "role": "bridge actual Reachability.swift",
+      "sha256": "67528bb6347e949611c2fda570a69f0598137da2ae6d1cf5a048575c8d84993b"
+    },
+    {
+      "bytes": 2755,
+      "path": "packages/flutter_openim_sdk/ios/Classes/SwiftFlutterOpenimSdkPlugin.swift",
+      "role": "bridge actual SwiftFlutterOpenimSdkPlugin.swift",
+      "sha256": "1f252f7581ca5fc3c25253604a69a9a2f4fba86a44ca09156c42c2e48a52065c"
+    },
+    {
+      "bytes": 435,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Util/Any+Extension.swift",
+      "role": "bridge actual Util/Any+Extension.swift",
+      "sha256": "381d5f114b2a289cdfe640080a801f712ea0fbcc51951509c68a3952857ec2c8"
+    },
+    {
+      "bytes": 2819,
+      "path": "packages/flutter_openim_sdk/ios/Classes/Util/FlutterMethodCall+Extension.swift",
+      "role": "bridge actual Util/FlutterMethodCall+Extension.swift",
+      "sha256": "24b9b1c6b3e4112fb7a4176858b200db38a6e72ed7422c4386648b32c441ebf4"
+    },
+    {
+      "bytes": 1313,
+      "path": "server/pkg/protocol/auth/auth.go",
+      "role": "protocol52",
+      "sha256": "52eefc172f11333ea832b73819189d284b22703c79d2661ae7434378052eff64"
+    },
+    {
+      "bytes": 23370,
+      "path": "server/pkg/protocol/auth/auth.pb.go",
+      "role": "protocol52",
+      "sha256": "1b343eace9056023bb3fa2a3120ae98dc912f9591c0f27618118c227e3c3ea94"
+    },
+    {
+      "bytes": 1379,
+      "path": "server/pkg/protocol/auth/auth.proto",
+      "role": "protocol52",
+      "sha256": "01f56aadfbd4c7e45454fdbfdbb23e506caa2215b5998b28d1668787ba1400a8"
+    },
+    {
+      "bytes": 11300,
+      "path": "server/pkg/protocol/constant/constant.go",
+      "role": "protocol52",
+      "sha256": "ede1c9c1499a89915f535582966617a128025dc80171000a0f3427511ca93176"
+    },
+    {
+      "bytes": 757,
+      "path": "server/pkg/protocol/constant/limit.go",
+      "role": "protocol52",
+      "sha256": "c7e2c563195c1878aa23c6c15451ab6e89738418d8a24f9a8d647e532185bf78"
+    },
+    {
+      "bytes": 3253,
+      "path": "server/pkg/protocol/constant/platform_id_to_name.go",
+      "role": "protocol52",
+      "sha256": "f519af5e3027c0e0d5967ab6d780365733d6ad84865d3edd2fa5a174016fb425"
+    },
+    {
+      "bytes": 405,
+      "path": "server/pkg/protocol/constant/rtc.go",
+      "role": "protocol52",
+      "sha256": "5c53ed53f084b141d32f821488aa15076b5b339006ca271cece68ec6c616e43f"
+    },
+    {
+      "bytes": 4445,
+      "path": "server/pkg/protocol/conversation/conversation.go",
+      "role": "protocol52",
+      "sha256": "927700be1b6a42c7b8a8b263743783da9d114382746ea14a5260223f4cd4c3e6"
+    },
+    {
+      "bytes": 141298,
+      "path": "server/pkg/protocol/conversation/conversation.pb.go",
+      "role": "protocol52",
+      "sha256": "0c70b4033888e7ee3da6f7368d0178135890a1a52082c22c360305d6dc891ad3"
+    },
+    {
+      "bytes": 5952,
+      "path": "server/pkg/protocol/conversation/conversation.proto",
+      "role": "protocol52",
+      "sha256": "f4a513ea9516d82dd4a379335c231a428e5fda2f783707749cdd1ceab9d21457"
+    },
+    {
+      "bytes": 40744,
+      "path": "server/pkg/protocol/encryption/encryption.pb.go",
+      "role": "protocol52",
+      "sha256": "44cc06b4b3840c3486fc3d68cbf600c11c047f6214b08e0492ba9190f3bfa1d3"
+    },
+    {
+      "bytes": 1532,
+      "path": "server/pkg/protocol/encryption/encryption.proto",
+      "role": "protocol52",
+      "sha256": "e549a76baee8db3bae470699d634b2b2867effa078cbbe35846e24637743f540"
+    },
+    {
+      "bytes": 6299,
+      "path": "server/pkg/protocol/errinfo/errinfo.pb.go",
+      "role": "protocol52",
+      "sha256": "7302a889a44f1af10ea68660f5166010624fd5dc5cdac6f89486ca2d34364535"
+    },
+    {
+      "bytes": 849,
+      "path": "server/pkg/protocol/errinfo/errinfo.proto",
+      "role": "protocol52",
+      "sha256": "a3c216dbb7150ef640e5beb16d4b153d110c3ccb4d4aee0fbb3bf539a868b641"
+    },
+    {
+      "bytes": 76520,
+      "path": "server/pkg/protocol/extendmsg/extendmsg.pb.go",
+      "role": "protocol52",
+      "sha256": "6d0f478a70a3a5c0c3701cdc235498b1ea19c1d70495dd36e837c7a3e5a69c1f"
+    },
+    {
+      "bytes": 2953,
+      "path": "server/pkg/protocol/extendmsg/extendmsg.proto",
+      "role": "protocol52",
+      "sha256": "574d7f3218f43a8dc7b140e1f4d78b21f38e579e9c0ccdb285ebc54c13df3458"
+    },
+    {
+      "bytes": 4524,
+      "path": "server/pkg/protocol/friend/friend.go",
+      "role": "protocol52",
+      "sha256": "950d2b18bae852c4ac7441d6342d9ba9586bf625c20f72f525806bb32657e171"
+    },
+    {
+      "bytes": 137820,
+      "path": "server/pkg/protocol/friend/friend.pb.go",
+      "role": "protocol52",
+      "sha256": "3c283df272cd589e784a2a903b8d4444748f7f10a9faffc9d029198c06d8cf18"
+    },
+    {
+      "bytes": 6096,
+      "path": "server/pkg/protocol/friend/friend.proto",
+      "role": "protocol52",
+      "sha256": "4cdd43517842033c0dd1bf8a4717b690153ca647e466e7768994f84d1b6b463c"
+    },
+    {
+      "bytes": 374,
+      "path": "server/pkg/protocol/go.mod",
+      "role": "protocol52",
+      "sha256": "badbbca7e55346a0b2bb295779db61e0a007df0f7af017f4b2da419851e14294"
+    },
+    {
+      "bytes": 1743,
+      "path": "server/pkg/protocol/go.sum",
+      "role": "protocol52",
+      "sha256": "7ecb9e6d3ccee8738c9fe70740c08a91f2ed669f6af01b4e42038e2e7ee58df4"
+    },
+    {
+      "bytes": 7941,
+      "path": "server/pkg/protocol/group/group.go",
+      "role": "protocol52",
+      "sha256": "1b5c7ff5540dff5421f883a1ed791fee133445ef612503c6c73744d484b5db80"
+    },
+    {
+      "bytes": 254685,
+      "path": "server/pkg/protocol/group/group.pb.go",
+      "role": "protocol52",
+      "sha256": "d62b9f6634b96a11b3919d83398a2b92000fdbce01aa0c3d12d5bd24f123a002"
+    },
+    {
+      "bytes": 10243,
+      "path": "server/pkg/protocol/group/group.proto",
+      "role": "protocol52",
+      "sha256": "f1bbb2b7b4fc4524bf6fa60060cd643843e5fc7afae75e21ce668931b297468a"
+    },
+    {
+      "bytes": 5116,
+      "path": "server/pkg/protocol/msg/msg.go",
+      "role": "protocol52",
+      "sha256": "e1bf3abf8d7eca8e04c96215ce0b90cbe77eb2818db341ace93163f507cbe634"
+    },
+    {
+      "bytes": 231647,
+      "path": "server/pkg/protocol/msg/msg.pb.go",
+      "role": "protocol52",
+      "sha256": "c89c33defb8bd65825511ede621f1d3e29016f59fe4ed2305c90c195ca4e201c"
+    },
+    {
+      "bytes": 9241,
+      "path": "server/pkg/protocol/msg/msg.proto",
+      "role": "protocol52",
+      "sha256": "2faf0eb1cd7ae42e0346eeca102cc2e405dcd45ef5c7a672c196352f59ccb2a6"
+    },
+    {
+      "bytes": 2186,
+      "path": "server/pkg/protocol/msggateway/msggateway.go",
+      "role": "protocol52",
+      "sha256": "65d4e5ff4c24c47f57b59a0adb51b9bc2442be072cf72f9f81740d72888aa438"
+    },
+    {
+      "bytes": 61402,
+      "path": "server/pkg/protocol/msggateway/msggateway.pb.go",
+      "role": "protocol52",
+      "sha256": "6a9302b5e347caa88243e132b72aff412efc48a88993d98190a9cb777a9e1591"
+    },
+    {
+      "bytes": 3535,
+      "path": "server/pkg/protocol/msggateway/msggateway.proto",
+      "role": "protocol52",
+      "sha256": "489f359d42d8d1b76317aace6e543b036d9393a7b099abb23f447ba7f46bab88"
+    },
+    {
+      "bytes": 14787,
+      "path": "server/pkg/protocol/msggateway/msggateway_grpc.pb.go",
+      "role": "protocol52",
+      "sha256": "e87f67bedae0d892418f8221b895c5efd88c6c1ce61c2df94b5f05551b0699ba"
+    },
+    {
+      "bytes": 1110,
+      "path": "server/pkg/protocol/push/push.go",
+      "role": "protocol52",
+      "sha256": "b8afd2224f0aefc93bebeab2628ebc001f84a2cccd3d44a5491da6e9476011bd"
+    },
+    {
+      "bytes": 17095,
+      "path": "server/pkg/protocol/push/push.pb.go",
+      "role": "protocol52",
+      "sha256": "19f852b5cdafb39beb8e86bd76416effc34f36a688b8550439860e45ec57b0ef"
+    },
+    {
+      "bytes": 1109,
+      "path": "server/pkg/protocol/push/push.proto",
+      "role": "protocol52",
+      "sha256": "2c54bca1d29e23e9fb27b9be847b84545ff30b2c6daa9f23f565252761220f42"
+    },
+    {
+      "bytes": 564,
+      "path": "server/pkg/protocol/rtc/check.go",
+      "role": "protocol52",
+      "sha256": "2e33e284622970f81ddf6e789157c155c8382ae429c49b83651d50ee8e365989"
+    },
+    {
+      "bytes": 265868,
+      "path": "server/pkg/protocol/rtc/rtc.pb.go",
+      "role": "protocol52",
+      "sha256": "cdbe31fced2b54aa08fc23ef1f79939b3df94a068fccd285be23ab265a0986b7"
+    },
+    {
+      "bytes": 11542,
+      "path": "server/pkg/protocol/rtc/rtc.proto",
+      "role": "protocol52",
+      "sha256": "3b68676d9f4231dd602520a4585d758538961de0aa694ac4a64beffd19cd0a5d"
+    },
+    {
+      "bytes": 2368,
+      "path": "server/pkg/protocol/sdkws/method.go",
+      "role": "protocol52",
+      "sha256": "943a181f45c400a92636646b32bc3ef7bdf7706246bb7de416cb3b1f614a488f"
+    },
+    {
+      "bytes": 823,
+      "path": "server/pkg/protocol/sdkws/sdkws.go",
+      "role": "protocol52",
+      "sha256": "d21d12089e0f5b5bf09717bdc9f7f474ac50b3e06307cc66fdd0a714c785bc6b"
+    },
+    {
+      "bytes": 263197,
+      "path": "server/pkg/protocol/sdkws/sdkws.pb.go",
+      "role": "protocol52",
+      "sha256": "845e9933bf3fa23e8fc26db71b1b8d3cbebd57ee269270acfba31681fb1875f8"
+    },
+    {
+      "bytes": 12400,
+      "path": "server/pkg/protocol/sdkws/sdkws.proto",
+      "role": "protocol52",
+      "sha256": "39ad06df6a5f9cd6bc05d92db5b814b9e913f10190ad1c966b948a2a7e9e28b4"
+    },
+    {
+      "bytes": 3099,
+      "path": "server/pkg/protocol/statistics/statistics.pb.go",
+      "role": "protocol52",
+      "sha256": "61258311376a408c8508f50e2cc7af1f725b7f0f9a54bc42d0b4906350ce8873"
+    },
+    {
+      "bytes": 726,
+      "path": "server/pkg/protocol/statistics/statistics.proto",
+      "role": "protocol52",
+      "sha256": "c1cd734ffa0314555ad368998ebeb206ee896e41e2699cbe58cf2cfc234a8f8e"
+    },
+    {
+      "bytes": 1135,
+      "path": "server/pkg/protocol/third/third.go",
+      "role": "protocol52",
+      "sha256": "fc0db677ed30501bc8e2632adb5d936f4401a5fd115b367afed9c53aa21e9222"
+    },
+    {
+      "bytes": 115936,
+      "path": "server/pkg/protocol/third/third.pb.go",
+      "role": "protocol52",
+      "sha256": "bc16e0582f58960701b153c32c8d78dae93b8035c16841bc9c57df547e66a4cb"
+    },
+    {
+      "bytes": 4673,
+      "path": "server/pkg/protocol/third/third.proto",
+      "role": "protocol52",
+      "sha256": "a2e43111fc05723cef96c04b6088c399d0b5cf655c8cd4488387efe9b649c9e7"
+    },
+    {
+      "bytes": 6633,
+      "path": "server/pkg/protocol/user/user.go",
+      "role": "protocol52",
+      "sha256": "9d45d02abda20911a6a1f83ca5ee2452ad17c12f217fdf392fedde801bdc6eab"
+    },
+    {
+      "bytes": 213518,
+      "path": "server/pkg/protocol/user/user.pb.go",
+      "role": "protocol52",
+      "sha256": "24aa16d4fd75f546868f1b188e4ec32579901abeaed009c9746493fedc8e542c"
+    },
+    {
+      "bytes": 9121,
+      "path": "server/pkg/protocol/user/user.proto",
+      "role": "protocol52",
+      "sha256": "9ceb7fa394250025bf9cc523dcdee8efd03e7b5f72cea2a1bcf6901fe51c1e9c"
+    },
+    {
+      "bytes": 5909,
+      "path": "server/pkg/protocol/wrapperspb/wrapperspb.go",
+      "role": "protocol52",
+      "sha256": "8983810b9599dabe1b9a62cec9011ee0656d12a7c559a07de186567d8257e286"
+    },
+    {
+      "bytes": 20136,
+      "path": "server/pkg/protocol/wrapperspb/wrapperspb.pb.go",
+      "role": "protocol52",
+      "sha256": "dd6d6ebb20bdc5be6f145984413271bf866909931e450a915eccfe2638995000"
+    },
+    {
+      "bytes": 2191,
+      "path": "server/pkg/protocol/wrapperspb/wrapperspb.proto",
+      "role": "protocol52",
+      "sha256": "4c0b0dae23baa869cb6045d37ea88083ff7bf59cbfafb7cb9aa1f37c56ea48ec"
+    },
+    {
+      "bytes": 21153,
+      "path": "packages/flutter_openim_sdk/tool/native_core/candidate-source-manifest.json",
+      "role": "borrowed source/lock/helper",
+      "sha256": "c4311042854604c113ce484b327349c9ff566b80ba326fc071d358cdbaa67447"
+    },
+    {
+      "bytes": 142887,
+      "path": "packages/flutter_openim_sdk/tool/native_core/patches/0001-enterprise-protocol-compat.patch",
+      "role": "borrowed source/lock/helper",
+      "sha256": "dcbc80f89ce07eaac8a2c28c23e1cbaef0db9c2c79cacffdaa020d61a356e1f7"
+    },
+    {
+      "bytes": 18776,
+      "path": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
+      "role": "borrowed source/lock/helper",
+      "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
+    },
+    {
+      "bytes": 16877,
+      "path": "packages/flutter_openim_sdk/tool/native_core/build_candidate.py",
+      "role": "borrowed source/lock/helper",
+      "sha256": "44d5d7d713e1f3e536db405318998ff618beb1ce6e25030269ba3557f373c32c"
+    },
+    {
+      "bytes": 14494,
+      "path": "ci/android-native/go_observer.py",
+      "role": "borrowed source/lock/helper",
+      "sha256": "e7939ea1fe1332cb9891449309a69706fa63b72fea948384cb3612fa600cd44d"
+    },
+    {
+      "bytes": 6736,
+      "path": "ci/group-effects/resource_guard.py",
+      "role": "borrowed source/lock/helper",
+      "sha256": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c"
+    }
+  ],
+  "private_binaries": 0,
+  "public_text_members": 78,
+  "schema": 1,
+  "total_bytes": 2361035
+}

@@ -1,0 +1,48 @@
+{
+  "SDK_cohort": "auditable-sdk-apple-arm64-v1",
+  "acquired_sum": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
+  "acquired_sum_sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f",
+  "controller_identity": "apple-sdk-only-cloud-arm64-r1",
+  "core_commit": "7b156fc5557878ad6e6a07e572694af5699c6624",
+  "core_manifest": "packages/flutter_openim_sdk/tool/native_core/candidate-source-manifest.json",
+  "core_modified_count": 78,
+  "core_repository": "https://github.com/openimsdk/openim-sdk-core",
+  "engine": {
+    "archive_SHA256_preexisting": false,
+    "bytes": 93100875,
+    "crc32c_base64": "P+VkbQ==",
+    "generation": "1791396521564477",
+    "md5_base64": "j94FhFKfVk/7jYLp2zX5WA==",
+    "revision": "deb287481e3ce9468f3434937ced4240a70539ca",
+    "url": "https://storage.googleapis.com/flutter_infra_release/flutter/deb287481e3ce9468f3434937ced4240a70539ca/ios/artifacts.zip?generation=1791396521564477"
+  },
+  "go": {
+    "bytes": 68195916,
+    "sha256": "76812b213b1b2302c978d28fa52fa92d541704b9e7d9d5db8002c50e4018c4c5",
+    "url": "https://go.dev/dl/go1.27.2.darwin-arm64.tar.gz"
+  },
+  "guard": "ci/group-effects/resource_guard.py",
+  "mobile": {
+    "commit": "19777044486779222400e9ca16c4306f9c6dbfa9",
+    "go_mod_h1": "h1:HR/iBzuQmVTl/us733QPwrqHp43a8m9ZLgyKXD3ST6U=",
+    "h1": "h1:rav73cdd7OQUPgt1aIFbZQTiPNnjfueKXvfOiLCY0Ss=",
+    "version": "v0.0.0-20261011034528-197770444867"
+  },
+  "observer_helper": "ci/android-native/go_observer.py",
+  "original_protocol_replacement": "/Users/chuzu/Documents/projects/LuoboIM/Newchat-openim/server/pkg/protocol",
+  "parent_builder": "packages/flutter_openim_sdk/tool/native_core/build_candidate.py",
+  "parent_manifest_sha256": "e487450690b3bb6091ffa5d498aeb21a507f8818617722ffc0084eb6516d7b32",
+  "patch": "packages/flutter_openim_sdk/tool/native_core/patches/0001-enterprise-protocol-compat.patch",
+  "protocol_files": 52,
+  "runner": {
+    "SDK_version": "18.5",
+    "arch": "arm64",
+    "developer": "/Applications/Xcode_16.4.app/Contents/Developer",
+    "label": "macos-15",
+    "python_cache_version": "3.12.10",
+    "xcode_build": "16F6",
+    "xcode_version": "16.4"
+  },
+  "schema": "luobo.apple-sdk.cloud-portable.v1",
+  "source_sum": "81035756f13f282d14ca4629a94535d3317df4b5e35022b6f11f5becd79c574d"
+}
