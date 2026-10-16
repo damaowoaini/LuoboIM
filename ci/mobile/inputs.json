@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v4",
-  "state": "current282_QR_r4_source_revision_pending_target97_full785_analyze0",
+  "state": "current282_QR_r5_fixture_API_correction_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -27,7 +27,8 @@
     "global_search_analyze_r4_manifest_sha256": "330f6c8f5ce20f1165382b72ad807b2a1ab96a788b6c35b7770f675c65e4594f",
     "qr_candidate_manifest_sha256": "68fa203b134a1754b65383b0da23cdd9fbf323c1a191294f7f16e26756d58de6",
     "accepted_current269_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64",
-    "QR_r4_manifest_sha256": "6e64e8062e5fa622d9b6d312bac1891aa4f701951049d1e6f5eb17160e595590"
+    "QR_r4_manifest_sha256": "6e64e8062e5fa622d9b6d312bac1891aa4f701951049d1e6f5eb17160e595590",
+    "QR_r5_manifest_sha256": "085625490299faec3f82433d7711adead78abcd6366b3967b06b76bef0927c67"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -306,7 +307,7 @@
     "current282": 334
   },
   "portable_digests": {
-    "current282": "77b1011910379f7b0812791269cf9c33104c55214454e46d34f4438465c13cda"
+    "current282": "a6bbcb8d8a71a8d57a3bbc3038aca79a1c59fb93991467e2b0b20f73d95624ef"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -419,6 +420,17 @@
       "actual": "setup enforced-lockfile SUCCESS,target97 completed70PASS27ERROR;hidden11PASS0skip;QR24PASS27ERROR/search46PASS;full785/analyze notstarted",
       "independent_verification_sha256": "29b19b2d85e2f0ef18f7840f615383e0de7e6897b17a5d06c396931c8ffc1d84",
       "accepted": false
+    },
+    "current282_QR_r4_fixture_compile_failure": {
+      "commit": "fda6b010ce41b9e4c00f169a8f60dae9b6356573",
+      "run": 38867605425,
+      "job": 116863941694,
+      "source_digest": "3715d6d2be0acc4edfd3bbe439c47bb9357aef09ec0a03f6c2f094f0ace57a70",
+      "portable_digest": "77b1011910379f7b0812791269cf9c33104c55214454e46d34f4438465c13cda",
+      "artifact_sha256": "4733257c437a262c8feecb51c70a3870137b25ef5bb8f91dcf17671c3a826f0f",
+      "actual": "54businessPASS=QRcodec7+PNG1+search46;4QRsuite loadERROR;7hiddenPASS0skip/falsefooter;remaining43QR/full785/analyze notstarted",
+      "verification_sha256": "3b5ea3945b11b313f24d325db49dc564d774fd85b89262764612280798d4127f",
+      "accepted": false
     }
   },
   "reference_entry": {
@@ -426,7 +438,7 @@
     "default_enabled": false,
     "working_cohort": "current282",
     "members": 282,
-    "reference_source_digest": "d7e4aef06be31c566ef885f882fbccd4bf9ed62ce2a66c1f8016455629f65320",
+    "reference_source_digest": "bd91349fc110812ee740f4ceabe486d010e5c678843802f007c050f6f64bfd4b",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -471,7 +483,7 @@
   ],
   "current282": {
     "members": 282,
-    "source_digest": "3715d6d2be0acc4edfd3bbe439c47bb9357aef09ec0a03f6c2f094f0ace57a70",
+    "source_digest": "b9b37bef5b416d4fb6119892c9b7c981665e34849273221e828adcf7ca3bdbda",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1800,8 +1812,8 @@
       },
       {
         "path": "app/test/features/qr/qr_flow_fixture.dart",
-        "bytes": 10767,
-        "sha256": "23d11320a649ebb7ddc437b7371859810de9922c317fadfc3eee9495ea738c76"
+        "bytes": 10826,
+        "sha256": "e73305deb83aa4161a33266f74e0fef863c4747c12647896d33f5a26a3830edd"
       },
       {
         "path": "app/test/features/qr/qr_invite_test.dart",

@@ -120,7 +120,7 @@ final class QrFlowFixture {
     if (!drained) throw StateError('QR fixture real async drain failed');
     // Meaningful pending IO is explicitly awaited above. A persistent UI
     // animation still fails; no observer/exception or product guard is removed.
-    await tester.pumpAndSettle(timeout: const Duration(seconds: 5));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100), EnginePhase.sendSemanticsUpdate, const Duration(seconds: 5));
   }
   void pause(WidgetTester tester) {
     final binding = tester.binding;

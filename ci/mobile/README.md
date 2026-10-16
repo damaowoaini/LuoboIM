@@ -13,3 +13,7 @@ Public authored inventory has zero exceptions. Local-only `app/tool/check.sh` is
 ## QR r4 narrow follow-up (not yet accepted)
 
 The first current282 run38866360052 completed target97 with70PASS/27ERROR (QR24/27 plus search46PASS),11 hidden successful loads and no skip. Full785/analyze did not start. Its first enforced lock setup passed. Source r4 keeps all51 QR names/expectations and46 search cases: confirmation no longer displays a perpetual loading indicator while waiting for the user; owner/route/busy guards remain. The QR fixture now follows valid lifecycle transitions, drains its observed real SDK reply completions in bounded runAsync and scrolls UI controls before actual taps. No sharedSdkHarness/GlobalFixture, public parser/runner/workflow or test count changes. Full785/fatal analysis and original734 name retention still require new cloud evidence.
+
+## QR r5 fixture API correction (pending)
+
+Run38867605425:54 businessPASS=QRcodec7/PNG1+search46,4 QRsuite loaderERROR,7hiddenPASS;other43QR/full785/analyze did not run. The fixture used an invalid named timeout argument. R5 changes only that call to the official third positional timeout5s, preserving100ms/EnginePhase defaults. No product/assertion/count/SDK/runner/resource change.
