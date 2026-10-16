@@ -23,8 +23,9 @@
 
 - Web：完整测试、严格类型检查、桌面类型检查、Vite 构建，以及隔离的群设置、编辑草稿 before/after 回归。见 [Web CI](ci/README.web-ci.md)。
 - Admin：锁定依赖安装、Max setup、核心测试、类型检查和后台构建。见 [后台 CI](ci/README.admin-ci.md)。
-- Mobile：当前源码已合并预约、自定义消息、群头像和批量移除，单个 Linux 任务先运行群管理 64 项，再完整 688 项及严格 analyze。见 [移动端 CI](ci/mobile/README.md)。本次组合尚待云端完整验收；历史版本 548 项通过，不能代替当前版本的验证。
+- Mobile：当前源码已合并预约、自定义消息、群头像和批量移除。[云端群管理 64 项、完整 688 项和严格 analyze 已通过](https://github.com/damaowoaini/LuoboIM/actions/runs/38854472595)，原 548 项用例全部保留。见 [移动端 CI](ci/mobile/README.md)。这不代替当前版本的原生构建和真机验收。
 - Backend：`server`、`chart`、`route` 分别执行 Go race 测试和 vet。另有一次性 Mongo 副本集与 Redis 集成任务，强制执行 54 项事务、资源归属、会话与服务凭证用例；任意必跑项跳过或清理门禁失败都会使任务失败。见 [后端集成 CI](ci/backend-integration.README.md)。其他跳过项单列，不能计为集成验证通过。
+- 群权限事务基础候选：独立临时目录验证真实 Mongo、固定驱动 Mock、提交未知结果和缓存恢复机制，尚未接入业务 RPC。见 [验证范围](ci/group-authority-foundation.README.md)；通过也不代表完整并发权限整改完成。
 
 `ci/` 保留隔离候选及已采用修改的历史 before/after。CI 只验证，不自动切换产品源码或运行服务。云端结果不等于真机、多端媒体或线上部署验收。
 

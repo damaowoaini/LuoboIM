@@ -1,0 +1,76 @@
+name: Group authority foundation candidate
+
+on:
+  push:
+    paths:
+      - 'ci/group-authority-foundation*'
+      - 'ci/candidates/group-authority-foundation/**'
+      - '.github/workflows/group-authority-foundation.yml'
+  pull_request:
+    paths:
+      - 'ci/group-authority-foundation*'
+      - 'ci/candidates/group-authority-foundation/**'
+      - '.github/workflows/group-authority-foundation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: group-authority-foundation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  foundation:
+    name: ${{ matrix.stage }} / foundation only, no RPC adoption
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        stage: [before, after]
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 2GiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+      LUOBO_STORAGE_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Upload safety and exact foundation inputs
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/group-authority-foundation-tools.py
+          python3 -B ci/group-authority-foundation-ci.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache-dependency-path: |
+            server/go.sum
+            server/pkg/protocol/go.sum
+      - name: Prepare owned loopback replica fixture
+        run: bash ci/backend-integration.sh prepare
+      - name: Validate candidate foundation in fresh source tree
+        run: python3 -B ci/group-authority-foundation-ci.py --stage '${{ matrix.stage }}'
+      - name: Always collect and check fixture residual counts
+        if: always()
+        run: bash ci/backend-integration.sh collect
+      - name: Always remove only owned containers
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve original tests and fixture evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: group-authority-foundation-${{ matrix.stage }}-${{ github.run_id }}
+          path: |
+            ci-results/group-authority-foundation-${{ matrix.stage }}/
+            ci-results/backend-integration/
+          if-no-files-found: warn
+          retention-days: 14

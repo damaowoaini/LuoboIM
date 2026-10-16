@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "scope": "foundation_only_not_real_RPC_or_controller_adoption",
+  "candidate_version": 2,
+  "original_manifest_sha256": "fe0e44df446b0f38d0b792eba73b756d71a007f77d7a09dafe3a4e3322b9f581",
+  "original_candidate_source_digest": "7bf7e823949ae7e385ea3cc2b41862945c7852751f94a6e7ddf9e7224bd3b8e0",
+  "source": [
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/authority.go",
+      "bytes": 8374,
+      "sha256": "d4fd97afc3b7745353235e891caae1514df3045e8df71723c2d8da79a61dcefb"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/authority_test.go",
+      "bytes": 6232,
+      "sha256": "4e1edb1885f75c54b73ae431bbebb04fb7dc4f4c321940bf6157cd49abab0823"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/barrier_adapter_test.go",
+      "bytes": 478,
+      "sha256": "66f862838d62ee91f9eeec523f77f7f1ed195a450fb7ece3afb9c0adb5869aa6"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/barrier_integration_test.go",
+      "bytes": 4996,
+      "sha256": "445d2eb30d8542d241df475cb09b534d581761b9d6add94c37f1aca50be7e1a7"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/invalidations.go",
+      "bytes": 6502,
+      "sha256": "5aba1422daf6d93d2b6b2912eb7214c288f66f36a18be086039912c4a6fa572c"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/mongo_fixture_test.go",
+      "bytes": 5046,
+      "sha256": "239a4c6d51ccf97cebe039235fd769a6915fb8bddf3e98b30b19f2fbc1b4d4ea"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/mongo_integration_test.go",
+      "bytes": 19320,
+      "sha256": "ab4ea458c3c3c3e5d5cbf5fb8d6f0534686917dbd2c012b55d5a4aa7d2ca5c20"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/recovery.go",
+      "bytes": 1867,
+      "sha256": "fa0d11e2f43ea1fa56e3f7e447024ea45b3a9969eddf330f99ab808fbc8f897f"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/recovery_test.go",
+      "bytes": 1187,
+      "sha256": "770ec5ff4005c3d0b69daa9ed4335c01bbb78eba60c8256be70070a12e09691c"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/revision.go",
+      "bytes": 8886,
+      "sha256": "9b439b120532776f768c481d3988200850940740fddf9e95c804e803949624c3"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/transaction.go",
+      "bytes": 5994,
+      "sha256": "0e8f524828eed42d24b4d9a40089039f5991432526aef686c40c2d3b12eefaf9"
+    },
+    {
+      "path": "ci/candidates/group-authority-foundation/source/server/internal/groupauthority/transaction_test.go",
+      "bytes": 7479,
+      "sha256": "126f4d00af88d62e40dc003e197da0a8c92b20f4b40f1f60c7f4c31ae002f97d"
+    }
+  ],
+  "source_members": 12,
+  "source_digest": "c2d9264429de36734d98fa84febb145f2250e8a0cbfc9c1c1cfe4b9da6b7314c",
+  "module_inputs": [
+    {
+      "path": "server/go.mod",
+      "bytes": 8170,
+      "sha256": "e12331dfa5ce70b14a99f2c4408347ca11747ebe23e19d0d9b023f634eeab029"
+    },
+    {
+      "path": "server/go.sum",
+      "bytes": 50443,
+      "sha256": "97c43c12be1edc668225b2ef21c23e95c242327c310d0f05ffe84bc2d05c71c8"
+    },
+    {
+      "path": "server/pkg/protocol/go.mod",
+      "bytes": 374,
+      "sha256": "badbbca7e55346a0b2bb295779db61e0a007df0f7af017f4b2da419851e14294"
+    },
+    {
+      "path": "server/pkg/protocol/go.sum",
+      "bytes": 1743,
+      "sha256": "7ecb9e6d3ccee8738c9fe70740c08a91f2ed669f6af01b4e42038e2e7ee58df4"
+    }
+  ],
+  "base_inputs": [
+    {
+      "path": "ci/backend-integration.sh",
+      "bytes": 9933,
+      "sha256": "96c8025bd7437a3bb6665a31cdfc478514f1e727311e9e0223bc7a32b6655dc4"
+    },
+    {
+      "path": "ci/backend-integration.py",
+      "bytes": 12005,
+      "sha256": "a600a1aeac0a2a82a9b8ef2d586239986158534fb62fc6fd25b1466d3de83650"
+    },
+    {
+      "path": "ci/backend-integration.json",
+      "bytes": 6099,
+      "sha256": "5fd13ececf0593114090e17ed012b0f3e0dcfb0447a6191de897505d8aebd5f2"
+    },
+    {
+      "path": "ci/secret_scan.py",
+      "bytes": 6600,
+      "sha256": "86b539008eb65f4b81840ea20f13587ca3e87c3cf5796a039ae5d9af4fcd91da"
+    },
+    {
+      "path": "server/config/config.example.yaml",
+      "bytes": 20472,
+      "sha256": "6617df3d8d05d07a2b932aa9c1c2ccdf98a520a3efa2ca761cffb4e3265276d1"
+    }
+  ],
+  "before_adapter": {
+    "path": "ci/candidates/group-authority-foundation/before/barrier_adapter_test.go",
+    "bytes": 742,
+    "sha256": "159cf9884174b74d209a0b53c2a40b530a34694e1fde1a9a923fae27734a18b5"
+  },
+  "required_top_tests": [
+    "TestGroupAuthorityTargetsAreExactAndOrdered",
+    "TestGroupAuthorityRevisionRejectsCorruptionAndOverflow",
+    "TestGroupAuthorityScopeCannotBeFabricatedByMetadata",
+    "TestGroupAuthorityReservedFieldsAndCacheNamespace",
+    "TestGroupAuthorityTypedTargetsFreezeMemberAndCacheProvenance",
+    "TestGroupAuthorityTopologyNeedsWritableTransactionalServer",
+    "TestGroupAuthorityBarrierRevocationACKPreventsDelayedWrite",
+    "TestGroupAuthorityBarrierPreservesAuthorizedWrite",
+    "TestGroupAuthorityMongoRevocationWinsBeforeDelayedCAS",
+    "TestGroupAuthorityMongoCrossGroupBatchRollback",
+    "TestGroupAuthorityMongoScopeIsExactAndExpires",
+    "TestGroupAuthorityMongoExternalSessionsNeverStartIndependentTransaction",
+    "TestGroupAuthorityMongoRetryEffectsAreDurableAndPostCommit",
+    "TestGroupAuthorityMongoCreationAndLegacyRevision",
+    "TestGroupAuthorityMongoReadinessNeverPreparesMissingOutbox",
+    "TestGroupAuthorityMongoOutboxRejectsAutoDiscardingCollections",
+    "TestGroupAuthorityMongoWholeGroupScopeUsesOnlyActualMembers",
+    "TestGroupAuthorityMongoAcknowledgedCommitLostAtBoundaryNeverReplaysWrite",
+    "TestGroupAuthorityMongoCacheRecoveryCancellationRetainsDurableJob",
+    "TestGroupAuthorityRecoveryRequiresOwnedLifecycleAndStopsOnCancel",
+    "TestGroupAuthorityDriverTransactionRetryAndUnknownCommitBudget"
+  ],
+  "expected_sub_tests": 31,
+  "before_top_tests": [
+    "TestGroupAuthorityBarrierRevocationACKPreventsDelayedWrite",
+    "TestGroupAuthorityBarrierPreservesAuthorizedWrite"
+  ],
+  "expected_before_failures": [
+    "TestGroupAuthorityBarrierRevocationACKPreventsDelayedWrite"
+  ],
+  "expected_before_message": "revocation ACK did not fence delayed helper: revokedRole=20 staleWrite=true permissionDenied=false",
+  "before_positive_controls": [
+    "TestGroupAuthorityBarrierPreservesAuthorizedWrite",
+    "TestGroupAuthorityBarrierPreservesAuthorizedWrite/admin",
+    "TestGroupAuthorityBarrierPreservesAuthorizedWrite/owner"
+  ],
+  "expected_before_is_reference_not_real_RPC": true,
+  "runtime_or_RPC_adoption": false,
+  "actual_tests_at_preparation": 0
+}
