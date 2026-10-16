@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v4",
-  "state": "current282_QR_r6_explicit_read_retry_pending_cloud",
+  "state": "current282_QR_r7_equivalent_analysis_cleanup_pending_cloud",
   "parent_required": {
     "current269_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64",
     "source_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
@@ -12,8 +12,8 @@
     "analyze_issues": 0
   },
   "candidate_manifest_sha256": "68fa203b134a1754b65383b0da23cdd9fbf323c1a191294f7f16e26756d58de6",
-  "source282_digest": "ee4015afc60a87aa09d283e2bb0fb4035bd2ad1c78518c401b576e34440a7cd0",
-  "portable334_digest": "7107709f965e979b07fb29b8451b3532d0c78a140a97fee48d094626094c61af",
+  "source282_digest": "90b96e700ee37433fc33b5bd2782125bbcec2730e9f95541910055715accfc64",
+  "portable334_digest": "ba454d736bba30ee645450939e6276d1fd2e9f25825dd30498484a1eb2ab9329",
   "selected_source_delta": {
     "files": 21,
     "existing": 8,
@@ -47,7 +47,7 @@
   "manual_dependencies": "Exact3 metadata lock additions passed first cloud --enforce-lockfile; all enforced lock/setup gates remain required. No native acceptance.",
   "native_acceptance": false,
   "old_evidence": "Current269 r4 and all failed r1/r2/r3 records remain immutable history by commit/artifact; cannot alias current282 to oldcohort labels.",
-  "source_revision": "r6: QR expliciterror retry without Riverpod automaticreload; realpage route-state assertion;3additionalasserts,no counts changed",
+  "source_revision": "r7: equivalent 1production-file analysis cleanup only; all97/785 test names/assertions, SDK, runner, dependency and resource gates unchanged",
   "QR_r4_manifest_sha256": "6e64e8062e5fa622d9b6d312bac1891aa4f701951049d1e6f5eb17160e595590",
   "current282_first_failure": {
     "commit": "0410e3d09c8b68fa799a33fec9c1a4c1e6f9159f",
@@ -83,5 +83,22 @@
     "actual": "target97 complete94PASS3ERROR(QR48/3+search46PASS);hidden11PASS;latecameraPASS/lifecycle0;full785/analyze notstarted",
     "verification_sha256": "6383cc763e12ccedaf1a6cfcf0cf04ae4a50f1328d2ad2f207e20d8eb1694733",
     "accepted": false
+  },
+  "QR_r7_manifest_sha256": "b64bc7f238db13d50ecc5a96f10be4bedd4618c5dbf35e613efc4fab8ebf7453",
+  "current282_r6_tests_PASS_analysis_infos": {
+    "commit": "022b606eb2f92c147b2312226f5507cafdde2d24",
+    "run": 38869047275,
+    "job": 116868534564,
+    "source_digest": "ee4015afc60a87aa09d283e2bb0fb4035bd2ad1c78518c401b576e34440a7cd0",
+    "portable_digest": "7107709f965e979b07fb29b8451b3532d0c78a140a97fee48d094626094c61af",
+    "artifact_sha256": "992df68b3ac7e38ebe90150a3ad8820969553cf7e3d73255cfc49eb24c922456",
+    "target97": 97,
+    "full785": 785,
+    "old734_successful_names_multiset_preserved": true,
+    "QR51_exact_names_preserved": true,
+    "test_errors_skips": 0,
+    "analysis_infos": 2,
+    "accepted_all": false,
+    "verification_sha256": "e14820024eff3cfe5c6ed895cbac06235220f338a055e8484b2b9cb2660fb66c"
   }
 }

@@ -21,3 +21,7 @@ Run38867605425:54 businessPASS=QRcodec7/PNG1+search46,4 QRsuite loaderERROR,7hid
 ## QR r6 explicit retry and route observation (pending)
 
 Run38868222700 completed94PASS/3ERROR (QR48/3+search46),11hiddenPASS and no skip/lifecycle exception; late-camera recovery passed. Full785/analyze did not start. QRSubject now disables Riverpod3 automatic retry so invalidmembership/permission errors terminate in the actual error UI until explicitretry. The same nonmember case adds no-timed-reread and explicitretry-positive assertions. The successful profile navigation test reads the real mounted page's GoRouterState URI, preserving exacttargetbob instead of comparing the parent MatchList baseURI after imperativepush. No casecount/parser/runner/dependency/resource change.
+
+## QR r7 equivalent strict-analysis cleanup (pending)
+
+Run38869047275 completed target97 and full785 with all visible cases successful, all hidden loads successful, no errors/skips, true terminal footers and preserved old734 successful name multiset. The run failed only on two fatal analysis infos in qr_platform.dart (redundant typed_data import; callback if braces). R7 changes only that production file equivalently. All97/785 names/assertions and runner/dependency/resource gates remain unchanged; new full785 and zero-info analysis are still mandatory. Linux tests do not prove native camera/gallery/share acceptance.

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:file_selector/file_selector.dart';
@@ -136,8 +135,10 @@ final class _MobileQrCamera implements QrCamera {
     _previewFailed = false;
     await _codes?.cancel();
     _codes = controller.barcodes.listen((capture) {
-      if (!_disposed) onCodes(capture.barcodes.map((b) => b.rawValue)
-        .whereType<String>().where((s) => s.isNotEmpty).toList());
+      if (!_disposed) {
+        onCodes(capture.barcodes.map((b) => b.rawValue)
+          .whereType<String>().where((s) => s.isNotEmpty).toList());
+      }
     });
     await controller.start();
   });

@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v4",
-  "state": "current282_QR_r6_explicit_read_retry_pending_cloud",
+  "state": "current282_QR_r7_equivalent_analysis_cleanup_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -29,7 +29,8 @@
     "accepted_current269_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64",
     "QR_r4_manifest_sha256": "6e64e8062e5fa622d9b6d312bac1891aa4f701951049d1e6f5eb17160e595590",
     "QR_r5_manifest_sha256": "085625490299faec3f82433d7711adead78abcd6366b3967b06b76bef0927c67",
-    "QR_r6_manifest_sha256": "be752630e9cc2f970ca192254b7ea5a538d98b933e0f15423d247f06f43b1df9"
+    "QR_r6_manifest_sha256": "be752630e9cc2f970ca192254b7ea5a538d98b933e0f15423d247f06f43b1df9",
+    "QR_r7_manifest_sha256": "b64bc7f238db13d50ecc5a96f10be4bedd4618c5dbf35e613efc4fab8ebf7453"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -308,7 +309,7 @@
     "current282": 334
   },
   "portable_digests": {
-    "current282": "7107709f965e979b07fb29b8451b3532d0c78a140a97fee48d094626094c61af"
+    "current282": "ba454d736bba30ee645450939e6276d1fd2e9f25825dd30498484a1eb2ab9329"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -443,6 +444,22 @@
       "actual": "target97 complete94PASS3ERROR(QR48/3+search46PASS);hidden11PASS;latecameraPASS/lifecycle0;full785/analyze notstarted",
       "verification_sha256": "6383cc763e12ccedaf1a6cfcf0cf04ae4a50f1328d2ad2f207e20d8eb1694733",
       "accepted": false
+    },
+    "current282_QR_r6_tests_PASS_analysis_infos": {
+      "commit": "022b606eb2f92c147b2312226f5507cafdde2d24",
+      "run": 38869047275,
+      "job": 116868534564,
+      "source_digest": "ee4015afc60a87aa09d283e2bb0fb4035bd2ad1c78518c401b576e34440a7cd0",
+      "portable_digest": "7107709f965e979b07fb29b8451b3532d0c78a140a97fee48d094626094c61af",
+      "artifact_sha256": "992df68b3ac7e38ebe90150a3ad8820969553cf7e3d73255cfc49eb24c922456",
+      "target97": 97,
+      "full785": 785,
+      "old734_successful_names_multiset_preserved": true,
+      "QR51_exact_names_preserved": true,
+      "test_errors_skips": 0,
+      "analysis_infos": 2,
+      "accepted_all": false,
+      "verification_sha256": "e14820024eff3cfe5c6ed895cbac06235220f338a055e8484b2b9cb2660fb66c"
     }
   },
   "reference_entry": {
@@ -450,7 +467,7 @@
     "default_enabled": false,
     "working_cohort": "current282",
     "members": 282,
-    "reference_source_digest": "61e04b59ee85cc65307c59c478cecab92ef2f414e3a296df67ea54cfcc093aa4",
+    "reference_source_digest": "736a192051c3ccfc36f0bc92b621706d483147a583102339d0378004b113ee6e",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -495,7 +512,7 @@
   ],
   "current282": {
     "members": 282,
-    "source_digest": "ee4015afc60a87aa09d283e2bb0fb4035bd2ad1c78518c401b576e34440a7cd0",
+    "source_digest": "90b96e700ee37433fc33b5bd2782125bbcec2730e9f95541910055715accfc64",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1179,8 +1196,8 @@
       },
       {
         "path": "app/lib/features/qr/data/qr_platform.dart",
-        "bytes": 6836,
-        "sha256": "87c96843cd4aed0b2873763a935a87707dd65fcb3e5ada1c294fe4f5a70a5c73"
+        "bytes": 6830,
+        "sha256": "a631049d92a1ec2aeed3a5ce8eba6bb69ca78d4b09d28eeb3e73ef0887aca328"
       },
       {
         "path": "app/lib/features/qr/data/qr_repository.dart",
