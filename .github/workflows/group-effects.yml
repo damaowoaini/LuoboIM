@@ -1,0 +1,74 @@
+name: Group typed effects candidate
+
+on:
+  push:
+    paths:
+      - 'ci/group-effects/**'
+      - 'ci/candidates/group-effects/**'
+      - '.github/workflows/group-effects.yml'
+  pull_request:
+    paths:
+      - 'ci/group-effects/**'
+      - 'ci/candidates/group-effects/**'
+      - '.github/workflows/group-effects.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: group-effects-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  typed-effects:
+    name: Stage1 / 27 typed-effect tests, no RPC adoption
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 2GiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+      LUOBO_STORAGE_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety scan, reporter checks and pinned isolated source
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/group-effects/test_run.py
+          python3 -B ci/group-effects/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Prepare exact owned loopback fixture with continuous disk gate
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/group-effects-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/group-effects-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval 0.2 \
+            -- bash ci/backend-integration.sh prepare
+      - name: Isolated sequential race tests and vet
+        run: python3 -B ci/group-effects/run.py
+      - name: Always collect and verify fixture residuals
+        if: always()
+        run: bash ci/backend-integration.sh collect
+      - name: Always remove only exact run owned containers
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve actual logs and cleanup evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: group-effects-stage1-${{ github.run_id }}
+          path: ci-results/
+          if-no-files-found: warn
+          retention-days: 14
