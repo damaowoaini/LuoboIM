@@ -90,6 +90,8 @@ def safe_console(text):
                   "[REDACTED_PROVIDER_CREDENTIAL]", text)
     text = re.sub(r"([A-Za-z][A-Za-z0-9+.-]*://)[^\s/@]+(?::[^\s/@]*)?@",
                   r"\1[REDACTED]@", text)
+    text = re.sub(r"(?i)(\bauthorization[\"']?\s*[:=]\s*)(?:Bearer|Basic)\s+[^\s,;]+",
+                  r"\1[REDACTED]", text)
     text = re.sub(r"(?i)(\b[A-Za-z0-9_.-]*(?:password|passwd|secret|token|private.?key|encryption.?key|access.?key|api.?key|app.?key|authorization)[A-Za-z0-9_.-]*[\"']?\s*[:=]\s*)(?:\"[^\"]*\"|'[^']*'|[^\s,;]+)",
                   r"\1[REDACTED]", text)
     text = re.sub(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",

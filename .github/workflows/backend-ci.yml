@@ -18,6 +18,8 @@ jobs:
           persist-credentials: false
       - name: Reject secret and private-data upload paths
         run: python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+      - name: Verify credential redaction before printing backend diagnostics
+        run: python3 -B ci/backend-console-test.py
   backend:
     needs: upload-safety
     name: ${{ matrix.module }} / Go 1.27.2

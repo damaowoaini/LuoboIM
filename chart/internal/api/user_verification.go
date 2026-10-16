@@ -16,6 +16,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -28,6 +29,7 @@ import (
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/OpenIMSDK/tools/log"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type UserVerificationApi struct {
@@ -116,7 +118,8 @@ func (u *UserVerificationApi) SubmitVerification(c *gin.Context) {
 // GetVerificationStatus 获取实名认证状态
 func (u *UserVerificationApi) GetVerificationStatus(c *gin.Context) {
 	var req struct {
-		UserID string `json:"userID" binding:"required"`
+		UserID     string `json:"userID" binding:"required"`
+		StatusOnly bool   `json:"statusOnly"`
 	}
 	if err := c.BindJSON(&req); err != nil {
 		apiresp.GinError(c, errs.ErrArgs.Wrap("参数错误: "+err.Error()))
@@ -133,11 +136,21 @@ func (u *UserVerificationApi) GetVerificationStatus(c *gin.Context) {
 
 	verification, err := u.db.Take(c.Request.Context(), req.UserID)
 	if err != nil {
-		apiresp.GinSuccess(c, gin.H{"status": 0})
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			apiresp.GinSuccess(c, gin.H{"status": 0})
+		} else {
+			apiresp.GinError(c, errs.ErrInternalServer.Wrap("认证状态暂不可用，请稍后重试"))
+		}
 		return
 	}
-
-	if userType != constant.AdminUser && verification.UserID != opUserID {
+	if verification == nil || verification.UserID != req.UserID {
+		apiresp.GinError(c, errs.ErrInternalServer.Wrap("认证状态暂不可用，请稍后重试"))
+		return
+	}
+	// Entry preflights need no names, document numbers, images or review text.
+	// Existing detail callers and authenticated administrator targets keep their
+	// original response contract when this explicit option is absent.
+	if req.StatusOnly {
 		apiresp.GinSuccess(c, gin.H{"status": verification.Status})
 		return
 	}
