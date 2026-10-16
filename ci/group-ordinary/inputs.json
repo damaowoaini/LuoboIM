@@ -1581,8 +1581,8 @@
     },
     {
       "path": "server/internal/messagedelivery/kafka_physical_permit_integration_test.go",
-      "bytes": 14822,
-      "sha256": "0c93ffab6b5d0031d137f3bc1ed77d957537391126c5dff21b1671c6840eaafa"
+      "bytes": 15004,
+      "sha256": "9f316214c218ef815decb36ffc9c6abbf996ac27643946bfb7b2c68da09ad2e9"
     },
     {
       "path": "server/internal/messagedelivery/kafka_policy.go",
@@ -6612,7 +6612,7 @@
     "server/tools/yamlfmt/yamlfmt_test.go": 420
   },
   "effective_count": 1099,
-  "effective_digest": "ff2f83a5d7633bbb9a4c7621a5d3b202fc3b264fdfdd9072c915ac8d381dd027",
+  "effective_digest": "4374c5679091ed7b7ae856673198202142cfd58e454186029144047e78ba9c7a",
   "delta": [
     {
       "target": "server/cmd/tools/ordinary-alias-receipts/backend.go",
@@ -6773,8 +6773,8 @@
     {
       "target": "server/internal/messagedelivery/kafka_physical_permit_integration_test.go",
       "beforeSHA256": null,
-      "sha256": "0c93ffab6b5d0031d137f3bc1ed77d957537391126c5dff21b1671c6840eaafa",
-      "bytes": 14822
+      "sha256": "9f316214c218ef815decb36ffc9c6abbf996ac27643946bfb7b2c68da09ad2e9",
+      "bytes": 15004
     },
     {
       "target": "server/internal/messagedelivery/kafka_policy.go",
@@ -8189,8 +8189,8 @@
     {
       "path": "ci/candidates/group-ordinary/source/server/internal/messagedelivery/kafka_physical_permit_integration_test.go",
       "target": "server/internal/messagedelivery/kafka_physical_permit_integration_test.go",
-      "bytes": 14822,
-      "sha256": "0c93ffab6b5d0031d137f3bc1ed77d957537391126c5dff21b1671c6840eaafa",
+      "bytes": 15004,
+      "sha256": "9f316214c218ef815decb36ffc9c6abbf996ac27643946bfb7b2c68da09ad2e9",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -9537,7 +9537,7 @@
       "afterSHA256": "fd12b9f83bf3144efc3380fead01325fa4e0eb20f3fe1b95dfb3ace64f60dd94"
     }
   ],
-  "physical_before_effective_digest": "6189436588f0213efc979f9d8ee186407125d0f620f541a413ac778a48d750c1",
+  "physical_before_effective_digest": "352a2c78b43fdf82f89cb0840e82f569951bf93cd675a54f9a379a1222516416",
   "physical_before_contract": {
     "onlyProductRestore": [
       "kafka_alias_vendor.go",

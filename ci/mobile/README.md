@@ -1,3 +1,33 @@
+# Mobile309 fixture R2 (prepared, not run)
+
+R1 run38907998095 naturally failed after all273 visible tests finished:265PASS
+8ERROR,26hiddenPASS,falsefooter;old234+oldmeeting6 allPASS. Next29=24PASS5ERROR,
+newmeeting4=1PASS3ERROR. Every11Next four-marker shutdown sequence,35recorders/
+14unmounts,76parentcreation/safeexit6 completed.126.972s child1 without resource
+gate. Full955/analyze did not start; preserve10ZIP/raw/Root769d failure review.
+
+Only3 tests change. Actual clear timeout quarantines the whole SDK, which rejects
+unreadSnapshot synchronously before native dispatch. This corrects one test
+contract rather than weakening product isolation: remove2 unreachable returned-
+snapshot assertions, assert sync sessionExpired, original CID cut invalidation,
+0getAll and valid synthetic private metadata never observed in privacy ledger.
+The separate successful concurrent-clear snapshot/preview assertions stay exact.
+
+Actual popup entrance completion now precedes its original menu hitTest asserts.
+Three search cases tap the same real toolbar and wait for its conditional real
+TextField before enterText. Meeting retained callbacks/Navigator are captured
+from the real IconButton, not a RawTooltip. All page/meeting expect statements
+and every33new/273/955 name remain; no placeholder widget/manualstate injection,
+fixed sleep or larger timeout. These source diagnoses still need future actual
+cloud proof. Existing production,SDK/sharedHarness and 35Python/9AST/controller/
+cleanup/resource/netns/174lock contracts are untouched.3CI metadata files bind
+new309/361/reference digests;required-name file remains exact.
+
+Normal target273 ->full955 ->strictanalyze0 is unchanged and still mandatory.
+No localDart/DB/main/public apply/dispatch/rerun/cancel occurs in this draft.
+
+## Preserved R1 and earlier source documentation
+
 # Mobile current309 / portable361: next unread + booking entry (prepared)
 
 Parent R5 run38905415839 is Root accepted: actual234/922/strict0, exact old872

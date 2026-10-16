@@ -297,7 +297,7 @@ void main() {
       final container = await _online(tester, harness);
       final router = container.read(routerProvider)..go('/meetings');
       await tester.pumpAndSettle();
-      final retained = tester.widget<IconButton>(find.byTooltip('预约会议')).onPressed!;
+      final retained = tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.add)).onPressed!;
       await _signOut(tester, harness);
       retained();
       await tester.pumpAndSettle();
@@ -318,8 +318,8 @@ void main() {
         final container = await _online(tester, harness, unavailableBooking: true);
         final router = container.read(routerProvider)..go('/meetings');
         await tester.pumpAndSettle();
-        final retained = tester.widget<IconButton>(find.byTooltip('预约会议')).onPressed!;
-        final navigator = Navigator.of(tester.element(find.byTooltip('预约会议')));
+        final retained = tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.add)).onPressed!;
+        final navigator = Navigator.of(tester.element(find.widgetWithIcon(IconButton, Icons.add)));
         final covering = navigator.push<void>(MaterialPageRoute(
           builder: (_) => const Scaffold(body: Text('foreign route')),
         ));

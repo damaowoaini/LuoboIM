@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imapp/core/error/app_failure.dart';
+import 'package:imapp/core/privacy/message_privacy.dart';
 import 'package:imapp/features/conversation/data/conversation_repository.dart';
 
 import 'next_unread_fixture.dart';
@@ -89,6 +90,13 @@ void main() {
     final f = NextUnreadFixture(timeout: const Duration(milliseconds: 40));
     await f.start(count: 1, unread: const {0}); final blocked = Completer<void>();
     try {
+      final generation = f.sdk.session.state.generation;
+      final originalCut = f.sdk.gateway.historyAccess(generation, conversationId: 'inbox-0');
+      final latest = Map<String, dynamic>.from(f.sdk.conversations.single['latestMsg'] as Map);
+      latest['attachedInfoElem'] = {'isPrivateChat': true, 'burnDuration': 30};
+      f.sdk.conversations.single['latestMsg'] = latest;
+      expect(inspectMessagePrivacy(latest).containsPrivateContent, isTrue);
+      expect(f.sdk.gateway.privacyLedger.lookup('message-0').inspectionComplete, isFalse);
       f.sdk.overrideCall = (call) async {
         if (call.method == 'clearConversationAndDeleteAllMsg') { await blocked.future; return null; }
         if (call.method == 'getAllConversationList') return jsonEncode(f.sdk.conversations);
@@ -96,8 +104,14 @@ void main() {
       };
       await expectLater(f.sdk.gateway.clearConversationMessages(f.sdk.session.state.generation, 'inbox-0'),
         throwsA(isA<AppFailure>()));
-      final snapshot = await f.repository.unreadSnapshot(sourceCurrent: () => true);
-      expect(snapshot.cidCurrent('inbox-0'), isFalse); expect(snapshot.items.single.preview, isEmpty);
+      // A timed-out dispatched native call quarantines the whole SDK. No new
+      // snapshot may be admitted just to inspect one unavailable CID.
+      expect(() => f.repository.unreadSnapshot(sourceCurrent: () => true),
+        throwsA(isA<AppFailure>().having((failure) => failure.kind, 'kind', FailureKind.sessionExpired)));
+      expect(() => originalCut.check(),
+        throwsA(isA<AppFailure>().having((failure) => failure.kind, 'kind', FailureKind.sessionExpired)));
+      expect(f.reads, 0);
+      expect(f.sdk.gateway.privacyLedger.lookup('message-0').inspectionComplete, isFalse);
     } finally { if (!blocked.isCompleted) blocked.complete(); await f.closeUnit(); }
   });
   for (final dimension in ['issuer', 'tenant']) {

@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v10",
-  "state": "current309_next_unread_meeting_entry_whitespace_r1_pending_cloud",
+  "state": "current309_next_unread_meeting_fixture_r2_cleanup_print_r3_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -62,6 +62,16 @@
       "path": "references/integration/mobile-next-unread-whitespace-r1-candidate/candidate-manifest.json",
       "bytes": 2379,
       "sha256": "09db54c6808377776e53953d3fc10c57b7ffd1f42a88604e2e80b06d5dc424e4"
+    },
+    "next_unread_meeting_fixture_r2": {
+      "path": "references/integration/mobile309-next-unread-meeting-fixture-r2-candidate/candidate-manifest.json",
+      "bytes": 4287,
+      "sha256": "d7d6f4521793b3edcee6de266065697680ff46180bff5526c9a3409711df7f4e"
+    },
+    "next_unread_cleanup_print_r3": {
+      "path": "references/integration/mobile309-cleanup-print-r3-candidate/candidate-manifest.json",
+      "bytes": 2784,
+      "sha256": "e9dd7755bf031faf0aba3a84d2bd580dd175bdfcdc4b4c937129c9cfedf74570"
     }
   },
   "toolchain": {
@@ -341,7 +351,7 @@
     "current309": 361
   },
   "portable_digests": {
-    "current309": "09d58552efdfc3a08469a657d9190fc4062a1aa7887d55e9eeac9a83246fd3cb"
+    "current309": "0b6c63b68bdab1398dbbff372a3757673d2fc4398a64f8dbf8e00d01aefc1f86"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -736,6 +746,22 @@
         "sha256": "1096f3fc47877635843af94af05748e9deaab500a30909356ac2398e7cc2d37e"
       },
       "actual": "234/922/strict0 and exact50/all old872;cleanup/warnings strict"
+    },
+    "current309_R1_failure": {
+      "commit": "4758b30b6ac315f5e37e0b9fe436d7683769c868",
+      "run": 38907998095,
+      "job": 116996371640,
+      "agent": {
+        "path": "references/integration/cloud-mobile-ci/run-38907998095-agent/verification.json",
+        "bytes": 6630,
+        "sha256": "3bbfbd004a6a6d2da4840dd19eebc8b42bc3bc0d0060154802a82f907906ab76"
+      },
+      "Root": {
+        "path": "references/integration/cloud-mobile-ci/run-38907998095-agent/root-failure-review.json",
+        "bytes": 19330,
+        "sha256": "769d4bccf67997fe1ebef72488cd542aceaaee6af09d432304550f6b2e30f1fc"
+      },
+      "actual": "target273 completed265PASS8ERROR/26hiddenPASS/falsefooter;old234+oldmeeting6allPASS;Next24/5,newmeeting1/3;cleanup11Next+35/14+76safe6exact;126.972child1noresourcegate;full955/analyze notstarted"
     }
   },
   "reference_entry": {
@@ -743,7 +769,7 @@
     "default_enabled": false,
     "working_cohort": "current309",
     "members": 309,
-    "reference_source_digest": "04ab7c6d4b4fc47b2e930b2c93fc6c2d1821199a900d772b9624e431d24978f4",
+    "reference_source_digest": "e530ee57f195200537368a31c043045a35865afef1434b6b48ca40c89e4e5888",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -1263,7 +1289,7 @@
   },
   "current309": {
     "members": 309,
-    "source_digest": "9f1d9c21076aa72289b83b4918bad41c0a8babb16bbe8ba5817b914115e7e977",
+    "source_digest": "c4b3e68ed16fd2f25ec8497c86675d41b277d75eaa97b23e5ee5c34b521563ed",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -2427,18 +2453,18 @@
       },
       {
         "path": "app/test/features/conversation/next_unread_fixture.dart",
-        "bytes": 7322,
-        "sha256": "23d7926bca44276915b403b63af20d006ca3a670b9aee85edd68d0b1c395e47e"
+        "bytes": 7465,
+        "sha256": "47937979d092f7dd5e42ca086cf458cef8dfde72bb58ce5ee53099bd58b63faf"
       },
       {
         "path": "app/test/features/conversation/next_unread_page_test.dart",
-        "bytes": 14651,
-        "sha256": "ebd05bfd54ff4faf4c66516f5949ca5722461b00e7b69781788f6c0c26a611c5"
+        "bytes": 14995,
+        "sha256": "8b354b2b7aae9221d1c92265a808a5dd6ecc4a405271d56f538a143eecbe45a4"
       },
       {
         "path": "app/test/features/conversation/next_unread_repository_test.dart",
-        "bytes": 6468,
-        "sha256": "54adca0d2c7c3845fc1cbc806dcf661c9e3927d258e3f4e321240f4c8b9ba90c"
+        "bytes": 7483,
+        "sha256": "d8161a5054f6225c61fe9ef9d26ef45937a957dfe88c18289ef5eb667a394d4f"
       },
       {
         "path": "app/test/features/favorite/favorite_attachment_store_test.dart",
@@ -2607,8 +2633,8 @@
       },
       {
         "path": "app/test/features/meeting/meeting_routes_test.dart",
-        "bytes": 14038,
-        "sha256": "3428f288827144ac2f2dfed1f068e1f238e562b4959579842c577349defa39a1"
+        "bytes": 14074,
+        "sha256": "a661dd8e7f424e8807278490bb427d398df70764a0bcd8ac170507d20e33c4b3"
       },
       {
         "path": "app/test/features/mine/account_cancellation_test.dart",

@@ -24,6 +24,7 @@ void main() {
       final menu = find.byWidgetPredicate((widget) => widget is PopupMenuButton<Object> && widget.tooltip == '更多操作');
       await tester.tap(menu.hitTestable());
       await f.until(tester, () => find.text('添加好友').hitTestable().evaluate().length == 1);
+      await f.ready(tester, find.text('添加好友'));
       expect(find.text('下一未读会话').hitTestable(), findsOneWidget);
       expect(find.text('搜索加群').hitTestable(), findsOneWidget);
       expect(find.text('通话记录').hitTestable(), findsOneWidget);
@@ -73,6 +74,7 @@ void main() {
     final f = NextUnreadFixture();
     try {
       await f.mount(tester); await tester.tap(find.byTooltip('搜索当前会话').hitTestable());
+      await f.until(tester, () => find.byType(TextField).hitTestable().evaluate().length == 1);
       await tester.enterText(find.byType(TextField), '联系人 1'); await f.frame(tester);
       await f.choose(tester);
       await f.until(tester, () => find.text('查看全部会话').hitTestable().evaluate().length == 1);
@@ -95,6 +97,7 @@ void main() {
     final f = NextUnreadFixture();
     try {
       await f.mount(tester); await tester.tap(find.byTooltip('搜索当前会话').hitTestable());
+      await f.until(tester, () => find.byType(TextField).hitTestable().evaluate().length == 1);
       await tester.enterText(find.byType(TextField), '联系人 1'); await f.frame(tester);
       await f.choose(tester);
       await f.until(tester, () => find.text('查看全部会话').hitTestable().evaluate().length == 1);
@@ -112,6 +115,7 @@ void main() {
       await f.mount(tester); f.allReply = Completer<dynamic>(); f.allEntered = Completer<void>();
       await f.choose(tester); await f.until(tester, () => f.allEntered!.isCompleted);
       await tester.tap(find.byTooltip('搜索当前会话').hitTestable());
+      await f.until(tester, () => find.byType(TextField).hitTestable().evaluate().length == 1);
       await tester.enterText(find.byType(TextField), '联系人 2'); await f.frame(tester);
       f.allReply!.complete(jsonEncode(f.sdk.conversations)); await f.frame(tester); await f.frame(tester);
       expect(f.reads, 1); expect(find.text('已定位到下一未读会话'), findsNothing);

@@ -144,9 +144,9 @@ func TestKafkaPhysicalPermitMongoLostCommitACKDoesNotGrantHTTPOrReplayAfterResta
    auto,ok:=event.Command.Lookup("autocommit").BooleanOK();txn,txOK:=event.Command.Lookup("txnNumber").Int64OK();lsid,lsOK:=event.Command.Lookup("lsid").DocumentOK()
    mu.Lock();updates=append(updates,deliveryWireFact{command:"update",transaction:ok && !auto && txOK && lsOK,txn:txn,lsidSHA:hash(lsid)});mu.Unlock()
   }}
-  ctx,store,db,branch,message,adapter:=physicalPermitFixture(t,kind,monitor,drop);posts,permits:=0,0
+  ctx,store,db,branch,message,adapter:=physicalPermitFixture(t,kind,monitor,drop);posts,permits:=0,0;originalID:=""
   adapter.perform=func(current context.Context,probe physicalPermitProbe)error{
-   permits++;err:=probe.admit(context.WithValue(current,deliveryDropCommitKey{},true));if err==nil{posts++}
+   if originalID==""{originalID=probe.id};permits++;err:=probe.admit(context.WithValue(current,deliveryDropCommitKey{},true));if err==nil{posts++}
    if !errors.Is(err,ErrCommitUnconfirmed){return errors.New("lost commit did not preserve unknown attempt admission")}
    if err:=probe.notDispatched(current);!errors.Is(err,ErrKafkaOfflineUnconfirmed){return errors.New("unknown permission commit was rewritten as not-dispatched")};return ErrKafkaOfflineUnconfirmed
   }
@@ -159,7 +159,8 @@ func TestKafkaPhysicalPermitMongoLostCommitACKDoesNotGrantHTTPOrReplayAfterResta
   // The DB may have committed even though no local HTTP permit was granted.
   // Neither restart nor failed HTTP admission rewrites that as not-dispatched.
   kindName:="kafka-vendor-v1";if kind=="alias"{kindName="kafka-alias-vendor-v1"};if kind=="fcm"{kindName="kafka-fcm-device-v1"}
-  var raw bson.M;if err:=db.Collection(Effects).FindOne(ctx,bson.M{"kind":kindName}).Decode(&raw);err!=nil || raw["state"]!="dispatching"{t.Fatal("old admitted/unknown state was rewritten as unsent",err)}
+  if !validSHA(originalID){t.Fatal("original attempted receipt identity was not captured")}
+  var raw bson.M;if err:=db.Collection(Effects).FindOne(ctx,bson.M{"_id":originalID,"kind":kindName,"branch_id":branch}).Decode(&raw);err!=nil || raw["state"]!="dispatching"{t.Fatal("old admitted/unknown state was rewritten as unsent",err)}
   if kind!="alias" && raw["physical_permit"]!=true{t.Fatal("real commit did not preserve exact physical permission receipt")}
  })}
 }

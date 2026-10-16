@@ -1,8 +1,8 @@
 {
   "schema": "luobo.mobile.source-preparation.v10",
-  "state": "current309_next_unread_meeting_entry_whitespace_r1_pending_cloud",
-  "source309_digest": "9f1d9c21076aa72289b83b4918bad41c0a8babb16bbe8ba5817b914115e7e977",
-  "portable361_digest": "09d58552efdfc3a08469a657d9190fc4062a1aa7887d55e9eeac9a83246fd3cb",
+  "state": "current309_next_unread_meeting_fixture_r2_cleanup_print_r3_pending_cloud",
+  "source309_digest": "c4b3e68ed16fd2f25ec8497c86675d41b277d75eaa97b23e5ee5c34b521563ed",
+  "portable361_digest": "0b6c63b68bdab1398dbbff372a3757673d2fc4398a64f8dbf8e00d01aefc1f86",
   "next_unread_candidate": {
     "path": "references/integration/mobile-next-unread-r5-parent-candidate/candidate-manifest.json",
     "bytes": 15696,
@@ -14,9 +14,9 @@
     "sha256": "fbc9d6423f26f34f41e4c1a6d5b4592f9503ccb8c66ffabf0f42cef67a9ec3cb"
   },
   "combined_vector": {
-    "path": "references/integration/mobile-next-unread-whitespace-r1-candidate/effective-source-vector.json",
-    "bytes": 58094,
-    "sha256": "3ac2d93c5e1a24b59a5d814264a5c5282160161c8bf772a38e53e9bfd0d313b0"
+    "path": "references/integration/mobile309-cleanup-print-r3-candidate/effective-source-vector.json",
+    "bytes": 58082,
+    "sha256": "e0f3dfa304486685ff2d8fdfaa20793a2428f462729fb99f0a50035cea2dad01"
   },
   "source_delta": {
     "next_unread9": 9,
@@ -402,5 +402,44 @@
     "reason": "Root git diff --check line148 trailing U+0020;only this byte removed before first push",
     "old_frozen_payloads_unchanged": true,
     "actual_new_Dart_tests": 0
+  },
+  "fixture_r2": {
+    "manifest": {
+      "path": "references/integration/mobile309-next-unread-meeting-fixture-r2-candidate/candidate-manifest.json",
+      "bytes": 4287,
+      "sha256": "d7d6f4521793b3edcee6de266065697680ff46180bff5526c9a3409711df7f4e"
+    },
+    "selected_test_files": 3,
+    "production_changed": 0,
+    "all33new_names_and273955requirements": "unchanged",
+    "repository_contract": "Two impossible post-global-quarantine snapshot expectations explicitly replaced by sync sessionExpired,zero-read,oldcut/private-unobserved assertions;successful-clear snapshot checks unchanged",
+    "actual_new_Dart_tests": 0
+  },
+  "actual_parent_R1": {
+    "commit": "4758b30b6ac315f5e37e0b9fe436d7683769c868",
+    "run": 38907998095,
+    "job": 116996371640,
+    "agent": {
+      "path": "references/integration/cloud-mobile-ci/run-38907998095-agent/verification.json",
+      "bytes": 6630,
+      "sha256": "3bbfbd004a6a6d2da4840dd19eebc8b42bc3bc0d0060154802a82f907906ab76"
+    },
+    "Root": {
+      "path": "references/integration/cloud-mobile-ci/run-38907998095-agent/root-failure-review.json",
+      "bytes": 19330,
+      "sha256": "769d4bccf67997fe1ebef72488cd542aceaaee6af09d432304550f6b2e30f1fc"
+    },
+    "actual": "target273 completed265PASS8ERROR/26hiddenPASS/falsefooter;old234+oldmeeting6allPASS;Next24/5,newmeeting1/3;cleanup11Next+35/14+76safe6exact;126.972child1noresourcegate;full955/analyze notstarted"
+  },
+  "cleanup_print_r3": {
+    "manifest": {
+      "path": "references/integration/mobile309-cleanup-print-r3-candidate/candidate-manifest.json",
+      "bytes": 2784,
+      "sha256": "e9dd7755bf031faf0aba3a84d2bd580dd175bdfcdc4b4c937129c9cfedf74570"
+    },
+    "before_virtual_post_R2": true,
+    "scope": "Exact four print -> debugPrintSynchronously plus explicit foundation show import; messages/ordering/await/cleanup/name/count contracts unchanged.",
+    "production_changed": 0,
+    "actual_Dart_tests": 0
   }
 }

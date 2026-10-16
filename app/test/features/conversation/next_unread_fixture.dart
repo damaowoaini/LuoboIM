@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show debugPrintSynchronously;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -129,13 +130,13 @@ final class NextUnreadFixture {
   }
   Future<void> close(WidgetTester tester) async {
     try {
-      print('next_unread_cleanup sdk.begin');
+      debugPrintSynchronously('next_unread_cleanup sdk.begin');
       await tester.runAsync(() => closeUnit().timeout(const Duration(seconds: 20)));
-      print('next_unread_cleanup sdk.end');
+      debugPrintSynchronously('next_unread_cleanup sdk.end');
     } finally {
-      print('next_unread_cleanup unmount.begin');
+      debugPrintSynchronously('next_unread_cleanup unmount.begin');
       await tester.pumpWidget(const SizedBox.shrink()); await tester.pumpAndSettle();
-      print('next_unread_cleanup unmount.end');
+      debugPrintSynchronously('next_unread_cleanup unmount.end');
     }
   }
 }
