@@ -17,6 +17,75 @@ import verify_inputs
 
 
 class Tools(unittest.TestCase):
+    def local_work(self, tmp):
+        work = Path(tmp).resolve() / 'job'
+        (work / 'source/app/android').mkdir(mode=0o700, parents=True)
+        (work / 'evidence').mkdir(mode=0o700)
+        path = work / 'source/app/android/local.properties'
+        raw = ('sdk.dir=' + str(work / 'android') + '\nflutter.sdk=' + str(work / 'flutter')).encode()
+        path.write_bytes(raw)
+        return work, path, raw
+
+    def test_fresh_generated_local_properties_is_bound_and_receipted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work, path, raw = self.local_work(tmp)
+            provenance = {'synthetic_only': True}
+            run.update_job_local_properties(work, provenance)
+            self.assertEqual((work / 'evidence/local-properties-before.properties').read_bytes(), raw)
+            proof = json.loads((work / 'evidence/local-properties-complete.json').read_text())
+            self.assertEqual(proof['before_sha256'], s.sha(work / 'evidence/local-properties-before.properties'))
+            self.assertEqual(proof['after_sha256'], s.sha(path))
+            self.assertEqual(proof['generation'], provenance)
+            self.assertIn('cmake.dir=' + str(work / 'android/cmake/3.22.1'), path.read_text())
+            self.assertFalse(path.with_name('local.properties.job-generated.tmp').exists())
+
+    def test_generated_local_properties_refuses_external_toolchain_paths(self):
+        for key in ['sdk.dir', 'flutter.sdk', 'cmake.dir']:
+            with self.subTest(property=key), tempfile.TemporaryDirectory() as tmp:
+                work, path, raw = self.local_work(tmp)
+                lines = dict(line.split('=', 1) for line in raw.decode().split('\n'))
+                lines[key] = '/outside-this-job'
+                bad = '\n'.join(k + '=' + v for k, v in lines.items()).encode()
+                path.write_bytes(bad)
+                with self.assertRaisesRegex(ValueError, 'conflicting'):
+                    run.update_job_local_properties(work, {})
+                self.assertEqual(path.read_bytes(), bad)
+                self.assertFalse((work / 'evidence/local-properties-intent.json').exists())
+
+    def test_generated_local_properties_refuses_unknown_or_duplicate_properties(self):
+        for extra in ['\norg.gradle.jvmargs=-Xmx99g', '\nsdk.dir=duplicate', '\nmalformed-line']:
+            with self.subTest(suffix=extra), tempfile.TemporaryDirectory() as tmp:
+                work, path, raw = self.local_work(tmp)
+                bad = raw + extra.encode(); path.write_bytes(bad)
+                with self.assertRaisesRegex(ValueError, 'unknown, duplicate or conflicting'):
+                    run.update_job_local_properties(work, {})
+                self.assertEqual(path.read_bytes(), bad)
+
+    def test_generated_local_properties_refuses_leaf_and_parent_symlinks(self):
+        for which in ['leaf', 'parent']:
+            with self.subTest(link=which), tempfile.TemporaryDirectory() as tmp:
+                work, path, raw = self.local_work(tmp)
+                outside = Path(tmp) / 'outside'
+                if which == 'leaf':
+                    outside.write_bytes(b'untouched'); path.unlink(); path.symlink_to(outside)
+                else:
+                    path.parent.rename(outside); path.parent.symlink_to(outside, target_is_directory=True)
+                with self.assertRaises((OSError, ValueError)):
+                    run.update_job_local_properties(work, {})
+                self.assertEqual(outside.read_bytes() if which == 'leaf' else (outside / 'local.properties').read_bytes(),
+                                 b'untouched' if which == 'leaf' else raw)
+
+    def test_generated_local_properties_does_not_overwrite_other_files(self):
+        for occupied in ['evidence/local-properties-before.properties',
+                         'source/app/android/local.properties.job-generated.tmp']:
+            with self.subTest(occupied=occupied), tempfile.TemporaryDirectory() as tmp:
+                work, path, raw = self.local_work(tmp)
+                other = work / occupied; other.write_bytes(b'preexisting-sentinel')
+                with self.assertRaises(FileExistsError):
+                    run.update_job_local_properties(work, {})
+                self.assertEqual(other.read_bytes(), b'preexisting-sentinel')
+                self.assertEqual(path.read_bytes(), raw)
+
     def test_exact_metadata_does_not_read_mutable_App(self):
         registry, inputs, tools = run.metadata()
         self.assertEqual(registry['source_ref'], '314ac556fdc4be7f98dbd74370201922c71e67c5')

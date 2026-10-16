@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import re
 import socket
+import stat
 import subprocess
 import sys
 import tarfile
@@ -32,6 +33,73 @@ CORE_REPO = 'https://github.com/openimsdk/openim-sdk-core.git'
 CORE_TOOLS = 'packages/flutter_openim_sdk/tool/native_core'
 STAGES = ['setup', 'core', 'gradle-setup', 'apk']
 COLD = 20 * s.GIB
+
+
+def update_job_local_properties(work, provenance):
+    """Amend only the fresh official pub-get output; never relax put(xb)."""
+    work = Path(work)
+    directories = [work, work / 'source', work / 'source/app', work / 'source/app/android']
+    parents = {}
+    for directory in directories:
+        info = directory.lstat()
+        if (directory.resolve(strict=True) != directory or not stat.S_ISDIR(info.st_mode)
+                or info.st_uid != os.getuid()):
+            raise ValueError('local.properties requires canonical owned source/app/android')
+        parents[directory] = (info.st_dev, info.st_ino)
+    path = work / 'source/app/android/local.properties'
+
+    def read_original():
+        with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as source:
+            info = os.fstat(source.fileno())
+            if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
+                    or info.st_nlink != 1 or info.st_size > 4096):
+                raise ValueError('local.properties requires bounded owned regular single-link file')
+            body = source.read(4097)
+        if len(body) > 4096:
+            raise ValueError('local.properties exceeds bounded generated output')
+        return body, info
+
+    before, original = read_original()
+    expected = {'sdk.dir': str(work / 'android'), 'flutter.sdk': str(work / 'flutter'),
+                'cmake.dir': str(work / 'android/cmake/3.22.1')}
+    parsed = {}
+    for line in before.decode('utf-8').split('\n'):
+        if not line:
+            continue
+        key, equals, value = line.partition('=')
+        if not equals or key in parsed or key not in expected or value != expected[key]:
+            raise ValueError('unknown, duplicate or conflicting generated local.properties property')
+        parsed[key] = value
+    if not {'sdk.dir', 'flutter.sdk'}.issubset(parsed):
+        raise ValueError('generated local.properties lacks exact job SDK/Flutter paths')
+    after = ''.join(key + '=' + value + '\n' for key, value in expected.items()).encode()
+    proof = {'source': 'fresh official Flutter pub get output; SettingsFile/updateLocalProperties',
+             'target': 'source/app/android/local.properties', 'before_bytes': len(before),
+             'before_sha256': hashlib.sha256(before).hexdigest(),
+             'after_bytes': len(after), 'after_sha256': hashlib.sha256(after).hexdigest(),
+             'allowed_properties': expected, 'generation': provenance}
+    s.put(work / 'evidence/local-properties-before.properties', before)
+    s.write_json(work / 'evidence/local-properties-intent.json', proof)
+    temporary = path.with_name('local.properties.job-generated.tmp')
+    s.put(temporary, after)
+    os.chmod(temporary, stat.S_IMODE(original.st_mode))
+    with temporary.open('rb') as output:
+        os.fsync(output.fileno())
+    for directory, identity in parents.items():
+        info = directory.lstat()
+        if (directory.resolve(strict=True) != directory or not stat.S_ISDIR(info.st_mode)
+                or info.st_uid != os.getuid() or (info.st_dev, info.st_ino) != identity):
+            raise ValueError('local.properties parent changed before replacement')
+    current, info = read_original()
+    if (current != before or (info.st_dev, info.st_ino, info.st_mtime_ns, info.st_ctime_ns)
+            != (original.st_dev, original.st_ino, original.st_mtime_ns, original.st_ctime_ns)):
+        raise ValueError('generated local.properties changed before replacement')
+    os.replace(temporary, path)
+    s.sync(path.parent)
+    final, _ = read_original()
+    if final != after:
+        raise ValueError('generated local.properties replacement verification failed')
+    s.write_json(work / 'evidence/local-properties-complete.json', {'state': 'passed', **proof})
 
 
 def metadata():
@@ -261,8 +329,12 @@ class Job:
         s.mkdir(target.parent)
         receipt = s.download(asset, target, self.b)
         s.write_json(w / 'evidence/sqlite-Android-native.json', {**receipt, 'old_hook_snapshot_or_stamp': False})
-        s.put(w / 'source/app/android/local.properties', ('sdk.dir=' + str(w / 'android') + '\nflutter.sdk=' + str(w / 'flutter')
-            + '\ncmake.dir=' + str(w / 'android/cmake/3.22.1') + '\n').encode())
+        generator_files = ['packages/flutter_tools/lib/src/' + name for name in
+                           ['commands/packages.dart', 'project.dart', 'android/gradle_utils.dart', 'base/utils.dart']]
+        update_job_local_properties(w, {'Flutter_commit': flutter['framework_revision'],
+            'pub_get_resource_sha256': s.sha(w / 'evidence/pub-get.resource.json'),
+            'generator_sources': [{'path': name, 'sha256': s.sha(w / 'flutter' / name)} for name in generator_files]})
+        self.verify()
         ca = w / 'job-private/job-ca.pem'
         key = w / 'job-private/job-ca.key'
         self.cmd(['openssl', 'version'], w, e, 'openssl-version')
