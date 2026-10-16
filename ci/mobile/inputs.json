@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v3",
-  "state": "current269_fixture_r3_pending_target46_full734_analyze_not_native_acceptance",
+  "state": "current269_analyze_r4_equivalent_braces_pending_cloud_all_stages",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -23,7 +23,8 @@
       "pure_tests_sha256": "5887d3b05254491f05bc35ff34849a37b9e2e5106ffc546ea4e27b73a9c904c0",
       "root_review_sha256": "cad87a8b28fb8b57fc101e12e41c391557f259bb02a40aa9645b1dd9d85a22b6"
     },
-    "global_search_fixture_r3_manifest_sha256": "dfd21b0996a9363a8ee928da9dda2ef8b3a8b8c4555f9a7d2296840a45909ba0"
+    "global_search_fixture_r3_manifest_sha256": "dfd21b0996a9363a8ee928da9dda2ef8b3a8b8c4555f9a7d2296840a45909ba0",
+    "global_search_analyze_r4_manifest_sha256": "330f6c8f5ce20f1165382b72ad807b2a1ab96a788b6c35b7770f675c65e4594f"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -302,7 +303,7 @@
     "current269": 321
   },
   "portable_digests": {
-    "current269": "beddfff9dc698275420ca137d04a69b85315b11191eaa5e0314f840e25356ac8"
+    "current269": "794601ed37e0bad1034363583ee6bba0bba984bcbf66c6161f797d29d56e69ec"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -370,11 +371,31 @@
       "actual": "42 visiblePASS/4 nonassertionERROR; hidden5success; two actualChatPage assertion blocks completed then cleanup20s timeout; entry2 timeout/reentrant runAsync; target900.1s phase_timeout,child0 rejected; full734/analyze not started",
       "verification_sha256": "d3df3b52c31181d2e4d8c5b91a18248e3dba7c3fd5ea99acf0719fa8ae3371c9",
       "root_cause": "first cleanup failure confirmed; fake/real provider disposal chain source-backed hypothesis, candidate not yet executed"
+    },
+    "current269_r3_tests_passed_analysis_failed": {
+      "git_commit": "cafcd50c8d418e934ae8f5102f0b6ce50c67fe87",
+      "fixture_commit": "defd46abb19934f562b86992c2306c87e879e2a0",
+      "actual_run": 38863026938,
+      "job": 116849438270,
+      "inputs_sha256": "91d3ebff1297a5663cf0457b46e23847f27551564c743a8f79707b150bdb6325",
+      "source_digest": "8b018c5a67d8278054eceecb2d0f544f7b6d375d3d605af51047f3bda7effd99",
+      "portable_digest": "beddfff9dc698275420ca137d04a69b85315b11191eaa5e0314f840e25356ac8",
+      "artifact_zip_sha256": "da2c9d6040cfda695eb86bc6c5e78fb7647373168ac148f2d988eff682b69804",
+      "actual_target_passed": 46,
+      "actual_full_passed": 734,
+      "old688_completed_visible_name_multiset_subset": true,
+      "actual_analysis_issues": 2,
+      "analysis_diagnostics": [
+        "global_search_repository.dart137:49 curly_braces_in_flow_control_structures",
+        "global_search_controller.dart69:60 curly_braces_in_flow_control_structures"
+      ],
+      "accepted_all": false,
+      "verification_sha256": "78979f0eafa76330fc0d4be575376bf2bf60e0ee59200a96e9fec948b0b3fe11"
     }
   },
   "current269": {
     "members": 269,
-    "source_digest": "8b018c5a67d8278054eceecb2d0f544f7b6d375d3d605af51047f3bda7effd99",
+    "source_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1093,8 +1114,8 @@
       },
       {
         "path": "app/lib/features/search/data/global_search_repository.dart",
-        "bytes": 8218,
-        "sha256": "d3758fa2e5571816c10c6fff1c7df3e45bb1ce112f7e5fd3ae80fe6900aec9e1"
+        "bytes": 8244,
+        "sha256": "25e5a1e60110655912050b39f76ebf6fc5595d7c0eb5f9a4cc84ebef77b45163"
       },
       {
         "path": "app/lib/features/search/domain/global_search.dart",
@@ -1103,8 +1124,8 @@
       },
       {
         "path": "app/lib/features/search/presentation/global_search_controller.dart",
-        "bytes": 6360,
-        "sha256": "5fbd2ef8a57eb0cb46a374e88af937c7d76d664b4f4587cb19b96efabb1ed6bc"
+        "bytes": 6374,
+        "sha256": "e980a52055ac3e6a121d7d40004c204a5fc87ec4f53807ac959d2934a89882b7"
       },
       {
         "path": "app/lib/features/search/presentation/global_search_file_page.dart",
@@ -1733,7 +1754,7 @@
     "default_enabled": false,
     "working_cohort": "current269",
     "members": 269,
-    "reference_source_digest": "490122db81d45178004bd5e619b7a0e08b8479de95f137895695787698ad62af",
+    "reference_source_digest": "97b24341d8c2d0a354a043994b16dee07af48296e67dde6a773b194f0ba53877",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",

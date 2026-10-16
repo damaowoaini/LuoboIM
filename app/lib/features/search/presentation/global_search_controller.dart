@@ -66,7 +66,9 @@ final class GlobalSearchController extends ChangeNotifier {
     if (!usable) return;
     final keyword = raw.trim();
     if (keyword.isNotEmpty && keyword == query &&
-        phases.values.contains(GlobalSearchPhase.loading)) return;
+        phases.values.contains(GlobalSearchPhase.loading)) {
+      return;
+    }
     ++_request;
     query = keyword;
     _cut = null;

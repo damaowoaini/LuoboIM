@@ -134,7 +134,9 @@ final class GlobalSearchRepository {
           final id = raw.clientMsgID;
           if (id == null || id.isEmpty || id.length > 512 ||
               _removed.contains(id) || raw.status == MessageStatus.deleted ||
-              !types.contains(raw.contentType)) continue;
+              !types.contains(raw.contentType)) {
+            continue;
+          }
           final privacy = gateway.privacyLedger.observe(cid, raw.toJson(), now: now());
           final item = mapMessage(raw, access.credentials.userId, privacy: privacy);
           final hit = GlobalMessageHit(

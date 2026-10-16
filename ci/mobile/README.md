@@ -90,3 +90,13 @@ gateway.dispose和原sdk.dispose（幂等检查、channel解绑、native-folder�
 这一顺序与已验chat_page_test一致，仍需新云证据证实；无native完成声明。
 默认流程和所有网络/资源限制不变：23纯Python门禁→target46→full734→analyze；
 不增加替代性selected9阶段，不复制本地tool/check.sh。
+
+## analyze-r4 follow-up (pending exact new cloud)
+
+run38863026938完整target46及full734都PASS，隐藏加载/跳过/错误均严格检查；
+旧688全部完成的visible名称按multiset为734子集。两项真实ChatPage的session、
+gateway、SDK/channel/native-folder清理均结束后才unmount，entry2也通过。
+该run仍未整体验收：严格analyze仅两处if缺大括号info而失败。
+r4只给原continue/return分支加等价大括号；不更改条件、46/734测试或任何runner，
+不关闭fatal-infos。新源仍须按23门禁→46→734→analyze全部实际通过。
+原r1/r2超时和r3成功测试/失败分析原件均保留；native/真实服务验收不由此代替。

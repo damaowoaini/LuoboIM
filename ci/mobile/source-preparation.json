@@ -1,10 +1,10 @@
 {
   "schema": "luobo.mobile.source-preparation.v3",
-  "state": "current269_fixture_r3_prepared_pending_cloud",
+  "state": "current269_analyze_r4_prepared_pending_exact_cloud46_734_and_analyze0",
   "parent_public_commit": "7d8a9cd42fb009f0d51747c9728e1ed442fa410e",
   "root_final_base_must_match_before_CI_and257_rows": true,
-  "source269_digest": "8b018c5a67d8278054eceecb2d0f544f7b6d375d3d605af51047f3bda7effd99",
-  "portable321_digest": "beddfff9dc698275420ca137d04a69b85315b11191eaa5e0314f840e25356ac8",
+  "source269_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
+  "portable321_digest": "794601ed37e0bad1034363583ee6bba0bba984bcbf66c6161f797d29d56e69ec",
   "global_search_v1_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
   "global_search_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
   "selected_source_delta": {
@@ -26,8 +26,8 @@
     "restore": "Only isolated reference tree changes; restore its4 after files in finally and verify main after269 again"
   },
   "actual_this_revision": {
-    "Dart_Flutter_format_pubget_tests_native": 0,
-    "pure_Python_evidence": "readonly pins below; unchanged23 gate stays mandatory in existing push workflow"
+    "local_Dart_Flutter_Go": 0,
+    "public_CI_tools": "same23 mandatory Python gates; no parser/runner feature changes"
   },
   "accepted_history": {
     "git_commit": "314ac55",
@@ -44,17 +44,14 @@
   "unchanged_contract": "Official framework/engine/Dart and locked packages/SQLite raw SHA; new HOME/TMP/pubcache; setup-only networking; fresh Linux netns; reporter strict completion;4GiB initial/1GiB .2s/768MiB source+reference allocation/900s phase;latched failures win receipts",
   "native_acceptance": false,
   "root_ci_correction": "Public inventory remains strict; local-only app/tool/check.sh absent in public and never required or copied.",
-  "parent_inputs_sha256": "7b9fe630697ee347d783cb0d48dc61ab45052e91b8084b919936250cb2953ae7",
+  "parent_inputs_sha256": "91d3ebff1297a5663cf0457b46e23847f27551564c743a8f79707b150bdb6325",
   "followup_delta": {
-    "modified_private_test_fixture_files": 2,
-    "production_files": 0,
-    "dependencies": 0,
-    "fixture_r3_manifest_sha256": "dfd21b0996a9363a8ee928da9dda2ef8b3a8b8c4555f9a7d2296840a45909ba0",
-    "same46_test_names_and_expectations": true,
-    "selected9_extra_job": false,
-    "diagnostics": "same real session/gateway/harness disposal with per-stage20s bound before provider unmount; finally unloads even on failure; finegrain markers",
-    "public_SdkHarness_changed": false,
-    "optional_parser_r2": "already adopted and unchanged; exact2 distinct visible names contract remains"
+    "modified_product_files": 2,
+    "behavior_changes": 0,
+    "test_files_or_assertion_changes": 0,
+    "new_dependencies": 0,
+    "analyze_r4_manifest_sha256": "330f6c8f5ce20f1165382b72ad807b2a1ab96a788b6c35b7770f675c65e4594f",
+    "reason": "Add explicit braces around unchanged continue/return branches at the two actual strict-analyzer info positions; no ignore/fatal-info weakening."
   },
   "prior_current269_incomplete": {
     "git_commit": "5e2e12dc8da9091bfe9f8f7c928f299bcd4b7bd1",
@@ -78,5 +75,25 @@
     "actual": "42 visiblePASS/4 nonassertionERROR; hidden5success; two actualChatPage assertion blocks completed then cleanup20s timeout; entry2 timeout/reentrant runAsync; target900.1s phase_timeout,child0 rejected; full734/analyze not started",
     "verification_sha256": "d3df3b52c31181d2e4d8c5b91a18248e3dba7c3fd5ea99acf0719fa8ae3371c9",
     "root_cause": "first cleanup failure confirmed; fake/real provider disposal chain source-backed hypothesis, candidate not yet executed"
+  },
+  "prior_current269_r3_result": {
+    "git_commit": "cafcd50c8d418e934ae8f5102f0b6ce50c67fe87",
+    "fixture_commit": "defd46abb19934f562b86992c2306c87e879e2a0",
+    "actual_run": 38863026938,
+    "job": 116849438270,
+    "inputs_sha256": "91d3ebff1297a5663cf0457b46e23847f27551564c743a8f79707b150bdb6325",
+    "source_digest": "8b018c5a67d8278054eceecb2d0f544f7b6d375d3d605af51047f3bda7effd99",
+    "portable_digest": "beddfff9dc698275420ca137d04a69b85315b11191eaa5e0314f840e25356ac8",
+    "artifact_zip_sha256": "da2c9d6040cfda695eb86bc6c5e78fb7647373168ac148f2d988eff682b69804",
+    "actual_target_passed": 46,
+    "actual_full_passed": 734,
+    "old688_completed_visible_name_multiset_subset": true,
+    "actual_analysis_issues": 2,
+    "analysis_diagnostics": [
+      "global_search_repository.dart137:49 curly_braces_in_flow_control_structures",
+      "global_search_controller.dart69:60 curly_braces_in_flow_control_structures"
+    ],
+    "accepted_all": false,
+    "verification_sha256": "78979f0eafa76330fc0d4be575376bf2bf60e0ee59200a96e9fec948b0b3fe11"
   }
 }
