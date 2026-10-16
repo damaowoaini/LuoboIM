@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v4",
-  "state": "current282_QR_r7_equivalent_analysis_cleanup_pending_cloud",
+  "schema": "luobo.mobile.portable-ci-inputs.v5",
+  "state": "current287_create_group_avatar37_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -30,7 +30,8 @@
     "QR_r4_manifest_sha256": "6e64e8062e5fa622d9b6d312bac1891aa4f701951049d1e6f5eb17160e595590",
     "QR_r5_manifest_sha256": "085625490299faec3f82433d7711adead78abcd6366b3967b06b76bef0927c67",
     "QR_r6_manifest_sha256": "be752630e9cc2f970ca192254b7ea5a538d98b933e0f15423d247f06f43b1df9",
-    "QR_r7_manifest_sha256": "b64bc7f238db13d50ecc5a96f10be4bedd4618c5dbf35e613efc4fab8ebf7453"
+    "QR_r7_manifest_sha256": "b64bc7f238db13d50ecc5a96f10be4bedd4618c5dbf35e613efc4fab8ebf7453",
+    "create_group_avatar_v2_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -306,10 +307,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current282": 334
+    "current287": 339
   },
   "portable_digests": {
-    "current282": "ba454d736bba30ee645450939e6276d1fd2e9f25825dd30498484a1eb2ab9329"
+    "current287": "ec45244629b617523c23c5179a6e316f03eceadba744a6bbf5f84b8e2ff09e7d"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -343,7 +344,7 @@
       "actual_run": 38852506276,
       "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
     },
-    "reproduction": "Historical 230/249/257/269 cohorts require explicit immutable commit and inputs; schema v4 has no historical aliases. Optional reference_entry is a full282 compile context with exactly4 original search-before files, not old257/269 full.",
+    "reproduction": "Historical cohorts including accepted282 require immutable commit/inputs. Schema v5 current287 only; reference full287 replaces exactly4 historical search-before and executesentry2 only.",
     "accepted_current257": {
       "git_commit": "314ac55",
       "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
@@ -460,14 +461,30 @@
       "analysis_infos": 2,
       "accepted_all": false,
       "verification_sha256": "e14820024eff3cfe5c6ed895cbac06235220f338a055e8484b2b9cb2660fb66c"
+    },
+    "accepted_current282_r7": {
+      "git_commit": "b52da23f1255f04d21dc1caf6b5950b736287bd2",
+      "actual_run": 38870107437,
+      "job": 116871936025,
+      "source_digest": "90b96e700ee37433fc33b5bd2782125bbcec2730e9f95541910055715accfc64",
+      "portable_digest": "ba454d736bba30ee645450939e6276d1fd2e9f25825dd30498484a1eb2ab9329",
+      "target_passed": 97,
+      "full_passed": 785,
+      "analysis_issues": 0,
+      "old734_names_multiset_preserved": true,
+      "QR51_names_exact": true,
+      "artifact_zip_sha256": "895c26b9a1d2010e37150564b226d9b0536c3712fb5c8a44ec9979b3674906d7",
+      "verification_sha256": "00e8b9bec05814cbba706b321b15b6ce163c0c8c224bc6d8845f1d8ff909cb8e",
+      "original_inputs_sha256": "16dab31a738968117bbae1bbc74c99556ef193e8f196760f9aa32309b65c8ff6",
+      "native_or_service_acceptance": false
     }
   },
   "reference_entry": {
-    "state": "explicit_optional_reference_only_not_old257_or269_full",
+    "state": "explicit_optional_reference_only_not_old257_269_or282_full",
     "default_enabled": false,
-    "working_cohort": "current282",
-    "members": 282,
-    "reference_source_digest": "736a192051c3ccfc36f0bc92b621706d483147a583102339d0378004b113ee6e",
+    "working_cohort": "current287",
+    "members": 287,
+    "reference_source_digest": "cc38bf4db555c0cd7e91267f6609ae017b46f0e63c4bce616db9f89e470f9091",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -510,9 +527,21 @@
       "reason": "Local workspace provenance only. Keep original helper locally; do not upload, execute, require in public CI, or include in269/321. Public authored inventory has no auxiliary exceptions."
     }
   ],
-  "current282": {
-    "members": 282,
-    "source_digest": "90b96e700ee37433fc33b5bd2782125bbcec2730e9f95541910055715accfc64",
+  "new_dependencies": {
+    "state": "first_cloud_setup_enforce_lockfile_passed_QR_tests_failed_not_native_accepted",
+    "exact_versions": {
+      "mobile_scanner": "7.4.2",
+      "qr_flutter": "4.1.0",
+      "qr": "3.0.2"
+    },
+    "gate": "fresh official Flutter pub get --enforce-lockfile must pass without lock drift; no local resolution or downloaded packages",
+    "lock_draft_sha256": "f3eba25d2bdacdc2c8288bc65617798f909154e08ffe5e7b8ff8bea448cc4aca",
+    "first_actual_cloud_run": 38866360052,
+    "same_enforced_lock_gate_still_mandatory": true
+  },
+  "current287": {
+    "members": 287,
+    "source_digest": "b224cb1f26da71e00884db8533b3144282107ff7d81ff7da8b63edbdb6488640",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -861,8 +890,8 @@
       },
       {
         "path": "app/lib/features/contacts/presentation/select_contacts_page.dart",
-        "bytes": 5827,
-        "sha256": "8d6338afa87fc1a29d6846478fd82b64e7e9c2ce0cf9d77f7483d716f6875a63"
+        "bytes": 7709,
+        "sha256": "a1c1c09c9da4c1ea412cb69b1f4842e29cb7ddb6625503c2378a09b92c5abeff"
       },
       {
         "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
@@ -961,13 +990,18 @@
       },
       {
         "path": "app/lib/features/group/data/group_repository.dart",
-        "bytes": 15814,
-        "sha256": "35f7486cdb24266ff4d255cc2537b209b08608dd00162e7d3e69bd30f35437c3"
+        "bytes": 17655,
+        "sha256": "afcb9442c5602a931d7e9759bbe21321d5c8ec135635fe8f3c2d0f4ec6e79102"
       },
       {
         "path": "app/lib/features/group/domain/group.dart",
         "bytes": 1541,
         "sha256": "46f1c047de1130d4de0939de656e25214e0d7f57d0ded56f92a53be5b4eebbfc"
+      },
+      {
+        "path": "app/lib/features/group/presentation/create_group_page.dart",
+        "bytes": 15346,
+        "sha256": "0451fdfce24a3486e87b8262dd1e497d279cc00b13123ec5706f6125f8a123ec"
       },
       {
         "path": "app/lib/features/group/presentation/group_members_page.dart",
@@ -1301,13 +1335,13 @@
       },
       {
         "path": "app/pubspec.lock",
-        "bytes": 41354,
-        "sha256": "17422ee513d9faeff8adfd96ac2cd720f3366a132277a747adbd4774b015ac13"
+        "bytes": 41357,
+        "sha256": "21b6344d78de79f8127e3d176643159e8761e80e41179ee040fd20bc36583858"
       },
       {
         "path": "app/pubspec.yaml",
-        "bytes": 880,
-        "sha256": "7e8fe1e3989621344cd6788919d520229892c30ae52154b9e9fb9cf722688f7a"
+        "bytes": 900,
+        "sha256": "fd7ac77c2c3270e3a084d9a5e259830eb71f9d52f7d0752612d17fb33d5936ef"
       },
       {
         "path": "app/test/core/abandoned_login_test.dart",
@@ -1675,6 +1709,26 @@
         "sha256": "e9fefa91061b6f04971fae679e5d92f49476911a1d417b80792026a716ce2635"
       },
       {
+        "path": "app/test/features/group/create_group_entry_test.dart",
+        "bytes": 5376,
+        "sha256": "0685da850867fdc049d7e5eb1e321ffa3d09bdbb0150d85f4e6e042e0e4cad32"
+      },
+      {
+        "path": "app/test/features/group/create_group_fixture.dart",
+        "bytes": 8874,
+        "sha256": "9c7a7d148366a4f0537b3d75cfccede2cacc7eb3b413d0c68062160897c4e39c"
+      },
+      {
+        "path": "app/test/features/group/create_group_repository_test.dart",
+        "bytes": 6094,
+        "sha256": "1d704f5203c6a2caf6c0d48fbf5b5601d229da84a4a7a78ec1cb54fe2be6edd4"
+      },
+      {
+        "path": "app/test/features/group/create_group_workflow_test.dart",
+        "bytes": 15812,
+        "sha256": "9b58fc2e94f9bf882ecb27e63b3ddf6ce9f33d3e6e17f82652e6a202dd678588"
+      },
+      {
         "path": "app/test/features/group/group_avatar_entry_test.dart",
         "bytes": 2547,
         "sha256": "1d3dffdeeaacb6a63c9a7a7ef95f1bb12f7b3dc6c901b272224797574ac2a671"
@@ -1925,23 +1979,19 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 97,
-    "expected_full_tests": 785,
+    "expected_target_tests": 134,
+    "expected_full_tests": 822,
     "target_paths": [
       "test/features/qr",
-      "test/features/search"
+      "test/features/search",
+      "test/features/group/create_group_entry_test.dart",
+      "test/features/group/create_group_repository_test.dart",
+      "test/features/group/create_group_workflow_test.dart"
     ]
   },
-  "new_dependencies": {
-    "state": "first_cloud_setup_enforce_lockfile_passed_QR_tests_failed_not_native_accepted",
-    "exact_versions": {
-      "mobile_scanner": "7.4.2",
-      "qr_flutter": "4.1.0",
-      "qr": "3.0.2"
-    },
-    "gate": "fresh official Flutter pub get --enforce-lockfile must pass without lock drift; no local resolution or downloaded packages",
-    "lock_draft_sha256": "f3eba25d2bdacdc2c8288bc65617798f909154e08ffe5e7b8ff8bea448cc4aca",
-    "first_actual_cloud_run": 38866360052,
-    "same_enforced_lock_gate_still_mandatory": true
+  "required_test_names": {
+    "path": "ci/mobile/required-test-names.json",
+    "bytes": 121267,
+    "sha256": "e71206a1d7fef5551319225da6324919c7347e78204faf473e4b80d248aa7102"
   }
 }

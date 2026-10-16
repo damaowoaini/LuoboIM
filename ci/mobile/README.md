@@ -1,27 +1,20 @@
-# Mobile QR source validation (current282)
+# Mobile current287 / portable339
 
-This draft requires atomic adoption of the separately frozen complete QR candidate21 files and these CI files. It is not applied. It replaces current269 identity with current282/source282 + SDK51 + migration1 = portable334. Current269 r4 remains accepted history at commit 1d4629e573456750c50f32516aa924e3e107de55 (46/734/analyze0); no old report is relabeled.
+Atomic adoption of frozen create-group-avatar-v2 selected9 plus this CI delta is required. This draft applies nothing. Source287=accepted282+5 new files; portable339=source287+SDK51+migration1. Accepted282 at b52da23f1255f04d21dc1caf6b5950b736287bd2/run38870107437 (97/785/analyze0) stays immutable history, with original inputs/receipt and earlier failures retained.
 
-Default push sequence: strict23 Python gates; exact authored/portable source inventory; official pinned Flutter3.47.7, `pub get --enforce-lockfile`; target97 (`test/features/qr`51 plus preserved `test/features/search`46), full785, then analyze with fatal infos/warnings. New QR packages are exact official-metadata manual lock additions, not resolved locally. The cloud enforce-lockfile must succeed without changing lock. Setup/network/namespace/resource/failure reporter behavior is retained.
+Default push/PR sequence: original23 Python gates +5 successful-name guards, strict287/339 inventory, official pinned Flutter3.47.7 with fresh pub get --enforce-lockfile, target134, full822 and fatal-info/fatal-warning analyze0. Existing 4GiBinitial/1GiB .2s/768MiB/900s/processgroup/latchedfailure/netns/complete-reporter gates remain.
 
-The optional workflow_dispatch reference is full282 compilation context with exactly4 historical search-before production files and only entry2 executed. It requires the named missing entry assertion and old inbox filter positive, rejects setup/load/timeout/nonassertion errors, restores exact after4 and revalidates. It is not historical257/269 full.
+Target paths (fixture is not executed as a test):
+- test/features/qr:51
+- test/features/search:46
+- test/features/group/create_group_entry_test.dart:6
+- test/features/group/create_group_repository_test.dart:11
+- test/features/group/create_group_workflow_test.dart:20
 
-New QR OS camera/gallery/permission/torch/share/file-save ports are mocked in widget source; the PNG renderer test uses the real QrPainter and engine image bytes. Existing repositories and SDK MethodChannel contracts perform discovery/profile/joinSource4 and navigation checks. A native camera/gallery/share/permission/device test remains required separately. The full suite must retain all734 previously completed visible case names, and reporter events, resource/log pins and exact source inputs are authoritative. Green badge alone is insufficient.
+These are prepared expected counts, not actual results. The pinned required-test-names.json retains accepted785 raw successful visible names (including duplicate-name multiplicity) plus the new37 source names and exact134 target names. Existing completion/error/hidden/skip/footer gates run first. Then target134 and full822 must match the exact required successful name multisets. Hidden loader successes cannot substitute a case; all785 accepted names remain.
 
-Public authored inventory has zero exceptions. Local-only `app/tool/check.sh` is not uploaded, copied, required or executed. No old hook stamp/native binary/private config is an input.
+Only existing characters1.4.1 becomes a direct dependency so the data repository counts Unicode graphemes without a UI import. All174 package versions/archiveSHA and173 other blocks are exact. Enforced cloud lock resolution is still required; no local pubget/download/resolution is claimed.
 
-## QR r4 narrow follow-up (not yet accepted)
+Optional workflow_dispatch search reference stays defaultoff: full287 context with exactly4 historical search-before files, entry2 only, strict named1assertFAIL/1oldfilterPASS, exactafter4 restore and primary287/339 reverify. It is not historical282/269/257 full.
 
-The first current282 run38866360052 completed target97 with70PASS/27ERROR (QR24/27 plus search46PASS),11 hidden successful loads and no skip. Full785/analyze did not start. Its first enforced lock setup passed. Source r4 keeps all51 QR names/expectations and46 search cases: confirmation no longer displays a perpetual loading indicator while waiting for the user; owner/route/busy guards remain. The QR fixture now follows valid lifecycle transitions, drains its observed real SDK reply completions in bounded runAsync and scrolls UI controls before actual taps. No sharedSdkHarness/GlobalFixture, public parser/runner/workflow or test count changes. Full785/fatal analysis and original734 name retention still require new cloud evidence.
-
-## QR r5 fixture API correction (pending)
-
-Run38867605425:54 businessPASS=QRcodec7/PNG1+search46,4 QRsuite loaderERROR,7hiddenPASS;other43QR/full785/analyze did not run. The fixture used an invalid named timeout argument. R5 changes only that call to the official third positional timeout5s, preserving100ms/EnginePhase defaults. No product/assertion/count/SDK/runner/resource change.
-
-## QR r6 explicit retry and route observation (pending)
-
-Run38868222700 completed94PASS/3ERROR (QR48/3+search46),11hiddenPASS and no skip/lifecycle exception; late-camera recovery passed. Full785/analyze did not start. QRSubject now disables Riverpod3 automatic retry so invalidmembership/permission errors terminate in the actual error UI until explicitretry. The same nonmember case adds no-timed-reread and explicitretry-positive assertions. The successful profile navigation test reads the real mounted page's GoRouterState URI, preserving exacttargetbob instead of comparing the parent MatchList baseURI after imperativepush. No casecount/parser/runner/dependency/resource change.
-
-## QR r7 equivalent strict-analysis cleanup (pending)
-
-Run38869047275 completed target97 and full785 with all visible cases successful, all hidden loads successful, no errors/skips, true terminal footers and preserved old734 successful name multiset. The run failed only on two fatal analysis infos in qr_platform.dart (redundant typed_data import; callback if braces). R7 changes only that production file equivalently. All97/785 names/assertions and runner/dependency/resource gates remain unchanged; new full785 and zero-info analysis are still mandatory. Linux tests do not prove native camera/gallery/share acceptance.
+Public authored inventory has zero exceptions. Local-only app/tool/check.sh remains absent public/notcopied/notrequired/notexecuted. Private credentials/native binaries/generated hook stamps are not inputs. Creation37 uses actual selector/editor/repository/stager/uploader with OS/HTTP/native boundaries mocked. Existing real QR PNG test remains. No device camera/gallery/share/APK/business service acceptance is inferred.

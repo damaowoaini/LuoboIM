@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/error/app_failure.dart';
 import '../contacts_providers.dart';
+import '../data/contacts_repository.dart';
+import '../../group/data/group_repository.dart';
+import '../../group/presentation/create_group_page.dart';
 import '../domain/contact.dart';
 import 'contact_widgets.dart';
 
@@ -44,41 +47,63 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
   final selected = <String>{};
   String query = '';
   bool busy = false;
-  Future<void> submit(List<Contact> all) async {
-    final contacts = ref.read(contactsRepositoryProvider);
-    final groups = ref.read(groupRepositoryProvider);
-    if (contacts == null || groups == null || busy || selected.isEmpty) return;
+  ContactsRepository? selectionOwner;
+  GroupRepository? selectionGroups;
+  int view = 0;
+  bool editingGroup = false;
+
+  bool current(ContactsRepository contacts, GroupRepository groups) =>
+      mounted && identical(contacts, selectionOwner) && identical(groups, selectionGroups) &&
+      identical(contacts, ref.read(contactsRepositoryProvider)) &&
+      identical(groups, ref.read(groupRepositoryProvider)) &&
+      contacts.access.isCurrent && groups.access.isCurrent &&
+      identical(contacts.access.credentials, contacts.access.session.state.credentials) &&
+      identical(groups.access.credentials, contacts.access.credentials);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!editingGroup && ModalRoute.of(context)?.isCurrent == false) ++view;
+  }
+
+  Future<void> submit(List<Contact> all, ContactsRepository contacts, GroupRepository groups,
+      int original) async {
+    final route = ModalRoute.of(context);
+    bool active() => current(contacts, groups) && original == view && route?.isCurrent == true;
+    if (!active() || busy || selected.isEmpty) return;
     final chosen = all.where((user) => selected.contains(user.id)).toList();
     if (chosen.isEmpty) return;
     if (!widget.createConversation) {
       Navigator.pop(context, chosen);
       return;
     }
-    String? name;
     if (chosen.length > 1) {
-      name = await contactInput(
-        context,
-        '群聊名称',
-        value: chosen.take(3).map((user) => user.displayName).join('、'),
-      );
-      if (name == null ||
-          name.isEmpty ||
-          !mounted ||
-          !contacts.access.isCurrent) {
-        return;
+      final owner = contacts.access.credentials;
+      setState(() => busy = true);
+      editingGroup = true;
+      // Selection is still editable by returning before create is dispatched.
+      // Only the dedicated editor performs explicit group creation.
+      try {
+        await Navigator.of(context).push<void>(MaterialPageRoute(
+          builder: (_) => CreateGroupPage(members: List.unmodifiable(chosen), owner: groups),
+        ));
+      } finally {
+        editingGroup = false;
+        if (mounted && identical(contacts.access.session.state.credentials, owner)) {
+          setState(() => busy = false);
+        }
       }
+      return;
     }
     setState(() => busy = true);
     try {
-      final id = chosen.length == 1
-          ? await contacts.conversation(chosen.single.id)
-          : await groups.create(name!, chosen.map((user) => user.id).toList());
-      if (mounted && contacts.access.isCurrent) {
+      final id = await contacts.conversation(chosen.single.id);
+      if (mounted && active()) {
         refreshContacts(ref);
         context.go('/chat/${Uri.encodeComponent(id)}');
       }
     } on AppFailure catch (error) {
-      if (mounted && contacts.access.isCurrent) {
+      if (mounted && active()) {
         contactNotice(context, error.message);
       }
     } finally {
@@ -89,8 +114,17 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
   @override
   Widget build(BuildContext context) {
     final repository = ref.watch(contactsRepositoryProvider);
-    ref.watch(groupRepositoryProvider);
-    if (repository == null) return const SizedBox.shrink();
+    final groups = ref.watch(groupRepositoryProvider);
+    if (repository == null || groups == null) return const SizedBox.shrink();
+    selectionOwner ??= repository;
+    selectionGroups ??= groups;
+    if (!current(repository, groups)) {
+      return Scaffold(appBar: AppBar(title: Text(widget.title)),
+        body: const Center(child: Text('会话已变化，请返回后重新选择好友')));
+    }
+    final renderedView = view;
+    bool renderedCurrent() => current(repository, groups) && renderedView == view &&
+      ModalRoute.of(context)?.isCurrent == true;
     final friends = ref.watch(friendsProvider);
     return PopScope(
       canPop: !busy,
@@ -100,7 +134,7 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
           actions: [
             TextButton(
               onPressed: !busy && selected.isNotEmpty && friends.hasValue
-                  ? () => submit(friends.requireValue)
+                  ? () => submit(friends.requireValue, repository, groups, renderedView)
                   : null,
               child: Text(busy ? '处理中…' : '确定 (${selected.length})'),
             ),
@@ -111,8 +145,9 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: TextField(
-                onChanged: (value) =>
-                    setState(() => query = value.trim().toLowerCase()),
+                onChanged: (value) {
+                  if (renderedCurrent()) setState(() => query = value.trim().toLowerCase());
+                },
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.search),
                   hintText: '搜索好友',
@@ -148,13 +183,16 @@ class _SelectContactsPageState extends ConsumerState<SelectContactsPage> {
                         value: selected.contains(user.id),
                         onChanged: busy
                             ? null
-                            : (value) => setState(() {
+                            : (value) {
+                              if (!renderedCurrent()) return;
+                              setState(() {
                                 if (value == true) {
                                   selected.add(user.id);
                                 } else {
                                   selected.remove(user.id);
                                 }
-                              }),
+                              });
+                            },
                         secondary: ContactAvatar(uri: user.avatar),
                         title: Text(user.displayName),
                       );

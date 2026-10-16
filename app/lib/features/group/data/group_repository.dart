@@ -1,3 +1,4 @@
+import 'package:characters/characters.dart';
 import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 
 import '../../../core/error/app_failure.dart';
@@ -24,8 +25,16 @@ final class GroupRemovalReport {
       items.any((item) => item.state == GroupRemovalState.unconfirmed);
 }
 
+/// Acknowledged create result, retained separately from opening a conversation.
+final class CreatedGroup {
+  const CreatedGroup(this.id, this.sessionType);
+  final String id;
+  final int sessionType;
+}
+
 final class GroupRepository {
   GroupRepository(this.gateway, this.access);
+  static const maximumCreationNameLength = 128;
   final OpenImGateway gateway;
   final SessionAccess access;
   Future<T> _sdk<T>(Future<T> Function(IMManager manager) operation) async {
@@ -416,45 +425,80 @@ final class GroupRepository {
     });
   }
 
-  Future<String> conversation(String id) async {
+  Future<String> conversation(String id, {bool Function()? isCurrent}) async {
+    void check() {
+      access.check();
+      if (isCurrent?.call() == false) throw const AppFailure(FailureKind.cancelled);
+    }
+    check();
     final current = await profile(id);
+    check();
     if (!current.joined || current.summary.status == 2) {
       throw const AppFailure(FailureKind.permissionDenied);
     }
-    return _sdk(
-      (manager) async => (await manager.conversationManager.getOneConversation(
-        sourceID: id,
-        sessionType: current.summary.sessionType,
-      )).conversationID,
-    );
+    return _sdk((manager) async {
+      check();
+      final value = await manager.conversationManager.getOneConversation(
+        sourceID: id, sessionType: current.summary.sessionType,
+      );
+      check();
+      if (value.conversationID.isEmpty || value.groupID != id ||
+          value.conversationType != current.summary.sessionType) {
+        throw const AppFailure(FailureKind.invalidResponse);
+      }
+      return value.conversationID;
+    });
   }
 
-  Future<String> create(String name, List<String> userIds, {String? avatar}) =>
-      _sdk((manager) async {
-        final ids = userIds
-            .where((id) => id.isNotEmpty && id != access.credentials.userId)
-            .toSet()
-            .toList();
-        if (ids.length < 2 || name.trim().isEmpty || name.length > 128) {
-          throw const AppFailure(FailureKind.invalidInput);
-        }
-        final group = await manager.groupManager.createGroup(
-          groupInfo: GroupInfo(
-            groupID: '',
-            groupName: name.trim(),
-            faceURL: avatar,
-            groupType: GroupType.work,
-          ),
-          memberUserIDs: ids,
-        );
-        access.check();
-        final conversation = await manager.conversationManager
-            .getOneConversation(
-              sourceID: group.groupID,
-              sessionType: group.sessionType,
-            );
-        return conversation.conversationID;
-      });
+  Future<CreatedGroup> createRecord(String name, List<String> userIds, {
+    String? avatar,
+    bool Function()? isCurrent,
+    void Function()? onDispatched,
+  }) async {
+    final owner = access.credentials;
+    final ids = List<String>.unmodifiable(userIds
+      .where((id) => id.isNotEmpty && id != owner.userId).toSet());
+    final title = name.trim();
+    void check() {
+      access.check();
+      if (!identical(access.session.state.credentials, owner) || isCurrent?.call() == false) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+    }
+    check();
+    if (ids.length < 2 || title.isEmpty || title.characters.length > maximumCreationNameLength ||
+        (avatar != null && secureMediaUri(avatar) == null)) {
+      throw const AppFailure(FailureKind.invalidInput);
+    }
+    return _sdk((manager) async {
+      check();
+      // The caller freezes this exact draft at the native dispatch boundary.
+      // A later failure cannot be treated as proof that no group was created.
+      onDispatched?.call();
+      check();
+      final group = await manager.groupManager.createGroup(
+        groupInfo: GroupInfo(groupID: '', groupName: title,
+          faceURL: avatar, groupType: GroupType.work),
+        memberUserIDs: ids,
+      );
+      check();
+      if (group.groupID.isEmpty || group.groupType != GroupType.work ||
+          (group.ownerUserID != null && group.ownerUserID != owner.userId)) {
+        throw const AppFailure(FailureKind.invalidResponse);
+      }
+      return CreatedGroup(group.groupID, group.sessionType);
+    });
+  }
+
+  // Existing callers remain compatible. The new editor uses createRecord so
+  // it never loses the accepted groupID when opening its conversation fails.
+  Future<String> create(String name, List<String> userIds, {String? avatar}) async {
+    final group = await createRecord(name, userIds, avatar: avatar);
+    return _sdk((manager) async => (await manager.conversationManager.getOneConversation(
+      sourceID: group.id, sessionType: group.sessionType,
+    )).conversationID);
+  }
+
 }
 
 GroupMember mapGroupMember(GroupMembersInfo member) => GroupMember(

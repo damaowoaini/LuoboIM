@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current282 target97/full785."""
+"""Pure Python CI gate checks, separate from current287 target134/full822."""
 import copy
 import importlib.util
 import json
@@ -134,19 +134,57 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical257_cannot_alias282(self):
-        for historical in ('current257', 'current269'):
+    def test_historical257_cannot_alias287(self):
+        for historical in ('current257', 'current269', 'current282'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current282'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current287'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
 
     def test_reference_is_not_enabled_by_default(self):
         self.rejects(lambda p: p['reference_entry'].update(default_enabled=True))
+
+
+
+def named_report(names):
+    events = []
+    for identity, name in enumerate(names):
+        events += [
+            {'type': 'testStart', 'test': {'id': identity, 'name': name}},
+            {'type': 'testDone', 'testID': identity, 'hidden': False, 'skipped': False, 'result': 'success'},
+        ]
+    return '\n'.join(map(json.dumps, events + [{'type': 'done', 'success': True}]))
+
+
+class RequiredNamesTests(unittest.TestCase):
+    def test_exact_names_preserve_parent_multiplicity_and_new_cases(self):
+        result = check.required_name_summary(named_report(['old', 'old', 'new']), 3,
+                                             [{'name': 'old', 'count': 2}, {'name': 'new', 'count': 1}])
+        self.assertTrue(result['exact_successful_name_multiset'])
+
+    def test_same_count_different_name_cannot_replace_old_case(self):
+        with self.assertRaisesRegex(ValueError, 'multiset differs'):
+            check.required_name_summary(named_report(['new', 'replacement']), 2,
+                                        [{'name': 'old', 'count': 1}, {'name': 'new', 'count': 1}])
+
+    def test_duplicate_parent_names_require_full_multiplicity(self):
+        with self.assertRaisesRegex(ValueError, 'multiset differs'):
+            check.required_name_summary(named_report(['old', 'replacement']), 2,
+                                        [{'name': 'old', 'count': 2}])
+
+    def test_names_never_override_incomplete_footer_or_hidden_failure(self):
+        for text in [named_report(['old']).rsplit('\n', 1)[0], reporter(hidden_failure=True)]:
+            with self.subTest(text=text):
+                with self.assertRaises(ValueError):
+                    check.required_name_summary(text, 1, [{'name': 'old', 'count': 1}])
+
+    def test_required_count_boolean_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'invalid required'):
+            check.required_name_summary(named_report(['old']), 1, [{'name': 'old', 'count': True}])
 
 
 if __name__ == '__main__':
