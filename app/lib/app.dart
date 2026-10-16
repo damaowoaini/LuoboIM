@@ -30,6 +30,9 @@ import 'features/moments/presentation/moments_page.dart';
 import 'features/moments/presentation/moment_publish_page.dart';
 import 'features/moments/presentation/moment_interactions_page.dart';
 import 'features/meeting/presentation/meetings_page.dart';
+import 'features/meeting/booking/presentation/bookings_page.dart';
+import 'features/meeting/booking/presentation/booking_editor_page.dart';
+import 'features/meeting/booking/presentation/booking_detail_page.dart';
 import 'features/personal/domain/personal_item.dart';
 import 'features/personal/presentation/personal_page.dart';
 import 'features/favorite/presentation/favorites_page.dart';
@@ -66,6 +69,9 @@ final routerProvider = Provider<GoRouter>((ref) {
                   ].contains(path) ||
                   path.startsWith('/chat/') ||
                   path.startsWith('/mine/') ||
+                  path == '/meetings/bookings' ||
+                  path == '/meetings/bookings/new' ||
+                  RegExp(r'^/meetings/bookings/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$').hasMatch(path) ||
                   path == '/contacts' ||
                   path.startsWith('/contacts/') ||
                   path == '/favorites' ||
@@ -104,6 +110,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/rtc', builder: (_, _) => const RtcPage()),
       GoRoute(path: '/meetings', builder: (_, _) => const MeetingsPage()),
+      GoRoute(path: '/meetings/bookings', builder: (_, _) => const BookingsPage()),
+      GoRoute(path: '/meetings/bookings/new', builder: (_, _) => const BookingEditorPage()),
+      GoRoute(path: '/meetings/bookings/:bookingID', builder: (_, state) => BookingDetailPage(bookingID: state.pathParameters['bookingID']!)),
       GoRoute(
         path: '/mine/password',
         builder: (_, _) => const ChangePasswordPage(),

@@ -97,9 +97,9 @@ final bookingControllerProvider = FutureProvider.autoDispose<BookingController>(
     check(); final path = await pathLoader(credentials.accountKey); check();
     repository = await openTenantBookingRepository(api, factory, path, checkAlive: check);
     check();
-    controller = BookingController(repository!, released: released,
+    controller = BookingController(repository, released: released,
       invalidations: access.session.invalidations, accessChanges: access.session.accessChanges);
-    await controller!.start(); check(); return controller!;
+    await controller.start(); check(); return controller;
   } catch (_) {
     controller?.dispose(); await closeOwned(); rethrow;
   }

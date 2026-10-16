@@ -36,7 +36,10 @@ _LegacyCustom? _legacyCustom(Message item) {
     final value = jsonDecode(data);
     if (value is! Map || value['data'] is! Map) return null;
     final type = value['customType'];
-    if (type is! int || (type != 901 && type != 902)) return null;
+    if (type is! int ||
+        !const {901, 902, 903, 905, 910, 911, 912, 913}.contains(type)) {
+      return null;
+    }
     return (type: type, data: value['data'] as Map);
   } catch (_) {
     return null;
@@ -88,9 +91,52 @@ String _callPreview(Map data) {
   return '[$type] $state';
 }
 
+// This is a display projection of the existing more protocol. Custom data
+// remains opaque to privacy inspection and is never rewritten into a native
+// message element, permission, meeting admission, or trusted member identity.
+String? _legacySummary(_LegacyCustom custom) {
+  final data = custom.data;
+  switch (custom.type) {
+    case 903:
+      final text = data['textElem'];
+      if (text is Map && text['content'] is String) {
+        return text['content'] as String;
+      }
+      final sound = data['soundElem'];
+      if (sound is Map) {
+        final duration = sound['duration'];
+        final length = duration is int && duration >= 0
+            ? ' $duration 秒'
+            : '';
+        return '[标签语音]$length（当前版本暂不支持播放）';
+      }
+      return null;
+    case 905:
+      final subject = data['subject'];
+      final id = data['id'];
+      if (subject is! String || id is! String || id.trim().isEmpty) {
+        return null;
+      }
+      final title = subject.trim().isEmpty ? '会议邀请' : subject;
+      return '[会议邀请] $title\n会议号：$id\n当前版本未开放从邀请加入会议';
+    case 910:
+      return '消息已发出，但被对方拒收了';
+    case 911:
+      return '对方开启了好友验证，你还不是对方的好友';
+    case 912:
+      return '你已被移出群聊';
+    case 913:
+      return '群已经解散';
+    default:
+      return null;
+  }
+}
+
 String _preview(Message item, _LegacyCustom? custom) {
   if (custom?.type == 901) return _callPreview(custom!.data);
   if (custom?.type == 902) return '[表情]';
+  final summary = custom == null ? null : _legacySummary(custom);
+  if (summary != null) return summary;
   return switch (item.contentType) {
     MessageType.text => item.textElem?.content ?? '',
     MessageType.atText => item.atTextElem?.text ?? '',

@@ -53,25 +53,30 @@ def source_digest(files):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v1'
-            or plan['current230']['members'] != 230
-            or plan['candidate249']['members'] != 249
-            or plan['sdk_portable']['members'] != 51):
-        raise ValueError('portable input inventory differs')
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v2'
+            or plan['current257']['members'] != 257
+            or plan['sdk_portable']['members'] != 51
+            or plan['portable_members'] != {'current257': 309}
+            or plan['current257']['expected_target_tests'] != 64
+            or plan['current257']['expected_full_tests'] != 688
+            or plan['current257']['target_paths'] != ['test/features/group']
+            or 'current230' in plan or 'candidate249' in plan):
+        raise ValueError('current257 schema v2 inventory differs; no historical aliases')
     return plan
 
 
 def load_sources(cohort):
+    if cohort != 'current257':
+        raise ValueError('schema v2 supports current257 only; use historical Git commit for old cohorts')
     plan = descriptor()
-    base = {}
-    for row in plan['current230']['files']:
+    selected = {}
+    for row in plan['current257']['files']:
         name = row['path']
-        if name in base or not name.startswith('app/'):
+        if name in selected or not name.startswith('app/'):
             raise ValueError('duplicate or out-of-scope current source')
-        base[name] = check(regular(REPO / safe_name(name)), row)
-    if len(base) != 230 or source_digest(base) != plan['current230']['source_digest']:
-        raise ValueError('current230 aggregate differs')
-    # Do not let an unpinned extra Dart file quietly enter analysis or full test.
+        selected[name] = check(regular(REPO / safe_name(name)), row)
+    if len(selected) != 257 or source_digest(selected) != plan['current257']['source_digest']:
+        raise ValueError('current257 aggregate differs')
     actual = set()
     for prefix in ('app/lib', 'app/test', 'app/tool'):
         for directory, dirs, names in os.walk(REPO / prefix, followlinks=False):
@@ -80,41 +85,20 @@ def load_sources(cohort):
                     raise ValueError('authored-source directory symlink')
             for name in names:
                 actual.add(str((Path(directory) / name).relative_to(REPO)))
-    if actual != {p for p in base if p.startswith(('app/lib/', 'app/test/', 'app/tool/'))}:
+    if actual != {p for p in selected if p.startswith(('app/lib/', 'app/test/', 'app/tool/'))}:
         raise ValueError('unlocked app authored-source inventory')
-
-    selected = dict(base)
-    if cohort == 'booking-custom249':
-        overlay = plan['candidate249']['overlay']
-        before = plan['candidate249']['before']
-        if len(overlay) != 23 or len(before) != 4:
-            raise ValueError('exact23 overlay/4 replacements required')
-        expected = {r['path'] for r in overlay}
-        root = REPO / 'ci/mobile/candidate'
-        actual = {str(p.relative_to(root)) for p in root.rglob('*') if p.is_file()}
-        if actual != expected:
-            raise ValueError('candidate overlay missing or extra file')
-        for row in overlay:
-            name = row['path']
-            if name in base:
-                if name not in before:
-                    raise ValueError('unapproved replacement')
-                check(base[name], {'path': name, **before[name]})
-            elif name in before:
-                raise ValueError('missing replacement base')
-            selected[name] = check(regular(root / safe_name(name)), row)
-        if (len(selected) != 249
-                or source_digest(selected) != plan['candidate249']['source_digest']):
-            raise ValueError('candidate249 aggregate differs')
-
+    legacy = REPO / 'ci/mobile/candidate'
+    if legacy.is_symlink() or (legacy.exists() and any(legacy.rglob('*'))):
+        raise ValueError('legacy candidate body tree must be removed; history is available by commit')
     authored_digest = source_digest(selected)
     for row in [*plan['sdk_portable']['files'], plan['migration']]:
         name = row['path']
         if name in selected:
             raise ValueError('portable closure overlap')
         selected[name] = check(regular(REPO / safe_name(name)), row)
-    if len(selected) != plan['portable_members'][cohort]:
-        raise ValueError('portable closure count differs')
+    if (len(selected) != plan['portable_members'][cohort]
+            or source_digest(selected) != plan['portable_digests'][cohort]):
+        raise ValueError('portable closure count or digest differs')
     return plan, selected, authored_digest
 
 
@@ -144,7 +128,7 @@ def materialize(output, cohort):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cohort', choices=('current230', 'booking-custom249'), required=True)
+    p.add_argument('--cohort', choices=('current257',), required=True)
     p.add_argument('--output', type=Path, help='explicit fresh output; omitted means readonly')
     args = p.parse_args()
     if args.output:

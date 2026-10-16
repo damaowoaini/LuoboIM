@@ -61,7 +61,9 @@ class _BookingEditorPageState extends ConsumerState<BookingEditorPage> {
     receipt.found && !busy && !controller.isBusy(intent.id);
   void refill(BookingController controller, BookingIntent intent, int epoch, BookingReceipt receipt) {
     if (!matchesTerminal(controller, intent, epoch, receipt) || !receipt.definitiveNotApplied ||
-        original != null || !controller.canCreate) return;
+        original != null || !controller.canCreate) {
+      return;
+    }
     setState(() {
       ++_epoch; frozen = null; terminal = null; notice = null; title.clear();
       start = controller.now().add(const Duration(minutes: 10)); duration = 3600;
@@ -84,7 +86,7 @@ class _BookingEditorPageState extends ConsumerState<BookingEditorPage> {
     final epoch = _epoch, captured = owner!, now = owner!.now();
     final date = await showDatePicker(context: context, initialDate: start!.isBefore(now) ? now : start!,
       firstDate: DateTime(now.year, now.month, now.day), lastDate: now.add(const Duration(days: 365)));
-    if (date == null || !active || epoch != _epoch || owner != captured) return;
+    if (!mounted || date == null || !active || epoch != _epoch || owner != captured) return;
     final time = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(start!));
     if (time != null && active && epoch == _epoch && owner == captured) {
       setState(() => start = DateTime(date.year, date.month, date.day, time.hour, time.minute));
@@ -114,7 +116,7 @@ class _BookingEditorPageState extends ConsumerState<BookingEditorPage> {
     final submitted = frozen!;
     try {
       final receipt = await controller.submit(submitted);
-      if (!matches(controller, submitted, epoch)) return;
+      if (!mounted || !matches(controller, submitted, epoch)) return;
       if (receipt != null && verifiedTerminal(controller, submitted, epoch, receipt)) {
         if (receipt.applied && submitted.operation == BookingOperation.create) {
           // A direct GoRoute need not have a page to pop. Never render the

@@ -1,234 +1,54 @@
 {
-  "state": "candidate_v7_read_scope_source_prepared_local3_pass_current548_cloud_verified_Linux76_full624_pending",
-  "own_files": [
-    {
-      "path": ".github/workflows/mobile-ci.yml",
-      "bytes": 2509,
-      "sha256": "160f071e92dd7c9edd147985ea2d3bb1f98a4075d8e7f0906abf0c8c752ace8a"
-    },
-    {
-      "path": "ci/mobile-check.py",
-      "bytes": 12885,
-      "sha256": "bc7c34e7370fc2e626a30c62f1e99f886afb90aeba3f29c35557797c51c8cf16"
-    },
-    {
-      "path": "ci/mobile-netns.sh",
-      "bytes": 1034,
-      "sha256": "b8b329bcf37009e89291566df8ec3d16c42f397c47f91062ac292b0b79423c85"
-    },
-    {
-      "path": "ci/mobile-setup.sh",
-      "bytes": 5727,
-      "sha256": "7129630225535f6360c8ae77b502e7ae09ae40c0e1d726ff4860bdc293a8de3d"
-    },
-    {
-      "path": "ci/mobile-source.py",
-      "bytes": 6675,
-      "sha256": "c016e9ca2afdce16f839c387513e70ea15651a044aeb179cd4c90c7f6c180709"
-    },
-    {
-      "path": "ci/mobile-test-tools.py",
-      "bytes": 2105,
-      "sha256": "62980e110c0ae79af875503416db5696eab15be710522dbd55113ffe7ba0e88a"
-    },
-    {
-      "path": "ci/mobile/README.md",
-      "bytes": 6201,
-      "sha256": "baccb8fa9880be2227175dcd469ad47b4b55419268f0c1ed9f948a946f3fa2bd"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/app.dart",
-      "bytes": 18789,
-      "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/chat/data/chat_repository.dart",
-      "bytes": 38493,
-      "sha256": "377b0185655ab8c34bc0b5e97167c261c4f3ae85dfa939ebf4bd6602497d42f6"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/chat/data/message_mapper.dart",
-      "bytes": 12723,
-      "sha256": "f4c01d0e8d5e0c72fe330caabb2b25495126678997773f5446cc33e60e5d386f"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/booking_providers.dart",
-      "bytes": 4929,
-      "sha256": "c51d4767fe4b981b376e4a694da5fbc6a7d8d14f6b59d7f5a6dea129c5780326"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/booking_contract.dart",
-      "bytes": 11464,
-      "sha256": "3953ad2717c0e9881c070532fb042816d99818aa9514353a87bbd09e48355f6d"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/booking_pending_journal.dart",
-      "bytes": 19213,
-      "sha256": "55db0f98834b4d5a9bfc0f6685719ebf626a397ac70a5119980d90231d6fa85e"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/meeting_booking_repository.dart",
-      "bytes": 6805,
-      "sha256": "8d47526b7cdcaae39828871e102af24cccc2ec7b1bacc2c6c66b73c5ed11ec76"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/data/tenant_booking_adapter.dart",
-      "bytes": 1648,
-      "sha256": "c6977320f81835ff376ffc89a1b5d8cd1e8605e04436721904f41309fea0b17d"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/domain/booking_view.dart",
-      "bytes": 4185,
-      "sha256": "7ccdc39c4aab7ad2e5c9da699bf4913b2df9692013ab6c03bfda8e3cbfcac1c0"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_controller.dart",
-      "bytes": 8458,
-      "sha256": "f4093ba414dffe8387c3768ff6d6f1e11b70deb803d9a6c76cca55dc6329f9ff"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_detail_page.dart",
-      "bytes": 6380,
-      "sha256": "7bc26daac358ed0f4cc0afbaa6d10d7135d4c3912a2e59562aa194f9f7f94c47"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_editor_page.dart",
-      "bytes": 10683,
-      "sha256": "b05a8d8caf5b667d8a23c9ef7d825621151820c0e537644e88e95e8d300f66b3"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
-      "bytes": 3895,
-      "sha256": "88a8d3fac55288c57dec0cf8a58252242502c1292ee2c0c8f133376c1b74b302"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/booking/presentation/bookings_page.dart",
-      "bytes": 5107,
-      "sha256": "29731745cfecb9c9b9ac0fe25a205396adac4297fc5f9f73e5c03cbb6bb1031d"
-    },
-    {
-      "path": "ci/mobile/candidate/app/lib/features/meeting/presentation/meetings_page.dart",
-      "bytes": 6496,
-      "sha256": "87e4dd39073e49367ec5ecfd7cff4e04812e3cc1e6e7a4f8900c717f28af032f"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/chat/legacy_custom_summary_test.dart",
-      "bytes": 12544,
-      "sha256": "7f2f6c94c654c00a3a0bed9fd512368608acf15ecdb44e637b8d3df2e7bfec51"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_controller_test.dart",
-      "bytes": 5311,
-      "sha256": "ce2c633bc08ca313ffa08e505620ad6de4372dce08fe0fd2b4071ceff037d352"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pages_test.dart",
-      "bytes": 28151,
-      "sha256": "89c59d4d487dee3ce5009541a5d56dc75faca5c15bd8b19cdbff3bc0963f9c47"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_pending_journal_test.dart",
-      "bytes": 25519,
-      "sha256": "5f5380d17a7e549fee81f1e69055b0a3f3bf22c1e5b820021b90fb4d859055e5"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_provider_lifecycle_test.dart",
-      "bytes": 5070,
-      "sha256": "65f815aa4f0fe527f4d66a71f48669975a71054f54e6af919d1553da53115c40"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_routes_test.dart",
-      "bytes": 3659,
-      "sha256": "2ae65c33d92c0ad87537b4c0806e478b3df81facd3ed27f158a8a071085c4d9f"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_test_harness.dart",
-      "bytes": 4761,
-      "sha256": "48eda9e531a9f15ac9362ad259234dce0647946360c273cff3097e74793f261b"
-    },
-    {
-      "path": "ci/mobile/candidate/app/test/features/meeting/booking/booking_view_test.dart",
-      "bytes": 1808,
-      "sha256": "d25f1a90938b224b9cc2870a90fb0adbd0e2c05bfe5651a8e93121bcb2048ab5"
-    },
-    {
-      "path": "ci/mobile/inputs.json",
-      "bytes": 68139,
-      "sha256": "f625f28cdb237746e972c3a3d09408614bdd64ab8dfba9092b57c34f631155e9"
-    }
+  "schema": "luobo.mobile.source-preparation.v2",
+  "state": "current257_atomic_adoption_payload_prepared_no_live_apply_first_combined_cloud688_pending",
+  "parent_public_commit": "fa3d6850a3d3f8364f649fed9903991033af9ea8",
+  "root257_source_manifest_sha256": "7b7b861a22737af1434f495b382f5365687d2e08c5380942d55ae79b717d6a43",
+  "source257_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
+  "portable309_digest": "013194c7b391d62383ea47825b2db0627061e9b2ee32930166530c466bd3a0ea",
+  "authored_members": 257,
+  "portable_members": 309,
+  "source_delta": {
+    "unique_files": 34,
+    "replacements": 7,
+    "new": 27,
+    "group_repository_overlap": "Already hunk-combined in Root sealed257; this payload copies that exact one final body, never stacks alternative full files."
+  },
+  "CI_payload_files": [
+    ".github/workflows/mobile-ci.yml",
+    "ci/mobile-source.py",
+    "ci/mobile-check.py",
+    "ci/mobile-setup.sh",
+    "ci/mobile/inputs.json",
+    "ci/mobile/source-preparation.json",
+    "ci/mobile/README.md"
   ],
-  "aggregate_sha256": "89013c619c45f45cca5cd9052563751188dd9f3aa5d920389dca9395161789ee",
-  "no_product_edits": false,
-  "native_acceptance": false,
-  "ci_followup": {
-    "cause": "GitHub Actions run38844764587 validation rejected runner context in job-level env at line44",
-    "change": "Set MOBILE_WORK from RUNNER_TEMP in first run step via GITHUB_ENV; no product/source input change",
-    "prior_receipt_sha256": "be912b2566e7464ada107caf69b74aa1db29c12485b56ba1f452f5af375fe608",
-    "actual_cloud_tests_executed_in_rejected_run": 0
+  "CI_schema": "v2 current257 only; no historical aliases",
+  "legacy_candidate_body_files_to_delete": 23,
+  "expected_cloud": {
+    "group_target": 64,
+    "full": 688,
+    "analyze": "zero issues",
+    "skips": 0,
+    "failures": 0
   },
-  "cloud_setup_followup": {
-    "run_id": 38845232362,
-    "prior_receipt_sha256": "cd17d74f9f1490e01bf6feaa318cb5b27b11fd93ec75a274132996216ebd3139",
-    "cause": "fetching only FETCH_HEAD omitted local release tag; official Flutter version detector reported 0.0.0-unknown; pub-get rejected Flutter SDK constraint",
-    "not_cause": "exact framework/engine/Dart matched and Linux precache completed; no engine404 observed",
-    "changes": [
-      "fetch explicit local refs/tags/3.47.7 and verify tag points at pinned HEAD",
-      "failclosed frameworkVersion==3.47.7 in addition to existing framework/engine/Dart checks",
-      "safe bounded setup failure stage/log tail",
-      "actions checkout7.0.1/upload7.0.0 match root official pins"
-    ],
-    "artifacts": [
-      {
-        "id": 12023265367,
-        "sha256": "9df7c47b6aa8a6e761f4310407fa723df65c78d3748c15bec1728c3621160667"
-      },
-      {
-        "id": 12022488285,
-        "sha256": "431c2cfc313939cf4fdd3c768d937d759ee670d69f24acacf253929f6fb16c00"
-      }
-    ],
-    "product_tests_executed_in_setup_failed_run": 0,
-    "local_followup_validation": "bash-n and Python heredoc AST only; no local Flutter/compile/run"
+  "actual_this_preparation": {
+    "Dart_Flutter_native_or_service_execution": 0,
+    "combined688": 0,
+    "readonly_and_parser6": "separate receipt after actual checks"
   },
-  "fixture_revision_v2": {
-    "manifest_sha256": "4c303771c6d700021f32e1adb234074be444c06cc97aceb1f4325ee0020ce63b",
-    "prior_receipt_sha256": "12a4381e4e6278741530b2144bd33219342f8b9c29703827e2c2076221c37fb0",
-    "parent_run38845582450_current548": "actualPASS plus fullanalyze0",
-    "parent_run38845582450_candidate249": "incomplete failure; no full621/analyze",
-    "current_v2": "2localMacroutePASS; Linux73/621 pending",
-    "CI_observability": "fixed phase start/end enum progress; no change to timeouts/resource gates/expected counts",
-    "supersedes_receipt_with_stale_initial_preparation_state_sha256": "5fe7ad78fe7187dd60c206758e812457240c4f442e6850228d8c1f5c1742396c"
+  "historical_results": {
+    "accepted_current230": "Linux full548/analyze0; immutable commit292bea12",
+    "candidate249_v7": "Linux target76/full624 passed; analyze17 failed; run38852506276",
+    "v8_r2": "local target76/analyze0; no v8 full624",
+    "avatar": "28 local targeted passed, not combined688",
+    "bulk_remove": "36 local targeted passed, not combined688"
   },
-  "current_product_app230_unchanged": true,
-  "candidate_revision_v6": {
-    "prior_receipt_sha256": "08dd5ee358812b8959478a65320a22888af9a8f544c587bb392277b1f6a4b2ac",
-    "manifest_sha256": "b4fda331ed8c535139d39b0938d095b607a4950be6eefb35e2e807ca702f7ae7",
-    "actual_local_receipt_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
-    "candidate_product_fix_only": "RecoveryPanel legitimate rebuild vs stale callbacks; not applied to current product",
-    "actual_local": "19pages+2routes complete PASS/0skip/0error; no local full623",
-    "new_cloud_expected": {
-      "target": 75,
-      "full": 623,
-      "analyze": "pending"
-    },
-    "candidate_source_digest": "f703de845481101f7450fb78f89293b13f87b6e267e1e2ee6d02323395a7a8d1",
-    "preserved_original_pages": 17,
-    "added_negative_cases": 2,
-    "old_run38848168319": "candidate incomplete, not accepted; artifacts preserved"
+  "preservation": {
+    "original_current230_pubspec_lock_and_native_files": "unchanged; no native paths in delta",
+    "SDK51_and_migration": "exact v1 pins",
+    "protocol52": "no change or source input expansion",
+    "old_private_evidence": "untouched; historical Git commit reproduces v1 cohorts",
+    "cloud_acceptance": "working257 is not accepted257 until Root verifies actual cloud target64/full688/analyze0 originals"
   },
-  "candidate_revision_v7": {
-    "prior_receipt_sha256": "3b4d1bf07f47cc92eb4c83dcae65cc7d2cd841a2832def375bda12c65c40b8f3",
-    "manifest_sha256": "ab1f74de46e0268a6a5db2c47dabf217ba07762a1ef1e260add0831d15feb6b8",
-    "local_receipt_sha256": "526fa992549973b995b6218bc03bb3e1a396bbee8c95fbed39a081478200a2ae",
-    "current_product230_unchanged": true,
-    "new_product_candidate_only": "ChatRepository read result/session lease guards; no run/send/ACK change",
-    "source249_digest": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
-    "overlay23_before4": true,
-    "actual_local": "2assertionRED+ordinarytext positive ->3PASS",
-    "new_cloud_expected": {
-      "target": 76,
-      "full": 624,
-      "analyze": "pending"
-    }
-  }
+  "network_resource_reporter_contract": "unchanged setup-only download, fresh netns loopback without host fixtures, 4GiB admission,1GiB/.2s floor,768MiB source cap,concurrency1,900s phases,full raw reporter/footer/0skip,latched failure wins finalreceipt"
 }

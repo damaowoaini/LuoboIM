@@ -59,8 +59,10 @@ final class BookingFixture implements BookingTransport {
     if (action == 'detail') return rows[body['bookingID']] ?? record();
     final id = body['clientRequestID']! as String;
     if (receipts.containsKey(id)) return receipts[id];
-    if (action == 'receipt') return {'clientRequestID': id, 'found': false,
-      'applied': false, 'definitiveNotApplied': false, 'replaySafe': true};
+    if (action == 'receipt') {
+      return {'clientRequestID': id, 'found': false,
+        'applied': false, 'definitiveNotApplied': false, 'replaySafe': true};
+    }
     if (action == 'resolve') {
       return receipts[id] = {'clientRequestID': id, 'found': true, 'applied': false,
         'definitiveNotApplied': true, 'replaySafe': true, 'action': 'resolve'};

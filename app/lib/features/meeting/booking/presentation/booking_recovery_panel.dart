@@ -27,7 +27,9 @@ class BookingRecoveryPanel extends StatelessWidget {
     // belongs to the captured controller; the only consumer must fence its
     // own mounted page, route, provider, intent object and epoch before UI work.
     if (!controller.usable ||
-        receipt == null || receipt.id != id || !receipt.found) return;
+        receipt == null || receipt.id != id || !receipt.found) {
+      return;
+    }
     onTerminal?.call(receipt);
   }
   @override
@@ -53,7 +55,10 @@ class BookingRecoveryPanel extends StatelessWidget {
               actions: [TextButton(onPressed: () => navigator.pop(false), child: const Text('返回')),
                 FilledButton(onPressed: () => navigator.pop(true), child: const Text('核实原意图'))],
             ));
-            if (confirmed == true && current(context, intentID: id)) await recover(context, id, resolve: true);
+            if (!context.mounted) return;
+            if (confirmed == true && current(context, intentID: id)) {
+              await recover(context, id, resolve: true);
+            }
           } : null, child: const Text('核实并关闭原意图')),
         ]),
       ]))),

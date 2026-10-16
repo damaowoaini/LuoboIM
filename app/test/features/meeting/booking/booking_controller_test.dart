@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:imapp/features/meeting/booking/data/booking_contract.dart';
 import 'package:imapp/features/meeting/booking/presentation/booking_controller.dart';
 
 import 'booking_test_harness.dart';

@@ -1,50 +1,19 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v1",
-  "state": "v2_fixture_source_prepared_local_route2_passed_cloud_target73_full621_pending",
-  "digest_algorithm": "SHA256(UTF8(JSON(sorted by path rows {path,bytes,sha256}, sorted object keys, compact separators, ensure_ascii=false)))",
+  "schema": "luobo.mobile.portable-ci-inputs.v2",
+  "state": "working_current257_pending_first_combined_cloud688_not_native_acceptance",
+  "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
-    "current230": {
-      "local_evidence_name": "candidate-source230-9e00a25a.receipt.json",
-      "bytes": 44903,
-      "sha256": "e6fae386ae7850abd7eba1834ccabd84607fa254b481b2bb3e5e0b72feeb14f1"
+    "current257_root_source_manifest": {
+      "local_evidence_name": "mobile257-source-candidate-20261016/source-manifest.json",
+      "sha256": "7b7b861a22737af1434f495b382f5365687d2e08c5380942d55ae79b717d6a43"
     },
-    "sdk125_envelope": {
-      "local_evidence_name": "qa-505-90041b8a-source-envelope.receipt.json",
-      "bytes": 26190,
-      "sha256": "a8ce986c42775d7db6aef18d6495b3c229ff1745b73d2e226e5957d8f3f1b1ea"
+    "parents": {
+      "current230": "9e00a25ac45b277f3a1de33cd4c42c9c3b2893deb0d7969dcafcf8a313c446b1",
+      "booking_v7": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
+      "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
+      "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "booking_v4": {
-      "local_evidence_name": "candidate-manifest-v4.json",
-      "bytes": 10415,
-      "sha256": "b433022cc9e470a443d5264ea71321f35c1fd827ccbf88abe7c10a524ec003eb"
-    },
-    "custom_summary": {
-      "local_evidence_name": "manifest.json",
-      "bytes": 9236,
-      "sha256": "347df17389d40f5033a970efd2a319f9472748ceab13ec6c2241deac2c9cd341"
-    },
-    "combined249_375_descriptor": {
-      "local_evidence_name": "inputs.json",
-      "bytes": 17408,
-      "sha256": "930e51a633bfeafc165d725bb21cb111c8a99d3f263cc9de8f39aeb50ea8125d"
-    },
-    "booking_fixture_revision_v2": {
-      "local_evidence_name": "fixture-revision-v2/manifest.json",
-      "bytes": 3974,
-      "sha256": "4c303771c6d700021f32e1adb234074be444c06cc97aceb1f4325ee0020ce63b"
-    },
-    "candidate_revision_v6": {
-      "manifest_sha256": "b4fda331ed8c535139d39b0938d095b607a4950be6eefb35e2e807ca702f7ae7",
-      "local_verification_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
-      "historical_failed_run38848168319": "current548 passed; candidate2passed then incomplete900s phase_timeout. Preserved artifacts.",
-      "new_claim": "local Mac21 only; pending Linux75/full623/analyze"
-    },
-    "candidate_revision_v7": {
-      "manifest_sha256": "ab1f74de46e0268a6a5db2c47dabf217ba07762a1ef1e260add0831d15feb6b8",
-      "local_verification_sha256": "526fa992549973b995b6218bc03bb3e1a396bbee8c95fbed39a081478200a2ae",
-      "previous_cloud_run38851458094": "current548/analyze passed; target75 complete74PASS1assertFAIL, full623/analyze not started",
-      "cloud76_full624": "pending"
-    }
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -54,10 +23,9 @@
     "dart_version": "3.13.5",
     "official_remote_verification": "required_at_CI_fetch_no_substitution_or_floating_channel"
   },
-  "current230": {
-    "members": 230,
-    "source_digest": "9e00a25ac45b277f3a1de33cd4c42c9c3b2893deb0d7969dcafcf8a313c446b1",
-    "expected_full_tests": 548,
+  "current257": {
+    "members": 257,
+    "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -66,8 +34,8 @@
       },
       {
         "path": "app/lib/app.dart",
-        "bytes": 18016,
-        "sha256": "2db2f4e731a5ec693f10cd9d75830f9eff10232a0b8a252c78d1f3c6aab265e5"
+        "bytes": 18789,
+        "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
       },
       {
         "path": "app/lib/core/access/access_store.dart",
@@ -216,8 +184,8 @@
       },
       {
         "path": "app/lib/features/chat/data/chat_repository.dart",
-        "bytes": 38366,
-        "sha256": "66538ea6813f8f910923511bdd5bc4385c0f9dd4425b6d5ed4fb86fba1426fad"
+        "bytes": 38493,
+        "sha256": "377b0185655ab8c34bc0b5e97167c261c4f3ae85dfa939ebf4bd6602497d42f6"
       },
       {
         "path": "app/lib/features/chat/data/group_mention_authority.dart",
@@ -226,8 +194,8 @@
       },
       {
         "path": "app/lib/features/chat/data/message_mapper.dart",
-        "bytes": 11113,
-        "sha256": "5b4308b06b0a743525a9596689f2bbe76f4506ad1fe8c7f374bce56825900475"
+        "bytes": 12723,
+        "sha256": "f4c01d0e8d5e0c72fe330caabb2b25495126678997773f5446cc33e60e5d386f"
       },
       {
         "path": "app/lib/features/chat/data/retained_merge_codec.dart",
@@ -506,8 +474,8 @@
       },
       {
         "path": "app/lib/features/group/data/group_repository.dart",
-        "bytes": 10608,
-        "sha256": "8e9070f39d3868fd45d6409050f2e12bbf23b2ca0501d616aa07af30e059326e"
+        "bytes": 15814,
+        "sha256": "35f7486cdb24266ff4d255cc2537b209b08608dd00162e7d3e69bd30f35437c3"
       },
       {
         "path": "app/lib/features/group/domain/group.dart",
@@ -516,13 +484,68 @@
       },
       {
         "path": "app/lib/features/group/presentation/group_members_page.dart",
-        "bytes": 10175,
-        "sha256": "748a8b7ecdd04d575f650b87e6d536a398d1776ba4614d085cf8e0848fc9f355"
+        "bytes": 22993,
+        "sha256": "42dfcd2a4e9a4c7c6078d8e16b40956b77016420cb450e16e6541a41d12726c9"
       },
       {
         "path": "app/lib/features/group/presentation/group_page.dart",
-        "bytes": 16892,
-        "sha256": "2ad0c6f2752b63c0de9ae1c36387c76f445078b58d4258b1c61709c740e053dc"
+        "bytes": 28406,
+        "sha256": "3275da7bf6c904461d3dbe8fa4d2aecc3b22434a25d7635cc85048cd7cf2a9d1"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/booking_providers.dart",
+        "bytes": 4926,
+        "sha256": "c33d2d652ae0facaef20f14a7f715a321360da2dcd57e000fcfd2a3e860ac524"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/data/booking_contract.dart",
+        "bytes": 11464,
+        "sha256": "3953ad2717c0e9881c070532fb042816d99818aa9514353a87bbd09e48355f6d"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/data/booking_pending_journal.dart",
+        "bytes": 19213,
+        "sha256": "55db0f98834b4d5a9bfc0f6685719ebf626a397ac70a5119980d90231d6fa85e"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/data/meeting_booking_repository.dart",
+        "bytes": 6805,
+        "sha256": "8d47526b7cdcaae39828871e102af24cccc2ec7b1bacc2c6c66b73c5ed11ec76"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/data/tenant_booking_adapter.dart",
+        "bytes": 1648,
+        "sha256": "c6977320f81835ff376ffc89a1b5d8cd1e8605e04436721904f41309fea0b17d"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/domain/booking_view.dart",
+        "bytes": 4185,
+        "sha256": "7ccdc39c4aab7ad2e5c9da699bf4913b2df9692013ab6c03bfda8e3cbfcac1c0"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/presentation/booking_controller.dart",
+        "bytes": 8472,
+        "sha256": "7aaf133ac51e4e75333fa188c38ac427be600d2b3127026fc75f4046e34a582f"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/presentation/booking_detail_page.dart",
+        "bytes": 6408,
+        "sha256": "bd723789705e743b3b37d0f1f7361bbd989037efc6d818b19d96c6c1a26775a5"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/presentation/booking_editor_page.dart",
+        "bytes": 10721,
+        "sha256": "8b02688901950f06cf527d306d3bd744bfce5266e626d5ad6addec10328ba0ac"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
+        "bytes": 3981,
+        "sha256": "4a40c02343dc47a871721084e3e07730702dbc0699e50311e4bc50fe8aec8cb4"
+      },
+      {
+        "path": "app/lib/features/meeting/booking/presentation/bookings_page.dart",
+        "bytes": 5107,
+        "sha256": "29731745cfecb9c9b9ac0fe25a205396adac4297fc5f9f73e5c03cbb6bb1031d"
       },
       {
         "path": "app/lib/features/meeting/data/meeting_repository.dart",
@@ -561,8 +584,8 @@
       },
       {
         "path": "app/lib/features/meeting/presentation/meetings_page.dart",
-        "bytes": 6263,
-        "sha256": "3ddbfeb608aaa61f1a2532617bec4f805644cbf2b70e8d6e7881a276d5d9fcd9"
+        "bytes": 6496,
+        "sha256": "87e4dd39073e49367ec5ecfd7cff4e04812e3cc1e6e7a4f8900c717f28af032f"
       },
       {
         "path": "app/lib/features/mine/account_providers.dart",
@@ -930,6 +953,11 @@
         "sha256": "7ce9634305d6aa47596ab0cf1c515d091873f041001f3436e85ba047f06d1ee8"
       },
       {
+        "path": "app/test/features/chat/legacy_custom_summary_test.dart",
+        "bytes": 12544,
+        "sha256": "7f2f6c94c654c00a3a0bed9fd512368608acf15ecdb44e637b8d3df2e7bfec51"
+      },
+      {
         "path": "app/test/features/chat/legacy_message_mapping_test.dart",
         "bytes": 6144,
         "sha256": "d6dc664e391dd72328582c2cc7854e85ed55e21c175d2af25227b07c89547183"
@@ -1080,6 +1108,81 @@
         "sha256": "6ccc0e058b200a06acf4ead104481f939b8d91e91755545facf21cc70e37dbaf"
       },
       {
+        "path": "app/test/features/group/batch_remove_entry_test.dart",
+        "bytes": 1101,
+        "sha256": "81e5910a6c5ec8a40e1b539066db1a0c94da8796ec9c74009bcf618cd9d36740"
+      },
+      {
+        "path": "app/test/features/group/batch_remove_fixture.dart",
+        "bytes": 8082,
+        "sha256": "11dd2c6695412ead8b11d218d6d9c4a5e8301e750595cbbc6d092480283885e0"
+      },
+      {
+        "path": "app/test/features/group/batch_remove_page_test.dart",
+        "bytes": 13411,
+        "sha256": "ab795febbbbb6d4135e9906fb6782ba702263d3f1560317bd8884e87f48711d5"
+      },
+      {
+        "path": "app/test/features/group/batch_remove_repository_test.dart",
+        "bytes": 7664,
+        "sha256": "e9fefa91061b6f04971fae679e5d92f49476911a1d417b80792026a716ce2635"
+      },
+      {
+        "path": "app/test/features/group/group_avatar_entry_test.dart",
+        "bytes": 2547,
+        "sha256": "1d3dffdeeaacb6a63c9a7a7ef95f1bb12f7b3dc6c901b272224797574ac2a671"
+      },
+      {
+        "path": "app/test/features/group/group_avatar_fixture.dart",
+        "bytes": 8905,
+        "sha256": "51ecee50d3cbed7a773f8033cd3ec1421c55c00cf471e0e26bb980533a63569b"
+      },
+      {
+        "path": "app/test/features/group/group_avatar_repository_test.dart",
+        "bytes": 3835,
+        "sha256": "d8150466662ae09c7aee8d7d3c0865acbcf1798a01e8a2c19cf38b73e17f9652"
+      },
+      {
+        "path": "app/test/features/group/group_avatar_workflow_test.dart",
+        "bytes": 12492,
+        "sha256": "0f823ec1771e4df231aa329ab203d4bf2df7d60a77bfc90b57383419d7c350d6"
+      },
+      {
+        "path": "app/test/features/meeting/booking/booking_controller_test.dart",
+        "bytes": 5235,
+        "sha256": "e55817903a681499adad4b7e25f7915a653dc6b967c70788ff5b5a105a302411"
+      },
+      {
+        "path": "app/test/features/meeting/booking/booking_pages_test.dart",
+        "bytes": 28169,
+        "sha256": "01f16880593a9f37468a8d4bd3574179e247a41f79f8bf4e84194f8fb4215ff7"
+      },
+      {
+        "path": "app/test/features/meeting/booking/booking_pending_journal_test.dart",
+        "bytes": 25519,
+        "sha256": "5f5380d17a7e549fee81f1e69055b0a3f3bf22c1e5b820021b90fb4d859055e5"
+      },
+      {
+        "path": "app/test/features/meeting/booking/booking_provider_lifecycle_test.dart",
+        "bytes": 5070,
+        "sha256": "65f815aa4f0fe527f4d66a71f48669975a71054f54e6af919d1553da53115c40"
+      },
+      {
+        "path": "app/test/features/meeting/booking/booking_routes_test.dart",
+        "bytes": 3659,
+        "sha256": "2ae65c33d92c0ad87537b4c0806e478b3df81facd3ed27f158a8a071085c4d9f"
+      },
+      {
+        "path": "app/test/features/meeting/booking/booking_test_harness.dart",
+        "bytes": 4777,
+        "sha256": "c57809de6c0d5e3cb0b3fd31206b6b694e76d919bf0d3443499e209737707dc6"
+      },
+      {
+        "path": "app/test/features/meeting/booking/booking_view_test.dart",
+        "bytes": 1808,
+        "sha256": "d25f1a90938b224b9cc2870a90fb0adbd0e2c05bfe5651a8e93121bcb2048ab5"
+      },
+      {
         "path": "app/test/features/meeting/meeting_harness.dart",
         "bytes": 3250,
         "sha256": "875064567e488d9c1de112710fa736a12a149ed0b914f3c2ebab3ecee89fc394"
@@ -1209,6 +1312,11 @@
         "bytes": 3962,
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
+    ],
+    "expected_target_tests": 64,
+    "expected_full_tests": 688,
+    "target_paths": [
+      "test/features/group"
     ]
   },
   "sdk_portable": {
@@ -1476,203 +1584,11 @@
     "bytes": 2942,
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
-  "candidate249": {
-    "members": 249,
-    "source_digest": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
-    "expected_target_tests": 76,
-    "expected_full_tests": 624,
-    "before": {
-      "app/lib/app.dart": {
-        "bytes": 18016,
-        "sha256": "2db2f4e731a5ec693f10cd9d75830f9eff10232a0b8a252c78d1f3c6aab265e5"
-      },
-      "app/lib/features/meeting/presentation/meetings_page.dart": {
-        "bytes": 6263,
-        "sha256": "3ddbfeb608aaa61f1a2532617bec4f805644cbf2b70e8d6e7881a276d5d9fcd9"
-      },
-      "app/lib/features/chat/data/message_mapper.dart": {
-        "bytes": 11113,
-        "sha256": "5b4308b06b0a743525a9596689f2bbe76f4506ad1fe8c7f374bce56825900475"
-      },
-      "app/lib/features/chat/data/chat_repository.dart": {
-        "bytes": 38366,
-        "sha256": "66538ea6813f8f910923511bdd5bc4385c0f9dd4425b6d5ed4fb86fba1426fad"
-      }
-    },
-    "overlay": [
-      {
-        "path": "app/lib/app.dart",
-        "bytes": 18789,
-        "sha256": "53eeeda4cfb5e786e5638782f7388f6cb5c58fd1e6f1cd0591ee60795926448d"
-      },
-      {
-        "path": "app/lib/features/chat/data/chat_repository.dart",
-        "bytes": 38493,
-        "sha256": "377b0185655ab8c34bc0b5e97167c261c4f3ae85dfa939ebf4bd6602497d42f6"
-      },
-      {
-        "path": "app/lib/features/chat/data/message_mapper.dart",
-        "bytes": 12723,
-        "sha256": "f4c01d0e8d5e0c72fe330caabb2b25495126678997773f5446cc33e60e5d386f"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/booking_providers.dart",
-        "bytes": 4929,
-        "sha256": "c51d4767fe4b981b376e4a694da5fbc6a7d8d14f6b59d7f5a6dea129c5780326"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/data/booking_contract.dart",
-        "bytes": 11464,
-        "sha256": "3953ad2717c0e9881c070532fb042816d99818aa9514353a87bbd09e48355f6d"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/data/booking_pending_journal.dart",
-        "bytes": 19213,
-        "sha256": "55db0f98834b4d5a9bfc0f6685719ebf626a397ac70a5119980d90231d6fa85e"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/data/meeting_booking_repository.dart",
-        "bytes": 6805,
-        "sha256": "8d47526b7cdcaae39828871e102af24cccc2ec7b1bacc2c6c66b73c5ed11ec76"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/data/tenant_booking_adapter.dart",
-        "bytes": 1648,
-        "sha256": "c6977320f81835ff376ffc89a1b5d8cd1e8605e04436721904f41309fea0b17d"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/domain/booking_view.dart",
-        "bytes": 4185,
-        "sha256": "7ccdc39c4aab7ad2e5c9da699bf4913b2df9692013ab6c03bfda8e3cbfcac1c0"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/presentation/booking_controller.dart",
-        "bytes": 8458,
-        "sha256": "f4093ba414dffe8387c3768ff6d6f1e11b70deb803d9a6c76cca55dc6329f9ff"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/presentation/booking_detail_page.dart",
-        "bytes": 6380,
-        "sha256": "7bc26daac358ed0f4cc0afbaa6d10d7135d4c3912a2e59562aa194f9f7f94c47"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/presentation/booking_editor_page.dart",
-        "bytes": 10683,
-        "sha256": "b05a8d8caf5b667d8a23c9ef7d825621151820c0e537644e88e95e8d300f66b3"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
-        "bytes": 3895,
-        "sha256": "88a8d3fac55288c57dec0cf8a58252242502c1292ee2c0c8f133376c1b74b302"
-      },
-      {
-        "path": "app/lib/features/meeting/booking/presentation/bookings_page.dart",
-        "bytes": 5107,
-        "sha256": "29731745cfecb9c9b9ac0fe25a205396adac4297fc5f9f73e5c03cbb6bb1031d"
-      },
-      {
-        "path": "app/lib/features/meeting/presentation/meetings_page.dart",
-        "bytes": 6496,
-        "sha256": "87e4dd39073e49367ec5ecfd7cff4e04812e3cc1e6e7a4f8900c717f28af032f"
-      },
-      {
-        "path": "app/test/features/chat/legacy_custom_summary_test.dart",
-        "bytes": 12544,
-        "sha256": "7f2f6c94c654c00a3a0bed9fd512368608acf15ecdb44e637b8d3df2e7bfec51"
-      },
-      {
-        "path": "app/test/features/meeting/booking/booking_controller_test.dart",
-        "bytes": 5311,
-        "sha256": "ce2c633bc08ca313ffa08e505620ad6de4372dce08fe0fd2b4071ceff037d352"
-      },
-      {
-        "path": "app/test/features/meeting/booking/booking_pages_test.dart",
-        "bytes": 28151,
-        "sha256": "89c59d4d487dee3ce5009541a5d56dc75faca5c15bd8b19cdbff3bc0963f9c47"
-      },
-      {
-        "path": "app/test/features/meeting/booking/booking_pending_journal_test.dart",
-        "bytes": 25519,
-        "sha256": "5f5380d17a7e549fee81f1e69055b0a3f3bf22c1e5b820021b90fb4d859055e5"
-      },
-      {
-        "path": "app/test/features/meeting/booking/booking_provider_lifecycle_test.dart",
-        "bytes": 5070,
-        "sha256": "65f815aa4f0fe527f4d66a71f48669975a71054f54e6af919d1553da53115c40"
-      },
-      {
-        "path": "app/test/features/meeting/booking/booking_routes_test.dart",
-        "bytes": 3659,
-        "sha256": "2ae65c33d92c0ad87537b4c0806e478b3df81facd3ed27f158a8a071085c4d9f"
-      },
-      {
-        "path": "app/test/features/meeting/booking/booking_test_harness.dart",
-        "bytes": 4761,
-        "sha256": "48eda9e531a9f15ac9362ad259234dce0647946360c273cff3097e74793f261b"
-      },
-      {
-        "path": "app/test/features/meeting/booking/booking_view_test.dart",
-        "bytes": 1808,
-        "sha256": "d25f1a90938b224b9cc2870a90fb0adbd0e2c05bfe5651a8e93121bcb2048ab5"
-      }
-    ],
-    "target_paths": [
-      "test/features/meeting/booking",
-      "test/features/chat/legacy_custom_summary_test.dart"
-    ],
-    "not_applied_to_current": true,
-    "fixture_revision_v2": {
-      "parent_inputs_sha256": "6371fb146f9fae28797b3c0bfb816697ed10131a6d20e174e6f878425a7d2c21",
-      "parent_source_digest": "9c9fbb1cd47111bf089437358a7596829625abf96186dbfaae1fb2d923d56581",
-      "changed_test_paths": [
-        "app/test/features/meeting/booking/booking_pages_test.dart",
-        "app/test/features/meeting/booking/booking_routes_test.dart"
-      ],
-      "local_route_cases_passed": 2,
-      "cloud_target73_full621": "pending"
-    },
-    "revision_v6": {
-      "parent_public_commit": "320b23e24515519a0c907939e6c6ecef37f004b2",
-      "parent_inputs_sha256": "531ba2aa3db1b0601cfa945db58b5b00b30edeba0b0dd12f28343dc99b6fbd0c",
-      "parent_source_digest": "3c5da0fbfa62dd94c76368bbbb4d61e72893cbf52396935823f030de6f4cfafd",
-      "changed_source_paths": [
-        "app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
-        "app/test/features/meeting/booking/booking_pages_test.dart"
-      ],
-      "product_change": "RecoveryPanel binds captured controller, current route and still-visible original UUID across legitimate Widget replacement",
-      "fixture_change": "real-origin local completion futures and pointer events; bounded alternation of widget pump and real SQL barrier;2 added retained-element negative cases",
-      "preserved_original_pages": 17,
-      "added_pages": 2,
-      "local_mac19pages_routes2": "21 actual PASS,0skip0error",
-      "source_manifest_sha256": "b4fda331ed8c535139d39b0938d095b607a4950be6eefb35e2e807ca702f7ae7",
-      "local_receipt_sha256": "d37f38bef9aff5841320a089cd904bf2c0e78333b9c74b62f607ddd4e6f68e9a",
-      "cloud75_full623": "pending"
-    },
-    "revision_v7": {
-      "parent_public_commit": "76c02e6848940455e13729fa0ae601610d435ebe",
-      "parent_inputs_sha256": "bc320d298b55bc08bd859db15ddf7352502efe1b23bcef46a917b9cd56c0b159",
-      "parent_source249_digest": "f703de845481101f7450fb78f89293b13f87b6e267e1e2ee6d02323395a7a8d1",
-      "new_overlay_members": 23,
-      "replacements": 4,
-      "members_unchanged": 249,
-      "added_tests": 1,
-      "current_product_230_unchanged": true,
-      "fix": "Check same SessionCoordinator and original MessageHistoryAccess before late history mapping,conversation mapping/cacheassignment; no_run/send/ACK change",
-      "original_failure_test": "verbatim preserved",
-      "local_actual": "2read-race assertions RED+1ordinary positive ->3PASS; no full624",
-      "cloud76_full624": "pending",
-      "manifest_sha256": "ab1f74de46e0268a6a5db2c47dabf217ba07762a1ef1e260add0831d15feb6b8",
-      "local_verification_sha256": "526fa992549973b995b6218bc03bb3e1a396bbee8c95fbed39a081478200a2ae"
-    }
-  },
   "portable_members": {
-    "current230": 282,
-    "booking-custom249": 301
+    "current257": 309
   },
-  "original375": {
-    "source_digest": "55cff65aece25d9e012051892dfd42e097ea6e88d5979a30ada0b309cd3cda81",
-    "native_and_QA_members_excluded": 74,
-    "claim": "301 portable source inputs are not the complete375 native/QA environment"
+  "portable_digests": {
+    "current257": "013194c7b391d62383ea47825b2db0627061e9b2ee32930166530c466bd3a0ea"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -1691,5 +1607,21 @@
     "Mac-only SBPL runner",
     "all mutable task references"
   ],
-  "native_limits": "Linux unit/widget tests and analysis only; no Android/iOS, 16KiB runtime, RTC device or service acceptance"
+  "native_limits": "Linux unit/widget tests and analysis only; no Android/iOS, 16KiB runtime, RTC device or service acceptance",
+  "history": {
+    "accepted_current230": {
+      "git_commit": "292bea12ddcf250194beaf90ae62570faea1ab46",
+      "source_digest": "9e00a25ac45b277f3a1de33cd4c42c9c3b2893deb0d7969dcafcf8a313c446b1",
+      "expected_full": 548,
+      "actual_run": 38852506276,
+      "actual_full_and_analysis": "complete548PASS/analyze0"
+    },
+    "candidate249_v7": {
+      "git_commit": "292bea12ddcf250194beaf90ae62570faea1ab46",
+      "source_digest": "b5af11fd3cb10002872cd23f137d332790cf1d87e5dfa08157a1c1e0433027b1",
+      "actual_run": 38852506276,
+      "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
+    },
+    "reproduction": "Check out the explicit historical commit to use its v1 inputs and cohorts. Schema v2 has no current230 or booking-custom249 aliases and no candidate-body directory."
+  }
 }

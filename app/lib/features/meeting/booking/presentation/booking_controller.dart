@@ -112,7 +112,9 @@ final class BookingController extends ChangeNotifier {
     final key = intent.target ?? 'create';
     if (!canWrite || _busy.contains(key) ||
         (intent.operation == BookingOperation.create && !canCreate) ||
-        (intent.target != null && pending.any((e) => e.target == intent.target && e.id != intent.id))) return null;
+        (intent.target != null && pending.any((e) => e.target == intent.target && e.id != intent.id))) {
+      return null;
+    }
     _busy.add(key); _busy.add('intent:${intent.id}'); _held[intent.id] = intent; notice = null; _emit();
     try {
       final receipt = await repository.submit(intent); _check();

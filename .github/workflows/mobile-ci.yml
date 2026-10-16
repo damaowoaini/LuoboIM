@@ -33,16 +33,12 @@ concurrency:
 
 jobs:
   flutter-linux:
-    name: ${{ matrix.cohort }} / Linux unit + widget + analyze
+    name: current257 / Linux unit + widget + analyze
     runs-on: ubuntu-24.04
     timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      matrix:
-        cohort: [current230, booking-custom249]
     steps:
       - name: Set fresh workspace path
-        run: echo "MOBILE_WORK=$RUNNER_TEMP/mobile-${{ matrix.cohort }}" >> "$GITHUB_ENV"
+        run: echo "MOBILE_WORK=$RUNNER_TEMP/mobile-current257" >> "$GITHUB_ENV"
       - name: Checkout source without stored credentials
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -54,16 +50,16 @@ jobs:
       - name: Validate CI reporter tools
         run: python3 ci/mobile-test-tools.py
       - name: Prepare exact source, official Flutter and locked dependencies
-        run: bash ci/mobile-setup.sh '${{ matrix.cohort }}' "$MOBILE_WORK"
+        run: bash ci/mobile-setup.sh 'current257' "$MOBILE_WORK"
       - name: Test and analyze with no external network or host fixtures
         run: |
           sudo unshare --net -- bash "$GITHUB_WORKSPACE/ci/mobile-netns.sh" \
-            "$(id -un)" "$GITHUB_WORKSPACE" "$MOBILE_WORK" '${{ matrix.cohort }}'
+            "$(id -un)" "$GITHUB_WORKSPACE" "$MOBILE_WORK" 'current257'
       - name: Preserve actual results and setup failures
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          name: mobile-${{ matrix.cohort }}-${{ github.run_id }}
+          name: mobile-current257-${{ github.run_id }}
           path: ${{ env.MOBILE_WORK }}/evidence/
           if-no-files-found: warn
           retention-days: 14

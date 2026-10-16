@@ -23,7 +23,9 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
   bool get active => mounted && owner?.usable == true && ModalRoute.of(context)?.isCurrent == true;
   void backToList(BookingController controller, int epoch, String target) {
     if (!active || !identical(owner, controller) || epoch != request || target != widget.bookingID ||
-        !identical(ref.read(bookingControllerProvider).asData?.value, controller)) return;
+        !identical(ref.read(bookingControllerProvider).asData?.value, controller)) {
+      return;
+    }
     context.go('/meetings/bookings');
   }
   void bind(BookingController controller) {
@@ -53,7 +55,9 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
         FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('取消预约'))],
     ));
     if (confirm != true || !active || owner != captured || epoch != request ||
-        saved.id.value != widget.bookingID || !identical(row, saved) || !captured.canEdit(saved)) return;
+        saved.id.value != widget.bookingID || !identical(row, saved) || !captured.canEdit(saved)) {
+      return;
+    }
     final intentID = bookingUUID();
     final receipt = await captured.submit(BookingIntent(id: intentID, operation: BookingOperation.cancel,
       frozenBody: {'clientRequestID': intentID, 'bookingID': saved.id.value, 'expectedVersion': saved.version}));

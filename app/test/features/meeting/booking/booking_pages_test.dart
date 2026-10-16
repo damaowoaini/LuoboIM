@@ -70,7 +70,9 @@ void main() {
     final before = f.paths.where((x) => x == action).length, settled = await realCompleter<void>(tester);
     void changed() {
       if (!f.controller.isBusy('create') && !f.controller.unknownIDs.any(f.controller.isBusy) &&
-          f.paths.where((x) => x == action).length > before && !settled.isCompleted) settled.complete();
+          f.paths.where((x) => x == action).length > before && !settled.isCompleted) {
+        settled.complete();
+      }
     }
     f.controller.addListener(changed);
     try {

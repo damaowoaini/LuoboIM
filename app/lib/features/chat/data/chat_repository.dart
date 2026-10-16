@@ -117,10 +117,13 @@ final class ChatRepository {
   }
 
   Future<Conversation> conversation() async {
+    late final MessageHistoryAccess lease;
     final item = await _run((manager, access) async {
+      lease = access;
       final result = await manager.conversationManager.getMultipleConversation(
         conversationIDList: [conversationId],
       );
+      _checkCurrent(access);
       final matches = result.where(
         (item) => item.conversationID == conversationId,
       );
@@ -131,6 +134,7 @@ final class ChatRepository {
         now: now(),
       );
     });
+    _checkCurrent(lease);
     return _conversation = item;
   }
 
@@ -144,7 +148,7 @@ final class ChatRepository {
       lastMinSeq: lastMinSeq,
       count: 40,
     );
-    access.check();
+    _checkCurrent(access);
     if ((result.errCode ?? 0) != 0) throw AppFailure.fromCode(result.errCode!);
     final items = <ChatMessage>[];
     for (final item in result.messageList ?? <Message>[]) {

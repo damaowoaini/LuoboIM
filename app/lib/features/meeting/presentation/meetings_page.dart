@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../data/meeting_repository.dart';
 import '../meeting_providers.dart';
@@ -71,6 +72,8 @@ class _MeetingsPageState extends ConsumerState<MeetingsPage> {
       appBar: AppBar(
         title: const Text('会议'),
         actions: [
+          IconButton(tooltip: '我的预约（仅排期）', icon: const Icon(Icons.event_note),
+            onPressed: controller.usable ? () => context.push('/meetings/bookings') : null),
           IconButton(
             tooltip: '预约会议',
             onPressed: controller.usable ? _create : null,

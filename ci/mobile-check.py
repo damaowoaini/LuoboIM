@@ -226,21 +226,19 @@ def run(work, cohort):
         flutter = str(work / 'flutter/bin/flutter')
         tests = [flutter, 'test', '--no-pub', '--machine', '--concurrency=1', '--no-enable-vmservice']
         counts = {}
-        if cohort == 'booking-custom249':
-            target_expected = plan['candidate249']['expected_target_tests']
-            target_label = 'target' + str(target_expected)
-            log = guarded(tests + plan['candidate249']['target_paths'], work, guard, target_label)
-            counts['target'] = machine_summary(log.read_text(), target_expected)
-            write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
-        expected = 548 if cohort == 'current230' else plan['candidate249']['expected_full_tests']
+        target_expected = plan['current257']['expected_target_tests']
+        target_label = 'target' + str(target_expected)
+        log = guarded(tests + plan['current257']['target_paths'], work, guard, target_label)
+        counts['target'] = machine_summary(log.read_text(), target_expected)
+        write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
+        expected = plan['current257']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
         write_json(work / 'evidence/full.summary.json', counts['full'])
         guarded([flutter, 'analyze', '--no-pub', '--fatal-infos', '--fatal-warnings'],
                 work, guard, 'analyze')
         verify(work, cohort)
-        passed = {'state': 'completed_candidate_pending_native_acceptance' if cohort != 'current230'
-                  else 'completed_current_source_unit_widget_analysis',
+        passed = {'state': 'completed_current_source_unit_widget_analysis',
                   'cohort': cohort, 'authored_source_digest': digest,
                   'counts': counts, 'native_or_service_acceptance': False,
                   'network': 'fresh network namespace; synthetic in-process loopback only'}
@@ -272,7 +270,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current230', 'booking-custom249'), required=True)
+    p.add_argument('--cohort', choices=('current257',), required=True)
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')

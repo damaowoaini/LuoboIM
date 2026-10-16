@@ -7,6 +7,23 @@ import '../../chat/data/message_mapper.dart' show secureMediaUri;
 import '../../contacts/data/contacts_repository.dart' show mapGroup;
 import '../domain/group.dart';
 
+enum GroupRemovalState { acknowledged, rejected, unconfirmed, notAttempted }
+
+final class GroupRemovalItem {
+  const GroupRemovalItem(this.userId, this.state, [this.failure]);
+  final String userId;
+  final GroupRemovalState state;
+  final AppFailure? failure;
+}
+
+final class GroupRemovalReport {
+  GroupRemovalReport(List<GroupRemovalItem> items)
+    : items = List.unmodifiable(items);
+  final List<GroupRemovalItem> items;
+  bool get hasUnconfirmed =>
+      items.any((item) => item.state == GroupRemovalState.unconfirmed);
+}
+
 final class GroupRepository {
   GroupRepository(this.gateway, this.access);
   final OpenImGateway gateway;
@@ -91,8 +108,21 @@ final class GroupRepository {
     String? name,
     String? announcement,
     String? avatar,
+    bool Function()? isCurrent,
   }) async {
-    await _manager(id);
+    void checkCurrent() {
+      access.check();
+      if (isCurrent?.call() == false) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+    }
+
+    checkCurrent();
+    final profile = await _manager(id);
+    checkCurrent();
+    if (avatar != null && profile.summary.status == 2) {
+      throw const AppFailure(FailureKind.permissionDenied);
+    }
     if (name != null && (name.trim().isEmpty || name.length > 128)) {
       throw const AppFailure(FailureKind.invalidInput);
     }
@@ -103,6 +133,9 @@ final class GroupRepository {
       throw const AppFailure(FailureKind.invalidInput);
     }
     await _sdk((manager) async {
+      // The role lookup above is asynchronous. Recheck the original view at
+      // the actual native dispatch boundary, never acquire a new page's lease.
+      checkCurrent();
       await manager.groupManager.setGroupInfo(
         GroupInfo(
           groupID: id,
@@ -241,6 +274,110 @@ final class GroupRepository {
       }
       await manager.groupManager.kickGroupMember(groupID: id, userIDList: ids);
     });
+  }
+
+  /// One accepted native intent per user, in the frozen selection order.
+  /// Never replay a dispatched operation after a missing/ambiguous ACK.
+  Future<GroupRemovalReport> removeSelected(
+    String id,
+    List<String> userIds, {
+    required bool Function() isCurrent,
+    void Function(GroupRemovalItem item)? onResult,
+  }) async {
+    final ids = List<String>.unmodifiable(userIds);
+    if (ids.isEmpty ||
+        ids.length > 999 ||
+        ids.any((uid) => uid.isEmpty) ||
+        ids.toSet().length != ids.length) {
+      throw const AppFailure(FailureKind.invalidInput);
+    }
+    final items = <GroupRemovalItem>[];
+    void record(GroupRemovalItem item) {
+      items.add(item);
+      if (isCurrent() && access.isCurrent) onResult?.call(item);
+    }
+
+    bool stopped = false;
+    for (final userId in ids) {
+      if (stopped || !isCurrent() || !access.isCurrent) {
+        record(GroupRemovalItem(userId, GroupRemovalState.notAttempted));
+        continue;
+      }
+      var dispatched = false;
+      try {
+        final group = await _manager(id);
+        access.check();
+        if (!isCurrent()) throw const AppFailure(FailureKind.cancelled);
+        if (group.summary.status == 2) {
+          throw const AppFailure(FailureKind.permissionDenied);
+        }
+        await _sdk((manager) async {
+          // Read both roles together; the owner can remove admins, an admin
+          // only ordinary members. No send/mute permission is consulted.
+          final actor = access.credentials.userId;
+          if (actor == userId) {
+            throw const AppFailure(FailureKind.permissionDenied);
+          }
+          final members = await manager.groupManager.getGroupMembersInfo(
+            groupID: id,
+            userIDList: [actor, userId],
+          );
+          access.check();
+          if (!isCurrent()) throw const AppFailure(FailureKind.cancelled);
+          if (members.length != 2 ||
+              members.any((member) => member.groupID != id) ||
+              members.map((member) => member.userID).toSet().length != 2) {
+            throw const AppFailure(FailureKind.invalidResponse);
+          }
+          final me = members
+              .where((member) => member.userID == actor)
+              .firstOrNull;
+          final target = members
+              .where((member) => member.userID == userId)
+              .firstOrNull;
+          if (me == null ||
+              target == null ||
+              !mapGroupMember(me).canModerate(mapGroupMember(target))) {
+            throw const AppFailure(FailureKind.permissionDenied);
+          }
+          if (!isCurrent()) throw const AppFailure(FailureKind.cancelled);
+          dispatched = true;
+          final result = await manager.groupManager.kickGroupMember(
+            groupID: id,
+            userIDList: [userId],
+          );
+          // Current server response is empty and the public core returns only
+          // an error. Do not invent success semantics for unknown enterprise
+          // per-user result values, duplicates, or partial DTOs.
+          if (result.isNotEmpty) {
+            throw const AppFailure(FailureKind.invalidResponse);
+          }
+        });
+        record(GroupRemovalItem(userId, GroupRemovalState.acknowledged));
+      } catch (error) {
+        final failure = error is AppFailure
+            ? error
+            : const AppFailure(FailureKind.unknown);
+        if (dispatched) {
+          // Even permission errors can follow a committed delete when the
+          // post-delete callback rejects. A code alone is not rollback proof.
+          record(
+            GroupRemovalItem(userId, GroupRemovalState.unconfirmed, failure),
+          );
+          stopped = true;
+        } else if (failure.kind == FailureKind.permissionDenied &&
+            isCurrent() &&
+            access.isCurrent) {
+          record(GroupRemovalItem(userId, GroupRemovalState.rejected, failure));
+        } else {
+          record(
+            GroupRemovalItem(userId, GroupRemovalState.notAttempted, failure),
+          );
+          stopped = true;
+        }
+      }
+    }
+    return GroupRemovalReport(items);
   }
 
   Future<void> invite(String id, List<String> userIds) => _sdk((manager) async {
