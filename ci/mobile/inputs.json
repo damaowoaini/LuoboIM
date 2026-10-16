@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v12",
-  "state": "current316_font_and_booking_lint_adopted_local_targeted_only_final_regression_pending",
+  "schema": "luobo.mobile.portable-ci-inputs.v13",
+  "state": "current323_chat_background_targeted42_verified_final_regression_pending",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -133,6 +133,47 @@
       "command_elapsed_seconds_Root_report": 13.37,
       "all8_Dart_files_fatal_infos_analysis_Root_report": "PASS0",
       "actual_new_target303_full985": false
+    },
+    "chat_background_actual42": {
+      "root_final_manifest": {
+        "path": "references/integration/mobile-chat-background-final-candidate/candidate-manifest.json",
+        "bytes": 6283,
+        "sha256": "4ac70a70ad92f59ae5cba5a05c00fb03f4fe7c72b96f82607ae17c1b891c9764"
+      },
+      "root_targeted_acceptance": {
+        "path": "references/integration/mobile-chat-background-final-candidate/targeted-acceptance.json",
+        "bytes": 8713,
+        "sha256": "cec3beeddbcb7f07f5b2ddf8e12be007176965a069000e1149a6c05a74c9197f"
+      },
+      "first42_log": {
+        "path": "references/integration/mobile-background-local-20261016/tests-first.log",
+        "bytes": 67300,
+        "sha256": "5030c6960fba2f25a1adf1c1c882b558beeaf48575e5913728d5d419536f65d4"
+      },
+      "rerun15_log": {
+        "path": "references/integration/mobile-background-local-20261016/tests-fixture-r2.log",
+        "bytes": 22554,
+        "sha256": "3f707ce09dadfea18dc7f371a071d6bb15d42825f334d869613dfbdc0b108dc6"
+      },
+      "first42_passed": 29,
+      "first42_errors_retained": 13,
+      "unaffected_success_reused": 27,
+      "targeted_rerun_passed": 15,
+      "aggregate_unique_passed": 42,
+      "skipped": 0,
+      "combined_full_executed": false,
+      "initial_widget_fixture_instances": 22,
+      "actual_cleanup_markers": [
+        "drain.begin",
+        "drain.end",
+        "sdk.begin",
+        "sdk.end",
+        "unmount.begin",
+        "unmount.end"
+      ],
+      "root_final9_changed_file_analysis": "zero issues by reused clean checks plus targeted braces/fixture rechecks",
+      "rerun_elapsed_seconds": 16.803,
+      "rerun_min_free_bytes": 3274522624
     }
   },
   "toolchain": {
@@ -409,10 +450,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current316": 368
+    "current323": 375
   },
   "portable_digests": {
-    "current316": "82fc3b8b03839aa6456a62f72df71806a3940b70770ebaa8fa291abd58f4497f"
+    "current323": "d344e39862531a7c4c52f0aad4519f166c540336bee40c75a03da15c28871b3c"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -854,14 +895,19 @@
       "path": "references/integration/cloud-mobile-ci/run-38914699809-agent/root-result-review.json",
       "bytes": 842,
       "sha256": "4c4e8b793372c9f567ed74c798f962c46bdc8844e285f3b4ec91b1f5382de5d1"
+    },
+    "current316_CI_expected303985_not_combined_execution": {
+      "path": "references/integration/mobile323-background-ci-candidate/before/ci/mobile/inputs.json",
+      "bytes": 131317,
+      "sha256": "c7f1ed02886d07daee6888a4391892eedb261447cc1847214aa4ee205bcb819c"
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current316",
-    "members": 316,
-    "reference_source_digest": "fe85a08bd28a4906e8148f17542f242a0bc4eca8eb76c615a40685f3c0dc2cc1",
+    "working_cohort": "current323",
+    "members": 323,
+    "reference_source_digest": "c23f7f42b3e82148787245c16dfd7a7df2cc6d7200e022e1a46dd7d41ff63dfd",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -922,8 +968,8 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 632908,
-    "sha256": "5806e134d1e10bdb09dc712da437ee1cb2cc7ab2f7ba28c052afe4d63d7ace50"
+    "bytes": 811470,
+    "sha256": "9d861c300d9198513bf8575a1bf970ace25a5e794fd00c7f2b060a629d1e0f4e"
   },
   "call_records_cleanup": {
     "named_fixtures": [
@@ -1435,9 +1481,9 @@
     "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
     "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
   },
-  "current316": {
-    "members": 316,
-    "source_digest": "9450b7bd8b2c65a53461f5eebba39b037bea8f83f6f2d134a07c4274721e203b",
+  "current323": {
+    "members": 323,
+    "source_digest": "841373cda757789d6709d0a55879cd9ba0914bd53955513a3ed7a30088c26ed1",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1595,6 +1641,11 @@
         "sha256": "9be658add45afe824261f7e1e2d006694ac6652ae74a108f70ca7011ded41106"
       },
       {
+        "path": "app/lib/features/chat/data/chat_background_store.dart",
+        "bytes": 16234,
+        "sha256": "87701f120338fbfe924f3aa9efa9050dc7a520669ae3d142d160c95a05267e5d"
+      },
+      {
         "path": "app/lib/features/chat/data/chat_reading_preferences.dart",
         "bytes": 5025,
         "sha256": "5c89cdefde7fd731172604d6eb73c59a6382262d6d72b3fc81a6749cef6d94a3"
@@ -1650,6 +1701,11 @@
         "sha256": "eeff2f1cfc2dc211bc73abc6ebad15a7b043d3ed7e5f345ff53e0ad59e492b01"
       },
       {
+        "path": "app/lib/features/chat/presentation/chat_background_page.dart",
+        "bytes": 10358,
+        "sha256": "5eb914c9bc78903fbce1865a790b380887e60d42c0a20aa3f253bb189fdc398e"
+      },
+      {
         "path": "app/lib/features/chat/presentation/chat_batch_selection.dart",
         "bytes": 5623,
         "sha256": "a69251efef048ab106dbfff9f9eb0aaf3f91e23ddb927348bea216d334816a55"
@@ -1696,8 +1752,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 66213,
-        "sha256": "3ea907161fea1fd21b09f3dcf348b29cb15c80522ad5ca665df0207b143061ac"
+        "bytes": 70411,
+        "sha256": "9914a9b30d44cb6f4750ef62e00346fcfd29fb8716bf4f0187eb5674958ea3cc"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
@@ -2271,8 +2327,8 @@
       },
       {
         "path": "app/lib/providers.dart",
-        "bytes": 6944,
-        "sha256": "32ddb9d5e441e4c3e68db42227fe66513535ee9b2556fdf241de09dc1c54a354"
+        "bytes": 7220,
+        "sha256": "fc31b1e1a8b2380b086abb28e482681abe136559068679b14aa94f896d46fb92"
       },
       {
         "path": "app/pubspec.lock",
@@ -2428,6 +2484,31 @@
         "path": "app/test/features/chat/chat_attachment_test.dart",
         "bytes": 6704,
         "sha256": "c8f8c207e0365fc386cb0fff2a1d1246a807b7d3193f48bca6d486cf476a661c"
+      },
+      {
+        "path": "app/test/features/chat/chat_background_entry_test.dart",
+        "bytes": 6364,
+        "sha256": "1b5ffc56ffdc08c990b13afc155bc8667230b66aa04effb529469be19c9f0a70"
+      },
+      {
+        "path": "app/test/features/chat/chat_background_fixture.dart",
+        "bytes": 9546,
+        "sha256": "3c1e2c7d3868720758a1b6ebe8846536a23a994a12800810c7b90b1de273cc37"
+      },
+      {
+        "path": "app/test/features/chat/chat_background_page_test.dart",
+        "bytes": 12874,
+        "sha256": "6a0e885fa28befd39ad4dd91ab4029ac30aa5a00115293097ba2d20502c5724a"
+      },
+      {
+        "path": "app/test/features/chat/chat_background_recovery_test.dart",
+        "bytes": 12692,
+        "sha256": "8be26bb4c836dda1ccbad45ea2b89033c16e1b941064a132fa8026df73e239c3"
+      },
+      {
+        "path": "app/test/features/chat/chat_background_store_test.dart",
+        "bytes": 10093,
+        "sha256": "0b912f5a55056334c4582ccf7d7fd389fa8879c1cc7dc347cc021b579e8ef93a"
       },
       {
         "path": "app/test/features/chat/chat_business_test.dart",
@@ -3020,8 +3101,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 303,
-    "expected_full_tests": 985,
+    "expected_target_tests": 345,
+    "expected_full_tests": 1027,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -3043,7 +3124,11 @@
       "test/features/meeting/booking/booking_capability_discovery_test.dart",
       "test/features/chat/chat_reading_preferences_test.dart",
       "test/features/chat/chat_font_size_page_test.dart",
-      "test/features/chat/chat_font_entry_test.dart"
+      "test/features/chat/chat_font_entry_test.dart",
+      "test/features/chat/chat_background_store_test.dart",
+      "test/features/chat/chat_background_page_test.dart",
+      "test/features/chat/chat_background_entry_test.dart",
+      "test/features/chat/chat_background_recovery_test.dart"
     ]
   }
 }

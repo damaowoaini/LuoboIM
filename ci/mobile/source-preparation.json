@@ -1,68 +1,76 @@
 {
-  "schema": "luobo.mobile.source-preparation.v12",
-  "state": "current316_font_and_booking_lint_adopted_local_targeted_only_final_regression_pending",
-  "source316_digest": "9450b7bd8b2c65a53461f5eebba39b037bea8f83f6f2d134a07c4274721e203b",
-  "portable368_digest": "82fc3b8b03839aa6456a62f72df71806a3940b70770ebaa8fa291abd58f4497f",
-  "reference316_digest": "fe85a08bd28a4906e8148f17542f242a0bc4eca8eb76c615a40685f3c0dc2cc1",
+  "schema": "luobo.mobile.source-preparation.v13",
+  "state": "current323_chat_background_targeted42_verified_final_regression_pending",
+  "source323_digest": "841373cda757789d6709d0a55879cd9ba0914bd53955513a3ed7a30088c26ed1",
+  "portable375_digest": "d344e39862531a7c4c52f0aad4519f166c540336bee40c75a03da15c28871b3c",
+  "reference323_digest": "c23f7f42b3e82148787245c16dfd7a7df2cc6d7200e022e1a46dd7d41ff63dfd",
   "effective_vector": {
-    "path": "references/integration/mobile316-font-ci-candidate/effective-source-vector.json",
-    "bytes": 59428,
-    "sha256": "b843992e2126971502e348ffcb053d2dfe9a083517d60bf8fce4cb05d1c3537c"
+    "path": "references/integration/mobile323-background-ci-candidate/effective-source-vector.json",
+    "bytes": 131312,
+    "sha256": "df747455d76412d6b0b518ef6dc09d2cd32fa371d05e19c45759a619cdd7550e"
   },
-  "parent_preparation_before": {
-    "path": "references/integration/mobile316-font-ci-candidate/before/ci/mobile/source-preparation.json",
-    "bytes": 33696,
-    "sha256": "46c0635c87b63030cc66103f816d4c92d2c4aaee9492e278d0309fd2e3de72d2"
+  "parent_preparation": {
+    "path": "references/integration/mobile323-background-ci-candidate/before/ci/mobile/source-preparation.json",
+    "bytes": 3462,
+    "sha256": "7911b374798f352da79b45f803b3188a0d8bb477b7de5f82d857d75a0f79ee07"
   },
-  "font_frozen": {
-    "path": "references/integration/mobile-chat-font-size-candidate/candidate-manifest.json",
-    "bytes": 6321,
-    "sha256": "6ec06bc6b94d6041d375bf4a3699b85b3d8130f803e9ca3a501d6a24c9f89624"
+  "background_final": {
+    "path": "references/integration/mobile-chat-background-final-candidate/candidate-manifest.json",
+    "bytes": 6283,
+    "sha256": "4ac70a70ad92f59ae5cba5a05c00fb03f4fe7c72b96f82607ae17c1b891c9764"
   },
-  "booking_lint_frozen": {
-    "path": "references/integration/mobile-booking-capability-lint-r2-candidate/candidate-manifest.json",
-    "bytes": 2043,
-    "sha256": "6f6718bc79385e1ca4af3ef922d48abf0ba5f4904673fa9bf79ef6f637588838"
-  },
-  "actual_font_targeted": {
-    "Root_actual_log": {
-      "path": "references/integration/batch-fixes-20261016/font-local-attempt3/tests.log",
-      "bytes": 19454,
-      "sha256": "f341ba81cbea20969fcfc16533d02932bcdcd3216ed1542f66f413b201f56bf8"
+  "actual_background_targeted": {
+    "root_final_manifest": {
+      "path": "references/integration/mobile-chat-background-final-candidate/candidate-manifest.json",
+      "bytes": 6283,
+      "sha256": "4ac70a70ad92f59ae5cba5a05c00fb03f4fe7c72b96f82607ae17c1b891c9764"
     },
-    "visible_success": 22,
-    "hidden_success": 3,
-    "error": 0,
-    "skip": 0,
-    "unique_true_footer": true,
-    "new22_exact": true,
-    "SDK_cleanup_instances": 11,
-    "cleanup_markers": [
+    "root_targeted_acceptance": {
+      "path": "references/integration/mobile-chat-background-final-candidate/targeted-acceptance.json",
+      "bytes": 8713,
+      "sha256": "cec3beeddbcb7f07f5b2ddf8e12be007176965a069000e1149a6c05a74c9197f"
+    },
+    "first42_log": {
+      "path": "references/integration/mobile-background-local-20261016/tests-first.log",
+      "bytes": 67300,
+      "sha256": "5030c6960fba2f25a1adf1c1c882b558beeaf48575e5913728d5d419536f65d4"
+    },
+    "rerun15_log": {
+      "path": "references/integration/mobile-background-local-20261016/tests-fixture-r2.log",
+      "bytes": 22554,
+      "sha256": "3f707ce09dadfea18dc7f371a071d6bb15d42825f334d869613dfbdc0b108dc6"
+    },
+    "first42_passed": 29,
+    "first42_errors_retained": 13,
+    "unaffected_success_reused": 27,
+    "targeted_rerun_passed": 15,
+    "aggregate_unique_passed": 42,
+    "skipped": 0,
+    "combined_full_executed": false,
+    "initial_widget_fixture_instances": 22,
+    "actual_cleanup_markers": [
+      "drain.begin",
+      "drain.end",
       "sdk.begin",
       "sdk.end",
       "unmount.begin",
       "unmount.end"
     ],
-    "pure_scaler_widget_has_no_SDK": true,
-    "command_elapsed_seconds_Root_report": 13.37,
-    "all8_Dart_files_fatal_infos_analysis_Root_report": "PASS0",
-    "actual_new_target303_full985": false
+    "root_final9_changed_file_analysis": "zero issues by reused clean checks plus targeted braces/fixture rechecks",
+    "rerun_elapsed_seconds": 16.803,
+    "rerun_min_free_bytes": 3274522624
   },
-  "parent310_business_result": {
-    "path": "references/integration/cloud-mobile-ci/run-38914699809-agent/root-result-review.json",
-    "bytes": 842,
-    "sha256": "4c4e8b793372c9f567ed74c798f962c46bdc8844e285f3b4ec91b1f5382de5d1"
-  },
+  "parent316_history": "Original281/963 business cloud PASS; font22 local targeted PASS and booking controller targeted analysis0. Composed303/985 never executed, retained as exact expected-name layer.",
   "expected_not_actual": {
-    "target303": 303,
-    "full985": 985,
+    "target345": 345,
+    "full1027": 1027,
     "strict_analysis": 0
   },
-  "names": "Exact original281/963 plus all22 locally successful font names; every older name row/multiplicity retained. No hidden load can replace a visible case.",
-  "cleanup": "Existing35 recorder/14unmount,76creation/safe6,11Next parsers unchanged. Newfont local log proves11SDK four-marker teardowns; pure nonlinear widget has no SDK. No new cleanup parser.",
-  "control": "Same35Python checks,9guardAST+2cleanup parsers,4GiB admission/1GiB .2/cap768MiB/900s/netns;SDK51/migration1/174lockeddeps unchanged.",
-  "execution_policy": "workflow_dispatch only preserved from current queued workflow. No full per feature/batch; once after all known issues fixed and targeted checks clean. No dispatch/push/localfull in this draft.",
-  "reference": "Defaultoff exact4 historical search replacements in full316; strict1namedassertFAIL1oldfilterPASS parser unchanged.",
-  "public_inventory": "Strict business inventory, no check.sh exception. Private helper remains private; public absent.",
-  "native_service_acceptance": false
+  "names": "Actual Root42 plus exact previous303/985 composed inventories; all previous row multiplicities preserved. Hidden loader cannot replace visible success.",
+  "cleanup": "Existing35recorder/14unmount,76creation/safe6 and11Next parsers/AST unchanged; final background fixture retains awaited six-stage teardown. Root actual first42 and rerun15 logs prove exact fixture sequences. No new cleanup parser.",
+  "control": "Original35Python checks preserved;2new composition-rejection checks. Only changed Descriptor4+new2 are run in this proposal.11protectedAST/4GiB admission/1GiB .2/cap768MiB/900s/netns/native gate/SDK51+migration1/174lockeddeps unchanged.",
+  "execution_policy": "Manual-only workflow preserved. No full per feature/batch; one final full after all known issues fixed and targeted checks clean. No dispatch or full execution.",
+  "reference": "Default-off full323 with exact4 original historical search replacements; only entry2 strict1namedassertFAIL1oldfilterPASS.",
+  "public_inventory": "Zero private-helper exceptions; privatecheck.sh stays private and public absent.",
+  "native_or_service_acceptance": false
 }

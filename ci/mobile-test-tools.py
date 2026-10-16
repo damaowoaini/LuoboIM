@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current316 target303/full985."""
+"""Pure Python CI gate checks, separate from current323 target345/full1027."""
 import copy
 import importlib.util
 import json
@@ -134,13 +134,13 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical_cohorts_cannot_alias316(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310'):
+    def test_historical_cohorts_cannot_alias323(self):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current316'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current323'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -185,6 +185,25 @@ class RequiredNamesTests(unittest.TestCase):
     def test_required_count_boolean_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'invalid required'):
             check.required_name_summary(named_report(['old']), 1, [{'name': 'old', 'count': True}])
+
+
+class BackgroundInventoryTests(unittest.TestCase):
+    def rejected_inventory(self, change):
+        plan = check.source.descriptor()
+        body = check.source.regular(check.source.REPO / plan['required_test_names']['path'])
+        names = json.loads(body); change(names)
+        body = json.dumps(names).encode()
+        plan = copy.deepcopy(plan)
+        plan['required_test_names'].update(bytes=len(body), sha256=check.source.sha(body))
+        with mock.patch.object(check.source, 'regular', return_value=body):
+            with self.assertRaisesRegex(ValueError, 'background names do not preserve'):
+                check.source.required_names(plan)
+
+    def test_same_count_target_cannot_replace_background_case(self):
+        self.rejected_inventory(lambda n: n['current_target345'][-1].update(name='forged same-count replacement'))
+
+    def test_same_count_parent_full_cannot_replace_original_case(self):
+        self.rejected_inventory(lambda n: n['parent_full985'][-1].update(name='forged old-case replacement'))
 
 
 class CleanupTests(unittest.TestCase):

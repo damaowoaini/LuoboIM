@@ -1,32 +1,31 @@
-# Mobile316 font / booking lint CI metadata
+# Mobile323 chat background CI metadata
 
-This revision binds already-adopted font8 and the one booking lint correction.
-No product files, dependency versions or lock bytes change here. Root locally
-verified all8 Dart files with fatalinfos0 and actual font22 PASS (11SDK fixture
-four-stage teardowns; the nonlinear scaling widget has no SDK). The parent
-cloud run38914699809 completed281/963 PASS; its strict2infos are preserved as
-history, and the booking controller alone now has local fatalinfos0.
+This draft overlays the frozen9 background source/fixture files onto316.
+Root verified42 unique cases:27 unaffected initial successes reused plus15
+explicit rerun successes, with0skip/error in that rerun. The first42 run's
+29PASS/13ERROR and its repaired fixture history remain evidence. Final9
+changed files have zero fatal-info analysis using the recorded targeted checks.
+This is source/widget acceptance; real picker/device/private-storage lifecycle
+and native/service acceptance remain pending.
 
-Future target303=original281+font22; full985=original963+font22, followed by
-strictanalysis0. These combined counts have NOT been run or accepted. Exact
-successful visible-name multisets preserve every parent case and multiplicity.
-Three font test files join the target paths; fixture is not a separate target.
+Future target345=original303+background42; full1027=original985+background42,
+then strictanalysis0. Neither combined run was executed. Parent303/985 is the
+retained composed name layer (cloud281/963 and localfont22), not an accepted
+combined full run. Required42 names come from Root's actual acceptance record.
+All previous visible-success names and multiplicities remain mandatory.
 
-The CURRENT manual-only workflow is the baseline: workflow_dispatch stays the
-sole trigger, with read-only permissions, same official action SHAs and always
-artifact preservation. Only cohort arguments/labels and303/985 labels change.
-Do not restore historical push/PR triggers. Per user policy, accumulate known
-fixes and validate them with targeted local checks; run a full regression ONCE
-after known issues are resolved and targeted checks reveal no further problems.
-This metadata draft does not dispatch, install, build, push or run full tests.
+Manual-only workflow_dispatch, read-only permissions, action SHAs, setup/network
+namespace, process-group/resource gates and always-artifact preservation stay.
+No full per feature/batch: run one final full after all known issues are fixed
+and targeted checks are clean. This draft does not apply, dispatch or push.
 
-Same35Python checks,9guard functions and2cleanup parsers, original35callrecords
-(33normal/2expected failures)/14unmount,76creation/safe6 and11Next cleanup
-contracts;174 dependency blocks, SDK51+migration1 and official toolchain remain
-exact. Same4GiB initial/1GiB dynamic/.2s/768MiB/900s/process-group/latchedfailure,
-fresh network namespace and strict machine completion/hidden/skip/error gates.
-No new runner architecture or cleanup parser. Optional original search reference
-stays defaultoff with4 historical replacements and1namedassertFAIL1filterPASS.
-Public inventory has zero localhelper exceptions; app/tool/check.sh is absent.
-Source/widget evidence does not establish native, old-sandbox migration, RTC,
-real device preferences, media or deployed-service acceptance.
+The original35 Python cases remain;2 small inventory-composition negatives are
+added. Only changed Descriptor4 and new2 need local targeted execution here.
+The11 protected guard/parser ASTs,35 recorder/14unmount,76creation/safe6 and
+11Next cleanup contracts remain unchanged. Background actual logs prove22
+initial widget fixtures and affected-rerun six-stage awaited teardown; its real
+fixture source remains in CI, without an additional generic cleanup parser.
+174locked dependencies,SDK51+migration1/toolchain/native gate stay exact.
+Same4GiB initial/1GiB dynamic/.2s/768MiB/900s controls. Optional reference stays
+default-off:4 pinned search baseline bodies in full323, entry2 only, strict
+1namedassertFAIL+1oldfilterPASS. Public inventory has no check.sh exception.

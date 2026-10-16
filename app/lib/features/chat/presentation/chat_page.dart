@@ -12,6 +12,7 @@ import '../../../core/error/app_failure.dart';
 import '../../../core/im/open_im_gateway.dart';
 import '../../../core/network/tenant_api.dart';
 import '../../../core/tenant/session_access.dart';
+import '../../../core/tenant/session_coordinator.dart';
 import '../../../providers.dart';
 import '../../favorite/domain/favorite.dart';
 import '../../favorite/favorite_providers.dart';
@@ -20,6 +21,8 @@ import '../../conversation/data/conversation_repository.dart';
 import '../data/chat_repository.dart';
 import '../data/chat_reading_preferences.dart';
 import 'chat_font_size_page.dart';
+import '../data/chat_background_store.dart';
+import 'chat_background_page.dart';
 import '../domain/chat_message.dart';
 import '../domain/chat_mention.dart';
 import '../../group/data/group_repository.dart';
@@ -86,6 +89,29 @@ class _ChatPageState extends ConsumerState<ChatPage>
   bool _fontReadFailed = false;
   int _fontRead = 0, _fontIntent = 0;
 
+  late final ChatBackgroundPreferences _backgroundPreferences;
+  StreamSubscription<ChatBackgroundChange>? _backgroundChanges;
+  StreamSubscription<int>? _backgroundInvalidations, _backgroundAccess;
+  StreamSubscription<SessionSnapshot>? _backgroundSessions;
+  File? _background;
+  bool _backgroundReadFailed = false;
+  int _backgroundRead = 0;
+  bool _backgroundRetired = false;
+  bool get _backgroundCurrent => !_backgroundRetired && _backgroundPreferences.current &&
+      _backgroundPreferences.conversationId == widget.conversationId &&
+      controller.repository.conversationId == widget.conversationId;
+  Future<void> _loadBackground() async {
+    final ticket = ++_backgroundRead;
+    try {
+      final value = await _backgroundPreferences.read();
+      if (!mounted || ticket != _backgroundRead || !_backgroundCurrent) return;
+      setState(() { _background = value.unavailable ? null : value.image; _backgroundReadFailed = value.unavailable; });
+    } catch (_) {
+      if (!mounted || ticket != _backgroundRead || !_backgroundCurrent) return;
+      setState(() => _backgroundReadFailed = true);
+    }
+  }
+
   Future<void> _loadReadingPreferences() async {
     final ticket = ++_fontRead;
     try {
@@ -133,6 +159,30 @@ class _ChatPageState extends ConsumerState<ChatPage>
       setState(() { _fontFactor = change.factor; _fontReadFailed = false; });
     });
     unawaited(_loadReadingPreferences());
+    _backgroundPreferences = ChatBackgroundPreferences(ref.read(chatBackgroundStoreProvider),
+      controller.repository.session, widget.conversationId);
+    _backgroundChanges = _backgroundPreferences.store.changes.listen((change) {
+      if (!mounted || !_backgroundCurrent ||
+          change.accountKey != _backgroundPreferences.accountKey ||
+          change.conversationId != widget.conversationId) {
+        return;
+      }
+      ++_backgroundRead;
+      setState(() { _background = change.snapshot.image; _backgroundReadFailed = false; });
+    });
+    _backgroundInvalidations = controller.repository.session.invalidations.listen((_) {
+      ++_backgroundRead;
+      if (mounted) setState(() => _background = null);
+    });
+    void backgroundOwnerChanged() {
+      if (mounted && !_backgroundCurrent) {
+        ++_backgroundRead;
+        setState(() => _background = null);
+      }
+    }
+    _backgroundAccess = controller.repository.session.accessChanges.listen((_) => backgroundOwnerChanged());
+    _backgroundSessions = controller.repository.session.changes.listen((_) => backgroundOwnerChanged());
+    unawaited(_loadBackground());
     selection = ChatBatchSelection(controller)..addListener(_changed);
     controller.addListener(_changed);
     input.addListener(_inputChanged);
@@ -302,10 +352,29 @@ class _ChatPageState extends ConsumerState<ChatPage>
   }
 
   @override
+  void didUpdateWidget(covariant ChatPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.conversationId != widget.conversationId) {
+      // The production router normally creates a CID-keyed fresh ChatPage.
+      // If a caller reuses this State, retire its original background binding
+      // permanently; never paint/read/admit a new CID through the old owner.
+      _backgroundRetired = true;
+      ++_backgroundRead;
+      _background = null;
+      _backgroundReadFailed = false;
+    }
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     ++_fontRead; ++_fontIntent;
     unawaited(_readingChanges?.cancel());
+    ++_backgroundRead;
+    unawaited(_backgroundChanges?.cancel());
+    unawaited(_backgroundInvalidations?.cancel());
+    unawaited(_backgroundAccess?.cancel());
+    unawaited(_backgroundSessions?.cancel());
     selection.removeListener(_changed);
     selection.dispose();
     controller.removeListener(_changed);
@@ -438,7 +507,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
                     ],
                   ),
                 Expanded(
-                  child: controller.loading && controller.messages.isEmpty
+                  child: ChatBackgroundSurface(
+                    image: _backgroundCurrent ? _background : null,
+                    child: controller.loading && controller.messages.isEmpty
                       ? const Center(child: CircularProgressIndicator())
                       : controller.messages.isEmpty
                       ? Center(
@@ -501,6 +572,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
                             },
                           ),
                         ),
+                  ),
                 ),
                 if (selection.active || selection.busy)
                   ChatBatchToolbar(
@@ -1679,6 +1751,19 @@ class _ChatPageState extends ConsumerState<ChatPage>
               },
             ),
             ListTile(
+              leading: const Icon(Icons.wallpaper_outlined),
+              title: const Text('聊天背景'),
+              subtitle: _backgroundReadFailed ? const Text('背景读取失败，打开后可重试') : null,
+              onTap: () {
+                final route = fontSheet, navigator = fontSheet?.navigator;
+                if (fontCurrent() && _backgroundCurrent &&
+                    route?.isCurrent == true && route?.isActive == true &&
+                    navigator != null && navigator.mounted) {
+                  navigator.pop('background');
+                }
+              },
+            ),
+            ListTile(
               title: Text(item.pinned ? '取消置顶' : '置顶会话'),
               onTap: () => Navigator.pop(context, 'pin'),
             ),
@@ -1698,7 +1783,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
         ),
       )),
     );
-    if (action == 'font') {
+    if (action == 'font' || action == 'background') {
       final sheet = fontSheet;
       if (sheet != null) await sheet.completed;
       if (!mounted || !fontCurrent() || fontOrigin == null || !fontOrigin.isCurrent ||
@@ -1706,9 +1791,12 @@ class _ChatPageState extends ConsumerState<ChatPage>
           !identical(fontOrigin.navigator, fontNavigator)) {
         return;
       }
+      if (action == 'background' && !_backgroundCurrent) return;
       await fontNavigator.push<void>(MaterialPageRoute<void>(
-        builder: (_) => ChatFontSizePage(preferences: _readingPreferences,
-          sourceCurrent: fontCurrent)));
+        builder: (_) => action == 'background'
+          ? ChatBackgroundPage(preferences: _backgroundPreferences,
+              sourceCurrent: () => fontCurrent() && _backgroundCurrent, fontFactor: _fontFactor)
+          : ChatFontSizePage(preferences: _readingPreferences, sourceCurrent: fontCurrent)));
       return;
     }
     if (action == null || !mounted || !_acceptsPortal(lease)) return;

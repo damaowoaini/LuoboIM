@@ -312,7 +312,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full316 tree; restore exact after4 even if the reference fails."""
+    """Separate full323 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -383,8 +383,8 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after316_and_primary_source_reverified',
-                    'source_digest': plan['current316']['source_digest'],
+                   {'state': 'after323_and_primary_source_reverified',
+                    'source_digest': plan['current323']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
 
 
@@ -503,12 +503,12 @@ def run(work, cohort, reference=False):
         if reference:
             counts['reference_entry'] = run_reference_entry(work, cohort, plan, tests, guard)
         verify(work, cohort)
-        target_expected = plan['current316']['expected_target_tests']
+        target_expected = plan['current323']['expected_target_tests']
         target_label = 'target' + str(target_expected)
-        log = guarded(tests + plan['current316']['target_paths'], work, guard, target_label)
+        log = guarded(tests + plan['current323']['target_paths'], work, guard, target_label)
         counts['target'] = machine_summary(log.read_text(), target_expected)
         required = source.required_names(plan)
-        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target303'])
+        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target345'])
         cleanup = source.cleanup_contract(plan, required)
         counts['target_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
         next_cleanup = source.next_unread_contract(plan, required)
@@ -517,10 +517,10 @@ def run(work, cohort, reference=False):
         write_json(work / 'evidence' / (target_label + '.cleanup.json'), counts['target_cleanup'])
         write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
         verify(work, cohort)
-        expected = plan['current316']['expected_full_tests']
+        expected = plan['current323']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
-        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full985'])
+        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full1027'])
         counts['full_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
         counts['full_next_unread_cleanup'] = next_unread_cleanup_summary(log.read_text(), next_cleanup)
         write_json(work / 'evidence/full.next-unread-cleanup.json', counts['full_next_unread_cleanup'])
@@ -568,9 +568,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current316',), required=True)
+    p.add_argument('--cohort', choices=('current323',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full316 variant; exactly one entry assertion fails and one old filter passes')
+                   help='explicit full323 variant; exactly one entry assertion fails and one old filter passes')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')
