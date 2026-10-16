@@ -11,6 +11,7 @@ import tarfile
 
 import generated_module_probe as projection
 import go_observer as observer
+import gradle_selector_fixture as selectors
 import run as parent
 import support as s
 import verify_inputs
@@ -18,12 +19,15 @@ import verify_inputs
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
+REVISION = 'root-r4b-project-selector'
+STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 
 def metadata():
     registry, _, tools = projection.metadata()
     own = json.loads((HERE / 'observed-cohort.json').read_text())
-    if own['cohort'] != COHORT or own['source_ref'] != parent.SOURCE_REF:
+    if (own['cohort'] != COHORT or own['source_ref'] != parent.SOURCE_REF
+            or own['controller_revision'] != REVISION):
         raise ValueError('explicit historical257 observed-bind identity required')
     for row in own['controller_inputs']:
         file = verify_inputs.checked_path(parent.REPO, row['path'])
@@ -44,6 +48,79 @@ def metadata():
 
 
 class Job(parent.Job):
+    def cmd(self, args, cwd, env, label, timeout=900, reject=None, stdin=None):
+        if label == 'gradle-dependency-setup':
+            if getattr(self, '_typed_resolver_dispatch', None) is not False:
+                raise ValueError('one dispatch only inside inherited gradle_prepare')
+            original = self.gradle('dependencies', offline=False) + [
+                '--info', '-I', parent.HERE / 'resolve.gradle', '--write-verification-metadata', 'sha256']
+            if (list(map(str, args)) != list(map(str, original))
+                    or cwd != self.w / 'source/app/android'
+                    or env != parent.environment(self.w, False)
+                    or timeout != 1800 or reject is not None or stdin is not None):
+                raise ValueError('inherited dependency command/cwd/env contract differs')
+            changed = list(args)
+            changed[changed.index('-I') + 1] = HERE / 'resolve-observed.gradle'
+            s.write_json(self.w / 'evidence/observed-resolver-dispatch.json', {
+                'controller_revision': REVISION, 'original_argv': list(map(str, args)),
+                'derived_argv': list(map(str, changed)), 'only_change': '-I value',
+                'original_resolver_sha256': s.sha(parent.HERE / 'resolve.gradle'),
+                'derived_resolver_sha256': s.sha(HERE / 'resolve-observed.gradle')})
+            self._typed_resolver_dispatch = True
+            args = changed
+        return super().cmd(args, cwd, env, label, timeout, reject, stdin)
+
+    def gradle_prepare(self):
+        # Reuse the original method, including all source, Maven-origin and
+        # verification-metadata checks. Only its one -I argument is replaced.
+        self._typed_resolver_dispatch = False
+        try:
+            result = super().gradle_prepare()
+            if self._typed_resolver_dispatch is not True:
+                raise ValueError('inherited dependency dispatch was not observed')
+            return result
+        finally:
+            self._typed_resolver_dispatch = None
+
+    def gradle_controls(self):
+        parent.netns()
+        self.verify()
+        for name in selectors.OUTPUTS:
+            if (self.w / 'evidence' / name).exists():
+                raise ValueError('fixture may not consume preexisting dependency evidence')
+        cases = selectors.prepare(self.w)
+        results = []
+        for case in cases:
+            for name in selectors.OUTPUTS:
+                path = self.w / 'evidence' / name
+                if path.exists() or path.is_symlink():
+                    raise ValueError('fresh resolver output slots required')
+            command = [self.w / 'gradle/bin/gradle', '--no-daemon', '--max-workers=1',
+                '--no-watch-fs', '--console=plain', '--offline', '--project-cache-dir',
+                self.w / 'selector-project-cache' / case['label'],
+                '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m',
+                '-I', HERE / 'resolve-observed.gradle', 'dependencies']
+            captured = {}
+            control_env = parent.environment(self.w, True)
+            # Synthetic file-Maven artifacts must never contaminate the
+            # parent's real Maven-origin inventory in gradle-cache.
+            control_env['GRADLE_USER_HOME'] = str(self.w / 'selector-gradle-home')
+            try:
+                log = self.cmd(command, Path(case['cwd']), control_env,
+                    'selector-control-' + case['label'], 120, case['expected_rejection'])
+            finally:
+                captured = selectors.capture_outputs(self.w, case['cwd'])
+            proof = selectors.check(case, log, captured)
+            row = {'case': case['label'], 'state': 'passed', 'actual_Gradle': True,
+                'expected_rejection': case['expected_rejection'], 'outputs': captured, **proof}
+            s.write_json(Path(case['cwd']) / 'evidence/result.json', row)
+            results.append(row)
+        s.write_json(self.w / 'evidence/selector-controls-complete.json', {
+            'state': 'passed', 'cases': results, 'count': len(results),
+            'netns': 'loopback-only', 'Gradle_offline': True,
+            'actual_APK_compile_or_external_JitPack_transfer': False})
+        self.verify()
+
     def verify(self):
         if verify_inputs.digest(self.inputs['files']) != self.inputs['source_digest']:
             raise ValueError('derived source vector differs')
@@ -258,12 +335,13 @@ class Job(parent.Job):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cohort', required=True, choices=[COHORT])
-    parser.add_argument('--stage', choices=['readonly', 'admission', *parent.STAGES], default='readonly')
+    parser.add_argument('--stage', choices=['readonly', 'admission', *STAGES], default='readonly')
     parser.add_argument('--work')
     args = parser.parse_args()
     registry, inputs, tools = metadata()
     if args.stage == 'readonly':
-        print(json.dumps({'cohort': COHORT, 'source_members': 428, 'source_digest': inputs['source_digest'],
+        print(json.dumps({'cohort': COHORT, 'controller_revision': REVISION,
+                          'source_members': 428, 'source_digest': inputs['source_digest'],
                           'state': 'readonly_no_setup_or_build'}))
         return
     if not args.work or sys.platform != 'linux' or os.geteuid() == 0:
@@ -276,12 +354,15 @@ def main():
         s.mkdir(w)
         s.mkdir(w / 'evidence')
         s.write_json(w / 'activation.json', {'cohort': COHORT, 'source_ref': parent.SOURCE_REF,
+            'controller_revision': REVISION, 'registry_sha256': s.sha(HERE / 'observed-cohort.json'),
             'inputs_sha256': s.sha(HERE / 'observed-inputs.json'), 'controller_commit': os.environ.get('GITHUB_SHA')})
     else:
         activation = json.loads((w / 'activation.json').read_text())
-        if activation['cohort'] != COHORT or activation['inputs_sha256'] != s.sha(HERE / 'observed-inputs.json'):
+        if (activation['cohort'] != COHORT or activation['inputs_sha256'] != s.sha(HERE / 'observed-inputs.json')
+                or activation.get('controller_revision') != REVISION
+                or activation.get('registry_sha256') != s.sha(HERE / 'observed-cohort.json')):
             raise ValueError('exact observed-bind activation required')
-        previous = parent.STAGES[parent.STAGES.index(args.stage) - 1]
+        previous = STAGES[STAGES.index(args.stage) - 1]
         if ((w / 'evidence' / (previous + '-failure.json')).exists()
                 or json.loads((w / 'evidence' / (previous + '-complete.json')).read_text())['state'] != 'passed'
                 or json.loads((w / 'evidence' / (previous + '-final-resource.json')).read_text())['state'] != 'passed'):
@@ -295,11 +376,15 @@ def main():
     try:
         budget.start()
         job = Job(w, inputs, tools, budget)
-        {'setup': job.prepare, 'core': job.build_core, 'gradle-setup': job.gradle_prepare, 'apk': job.build_apk}[args.stage]()
-        s.write_json(w / 'evidence' / (args.stage + '-complete.json'), {'state': 'passed', 'cohort': COHORT, **budget.record()})
-        s.write_json(w / 'evidence' / (args.stage + '-final-resource.json'), {'state': 'passed', **budget.record()})
+        {'setup': job.prepare, 'core': job.build_core, 'gradle-controls': job.gradle_controls,
+         'gradle-setup': job.gradle_prepare, 'apk': job.build_apk}[args.stage]()
+        s.write_json(w / 'evidence' / (args.stage + '-complete.json'), {
+            'state': 'passed', 'cohort': COHORT, 'controller_revision': REVISION, **budget.record()})
+        s.write_json(w / 'evidence' / (args.stage + '-final-resource.json'), {
+            'state': 'passed', 'controller_revision': REVISION, **budget.record()})
         budget.finish()
-        print(json.dumps({'cohort': COHORT, 'stage': args.stage, 'state': 'passed', **budget.record()}))
+        print(json.dumps({'cohort': COHORT, 'controller_revision': REVISION,
+                          'stage': args.stage, 'state': 'passed', **budget.record()}))
     except BaseException as error:
         failure = type(error).__name__ + ': ' + str(error)
         budget.latch('phase_or_infrastructure_failed')
@@ -309,7 +394,8 @@ def main():
         if budget.thread is not None:
             budget.thread.join()
         if failure or budget.reason:
-            s.write_json(w / 'evidence' / (args.stage + '-failure.json'), {'state': 'failed', 'error': failure, **budget.record()})
+            s.write_json(w / 'evidence' / (args.stage + '-failure.json'), {
+                'state': 'failed', 'controller_revision': REVISION, 'error': failure, **budget.record()})
 
 
 if __name__ == '__main__':

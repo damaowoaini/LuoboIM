@@ -16,8 +16,8 @@
     },
     {
       "path": ".github/workflows/android-observed-debug.yml",
-      "bytes": 2892,
-      "sha256": "53b43594aea6854a7139c1666e30c8072b69b922c232b3438dc16d145b70ee4e"
+      "bytes": 3184,
+      "sha256": "18b98fa9a62a32d54afecebeb18485c3d0ec95915f99883b7d314c9810c3bfc6"
     },
     {
       "path": "ci/android-native/audit.py",
@@ -50,6 +50,11 @@
       "sha256": "e7939ea1fe1332cb9891449309a69706fa63b72fea948384cb3612fa600cd44d"
     },
     {
+      "path": "ci/android-native/gradle_selector_fixture.py",
+      "bytes": 9888,
+      "sha256": "c9ce2721ee9a8e8dfbdaf925c604decbb7423b46003519ed8e3ea307b3cbb232"
+    },
+    {
       "path": "ci/android-native/inputs.json",
       "bytes": 83426,
       "sha256": "1852fa0318522f8ca6cf41468880a7153022ae64f31369eddd9af0abadeb4364"
@@ -61,8 +66,8 @@
     },
     {
       "path": "ci/android-native/netns-observed.sh",
-      "bytes": 515,
-      "sha256": "871694aaded6cf2e971d484b06146a685d8688bf570fe780e04eb3ba2beb8ee6"
+      "bytes": 546,
+      "sha256": "6b7c41b40633548b342d0e0b2600747c4b379d67e2947b93bede350f3830cf32"
     },
     {
       "path": "ci/android-native/netns.sh",
@@ -76,8 +81,8 @@
     },
     {
       "path": "ci/android-native/observed_bind.py",
-      "bytes": 18653,
-      "sha256": "095db0155a5fc9d4a3106b67cf83d45aa95282e5d50f58a4e7f7a5b08b0f4b98"
+      "bytes": 23647,
+      "sha256": "04db0723823143b29245a0bbb7291b759c9ca1ae073270a905f5e40e8429f9c4"
     },
     {
       "path": "ci/android-native/projected-module-after.mod",
@@ -88,6 +93,11 @@
       "path": "ci/android-native/projected-module-before.mod",
       "bytes": 4081,
       "sha256": "05e30d386898edc45e01458e5dcd79d166965d89cb4537a436ed5beeaba21088"
+    },
+    {
+      "path": "ci/android-native/resolve-observed.gradle",
+      "bytes": 10224,
+      "sha256": "347c07dde8268e04b27ca4a40c2e8be4d1c1649555ea6f4193953fcb93e67116"
     },
     {
       "path": "ci/android-native/resolve.gradle",
@@ -113,6 +123,11 @@
       "path": "ci/android-native/test_go_observer.py",
       "bytes": 11688,
       "sha256": "af00dd3f3d8ea5fe9d25990aaeba871f1bbd800929610c137c950208e7032d8a"
+    },
+    {
+      "path": "ci/android-native/test_gradle_selectors.py",
+      "bytes": 7437,
+      "sha256": "975e1a54903b8849827710c795b5be1063a8c55c9ea16d2dca2a10b7b0ea694e"
     },
     {
       "path": "ci/android-native/test_tools.py",
@@ -172,5 +187,6 @@
   ],
   "members": 428,
   "old427_r1_r2_immutable": true,
-  "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true
+  "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true,
+  "controller_revision": "root-r4b-project-selector"
 }

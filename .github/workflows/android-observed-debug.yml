@@ -1,4 +1,4 @@
-name: Android current257 observed offline bind debug
+name: Android current257 observed offline bind debug r4b
 
 on:
   workflow_dispatch:
@@ -31,12 +31,13 @@ jobs:
           umask 077
           mkdir -m 700 "$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "ANDROID_WORK=$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current257" >> "$GITHUB_ENV"
-      - name: Validate original29, metadata8 and observer11 Python controls
+      - name: Validate original29, metadata8, observer11 and selector4 Python controls
         run: |
           python3 -B ci/secret_scan.py
           python3 -B ci/android-native/test_tools.py
           python3 -B ci/android-native/test_generated_module_probe.py
           python3 -B ci/android-native/test_go_observer.py
+          python3 -B ci/android-native/test_gradle_selectors.py
       - name: Readonly pins and cold admission
         run: |
           python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage admission --work "$ANDROID_WORK"
@@ -45,6 +46,8 @@ jobs:
         run: python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage setup --work "$ANDROID_WORK"
       - name: Actual offline bind with bounded real generated-source evidence
         run: sudo unshare --net -- bash ci/android-native/netns-observed.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" core
+      - name: Real offline Gradle project and external selector controls
+        run: sudo unshare --net -- bash ci/android-native/netns-observed.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" gradle-controls
       - name: Resolve Java dependencies with original source provenance checks
         run: python3 -B ci/android-native/observed_bind.py --cohort "$ANDROID_COHORT" --stage gradle-setup --work "$ANDROID_WORK"
       - name: Original seven negative gates and real Debug APK offline

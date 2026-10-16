@@ -1,0 +1,178 @@
+// Explicit observed-r4 resolver; original resolve.gradle remains immutable.
+import groovy.json.JsonOutput
+import java.security.MessageDigest
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ModuleComponentSelector
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentSelector
+
+def roots = [System.getenv('ANDROID_NATIVE_WORK')].findAll { it != null }.collect { new File(it).canonicalFile }
+if (roots.size() != 1) throw new GradleException('one owned cloud root required')
+def owned = roots[0]
+def ownedPrincipal = Files.getOwner(owned.toPath(), LinkOption.NOFOLLOW_LINKS)
+def checkedProject = { p ->
+    def directory = p.projectDir.canonicalFile
+    def script = p.buildFile.canonicalFile
+    if (p.projectDir.absoluteFile != directory || p.buildFile.absoluteFile != script ||
+            !directory.toPath().startsWith(owned.toPath()) || !script.toPath().startsWith(owned.toPath()) ||
+            !Files.isDirectory(directory.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(directory.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal) {
+        throw new GradleException('project directory/build file outside canonical owned root')
+    }
+    def exists = Files.exists(script.toPath(), LinkOption.NOFOLLOW_LINKS)
+    def defaultMissing = !exists && script.parentFile == directory &&
+            ['build.gradle', 'build.gradle.kts'].contains(script.name)
+    if ((exists && (!Files.isRegularFile(script.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(script.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal)) ||
+            (!exists && !defaultMissing)) {
+        throw new GradleException('owned regular or absent default project build file required')
+    }
+    def hash = null
+    if (exists) {
+        def h = MessageDigest.getInstance('SHA-256')
+        script.withInputStream { stream ->
+            byte[] b = new byte[65536]; int n
+            while ((n = stream.read(b)) > 0) h.update(b,0,n)
+        }
+        hash = h.digest().encodeHex().toString()
+    }
+    return [project:p.path, projectDir:directory.path, buildFile:script.path,
+            buildFileExists:exists, defaultBuildScriptMissing:defaultMissing,
+            buildFileSha256:hash, canonicalOwned:true]
+}
+def hosts = ['dl.google.com','maven.google.com','repo.maven.apache.org','repo1.maven.org',
+             'plugins.gradle.org','plugins-artifacts.gradle.org','storage.googleapis.com','jitpack.io'] as Set
+def checkRepo = { repo ->
+    if (repo.hasProperty('url')) {
+        def u = repo.url as URI
+        if (u.scheme == 'file') {
+            def f = new File(u).canonicalFile
+            if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('repository outside owned root')
+        } else if (u.scheme != 'https' || u.userInfo != null || u.query != null || u.fragment != null || !hosts.contains(u.host)) {
+            throw new GradleException('unexpected dependency repository')
+        }
+        if (u.host == 'jitpack.io') {
+            if (u.path != '' && u.path != '/') throw new GradleException('unexpected JitPack repository path')
+            repo.content { includeModule('com.github.davidliu','audioswitch') }
+        }
+    }
+}
+def checkModule = { group, module, v ->
+    if (group == 'com.github.davidliu' && module == 'audioswitch' &&
+            v != '039a35aefab7747c557242fa216c9ea11743b604') throw new GradleException('JitPack source commit differs')
+    if (v != null && (v.contains('+') || v.toLowerCase().contains('latest') || v.contains('SNAPSHOT') || v.startsWith('[') || v.startsWith('('))) {
+        throw new GradleException('dynamic dependency version refused')
+    }
+}
+def selectorIdentity = { selector ->
+    if (selector instanceof ProjectComponentSelector) {
+        return [kind:'project', identity:selector.displayName, buildPath:selector.buildPath,
+                projectPath:selector.projectPath]
+    }
+    if (selector instanceof ModuleComponentSelector) {
+        return [kind:'module', identity:selector.displayName, group:selector.group,
+                module:selector.module, version:selector.version]
+    }
+    throw new GradleException('unknown requested component selector refused')
+}
+def componentIdentity = { component ->
+    if (component instanceof ProjectComponentIdentifier) {
+        return [kind:'project', identity:component.displayName, buildTreePath:component.buildTreePath,
+                projectPath:component.projectPath]
+    }
+    if (component instanceof ModuleComponentIdentifier) {
+        checkModule(component.group, component.module, component.version)
+        return [kind:'module', identity:component.displayName, group:component.group,
+                module:component.module, version:component.version]
+    }
+    throw new GradleException('unknown selected component identifier refused')
+}
+gradle.settingsEvaluated { s ->
+    s.pluginManagement.repositories.each(checkRepo)
+    s.pluginManagement.repositories.whenObjectAdded(checkRepo)
+}
+gradle.beforeProject { p ->
+    checkedProject(p)
+    p.repositories.whenObjectAdded(checkRepo)
+    p.buildscript.repositories.whenObjectAdded(checkRepo)
+    [p.configurations,p.buildscript.configurations].each { configs -> configs.all { c ->
+        // Official Gradle9.3.1 DependencySubstitutions covers transitive
+        // dependencies and retains the actual requested selector type.
+        c.resolutionStrategy.dependencySubstitution.all { d ->
+            def requested = selectorIdentity(d.requested)
+            logger.lifecycle('LUOBO_SELECTOR_REQUEST ' + JsonOutput.toJson(
+                    [project:p.path, configuration:c.name, requested:requested]))
+            if (d.requested instanceof ModuleComponentSelector) {
+                checkModule(d.requested.group, d.requested.module, d.requested.version)
+            }
+            // No coordinate exemption and no useTarget/version substitution.
+        }
+    } }
+}
+gradle.projectsEvaluated {
+    gradle.rootProject.tasks.named('dependencies').configure {
+        doLast {
+            def rows = []
+            def selections = []
+            def projects = []
+            gradle.rootProject.allprojects.each { p ->
+                projects.add(checkedProject(p))
+                [p.configurations, p.buildscript.configurations].each { configs ->
+                    configs.findAll { it.canBeResolved && !(it.name.toLowerCase() =~ /release|profile|test|lint/) }.each { c ->
+                        // Trigger the original strict artifact resolution first.
+                        // Its failure retains the real rule exception/cause.
+                        def artifacts = c.resolvedConfiguration.resolvedArtifacts
+                        c.incoming.resolutionResult.allDependencies.each { edge ->
+                            def requested = selectorIdentity(edge.requested)
+                            if (edge instanceof UnresolvedDependencyResult) {
+                                throw new GradleException('unresolved dependency result refused: ' + requested.identity,
+                                        edge.failure)
+                            }
+                            if (!(edge instanceof ResolvedDependencyResult)) {
+                                throw new GradleException('unknown dependency result refused: ' + requested.identity)
+                            }
+                            selections.add([project:p.path, configuration:c.name,
+                                    from:componentIdentity(edge.from.id), requested:requested,
+                                    selected:componentIdentity(edge.selected.id)])
+                        }
+                        artifacts.each { a ->
+                            def f = a.file.canonicalFile
+                            if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('artifact outside owned root')
+                            def selected = componentIdentity(a.id.componentIdentifier)
+                            if (a.id.componentIdentifier instanceof ProjectComponentIdentifier) {
+                                rows.add([project:p.path,configuration:c.name,projectComponent:a.id.componentIdentifier.displayName,
+                                          selected:selected, deferred_to_actual_APK_compile:true])
+                                return
+                            }
+                            if (!f.isFile()) throw new GradleException('resolved external artifact missing')
+                            def h = MessageDigest.getInstance('SHA-256')
+                            f.withInputStream { stream ->
+                                byte[] b = new byte[65536]; int n
+                                while ((n = stream.read(b)) > 0) h.update(b,0,n)
+                            }
+                            rows.add([project:p.path,configuration:c.name,coordinate:a.moduleVersion.id.toString(),
+                                      selected:selected, path:owned.toPath().relativize(f.toPath()).toString(),
+                                      bytes:f.length(),sha256:h.digest().encodeHex().toString()])
+                        }
+                    }
+                }
+                p.repositories.each(checkRepo)
+                p.buildscript.repositories.each(checkRepo)
+            }
+            [ ['gradle-resolved-artifacts.json', rows], ['gradle-resolved-selectors.json', selections],
+              ['gradle-checked-projects.json', projects] ].each { entry ->
+                def out = new File(owned,'evidence/' + entry[0])
+                if (out.exists()) throw new GradleException('no overwrite of dependency evidence')
+                def stream = new FileOutputStream(out)
+                try {
+                    stream.write((JsonOutput.prettyPrint(JsonOutput.toJson(entry[1]))+'\n').getBytes('UTF-8'))
+                    stream.flush(); stream.fd.sync()
+                } finally { stream.close() }
+            }
+        }
+    }
+}
