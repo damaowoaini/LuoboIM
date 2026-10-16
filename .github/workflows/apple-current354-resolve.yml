@@ -1,0 +1,64 @@
+name: Current354 iOS native resolution only
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [current354-apple-native-resolution-v1]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: current354-apple-native-resolution-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  resolve-current354:
+    runs-on: macos-15
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select private root and fixed Python
+        run: |
+          umask 077
+          test "$(uname -m)" = arm64
+          python="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
+          test -x "$python"
+          echo "APPLE_APP_PYTHON=$python" >> "$GITHUB_ENV"
+          echo "APPLE_APP_WORK=$RUNNER_TEMP/luobo-apple-current354" >> "$GITHUB_ENV"
+      - name: Verify independent current354 source controller
+        run: '"$APPLE_APP_PYTHON" -B ci/apple-current354/run.py --identity current354-apple-native-resolution-v1 --stage readonly'
+      - name: Exact source472 original core engine and hosted dependency acquisition
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: '"$APPLE_APP_PYTHON" -B ci/apple-current354/run.py --identity current354-apple-native-resolution-v1 --stage acquire --work "$APPLE_APP_WORK"'
+      - name: Real SPM and fallback CocoaPods native resolution without App compilation
+        run: '"$APPLE_APP_PYTHON" -B ci/apple-current354/run.py --identity current354-apple-native-resolution-v1 --stage resolve --work "$APPLE_APP_WORK"'
+      - name: Preserve compact raw and native resolution evidence on failure as well
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-current354-native-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.APPLE_APP_WORK }}/activation.json
+            ${{ env.APPLE_APP_WORK }}/*-raw.log
+            ${{ env.APPLE_APP_WORK }}/*-resource.json
+            ${{ env.APPLE_APP_WORK }}/evidence/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Keep independently hash-checked native sources separate
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-current354-native-origin-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.APPLE_APP_WORK }}/origins/
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn

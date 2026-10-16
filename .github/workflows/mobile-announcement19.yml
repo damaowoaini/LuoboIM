@@ -1,0 +1,48 @@
+name: Manual Mobile announcement scoped19 successor
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-announcement19-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  candidate359-scoped19:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Set fresh scoped workspace path
+        run: echo "MOBILE_WORK=$RUNNER_TEMP/mobile-announcement19" >> "$GITHUB_ENV"
+      - name: Checkout without stored credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Linux tester runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
+      - name: Prepare exact354 inputs and official locked dependencies
+        run: bash ci/mobile-setup.sh 'current354' "$MOBILE_WORK"
+      - name: Preserve original R3 overlay then apply only scoped two fixtures
+        run: |
+          set -euo pipefail
+          python3 ci/mobile-announcement19.py overlay --work "$MOBILE_WORK" 2>&1 \
+            | tee "$MOBILE_WORK/evidence/announcement19-overlay.log"
+      - name: Reuse exact prior proofs and run only changed2 analysis then scoped19
+        run: |
+          set -euo pipefail
+          sudo unshare --net -- python3 "$GITHUB_WORKSPACE/ci/mobile-announcement19.py" netns \
+            --run-as "$(id -un)" --work "$MOBILE_WORK" 2>&1 \
+            | tee "$MOBILE_WORK/evidence/announcement19-controller.log"
+      - name: Preserve raw reports and setup failures
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: mobile-announcement19-${{ github.run_id }}
+          path: ${{ env.MOBILE_WORK }}/evidence/
+          if-no-files-found: warn
+          retention-days: 14

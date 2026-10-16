@@ -1,0 +1,232 @@
+{
+  "R10_root_acceptance": {
+    "bytes": 3140,
+    "path": "references/integration/apple-sdk-real-link-cloud-run-38966282283/root-acceptance.json",
+    "sha256": "cd65a2ab9dfb36ec468724c87cade3616b60ba218a174e91826f65e461cfc8ca"
+  },
+  "approved_native_resolution": null,
+  "borrowed": [
+    {
+      "bytes": 9781,
+      "path": "ci/apple-sdk-link/custody.py",
+      "sha256": "c242cbcc956b498b33a13dc18f87234212486616235b93de8443c63da7aac7f3"
+    },
+    {
+      "bytes": 18927,
+      "path": "ci/apple-sdk-link-real/run.py",
+      "sha256": "dff6340dd2774ffc4493194ae10635162b8907fffab217608da3f495f6fcc940"
+    },
+    {
+      "bytes": 33866,
+      "path": "ci/apple-sdk-link-real/inputs.json",
+      "sha256": "1fa9b5f3c26785cb8db1324320a24b1b663c38f45e2eabb7d07461fba4824910"
+    },
+    {
+      "bytes": 11626,
+      "path": "ci/apple-host-tool/run.py",
+      "sha256": "ef4fef688a380c0d7c39c078e812e91f89adee77b8fda1d0203cef2128cfca94"
+    },
+    {
+      "bytes": 7394,
+      "path": "ci/apple-sdk/resource_dual.py",
+      "sha256": "d1d872e0c2b394d73549f0ed071c457ee5019c41b90277c748c328b0219e7718"
+    },
+    {
+      "bytes": 7950,
+      "path": "ci/apple-sdk/core_binary.py",
+      "sha256": "76c87f6e12678f4588636793995245330e6022d8a6340ace285486b3ba36f1f9"
+    }
+  ],
+  "business354": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
+  "cocoapods_config": {
+    "bytes": 9929,
+    "lines": {
+      "CP_CACHE_DIR": [
+        110,
+        113
+      ],
+      "CP_HOME_DIR": [
+        100,
+        103,
+        127,
+        133
+      ]
+    },
+    "sha256": "9213f9002f16869b7fc1c6c7fb87ced2333effadcab9c23fdb89e61001da34d8",
+    "url": "https://raw.githubusercontent.com/CocoaPods/CocoaPods/1.16.2/lib/cocoapods/config.rb"
+  },
+  "flutter": {
+    "commit": "abaf9c523780a608bd46686fd5e53740a07077f8",
+    "dart": "3.13.5",
+    "engine": "deb287481e3ce9468f3434937ced4240a70539ca",
+    "repository": "https://github.com/flutter/flutter.git",
+    "tag": "3.47.7"
+  },
+  "flutter_source_pins": [
+    {
+      "bytes": 41,
+      "path": "bin/internal/engine.version",
+      "sha256": "0afc1ac714118b30d5691ecb010cb23ceef7b336dfb5097f337d580b39ffed19"
+    },
+    {
+      "bytes": 5941,
+      "path": "bin/internal/update_dart_sdk.sh",
+      "sha256": "730d3f3145d0c652147043fa914ac54679ab2b4ac94f8f983e4d44f1e17cb6f7"
+    },
+    {
+      "bytes": 6531,
+      "path": "packages/flutter_tools/lib/src/base/config.dart",
+      "sha256": "307ce29f4353b1266aeac395363db11466792ed27206ffe0dda778f81c132367"
+    },
+    {
+      "bytes": 47591,
+      "path": "packages/flutter_tools/lib/src/xcode_project.dart",
+      "sha256": "9f90819da0157880d3aa4521d677cd237162a50cef9a76f3121828688baa7f06"
+    },
+    {
+      "bytes": 19894,
+      "path": "packages/flutter_tools/lib/src/macos/darwin_dependency_management.dart",
+      "sha256": "45d0f0d266bf528c16298d4050e1f557dc04a727f36ea5c7b00d2efd18d9cea5"
+    },
+    {
+      "bytes": 21279,
+      "path": "packages/flutter_tools/lib/src/macos/swift_package_manager.dart",
+      "sha256": "870e13e60e5f5f4bbd01fcb8d567aec470a292730e2276401ab8f6219b8cc6e9"
+    },
+    {
+      "bytes": 3696,
+      "path": "packages/flutter_tools/lib/src/macos/cocoapod_utils.dart",
+      "sha256": "317e8aaf955070d2508ec2815005c1dd021c47b5badc3be7faeb8566fd42e62a"
+    },
+    {
+      "bytes": 26580,
+      "path": "packages/flutter_tools/lib/src/macos/cocoapods.dart",
+      "sha256": "a5f3df4e62e4f04e70bc638b22f3057534c3910c6d56033bf9708270ef314d36"
+    },
+    {
+      "bytes": 61324,
+      "path": "packages/flutter_tools/lib/src/ios/mac.dart",
+      "sha256": "2992e06d93210e6f3cebcb40c56cbfe8458d4bed5e1cd30ce892d4f6041d6407"
+    },
+    {
+      "bytes": 27804,
+      "path": "packages/flutter_tools/lib/src/ios/xcodeproj.dart",
+      "sha256": "296b0bfb0cfef2d829d8524e86d6d4f0aba87e8ac903eda6d9ece0dde426cc81"
+    },
+    {
+      "bytes": 19722,
+      "path": "packages/flutter_tools/bin/podhelper.rb",
+      "sha256": "455e786c8c92e23bce614311549cfd38815c3c0b0a1d6a6860039ccca407b922"
+    },
+    {
+      "bytes": 35338,
+      "path": "packages/flutter_tools/lib/src/isolated/native_assets/native_assets.dart",
+      "sha256": "cc6cbd4293e96f8b0bcfe480b2e101d0c0980a686f46adf0f4eac98dfff5ce0d"
+    }
+  ],
+  "hook_source_pins": [
+    {
+      "bytes": 5874,
+      "package": "sqlite3",
+      "path": "lib/src/hook/assets.dart",
+      "sha256": "2934c9e63b5cd9205d460ce2a08347c06352e92b91ccc1527eff87326b0cad69"
+    },
+    {
+      "bytes": 5736,
+      "package": "sqlite3",
+      "path": "lib/src/hook/asset_hashes.dart",
+      "sha256": "bcb2186b0532d3931ceae3e323d3587dd3a7b528b508e26399c7da6927500929"
+    },
+    {
+      "bytes": 15472,
+      "package": "sqlite3",
+      "path": "lib/src/hook/compile/description.dart",
+      "sha256": "dfc5540cca31100fa644d432b547c8c2c13e0106f227173e7551606cc4f0e449"
+    }
+  ],
+  "identity": "current354-apple-native-resolution-v1",
+  "implementation_count": 20,
+  "native_origins": [
+    {
+      "cap_bytes": 536870912,
+      "filename": "WebRTC.xcframework.zip",
+      "kind": "WebRTC_SPM_binary",
+      "sha256": "03815cdf2f6a0ed328c94d74cce8fd1b8d2b6e95e2b37eab66795012fcecfdfa",
+      "url": "https://github.com/webrtc-sdk/Specs/releases/download/150.7871.01/WebRTC.xcframework.zip"
+    },
+    {
+      "cap_bytes": 33554432,
+      "filename": "libsqlite3.arm64.ios.dylib",
+      "kind": "sqlite3_hook",
+      "sha256": "f1bc69a4304a21e472c15f849c34ae46539483cfa7ce901f54175c6d6cc17991",
+      "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.arm64.ios.dylib"
+    },
+    {
+      "cap_bytes": 33554432,
+      "filename": "libsqlite3.arm64.ios_sim.dylib",
+      "kind": "sqlite3_hook",
+      "sha256": "1ce8ac8ebbb3f61fd6282c45a4da15b9c6c6ec169eff40a918520357a502510b",
+      "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.arm64.ios_sim.dylib"
+    },
+    {
+      "cap_bytes": 33554432,
+      "filename": "libsqlite3.arm64.macos.dylib",
+      "kind": "sqlite3_hook",
+      "sha256": "6d80ba56cff1fa44f62bebc3e6b6b71513cc628862a9745c223c7bea8bf813f3",
+      "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.arm64.macos.dylib"
+    }
+  ],
+  "own_inputs": [
+    {
+      "bytes": 7874,
+      "path": "ci/apple-current354/consume.py",
+      "sha256": "f7eba4a81393b3841895f91f7b30463aa98e1453e18c32a4bfff38eda3abc119"
+    },
+    {
+      "bytes": 173592,
+      "path": "ci/apple-current354/inputs.json",
+      "sha256": "24314720b46cd862069ed97c9e183fb6ad091e71abad3c4cba8fa20bd7b7ced2"
+    },
+    {
+      "bytes": 146462,
+      "path": "ci/apple-current354/plugins.json",
+      "sha256": "794c22d92cd4052e7dee3299516843bc937e17ead88fed0638efd2a109fcdbea"
+    },
+    {
+      "bytes": 10141,
+      "path": "ci/apple-current354/packaging.py",
+      "sha256": "7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248"
+    },
+    {
+      "bytes": 30847,
+      "path": "ci/apple-current354/run.py",
+      "sha256": "d2b0cbfd43020c94c60e1cf7bf234ab75ce87fa28f0cab8abe441ee8a031fc10"
+    },
+    {
+      "bytes": 6518,
+      "path": "ci/apple-current354/test_packaging.py",
+      "sha256": "f88c9c29b46bae7230a04486c439fe0dc90b9b00e55ed11f1fe1a45ed3d0d36b"
+    },
+    {
+      "bytes": 3121,
+      "path": "ci/apple-current354/README.md",
+      "sha256": "ef780916f121910f43d5beb9bf48a83a68b6eda21ee9a0ef94567a9f3c4f5723"
+    }
+  ],
+  "packages": 178,
+  "portable406": "81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c",
+  "resource": {
+    "all_owned_cap_bytes": 17179869184,
+    "cold_bytes": 21474836480,
+    "continuous_floor_bytes": 1073741824,
+    "estimate_not_measured": true,
+    "phase_bytes": 4294967296,
+    "poll_seconds": 0.2,
+    "stage_timeout_seconds": 1800
+  },
+  "schema": 1,
+  "source_members": 472,
+  "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e",
+  "state": "prepared_source_only_new6_unrun_no_native_execution",
+  "xcodebuild": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild"
+}

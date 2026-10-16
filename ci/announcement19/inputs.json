@@ -1,0 +1,474 @@
+{
+  "schema": "luobo.announcement.scoped19.v1",
+  "state": "prepared_unexecuted",
+  "cohort": "candidate359-announcement-fixture-r5-scoped19",
+  "base": {
+    "setup_cohort": "current354",
+    "source_members": 359,
+    "portable_members": 411,
+    "source_digest": "1fd4048febdce707a91822f7b7ca56833a894c1d0251866734cd42d2ef2d8c8e",
+    "portable_digest": "a2f024ce7225b6815d13e17ef40d3837be1824103cf47a56b885474849e050c5",
+    "helper_pins": [
+      {
+        "path": "ci/mobile-source.py",
+        "bytes": 25994,
+        "sha256": "350db5208fdb8631d52ab225a25920f1354401473195e1906ecd6747ed725e32"
+      },
+      {
+        "path": "ci/mobile-check.py",
+        "bytes": 34824,
+        "sha256": "20034b7a24ac229b098eb71652d07f7548ef9ec28bf3f0d3386bc116b28c3ac4"
+      },
+      {
+        "path": "ci/mobile-setup.sh",
+        "bytes": 7411,
+        "sha256": "7d0fff26e145cee8be02dd4a8ecc56d2878df3a1e1097262380212ef1aed3287"
+      },
+      {
+        "path": "ci/mobile/inputs.json",
+        "bytes": 174879,
+        "sha256": "5611103e30219d32c3f5bca232cbb38c3606a86dc8c8c9de4772fdcc87a68fab"
+      },
+      {
+        "path": "ci/mobile/required-test-names.json",
+        "bytes": 2082485,
+        "sha256": "d736d22b7bb60081e941f952818070c6695bd717a8fa432eff9352cc6e1675dd"
+      },
+      {
+        "path": "ci/mobile-announcement.py",
+        "bytes": 35598,
+        "sha256": "c591483c07277305974b1964aa1a235a0f78c51f8d18ba6a677564001f959035"
+      },
+      {
+        "path": "ci/announcement26/inputs.json",
+        "bytes": 47764,
+        "sha256": "8f4686b38d5a667c9e4e21a09abbe7199bbe8c6d182f69001f6ce16a975d539a"
+      }
+    ],
+    "before2": [
+      {
+        "path": "app/test/features/chat/group_announcement_fixture.dart",
+        "bytes": 8569,
+        "sha256": "80b4e3fac1008c31e11fa90be1bef125d59c2812ce04688ab890c8e4d5282a58"
+      },
+      {
+        "path": "app/test/features/chat/group_announcement_store_test.dart",
+        "bytes": 6957,
+        "sha256": "72d859894e37fdc8c3f45c9ee1c1901cf0e39ee7b17dbf56a705af1f016dc7ab"
+      }
+    ],
+    "original26_payload_untouched": true
+  },
+  "candidate": {
+    "source_manifest": {
+      "path": "references/integration/mobile-group-announcement-fixture-format-r5-candidate-20261017/candidate-manifest.json",
+      "bytes": 5434,
+      "sha256": "8b3c935e1ae69066737dc024967bff7b3c7315cf7ab404527b7757322edaf14a"
+    },
+    "source_members": 359,
+    "portable_members": 411,
+    "source_digest": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+    "portable_digest": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3",
+    "payload_prefix": "ci/candidates/mobile-announcement19/after",
+    "selected2": [
+      {
+        "path": "app/test/features/chat/group_announcement_fixture.dart",
+        "bytes": 9327,
+        "sha256": "3397f18eae8f9d7918472daea7cad83b4ea7ac0c5f1a4e39c35b6107d9789374",
+        "payload_path": "ci/candidates/mobile-announcement19/after/app/test/features/chat/group_announcement_fixture.dart"
+      },
+      {
+        "path": "app/test/features/chat/group_announcement_store_test.dart",
+        "bytes": 7195,
+        "sha256": "adea1dda8a54e1ab230a18166160b5bae74c9dbc6fc049ff3af1aa7f4e7b9e88",
+        "payload_path": "ci/candidates/mobile-announcement19/after/app/test/features/chat/group_announcement_store_test.dart"
+      }
+    ]
+  },
+  "target": {
+    "analysis_paths": [
+      "test/features/chat/group_announcement_fixture.dart",
+      "test/features/chat/group_announcement_store_test.dart"
+    ],
+    "test_paths": [
+      "test/features/chat/group_announcement_store_test.dart",
+      "test/features/chat/group_announcement_workflow_test.dart"
+    ],
+    "names": [
+      "acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group",
+      "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "a genuine at-me hint does not create an announcement from historical group text",
+      "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "owner replacement while original group metadata waits prevents its next real member lookup",
+      "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior"
+    ],
+    "expected19": 19,
+    "cleanup_names": [
+      "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "a genuine at-me hint does not create an announcement from historical group text",
+      "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "owner replacement while original group metadata waits prevents its next real member lookup",
+      "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior"
+    ],
+    "cleanup_prefix": "group_announcement_cleanup ",
+    "cleanup_markers": [
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ],
+    "fixtures": 18,
+    "cleanup_events": 72
+  },
+  "reuse": {
+    "analysis9": [
+      {
+        "analysis_path": "lib/features/chat/data/group_announcement_store.dart",
+        "source_pin": {
+          "path": "app/lib/features/chat/data/group_announcement_store.dart",
+          "bytes": 5012,
+          "sha256": "b5da8994042e75f703e4cae3ac3f4a4e1b773fdb166b31a46323a15d0c7a6be4"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-1.log",
+          "bytes": 60,
+          "sha256": "e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-1.resource.json",
+          "bytes": 489,
+          "sha256": "425a82b4253eebfc1c2989593b7f13adbfea7f48fecc3b02d08db43ad6af7f79"
+        },
+        "log_utf8": "Analyzing group_announcement_store.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/data/group_announcement_store.dart\"\n  ],\n  \"elapsed_seconds\": 1.812,\n  \"latched_failure\": null,\n  \"log_sha256\": \"e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2\",\n  \"minimum_free_bytes\": 90100535296,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-1\"\n}\n",
+        "run": "38974011605",
+        "job": "117218966812"
+      },
+      {
+        "analysis_path": "lib/features/chat/presentation/chat_page.dart",
+        "source_pin": {
+          "path": "app/lib/features/chat/presentation/chat_page.dart",
+          "bytes": 99227,
+          "sha256": "b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-2.log",
+          "bytes": 45,
+          "sha256": "ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-2.resource.json",
+          "bytes": 483,
+          "sha256": "80f7d82dab8a8baab1d14610e9553ee15cb3c61934f7db52117be693fe6798cf"
+        },
+        "log_utf8": "Analyzing chat_page.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/presentation/chat_page.dart\"\n  ],\n  \"elapsed_seconds\": 19.433,\n  \"latched_failure\": null,\n  \"log_sha256\": \"ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0\",\n  \"minimum_free_bytes\": 90089451520,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-2\"\n}\n",
+        "run": "38974011605",
+        "job": "117218966812"
+      },
+      {
+        "run": "38975527239",
+        "job": "117223929591",
+        "analysis_path": "lib/features/chat/presentation/group_announcement_panel.dart",
+        "source_pin": {
+          "path": "app/lib/features/chat/presentation/group_announcement_panel.dart",
+          "bytes": 17053,
+          "sha256": "5c45548163ed6dc9fc8ef0f96dd405199e4e19bc1b8e078694772955491dbecf"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-3.log",
+          "bytes": 60,
+          "sha256": "37c5d8b80e1275336578f7a67e33f0adfc976f455c58107d307e7aaf759e6343"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-3.resource.json",
+          "bytes": 497,
+          "sha256": "32a237685abe1da2a16b7f72d8c66009c3939e5857a79d798500c5bee62343c5"
+        },
+        "log_utf8": "Analyzing group_announcement_panel.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/presentation/group_announcement_panel.dart\"\n  ],\n  \"elapsed_seconds\": 5.311,\n  \"latched_failure\": null,\n  \"log_sha256\": \"37c5d8b80e1275336578f7a67e33f0adfc976f455c58107d307e7aaf759e6343\",\n  \"minimum_free_bytes\": 90100015104,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-3\"\n}\n"
+      },
+      {
+        "run": "38975527239",
+        "job": "117223929591",
+        "analysis_path": "lib/features/conversation/data/conversation_repository.dart",
+        "source_pin": {
+          "path": "app/lib/features/conversation/data/conversation_repository.dart",
+          "bytes": 7551,
+          "sha256": "299b465182570c55a2b829c36b13b7db6c62454f157e4549ffd26417373501e8"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-4.log",
+          "bytes": 59,
+          "sha256": "b2edb2535cb7e727ababeab90707bc44dfd565377af333dd980ba8a4e0db599d"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-4.resource.json",
+          "bytes": 496,
+          "sha256": "98d64d9fee144c0695fe5db44eb08dde4eab672b75d441e2432048dcbc84fb50"
+        },
+        "log_utf8": "Analyzing conversation_repository.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/conversation/data/conversation_repository.dart\"\n  ],\n  \"elapsed_seconds\": 1.107,\n  \"latched_failure\": null,\n  \"log_sha256\": \"b2edb2535cb7e727ababeab90707bc44dfd565377af333dd980ba8a4e0db599d\",\n  \"minimum_free_bytes\": 90098073600,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-4\"\n}\n"
+      },
+      {
+        "run": "38975527239",
+        "job": "117223929591",
+        "analysis_path": "lib/features/conversation/domain/conversation.dart",
+        "source_pin": {
+          "path": "app/lib/features/conversation/domain/conversation.dart",
+          "bytes": 1952,
+          "sha256": "5e114b9a1c8559f24236662f6bb050dd73550d7f38551b9955fffdc8ddf3d098"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-5.log",
+          "bytes": 48,
+          "sha256": "daab4b4fe08b20c8598f0b6bd27571407e7e64a0b01dc22341f5f19128f3376b"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-5.resource.json",
+          "bytes": 487,
+          "sha256": "020902974c2f1c2ddb6cd675c0eaf9c4cda7fc9abcd06383ef94ad1dd8e24d3d"
+        },
+        "log_utf8": "Analyzing conversation.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/conversation/domain/conversation.dart\"\n  ],\n  \"elapsed_seconds\": 0.306,\n  \"latched_failure\": null,\n  \"log_sha256\": \"daab4b4fe08b20c8598f0b6bd27571407e7e64a0b01dc22341f5f19128f3376b\",\n  \"minimum_free_bytes\": 90096607232,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-5\"\n}\n"
+      },
+      {
+        "run": "38977908850",
+        "job": "117231662761",
+        "analysis_path": "lib/features/group/data/group_repository.dart",
+        "source_pin": {
+          "path": "app/lib/features/group/data/group_repository.dart",
+          "bytes": 18719,
+          "sha256": "febf050af779434f60ec596963e3193ca07f791bb6f9c5362c48807d8569b337"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-6.log",
+          "bytes": 52,
+          "sha256": "82e421f5cbc81e53cbdba545f2e625669b96f44f4332d0ec986b940af74389de"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-6.resource.json",
+          "bytes": 482,
+          "sha256": "0b36628f2811d1288adbcbad4b022976c171e38a06099ff1235bce340da81e6a"
+        },
+        "log_utf8": "Analyzing group_repository.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/group/data/group_repository.dart\"\n  ],\n  \"elapsed_seconds\": 8.114,\n  \"latched_failure\": null,\n  \"log_sha256\": \"82e421f5cbc81e53cbdba545f2e625669b96f44f4332d0ec986b940af74389de\",\n  \"minimum_free_bytes\": 90094489600,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-6\"\n}\n"
+      },
+      {
+        "run": "38977908850",
+        "job": "117231662761",
+        "analysis_path": "lib/features/group/domain/group.dart",
+        "source_pin": {
+          "path": "app/lib/features/group/domain/group.dart",
+          "bytes": 1691,
+          "sha256": "d6e28ca24db983ead0b3bad7ecd63de62850c414393031d1f2e486e640cecf4d"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-7.log",
+          "bytes": 41,
+          "sha256": "c80570ead0a3924699fdbcc8ead6cc2868f4dde42a699a9341ebd0ffbbd0e48d"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-7.resource.json",
+          "bytes": 473,
+          "sha256": "87c41052531e71a992cef0d9ba768d044873a5b4848464b525674f606041bd0b"
+        },
+        "log_utf8": "Analyzing group.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/group/domain/group.dart\"\n  ],\n  \"elapsed_seconds\": 0.405,\n  \"latched_failure\": null,\n  \"log_sha256\": \"c80570ead0a3924699fdbcc8ead6cc2868f4dde42a699a9341ebd0ffbbd0e48d\",\n  \"minimum_free_bytes\": 90093305856,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-7\"\n}\n"
+      },
+      {
+        "run": "38977908850",
+        "job": "117231662761",
+        "analysis_path": "lib/providers.dart",
+        "source_pin": {
+          "path": "app/lib/providers.dart",
+          "bytes": 7700,
+          "sha256": "ca1ecfd2f433c11fb36f342376714dfcba33d8cc266a8d274cfb75deb9c98b19"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-8.log",
+          "bytes": 45,
+          "sha256": "09f839196b1b26c52afc422854de0b93ac6d6b5b19ee184c6d9a904e600509fd"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-8.resource.json",
+          "bytes": 455,
+          "sha256": "23523077f797497f1ecdcc597329abe8237280b983a638d1155529e4e7262ca3"
+        },
+        "log_utf8": "Analyzing providers.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/providers.dart\"\n  ],\n  \"elapsed_seconds\": 7.413,\n  \"latched_failure\": null,\n  \"log_sha256\": \"09f839196b1b26c52afc422854de0b93ac6d6b5b19ee184c6d9a904e600509fd\",\n  \"minimum_free_bytes\": 90085502976,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-8\"\n}\n"
+      },
+      {
+        "run": "38977908850",
+        "job": "117231662761",
+        "analysis_path": "test/features/chat/group_announcement_workflow_test.dart",
+        "source_pin": {
+          "path": "app/test/features/chat/group_announcement_workflow_test.dart",
+          "bytes": 14398,
+          "sha256": "c8fc525c1f8865ebb67d92b0cad07b7ebe4942dac25b1b92bf4442a801103534"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-11.log",
+          "bytes": 68,
+          "sha256": "3bc7e2a149f1df6d54882d7445d36c4aac547cf389918d2894a276fd26b03662"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-11.resource.json",
+          "bytes": 495,
+          "sha256": "2150656e7456517ffe3eecfb24eb279f639e60e7f66b792e57ffd08a959bcbbd"
+        },
+        "log_utf8": "Analyzing group_announcement_workflow_test.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"test/features/chat/group_announcement_workflow_test.dart\"\n  ],\n  \"elapsed_seconds\": 17.024,\n  \"latched_failure\": null,\n  \"log_sha256\": \"3bc7e2a149f1df6d54882d7445d36c4aac547cf389918d2894a276fd26b03662\",\n  \"minimum_free_bytes\": 90056728576,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-11\"\n}\n"
+      }
+    ],
+    "analysis_boundary": "Only unchanged body/library interface reused; real scoped19 compilation and changed2fatal-info analyses mandatory. Not11freshanalysis.",
+    "cases7": [
+      {
+        "name": "SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity",
+        "source_path": "app/test/features/chat/group_announcement_store_test.dart",
+        "mode": "exact_registration_block",
+        "block_bytes": 725,
+        "block_sha256": "4c0f928551bb528a24a88b1a90e9ad441a417eb043b1fe0fdf19a0a9b9bf4428"
+      },
+      {
+        "name": "fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain",
+        "source_path": "app/test/features/chat/group_announcement_store_test.dart",
+        "mode": "exact_registration_block",
+        "block_bytes": 875,
+        "block_sha256": "9e537caf4e4d2f8e2761135b37fb6ad5615953c7da8e6f89b88c2d5006ba63f7"
+      },
+      {
+        "name": "preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key",
+        "source_path": "app/test/features/chat/group_announcement_store_test.dart",
+        "mode": "exact_registration_block",
+        "block_bytes": 956,
+        "block_sha256": "83a6d68105065aeab01c84e58288821e2ac427b73ca854e3f9123cc2ceac5830"
+      },
+      {
+        "name": "queued preference dispatch rechecks its original source before physical acknowledgement",
+        "source_path": "app/test/features/chat/group_announcement_store_test.dart",
+        "mode": "exact_registration_block",
+        "block_bytes": 997,
+        "block_sha256": "4f81adaa90f1407ea48e8c9b7af79d599bc768f3eb30b65d98e0884c1d556261"
+      },
+      {
+        "name": "an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner",
+        "source_path": "app/test/features/chat/group_announcement_store_test.dart",
+        "mode": "exact_registration_block",
+        "block_bytes": 1096,
+        "block_sha256": "4dade3b25c7ad3c6c388ef6a70a0b3cc79759e94964e60e6e940cf8846a8f1c2"
+      },
+      {
+        "name": "SDK paging, drafts, read and preference mutations preserve the exact conversation target",
+        "source_path": "app/test/features/conversation/conversation_repository_test.dart",
+        "mode": "exact_whole_file",
+        "source_pin": {
+          "path": "app/test/features/conversation/conversation_repository_test.dart",
+          "bytes": 5083,
+          "sha256": "363768da0084598a3dd474a96f41d9434ef6f9fe9b2ca0abcbf0bc0a4906670d"
+        }
+      },
+      {
+        "name": "group flags keep prohibition semantics and booleans serialize to SDK status 1",
+        "source_path": "app/test/features/contacts/contacts_repository_test.dart",
+        "mode": "exact_whole_file",
+        "source_pin": {
+          "path": "app/test/features/contacts/contacts_repository_test.dart",
+          "bytes": 11426,
+          "sha256": "4948a2cf56946d6c33546d039d4a68bd9939c50400de0ef1747d03f63299d99d"
+        }
+      }
+    ],
+    "success_names": [
+      "SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity",
+      "fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain",
+      "preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key",
+      "queued preference dispatch rechecks its original source before physical acknowledgement",
+      "an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner",
+      "SDK paging, drafts, read and preference mutations preserve the exact conversation target",
+      "group flags keep prohibition semantics and booleans serialize to SDK status 1"
+    ],
+    "run": "38977908850",
+    "job": "117231662761",
+    "raw_log_pin": {
+      "path": "announcement-target26.log",
+      "bytes": 32059,
+      "sha256": "bae636468fad332973eca905fdc86a808ddebe5e57ec32ca9589833f1c3029af"
+    },
+    "raw_log_utf8": "{\"protocolVersion\":\"0.1.1\",\"runnerVersion\":null,\"pid\":4356,\"type\":\"start\",\"time\":0}\n{\"suite\":{\"id\":0,\"platform\":\"vm\",\"path\":\"/home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\"},\"type\":\"suite\",\"time\":0}\n{\"test\":{\"id\":1,\"name\":\"loading /home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\",\"suiteID\":0,\"groupIDs\":[],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":null,\"column\":null,\"url\":null},\"type\":\"testStart\",\"time\":1}\n{\"count\":4,\"time\":5,\"type\":\"allSuites\"}\n\n[{\"event\":\"test.startedProcess\",\"params\":{\"vmServiceUri\":null}}]\n{\"testID\":1,\"result\":\"success\",\"skipped\":false,\"hidden\":true,\"type\":\"testDone\",\"time\":7795}\n{\"group\":{\"id\":2,\"suiteID\":0,\"parentID\":null,\"name\":\"\",\"metadata\":{\"skip\":false,\"skipReason\":null},\"testCount\":6,\"line\":null,\"column\":null,\"url\":null},\"type\":\"group\",\"time\":7797}\n{\"test\":{\"id\":3,\"name\":\"SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity\",\"suiteID\":0,\"groupIDs\":[2],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":37,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\"},\"type\":\"testStart\",\"time\":7797}\n{\"testID\":3,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":7821}\n{\"test\":{\"id\":4,\"name\":\"fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain\",\"suiteID\":0,\"groupIDs\":[2],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":55,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\"},\"type\":\"testStart\",\"time\":7822}\n{\"testID\":4,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":7829}\n{\"test\":{\"id\":5,\"name\":\"acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group\",\"suiteID\":0,\"groupIDs\":[2],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":82,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\"},\"type\":\"testStart\",\"time\":7829}\n{\"testID\":5,\"error\":\"Expected: not contains 'group-a'\\n  Actual: 'luobo.group-announcement.v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.e610eab3e8256d8d66aca356f497578097dbca7124025dc25a997fcba513d31a.2d281e94714d5363fe4a8aec6475f0dc3a8f11d37786e1c341d986121464bf4a'\\n\",\"stackTrace\":\"package:matcher                                              expect\\npackage:flutter_test/src/widget_tester.dart 473:18           expect\\ntest/features/chat/group_announcement_store_test.dart 104:7  main.<fn>\\n\",\"isFailure\":true,\"type\":\"error\",\"time\":7860}\n{\"testID\":5,\"result\":\"failure\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":7861}\n{\"test\":{\"id\":6,\"name\":\"preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key\",\"suiteID\":0,\"groupIDs\":[2],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":109,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\"},\"type\":\"testStart\",\"time\":7861}\n{\"testID\":6,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":7867}\n{\"test\":{\"id\":7,\"name\":\"queued preference dispatch rechecks its original source before physical acknowledgement\",\"suiteID\":0,\"groupIDs\":[2],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":138,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\"},\"type\":\"testStart\",\"time\":7867}\n{\"testID\":7,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":7870}\n{\"test\":{\"id\":8,\"name\":\"an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner\",\"suiteID\":0,\"groupIDs\":[2],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":164,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_store_test.dart\"},\"type\":\"testStart\",\"time\":7870}\n{\"testID\":8,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":7874}\n{\"suite\":{\"id\":9,\"platform\":\"vm\",\"path\":\"/home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"suite\",\"time\":7886}\n{\"test\":{\"id\":10,\"name\":\"loading /home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\",\"suiteID\":9,\"groupIDs\":[],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":null,\"column\":null,\"url\":null},\"type\":\"testStart\",\"time\":7886}\n\n[{\"event\":\"test.startedProcess\",\"params\":{\"vmServiceUri\":null}}]\n{\"testID\":10,\"result\":\"success\",\"skipped\":false,\"hidden\":true,\"type\":\"testDone\",\"time\":19663}\n{\"group\":{\"id\":11,\"suiteID\":9,\"parentID\":null,\"name\":\"\",\"metadata\":{\"skip\":false,\"skipReason\":null},\"testCount\":18,\"line\":null,\"column\":null,\"url\":null},\"type\":\"group\",\"time\":19663}\n{\"test\":{\"id\":12,\"name\":\"actual group chat opens a fresh ordinary-member announcement and its own detail stays readable\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":10,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":19663}\n{\"testID\":12,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":21306}\n{\"testID\":12,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":21318}\n{\"testID\":12,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":21318}\n{\"testID\":12,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":21349}\n{\"testID\":12,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":21357}\n{\"test\":{\"id\":13,\"name\":\"acknowledged announcement close survives a new real chat route while a republished version appears again\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":37,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":21357}\n{\"testID\":13,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":21894}\n{\"testID\":13,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":21901}\n{\"testID\":13,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":21901}\n{\"testID\":13,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":21913}\n{\"testID\":13,\"messageType\":\"print\",\"message\":\"══╡ EXCEPTION CAUGHT BY SCHEDULER LIBRARY ╞═════════════════════════════════════════════════════════\\nThe following assertion was thrown during a scheduler callback:\\nNo GoRouter found in context\\n\\nWhen the exception was thrown, this was the stack:\\n#0      GoRouter.of (package:go_router/src/router.dart:596:7)\\n#1      GoRouterHelper.pop (package:go_router/src/misc/extensions.dart:72:56)\\n#2      _ChatPageState._leave.<anonymous closure> (package:imapp/features/chat/presentation/chat_page.dart:540:28)\\n#3      SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1430:15)\\n#4      SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1357:11)\\n#5      AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:2261:9)\\n#8      TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)\\n#9      AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:2250:27)\\n#10     WidgetTester.pump.<anonymous closure> (package:flutter_test/src/widget_tester.dart:652:53)\\n#13     TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)\\n#14     WidgetTester.pump (package:flutter_test/src/widget_tester.dart:652:27)\\n#15     ChatLocationFixture.frame (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/chat_location_fixture.dart:60:18)\\n<asynchronous suspension>\\n#16     ChatLocationFixture.until (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/chat_location_fixture.dart:68:7)\\n<asynchronous suspension>\\n#17     ChatLocationFixture.actual (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/chat_location_fixture.dart:110:5)\\n<asynchronous suspension>\\n#18     GroupAnnouncementFixture.leaveChat (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_fixture.dart:152:5)\\n<asynchronous suspension>\\n#19     main.<anonymous closure> (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart:49:9)\\n<asynchronous suspension>\\n#20     testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)\\n<asynchronous suspension>\\n#21     TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)\\n<asynchronous suspension>\\n<asynchronous suspension>\\n(elided 5 frames from dart:async and package:stack_trace)\\n════════════════════════════════════════════════════════════════════════════════════════════════════\",\"type\":\"print\",\"time\":21936}\n{\"testID\":13,\"messageType\":\"print\",\"message\":\"══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════\\nThe following TestFailure was thrown running a test:\\nExpected bounded actual location page/route state\\n\\nWhen the exception was thrown, this was the stack:\\n#0      ChatLocationFixture.until (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/chat_location_fixture.dart:70:5)\\n<asynchronous suspension>\\n#1      ChatLocationFixture.actual (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/chat_location_fixture.dart:110:5)\\n<asynchronous suspension>\\n#2      GroupAnnouncementFixture.leaveChat (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_fixture.dart:152:5)\\n<asynchronous suspension>\\n#3      main.<anonymous closure> (file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart:49:9)\\n<asynchronous suspension>\\n#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)\\n<asynchronous suspension>\\n#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)\\n<asynchronous suspension>\\n<asynchronous suspension>\\n(elided one frame from package:stack_trace)\\n\\nThe test description was:\\n  acknowledged announcement close survives a new real chat route while a republished version appears\\n  again\\n════════════════════════════════════════════════════════════════════════════════════════════════════\",\"type\":\"print\",\"time\":21938}\n{\"testID\":13,\"messageType\":\"print\",\"message\":\"══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════\\nThe following message was thrown:\\nMultiple exceptions (2) were detected during the running of the current test, and at least one was\\nunexpected.\\n════════════════════════════════════════════════════════════════════════════════════════════════════\",\"type\":\"print\",\"time\":21939}\n{\"testID\":13,\"error\":\"Test failed. See exception logs above.\\nThe test description was: acknowledged announcement close survives a new real chat route while a republished version appears again\",\"stackTrace\":\"\",\"isFailure\":false,\"type\":\"error\",\"time\":21940}\n{\"testID\":13,\"result\":\"error\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":21941}\n{\"test\":{\"id\":14,\"name\":\"a preferences failure retains the visible announcement until one explicit retry is acknowledged\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":71,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":21941}\n{\"testID\":14,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":22285}\n{\"testID\":14,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":22289}\n{\"testID\":14,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":22290}\n{\"testID\":14,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":22296}\n{\"testID\":14,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":22297}\n{\"test\":{\"id\":15,\"name\":\"a delayed versionA dismissal never consumes a newly loaded versionB\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":94,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":22298}\n{\"testID\":15,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":22623}\n{\"testID\":15,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":22634}\n{\"testID\":15,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":22634}\n{\"testID\":15,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":22641}\n{\"testID\":15,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":22643}\n{\"test\":{\"id\":16,\"name\":\"a genuine at-me hint does not create an announcement from historical group text\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":126,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":22643}\n{\"testID\":16,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":22879}\n{\"testID\":16,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":22889}\n{\"testID\":16,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":22889}\n{\"testID\":16,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":22905}\n{\"testID\":16,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":22907}\n{\"test\":{\"id\":17,\"name\":\"failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":151,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":22907}\n{\"testID\":17,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":23197}\n{\"testID\":17,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":23201}\n{\"testID\":17,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":23201}\n{\"testID\":17,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":23207}\n{\"testID\":17,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":23209}\n{\"test\":{\"id\":18,\"name\":\"fresh duplicate group metadata withdraws the announcement before any acknowledgement\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":174,\"root_column\":5,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":23209}\n{\"testID\":18,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":23496}\n{\"testID\":18,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":23499}\n{\"testID\":18,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":23499}\n{\"testID\":18,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":23506}\n{\"testID\":18,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":23508}\n{\"test\":{\"id\":19,\"name\":\"fresh foreign group metadata withdraws the announcement before any acknowledgement\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":174,\"root_column\":5,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":23509}\n{\"testID\":19,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":23823}\n{\"testID\":19,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":23828}\n{\"testID\":19,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":23828}\n{\"testID\":19,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":23834}\n{\"testID\":19,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":23836}\n{\"test\":{\"id\":20,\"name\":\"fresh left group metadata withdraws the announcement before any acknowledgement\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":174,\"root_column\":5,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":23837}\n{\"testID\":20,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":24163}\n{\"testID\":20,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":24167}\n{\"testID\":20,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":24167}\n{\"testID\":20,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":24172}\n{\"testID\":20,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":24174}\n{\"test\":{\"id\":21,\"name\":\"original owner replacement withdraws an open announcement and rejects its retained close callback\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":211,\"root_column\":5,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":24174}\n{\"testID\":21,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":24782}\n{\"testID\":21,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":24784}\n{\"testID\":21,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":24784}\n{\"testID\":21,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":24790}\n{\"testID\":21,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":24792}\n{\"test\":{\"id\":22,\"name\":\"original issuer replacement withdraws an open announcement and rejects its retained close callback\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":211,\"root_column\":5,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":24792}\n{\"testID\":22,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":25424}\n{\"testID\":22,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":25426}\n{\"testID\":22,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":25426}\n{\"testID\":22,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":25431}\n{\"testID\":22,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":25433}\n{\"test\":{\"id\":23,\"name\":\"original tenant replacement withdraws an open announcement and rejects its retained close callback\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":211,\"root_column\":5,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":25434}\n{\"testID\":23,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":25993}\n{\"testID\":23,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":25995}\n{\"testID\":23,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":25995}\n{\"testID\":23,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":26000}\n{\"testID\":23,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":26001}\n{\"test\":{\"id\":24,\"name\":\"owner replacement while original group metadata waits prevents its next real member lookup\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":235,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":26002}\n{\"testID\":24,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":26281}\n{\"testID\":24,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":26289}\n{\"testID\":24,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":26289}\n{\"testID\":24,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":26293}\n{\"testID\":24,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":26295}\n{\"test\":{\"id\":25,\"name\":\"a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":268,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":26295}\n{\"testID\":25,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":26790}\n{\"testID\":25,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":26793}\n{\"testID\":25,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":26793}\n{\"testID\":25,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":26798}\n{\"testID\":25,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":26799}\n{\"test\":{\"id\":26,\"name\":\"foreign coverage retires only the old owned announcement and a new explicit read remains usable\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":294,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":26800}\n{\"testID\":26,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":27489}\n{\"testID\":26,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":27493}\n{\"testID\":26,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":27493}\n{\"testID\":26,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":27499}\n{\"testID\":26,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":27501}\n{\"test\":{\"id\":27,\"name\":\"foreground loss immediately rejects the old callback and the next frame withdraws announcement text\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":323,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":27501}\n{\"testID\":27,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":28037}\n{\"testID\":27,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":28050}\n{\"testID\":27,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":28050}\n{\"testID\":27,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":28055}\n{\"testID\":27,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":28057}\n{\"test\":{\"id\":28,\"name\":\"sameCID metadata refresh preserves composer draft and never consumes genuine strong hints\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":360,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":28057}\n{\"testID\":28,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":28343}\n{\"testID\":28,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":28355}\n{\"testID\":28,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":28355}\n{\"testID\":28,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":28365}\n{\"testID\":28,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":28367}\n{\"test\":{\"id\":29,\"name\":\"muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior\",\"suiteID\":9,\"groupIDs\":[11],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":174,\"column\":5,\"url\":\"package:flutter_test/src/widget_tester.dart\",\"root_line\":393,\"root_column\":3,\"root_url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/chat/group_announcement_workflow_test.dart\"},\"type\":\"testStart\",\"time\":28367}\n{\"testID\":29,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.begin\",\"type\":\"print\",\"time\":28653}\n{\"testID\":29,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup sdk.end\",\"type\":\"print\",\"time\":28661}\n{\"testID\":29,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.begin\",\"type\":\"print\",\"time\":28661}\n{\"testID\":29,\"messageType\":\"print\",\"message\":\"group_announcement_cleanup unmount.end\",\"type\":\"print\",\"time\":28666}\n{\"testID\":29,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":28668}\n{\"suite\":{\"id\":30,\"platform\":\"vm\",\"path\":\"/home/runner/work/_temp/mobile-announcement26/source/app/test/features/conversation/conversation_repository_test.dart\"},\"type\":\"suite\",\"time\":28687}\n{\"test\":{\"id\":31,\"name\":\"loading /home/runner/work/_temp/mobile-announcement26/source/app/test/features/conversation/conversation_repository_test.dart\",\"suiteID\":30,\"groupIDs\":[],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":null,\"column\":null,\"url\":null},\"type\":\"testStart\",\"time\":28687}\n\n[{\"event\":\"test.startedProcess\",\"params\":{\"vmServiceUri\":null}}]\n{\"testID\":31,\"result\":\"success\",\"skipped\":false,\"hidden\":true,\"type\":\"testDone\",\"time\":29582}\n{\"group\":{\"id\":32,\"suiteID\":30,\"parentID\":null,\"name\":\"\",\"metadata\":{\"skip\":false,\"skipReason\":null},\"testCount\":1,\"line\":null,\"column\":null,\"url\":null},\"type\":\"group\",\"time\":29582}\n{\"test\":{\"id\":33,\"name\":\"SDK paging, drafts, read and preference mutations preserve the exact conversation target\",\"suiteID\":30,\"groupIDs\":[32],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":24,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/conversation/conversation_repository_test.dart\"},\"type\":\"testStart\",\"time\":29582}\n{\"testID\":33,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":29657}\n{\"suite\":{\"id\":34,\"platform\":\"vm\",\"path\":\"/home/runner/work/_temp/mobile-announcement26/source/app/test/features/contacts/contacts_repository_test.dart\"},\"type\":\"suite\",\"time\":29670}\n{\"test\":{\"id\":35,\"name\":\"loading /home/runner/work/_temp/mobile-announcement26/source/app/test/features/contacts/contacts_repository_test.dart\",\"suiteID\":34,\"groupIDs\":[],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":null,\"column\":null,\"url\":null},\"type\":\"testStart\",\"time\":29670}\n\n[{\"event\":\"test.startedProcess\",\"params\":{\"vmServiceUri\":null}}]\n{\"testID\":35,\"result\":\"success\",\"skipped\":false,\"hidden\":true,\"type\":\"testDone\",\"time\":30336}\n{\"group\":{\"id\":36,\"suiteID\":34,\"parentID\":null,\"name\":\"\",\"metadata\":{\"skip\":false,\"skipReason\":null},\"testCount\":1,\"line\":null,\"column\":null,\"url\":null},\"type\":\"group\",\"time\":30336}\n{\"test\":{\"id\":37,\"name\":\"group flags keep prohibition semantics and booleans serialize to SDK status 1\",\"suiteID\":34,\"groupIDs\":[36],\"metadata\":{\"skip\":false,\"skipReason\":null},\"line\":168,\"column\":3,\"url\":\"file:///home/runner/work/_temp/mobile-announcement26/source/app/test/features/contacts/contacts_repository_test.dart\"},\"type\":\"testStart\",\"time\":30337}\n{\"testID\":37,\"result\":\"success\",\"skipped\":false,\"hidden\":false,\"type\":\"testDone\",\"time\":30408}\n{\"success\":false,\"type\":\"done\",\"time\":30422}\n",
+    "raw_resource_pin": {
+      "path": "announcement-target26.resource.json",
+      "bytes": 3890,
+      "sha256": "a224f872b148de5bbe0acb0ca45b570c7005093960bce42689919bde47e53d8a"
+    },
+    "raw_resource_utf8": "{\n  \"child_exit_code\": 1,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/flutter\",\n    \"test\",\n    \"--no-pub\",\n    \"--machine\",\n    \"--concurrency=1\",\n    \"--no-enable-vmservice\",\n    \"--name\",\n    \"^(?:SDK\\\\ hint4\\\\ is\\\\ announcement\\\\ while\\\\ true\\\\ at1to3\\\\ and\\\\ preview\\\\ stripping\\\\ preserve\\\\ independent\\\\ identity|fresh\\\\ snapshot\\\\ bounds\\\\ reject\\\\ controls\\\\ bidi\\\\ malformed\\\\ unicode\\\\ and\\\\ unavailable\\\\ membership\\\\ while\\\\ URL\\\\ text\\\\ stays\\\\ plain|acknowledged\\\\ exact\\\\-version\\\\ dismissal\\\\ survives\\\\ reopening\\\\ without\\\\ consuming\\\\ a\\\\ republished\\\\ version\\\\ or\\\\ another\\\\ owner\\\\ group|preferences\\\\ failure\\\\ leaves\\\\ the\\\\ version\\\\ unacknowledged\\\\ and\\\\ one\\\\ explicit\\\\ retry\\\\ persists\\\\ only\\\\ a\\\\ boolean\\\\ digest\\\\ key|queued\\\\ preference\\\\ dispatch\\\\ rechecks\\\\ its\\\\ original\\\\ source\\\\ before\\\\ physical\\\\ acknowledgement|an\\\\ already\\\\ dispatched\\\\ dismissal\\\\ keeps\\\\ its\\\\ original\\\\ key\\\\ after\\\\ source\\\\ retirement\\\\ without\\\\ acknowledging\\\\ another\\\\ owner|actual\\\\ group\\\\ chat\\\\ opens\\\\ a\\\\ fresh\\\\ ordinary\\\\-member\\\\ announcement\\\\ and\\\\ its\\\\ own\\\\ detail\\\\ stays\\\\ readable|acknowledged\\\\ announcement\\\\ close\\\\ survives\\\\ a\\\\ new\\\\ real\\\\ chat\\\\ route\\\\ while\\\\ a\\\\ republished\\\\ version\\\\ appears\\\\ again|a\\\\ preferences\\\\ failure\\\\ retains\\\\ the\\\\ visible\\\\ announcement\\\\ until\\\\ one\\\\ explicit\\\\ retry\\\\ is\\\\ acknowledged|a\\\\ delayed\\\\ versionA\\\\ dismissal\\\\ never\\\\ consumes\\\\ a\\\\ newly\\\\ loaded\\\\ versionB|a\\\\ genuine\\\\ at\\\\-me\\\\ hint\\\\ does\\\\ not\\\\ create\\\\ an\\\\ announcement\\\\ from\\\\ historical\\\\ group\\\\ text|failed\\\\ fresh\\\\ group\\\\ metadata\\\\ offers\\\\ an\\\\ actual\\\\ read\\\\-only\\\\ retry\\\\ instead\\\\ of\\\\ an\\\\ empty\\\\ successful\\\\ announcement|fresh\\\\ duplicate\\\\ group\\\\ metadata\\\\ withdraws\\\\ the\\\\ announcement\\\\ before\\\\ any\\\\ acknowledgement|fresh\\\\ foreign\\\\ group\\\\ metadata\\\\ withdraws\\\\ the\\\\ announcement\\\\ before\\\\ any\\\\ acknowledgement|fresh\\\\ left\\\\ group\\\\ metadata\\\\ withdraws\\\\ the\\\\ announcement\\\\ before\\\\ any\\\\ acknowledgement|original\\\\ owner\\\\ replacement\\\\ withdraws\\\\ an\\\\ open\\\\ announcement\\\\ and\\\\ rejects\\\\ its\\\\ retained\\\\ close\\\\ callback|original\\\\ issuer\\\\ replacement\\\\ withdraws\\\\ an\\\\ open\\\\ announcement\\\\ and\\\\ rejects\\\\ its\\\\ retained\\\\ close\\\\ callback|original\\\\ tenant\\\\ replacement\\\\ withdraws\\\\ an\\\\ open\\\\ announcement\\\\ and\\\\ rejects\\\\ its\\\\ retained\\\\ close\\\\ callback|owner\\\\ replacement\\\\ while\\\\ original\\\\ group\\\\ metadata\\\\ waits\\\\ prevents\\\\ its\\\\ next\\\\ real\\\\ member\\\\ lookup|a\\\\ same\\\\-State\\\\ CID\\\\ ABA\\\\ cannot\\\\ renew\\\\ the\\\\ original\\\\ announcement\\\\ dialog\\\\ or\\\\ its\\\\ acknowledgement|foreign\\\\ coverage\\\\ retires\\\\ only\\\\ the\\\\ old\\\\ owned\\\\ announcement\\\\ and\\\\ a\\\\ new\\\\ explicit\\\\ read\\\\ remains\\\\ usable|foreground\\\\ loss\\\\ immediately\\\\ rejects\\\\ the\\\\ old\\\\ callback\\\\ and\\\\ the\\\\ next\\\\ frame\\\\ withdraws\\\\ announcement\\\\ text|sameCID\\\\ metadata\\\\ refresh\\\\ preserves\\\\ composer\\\\ draft\\\\ and\\\\ never\\\\ consumes\\\\ genuine\\\\ strong\\\\ hints|muted\\\\-admin\\\\ announcement\\\\ controls\\\\ and\\\\ full\\\\ URL\\\\-like\\\\ text\\\\ remain\\\\ usable\\\\ at360\\\\ large\\\\ text\\\\ without\\\\ automatic\\\\ link\\\\ behavior|SDK\\\\ paging,\\\\ drafts,\\\\ read\\\\ and\\\\ preference\\\\ mutations\\\\ preserve\\\\ the\\\\ exact\\\\ conversation\\\\ target|group\\\\ flags\\\\ keep\\\\ prohibition\\\\ semantics\\\\ and\\\\ booleans\\\\ serialize\\\\ to\\\\ SDK\\\\ status\\\\ 1)$\",\n    \"test/features/chat/group_announcement_store_test.dart\",\n    \"test/features/chat/group_announcement_workflow_test.dart\",\n    \"test/features/conversation/conversation_repository_test.dart\",\n    \"test/features/contacts/contacts_repository_test.dart\"\n  ],\n  \"elapsed_seconds\": 33.448,\n  \"latched_failure\": null,\n  \"log_sha256\": \"bae636468fad332973eca905fdc86a808ddebe5e57ec32ca9589833f1c3029af\",\n  \"minimum_free_bytes\": 89683783680,\n  \"peak_workspace_allocated_bytes\": 149094400,\n  \"phase\": \"announcement-target26\"\n}\n",
+    "old_names26": [
+      "SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity",
+      "fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain",
+      "acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group",
+      "preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key",
+      "queued preference dispatch rechecks its original source before physical acknowledgement",
+      "an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner",
+      "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "a genuine at-me hint does not create an announcement from historical group text",
+      "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "owner replacement while original group metadata waits prevents its next real member lookup",
+      "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior",
+      "SDK paging, drafts, read and preference mutations preserve the exact conversation target",
+      "group flags keep prohibition semantics and booleans serialize to SDK status 1"
+    ],
+    "old_failure_names": [
+      "acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group",
+      "acknowledged announcement close survives a new real chat route while a republished version appears again"
+    ],
+    "original_false_footer_preserved": true,
+    "whole26_not_green": true
+  },
+  "resource": {
+    "initial_bytes": 4294967296,
+    "floor_bytes": 1073741824,
+    "allocated_cap_bytes": 805306368,
+    "poll_seconds": 0.2,
+    "phase_seconds": 120
+  },
+  "inherit": "178lock/SDK51/migration1/officialtoolchain/native530/refsame; realHOME/netns/guard unchanged; noCard/group/full/old26 rerun"
+}
