@@ -1,0 +1,2831 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../design/tokens.dart';
+import '../../../core/error/app_failure.dart';
+import '../../../core/im/open_im_gateway.dart';
+import '../../../core/network/tenant_api.dart';
+import '../../../core/tenant/session_access.dart';
+import '../../../core/tenant/session_coordinator.dart';
+import '../../../providers.dart';
+import '../../favorite/domain/favorite.dart';
+import '../../favorite/favorite_providers.dart';
+import '../../rtc/presentation/rtc_providers.dart';
+import '../../conversation/data/conversation_repository.dart';
+import '../data/chat_repository.dart';
+import '../data/chat_reading_preferences.dart';
+import 'chat_font_size_page.dart';
+import 'group_announcement_panel.dart';
+import 'saved_emoji_sheet.dart';
+import '../data/chat_background_store.dart';
+import 'chat_background_page.dart';
+import '../domain/chat_message.dart';
+import '../domain/chat_mention.dart';
+import '../../group/data/group_repository.dart';
+import '../../group/presentation/group_creation_action.dart';
+import '../../contacts/domain/contact.dart';
+import '../../contacts/contacts_providers.dart';
+import 'chat_controller.dart';
+import 'mention_text_controller.dart';
+import 'group_mention_picker.dart';
+import 'mentioned_message_text.dart';
+import 'chat_media_actions.dart';
+import 'chat_batch_selection.dart';
+import 'chat_batch_widgets.dart';
+import 'chat_content_access.dart';
+import 'chat_location_view.dart';
+import 'chat_location_picker_page.dart';
+import 'chat_card_picker_page.dart';
+import 'chat_card_view.dart';
+import 'chat_merged_messages_page.dart';
+import 'chat_call_picker.dart';
+import 'message_media.dart';
+import 'message_readers_sheet.dart';
+import 'chat_search_page.dart';
+import 'chat_forward_page.dart';
+import 'message_privacy_content.dart';
+
+class ChatPage extends ConsumerStatefulWidget {
+  const ChatPage({
+    super.key,
+    required this.conversationId,
+    this.sourceMessageId,
+    this.sourceCurrent,
+    this.now,
+    this.playbackFactory,
+    this.locationPicker,
+  });
+  final String conversationId;
+  final String? sourceMessageId;
+  final bool Function()? sourceCurrent;
+  final DateTime Function()? now;
+  final ChatAudioPlayback Function(VoidCallback onFailure)? playbackFactory;
+  final LocationPickerDependencies? locationPicker;
+  @override
+  ConsumerState<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends ConsumerState<ChatPage>
+    with WidgetsBindingObserver {
+  late final ChatController controller;
+  late final ChatBatchSelection selection;
+  late final ChatAudioPlayback playback;
+  final input = MentionTextController();
+  final focus = FocusNode();
+  final scroll = ScrollController();
+  bool _draftLoaded = false;
+  bool _restoredMentionText = false;
+  bool _allowPop = false;
+  bool _leaving = false;
+  final _viewportKey = GlobalKey();
+  final Map<String, GlobalKey> _rowKeys = {};
+  bool _foreground = true;
+  bool _routeVisible = true;
+  bool _readQueued = false;
+  bool _receiptBusy = false;
+  String _readSignature = '';
+  final Set<String> _voiceReadAttempted = {};
+  Timer? _audioExpiry;
+  late final ChatReadingPreferences _readingPreferences;
+  StreamSubscription<ChatReadingChange>? _readingChanges;
+  double _fontFactor = defaultChatFontFactor;
+  bool _fontReadFailed = false;
+  int _fontRead = 0, _fontIntent = 0;
+  int _emojiIntent = 0;
+  int _locationIntent = 0;
+  int _cardIntent = 0;
+  int _revokeIntent = 0;
+  ModalRoute<dynamic>? _revokeRoute;
+  final _revokeChanges = ValueNotifier<int>(0);
+  bool _revokeChangeQueued = false;
+  final _cardChanges = ValueNotifier<int>(0);
+  ModalRoute<dynamic>? _cardPickerRoute;
+  final _locationChanges = ValueNotifier<int>(0);
+  bool _locationPickerOpen = false;
+  ModalRoute<dynamic>? _locationPickerRoute;
+  int? _emojiPickerTicket;
+  Completer<void>? _emojiPickerResumed;
+
+  late final ChatBackgroundPreferences _backgroundPreferences;
+  StreamSubscription<ChatBackgroundChange>? _backgroundChanges;
+  StreamSubscription<int>? _backgroundInvalidations, _backgroundAccess;
+  StreamSubscription<SessionSnapshot>? _backgroundSessions;
+  File? _background;
+  bool _backgroundReadFailed = false;
+  int _backgroundRead = 0;
+  bool _backgroundRetired = false;
+  bool get _backgroundCurrent =>
+      !_backgroundRetired &&
+      _backgroundPreferences.current &&
+      _backgroundPreferences.conversationId == widget.conversationId &&
+      controller.repository.conversationId == widget.conversationId;
+  Future<void> _loadBackground() async {
+    final ticket = ++_backgroundRead;
+    try {
+      final value = await _backgroundPreferences.read();
+      if (!mounted || ticket != _backgroundRead || !_backgroundCurrent) return;
+      setState(() {
+        _background = value.unavailable ? null : value.image;
+        _backgroundReadFailed = value.unavailable;
+      });
+    } catch (_) {
+      if (!mounted || ticket != _backgroundRead || !_backgroundCurrent) return;
+      setState(() => _backgroundReadFailed = true);
+    }
+  }
+
+  Future<void> _loadReadingPreferences() async {
+    final ticket = ++_fontRead;
+    try {
+      final factor = await _readingPreferences.read();
+      if (!mounted || ticket != _fontRead || !_readingPreferences.current) {
+        return;
+      }
+      setState(() {
+        _fontFactor = factor;
+        _fontReadFailed = false;
+      });
+    } catch (_) {
+      if (!mounted || ticket != _fontRead || !_readingPreferences.current) {
+        return;
+      }
+      setState(() => _fontReadFailed = true);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    _foreground = lifecycle == null || lifecycle == AppLifecycleState.resumed;
+    void audioFailure() {
+      if (mounted) _notice('语音播放失败，请重试');
+    }
+
+    playback =
+        widget.playbackFactory?.call(audioFailure) ??
+        ChatAudioPlayback(onFailure: audioFailure);
+    playback.addListener(_changed);
+    controller = ChatController(
+      ChatRepository(
+        gateway: ref.read(imGatewayProvider),
+        session: ref.read(appRuntimeProvider).session,
+        conversationId: widget.conversationId,
+        api: ref.read(tenantApiProvider),
+        now: widget.now,
+      ),
+    );
+    _readingPreferences = ChatReadingPreferences(
+      ref.read(chatReadingStoreProvider),
+      controller.repository.session,
+    );
+    _readingChanges = _readingPreferences.store.changes.listen((change) {
+      if (!mounted ||
+          !_readingPreferences.current ||
+          change.accountKey != _readingPreferences.accountKey) {
+        return;
+      }
+      ++_fontRead; // An older initial read cannot overwrite this acknowledged save.
+      setState(() {
+        _fontFactor = change.factor;
+        _fontReadFailed = false;
+      });
+    });
+    unawaited(_loadReadingPreferences());
+    _backgroundPreferences = ChatBackgroundPreferences(
+      ref.read(chatBackgroundStoreProvider),
+      controller.repository.session,
+      widget.conversationId,
+    );
+    _backgroundChanges = _backgroundPreferences.store.changes.listen((change) {
+      if (!mounted ||
+          !_backgroundCurrent ||
+          change.accountKey != _backgroundPreferences.accountKey ||
+          change.conversationId != widget.conversationId) {
+        return;
+      }
+      ++_backgroundRead;
+      setState(() {
+        _background = change.snapshot.image;
+        _backgroundReadFailed = false;
+      });
+    });
+    _backgroundInvalidations = controller.repository.session.invalidations
+        .listen((_) {
+          ++_backgroundRead;
+          if (mounted) setState(() => _background = null);
+        });
+    void backgroundOwnerChanged() {
+      if (mounted && !_backgroundCurrent) {
+        ++_backgroundRead;
+        setState(() => _background = null);
+      }
+    }
+
+    _backgroundAccess = controller.repository.session.accessChanges.listen(
+      (_) => backgroundOwnerChanged(),
+    );
+    _backgroundSessions = controller.repository.session.changes.listen(
+      (_) => backgroundOwnerChanged(),
+    );
+    unawaited(_loadBackground());
+    selection = ChatBatchSelection(controller)..addListener(_changed);
+    controller.addListener(_changed);
+    input.addListener(_inputChanged);
+    unawaited(_start());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _foreground = state == AppLifecycleState.resumed;
+    if (!_foreground) _retireRevoke();
+    if (!_foreground) ++_cardIntent;
+    if (!_foreground && !_locationPickerOpen) {
+      ++_locationIntent;
+    }
+    // The OS picker/permission prompt may background this exact portal. Only
+    // its outstanding picker may resume; sending and all other continuations
+    // still require foreground and the original owner/CID/route ticket.
+    if (!_foreground && _emojiPickerTicket != _emojiIntent) {
+      ++_emojiIntent;
+    }
+    if (!_foreground && _emojiPickerTicket == _emojiIntent) {
+      _emojiPickerResumed ??= Completer<void>();
+    }
+    if (_foreground) {
+      if (_emojiPickerResumed case final resumed?) {
+        if (!resumed.isCompleted) {
+          resumed.complete();
+        }
+        _emojiPickerResumed = null;
+      }
+    }
+    _readSignature = '';
+    if (_foreground) {
+      _scheduleVisibleReads();
+    } else {
+      unawaited(playback.pause());
+    }
+  }
+
+  void _scheduleVisibleReads() {
+    if (_readQueued) return;
+    _readQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _readQueued = false;
+      if (!mounted ||
+          !_foreground ||
+          !_routeVisible ||
+          _receiptBusy ||
+          !controller.usable ||
+          controller.conversation?.isGroup != true) {
+        return;
+      }
+      final viewport = _viewportKey.currentContext?.findRenderObject();
+      if (viewport is! RenderBox || !viewport.hasSize) return;
+      final bounds = viewport.localToGlobal(Offset.zero) & viewport.size;
+      final ids = <String>[];
+      for (final message in controller.messages) {
+        if (message.mine ||
+            message.privacy.isExpiredAt(controller.repository.now()) ||
+            message.kind == ChatMessageKind.voice ||
+            message.kind == ChatMessageKind.system ||
+            message.kind == ChatMessageKind.typing) {
+          continue;
+        }
+        final row = _rowKeys[message.id]?.currentContext?.findRenderObject();
+        if (row is! RenderBox || !row.hasSize) continue;
+        final rectangle = row.localToGlobal(Offset.zero) & row.size;
+        final visible = rectangle.intersect(bounds);
+        final threshold =
+            (rectangle.height < bounds.height
+                ? rectangle.height
+                : bounds.height) /
+            2;
+        if (visible.width > 0 &&
+            visible.height > 0 &&
+            visible.height >= threshold) {
+          ids.add(message.id);
+        }
+      }
+      ids.sort();
+      final signature = ids.join('|');
+      if (signature == _readSignature) return;
+      _readSignature = signature;
+      if (ids.isEmpty) return;
+      _receiptBusy = true;
+      try {
+        await controller.markVisibleRead(ids);
+      } finally {
+        _receiptBusy = false;
+        if (mounted) _scheduleVisibleReads();
+      }
+    });
+  }
+
+  Future<void> _showReaders(String messageId) async {
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => MessageReadersSheet(
+        repository: controller.repository,
+        messageId: messageId,
+      ),
+    );
+    if (!mounted || selected == null) return;
+    final group = controller.conversation?.groupId;
+    final query = group == null ? '' : '?group=${Uri.encodeComponent(group)}';
+    await context.push('/contacts/user/${Uri.encodeComponent(selected)}$query');
+  }
+
+  Future<void> _start() async {
+    bool initialCurrent() =>
+        mounted &&
+        (widget.sourceCurrent == null ||
+            _routeVisible && widget.sourceCurrent!());
+    if (!initialCurrent()) return;
+    await controller.start(
+      isCurrent: widget.sourceCurrent == null ? null : initialCurrent,
+    );
+    final id = widget.sourceMessageId;
+    if (id == null ||
+        !mounted ||
+        !controller.usable ||
+        widget.sourceCurrent?.call() == false) {
+      return;
+    }
+    await _locateSource(id, sourceCurrent: widget.sourceCurrent);
+  }
+
+  Future<void> _locateSource(
+    String id, {
+    bool Function()? sourceCurrent,
+  }) async {
+    bool current() =>
+        mounted &&
+        controller.usable &&
+        (sourceCurrent == null || _routeVisible && sourceCurrent());
+    if (!current()) return;
+    try {
+      final found = await controller.viewSource(id, isCurrent: current);
+      if (!current()) return;
+      if (!found) _notice('原消息已删除或尚未同步到本机');
+      if (found && scroll.hasClients) scroll.jumpTo(0);
+    } catch (_) {
+      if (current()) _notice('暂时无法定位原消息，请稍后重试');
+    }
+  }
+
+  void _inputChanged() {
+    if (input.text.isEmpty) _restoredMentionText = false;
+    if (_draftLoaded) controller.updateDraft(input.storedDraft);
+    if (mounted) setState(() {});
+  }
+
+  void _changed() {
+    if (!mounted) return;
+    playback.recheck();
+    _audioExpiry?.cancel();
+    final playing = controller.messages
+        .where((item) => item.id == playback.messageId)
+        .firstOrNull;
+    if (playing != null && playback.playing) {
+      final delay = playing.privacy.millisecondsUntilExpiry(
+        controller.repository.now(),
+      );
+      if (delay != null) {
+        if (delay <= 0) {
+          unawaited(playback.pause());
+        } else {
+          _audioExpiry = Timer(Duration(milliseconds: delay + 1), () {
+            if (mounted && playback.messageId == playing.id) {
+              unawaited(playback.pause());
+            }
+          });
+        }
+      }
+    }
+    if (!_draftLoaded && controller.conversation != null) {
+      input.restore(controller.draft);
+      _restoredMentionText =
+          controller.conversation!.isGroup && controller.draft.contains('@');
+      input.selection = TextSelection.collapsed(offset: input.text.length);
+      _draftLoaded = true;
+    }
+    if (_foreground &&
+        _routeVisible &&
+        playback.playing &&
+        playback.messageId != null &&
+        _voiceReadAttempted.add(playback.messageId!)) {
+      unawaited(controller.markVisibleRead([playback.messageId!]));
+    }
+    setState(() {});
+  }
+
+  Future<void> _retry() async {
+    _readSignature = '';
+    if (controller.conversation == null) {
+      await controller.start();
+    } else {
+      await controller.refresh();
+    }
+    await controller.markVisibleRead(const []);
+    if (mounted) _scheduleVisibleReads();
+  }
+
+  @override
+  void didUpdateWidget(covariant ChatPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.conversationId != widget.conversationId) {
+      // The production router normally creates a CID-keyed fresh ChatPage.
+      // If a caller reuses this State, retire its original background binding
+      // permanently; never paint/read/admit a new CID through the old owner.
+      ++_emojiIntent;
+      ++_locationIntent;
+      ++_cardIntent;
+      _retireRevoke();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ++_locationChanges.value;
+          ++_cardChanges.value;
+        }
+      });
+      _backgroundRetired = true;
+      ++_backgroundRead;
+      _background = null;
+      _backgroundReadFailed = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    ++_locationIntent;
+    _locationChanges.dispose();
+    ++_cardIntent;
+    _cardChanges.dispose();
+    ++_emojiIntent;
+    ++_revokeIntent;
+    _revokeChanges.dispose();
+    if (_emojiPickerResumed case final resumed?) {
+      if (!resumed.isCompleted) {
+        resumed.complete();
+      }
+    }
+    ++_fontRead;
+    ++_fontIntent;
+    unawaited(_readingChanges?.cancel());
+    ++_backgroundRead;
+    unawaited(_backgroundChanges?.cancel());
+    unawaited(_backgroundInvalidations?.cancel());
+    unawaited(_backgroundAccess?.cancel());
+    unawaited(_backgroundSessions?.cancel());
+    selection.removeListener(_changed);
+    selection.dispose();
+    controller.removeListener(_changed);
+    controller.dispose();
+    playback.removeListener(_changed);
+    playback.dispose();
+    input.removeListener(_inputChanged);
+    input.dispose();
+    focus.dispose();
+    scroll.dispose();
+    _audioExpiry?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _leave() async {
+    if (selection.active) {
+      selection.cancel();
+      return;
+    }
+    if (_leaving) return;
+    _leaving = true;
+    await controller.flushDraft();
+    if (!mounted) return;
+    if (controller.draftFailure != null) {
+      final leave = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('草稿未保存'),
+          content: const Text('暂时无法保存输入内容，返回可能丢失本次修改。'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('留在此页'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('仍然返回'),
+            ),
+          ],
+        ),
+      );
+      if (leave != true) {
+        _leaving = false;
+        return;
+      }
+    }
+    if (!mounted) return;
+    setState(() => _allowPop = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.pop();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _routeVisible = ModalRoute.of(context)?.isCurrent ?? true;
+    if (!_routeVisible &&
+        _revokeRoute != null &&
+        !(_revokeRoute!.isActive && _revokeRoute!.isCurrent)) {
+      _retireRevoke();
+    }
+    if (!_routeVisible) _readSignature = '';
+    _scheduleVisibleReads();
+    return PopScope<Object?>(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) unawaited(_leave());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(onPressed: _leave),
+          title: selection.active
+              ? Text('已选 ${selection.count} 条')
+              : InkWell(
+                  onTap: controller.conversation == null
+                      ? null
+                      : _conversationDetails,
+                  child: Text(
+                    controller.conversation?.title ?? '聊天',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+          actions: [
+            if (!selection.active)
+              IconButton(
+                tooltip: '发起通话',
+                icon: const Icon(Icons.call_outlined),
+                onPressed: controller.conversation == null || !controller.usable
+                    ? null
+                    : _call,
+              ),
+            if (!selection.active)
+              IconButton(
+                tooltip: '聊天设置',
+                icon: const Icon(Icons.more_horiz),
+                onPressed: controller.conversation == null ? null : _settings,
+              ),
+          ],
+        ),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 900),
+            child: Column(
+              children: [
+                if (controller.conversation?.isGroup == true &&
+                    (controller.conversation?.groupId?.isNotEmpty ?? false))
+                  ChatReadingTextScale(
+                    factor: _fontFactor,
+                    child: GroupAnnouncementPanel(
+                      repository: controller.repository,
+                      conversationId: widget.conversationId,
+                      groupId: controller.conversation!.groupId!,
+                      hint: controller.conversation!.groupHint,
+                      sourceCurrent: () =>
+                          mounted &&
+                          controller.repository.current &&
+                          controller.repository.conversationId ==
+                              widget.conversationId,
+                    ),
+                  ),
+                if (controller.sourceMessageId != null)
+                  MaterialBanner(
+                    content: const Text('正在查看来源消息'),
+                    actions: [
+                      TextButton(
+                        onPressed: controller.returnToLatest,
+                        child: const Text('返回最新'),
+                      ),
+                    ],
+                  ),
+                if (controller.failure != null)
+                  MaterialBanner(
+                    content: Text(controller.failure!.message),
+                    actions: [
+                      TextButton(onPressed: _retry, child: const Text('重试')),
+                    ],
+                  ),
+                if (controller.draftFailure != null)
+                  MaterialBanner(
+                    content: const Text('草稿未保存'),
+                    actions: [
+                      TextButton(
+                        onPressed: controller.flushDraft,
+                        child: const Text('重新保存'),
+                      ),
+                    ],
+                  ),
+                Expanded(
+                  child: ChatBackgroundSurface(
+                    image: _backgroundCurrent ? _background : null,
+                    child: controller.loading && controller.messages.isEmpty
+                        ? const Center(child: CircularProgressIndicator())
+                        : controller.messages.isEmpty
+                        ? Center(
+                            child: Text(
+                              controller.conversation == null
+                                  ? '暂时无法加载会话'
+                                  : '还没有消息，开始聊天吧',
+                              style: const TextStyle(
+                                color: AppColors.secondary,
+                              ),
+                            ),
+                          )
+                        : NotificationListener<ScrollNotification>(
+                            onNotification: (notification) {
+                              _scheduleVisibleReads();
+                              if (notification.metrics.extentAfter < 200) {
+                                unawaited(controller.loadOlder());
+                              }
+                              return false;
+                            },
+                            child: ListView.builder(
+                              key: _viewportKey,
+                              controller: scroll,
+                              reverse: true,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 16,
+                              ),
+                              itemCount:
+                                  controller.messages.length +
+                                  (controller.hasMore ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == controller.messages.length) {
+                                  return Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: controller.loadingOlder
+                                          ? const CircularProgressIndicator()
+                                          : TextButton(
+                                              onPressed: controller.loadOlder,
+                                              child: const Text('加载更早的消息'),
+                                            ),
+                                    ),
+                                  );
+                                }
+                                final item =
+                                    controller.messages[controller
+                                            .messages
+                                            .length -
+                                        1 -
+                                        index];
+                                return ColoredBox(
+                                  key: _rowKeys.putIfAbsent(
+                                    item.id,
+                                    GlobalKey.new,
+                                  ),
+                                  color: item.id == controller.sourceMessageId
+                                      ? const Color(0xffdbeafe)
+                                      : Colors.transparent,
+                                  child: _message(item),
+                                );
+                              },
+                            ),
+                          ),
+                  ),
+                ),
+                if (selection.active || selection.busy)
+                  ChatBatchToolbar(
+                    count: selection.count,
+                    busy: selection.busy,
+                    canMerge: selection.canMerge,
+                    onDelete: _deleteSelection,
+                    onMerge: _forwardSelection,
+                    onCancel: selection.cancel,
+                  )
+                else
+                  _composer(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _message(ChatMessage item) => ChatSelectionRow(
+    active: selection.active,
+    eligible: selection.eligible(item),
+    selected: selection.selected(item.id),
+    onToggle: () {
+      if (!selection.toggle(item)) _notice('最多选择 20 条消息');
+    },
+    child: _messageBody(item),
+  );
+
+  Widget _messageBody(ChatMessage item) {
+    if (item.kind == ChatMessageKind.system ||
+        item.kind == ChatMessageKind.typing) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Center(
+          child: Text(
+            item.text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: AppColors.secondary, fontSize: 12),
+          ),
+        ),
+      );
+    }
+    final avatar = InkWell(
+      onTap: item.senderId.isEmpty || !controller.usable
+          ? null
+          : () => _userDetails(item.senderId),
+      onLongPress:
+          item.senderId.isEmpty ||
+              item.mine ||
+              controller.conversation?.isGroup != true ||
+              !controller.usable
+          ? null
+          : () => _mentionSender(item),
+      customBorder: const CircleBorder(),
+      child: CircleAvatar(
+        radius: 18,
+        backgroundColor: const Color(0xffdce7ff),
+        child: Text(
+          item.senderName.isEmpty ? '?' : item.senderName.characters.first,
+          style: const TextStyle(color: AppColors.primary, fontSize: 13),
+        ),
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: item.mine
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
+        children: [
+          if (!item.mine) avatar,
+          if (!item.mine) const SizedBox(width: 9),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: item.mine
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
+              children: [
+                if (!item.mine && controller.conversation?.isGroup == true)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      item.senderName,
+                      style: const TextStyle(
+                        color: AppColors.secondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                GestureDetector(
+                  onLongPress: () => _messageActions(item),
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.sizeOf(context).width * .7,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 13,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: item.mine ? const Color(0xffdce8ff) : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: MessagePrivacyContent(
+                      key: ValueKey(item.id),
+                      privacy: item.privacy,
+                      now: controller.repository.now,
+                      child: _content(item),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                if (item.privacy.notice case final notice?)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      notice,
+                      style: const TextStyle(
+                        color: AppColors.error,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                Wrap(
+                  spacing: 5,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      _time(item.sentAt),
+                      style: const TextStyle(
+                        color: AppColors.secondary,
+                        fontSize: 10,
+                      ),
+                    ),
+                    if (item.mine &&
+                        item.delivery == MessageDelivery.sending) ...[
+                      const SizedBox(
+                        width: 10,
+                        height: 10,
+                        child: CircularProgressIndicator(strokeWidth: 1.5),
+                      ),
+                      Text(
+                        controller.progress.containsKey(item.id)
+                            ? '${controller.progress[item.id]}%'
+                            : '发送中',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                    ],
+                    if (item.mine && item.delivery == MessageDelivery.failed)
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(44, 44),
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                        ),
+                        onPressed:
+                            controller.isUnconfirmedLocation(item.id) ||
+                                controller.isUnconfirmedCard(item.id)
+                            ? _retry
+                            : () => controller.resend(item.id),
+                        icon: const Icon(
+                          Icons.error_outline,
+                          color: AppColors.error,
+                          size: 16,
+                        ),
+                        label: Text(
+                          controller.isUnconfirmedLocation(item.id) ||
+                                  controller.isUnconfirmedCard(item.id)
+                              ? '发送未确认，刷新核对'
+                              : '发送失败，重试',
+                          style: const TextStyle(
+                            color: AppColors.error,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    if (item.mine &&
+                        item.delivery == MessageDelivery.sent &&
+                        controller.conversation?.isGroup == true)
+                      TextButton(
+                        onPressed: () => _showReaders(item.id),
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(44, 44),
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                        ),
+                        child: Text(
+                          '${item.groupReadCount ?? 0} 人已读',
+                          style: const TextStyle(fontSize: 11),
+                        ),
+                      )
+                    else if (item.mine && item.delivery == MessageDelivery.sent)
+                      Text(
+                        item.read ? '已读' : '已发送',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppColors.secondary,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (item.mine) const SizedBox(width: 9),
+          if (item.mine) avatar,
+        ],
+      ),
+    );
+  }
+
+  ChatContentAccess? _contentAccess(
+    ChatMessage child,
+    ChatMessage? portal,
+    bool Function()? portalCurrent,
+  ) {
+    try {
+      return ChatContentAccess(
+        repository: controller.repository,
+        root: portal ?? child,
+        child: child,
+        isRouteCurrent: () =>
+            mounted &&
+            _foreground &&
+            (portalCurrent?.call() ??
+                (ModalRoute.of(context)?.isCurrent ?? false)),
+      );
+    } on AppFailure {
+      return null;
+    }
+  }
+
+  Widget _content(
+    ChatMessage item, {
+    ChatMessage? portal,
+    bool Function()? portalCurrent,
+  }) => ChatReadingTextScale(
+    factor: _fontFactor,
+    child: _readingContent(item, portal: portal, portalCurrent: portalCurrent),
+  );
+
+  Widget _readingContent(
+    ChatMessage item, {
+    ChatMessage? portal,
+    bool Function()? portalCurrent,
+  }) {
+    switch (item.kind) {
+      case ChatMessageKind.card:
+        final contacts = ref.watch(contactsRepositoryProvider);
+        final fromGroup = controller.conversation?.isGroup == true;
+        final sourceGroupId = fromGroup
+            ? controller.conversation?.groupId
+            : null;
+        final sourceGroups = sourceGroupId == null
+            ? null
+            : ref.watch(groupRepositoryProvider);
+        return ChatCardView(
+          key: ValueKey((
+            controller.repository.conversationId,
+            (portal ?? item).id,
+            item.id,
+            'card',
+          )),
+          card: item.card,
+          contacts: contacts,
+          sourceGroupId: sourceGroupId,
+          sourceGroups: sourceGroups,
+          contactsCurrent: () =>
+              mounted &&
+              identical(ref.read(contactsRepositoryProvider), contacts) &&
+              (controller.conversation?.isGroup == true) == fromGroup &&
+              (!fromGroup || sourceGroupId?.isNotEmpty == true) &&
+              (controller.conversation?.isGroup == true
+                      ? controller.conversation?.groupId
+                      : null) ==
+                  sourceGroupId &&
+              (sourceGroupId == null ||
+                  identical(ref.read(groupRepositoryProvider), sourceGroups)),
+          changes: controller,
+          captureAccess: (routeCurrent) => ChatContentAccess(
+            repository: controller.repository,
+            root: portal ?? item,
+            child: item,
+            // The exact source card owns its detail, including inside a
+            // merged-message route. A generic portalCurrent AND here would
+            // reject our own detail as soon as it covers that source route.
+            isRouteCurrent: () =>
+                mounted &&
+                _foreground &&
+                controller.repository.conversationId == widget.conversationId &&
+                routeCurrent(),
+          ),
+        );
+      case ChatMessageKind.location:
+        return ChatLocationView(
+          key: ValueKey((
+            controller.repository.conversationId,
+            (portal ?? item).id,
+            item.id,
+          )),
+          location: item.location,
+          changes: controller,
+          captureAccess: (routeCurrent) => ChatContentAccess(
+            repository: controller.repository,
+            root: portal ?? item,
+            child: item,
+            isRouteCurrent: () =>
+                mounted &&
+                _foreground &&
+                controller.repository.conversationId == widget.conversationId &&
+                routeCurrent(),
+          ),
+        );
+      case ChatMessageKind.forwarded:
+        final original = item.forwardedMessage;
+        if (original == null) {
+          if (!item.mergedContentComplete) return const Text('聊天记录内容过多，暂不可用');
+          if (item.mergedMessages.isEmpty) return const Text('[聊天记录]');
+          final root = portal ?? item;
+          return TextButton.icon(
+            icon: const Icon(Icons.forum_outlined),
+            label: Text('聊天记录 · ${item.mergedMessages.length} 条 · 查看'),
+            onPressed: () async {
+              final access = _contentAccess(item, portal, portalCurrent);
+              if (access == null || !access.canView) return;
+              await playback.pause();
+              if (!mounted || !access.canView) return;
+              await Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ChatMergedMessagesPage(
+                    root: root,
+                    messages: item.mergedMessages,
+                    now: controller.repository.now,
+                    canView: () => controller.repository.canView(root),
+                    onExit: () {
+                      unawaited(playback.pause());
+                    },
+                    childBuilder: (child, isCurrent) =>
+                        _content(child, portal: root, portalCurrent: isCurrent),
+                  ),
+                ),
+              );
+            },
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('转发的消息', style: TextStyle(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            Text(
+              original.senderName,
+              style: const TextStyle(fontSize: 12, color: AppColors.secondary),
+            ),
+            _messageText(original, portal: portal ?? item, embedded: true),
+            if (original.quotePreview != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text('引用：${original.quotePreview}'),
+              ),
+            const Text(
+              '原提及仅作展示，不会再次提醒成员',
+              style: TextStyle(fontSize: 11, color: AppColors.secondary),
+            ),
+          ],
+        );
+      case ChatMessageKind.image:
+      case ChatMessageKind.sticker:
+        final image = item.playableMedia;
+        if (image == null) return const Text('图片暂不可用');
+        return Semantics(
+          label: '图片消息',
+          button: true,
+          child: InkWell(
+            onTap: () async {
+              final access = _contentAccess(item, portal, portalCurrent);
+              if (access == null || !access.canView) return;
+              await playback.pause();
+              if (!mounted || !access.canView) return;
+              await _image(image, access);
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image(
+                image: image.scheme == 'file'
+                    ? FileImage(File.fromUri(image))
+                    : NetworkImage(image.toString()),
+                width: 210,
+                height: 160,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => const SizedBox(
+                  width: 170,
+                  height: 80,
+                  child: Center(child: Text('图片加载失败，点击重试')),
+                ),
+              ),
+            ),
+          ),
+        );
+      case ChatMessageKind.video:
+      case ChatMessageKind.voice:
+      case ChatMessageKind.file:
+        final icon = switch (item.kind) {
+          ChatMessageKind.video => Icons.play_circle_outline,
+          ChatMessageKind.voice => Icons.volume_up_outlined,
+          _ => Icons.insert_drive_file_outlined,
+        };
+        return InkWell(
+          onTap: item.playableMedia == null
+              ? null
+              : () async {
+                  final access = _contentAccess(item, portal, portalCurrent);
+                  if (access == null || !access.canView) {
+                    _notice('消息内容已不可用');
+                    return;
+                  }
+                  if (item.kind == ChatMessageKind.voice) {
+                    await playback.toggle(
+                      item,
+                      allowed: () => access.canView,
+                      privacy: access.privacy,
+                      now: controller.repository.now,
+                    );
+                    if (mounted &&
+                        access.canView &&
+                        portal == null &&
+                        playback.playing &&
+                        playback.messageId == item.id &&
+                        _voiceReadAttempted.add(item.id)) {
+                      await controller.markVisibleRead([item.id]);
+                    }
+                  } else if (item.kind == ChatMessageKind.video) {
+                    await playback.pause();
+                    if (!mounted || !access.canView) return;
+                    await Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => MessagePrivacyContent(
+                          privacy: access.privacy,
+                          now: controller.repository.now,
+                          expired: const Scaffold(
+                            body: Center(child: Text('消息内容已不可用')),
+                          ),
+                          child: VideoMessageViewer(uri: item.playableMedia!),
+                        ),
+                      ),
+                    );
+                  } else {
+                    if (!access.canRetain) {
+                      _notice('阅后即焚或隐私状态无法确认的文件不能交给外部应用；外部副本无法由本应用收回');
+                      return;
+                    }
+                    if (item.media != null) {
+                      await _open(item.media!, check: access.checkRetention);
+                    }
+                  }
+                },
+          child: SizedBox(
+            width: 210,
+            child: Row(
+              children: [
+                Icon(
+                  item.kind == ChatMessageKind.voice &&
+                          playback.messageId == item.id &&
+                          playback.playing
+                      ? Icons.pause_circle_outline
+                      : icon,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.fileName ??
+                            (item.kind == ChatMessageKind.voice
+                                ? '语音消息'
+                                : '视频消息'),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (item.durationSeconds != null)
+                        Text(
+                          '${item.durationSeconds} 秒',
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      if (item.fileBytes != null)
+                        Text(
+                          _fileSize(item.fileBytes!),
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      if (item.playableMedia == null)
+                        const Text(
+                          '媒体暂不可用',
+                          style: TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      case ChatMessageKind.quote:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _messageText(
+              item,
+              portal: portal ?? item,
+              embedded: portal != null,
+            ),
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: portal != null || item.quoteId == null
+                  ? null
+                  : () => _locateSource(item.quoteId!),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: .04),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  item.quotePreview ?? '引用消息',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.secondary,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      default:
+        return _messageText(
+          item,
+          portal: portal ?? item,
+          embedded: portal != null,
+        );
+    }
+  }
+
+  Widget _messageText(
+    ChatMessage item, {
+    ChatMessage? portal,
+    bool embedded = false,
+  }) => item.mentions.isEmpty
+      ? Text(
+          item.text.isEmpty ? '[暂不支持的消息]' : item.text,
+          style: const TextStyle(fontSize: 16, height: 1.45),
+        )
+      : MentionedMessageText(
+          text: item.text,
+          mentions: item.mentions,
+          canOpen: (identity) =>
+              !identity.all ||
+              !embedded ||
+              item.sourceGroupId?.isNotEmpty == true,
+          onMention: (identity) => _openReceivedMention(
+            portal ?? item,
+            identity,
+            original: item,
+            embedded: embedded,
+          ),
+        );
+
+  MessageHistoryAccess _mentionLease() =>
+      controller.repository.gateway.historyAccess(
+        controller.repository.generation,
+        conversationId: widget.conversationId,
+      );
+
+  Future<void> _pickMention() async {
+    final group = controller.conversation?.groupId;
+    if (!controller.usable || group == null || group.isEmpty) return;
+    try {
+      final lease = _mentionLease();
+      final groupRepository = GroupRepository(
+        controller.repository.gateway,
+        SessionAccess(controller.repository.session),
+      );
+      final selected = await showModalBottomSheet<MentionIdentity>(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (_) => GroupMentionPicker(
+          repository: groupRepository,
+          groupId: group,
+          checkLease: lease.check,
+        ),
+      );
+      if (selected == null || !_acceptsPortal(lease)) return;
+      _insertMention(selected);
+    } on AppFailure catch (error) {
+      if (mounted && controller.usable) _notice(error.message);
+    }
+  }
+
+  Future<void> _mentionSender(ChatMessage item) async {
+    if (!controller.repository.canView(item)) return;
+    try {
+      final lease = _mentionLease();
+      final identity = await controller.repository.mentionMember(item.senderId);
+      if (!_acceptsPortal(lease) || !controller.repository.canView(item)) {
+        return;
+      }
+      _insertMention(identity);
+    } on AppFailure catch (error) {
+      if (mounted && controller.usable) _notice(error.message);
+    }
+  }
+
+  void _insertMention(MentionIdentity identity) {
+    if (!input.insert(identity)) {
+      _notice('请先完成输入，最多可提醒 10 个不同身份。');
+      return;
+    }
+    focus.requestFocus();
+  }
+
+  Future<void> _openReceivedMention(
+    ChatMessage item,
+    MentionIdentity identity, {
+    ChatMessage? original,
+    bool embedded = false,
+  }) async {
+    final source = original ?? item;
+    if (!controller.repository.canView(item) ||
+        !source.mentions.any((m) => m.identity.userId == identity.userId)) {
+      return;
+    }
+    try {
+      final lease = _mentionLease();
+      await playback.pause();
+      if (!mounted) return;
+      if (!_acceptsPortal(lease) || !controller.repository.canView(item)) {
+        return;
+      }
+      final group = embedded
+          ? source.sourceGroupId
+          : controller.conversation?.groupId;
+      if (identity.all) {
+        if (group != null && group.isNotEmpty) {
+          await context.push(
+            Uri(pathSegments: ['', 'contacts', 'groups', group]).toString(),
+          );
+        }
+      } else {
+        await context.push(
+          Uri(
+            pathSegments: ['', 'contacts', 'user', identity.userId],
+            queryParameters: group == null || group.isEmpty
+                ? null
+                : {'group': group},
+          ).toString(),
+        );
+      }
+    } on AppFailure catch (error) {
+      if (mounted && controller.usable) _notice(error.message);
+    }
+  }
+
+  Widget _composer() => SafeArea(
+    top: false,
+    child: Material(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_restoredMentionText)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                child: Text(
+                  '草稿仅保留文字，请重新选择需要提醒的成员',
+                  style: TextStyle(color: AppColors.secondary, fontSize: 13),
+                ),
+              ),
+            if (controller.quote != null)
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: MessagePrivacyContent(
+                        key: ValueKey('quote:${controller.quote!.id}'),
+                        privacy: controller.quote!.privacy,
+                        now: controller.repository.now,
+                        child: Text(
+                          '回复 ${controller.quote!.senderName}：${controller.quote!.text}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: '取消引用',
+                    onPressed: controller.clearReply,
+                    icon: const Icon(Icons.close, size: 18),
+                  ),
+                ],
+              ),
+            if (controller.conversation?.canSend == false)
+              const Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(
+                  '此会话当前无法发送消息',
+                  style: TextStyle(color: AppColors.secondary),
+                ),
+              )
+            else ...[
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  IconButton(
+                    tooltip: '插入表情',
+                    onPressed: controller.conversation == null ? null : _emoji,
+                    icon: const Icon(
+                      Icons.sentiment_satisfied_alt,
+                      color: AppColors.secondary,
+                    ),
+                  ),
+                  ChatMediaActions(
+                    controller: controller,
+                    onLocation: _locationAction(),
+                    onCard: _cardAction(),
+                  ),
+                  if (controller.conversation?.isGroup == true)
+                    IconButton(
+                      tooltip: '提及群成员',
+                      onPressed: controller.preparing || !controller.usable
+                          ? null
+                          : _pickMention,
+                      icon: const Icon(Icons.alternate_email),
+                    ),
+                ],
+              ),
+              if (input.tokens.isNotEmpty)
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: input
+                        .freeze()
+                        .recipients
+                        .map(
+                          (m) => Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: InputChip(
+                              label: Text('${m.label} · ${m.identityLabel}'),
+                              deleteButtonTooltipMessage:
+                                  '取消提醒${m.identityLabel}，保留普通文字',
+                              onDeleted: () => input.removeIdentity(m.userId),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: input,
+                      focusNode: focus,
+                      minLines: 1,
+                      maxLines: 5,
+                      enabled:
+                          controller.conversation != null && controller.usable,
+                      textInputAction: TextInputAction.newline,
+                      decoration: const InputDecoration(
+                        hintText: '输入消息…',
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 11,
+                        ),
+                      ),
+                      maxLength: 20000,
+                      buildCounter: (
+                        _, {
+                        required currentLength,
+                        required isFocused,
+                        required maxLength,
+                      }) => null,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  IconButton.filled(
+                    tooltip: '发送',
+                    onPressed:
+                        input.text.trim().isEmpty ||
+                            controller.preparing ||
+                            !controller.usable
+                        ? null
+                        : _send,
+                    icon: controller.preparing
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.arrow_upward),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Future<void> _send() async {
+    if (input.value.composing.isValid && !input.value.composing.isCollapsed) {
+      _notice('请先完成当前输入。');
+      return;
+    }
+    final draft = input.freeze();
+    final text = draft.text;
+    final accepted = await controller.sendText(text, mentionDraft: draft);
+    if (!mounted || !accepted) return;
+    if (input.text == text) input.clear();
+    focus.requestFocus();
+    if (scroll.hasClients) {
+      unawaited(
+        scroll.animateTo(
+          0,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+        ),
+      );
+    }
+  }
+
+  Future<void> Function() _locationAction() {
+    final repository = controller.repository,
+        session = controller.repository.session;
+    final providerSession = ref.watch(appRuntimeProvider).session;
+    final providerGateway = ref.watch(imGatewayProvider);
+    if (!identical(providerSession, session) ||
+        !identical(providerGateway, repository.gateway)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ++_locationChanges.value;
+        }
+      });
+    }
+    final owner = session.state.credentials,
+        generation = session.state.generation;
+    final issuer = owner?.issuer, tenant = owner?.tenantId;
+    final cid = widget.conversationId, rendered = _locationIntent;
+    final target = controller.conversation;
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    MessageHistoryAccess? cut;
+    try {
+      cut = repository.gateway.historyAccess(
+        repository.generation,
+        conversationId: cid,
+      );
+    } on AppFailure {
+      // The attachment entry may render before the SDK is admitted.
+    }
+    bool ownerCurrent() =>
+        mounted &&
+        controller.usable &&
+        owner != null &&
+        identical(ref.read(appRuntimeProvider).session, session) &&
+        identical(ref.read(imGatewayProvider), repository.gateway) &&
+        identical(session.state.credentials, owner) &&
+        session.state.generation == generation &&
+        owner.issuer == issuer &&
+        owner.tenantId == tenant &&
+        widget.conversationId == cid &&
+        repository.conversationId == cid &&
+        target?.id == cid &&
+        controller.conversation?.userId == target?.userId &&
+        controller.conversation?.groupId == target?.groupId &&
+        controller.conversation?.isGroup == target?.isGroup &&
+        origin?.isActive == true &&
+        navigator.mounted &&
+        identical(origin?.navigator, navigator);
+    return () async {
+      if (!ownerCurrent() ||
+          !_foreground ||
+          rendered != _locationIntent ||
+          origin?.isCurrent != true ||
+          cut == null) {
+        return;
+      }
+      final ticket = ++_locationIntent, access = cut;
+      bool current() {
+        if (!ownerCurrent() ||
+            ticket != _locationIntent ||
+            !(origin?.isCurrent == true ||
+                _locationPickerRoute?.isCurrent == true)) {
+          return false;
+        }
+        try {
+          access.check();
+          return true;
+        } on AppFailure {
+          return false;
+        }
+      }
+
+      if (!current() || controller.conversation?.canSend != true) {
+        return;
+      }
+      focus.unfocus();
+      final dependencies =
+          widget.locationPicker ?? LocationPickerDependencies.deployment();
+      final route = MaterialPageRoute<void>(
+        builder: (_) => ChatLocationPickerPage(
+          controller: controller,
+          access: access,
+          sourceCurrent: current,
+          sourceChanges: _locationChanges,
+          dependencies: dependencies,
+        ),
+      );
+      _locationPickerRoute = route;
+      _locationPickerOpen = true;
+      try {
+        await navigator.push(route);
+      } finally {
+        if (identical(_locationPickerRoute, route)) {
+          _locationPickerRoute = null;
+          _locationPickerOpen = false;
+          ++_locationIntent;
+        }
+      }
+    };
+  }
+
+  Future<void> Function() _cardAction() {
+    final repository = controller.repository,
+        session = controller.repository.session;
+    final contacts = ref.watch(contactsRepositoryProvider);
+    final providerSession = ref.watch(appRuntimeProvider).session;
+    final providerGateway = ref.watch(imGatewayProvider);
+    if (!identical(providerSession, session) ||
+        !identical(providerGateway, repository.gateway)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ++_cardChanges.value;
+        }
+      });
+    }
+    final owner = session.state.credentials,
+        generation = session.state.generation;
+    final issuer = owner?.issuer, tenant = owner?.tenantId;
+    final cid = widget.conversationId, rendered = _cardIntent;
+    final target = controller.conversation;
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    MessageHistoryAccess? cut;
+    try {
+      cut = repository.gateway.historyAccess(
+        repository.generation,
+        conversationId: cid,
+      );
+    } on AppFailure {
+      // The attachment entry may render before the SDK is admitted.
+    }
+    bool ownerCurrent() =>
+        mounted &&
+        controller.usable &&
+        owner != null &&
+        identical(ref.read(appRuntimeProvider).session, session) &&
+        identical(ref.read(imGatewayProvider), repository.gateway) &&
+        identical(session.state.credentials, owner) &&
+        session.state.generation == generation &&
+        owner.issuer == issuer &&
+        owner.tenantId == tenant &&
+        widget.conversationId == cid &&
+        repository.conversationId == cid &&
+        target?.id == cid &&
+        controller.conversation?.userId == target?.userId &&
+        controller.conversation?.groupId == target?.groupId &&
+        controller.conversation?.isGroup == target?.isGroup &&
+        origin?.isActive == true &&
+        navigator.mounted &&
+        identical(origin?.navigator, navigator);
+    return () async {
+      if (!ownerCurrent() ||
+          !_foreground ||
+          rendered != _cardIntent ||
+          origin?.isCurrent != true ||
+          cut == null) {
+        return;
+      }
+      final ticket = ++_cardIntent, access = cut;
+      bool current() {
+        if (!ownerCurrent() ||
+            !_foreground ||
+            !identical(ref.read(contactsRepositoryProvider), contacts) ||
+            ticket != _cardIntent ||
+            !(origin?.isCurrent == true ||
+                _cardPickerRoute?.isActive == true)) {
+          return false;
+        }
+        try {
+          access.check();
+          return true;
+        } on AppFailure {
+          return false;
+        }
+      }
+
+      if (contacts == null) {
+        if (current()) _notice('联系人服务暂不可用，请稍后重试');
+        return;
+      }
+      if (!current() ||
+          controller.conversation?.canSend != true ||
+          !contacts.access.isCurrent ||
+          !identical(contacts.access.credentials, owner) ||
+          contacts.access.generation != generation) {
+        return;
+      }
+      focus.unfocus();
+      final route = MaterialPageRoute<void>(
+        builder: (_) => ChatCardPickerPage(
+          controller: controller,
+          access: access,
+          sourceCurrent: current,
+          sourceChanges: _cardChanges,
+          contacts: contacts,
+        ),
+      );
+      _cardPickerRoute = route;
+      try {
+        await navigator.push(route);
+      } finally {
+        if (identical(_cardPickerRoute, route)) {
+          _cardPickerRoute = null;
+          ++_cardIntent;
+        }
+      }
+    };
+  }
+
+  Future<void> _emoji() async {
+    if (!mounted || !controller.usable) {
+      return;
+    }
+    final cid = widget.conversationId, ticket = ++_emojiIntent;
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    ModalRoute<dynamic>? sheet;
+    late final MessageHistoryAccess cut;
+    try {
+      cut = controller.repository.gateway.historyAccess(
+        controller.repository.generation,
+        conversationId: cid,
+      );
+    } on AppFailure {
+      return;
+    }
+    bool current() {
+      if (!mounted ||
+          !_foreground ||
+          !controller.usable ||
+          ticket != _emojiIntent ||
+          widget.conversationId != cid ||
+          controller.repository.conversationId != cid ||
+          origin?.isActive != true ||
+          !navigator.mounted ||
+          !identical(origin?.navigator, navigator) ||
+          !(origin?.isCurrent == true || sheet?.isCurrent == true)) {
+        return false;
+      }
+      try {
+        cut.check();
+        return true;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    focus.unfocus();
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        sheet ??= ModalRoute.of(sheetContext);
+        return SavedEmojiSheet(
+          controller: controller,
+          sourceCurrent: current,
+          withOwnedPicker: (pick) async {
+            if (!current()) {
+              throw const AppFailure(FailureKind.cancelled);
+            }
+            _emojiPickerTicket = ticket;
+            try {
+              await pick();
+              if (!_foreground) {
+                final resumed = _emojiPickerResumed ??= Completer<void>();
+                await resumed.future.timeout(
+                  const Duration(seconds: 10),
+                  onTimeout: () => throw const AppFailure(FailureKind.timeout),
+                );
+              }
+              if (!current()) {
+                throw const AppFailure(FailureKind.cancelled);
+              }
+            } finally {
+              if (_emojiPickerTicket == ticket) {
+                _emojiPickerTicket = null;
+              }
+            }
+          },
+          insertUnicode: (emoji) {
+            if (!current() || sheet?.isCurrent != true) {
+              return;
+            }
+            final selection = input.selection;
+            final start = selection.isValid
+                ? selection.start
+                : input.text.length;
+            final end = selection.isValid ? selection.end : input.text.length;
+            input.value = TextEditingValue(
+              text: input.text.replaceRange(start, end, emoji),
+              selection: TextSelection.collapsed(offset: start + emoji.length),
+            );
+            navigator.pop();
+            focus.requestFocus();
+          },
+        );
+      },
+    );
+  }
+
+  bool _acceptsPortal(MessageHistoryAccess lease) {
+    if (!mounted || !controller.usable) return false;
+    try {
+      lease.check();
+      return true;
+    } on AppFailure {
+      return false;
+    }
+  }
+
+  Future<void> _messageActions(ChatMessage item) async {
+    final repository = controller.repository;
+    if (!controller.usable) return;
+    late final MessageHistoryAccess lease;
+    try {
+      lease = repository.gateway.historyAccess(
+        repository.generation,
+        conversationId: repository.conversationId,
+      );
+    } on AppFailure {
+      return;
+    }
+    final emojiTicket = ++_emojiIntent, emojiCid = widget.conversationId;
+    final emojiOrigin = ModalRoute.of(context),
+        emojiNavigator = Navigator.of(context);
+    bool emojiCurrent() {
+      if (!mounted ||
+          !_foreground ||
+          !controller.usable ||
+          emojiTicket != _emojiIntent ||
+          widget.conversationId != emojiCid ||
+          repository.conversationId != emojiCid ||
+          emojiOrigin?.isCurrent != true ||
+          !emojiNavigator.mounted) {
+        return false;
+      }
+      try {
+        lease.check();
+        repository.requireRetention(item.id);
+        return true;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    final expired = !repository.canView(item);
+    final retainable = repository.canRetain(item);
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => EmojiPortalGuard(
+        onCovered: () {
+          ++_emojiIntent;
+        },
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final entry in <String, String>{
+                  if (retainable) 'copy': '复制文字',
+                  if (retainable) 'reply': '引用回复',
+                  if (item.canForward && retainable) 'forward': '转发到聊天',
+                  if (!expired &&
+                      repository.canRevokeSource(item) &&
+                      (item.mine || controller.conversation?.isGroup == true) &&
+                      item.delivery == MessageDelivery.sent)
+                    'revoke': item.mine ? '撤回消息' : '群管理撤回',
+                  if (!expired &&
+                      item.delivery == MessageDelivery.failed &&
+                      !controller.isUnconfirmedLocation(item.id) &&
+                      !controller.isUnconfirmedCard(item.id))
+                    'retry': '重新发送',
+                  if (item.delivery == MessageDelivery.sent && retainable)
+                    'favorite': '收藏',
+                  if (retainable &&
+                      item.delivery == MessageDelivery.sent &&
+                      item.privacy.expiresAtMilliseconds == null &&
+                      const {
+                        ChatMessageKind.image,
+                        ChatMessageKind.sticker,
+                      }.contains(item.kind))
+                    'savedEmoji': '加入常用表情',
+                  'delete': '删除消息',
+                  if (selection.eligible(item)) 'multiple': '多选消息',
+                }.entries)
+                  ListTile(
+                    title: Text(entry.value),
+                    onTap: () => Navigator.pop(context, entry.key),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    if (action == null || !mounted || !controller.usable) return;
+    try {
+      lease.check();
+    } on AppFailure {
+      return;
+    }
+    if (const {
+          'copy',
+          'reply',
+          'forward',
+          'favorite',
+          'savedEmoji',
+        }.contains(action) &&
+        !repository.canRetain(item)) {
+      _notice(item.privacy.notice ?? '此消息暂不能保留');
+      return;
+    }
+    if (action != 'delete' &&
+        item.privacy.isExpiredAt(controller.repository.now())) {
+      _notice('阅后即焚内容已到期');
+      return;
+    }
+    switch (action) {
+      case 'savedEmoji':
+        if (!emojiCurrent()) {
+          return;
+        }
+        try {
+          final store = ref.read(savedEmojiStoreProvider);
+          final owner = SessionAccess(repository.session);
+          void Function()? permit;
+          final entry = await repository.savedEmojiFromMessage(
+            item.id,
+            access: lease,
+            checkSource: () {
+              if (!emojiCurrent()) {
+                throw const AppFailure(FailureKind.cancelled);
+              }
+            },
+            onProof: (proof) {
+              permit = proof;
+            },
+          );
+          bool retainCurrent() {
+            if (!emojiCurrent() || permit == null) {
+              return false;
+            }
+            try {
+              permit!();
+              return true;
+            } on AppFailure {
+              return false;
+            }
+          }
+
+          if (!retainCurrent()) {
+            return;
+          }
+          final previous = await store.read(owner, current: retainCurrent);
+          if (!retainCurrent()) {
+            return;
+          }
+          await store.add(owner, previous, entry, current: retainCurrent);
+          if (emojiCurrent()) _notice('已加入常用表情');
+        } catch (error) {
+          if (emojiCurrent()) {
+            _notice(error is AppFailure ? error.message : '加入常用表情失败，请重试');
+          }
+        }
+      case 'multiple':
+        selection.begin(item);
+      case 'copy':
+        await Clipboard.setData(ClipboardData(text: item.text));
+      case 'reply':
+        controller.reply(item);
+        focus.requestFocus();
+      case 'retry':
+        await controller.resend(item.id);
+      case 'forward':
+        try {
+          final snapshot = await controller.repository.favoriteSnapshot(
+            item.id,
+          );
+          if (!mounted || !controller.usable) return;
+          final sent = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (_) => ChatForwardPage(
+                source: controller.repository,
+                snapshot: snapshot,
+              ),
+            ),
+          );
+          if (mounted && controller.usable && sent == true) {
+            _notice('消息已转发');
+          }
+        } catch (error) {
+          if (mounted && controller.usable) {
+            _notice(error is AppFailure ? error.message : '暂时无法转发此消息');
+          }
+        }
+      case 'favorite':
+        final repository = ref.read(favoriteRepositoryProvider);
+        if (repository == null) return;
+        try {
+          final snapshot = await controller.repository.favoriteSnapshot(
+            item.id,
+          );
+          if (!mounted || !controller.usable) return;
+          await repository.add(
+            sourceId: snapshot.messageId,
+            conversationId: snapshot.conversationId,
+            content: snapshot.content,
+            title: snapshot.title,
+            thumbnail: snapshot.thumbnail,
+            kind: switch (snapshot.kind) {
+              ChatMessageKind.image => FavoriteKind.image,
+              ChatMessageKind.voice => FavoriteKind.audio,
+              ChatMessageKind.video => FavoriteKind.video,
+              ChatMessageKind.file => FavoriteKind.file,
+              _ => FavoriteKind.message,
+            },
+          );
+          if (mounted && controller.usable) _notice('已收藏');
+        } catch (error) {
+          if (mounted && controller.usable) {
+            _notice(error is AppFailure ? error.message : '收藏失败，请重试');
+          }
+        }
+      case 'revoke':
+        await _openRevoke(
+          item,
+          lease,
+          emojiTicket,
+          emojiOrigin,
+          emojiNavigator,
+        );
+      case 'delete':
+        if (await _confirm('删除消息？', '将删除你账号中的此条消息，此操作无法撤销。')) {
+          if (!_acceptsPortal(lease)) return;
+          await controller.delete(item);
+        }
+    }
+  }
+
+  void _retireRevoke() {
+    // Permission retires synchronously; only the UI signal may wait for build.
+    ++_revokeIntent;
+    if (!mounted) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      if (_revokeChangeQueued) return;
+      _revokeChangeQueued = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _revokeChangeQueued = false;
+        if (mounted) _revokeChanges.value = _revokeIntent;
+      });
+    } else {
+      _revokeChanges.value = _revokeIntent;
+    }
+  }
+
+  Future<void> _openRevoke(
+    ChatMessage item,
+    MessageHistoryAccess access,
+    int menuTicket,
+    ModalRoute<dynamic>? origin,
+    NavigatorState navigator,
+  ) async {
+    if (!mounted ||
+        !_foreground ||
+        menuTicket != _emojiIntent ||
+        origin?.isCurrent != true ||
+        !navigator.mounted) {
+      return;
+    }
+    final ticket = ++_revokeIntent, cid = widget.conversationId;
+    var opened = false;
+    late final DialogRoute<bool> route;
+    late final ChatRevokeIntent intent;
+    bool current() {
+      if (!mounted ||
+          !_foreground ||
+          !controller.usable ||
+          ticket != _revokeIntent ||
+          widget.conversationId != cid ||
+          controller.repository.conversationId != cid ||
+          origin?.isActive != true ||
+          !navigator.mounted ||
+          !identical(origin?.navigator, navigator)) {
+        return false;
+      }
+      if (opened &&
+          (!route.isActive ||
+              !route.isCurrent ||
+              !identical(route.navigator, navigator))) {
+        return false;
+      }
+      if (!opened && origin?.isCurrent != true) {
+        return false;
+      }
+      try {
+        access.check();
+        return true;
+      } on AppFailure {
+        return false;
+      }
+    }
+
+    route = DialogRoute<bool>(
+      context: context,
+      builder: (_) => _GroupRevokeDialog(
+        controller: controller,
+        intent: intent,
+        isCurrent: current,
+        ticketChanges: _revokeChanges,
+        onCovered: () {
+          if (ticket == _revokeIntent) _retireRevoke();
+        },
+      ),
+    );
+    try {
+      intent = controller.captureRevoke(
+        item,
+        access: access,
+        isCurrent: current,
+      );
+      _revokeRoute = route;
+      opened = true;
+      await navigator.push(route);
+      await route.completed;
+    } on AppFailure catch (error) {
+      if (mounted && origin?.isCurrent == true && ticket == _revokeIntent) {
+        _notice(error.message);
+      }
+    } finally {
+      if (identical(_revokeRoute, route)) _revokeRoute = null;
+      if (ticket == _revokeIntent) _retireRevoke();
+    }
+  }
+
+  Future<void> _deleteSelection() async {
+    try {
+      final intent = selection.capture();
+      if (!await _confirm(
+        '删除所选消息？',
+        '将提交 ${intent.messageIds.length} 条删除请求。已完成部分无法撤销，失败或结果未确认时会停止后续请求。',
+      )) {
+        return;
+      }
+      if (!mounted || !controller.usable) return;
+      intent.check();
+      final result = await selection.deleteConfirmed(intent);
+      if (mounted && controller.usable) _notice(result.notice);
+    } catch (error) {
+      if (mounted && controller.usable) {
+        _notice(error is AppFailure ? error.message : '删除请求未提交');
+      }
+    }
+  }
+
+  Future<void> _forwardSelection() async {
+    try {
+      final intent = selection.capture();
+      if (!selection.beginForward(intent)) return;
+      focus.unfocus();
+      final sent = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => ChatForwardPage.merge(
+            source: controller.repository,
+            selection: intent,
+          ),
+        ),
+      );
+      selection.endForward(sent: sent == true);
+      if (mounted && controller.usable && sent == true) _notice('合并消息已转发');
+    } catch (error) {
+      selection.endForward(sent: false);
+      if (mounted && controller.usable) {
+        _notice(error is AppFailure ? error.message : '暂时无法合并转发');
+      }
+    }
+  }
+
+  Future<void> _call() async {
+    final conversation = controller.conversation;
+    if (conversation == null || !controller.usable) return;
+    final rtc = ref.read(rtcCoordinatorProvider);
+    if (rtc.busy) {
+      await context.push('/rtc');
+      return;
+    }
+    final video = await showModalBottomSheet<bool>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.call),
+              title: const Text('语音通话'),
+              onTap: () => Navigator.pop(context, false),
+            ),
+            ListTile(
+              leading: const Icon(Icons.videocam),
+              title: const Text('视频通话'),
+              onTap: () => Navigator.pop(context, true),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (video == null || !mounted || !controller.usable) return;
+    List<String>? ids;
+    if (conversation.isGroup) {
+      ids = await showDialog<List<String>>(
+        context: context,
+        builder: (_) => ChatCallPicker(repository: controller.repository),
+      );
+    } else {
+      ids = [if (conversation.userId != null) conversation.userId!];
+    }
+    if (ids == null || ids.isEmpty || !mounted || !controller.usable) return;
+    await playback.pause();
+    if (!mounted || !controller.usable) return;
+    unawaited(
+      rtc.dial(
+        inviteeIds: ids,
+        video: video,
+        groupId: conversation.groupId ?? '',
+        title: conversation.title,
+      ),
+    );
+    await context.push('/rtc');
+  }
+
+  Future<void> _userDetails(String userId) async {
+    if (!controller.usable) return;
+    await playback.pause();
+    if (!mounted || !controller.usable) return;
+    final group = controller.conversation?.groupId;
+    await context.push(
+      Uri(
+        pathSegments: ['', 'contacts', 'user', userId],
+        queryParameters: group == null || group.isEmpty
+            ? null
+            : {'group': group},
+      ).toString(),
+    );
+  }
+
+  Future<void> _conversationDetails() async {
+    final conversation = controller.conversation;
+    if (conversation == null || !controller.usable) return;
+    if (conversation.isGroup && conversation.groupId != null) {
+      await playback.pause();
+      if (!mounted || !controller.usable) return;
+      await context.push(
+        Uri(pathSegments: ['', 'contacts', 'groups', conversation.groupId!])
+            .toString(),
+      );
+    } else if (conversation.userId != null) {
+      await _userDetails(conversation.userId!);
+    }
+  }
+
+  Future<void> _settings() async {
+    final item = controller.conversation;
+    if (item == null || !controller.usable) return;
+    final repository = ConversationRepository(
+      ref.read(imGatewayProvider),
+      ref.read(appRuntimeProvider).session,
+    );
+    late final MessageHistoryAccess lease;
+    try {
+      lease = controller.repository.gateway.historyAccess(
+        controller.repository.generation,
+        conversationId: controller.repository.conversationId,
+      );
+    } on AppFailure {
+      return;
+    }
+    final creationOwner = controller.repository.session.state.credentials;
+    final fontTicket = ++_fontIntent;
+    final fontOrigin = ModalRoute.of(context);
+    final fontNavigator = Navigator.of(context);
+    ModalRoute<dynamic>? fontSheet;
+    bool fontCurrent() =>
+        mounted &&
+        !_leaving &&
+        fontTicket == _fontIntent &&
+        _readingPreferences.current &&
+        identical(
+          controller.repository.session.state.credentials,
+          creationOwner,
+        ) &&
+        controller.repository.conversationId == widget.conversationId &&
+        controller.conversation?.id == item.id;
+
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => ChatFontRouteGuard(
+        onRoute: (route) => fontSheet = route,
+        onCovered: () {
+          ++_fontIntent;
+        },
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!item.isGroup &&
+                    item.userId != null &&
+                    item.userId!.isNotEmpty &&
+                    item.userId != creationOwner?.userId)
+                  GroupCreationAction(
+                    key: ValueKey('expand-group-${item.id}'),
+                    peer: Contact(
+                      id: item.userId!,
+                      name: item.title,
+                      avatar: item.avatar,
+                    ),
+                    asListTile: true,
+                    sourceCurrent: () =>
+                        _acceptsPortal(lease) &&
+                        identical(
+                          controller.repository.session.state.credentials,
+                          creationOwner,
+                        ) &&
+                        controller.conversation?.id == item.id &&
+                        controller.conversation?.userId == item.userId &&
+                        controller.conversation?.isGroup == false,
+                  ),
+                ListTile(
+                  title: Text(item.isGroup ? '群资料与成员' : '联系人资料'),
+                  onTap: () => Navigator.pop(context, 'details'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: const Text('查找聊天记录'),
+                  onTap: () => Navigator.pop(context, 'search'),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.text_fields),
+                  title: const Text('聊天字号'),
+                  subtitle: _fontReadFailed
+                      ? const Text('字号读取失败，打开后可重试')
+                      : null,
+                  onTap: () {
+                    final route = fontSheet, navigator = fontSheet?.navigator;
+                    if (fontCurrent() &&
+                        route?.isCurrent == true &&
+                        route?.isActive == true &&
+                        navigator != null &&
+                        navigator.mounted) {
+                      navigator.pop('font');
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.wallpaper_outlined),
+                  title: const Text('聊天背景'),
+                  subtitle: _backgroundReadFailed
+                      ? const Text('背景读取失败，打开后可重试')
+                      : null,
+                  onTap: () {
+                    final route = fontSheet, navigator = fontSheet?.navigator;
+                    if (fontCurrent() &&
+                        _backgroundCurrent &&
+                        route?.isCurrent == true &&
+                        route?.isActive == true &&
+                        navigator != null &&
+                        navigator.mounted) {
+                      navigator.pop('background');
+                    }
+                  },
+                ),
+                ListTile(
+                  title: Text(item.pinned ? '取消置顶' : '置顶会话'),
+                  onTap: () => Navigator.pop(context, 'pin'),
+                ),
+                ListTile(
+                  title: Text(item.muted ? '关闭免打扰' : '开启免打扰'),
+                  onTap: () => Navigator.pop(context, 'mute'),
+                ),
+                ListTile(
+                  title: const Text(
+                    '清空聊天记录',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                  onTap: () => Navigator.pop(context, 'clear'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    if (action == 'font' || action == 'background') {
+      final sheet = fontSheet;
+      if (sheet != null) await sheet.completed;
+      if (!mounted ||
+          !fontCurrent() ||
+          fontOrigin == null ||
+          !fontOrigin.isCurrent ||
+          !fontOrigin.isActive ||
+          !fontNavigator.mounted ||
+          !identical(fontOrigin.navigator, fontNavigator)) {
+        return;
+      }
+      if (action == 'background' && !_backgroundCurrent) return;
+      await fontNavigator.push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => action == 'background'
+              ? ChatBackgroundPage(
+                  preferences: _backgroundPreferences,
+                  sourceCurrent: () => fontCurrent() && _backgroundCurrent,
+                  fontFactor: _fontFactor,
+                )
+              : ChatFontSizePage(
+                  preferences: _readingPreferences,
+                  sourceCurrent: fontCurrent,
+                ),
+        ),
+      );
+      return;
+    }
+    if (action == null || !mounted || !_acceptsPortal(lease)) return;
+    if (action == 'search') {
+      await playback.pause();
+      if (!mounted || !_acceptsPortal(lease)) return;
+      final id = await Navigator.of(context).push<String>(
+        MaterialPageRoute(
+          builder: (_) => ChatSearchPage(repository: controller.repository),
+        ),
+      );
+      if (id != null) await _locateSource(id);
+      return;
+    }
+    if (action == 'details') {
+      await _conversationDetails();
+      return;
+    }
+    if (action == 'clear') {
+      if (await _confirm('清空聊天记录？', '将清空你账号中的此会话记录，此操作无法撤销。')) {
+        if (!_acceptsPortal(lease)) return;
+        await controller.clearHistory();
+      }
+      return;
+    }
+    try {
+      if (action == 'pin') await repository.pin(item);
+      if (action == 'mute') await repository.mute(item);
+      await controller.refreshConversation();
+    } catch (_) {
+      if (mounted) _notice('设置未完成，请重试');
+    }
+  }
+
+  Future<bool> _confirm(String title, String body) async =>
+      await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('取消'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('确认'),
+            ),
+          ],
+        ),
+      ) ??
+      false;
+
+  Future<void> _open(Uri uri, {void Function()? check}) async {
+    try {
+      check?.call();
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication) &&
+          mounted) {
+        _notice('无法打开此媒体，请稍后重试');
+      }
+    } catch (_) {
+      if (mounted) _notice('无法打开此媒体，请稍后重试');
+    }
+  }
+
+  Future<void> _image(Uri uri, ChatContentAccess access) => showDialog<void>(
+    context: context,
+    builder: (context) => Dialog.fullscreen(
+      backgroundColor: Colors.black,
+      child: Stack(
+        children: [
+          Center(
+            child: MessagePrivacyContent(
+              privacy: access.privacy,
+              now: controller.repository.now,
+              expired: const Text(
+                '阅后即焚内容已到期',
+                style: TextStyle(color: Colors.white),
+              ),
+              child: InteractiveViewer(
+                child: Image(
+                  image: uri.scheme == 'file'
+                      ? FileImage(File.fromUri(uri))
+                      : NetworkImage(uri.toString()),
+                  errorBuilder: (_, _, _) => const Text(
+                    '图片加载失败',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                tooltip: '关闭图片',
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  void _notice(String message) =>
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+  String _time(DateTime value) =>
+      '${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}';
+  String _fileSize(int size) => size < 1024
+      ? '$size B'
+      : size < 1024 * 1024
+      ? '${(size / 1024).toStringAsFixed(1)} KB'
+      : '${(size / (1024 * 1024)).toStringAsFixed(1)} MB';
+}
+
+/// The confirmation owns exactly its DialogRoute. Foreign coverage retires it
+/// monotonically; it never finds ancestors from a retained button callback.
+class _GroupRevokeDialog extends StatefulWidget {
+  const _GroupRevokeDialog({
+    required this.controller,
+    required this.intent,
+    required this.isCurrent,
+    required this.ticketChanges,
+    required this.onCovered,
+  });
+  final ChatController controller;
+  final ChatRevokeIntent intent;
+  final bool Function() isCurrent;
+  final Listenable ticketChanges;
+  final VoidCallback onCovered;
+  @override
+  State<_GroupRevokeDialog> createState() => _GroupRevokeDialogState();
+}
+
+class _GroupRevokeDialogState extends State<_GroupRevokeDialog> {
+  ModalRoute<dynamic>? _route;
+  NavigatorState? _navigator;
+  bool _retired = false, _loading = true, _saving = false, _ready = false;
+  bool _inspecting = false;
+  String? _error, _review;
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_changed);
+    widget.ticketChanges.addListener(_changed);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_inspect());
+    });
+  }
+
+  bool get _viewCurrent => mounted && !_retired && widget.isCurrent();
+  bool get _sourceCurrent =>
+      _viewCurrent &&
+      widget.controller.revokeCurrent(
+        widget.intent,
+        authority: !widget.intent.unconfirmed,
+      );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _route ??= ModalRoute.of(context);
+    _navigator ??= Navigator.of(context);
+    if (!_retired && _route?.isActive == true && _route?.isCurrent == false) {
+      _retired = true;
+      widget.onCovered();
+    }
+  }
+
+  void _changed() {
+    if (!mounted) return;
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+    } else {
+      setState(() {});
+    }
+  }
+
+  Future<void> _inspect() async {
+    if (!_sourceCurrent || _saving || _inspecting) return;
+    _inspecting = true;
+    setState(() {
+      _loading = true;
+      _ready = false;
+      _error = null;
+    });
+    try {
+      await widget.controller.repository.inspectRevoke(widget.intent);
+      if (_sourceCurrent) _ready = !widget.intent.unconfirmed;
+    } catch (error) {
+      if (_viewCurrent) {
+        _error = widget.intent.unsupported
+            ? '当前服务暂不支持这类群会话的管理撤回'
+            : error is AppFailure
+            ? error.message
+            : '无法核对撤回权限，请重试';
+      }
+    } finally {
+      _inspecting = false;
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _finish(bool value) {
+    final route = _route, navigator = _navigator;
+    if (route?.isActive == true &&
+        route?.isCurrent == true &&
+        navigator?.mounted == true &&
+        identical(route?.navigator, navigator) &&
+        (!value || _viewCurrent)) {
+      navigator!.pop(value);
+    }
+  }
+
+  Future<void> _submit() async {
+    if (_saving || _loading || !_ready || !_sourceCurrent) return;
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      final result = await widget.controller.executeRevoke(
+        widget.intent,
+        isCurrent: () => _viewCurrent,
+      );
+      if (!_viewCurrent) return;
+      switch (result.kind) {
+        case ChatRevokeKind.acknowledged:
+          _finish(true);
+        case ChatRevokeKind.unconfirmed:
+          _ready = false;
+          _review = '撤回结果未确认，请先核对原消息，不会自动重复撤回。';
+        case ChatRevokeKind.notDispatched:
+          _ready = false;
+          _error = result.failure?.message ?? '未发起撤回，请重新核对';
+        case ChatRevokeKind.busy:
+          _error = '这条消息正在处理，请稍后核对';
+      }
+    } catch (error) {
+      if (_viewCurrent) {
+        _error = error is AppFailure ? error.message : '无法发起撤回';
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _reviewOnly() async {
+    if (_loading || _saving || !_sourceCurrent) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final present = await widget.controller.repository.reviewRevoke(
+        widget.intent,
+      );
+      if (_viewCurrent) {
+        _review = present
+            ? '原消息仍可见，撤回结果尚未确认，请稍后再核对。'
+            : '原消息已不可见；这不能单独确认撤回结果，请返回会话核对。';
+      }
+    } catch (error) {
+      if (_viewCurrent) {
+        _error = error is AppFailure ? error.message : '暂时无法核对原消息';
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_changed);
+    widget.ticketChanges.removeListener(_changed);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final current = _sourceCurrent;
+    final unknown = current && widget.intent.unconfirmed;
+    final style = TextButton.styleFrom(
+      minimumSize: const Size(44, 44),
+      visualDensity: VisualDensity.standard,
+      tapTargetSize: MaterialTapTargetSize.padded,
+    );
+    return PopScope(
+      canPop: !_saving || !_viewCurrent,
+      child: AlertDialog(
+        scrollable: true,
+        title: const Text('撤回这条消息？'),
+        content: !current
+            ? const Text('会话或消息已变化，请关闭后重新核对。')
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('撤回将对聊天参与者生效。群管理权限会在提交前再次核对。'),
+                  if (_loading || _saving)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 12),
+                      child: LinearProgressIndicator(),
+                    ),
+                  if (unknown) Text(_review ?? '撤回结果未确认，请先核对原消息。'),
+                  if (_error != null) Text(_error!),
+                ],
+              ),
+        actions: [
+          TextButton(
+            style: style,
+            onPressed: _saving && _viewCurrent ? null : () => _finish(false),
+            child: const Text('关闭'),
+          ),
+          if (current && unknown)
+            TextButton(
+              style: style,
+              onPressed: _loading || _saving ? null : _reviewOnly,
+              child: const Text('只读核对'),
+            )
+          else if (current && !_ready && !_loading && !_saving)
+            TextButton(
+              style: style,
+              onPressed: _inspect,
+              child: const Text('重新核对'),
+            )
+          else if (current)
+            TextButton(
+              style: style,
+              onPressed: _ready && !_loading && !_saving ? _submit : null,
+              child: Text(_saving ? '撤回中…' : '确认撤回'),
+            ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,838 @@
+{
+  "schema": "luobo.mobile.announcement26.isolated-cloud.v1",
+  "cohort": "candidate359-announcement26",
+  "status": "prepared_only_no_cloud_or_local_analysis_tests",
+  "base": {
+    "cohort": "current354",
+    "source_members": 354,
+    "source_digest": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
+    "portable_members": 406,
+    "portable_digest": "81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c",
+    "helper_pins": [
+      {
+        "path": "ci/mobile-source.py",
+        "bytes": 25994,
+        "sha256": "350db5208fdb8631d52ab225a25920f1354401473195e1906ecd6747ed725e32"
+      },
+      {
+        "path": "ci/mobile-check.py",
+        "bytes": 34824,
+        "sha256": "20034b7a24ac229b098eb71652d07f7548ef9ec28bf3f0d3386bc116b28c3ac4"
+      },
+      {
+        "path": "ci/mobile-setup.sh",
+        "bytes": 7411,
+        "sha256": "7d0fff26e145cee8be02dd4a8ecc56d2878df3a1e1097262380212ef1aed3287"
+      },
+      {
+        "path": "ci/mobile/inputs.json",
+        "bytes": 174879,
+        "sha256": "5611103e30219d32c3f5bca232cbb38c3606a86dc8c8c9de4772fdcc87a68fab"
+      },
+      {
+        "path": "ci/mobile/required-test-names.json",
+        "bytes": 2082485,
+        "sha256": "d736d22b7bb60081e941f952818070c6695bd717a8fa432eff9352cc6e1675dd"
+      }
+    ],
+    "before6": [
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 98364,
+        "sha256": "6c48c1224cb98870a38ada5e7b0c05dc944321a762bbda19cc40f38c42a68590"
+      },
+      {
+        "path": "app/lib/features/conversation/data/conversation_repository.dart",
+        "bytes": 7335,
+        "sha256": "005dd617e6bbdb8f5597bca03934d5b4fa66bae9845333ca14401c795745de0f"
+      },
+      {
+        "path": "app/lib/features/conversation/domain/conversation.dart",
+        "bytes": 1424,
+        "sha256": "b089eb93ec54af4020ee4e618cab69d104a9984c6a380da6e03098632203eeb3"
+      },
+      {
+        "path": "app/lib/features/group/data/group_repository.dart",
+        "bytes": 18412,
+        "sha256": "80d74efba7edff2eac89171757b0cf345d63c60ef4347af07ebb5725cb0e3207"
+      },
+      {
+        "path": "app/lib/features/group/domain/group.dart",
+        "bytes": 1541,
+        "sha256": "46f1c047de1130d4de0939de656e25214e0d7f57d0ded56f92a53be5b4eebbfc"
+      },
+      {
+        "path": "app/lib/providers.dart",
+        "bytes": 7441,
+        "sha256": "d56739337d0a4bebdfed496c6e2f2a6f7a3164be4177623de48c81520014ea73"
+      }
+    ]
+  },
+  "candidate": {
+    "manifest": {
+      "path": "references/integration/mobile-group-announcement-format-v2-candidate-20261017/candidate-manifest.json",
+      "bytes": 12969,
+      "sha256": "9f5930adb06d0dcecb68557042ddad1608e37b8a558670c654a9e2ef50b54ac0"
+    },
+    "source_members": 359,
+    "source_digest": "b92ea7b511681637e5a1ac509f1e3ed5037973b0b40c3f0f87be0a0f3c46ba1f",
+    "portable_members": 411,
+    "portable_digest": "e17d93580192e8a652ec98c4baebe525417897fa29114618010c0fb55840f0fd",
+    "payload_prefix": "ci/candidates/mobile-announcement26/after",
+    "selected11": [
+      {
+        "path": "app/lib/features/chat/data/group_announcement_store.dart",
+        "bytes": 4902,
+        "sha256": "2bb9b70829dfaaf27a52af038d572fb7af1670c6db33eb3a6da0a71a4be0b584",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/chat/data/group_announcement_store.dart"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 99227,
+        "sha256": "b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/chat/presentation/chat_page.dart"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/group_announcement_panel.dart",
+        "bytes": 17056,
+        "sha256": "56545ff4b3a78a1489f8596797d2f6cd7706fd4251b626b3d7781cdab7e35ecb",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/chat/presentation/group_announcement_panel.dart"
+      },
+      {
+        "path": "app/lib/features/conversation/data/conversation_repository.dart",
+        "bytes": 7551,
+        "sha256": "299b465182570c55a2b829c36b13b7db6c62454f157e4549ffd26417373501e8",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/conversation/data/conversation_repository.dart"
+      },
+      {
+        "path": "app/lib/features/conversation/domain/conversation.dart",
+        "bytes": 1952,
+        "sha256": "5e114b9a1c8559f24236662f6bb050dd73550d7f38551b9955fffdc8ddf3d098",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/conversation/domain/conversation.dart"
+      },
+      {
+        "path": "app/lib/features/group/data/group_repository.dart",
+        "bytes": 18709,
+        "sha256": "780ed40bf1be140e51dbbcb8ce857e6669b54dce4f4d61444ef97ef73dc98e71",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/group/data/group_repository.dart"
+      },
+      {
+        "path": "app/lib/features/group/domain/group.dart",
+        "bytes": 1691,
+        "sha256": "d6e28ca24db983ead0b3bad7ecd63de62850c414393031d1f2e486e640cecf4d",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/group/domain/group.dart"
+      },
+      {
+        "path": "app/lib/providers.dart",
+        "bytes": 7700,
+        "sha256": "ca1ecfd2f433c11fb36f342376714dfcba33d8cc266a8d274cfb75deb9c98b19",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/providers.dart"
+      },
+      {
+        "path": "app/test/features/chat/group_announcement_fixture.dart",
+        "bytes": 8569,
+        "sha256": "80b4e3fac1008c31e11fa90be1bef125d59c2812ce04688ab890c8e4d5282a58",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/test/features/chat/group_announcement_fixture.dart"
+      },
+      {
+        "path": "app/test/features/chat/group_announcement_store_test.dart",
+        "bytes": 6957,
+        "sha256": "72d859894e37fdc8c3f45c9ee1c1901cf0e39ee7b17dbf56a705af1f016dc7ab",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/test/features/chat/group_announcement_store_test.dart"
+      },
+      {
+        "path": "app/test/features/chat/group_announcement_workflow_test.dart",
+        "bytes": 14398,
+        "sha256": "c8fc525c1f8865ebb67d92b0cad07b7ebe4942dac25b1b92bf4442a801103534",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-announcement26/after/app/test/features/chat/group_announcement_workflow_test.dart"
+      }
+    ]
+  },
+  "target": {
+    "analysis_paths": [
+      "lib/features/chat/data/group_announcement_store.dart",
+      "lib/features/chat/presentation/chat_page.dart",
+      "lib/features/chat/presentation/group_announcement_panel.dart",
+      "lib/features/conversation/data/conversation_repository.dart",
+      "lib/features/conversation/domain/conversation.dart",
+      "lib/features/group/data/group_repository.dart",
+      "lib/features/group/domain/group.dart",
+      "lib/providers.dart",
+      "test/features/chat/group_announcement_fixture.dart",
+      "test/features/chat/group_announcement_store_test.dart",
+      "test/features/chat/group_announcement_workflow_test.dart"
+    ],
+    "test_paths": [
+      "test/features/chat/group_announcement_store_test.dart",
+      "test/features/chat/group_announcement_workflow_test.dart",
+      "test/features/conversation/conversation_repository_test.dart",
+      "test/features/contacts/contacts_repository_test.dart"
+    ],
+    "names": [
+      "SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity",
+      "fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain",
+      "acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group",
+      "preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key",
+      "queued preference dispatch rechecks its original source before physical acknowledgement",
+      "an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner",
+      "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "a genuine at-me hint does not create an announcement from historical group text",
+      "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "owner replacement while original group metadata waits prevents its next real member lookup",
+      "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior",
+      "SDK paging, drafts, read and preference mutations preserve the exact conversation target",
+      "group flags keep prohibition semantics and booleans serialize to SDK status 1"
+    ],
+    "new24": [
+      "SDK hint4 is announcement while true at1to3 and preview stripping preserve independent identity",
+      "fresh snapshot bounds reject controls bidi malformed unicode and unavailable membership while URL text stays plain",
+      "acknowledged exact-version dismissal survives reopening without consuming a republished version or another owner group",
+      "preferences failure leaves the version unacknowledged and one explicit retry persists only a boolean digest key",
+      "queued preference dispatch rechecks its original source before physical acknowledgement",
+      "an already dispatched dismissal keeps its original key after source retirement without acknowledging another owner",
+      "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "a genuine at-me hint does not create an announcement from historical group text",
+      "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "owner replacement while original group metadata waits prevents its next real member lookup",
+      "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior"
+    ],
+    "old2": [
+      {
+        "path": "test/features/conversation/conversation_repository_test.dart",
+        "name": "SDK paging, drafts, read and preference mutations preserve the exact conversation target"
+      },
+      {
+        "path": "test/features/contacts/contacts_repository_test.dart",
+        "name": "group flags keep prohibition semantics and booleans serialize to SDK status 1"
+      }
+    ],
+    "expected_tests": 26,
+    "cleanup_prefix": "group_announcement_cleanup ",
+    "cleanup_names": [
+      "actual group chat opens a fresh ordinary-member announcement and its own detail stays readable",
+      "acknowledged announcement close survives a new real chat route while a republished version appears again",
+      "a preferences failure retains the visible announcement until one explicit retry is acknowledged",
+      "a delayed versionA dismissal never consumes a newly loaded versionB",
+      "a genuine at-me hint does not create an announcement from historical group text",
+      "failed fresh group metadata offers an actual read-only retry instead of an empty successful announcement",
+      "fresh duplicate group metadata withdraws the announcement before any acknowledgement",
+      "fresh foreign group metadata withdraws the announcement before any acknowledgement",
+      "fresh left group metadata withdraws the announcement before any acknowledgement",
+      "original owner replacement withdraws an open announcement and rejects its retained close callback",
+      "original issuer replacement withdraws an open announcement and rejects its retained close callback",
+      "original tenant replacement withdraws an open announcement and rejects its retained close callback",
+      "owner replacement while original group metadata waits prevents its next real member lookup",
+      "a same-State CID ABA cannot renew the original announcement dialog or its acknowledgement",
+      "foreign coverage retires only the old owned announcement and a new explicit read remains usable",
+      "foreground loss immediately rejects the old callback and the next frame withdraws announcement text",
+      "sameCID metadata refresh preserves composer draft and never consumes genuine strong hints",
+      "muted-admin announcement controls and full URL-like text remain usable at360 large text without automatic link behavior"
+    ],
+    "cleanup_markers": [
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ],
+    "expected_owned_fixtures": 18,
+    "expected_markers": 72,
+    "unit6_no_sdk_cleanup_claimed": true,
+    "old2_existing_fixture_teardown_unchanged": true
+  },
+  "resource": {
+    "initial_bytes": 4294967296,
+    "floor_bytes": 1073741824,
+    "allocated_cap_bytes": 805306368,
+    "poll_seconds": 0.2,
+    "phase_seconds": 120
+  },
+  "lineage": {
+    "card351_original17": [
+      {
+        "path": "app/lib/design/components/feedback.dart",
+        "bytes": 5379,
+        "sha256": "c9705bde73b2dec9ad208c7ef905fe90ad2c6c3feb5dbd9fe6063bbc963ffd41"
+      },
+      {
+        "path": "app/lib/features/chat/data/chat_repository.dart",
+        "bytes": 50484,
+        "sha256": "4c1dfa2d10ca21f2d6ac302dacc5aeb1c9b897f9923c2ef5a4219165d1e2efdb"
+      },
+      {
+        "path": "app/lib/features/chat/data/message_mapper.dart",
+        "bytes": 13443,
+        "sha256": "1199183a036b040c14e92f708c2fafe852bc83d9a9b3f5e2f9af0404251119cc"
+      },
+      {
+        "path": "app/lib/features/chat/domain/chat_card.dart",
+        "bytes": 2104,
+        "sha256": "b06391da2496e745cbf5c842b16ef076b6d418af8f1e4657d2b95444bb91b372"
+      },
+      {
+        "path": "app/lib/features/chat/domain/chat_message.dart",
+        "bytes": 5053,
+        "sha256": "078e179505789b7b94adc34e7bb86da2524ebcb360a485bddad38adcb842d3c6"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_card_picker_page.dart",
+        "bytes": 14774,
+        "sha256": "22051912b973b503d66baf9fabf13c2ced87e2994184eb918b005315ba73c165"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_card_view.dart",
+        "bytes": 7884,
+        "sha256": "235575755def6c78083b4ef60f6e3314d97a0c37bb87960de465e7c5e4e3807e"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_controller.dart",
+        "bytes": 22967,
+        "sha256": "d8a9e14bc26a25eb86c88dbffc95a04e7ff5463e7629021571f3e8274a1297c9"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_media_actions.dart",
+        "bytes": 16685,
+        "sha256": "324e991eafbeec1e03fd42263f4fe06ca90e979e14c1198f055b95534e0e6edb"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 87839,
+        "sha256": "08869981fe618ef7661fb120b96de5f017c6439c9dac32f2ff3fcc269526fb4b"
+      },
+      {
+        "path": "app/lib/features/contacts/data/contacts_repository.dart",
+        "bytes": 14770,
+        "sha256": "8c561c087370f2958e7f8aeb94f2c1ed6df7e40d66d14cef67352836bcc1acac"
+      },
+      {
+        "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
+        "bytes": 35748,
+        "sha256": "0ff0d3400e866dbb7d5ddb3ea4f5733313af9873c9d6985c3a77d20b83f2ce18"
+      },
+      {
+        "path": "app/lib/features/group/data/group_repository.dart",
+        "bytes": 18412,
+        "sha256": "80d74efba7edff2eac89171757b0cf345d63c60ef4347af07ebb5725cb0e3207"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_fixture.dart",
+        "bytes": 15167,
+        "sha256": "fa6be455bb3c6168adf5ef5870cf4d606fe6820d302710a9e1acf11564dfd3f5"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_model_test.dart",
+        "bytes": 4700,
+        "sha256": "cee206de82e97b07fa801b0d7821e460797d2a7c3c61a5bb3cb122e32374daf6"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_repository_test.dart",
+        "bytes": 17602,
+        "sha256": "4597c4916442d00748770e279c5c4e46295cee0f785e615b79fb74bb78045559"
+      },
+      {
+        "path": "app/test/features/chat/chat_card_workflow_test.dart",
+        "bytes": 41713,
+        "sha256": "9efb93f4acaa6516eb1a630d3d81df68b9c69f2b1569b81cc4e5869aeefeef55"
+      }
+    ],
+    "card351_to354": {
+      "historical_cohort": "current351",
+      "historical_ref": "50ff7d3d705c52775bf37840e6bef10fa2a55ae0",
+      "historical_source_digest": "fc2644ca9333596900be65f95fe0250f2d2106bb8429bc8f2f595c501bb2aba6",
+      "product_manifest_sha256": "88f56b2c18547415c3001e3693d0f42095b1c7b0d74005a3b4799906565cf60e",
+      "replacements": [
+        {
+          "before": {
+            "path": "app/lib/features/chat/data/chat_repository.dart",
+            "bytes": 50484,
+            "sha256": "4c1dfa2d10ca21f2d6ac302dacc5aeb1c9b897f9923c2ef5a4219165d1e2efdb"
+          },
+          "after": {
+            "path": "app/lib/features/chat/data/chat_repository.dart",
+            "bytes": 62522,
+            "sha256": "10a85b1089918f7dccf30afe73ad8e11654ec6b53c0a06b51fabe19358d4113f"
+          }
+        },
+        {
+          "before": {
+            "path": "app/lib/features/chat/presentation/chat_controller.dart",
+            "bytes": 22967,
+            "sha256": "d8a9e14bc26a25eb86c88dbffc95a04e7ff5463e7629021571f3e8274a1297c9"
+          },
+          "after": {
+            "path": "app/lib/features/chat/presentation/chat_controller.dart",
+            "bytes": 24936,
+            "sha256": "9790c4561e52fbf0a1396b50d7704945b967d83d093a1356869989c6670b6f92"
+          }
+        },
+        {
+          "before": {
+            "path": "app/lib/features/chat/presentation/chat_page.dart",
+            "bytes": 87839,
+            "sha256": "08869981fe618ef7661fb120b96de5f017c6439c9dac32f2ff3fcc269526fb4b"
+          },
+          "after": {
+            "path": "app/lib/features/chat/presentation/chat_page.dart",
+            "bytes": 98364,
+            "sha256": "6c48c1224cb98870a38ada5e7b0c05dc944321a762bbda19cc40f38c42a68590"
+          }
+        }
+      ]
+    },
+    "card354_to359": [
+      {
+        "before354": {
+          "path": "app/lib/features/chat/presentation/chat_page.dart",
+          "bytes": 98364,
+          "sha256": "6c48c1224cb98870a38ada5e7b0c05dc944321a762bbda19cc40f38c42a68590"
+        },
+        "after359": {
+          "path": "app/lib/features/chat/presentation/chat_page.dart",
+          "bytes": 99227,
+          "sha256": "b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9"
+        }
+      },
+      {
+        "before354": {
+          "path": "app/lib/features/group/data/group_repository.dart",
+          "bytes": 18412,
+          "sha256": "80d74efba7edff2eac89171757b0cf345d63c60ef4347af07ebb5725cb0e3207"
+        },
+        "after359": {
+          "path": "app/lib/features/group/data/group_repository.dart",
+          "bytes": 18709,
+          "sha256": "780ed40bf1be140e51dbbcb8ce857e6669b54dce4f4d61444ef97ef73dc98e71"
+        }
+      }
+    ],
+    "group_revoke354_original6": [
+      {
+        "path": "app/lib/features/chat/data/chat_repository.dart",
+        "bytes": 62522,
+        "sha256": "10a85b1089918f7dccf30afe73ad8e11654ec6b53c0a06b51fabe19358d4113f"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_controller.dart",
+        "bytes": 24936,
+        "sha256": "9790c4561e52fbf0a1396b50d7704945b967d83d093a1356869989c6670b6f92"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 98364,
+        "sha256": "6c48c1224cb98870a38ada5e7b0c05dc944321a762bbda19cc40f38c42a68590"
+      },
+      {
+        "path": "app/test/features/chat/group_revoke_fixture.dart",
+        "bytes": 10773,
+        "sha256": "61eb1863cfddf10108bccf8efd99fbc82493d98e20686551bda2a86cd82ee3c8"
+      },
+      {
+        "path": "app/test/features/chat/group_revoke_repository_test.dart",
+        "bytes": 18730,
+        "sha256": "0091e9bbf1f0c56dd31be0910d0ee417ab348a653af8224293bb07edde360a00"
+      },
+      {
+        "path": "app/test/features/chat/group_revoke_workflow_test.dart",
+        "bytes": 16238,
+        "sha256": "f5e11ef3e487122efca82c3660c2ec1dab1b72cdf8b2d6aea4cee930b47f61fd"
+      }
+    ],
+    "group_revoke354_to359": [
+      {
+        "before354": {
+          "path": "app/lib/features/chat/presentation/chat_page.dart",
+          "bytes": 98364,
+          "sha256": "6c48c1224cb98870a38ada5e7b0c05dc944321a762bbda19cc40f38c42a68590"
+        },
+        "after359": {
+          "path": "app/lib/features/chat/presentation/chat_page.dart",
+          "bytes": 99227,
+          "sha256": "b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9"
+        }
+      }
+    ],
+    "historical_identities_immutable": true,
+    "no_old_card80_or_revoke58_execution": true,
+    "native530_ref_unchanged": "ff7bc1f588f935d6315ad0211e68e15e58cd037e"
+  },
+  "unchanged_dependencies": {
+    "locked_packages": 178,
+    "pubspec": {
+      "path": "app/pubspec.yaml",
+      "bytes": 1005,
+      "sha256": "0224da8c6c4e8922c921e4009d1e443b545d3d922d3ab77f41fe2dc707f7efa1"
+    },
+    "lock": {
+      "path": "app/pubspec.lock",
+      "bytes": 42399,
+      "sha256": "0e678e98a6efc7cbb34c6c3a58f8b890171bd443c2b61e6f5ec525853c4f34fa"
+    },
+    "SDK51_and_migration1": [
+      {
+        "path": "packages/flutter_openim_sdk/lib/flutter_openim_sdk.dart",
+        "bytes": 1826,
+        "sha256": "6d172fefef2f4587f542c1cc755dbee883f1fe9f3f0ff52c5b3f52f8e349e43f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/allow_type.dart",
+        "bytes": 74,
+        "sha256": "40a204b1d4c117ae0070784e928cd9b4cf3bc4cbba4f953d1f6a2fcf4150e220"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/conversation_type.dart",
+        "bytes": 301,
+        "sha256": "5b4f2ccbd5ba12947c5db2978c71bca82e44044a1cbed328e79048ffc70b6e7f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_at_type.dart",
+        "bytes": 386,
+        "sha256": "2f8381e45825ebe02b3933ffe43c5b421d286c23bdbdd3694a16e9ddf73b7032"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_member_filter.dart",
+        "bytes": 230,
+        "sha256": "630c5588e89e2aef497b409420b664ac911cb97e93608036ca971269bde1513b"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_role_level.dart",
+        "bytes": 192,
+        "sha256": "eeb99bfb139292ed04f51520de02c7b4623f41027ac68352e5fa2d2d15815fa3"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_status.dart",
+        "bytes": 148,
+        "sha256": "7acc19c57130d7360aeaf96acec4eb6f17f72f82f1fe0caf45713cfec3bcc0fd"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_type.dart",
+        "bytes": 188,
+        "sha256": "60bf0667cfca31093b1ea43b9111bb09a09999c684ee913f606ea866cb53c4bd"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/group_verification.dart",
+        "bytes": 386,
+        "sha256": "4ee8a3e8dbda6b0306a1c1ddad6d2ea5c160412bc5f622dfd227a53904438e0f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/im_platform.dart",
+        "bytes": 344,
+        "sha256": "d5002983752430cf03d281c199c7807c022c03fc6e97a20421dce22fe36dc55a"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/join_source.dart",
+        "bytes": 102,
+        "sha256": "93c163333b5c41fdc86cf97d738877f0d772c3341746c8ec97a3a2ea5fced086"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/listener_type.dart",
+        "bytes": 966,
+        "sha256": "d98f84e7a09ea8c74b915818c77e5cc47b75cf8e96f7b708acac835a2dd7c2a8"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/login_status.dart",
+        "bytes": 104,
+        "sha256": "3a8633023ad67b45765e313f1225cdf679ac4a5bda350c06cf8f17690e6141b9"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/message_status.dart",
+        "bytes": 242,
+        "sha256": "4363365e4c72b3b3cd011eb390eb11bfe1422883d84d7336c2b7fc262566e67e"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/message_type.dart",
+        "bytes": 4187,
+        "sha256": "32d26337478668f4bab3a7e13d785b267c4e63f6d83176c15584a8a6d095ea25"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/receive_message_opt.dart",
+        "bytes": 116,
+        "sha256": "b585a65491ffe2a15b038e4821219cd6e605cd3857979f9266951e42f9a6177b"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/relationship.dart",
+        "bytes": 72,
+        "sha256": "99a02e96c1c210f97542425f0cfde228784af86b9984f9d61b5414a78f3ff263"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/enum/sdk_error_code.dart",
+        "bytes": 4896,
+        "sha256": "19f95e488daa548bb1080e4ca2e7ef0eca1c48e3b29d4e1e0a20c4ae648cfc33"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/advanced_msg_listener.dart",
+        "bytes": 2428,
+        "sha256": "9a5caf502155f19463523f06034a49dc3cbe51ba7d3164ef65813d76c620fea2"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/connect_listener.dart",
+        "bytes": 1053,
+        "sha256": "2bfe0ec04328b97a48785228b89c955f69566f0fa4e9dab84d11ca6e586a723e"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/conversation_listener.dart",
+        "bytes": 1242,
+        "sha256": "3846e87b7788e5051256b55053cef08e2852b0198aa9126f6333f6f084ec0e68"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/custom_business_listener.dart",
+        "bytes": 243,
+        "sha256": "b8abc1d45fcc5f7e5e0ef7bbd84dbfb75af038f83d182c793fc4678197c94e6a"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/friendship_listener.dart",
+        "bytes": 2038,
+        "sha256": "41c19fbceee8f9b50a1786dc3380b931ba477ece2c9063486a8c45d6718132eb"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/group_listener.dart",
+        "bytes": 2471,
+        "sha256": "fae5327454d0a84cc629cf01cd9d7fd6ff69e93fac337075b216f110499e5770"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/listener_for_service.dart",
+        "bytes": 1129,
+        "sha256": "7fc5a117160ab5b070ee94aefbfcd2f24eb88cb20ec2c8352eeec221e8d5dc5f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/message_kv_info_listener.dart",
+        "bytes": 310,
+        "sha256": "fee8e2a9aa46cbf549d9164c37c3afbc53727f6f2b2470ed2278b7425120db6a"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/msg_send_progress_listener.dart",
+        "bytes": 314,
+        "sha256": "882a03165869559ef5a3e5d61bae2543dc356a32c80e8593ee62dbff0c5fda76"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/signaling_listener.dart",
+        "bytes": 2939,
+        "sha256": "96bef0fb7188d75bd0b352f81e5756cdbb0619e2dc5a0beae51e51bc376a10a5"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/upload_file_listener.dart",
+        "bytes": 1758,
+        "sha256": "7d42b533be8196198607292b877f9108b7dcde706f8232adc029cb174d7fea9d"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/listener/user_listener.dart",
+        "bytes": 618,
+        "sha256": "e506dc653bf5a65e08c469870f9ccf0ebc0bf6cd628116275cae9b5f17fd030c"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/logger.dart",
+        "bytes": 604,
+        "sha256": "1dd33f80233868cfa9ad71b69d785f961081fb823261f117db715a6a36ca9133"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_conversation_manager.dart",
+        "bytes": 12682,
+        "sha256": "b56a5152ed39fd7539dbf93900b2c7af6b4ea2cdb07f74e6b6fed02771e7999f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_friendship_manager.dart",
+        "bytes": 7869,
+        "sha256": "3ebae5cb4ed8fa3087714250797606aada16e3401cde9364a11a6773771e325d"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_group_manager.dart",
+        "bytes": 18777,
+        "sha256": "7c31aa3c4fa9d53ba1ca44dfbaaf2d24accaa627117ff6e3a55d325740fcb29d"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_manager.dart",
+        "bytes": 27017,
+        "sha256": "a57afb44fb24b819cb522dfbbec0513b7c553859c094a822b94a03a974c9bc0b"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_message_manager.dart",
+        "bytes": 31563,
+        "sha256": "896938466e9d93c484ba6387074d10139fa9fffcb91e9535623ada4174df3956"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_signaling_manager.dart",
+        "bytes": 10188,
+        "sha256": "6a586404453380dfb15b07a706d536bd4c0d83f7563be00f84fa555f4fa164b4"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/manager/im_user_manager.dart",
+        "bytes": 4301,
+        "sha256": "703c96eef6aa00a98169d7339de25eef3b2a136d78cd4ddb669339863de09df4"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/conversation_info.dart",
+        "bytes": 4952,
+        "sha256": "559b288b7b80459c05de231610939f94a0972e72f26f078b75269be40510fab2"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/group_info.dart",
+        "bytes": 10514,
+        "sha256": "10c23e72969d8c11e71dfbedd5250ad39c9a72b0e25172c3bc9c0f0c97f24e86"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/init_config.dart",
+        "bytes": 1146,
+        "sha256": "33e3ad80fccd93dab15f3b14830c35cf47f51435ab2ca3224811628e68029df2"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/meeting_info.dart",
+        "bytes": 5464,
+        "sha256": "538235d95997f6a2c41ee89544dda6faf281386604b4fac610131e3787e4c290"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/message.dart",
+        "bytes": 37894,
+        "sha256": "f8ded4b316ee739db334fbc50b7e1dbca23e7f1f731fd8b2fca6d53f68589ed1"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/notification_info.dart",
+        "bytes": 11746,
+        "sha256": "c6f70e31dea5ae4acab82802fcf9c07fbbb4674272cc651406ae2d8870f2eba7"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/search_info.dart",
+        "bytes": 3619,
+        "sha256": "10921415efae75c7c2330def43b987daf4fa5b939fa8d6fd7397f38157d479f7"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/signaling_info.dart",
+        "bytes": 6099,
+        "sha256": "c2c96af4260d39b47bd3fcd3cbecac849c7502a174c36e8171e67d053bcd86c6"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/models/user_info.dart",
+        "bytes": 10680,
+        "sha256": "f1628f73760f4e6749f2826a263b1461d6a6b9b0d037d71029ae0933c9dad44f"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/openim.dart",
+        "bytes": 291,
+        "sha256": "f1ce2af68f16300f64c82ad972da985f31cfe74b0154ed631b97f5d8c7341236"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/lib/src/utils.dart",
+        "bytes": 521,
+        "sha256": "de2e9970b01c58825f7d050bb1d9b377ede16fc61377f67db1154a4320899907"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/pubspec.yaml",
+        "bytes": 2187,
+        "sha256": "0e36e2e27e5e3e77c398858647d95ed41ec79c98d67e2934341deba0a427a1ad"
+      },
+      {
+        "path": "packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart",
+        "bytes": 2516,
+        "sha256": "039c73a2f9556611f23744e031682f0b6b4298ab31f0859cf79c7090f64a78ee"
+      },
+      {
+        "path": "migration/legacy_personal_export/legacy_personal_export.dart",
+        "bytes": 2942,
+        "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
+      }
+    ],
+    "official_toolchain": {
+      "repository": "https://github.com/flutter/flutter.git",
+      "tag": "3.47.7",
+      "framework_revision": "abaf9c523780a608bd46686fd5e53740a07077f8",
+      "engine_revision": "deb287481e3ce9468f3434937ced4240a70539ca",
+      "dart_version": "3.13.5",
+      "official_remote_verification": "required_at_CI_fetch_no_substitution_or_floating_channel"
+    },
+    "native_snapshot": {
+      "members": 7,
+      "files": [
+        {
+          "path": "app/android/app/src/main/AndroidManifest.xml",
+          "bytes": 3343,
+          "sha256": "5a4b4585cfa73575ed82c4e3e32fb9062036c96d0009a674e72ba21d9de78aa6"
+        },
+        {
+          "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/LocationOnceBridge.kt",
+          "bytes": 10666,
+          "sha256": "f10fa7b56779bbb5d347f063fa961b462172ca6e916ce32b26556e4eeb3d1c07"
+        },
+        {
+          "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/MainActivity.kt",
+          "bytes": 2135,
+          "sha256": "2ff99269679e8d63ba96af433db370623a5f0e654978a77bfd97b5b81c7ba1d1"
+        },
+        {
+          "path": "app/ios/Runner.xcodeproj/project.pbxproj",
+          "bytes": 32985,
+          "sha256": "cb6ee3082bba34b3946415b92f7b7006167d0535b3efbeae5424d69d25b8324c"
+        },
+        {
+          "path": "app/ios/Runner/AppDelegate.swift",
+          "bytes": 849,
+          "sha256": "f0595cf79a3efaca51b85895cacc6b9f01f13438fee6f5a3c201f796bb71cb7c"
+        },
+        {
+          "path": "app/ios/Runner/Info.plist",
+          "bytes": 2916,
+          "sha256": "94e2ab712ea1e6882d4c5b77adcc25ec552956dc300bb60e82d6b181780df152"
+        },
+        {
+          "path": "app/ios/Runner/LocationOnceBridge.swift",
+          "bytes": 13055,
+          "sha256": "13de6890dad64e4a12c17d02f3ac32dbd3e9cb11dde8caff12f5ec35ab413ee8"
+        }
+      ],
+      "digest": "7cca8d5e6005c3ff3f6c3a6f2524bd8b523226bc0dbbacaa8c7b1dc28206a426",
+      "R1_manifest_sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894",
+      "Root_type_API_acceptance": {
+        "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/root-type-api-acceptance.json",
+        "bytes": 616,
+        "sha256": "ed85b0c8456de99f36f4ef1038e9c5e3ecdd834432acb1c68ae3568c1556bdc9"
+      },
+      "Kotlin_compile_Swift_parse_typecheck_passed": true,
+      "scene8_device_GPS_accepted": false,
+      "portable396_includes_native": false,
+      "contract": "verify7 public source bodies separately; Linux396 has no native binaries; type/API not device acceptance"
+    }
+  },
+  "provenance": {
+    "announcement_format_parse": {
+      "path": "references/integration/mobile-group-announcement-format-v2-candidate-20261017/format/receipt.json",
+      "bytes": 7878,
+      "sha256": "1474ba53af6d42609200fbdfa4662f998d72f79a6a7bb246d85e3953b1919ef5"
+    },
+    "current354_expected_full1280_not_executed": "No fresh full1280 acceptance exists; preserve earlier targeted union60 and all prior accepted boundaries. Full1304 is expected arithmetic only, this manual lane cannot execute it.",
+    "required_scope": "Onlyselected11analysis thenexactnew24+directold2; noCard80,revoke58,full,searchreference,installation/native/device business operations",
+    "local_resource_note": "Current free below4GiB. Only direct formatter ran under1GiB continuous; no cold Flutter or source workspace has been materialized."
+  }
+}

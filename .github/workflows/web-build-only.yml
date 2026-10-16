@@ -1,0 +1,68 @@
+name: Web4301 build only
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [web4301-build-only-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-build-only-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bundle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Locked official install and reviewed SDK patch only
+        run: |
+          umask 077
+          test ! -e ci-output/web-build
+          test ! -e ci-output/web-build-guard
+          mkdir -p ci-output/web-build-guard
+          python3 -c "import hashlib,pathlib; assert hashlib.sha256(pathlib.Path('ci/group-effects/resource_guard.py').read_bytes()).hexdigest() == 'ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c'"
+          python3 ci/group-effects/resource_guard.py --cwd "$GITHUB_WORKSPACE" --allocated-root "$GITHUB_WORKSPACE" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 900 --log "$GITHUB_WORKSPACE/ci-output/web-build-guard/setup.log" --record "$GITHUB_WORKSPACE/ci-output/web-build-guard/setup.resource.json" -- node ci/web-build.mjs web4301-build-only-v1
+      - name: Actual current Vite bundle offline; no tests or types
+        id: bundle
+        run: |
+          umask 077
+          test ! -e ci-output/web-build-guard/bundle.resource.json
+          python3 -c "import hashlib,pathlib; assert hashlib.sha256(pathlib.Path('ci/group-effects/resource_guard.py').read_bytes()).hexdigest() == 'ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c'"
+          sudo unshare --net -- /usr/sbin/runuser -u "$(id -un)" -- /usr/bin/python3 "$GITHUB_WORKSPACE/ci/group-effects/resource_guard.py" --cwd "$GITHUB_WORKSPACE" --allocated-root "$GITHUB_WORKSPACE" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 300 --log "$GITHUB_WORKSPACE/ci-output/web-build-guard/bundle.log" --record "$GITHUB_WORKSPACE/ci-output/web-build-guard/bundle.resource.json" -- "$(command -v node)" "$GITHUB_WORKSPACE/ci/web-build.mjs" --bundle-worker
+      - name: Preserve compact raw before dist
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: web4301-build-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-output/web-build-guard/*.log
+            ci-output/web-build-guard/*.json
+            ci-output/web-build/*.log
+            ci-output/web-build/*.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Separate review bundle; never deploy
+        if: always() && steps.bundle.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: web4301-dist-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-output/web-build/dist/
+            ci-output/web-build/dist-manifest.json
+            ci-output/web-build/dist-proof.json
+          if-no-files-found: error
+          retention-days: 14
