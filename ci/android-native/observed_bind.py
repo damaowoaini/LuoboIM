@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import sys
 import tarfile
 
@@ -195,8 +196,10 @@ class Job(parent.Job):
             'real_go': str(w / 'go/bin/go'), 'real_go_sha256': s.sha(w / 'go/bin/go'),
             'observer_go': str(w / 'observer/go'), 'observer_sha256': s.sha(HERE / 'go_observer.py'),
             'base_path': str(w / 'go/bin') + ':' + str(w / 'mobile-tools') + ':' + base}
-        s.write_json(w / 'observer/config.json', config)
+        # The next process requires0600, regardless of this shell's umask.
+        observer.record(w / 'observer/config.json', config)
         s.write_json(w / 'evidence/observer-configuration.json', {'config_sha256': s.sha(w / 'observer/config.json'),
+            'config_mode': stat.S_IMODE((w / 'observer/config.json').lstat().st_mode),
             **config, 'outer_resource_guard': 'support.Budget dual1GiB/.2s/16GiB; same PG for all observer/Go children',
             'before_after_plus_failure_snapshot_max_body_bytes': 3 * observer.TREE_LIMIT,
             'no_metadata_lock_installed_into_actual_bind': True})

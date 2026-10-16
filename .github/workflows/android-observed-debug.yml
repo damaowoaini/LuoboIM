@@ -31,7 +31,7 @@ jobs:
           umask 077
           mkdir -m 700 "$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           echo "ANDROID_WORK=$RUNNER_TEMP/observed-bind-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current257" >> "$GITHUB_ENV"
-      - name: Validate original29, metadata8 and observer10 Python controls
+      - name: Validate original29, metadata8 and observer11 Python controls
         run: |
           python3 -B ci/secret_scan.py
           python3 -B ci/android-native/test_tools.py

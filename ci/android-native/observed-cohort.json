@@ -17,7 +17,7 @@
     {
       "path": ".github/workflows/android-observed-debug.yml",
       "bytes": 2892,
-      "sha256": "457a9ceec50f030f6f1146f43f2629f4a6534709d97c1c32601d145c778d6ea3"
+      "sha256": "53b43594aea6854a7139c1666e30c8072b69b922c232b3438dc16d145b70ee4e"
     },
     {
       "path": "ci/android-native/audit.py",
@@ -76,8 +76,8 @@
     },
     {
       "path": "ci/android-native/observed_bind.py",
-      "bytes": 18476,
-      "sha256": "dcacba6d0738387c1292a1459fd1e944ec37fefe96fc0492bb4f91fc6b288617"
+      "bytes": 18653,
+      "sha256": "095db0155a5fc9d4a3106b67cf83d45aa95282e5d50f58a4e7f7a5b08b0f4b98"
     },
     {
       "path": "ci/android-native/projected-module-after.mod",
@@ -111,8 +111,8 @@
     },
     {
       "path": "ci/android-native/test_go_observer.py",
-      "bytes": 9933,
-      "sha256": "3ac3cf014acef12919ce97870f7b36fcbeaa5407add2aed6aca1026a8938faf5"
+      "bytes": 11688,
+      "sha256": "af00dd3f3d8ea5fe9d25990aaeba871f1bbd800929610c137c950208e7032d8a"
     },
     {
       "path": "ci/android-native/test_tools.py",

@@ -6,13 +6,16 @@ import os
 from pathlib import Path
 import shutil
 import signal
+import stat
 import subprocess
 import tempfile
 import time
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
 import go_observer as observer
+import observed_bind as controller
 
 STUB = '''#!/usr/bin/python3 -B
 import json, os, signal, sys, time
@@ -79,6 +82,34 @@ class ObserverTests(unittest.TestCase):
     def run_wrapper(self, job, env, args, cwd, stdin=''):
         return subprocess.run([str(job/'observer/go'), *args], env=env,cwd=cwd,
             input=stdin,text=True,capture_output=True,timeout=5)
+
+    def test_real_configure_observer_creates0600_under_umask022_and_loads(self):
+        with tempfile.TemporaryDirectory() as value:
+            job = Path(value).resolve()
+            for name in ['tmp', 'evidence', 'go/bin']:
+                (job / name).mkdir(parents=True, exist_ok=True, mode=0o700)
+            real = job / 'go/bin/go'
+            real.write_text(STUB)
+            real.chmod(0o700)
+            previous = os.umask(0o022)
+            try:
+                # Exercise the actual controller method and its real support
+                # primitives; never invoke the CLI or the synthetic Go stub.
+                with patch.object(controller.parent, 'REPO', job):
+                    controller.Job.configure_observer(SimpleNamespace(w=job))
+                config = job / 'observer/config.json'
+                self.assertEqual(stat.S_IMODE(config.lstat().st_mode), 0o600)
+                proof = json.loads((job / 'evidence/observer-configuration.json').read_text())
+                self.assertEqual(proof['config_mode'], 0o600)
+                self.assertEqual(observer.digest(config.read_bytes()), proof['config_sha256'])
+                path = str(job / 'observer') + os.pathsep + proof['base_path']
+                with patch.dict(os.environ, {'PATH': path}), contextlib.chdir(job):
+                    loaded = observer.load_config(config, proof['config_sha256'], job / 'observer/go')
+                self.assertEqual(loaded['real_go'], str(real))
+                self.assertEqual(loaded['observer_go'], str(job / 'observer/go'))
+                self.assertFalse((job / 'started').exists())
+            finally:
+                os.umask(previous)
 
     def test_argv_env_stdio_and_process_group_are_forwarded_without_recursion(self):
         with fixture() as (job, config, env, _):
