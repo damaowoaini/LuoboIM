@@ -17,3 +17,7 @@ The first current282 run38866360052 completed target97 with70PASS/27ERROR (QR24/
 ## QR r5 fixture API correction (pending)
 
 Run38867605425:54 businessPASS=QRcodec7/PNG1+search46,4 QRsuite loaderERROR,7hiddenPASS;other43QR/full785/analyze did not run. The fixture used an invalid named timeout argument. R5 changes only that call to the official third positional timeout5s, preserving100ms/EnginePhase defaults. No product/assertion/count/SDK/runner/resource change.
+
+## QR r6 explicit retry and route observation (pending)
+
+Run38868222700 completed94PASS/3ERROR (QR48/3+search46),11hiddenPASS and no skip/lifecycle exception; late-camera recovery passed. Full785/analyze did not start. QRSubject now disables Riverpod3 automatic retry so invalidmembership/permission errors terminate in the actual error UI until explicitretry. The same nonmember case adds no-timed-reread and explicitretry-positive assertions. The successful profile navigation test reads the real mounted page's GoRouterState URI, preserving exacttargetbob instead of comparing the parent MatchList baseURI after imperativepush. No casecount/parser/runner/dependency/resource change.

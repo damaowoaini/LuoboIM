@@ -66,6 +66,14 @@ void main() {
       expect(find.textContaining('无法核验群资料'), findsOneWidget);
       expect(find.text('重试'), findsOneWidget);
       expect(f.platform.shares, 0);
+      final deniedReads = f.business.calls('getGroupsInfo');
+      await tester.pump(const Duration(seconds: 10)); await f.settle(tester);
+      expect(f.business.calls('getGroupsInfo'), deniedReads);
+      // A later explicit retry may observe new authoritative membership.
+      f.business.pending = null;
+      await tester.tap(find.text('重试')); await f.settle(tester);
+      expect(f.business.calls('getGroupsInfo'), greaterThan(deniedReads));
+      expect(find.byType(QrImageView), findsOneWidget);
     } finally { await f.close(tester); }
   });
   testWidgets('unavailable share is not reported as saved or shared and explicit retry works', (tester) async {

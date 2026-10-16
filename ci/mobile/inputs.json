@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v4",
-  "state": "current282_QR_r5_fixture_API_correction_pending_cloud",
+  "state": "current282_QR_r6_explicit_read_retry_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -28,7 +28,8 @@
     "qr_candidate_manifest_sha256": "68fa203b134a1754b65383b0da23cdd9fbf323c1a191294f7f16e26756d58de6",
     "accepted_current269_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64",
     "QR_r4_manifest_sha256": "6e64e8062e5fa622d9b6d312bac1891aa4f701951049d1e6f5eb17160e595590",
-    "QR_r5_manifest_sha256": "085625490299faec3f82433d7711adead78abcd6366b3967b06b76bef0927c67"
+    "QR_r5_manifest_sha256": "085625490299faec3f82433d7711adead78abcd6366b3967b06b76bef0927c67",
+    "QR_r6_manifest_sha256": "be752630e9cc2f970ca192254b7ea5a538d98b933e0f15423d247f06f43b1df9"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -307,7 +308,7 @@
     "current282": 334
   },
   "portable_digests": {
-    "current282": "a6bbcb8d8a71a8d57a3bbc3038aca79a1c59fb93991467e2b0b20f73d95624ef"
+    "current282": "7107709f965e979b07fb29b8451b3532d0c78a140a97fee48d094626094c61af"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -431,6 +432,17 @@
       "actual": "54businessPASS=QRcodec7+PNG1+search46;4QRsuite loadERROR;7hiddenPASS0skip/falsefooter;remaining43QR/full785/analyze notstarted",
       "verification_sha256": "3b5ea3945b11b313f24d325db49dc564d774fd85b89262764612280798d4127f",
       "accepted": false
+    },
+    "current282_QR_r5_three_remaining": {
+      "commit": "35fa0a6c830bb0906726f6f6911d04dccd404d6f",
+      "run": 38868222700,
+      "job": 116865893156,
+      "source_digest": "b9b37bef5b416d4fb6119892c9b7c981665e34849273221e828adcf7ca3bdbda",
+      "portable_digest": "a6bbcb8d8a71a8d57a3bbc3038aca79a1c59fb93991467e2b0b20f73d95624ef",
+      "artifact_sha256": "058bb9984f7334eb70cc736f97de97769c6a9138e928d49c9c396a8c8b042ac3",
+      "actual": "target97 complete94PASS3ERROR(QR48/3+search46PASS);hidden11PASS;latecameraPASS/lifecycle0;full785/analyze notstarted",
+      "verification_sha256": "6383cc763e12ccedaf1a6cfcf0cf04ae4a50f1328d2ad2f207e20d8eb1694733",
+      "accepted": false
     }
   },
   "reference_entry": {
@@ -438,7 +450,7 @@
     "default_enabled": false,
     "working_cohort": "current282",
     "members": 282,
-    "reference_source_digest": "bd91349fc110812ee740f4ceabe486d010e5c678843802f007c050f6f64bfd4b",
+    "reference_source_digest": "61e04b59ee85cc65307c59c478cecab92ef2f414e3a296df67ea54cfcc093aa4",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -483,7 +495,7 @@
   ],
   "current282": {
     "members": 282,
-    "source_digest": "b9b37bef5b416d4fb6119892c9b7c981665e34849273221e828adcf7ca3bdbda",
+    "source_digest": "ee4015afc60a87aa09d283e2bb0fb4035bd2ad1c78518c401b576e34440a7cd0",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1172,8 +1184,8 @@
       },
       {
         "path": "app/lib/features/qr/data/qr_repository.dart",
-        "bytes": 3588,
-        "sha256": "ab130dfd2796064b4821470e97081e1708cb91c2c54d81ee9d87f53d405222a9"
+        "bytes": 3611,
+        "sha256": "76a7107d7ada9bf4f2c2f9de573e0c02928a8586122c64e652ef96376489a7ac"
       },
       {
         "path": "app/lib/features/qr/domain/qr_invite.dart",
@@ -1802,8 +1814,8 @@
       },
       {
         "path": "app/test/features/qr/qr_code_page_test.dart",
-        "bytes": 7920,
-        "sha256": "f89a7efde39b2e8a22ed00548c858ca2baa0539c86279571e55e6a174cf0a19b"
+        "bytes": 8428,
+        "sha256": "8826cbdc813ba057b891af5a489e9db99ab4a81c789a79ce5bae13074030949a"
       },
       {
         "path": "app/test/features/qr/qr_entry_navigation_test.dart",
@@ -1832,8 +1844,8 @@
       },
       {
         "path": "app/test/features/qr/qr_scan_page_test.dart",
-        "bytes": 17539,
-        "sha256": "0f8ee49edd0b0199fa5d304bb00eb7bcee77d086feb4e862c4c871d469b2be5f"
+        "bytes": 17599,
+        "sha256": "8a945ded02dda58794ef84a68a86fc84fbcca342152b33a26c8b81efbcfc59b3"
       },
       {
         "path": "app/test/features/rtc/rtc_page_test.dart",

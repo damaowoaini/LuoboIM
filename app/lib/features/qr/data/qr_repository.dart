@@ -86,4 +86,4 @@ final qrSubjectProvider = FutureProvider.autoDispose.family<QrSubject, String?>(
   });
   ref.onDispose(() => unawaited(events.cancel()));
   return repository.ownCode(id);
-});
+}, retry: (_, _) => null);

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:imapp/features/contacts/presentation/user_profile_page.dart';
 import 'package:imapp/features/group/presentation/group_page.dart';
@@ -39,7 +40,7 @@ void main() {
       expect(f.business.calls('addFriend'), 0); expect(f.business.calls('joinGroup'), 0);
       await tester.tap(find.text('查看资料')); await f.settle(tester);
       expect(find.byType(UserProfilePage), findsOneWidget);
-      expect(f.router!.routerDelegate.currentConfiguration.uri.path, '/contacts/user/bob');
+      expect(GoRouterState.of(tester.element(find.byType(UserProfilePage))).uri.path, '/contacts/user/bob');
       expect(tester.takeException(), isNull);
     } finally { await f.close(tester); }
   });

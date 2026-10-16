@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v4",
-  "state": "current282_QR_r5_fixture_API_correction_pending_cloud",
+  "state": "current282_QR_r6_explicit_read_retry_pending_cloud",
   "parent_required": {
     "current269_inputs_sha256": "df63e1e19d5a5f87151099d007b1f05ccf266d1768f0d09b59728f5ab047da64",
     "source_digest": "400010c9e2fe5e1e4eb0a02c7454c17c4930a4c59779231349ca7fc04c3bcfe5",
@@ -12,8 +12,8 @@
     "analyze_issues": 0
   },
   "candidate_manifest_sha256": "68fa203b134a1754b65383b0da23cdd9fbf323c1a191294f7f16e26756d58de6",
-  "source282_digest": "b9b37bef5b416d4fb6119892c9b7c981665e34849273221e828adcf7ca3bdbda",
-  "portable334_digest": "a6bbcb8d8a71a8d57a3bbc3038aca79a1c59fb93991467e2b0b20f73d95624ef",
+  "source282_digest": "ee4015afc60a87aa09d283e2bb0fb4035bd2ad1c78518c401b576e34440a7cd0",
+  "portable334_digest": "7107709f965e979b07fb29b8451b3532d0c78a140a97fee48d094626094c61af",
   "selected_source_delta": {
     "files": 21,
     "existing": 8,
@@ -47,7 +47,7 @@
   "manual_dependencies": "Exact3 metadata lock additions passed first cloud --enforce-lockfile; all enforced lock/setup gates remain required. No native acceptance.",
   "native_acceptance": false,
   "old_evidence": "Current269 r4 and all failed r1/r2/r3 records remain immutable history by commit/artifact; cannot alias current282 to oldcohort labels.",
-  "source_revision": "r5:1fixtureline fixesofficial3rd positionaltimeout;0prod/0assertion/0runner change",
+  "source_revision": "r6: QR expliciterror retry without Riverpod automaticreload; realpage route-state assertion;3additionalasserts,no counts changed",
   "QR_r4_manifest_sha256": "6e64e8062e5fa622d9b6d312bac1891aa4f701951049d1e6f5eb17160e595590",
   "current282_first_failure": {
     "commit": "0410e3d09c8b68fa799a33fec9c1a4c1e6f9159f",
@@ -70,6 +70,18 @@
     "artifact_sha256": "4733257c437a262c8feecb51c70a3870137b25ef5bb8f91dcf17671c3a826f0f",
     "actual": "54businessPASS=QRcodec7+PNG1+search46;4QRsuite loadERROR;7hiddenPASS0skip/falsefooter;remaining43QR/full785/analyze notstarted",
     "verification_sha256": "3b5ea3945b11b313f24d325db49dc564d774fd85b89262764612280798d4127f",
+    "accepted": false
+  },
+  "QR_r6_manifest_sha256": "be752630e9cc2f970ca192254b7ea5a538d98b933e0f15423d247f06f43b1df9",
+  "current282_r5_three_remaining": {
+    "commit": "35fa0a6c830bb0906726f6f6911d04dccd404d6f",
+    "run": 38868222700,
+    "job": 116865893156,
+    "source_digest": "b9b37bef5b416d4fb6119892c9b7c981665e34849273221e828adcf7ca3bdbda",
+    "portable_digest": "a6bbcb8d8a71a8d57a3bbc3038aca79a1c59fb93991467e2b0b20f73d95624ef",
+    "artifact_sha256": "058bb9984f7334eb70cc736f97de97769c6a9138e928d49c9c396a8c8b042ac3",
+    "actual": "target97 complete94PASS3ERROR(QR48/3+search46PASS);hidden11PASS;latecameraPASS/lifecycle0;full785/analyze notstarted",
+    "verification_sha256": "6383cc763e12ccedaf1a6cfcf0cf04ae4a50f1328d2ad2f207e20d8eb1694733",
     "accepted": false
   }
 }
