@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v5",
-  "state": "current287_creation_fixture_r4_route_async_pending_cloud",
+  "state": "current287_creation_analysis_r5_equivalent_braces_pending_cloud",
   "parent_required": {
     "git_commit": "b52da23f1255f04d21dc1caf6b5950b736287bd2",
     "actual_run": 38870107437,
@@ -18,8 +18,8 @@
     "native_or_service_acceptance": false
   },
   "candidate_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39",
-  "source287_digest": "289a7e494b124c3cf4d7c73149be2c59b8d9db70c751d5dbfd1ef662bc33b1a5",
-  "portable339_digest": "934021c7dd6f664e879fdc99b32fa044e7b3396f9a4b90f3a1c06f746a4c80f1",
+  "source287_digest": "99b867473443567e99d8e622b7d62bc3ac3a72c3974e8ce8d96cb584e3393be7",
+  "portable339_digest": "b72230bf055323fe5a76f0a3425b77adf38d296c0183da1a634e2ce695f06b50",
   "selected_delta": {
     "files": 9,
     "existing": 4,
@@ -57,7 +57,7 @@
     "root_cause": "Fixture omitted actual tenantApiProvider defining library import; no new product assertion executed",
     "accepted": false
   },
-  "source_revision": "r4 fixture-only3: exact actual route animation/completed barriers; serialized signOut created+awaited in same runAsync real zone; bounded native drain/SDK-first teardown and finegrain markers. Original37 names/expect expressions and old785+134+822 names unchanged; no product/SDK harness/runner/resource changes.",
+  "source_revision": "r5 equivalent braces only at mounted setState in1 production file; all37/134/822/old785 names,102 selected expect expressions, fixture r4 bytes, runner/resource/network/dependencies unchanged.",
   "fixture_r4_manifest_sha256": "39e79136cf20e253d170d070f248208cd34ceedaa931f29ab380e7fac7e88370",
   "current287_fixture_r3_actual_failure": {
     "git_commit": "1eba065c3ac75b193c2658e8250b67e109df8955",
@@ -72,5 +72,25 @@
     "classification": "135 document-global Back lookup ambiguity;166 incomplete route removal/tap source risk;174 fake/real zone serialized signOut hypothesis;175 reentrant runAsync cascade, not independent Unicode productFAIL",
     "accepted": false
   },
-  "actual_creation_Dart_tests_scope": "This r4 revision; prior r3 new37 attempted:33PASS4ERROR, preserved above."
+  "actual_creation_Dart_tests_scope": "This r5 revision; prior r4 target134/full822 complete PASS, analyze1info FAIL preserved above.",
+  "analysis_r5_manifest_sha256": "ed5e62c2a994f946875817f5ee0352f44a97edb9851a73834edc87171bf989d9",
+  "current287_fixture_r4_actual": {
+    "git_commit": "e962194dad65a2d616d0cad79c9b91388ae9511b",
+    "run": 38876608760,
+    "job": 116893063635,
+    "source_digest": "289a7e494b124c3cf4d7c73149be2c59b8d9db70c751d5dbfd1ef662bc33b1a5",
+    "portable_digest": "934021c7dd6f664e879fdc99b32fa044e7b3396f9a4b90f3a1c06f746a4c80f1",
+    "verification_sha256": "454c28ecac8b60897c4f1f9143b066a5cead4b5dcd1075b44177cf449fb769e2",
+    "artifact_sha256": "64b0b5050c1098bfc924e7788a811952485e692f5171a827c37cdfa535ca026e",
+    "actual": "target134PASS/14hidden;full822PASS/110hidden;0error/skip;old785+new37 success-name-multisets exact",
+    "analysis": "1info create_group_page128 curly_braces_in_flow_control_structures;strictanalyze failed",
+    "safe_exit": "all6stage markers ordered;creation26 SDK-before-unmount cleanup complete in target/full",
+    "inherited_hitTest_warnings": {
+      "count": 3,
+      "evidence_sha256": "50f141320c95ac977faeec7a1e49f57a76d28ed4abe793feeb2d05322c0d7e6b",
+      "not_suppressed": true,
+      "not_creation37": true
+    },
+    "accepted": false
+  }
 }

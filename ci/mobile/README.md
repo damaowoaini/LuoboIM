@@ -30,3 +30,9 @@ First287 run38872382676 completed the original QR/search97 successfully, with3 n
 本修订仅 3 个夹具/测试文件：限定当前真实编辑页的返回按钮；以实际路由 animation/completed 等待可交互与退场；退出序列在同一 runAsync 真实区创建并等待，明确创建已进入/释放/有界 drain，SDK 完成后卸载。四个旧错误分开记录，Unicode 是前一超时后的 runAsync 级联，不作为独立产品失败。产品、原 37 名称及全部 expect 表达式、SDK harness、runner、依赖与资源门禁均不变。
 
 新 287 / 339 字节向量显式绑定 r4。仍须原 target134 → full822 → 严格 analyze0，以及旧 785 名称多重集和新 37 名称；没有新增已通过声明，正式云测待执行。
+
+## 创建群头像分析 r5
+
+r4 原件已独验：134 专项和完整822全通过（0错误/跳过、true结束事件），旧785与新37成功名称多重集保留，safe-exit六阶段与SDK先于卸载清理完整；严格分析因 create_group_page.dart:128 的一处 if 缺花括号 info 失败，未整体接受。原16成员ZIP与3条旧测试点击警告独立保留，不压制警告。
+
+r5 只为既有 mounted 分支加等价花括号并更新这3项元数据；产品语义、全部测试/夹具、名称、runner、资源/网络和依赖均未更改。仍须完整134→822→严格分析0及旧785/新37成功名称门禁；0本地Dart/Flutter或重跑。

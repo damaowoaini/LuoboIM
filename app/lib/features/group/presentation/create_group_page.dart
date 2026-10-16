@@ -125,8 +125,9 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
         : await showDialog<T>(context: context, builder: content);
     } finally {
       overlays--;
-      if (mounted) setState(() {});
-      else if (overlays == 0 && !revisionDisposed) {
+      if (mounted) {
+        setState(() {});
+      } else if (overlays == 0 && !revisionDisposed) {
         revision.dispose(); revisionDisposed = true;
       }
     }

@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v5",
-  "state": "current287_creation_fixture_r4_route_async_pending_cloud",
+  "state": "current287_creation_analysis_r5_equivalent_braces_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -33,7 +33,8 @@
     "QR_r7_manifest_sha256": "b64bc7f238db13d50ecc5a96f10be4bedd4618c5dbf35e613efc4fab8ebf7453",
     "create_group_avatar_v2_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39",
     "create_group_avatar_fixture_r3_manifest_sha256": "ce469ea2b56d574f77374cb3dfecdb9aeb3b56f57a7b7ce6e24014d8a6bd2763",
-    "create_group_avatar_fixture_r4_manifest_sha256": "39e79136cf20e253d170d070f248208cd34ceedaa931f29ab380e7fac7e88370"
+    "create_group_avatar_fixture_r4_manifest_sha256": "39e79136cf20e253d170d070f248208cd34ceedaa931f29ab380e7fac7e88370",
+    "create_group_avatar_analysis_r5_manifest_sha256": "ed5e62c2a994f946875817f5ee0352f44a97edb9851a73834edc87171bf989d9"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -312,7 +313,7 @@
     "current287": 339
   },
   "portable_digests": {
-    "current287": "934021c7dd6f664e879fdc99b32fa044e7b3396f9a4b90f3a1c06f746a4c80f1"
+    "current287": "b72230bf055323fe5a76f0a3425b77adf38d296c0183da1a634e2ce695f06b50"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -504,6 +505,25 @@
       "resource": "900.121s phase_timeout latched; child0 afterTERM is not accepted",
       "classification": "135 document-global Back lookup ambiguity;166 incomplete route removal/tap source risk;174 fake/real zone serialized signOut hypothesis;175 reentrant runAsync cascade, not independent Unicode productFAIL",
       "accepted": false
+    },
+    "current287_creation_fixture_r4_tests_pass_analysis_info": {
+      "git_commit": "e962194dad65a2d616d0cad79c9b91388ae9511b",
+      "run": 38876608760,
+      "job": 116893063635,
+      "source_digest": "289a7e494b124c3cf4d7c73149be2c59b8d9db70c751d5dbfd1ef662bc33b1a5",
+      "portable_digest": "934021c7dd6f664e879fdc99b32fa044e7b3396f9a4b90f3a1c06f746a4c80f1",
+      "verification_sha256": "454c28ecac8b60897c4f1f9143b066a5cead4b5dcd1075b44177cf449fb769e2",
+      "artifact_sha256": "64b0b5050c1098bfc924e7788a811952485e692f5171a827c37cdfa535ca026e",
+      "actual": "target134PASS/14hidden;full822PASS/110hidden;0error/skip;old785+new37 success-name-multisets exact",
+      "analysis": "1info create_group_page128 curly_braces_in_flow_control_structures;strictanalyze failed",
+      "safe_exit": "all6stage markers ordered;creation26 SDK-before-unmount cleanup complete in target/full",
+      "inherited_hitTest_warnings": {
+        "count": 3,
+        "evidence_sha256": "50f141320c95ac977faeec7a1e49f57a76d28ed4abe793feeb2d05322c0d7e6b",
+        "not_suppressed": true,
+        "not_creation37": true
+      },
+      "accepted": false
     }
   },
   "reference_entry": {
@@ -511,7 +531,7 @@
     "default_enabled": false,
     "working_cohort": "current287",
     "members": 287,
-    "reference_source_digest": "519208b2d08a9115d917f90dce826e7601b40e35ab5520dfc96cac7189ec23d2",
+    "reference_source_digest": "080ec0441867d9a9ce98238e99984d5f29cc0b09e4b578a09ea0f223c5b4a0e8",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -568,7 +588,7 @@
   },
   "current287": {
     "members": 287,
-    "source_digest": "289a7e494b124c3cf4d7c73149be2c59b8d9db70c751d5dbfd1ef662bc33b1a5",
+    "source_digest": "99b867473443567e99d8e622b7d62bc3ac3a72c3974e8ce8d96cb584e3393be7",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1027,8 +1047,8 @@
       },
       {
         "path": "app/lib/features/group/presentation/create_group_page.dart",
-        "bytes": 15346,
-        "sha256": "0451fdfce24a3486e87b8262dd1e497d279cc00b13123ec5706f6125f8a123ec"
+        "bytes": 15358,
+        "sha256": "becac201a69023df4c9ba50a283d3cffeb68a68892c5e6e692588b93656eac44"
       },
       {
         "path": "app/lib/features/group/presentation/group_members_page.dart",
