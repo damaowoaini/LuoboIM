@@ -1,7 +1,7 @@
 {
   "version": 3,
   "node": "24.21.0",
-  "fullMinimumTests": 731,
+  "fullMinimumTests": 763,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -950,5 +950,163 @@
       ],
       "nameContract": "requiredNames matches audit.tests[].name (short); expectedAuditFullNames records audit.tests[].fullName for later evidence review only. New5 unrun."
     }
+  },
+  "individualForwardAdoption": {
+    "originManifestSHA256": "e8ef19f09c1c0d38b764e16389333c9f426b50e312dde84e715f109be012b934",
+    "cardOriginManifestSHA256": "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a",
+    "before": [
+      {
+        "path": "web/src/pages/chat/queryChat/ChatFooter/MultipleActionBar.tsx",
+        "bytes": 4909,
+        "sha256": "583687940af53039c158b9c61f313c2066e8ea21769ce889afdd4a46af60a539"
+      },
+      {
+        "path": "web/src/pages/common/ChooseModal/index.tsx",
+        "bytes": 18464,
+        "sha256": "9d856011a50f95c81b3f841224a79f26c77c923128e70861c24794d65b335b44"
+      },
+      {
+        "path": "web/src/i18n/resources/zh.json",
+        "bytes": 20605,
+        "sha256": "69e3f6bbae38dbe4cbead12a440d4a235dbe1ad3026a3c7ac305c915307c4796"
+      },
+      {
+        "path": "web/src/i18n/resources/en.json",
+        "bytes": 22194,
+        "sha256": "185234982745844d1be00762180784e40ff2d8f790956b1cc0bc5aba707f2625"
+      }
+    ],
+    "currentAfter": [
+      {
+        "path": "web/src/pages/chat/queryChat/ChatFooter/MultipleActionBar.tsx",
+        "bytes": 6962,
+        "sha256": "3273f8694c74f0e2ad9d935f2b1a427500647d3a677dfe71b27973c4db00a359"
+      },
+      {
+        "path": "web/src/pages/common/ChooseModal/index.tsx",
+        "bytes": 26236,
+        "sha256": "26e4e5ea4fa7ab9ca04bf12e25bd12e19bcedbcdd1aa7adcc760709b6a46e780"
+      },
+      {
+        "path": "web/src/core/individualForward.ts",
+        "bytes": 10844,
+        "sha256": "0f204f8165119dffa4031f65b5947c823a884b737c39fa7b400f974676b1aa1f"
+      },
+      {
+        "path": "web/src/i18n/resources/zh.json",
+        "bytes": 22148,
+        "sha256": "4cd4f88649a85fad31db829c9328771074972156bdfe30811c151f80e79be1d3"
+      },
+      {
+        "path": "web/src/i18n/resources/en.json",
+        "bytes": 23920,
+        "sha256": "481f81af591d7d0ae5da1f72525b0519ef6eca48bebc6c8bde06e9f5358fb7be"
+      }
+    ],
+    "adoptedTests": [
+      {
+        "path": "web/src/core/individualForward/operation.test.ts",
+        "bytes": 9926,
+        "sha256": "cea5915b3716e21046631cce56cbfbf56b18550f0560f4624d29d421a3a7b07b"
+      },
+      {
+        "path": "web/src/core/individualForward/components.test.tsx",
+        "bytes": 20257,
+        "sha256": "155430bec5ea8a21593b7b38291c2b81bd47f5f283fa710f9762858c79b7c324"
+      },
+      {
+        "path": "web/src/core/individualForward/fixture.ts",
+        "bytes": 6587,
+        "sha256": "88b71f1a08f8e85c2a550347983411ea21b8f226049d6c13a33dc60d1fb5c1f6"
+      }
+    ],
+    "testPaths": [
+      "src/core/individualForward/operation.test.ts",
+      "src/core/individualForward/components.test.tsx"
+    ],
+    "tests": 32,
+    "requiredNames": [
+      "accepts exactly one to twenty unique IDs and stores no source body",
+      "serializes separate sources and one additional tuple for each explicit target",
+      "records ACK then unknown then not-attempted without replaying the frozen operation",
+      "counts an unconfirmed additional tuple and stops the next recipient",
+      "rejects final target permission before reading or preparing any source",
+      "refuses ordinary-looking sources containing a private quoted child",
+      "cannot resume after source history clears while forward creation is pending",
+      "retains a verified ACK as fact when the view becomes invalid during dispatch",
+      "latches send timeout as unknown and late completion never continues later tuples",
+      "refuses exact lookup mismatch: empty",
+      "refuses exact lookup mismatch: foreign-cid",
+      "refuses exact lookup mismatch: foreign-id",
+      "refuses exact lookup mismatch: duplicate-source",
+      "refuses exact lookup mismatch: extra-result",
+      "refuses exact lookup mismatch: revoked",
+      "offers a keyboard button, visible twenty-source bound and separate ID-only ordered intent",
+      "does not truncate or open a picker for zero or twenty-one selected sources",
+      "takes the real toolbar path through fresh exact-CID lookup and distinct user/group sends",
+      "preserves explicit targets through navigation and ordinary same-CID metadata refresh",
+      "does not read or create for a foreign actor returned by final group permission lookup",
+      "checks the resolved target CID when a target clear was already in progress at capture",
+      "refuses a resolved recipient identity mismatch instead of borrowing the active chat",
+      "honors source revocation during creation and never sends its late prepared message",
+      "keeps ACK, unknown and not-attempted rows visible and disables replay of this panel",
+      "treats an actual session-wrapper discarded ACK as unconfirmed and writes no new-owner UI",
+      "settles an observed ACK after a same-view mute and refuses the next source before creation",
+      "does not revive source lookup after a clear finishes with a fresh history revision",
+      "does not project or dispatch old preparation into a replacement picker operation",
+      "rechecks metadata-only source retention at the additional text sender's final target await",
+      "stops pending preparation with no later send and shows bounded recipient names and source ordinals",
+      "settles the native tuple after stop, keeps its ACK visible and permits a later explicit reselection",
+      "stops the final sender's pending target read without claiming a native cancellation"
+    ],
+    "acceptedFullNames": [
+      "individual forwarding one-shot operation > accepts exactly one to twenty unique IDs and stores no source body",
+      "individual forwarding one-shot operation > serializes separate sources and one additional tuple for each explicit target",
+      "individual forwarding one-shot operation > records ACK then unknown then not-attempted without replaying the frozen operation",
+      "individual forwarding one-shot operation > counts an unconfirmed additional tuple and stops the next recipient",
+      "individual forwarding one-shot operation > rejects final target permission before reading or preparing any source",
+      "individual forwarding one-shot operation > refuses ordinary-looking sources containing a private quoted child",
+      "individual forwarding one-shot operation > cannot resume after source history clears while forward creation is pending",
+      "individual forwarding one-shot operation > retains a verified ACK as fact when the view becomes invalid during dispatch",
+      "individual forwarding one-shot operation > latches send timeout as unknown and late completion never continues later tuples",
+      "individual forwarding one-shot operation > refuses exact lookup mismatch: empty",
+      "individual forwarding one-shot operation > refuses exact lookup mismatch: foreign-cid",
+      "individual forwarding one-shot operation > refuses exact lookup mismatch: foreign-id",
+      "individual forwarding one-shot operation > refuses exact lookup mismatch: duplicate-source",
+      "individual forwarding one-shot operation > refuses exact lookup mismatch: extra-result",
+      "individual forwarding one-shot operation > refuses exact lookup mismatch: revoked",
+      "actual individual-forward entry, picker and sender > offers a keyboard button, visible twenty-source bound and separate ID-only ordered intent",
+      "actual individual-forward entry, picker and sender > does not truncate or open a picker for zero or twenty-one selected sources",
+      "actual individual-forward entry, picker and sender > takes the real toolbar path through fresh exact-CID lookup and distinct user/group sends",
+      "actual individual-forward entry, picker and sender > preserves explicit targets through navigation and ordinary same-CID metadata refresh",
+      "actual individual-forward entry, picker and sender > does not read or create for a foreign actor returned by final group permission lookup",
+      "actual individual-forward entry, picker and sender > checks the resolved target CID when a target clear was already in progress at capture",
+      "actual individual-forward entry, picker and sender > refuses a resolved recipient identity mismatch instead of borrowing the active chat",
+      "actual individual-forward entry, picker and sender > honors source revocation during creation and never sends its late prepared message",
+      "actual individual-forward entry, picker and sender > keeps ACK, unknown and not-attempted rows visible and disables replay of this panel",
+      "actual individual-forward entry, picker and sender > treats an actual session-wrapper discarded ACK as unconfirmed and writes no new-owner UI",
+      "actual individual-forward entry, picker and sender > settles an observed ACK after a same-view mute and refuses the next source before creation",
+      "actual individual-forward entry, picker and sender > does not revive source lookup after a clear finishes with a fresh history revision",
+      "actual individual-forward entry, picker and sender > does not project or dispatch old preparation into a replacement picker operation",
+      "actual individual-forward entry, picker and sender > rechecks metadata-only source retention at the additional text sender's final target await",
+      "actual individual-forward entry, picker and sender > stops pending preparation with no later send and shows bounded recipient names and source ordinals",
+      "actual individual-forward entry, picker and sender > settles the native tuple after stop, keeps its ACK visible and permits a later explicit reselection",
+      "actual individual-forward entry, picker and sender > stops the final sender's pending target read without claiming a native cancellation"
+    ],
+    "previousExpectedFullTests": 731,
+    "expectedFullTests": 763,
+    "fullState": "expected_unrun_no_full_executed_for_this_successor",
+    "localAccepted": {
+      "parent_actual_new": 32,
+      "directly_affected_old": 7,
+      "act_warning_in_parent": 1,
+      "affected_cleanup_recheck": 1,
+      "affected_warning_after": 0,
+      "WebStrictNoEmit_exit": 0,
+      "DesktopNoEmit_exit": 0,
+      "parentReceiptSHA256": "286a30e1a7ebe2738939f34a3493bd9751b3d24ef1c73f33ec02779ac8596c99",
+      "affectedReceiptSHA256": "2700bede7fc5f6d9a085e13f246ecf1b7598220811f622709715db0bab45e149"
+    },
+    "sourceMeaning": "Explicit successor of reviewed R5 5product+3test/fixture; overlap before ChooseModal equals original d640 currentAfter. Old card15/copy lineage unchanged; known32 exact normal-source test names. Source/body privacy and ACK receipts do not prove actual business sending."
   }
 }

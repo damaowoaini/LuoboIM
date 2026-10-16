@@ -5,10 +5,11 @@ on:
   workflow_dispatch:
     inputs:
       cohort:
-        description: 'Focused card wiring, or the final combined regression'
+        description: 'Focused card/individual forwarding, or the final combined regression'
         type: choice
         options:
           - chat-card-42
+          - individual-forward-32
           - full-regression
         default: chat-card-42
         required: true

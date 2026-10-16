@@ -347,6 +347,38 @@
     "mentionAll": "Everyone",
     "forward": "Forward",
     "mergeForward": "Merge and Forward",
+    "individualForward": "Forward individually",
+    "individualForwardSelection": "Selected (individual mode only)",
+    "individualForwardLimit": "Select 1–20 messages for individual forwarding. No selection is silently truncated.",
+    "individualForwardInvalidSource": "A source is unavailable, non-retainable or unverified. Select again.",
+    "individualForwardStop": "Stop remaining sends",
+    "individualForwardStopRequested": "Remaining sends are stopped. The current item will still settle by its actual receipt; it will not be retried.",
+    "individualForwardItem": "Message {{index}}",
+    "individualForwardConfirmedTotal": "Acknowledged items (including additional text)",
+    "individualForwardReceipts": "Individual forwarding receipts",
+    "individualForwardNoReplay": "This operation was submitted and cannot be sent again. Verify unconfirmed items first; there are no automatic retries.",
+    "individualForwardAdditional": "Additional text",
+    "individualForwardTarget": {
+      "user": "User",
+      "group": "Group"
+    },
+    "individualForwardState": {
+      "processing": "Processing",
+      "acknowledged": "Acknowledged",
+      "unconfirmed": "Unconfirmed",
+      "rejected": "Rejected before send",
+      "not-attempted": "Not attempted"
+    },
+    "individualForwardReason": {
+      "processing": "Checking and submitting; result pending",
+      "ready": "Waiting",
+      "stopped": "Operation stopped",
+      "invalid-source": "Source cannot be retained",
+      "permission": "Target or permission changed",
+      "prepare": "Source or message preparation did not complete",
+      "unknown": "Check history; this will not be replayed",
+      "acknowledged": "Send receipt verified"
+    },
     "messageHistory": "Chat History",
     "whosMessageHistory": "Chat History for {{who}} ",
     "launch": "Launched by",

@@ -75,6 +75,11 @@ def strict_version(code, stdout, stderr, expected):
         raise ValueError('exact clean version query required')
 
 
+def apple_signature_argv(tool):
+    # codesign treats plain -R text as a filename; '=' selects literal source.
+    return ['/usr/bin/codesign', '--verify', '--strict', '-R', '=anchor apple', str(tool)]
+
+
 def probe(root):
     spec = metadata()
     custody = load(REPO/'ci/apple-sdk-link/custody.py', 'host_tool_custody')
@@ -126,7 +131,7 @@ def probe(root):
         return code, out.read_bytes(), err.read_bytes()
 
     # A requirement is verified, not merely parsed from untrusted display text.
-    code, _, _ = command('apple-signature-verify', ['/usr/bin/codesign', '--verify', '--strict', '-R', 'anchor apple', tool])
+    code, _, _ = command('apple-signature-verify', apple_signature_argv(tool))
     if code != 0:
         raise ValueError('Apple anchored tool signature required')
     code, _, _ = command('apple-signature-display', ['/usr/bin/codesign', '--display', '--verbose=4', tool])

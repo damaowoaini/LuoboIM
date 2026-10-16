@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort } from "./web-ci.mjs";
+import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput } from "./web-ci.mjs";
 
 function runFixture(callback) {
   const root = mkdtempSync(path.join(os.tmpdir(), "luobo-web-ci-"));
@@ -110,4 +110,30 @@ test("chat-card copy retention successor preserves its exact original profile id
   assert.throws(() => currentCardCopyInput({ ...copy.before[0], sha256: "0".repeat(64) }, copy), /predecessor differs/);
   assert.throws(() => currentCardCopyInput(copy.before[0], { ...copy, before: [{ ...copy.before[0], sha256: "0".repeat(64) }] }), /Exact original/);
   assert.throws(() => currentCardCopyInput(copy.before[0], { ...copy, after: [{ ...copy.after[0], path: "web/src/unrelated.tsx" }] }), /Exact original/);
+});
+
+const individual = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8")).individualForwardAdoption;
+test("individual-forward manual cohort retains exact reviewed names and normal paths", () => {
+  assert.equal(webCohort("individual-forward-32"), "individual-forward-32");
+  const options = individualForwardCohort(individual);
+  assert.equal(options.exact, 32); assert.equal(options.requiredNames, individual.requiredNames);
+  const data = reports(Array(32).fill("passed"));
+  data.audit.tests.forEach((entry, index) => { entry.name = individual.requiredNames[index]; });
+  assert.equal(checked(data, 0, options).passed, 32);
+  data.audit.tests[0].name = "unreviewed name";
+  assert.throws(() => checked(data, 0, options), /Required test/);
+  assert.throws(() => individualForwardCohort({ ...individual, requiredNames: individual.requiredNames.slice(1) }), /Exact 32/);
+  assert.throws(() => individualForwardCohort({ ...individual, requiredNames: ["unreviewed name", ...individual.requiredNames.slice(1)] }), /Exact 32/);
+  assert.throws(() => individualForwardCohort({ ...individual, testPaths: [...individual.testPaths, "src/unrelated.test.ts"] }), /Exact 32/);
+  assert.throws(() => individualForwardCohort({ ...individual, expectedFullTests: 731 }), /regression lineage/);
+});
+test("individual-forward successor preserves card history and rejects changed lineage", () => {
+  const picker = card.currentAfter.find((entry) => entry.path === "web/src/pages/common/ChooseModal/index.tsx");
+  assert.equal(currentIndividualForwardInput(picker, individual), individual.currentAfter.find((entry) => entry.path === picker.path));
+  const unchanged = card.currentAfter.find((entry) => entry.path === "web/src/core/messageCard.ts");
+  assert.equal(currentIndividualForwardInput(unchanged, individual), unchanged);
+  assert.throws(() => currentIndividualForwardInput({ ...picker, sha256: "0".repeat(64) }, individual), /predecessor differs/);
+  assert.throws(() => currentIndividualForwardInput(picker, { ...individual, originManifestSHA256: "0".repeat(64) }), /Reviewed/);
+  assert.throws(() => currentIndividualForwardInput(picker, { ...individual, before: individual.before.filter((entry) => entry.path !== picker.path) }), /predecessor paths/);
+  assert.throws(() => currentIndividualForwardInput(picker, { ...individual, currentAfter: individual.currentAfter.slice(1) }), /source and fixture paths/);
 });

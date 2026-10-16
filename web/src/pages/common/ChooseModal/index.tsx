@@ -1,5 +1,9 @@
 import { selectedSendTarget, type SendOrigin, type SendIntent } from "@/core/messageSendIntent";
-import { captureMessageRetention, captureMessageAccess, messageOwner } from "@/core/messagePrivacyRuntime";
+import { conversationSendTarget, sameSendTarget } from "@/core/messageSendIntent";
+import { isIndividualForwardSelection, runIndividualForward, INDIVIDUAL_FORWARD_LIMIT,
+  stopIndividualForward, individualForwardStopped,
+  type IndividualForwardSelection, type IndividualReceipt } from "@/core/individualForward";
+import { captureMessageRetention, captureMessageAccess, messageOwner, subscribeMessagePrivacy } from "@/core/messagePrivacyRuntime";
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Upload } from "antd";
 import i18n, { t } from "i18next";
@@ -56,6 +60,7 @@ export interface ChooseModalState {
   sourceOwner?: string;
   sourceCurrent?: () => boolean;
   sourceCanShare?: () => boolean;
+  individualSelection?: IndividualForwardSelection;
 }
 
 interface IChooseModalProps {
@@ -91,13 +96,17 @@ i18n.on("languageChanged", () => {
 const showConversationTypes = ["FORWARD_MESSAGE", "SHARE_CARD", "MEETING_INVITE"];
 const onlyOneTypes = ["TRANSFER_IN_GROUP", "SELECT_CARD"];
 const onlyMemberTypes = ["KICK_FORM_GROUP", "TRANSFER_IN_GROUP", "RTC_INVITE"];
+const individualRecipientText = (value: unknown) => typeof value === "string"
+  ? value.replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g, " ").trim().slice(0, 80) : "";
 
 const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalProps> = (
-  { state: { type, extraData, sendOrigin, sourceConversationID, sourceOwner, sourceCurrent, sourceCanShare } },
+  { state: { type, extraData, sendOrigin, sourceConversationID, sourceOwner, sourceCurrent, sourceCanShare, individualSelection } },
   ref,
 ) => {
   const chooseBoxRef = useRef<ChooseBoxHandle>(null);
   const [loading, setLoading] = useState(false);
+  const [individualReport, setIndividualReport] = useState<{ selection: IndividualForwardSelection; rows: readonly IndividualReceipt[]; labels: ReadonlyMap<string, string> }>();
+  const [, refreshIndividual] = useState(0);
   const [groupBaseInfo, setGroupBaseInfo] = useState({
     groupName: "",
     groupAvatar: "",
@@ -106,11 +115,15 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
   const { sendMessage } = useSendMessage();
   const { isOverlayOpen, closeOverlay } = useOverlayVisible(ref);
   const mounted=useRef(true),inFlight=useRef(false);
-  const context=useRef({open:isOverlayOpen,type,extraData,sendOrigin,sourceCurrent,sourceCanShare,turn:0,owner:messageOwner(),access:captureMessageAccess()});
-  if(context.current.open!==isOverlayOpen||context.current.type!==type||context.current.extraData!==extraData||context.current.sendOrigin!==sendOrigin||context.current.sourceCurrent!==sourceCurrent||context.current.sourceCanShare!==sourceCanShare)
-    context.current={open:isOverlayOpen,type,extraData,sendOrigin,sourceCurrent,sourceCanShare,turn:context.current.turn+1,owner:messageOwner(),access:captureMessageAccess()};
+  const context=useRef({open:isOverlayOpen,type,extraData,sendOrigin,sourceCurrent,sourceCanShare,individualSelection,turn:0,owner:messageOwner(),access:captureMessageAccess()});
+  if(context.current.open!==isOverlayOpen||context.current.type!==type||context.current.extraData!==extraData||context.current.sendOrigin!==sendOrigin||context.current.sourceCurrent!==sourceCurrent||context.current.sourceCanShare!==sourceCanShare||context.current.individualSelection!==individualSelection)
+    context.current={open:isOverlayOpen,type,extraData,sendOrigin,sourceCurrent,sourceCanShare,individualSelection,turn:context.current.turn+1,owner:messageOwner(),access:captureMessageAccess()};
   useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;};},[]);
   const requestClose=()=>{if(!inFlight.current)closeOverlay();};
+  useEffect(() => {
+    if (isOverlayOpen && isIndividualForwardSelection(individualSelection))
+      return subscribeMessagePrivacy(() => refreshIndividual(value => value + 1));
+  }, [isOverlayOpen, individualSelection]);
 
   useEffect(() => {
     if (isOverlayOpen && type === "CRATE_GROUP" && extraData) {
@@ -130,6 +143,55 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
     }
   }, [isOverlayOpen]);
 
+  const confirmIndividual = async (choosedList: CheckListItem[]) => {
+    const selection = individualSelection;
+    if (!isIndividualForwardSelection(selection) || !sendOrigin || !selection.current() ||
+        sourceConversationID !== selection.sourceCID || sourceOwner !== selection.owner ||
+        sendOrigin.sourceCID !== selection.sourceCID || sendOrigin.ownerKey !== selection.owner) return;
+    const entry = context.current;
+    const sourcePermits = () => (!sourceCurrent || sourceCurrent()) && (!sourceCanShare || sourceCanShare());
+    // View settlement has no canSend dependency. A verified ACK survives a mute.
+    const current = () => mounted.current && context.current === entry && entry.open &&
+      entry.owner === messageOwner() && entry.access.current() && selection.current() && sendOrigin.current() && sourcePermits();
+    if (!current()) return;
+    if (selection.started()) { setIndividualReport(previous => previous?.selection === selection ? { ...previous, rows: selection.receipts() }
+      : { selection, rows: selection.receipts(), labels: new Map() }); return; }
+    const dispatchPermits = () => sourcePermits() && !individualForwardStopped(selection);
+    const labels = new Map<string, string>();
+    const intents = choosedList.map(item => {
+      const target = selectedSendTarget(item);
+      if (!target) return;
+      const key = JSON.stringify([target.kind, target.id]);
+      if (!labels.has(key)) labels.set(key, [item.remark, item.nickname, item.groupName, item.showName].map(individualRecipientText).find(Boolean) || individualRecipientText(target.id));
+      return sendOrigin.selectedIntent(target, dispatchPermits);
+    });
+    if (intents.some(intent => !intent)) return;
+    const additional = chooseBoxRef.current?.getAdditional() || "";
+    inFlight.current = true; setLoading(true);
+    try {
+      await runIndividualForward(selection, intents.filter((intent): intent is SendIntent => !!intent), additional, {
+        isCurrent: current,
+        resolve: async original => {
+          if (!current() || !original.current()) return;
+          const { data } = await IMSDK.getOneConversation({ sourceID: original.target.id, sessionType: original.target.kind === "user" ? 1 : 3 });
+          const target = conversationSendTarget(data);
+          if (!current() || !original.current() || !target || !sameSendTarget(target, original.target) ||
+              original.target.conversationID && original.target.conversationID !== target.conversationID) return;
+          return sendOrigin.selectedIntent(target, dispatchPermits);
+        },
+        canDeliver: checkKnownSendPermission,
+        find: async (conversationID, id) => (await IMSDK.findMessageList([{ conversationID, clientMsgIDList: [id] }])).data,
+        create: async source => (await IMSDK.createForwardMessage(source)).data,
+        createAdditional: async text => (await IMSDK.createTextMessage(text)).data,
+        send: (message, intent, sourceRetention) => sendMessage({ message, intent, sourceRetention }),
+        onProgress: rows => { if (current()) setIndividualReport({ selection, rows, labels }); },
+      });
+    } finally {
+      inFlight.current = false;
+      if (mounted.current && context.current === entry) setLoading(false);
+    }
+  };
+
   const confirmChoose = async () => {
     if(inFlight.current||!isOverlayOpen||!context.current.access.current()||context.current.owner!==messageOwner())return;
     const choosedList = chooseBoxRef.current?.getCheckedList() ?? [];
@@ -138,6 +200,10 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
 
     if (!groupBaseInfo.groupName && type === "CRATE_GROUP")
       return message.warning(t("toast.inputGroupName"));
+
+    if (type === "FORWARD_MESSAGE" && individualSelection !== undefined) {
+      await confirmIndividual(choosedList); return;
+    }
 
     const sendsMessage = ["SELECT_CARD", "FORWARD_MESSAGE", "SHARE_CARD", "MEETING_INVITE"].includes(type);
     if (sendsMessage && (!sendOrigin?.current() || (sourceCurrent && !sourceCurrent()) || (sourceCanShare && !sourceCanShare()))) return;
@@ -279,6 +345,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
 
   const getForwardContent = () => {
     if (!showConversationTypes.includes(type)) return undefined;
+    if (type === "FORWARD_MESSAGE" && isIndividualForwardSelection(individualSelection)) return `${t("placeholder.individualForward")}: ${individualSelection.sourceIDs.length}/${INDIVIDUAL_FORWARD_LIMIT}`;
     if (type === "FORWARD_MESSAGE" && !captureMessageRetention(Array.isArray((extraData as MergerMsgParams)?.messageList) ? (extraData as MergerMsgParams).messageList : extraData, sendOrigin?.sourceCID, context.current.owner).current()) return "阅后即焚、已过期或未能核验的消息不可转发";
     if ((extraData as MergerMsgParams).title) {
       return t("messageDescription.forwardMessage", {
@@ -324,6 +391,10 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
 
   const isCheckInGroup = type === "INVITE_TO_GROUP";
   const notConversation = !showConversationTypes.includes(type);
+  const individualMode = type === "FORWARD_MESSAGE" && isIndividualForwardSelection(individualSelection);
+  const individualRows = individualMode && individualReport?.selection === individualSelection &&
+    individualSelection.current() && context.current.owner === messageOwner() && (!sourceCurrent || sourceCurrent()) &&
+    (!sourceCanShare || sourceCanShare()) ? individualSelection.receipts() : [];
 
   return (
     <Modal
@@ -347,7 +418,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
     >
       <div>
         <div className="app-no-drag flex h-16 items-center justify-between bg-[var(--gap-text)] px-7">
-          <div>{titleMap[type]}</div>
+          <div>{individualMode ? t("placeholder.individualForward") : titleMap[type]}</div>
           <CloseOutlined
             className="cursor-pointer text-[var(--sub-text)]"
             rev={undefined}
@@ -397,7 +468,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
               />
             </div>
           </div>
-        ) : (
+        ) : individualMode && individualSelection.started() ? null : (
           <ChooseBox
             className="!h-[60vh]"
             ref={chooseBoxRef}
@@ -411,6 +482,34 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
             fowardContent={getForwardContent()}
           />
         )}
+        {individualMode && (
+          <section aria-label={t("placeholder.individualForwardReceipts")} className="px-4 pt-4 text-sm">
+            <p>{t("placeholder.individualForwardLimit")}</p>
+            {individualSelection.started() && <p>{t("placeholder.individualForwardNoReplay")}</p>}
+            {loading && individualSelection.started() && <button type="button"
+              aria-label={t("placeholder.individualForwardStop")} disabled={individualForwardStopped(individualSelection)}
+              onClick={() => { if (stopIndividualForward(individualSelection)) refreshIndividual(value => value + 1); }}
+              style={{ minWidth: 44, minHeight: 44 }}
+              className="rounded-[var(--luobo-radius-control)] bg-[var(--luobo-primary-soft)] px-3 text-[var(--luobo-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600">
+              {t("placeholder.individualForwardStop")}
+            </button>}
+            {individualForwardStopped(individualSelection) && <p role="status">{t("placeholder.individualForwardStopRequested")}</p>}
+            <p>{t("placeholder.individualForwardConfirmedTotal")}: {individualRows.filter(row => row.state === "acknowledged").length}/{individualRows.length}</p>
+            <div role="status" aria-live="polite" className="flex flex-wrap gap-3 py-2">
+              {(["processing", "acknowledged", "unconfirmed", "rejected", "not-attempted"] as const).map(state => (
+                <span key={state}>{t(`placeholder.individualForwardState.${state}`)}: {individualRows.filter(row => row.state === state).length}</span>
+              ))}
+            </div>
+            <ol className="max-h-[40vh] list-none space-y-2 overflow-auto break-all">
+              {individualRows.map((row, i) => <li key={i}>
+                {t(`placeholder.individualForwardTarget.${row.target.kind}`)} {individualReport?.labels.get(JSON.stringify([row.target.kind, row.target.id])) || individualRecipientText(row.target.id)}
+                {" · "}{row.kind === "message" ? t("placeholder.individualForwardItem", { index: individualSelection.sourceIDs.indexOf(row.sourceID) + 1 }) : t("placeholder.individualForwardAdditional")}
+                {" · "}{t(`placeholder.individualForwardState.${row.state}`)}
+                {" · "}{t(`placeholder.individualForwardReason.${row.reason}`)}
+              </li>)}
+            </ol>
+          </section>
+        )}
         <div className="flex justify-end px-9 py-6">
           <Button
             className="mr-6 border-0 bg-[var(--chat-bubble)] px-6"
@@ -423,6 +522,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
             className="px-6"
             type="primary"
             loading={loading}
+            disabled={individualMode && individualSelection.started()}
             onClick={confirmChoose}
           >
             {t("confirm")}

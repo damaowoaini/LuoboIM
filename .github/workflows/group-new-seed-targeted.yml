@@ -1,0 +1,102 @@
+name: Group new namespace seed targeted eight
+
+# Affected checks only. Existing CID, pure13 and full29 lanes remain unchanged.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: group-new-seed-target8-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  target8:
+    name: New group seed / exact eight tops and twenty-one subs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+      LUOBO_STORAGE_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+      LUOBO_GROUP_RECEIVER_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+      LUOBO_GROUP_ROLE_TEST_MONGO_URI: 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety and exact seed source; pure controls reused locally
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/group-new-seed/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Four GiB admission before any owned fixture
+        run: |
+          python3 -B - <<'PYCODE'
+          import json, os
+          from pathlib import Path
+          free = os.statvfs(os.environ['RUNNER_TEMP'])
+          value = free.f_bavail * free.f_frsize
+          Path('ci-results').mkdir(exist_ok=True)
+          record = {'freeBytes': value, 'minimumInitialBytes': 4 * 1024**3, 'accepted': value >= 4 * 1024**3}
+          with Path('ci-results/group-new-seed-bootstrap.json').open('x') as out:
+              json.dump(record, out); out.write('\n'); out.flush(); os.fsync(out.fileno())
+          if not record['accepted']:
+              raise SystemExit('4GiB bootstrap floor; fixtures not started')
+          PYCODE
+      - name: Prepare exact owned ephemeral Mongo and paired Redis
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/group-new-seed-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/group-new-seed-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval .2 \
+            -- bash ci/backend-integration.sh prepare
+      - name: Prepare exact owned private MySQL
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/group-new-seed-mysql-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/group-new-seed-mysql-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval .2 \
+            -- python3 -B ci/group-ordinary/mysql_fixture.py prepare
+      - name: Only three packages and exact new eight tops twenty-one subs under guards
+        run: python3 -B ci/group-new-seed/run.py
+      - name: Always collect owned private SQL residuals
+        if: always()
+        run: python3 -B ci/group-ordinary/mysql_fixture.py collect
+      - name: Always join and remove exact owned SQL container
+        if: always()
+        run: python3 -B ci/group-ordinary/mysql_fixture.py cleanup
+      - name: Always collect owned Mongo and Redis residuals
+        if: always()
+        run: bash ci/backend-integration.sh collect
+      - name: Always remove only exact run owned Mongo and Redis containers
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve explicit public evidence only
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: group-new-seed-target8-${{ github.run_id }}
+          path: |
+            ci-results/group-new-seed/
+            ci-results/group-new-seed-bootstrap.json
+            ci-results/group-new-seed-prepare.log
+            ci-results/group-new-seed-prepare.resource.json
+            ci-results/group-new-seed-mysql-prepare.log
+            ci-results/group-new-seed-mysql-prepare.resource.json
+            ci-results/backend-integration/
+            ci-results/group-ordinary-mysql/
+          if-no-files-found: warn
+          retention-days: 14

@@ -28,14 +28,14 @@
   "source_files": [
     {
       "path": "ci/apple-host-tool/run.py",
-      "bytes": 11469,
-      "sha256": "d382595fa3003b81e17a67eee97eb01640d8c1bf2a7ff608473bf748ff4ed8df",
+      "bytes": 11626,
+      "sha256": "ef4fef688a380c0d7c39c078e812e91f89adee77b8fda1d0203cef2128cfca94",
       "mode": "0o644"
     },
     {
       "path": "ci/apple-host-tool/test_run.py",
-      "bytes": 3302,
-      "sha256": "c7d4ee73e53169c0f29241e493188d5e921eab3e26321ea32ffc8b71acd24a6c",
+      "bytes": 3637,
+      "sha256": "2b97ac885406f0cc28d13d563ed44a75be02750fb7a095c55303b3cd9461e1c9",
       "mode": "0o644"
     },
     {
@@ -54,7 +54,7 @@
     "log_member_bytes": 65536
   },
   "new_tool_bytes": "First observed on actual cloud probe, signature checked and kept immutable across queries; not accepted for link hostpins until independent Root review.",
-  "revision": "r1_host_stream_cap_and_fixed_real_tool_hardlink_proof",
+  "revision": "r2_inline_signature_requirement",
   "host_tool_contract": {
     "stream_cap_bytes": 67108864,
     "copy_or_upload_host_binary": false,
@@ -65,7 +65,7 @@
     ],
     "repo_sources_nlink": 1,
     "identity": "dev, inode, mode, uid, gid, nlink, size, mtime_ns, ctime_ns; same fd before/after and original path lstat; no symlink/canonical path; actual nlink recorded",
-    "signature": "same Apple anchor verification/display and exact bundle/version; immutable tool bytes/stat before and after all queries",
+    "signature": "codesign --verify --strict -R =anchor apple: inline literal source per official man; same Apple anchor, bundle identity and before/after immutability required. No file fallback or weaker signature.",
     "probe": "metadata queries only: codesign2 and version2; no build/link; new bytes require Root review before any link hostpin"
   }
 }

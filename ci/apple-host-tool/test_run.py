@@ -1,4 +1,4 @@
-"""Three pure controls; no native subprocess, network, download or link."""
+"""Four pure controls; no native subprocess, network, download or link."""
 import hashlib
 import os
 from pathlib import Path
@@ -60,6 +60,12 @@ class HostToolControls(unittest.TestCase):
             self.assertEqual(regular['sha256'], actual['sha256'])
             self.assertEqual(regular['nlink'], 1)
             self.assertFalse(regular['system_hardlink_exception'])
+
+    def test_signature_argv_uses_inline_Apple_anchor_and_strict_verification(self):
+        tool = Path('/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild')
+        self.assertEqual(run.apple_signature_argv(tool), [
+            '/usr/bin/codesign', '--verify', '--strict', '-R', '=anchor apple', str(tool),
+        ])
 
 
 if __name__ == '__main__':

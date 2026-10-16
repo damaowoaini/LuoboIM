@@ -61,8 +61,29 @@ export function validateReport(report, audit, exit, { minimum, exact, before = f
 }
 
 export function webCohort(value = "full-regression") {
-  assert(["chat-card-42", "full-regression"].includes(value), "Explicit chat-card-42 or full-regression cohort required");
+  assert(["chat-card-42", "individual-forward-32", "full-regression"].includes(value), "Explicit chat-card-42, individual-forward-32 or full-regression cohort required");
   return value;
+}
+
+export function individualForwardCohort(individual) {
+  assert(individual?.originManifestSHA256 === "e8ef19f09c1c0d38b764e16389333c9f426b50e312dde84e715f109be012b934" && individual.cardOriginManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a", "Reviewed individual-forward lineage required");
+  const productPaths = ["web/src/pages/chat/queryChat/ChatFooter/MultipleActionBar.tsx", "web/src/pages/common/ChooseModal/index.tsx", "web/src/core/individualForward.ts", "web/src/i18n/resources/zh.json", "web/src/i18n/resources/en.json"];
+  const testPaths = ["src/core/individualForward/operation.test.ts", "src/core/individualForward/components.test.tsx"];
+  const fixturePaths = [...testPaths.map((file) => `web/${file}`), "web/src/core/individualForward/fixture.ts"];
+  assert(JSON.stringify(individual.currentAfter?.map((entry) => entry.path)) === JSON.stringify(productPaths) && JSON.stringify(individual.adoptedTests?.map((entry) => entry.path)) === JSON.stringify(fixturePaths), "Exact individual-forward source and fixture paths required");
+  assert(JSON.stringify(individual.before?.map((entry) => entry.path)) === JSON.stringify(productPaths.filter((file) => file !== "web/src/core/individualForward.ts")), "Exact individual-forward predecessor paths required");
+  assert(JSON.stringify(individual.testPaths) === JSON.stringify(testPaths) && individual.tests === 32 && individual.requiredNames?.length === 32 && new Set(individual.requiredNames).size === 32 && hash(Buffer.from(JSON.stringify(individual.requiredNames))) === "8d541cc496dc3345a5df5b3485edd13e1bb49591fc179d11c295ed9966140a12", "Exact 32 individual-forward names and normal test paths required");
+  assert(individual.previousExpectedFullTests === 731 && individual.expectedFullTests === 763, "Explicit expected 731+32 regression lineage required");
+  return { exact: individual.tests, requiredNames: individual.requiredNames };
+}
+
+export function currentIndividualForwardInput(previous, individual) {
+  individualForwardCohort(individual);
+  const current = individual.currentAfter.find((entry) => entry.path === previous.path);
+  if (!current) return previous;
+  const before = individual.before.find((entry) => entry.path === previous.path);
+  assert(before?.bytes === previous.bytes && before?.sha256 === previous.sha256, "Individual-forward predecessor differs");
+  return current;
 }
 
 export function currentChatCardInput(previous, card) {
@@ -143,10 +164,13 @@ export function verifyInputs() {
   const inputs = json(inputPath), direct = inputs.candidate, edit = inputs.editableContentAdoption;
   const card = inputs.chatCardAdoption;
   const copy = card?.copyRetention;
+  const individual = inputs.individualForwardAdoption;
+  individualForwardCohort(individual);
   assert(card?.originManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a" && card.before.length === 13 && card.currentAfter.length === 15 && card.adoptedTests.length === 4, "Complete chat-card source/test lineage required");
-  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === 731, "Explicit pending 689+37+5 regression cohort required");
+  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === individual.expectedFullTests, "Explicit pending 689+37+5+32 regression cohort required");
   assert(card.requiredNames.length === 37 && new Set(card.requiredNames).size === 37, "Complete unique chat-card names required");
   assert(copy.requiredNames.length === 5 && new Set([...card.requiredNames, ...copy.requiredNames]).size === 42, "Complete unique copy-retention names required");
+  assert(new Set([...card.requiredNames, ...copy.requiredNames, ...individual.requiredNames]).size === 74, "Complete unique 42+32 current names required");
   const cardTestPaths = ["src/core/messageCard/messageCard.test.ts", "src/core/messageCard/receivedCardComponents.test.tsx", "src/core/messageCard/cardShareSource.test.tsx"];
   assert(JSON.stringify(card.testPaths) === JSON.stringify(cardTestPaths), "Exact normal-source card test paths required");
   assert(JSON.stringify(copy.testPaths) === JSON.stringify(["src/core/messageCard/profileCopy.test.tsx"]) && copy.adoptedTest.path === "web/src/core/messageCard/profileCopy.test.tsx", "Exact new copy-retention test path required");
@@ -155,7 +179,11 @@ export function verifyInputs() {
   for (const entry of [card.config, ...card.typeInputs]) verifyFile(repo, entry);
   assert(new Set(card.currentAfter.map((entry) => entry.path)).size === 15 && new Set(card.before.map((entry) => entry.path)).size === 13, "Duplicate chat-card source identity");
   assert(card.before.every((entry) => card.currentAfter.some((after) => after.path === entry.path)), "Missing chat-card source successor");
-  for (const entry of card.currentAfter) { assert(entry.path.startsWith("web/src/"), "Unsafe chat-card source path"); verifyFile(repo, currentCardCopyInput(entry, copy)); }
+  const originalPicker = card.currentAfter.find((entry) => entry.path === "web/src/pages/common/ChooseModal/index.tsx");
+  assert(originalPicker?.bytes === 18464 && originalPicker?.sha256 === "9d856011a50f95c81b3f841224a79f26c77c923128e70861c24794d65b335b44", "Exact original card picker identity required");
+  currentIndividualForwardInput(originalPicker, individual);
+  for (const entry of [...individual.currentAfter, ...individual.adoptedTests]) verifyFile(repo, entry);
+  for (const entry of card.currentAfter) { assert(entry.path.startsWith("web/src/"), "Unsafe chat-card source path"); verifyFile(repo, currentIndividualForwardInput(currentCardCopyInput(entry, copy), individual)); }
   assert(card.adoptedTests.every((entry) => entry.path.startsWith("web/src/core/messageCard/")), "Unsafe adopted card test path");
   for (const entry of card.adoptedTests) verifyFile(repo, entry);
   const same = (a, b) => a?.path === b?.path && a?.bytes === b?.bytes && a?.sha256 === b?.sha256;
@@ -186,7 +214,7 @@ export function verifyInputs() {
   }
   for (const entry of edit.currentAfter) {
     assert(entry.path.startsWith("web/src/"), "Unsafe editor successor path");
-    verifyFile(repo, currentChatCardInput(entry, card));
+    verifyFile(repo, currentIndividualForwardInput(currentChatCardInput(entry, card), individual));
     verifyFile(repo, { ...entry, path: `ci/candidates/web-editable-save/after/src/${entry.path.slice("web/src/".length)}` });
   }
   for (const entry of edit.adoptedTests) {
@@ -214,7 +242,7 @@ export function verifyInputs() {
     else if (previous.path === "web/src/pages/chat/queryChat/ChatHeader/index.tsx") verifyStyleCaller(previous, now, inputs.mobileStyleAdoption);
     else assert(same(previous, now), "Unrelated caller/SDK pin changed");
   }
-  for (const entry of direct.realCallers) verifyFile(repo, currentChatCardInput(entry, card));
+  for (const entry of direct.realCallers) verifyFile(repo, currentIndividualForwardInput(currentChatCardInput(entry, card), individual));
   const style = inputs.mobileStyleAdoption;
   assert(style.fullMinimumTests === 689 && inputs.fullMinimumTests >= style.fullMinimumTests && style.newTests === 6 && style.requiredInputs.length === 3, "Complete mobile style regression context required");
   verifyFile(repo, style.frozenBefore);
@@ -250,10 +278,13 @@ async function main() {
     };
     const inputs = json(inputPath);
     const card = inputs.chatCardAdoption, copy = card.copyRetention;
+    const individual = inputs.individualForwardAdoption;
     const cardNames = [...card.requiredNames, ...copy.requiredNames];
     if (cohort === "chat-card-42") await phase("chat-card-42", () => runTests("chat-card-42",
       { exact: card.tests + copy.newTests, requiredNames: cardNames }, [...card.testPaths, ...copy.testPaths]));
-    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: cardNames }));
+    else if (cohort === "individual-forward-32") await phase("individual-forward-32", () => runTests("individual-forward-32",
+      individualForwardCohort(individual), individual.testPaths));
+    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames] }));
     await phase("types-web-strict", async () => checkedProcess(await execute("types-web-strict", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"])));
     await phase("types-desktop-original", async () => checkedProcess(await execute("types-desktop-original", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.desktop.json"])));
     if (cohort === "full-regression") {

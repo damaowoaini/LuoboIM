@@ -1,5 +1,6 @@
 import { useMessageAccess } from "@/hooks/useMessagePrivacy";
 import { messageOwner } from "@/core/messagePrivacyRuntime";
+import { captureIndividualForward, INDIVIDUAL_FORWARD_LIMIT } from "@/core/individualForward";
 import { captureMessageAccess, captureMessageRetention } from "@/core/messagePrivacyRuntime";
 import { Spin } from "antd";
 import { t } from "i18next";
@@ -40,6 +41,26 @@ const MultipleActionBar = () => {
   const historyMessageList = useMessageStore((state) => state.historyMessageList);
   const updateCheckMode = useMessageStore((state) => state.updateCheckMode);
   const deleteOneMessage = useMessageStore((state) => state.deleteOneMessage);
+  const sourceView = useConversationStore.getState().captureConversationViewScope();
+  const checkedCount = historyMessageList.filter(message => message.checked).length;
+
+  const forwardIndividually = () => {
+    const sourceCID = currentConversation?.conversationID;
+    if (!sourceCID || sourceOwner !== messageOwner() || !sourceView?.current() ||
+        sourceView.conversationID !== sourceCID || !sourceAccess.current()) return;
+    const checked = getCheckedMessageList();
+    if (!checked.length || checked.length > INDIVIDUAL_FORWARD_LIMIT) {
+      feedbackToast({ error: new Error(t("placeholder.individualForwardLimit")) }); return;
+    }
+    if (!captureMessageRetention(checked, sourceCID, sourceOwner).current()) {
+      feedbackToast({ error: new Error(t("placeholder.individualForwardInvalidSource")) }); return;
+    }
+    const selection = captureIndividualForward(sourceCID, sourceOwner, [...checked].reverse().map(message => message.clientMsgID));
+    if (!selection) { feedbackToast({ error: new Error(t("placeholder.individualForwardInvalidSource")) }); return; }
+    emitter.emit("OPEN_CHOOSE_MODAL", { type: "FORWARD_MESSAGE", sourceConversationID: sourceCID,
+      sourceOwner, sourceCurrent: selection.current, individualSelection: selection });
+    updateCheckMode(false);
+  };
 
   const actionClick = async (idx: number) => {
     if (!sourceAccess.current()) return;
@@ -121,10 +142,17 @@ const MultipleActionBar = () => {
 
   return (
     <Spin spinning={loading}>
-      <div className="flex bg-[var(--chat-bubble)] px-16 py-4">
+      <div className="flex flex-wrap gap-3 bg-[var(--chat-bubble)] px-4 py-4">
+        <button type="button" disabled={loading} onClick={forwardIndividually}
+          aria-label={t("placeholder.individualForward")}
+          style={{ minWidth: 44, minHeight: 44 }}
+          className="flex min-h-16 flex-col items-center justify-center rounded-[var(--luobo-radius-control)] bg-[var(--luobo-primary-soft)] px-3 py-2 text-[var(--luobo-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600">
+          <span>{t("placeholder.individualForward")}</span>
+          <span className="text-xs">{t("placeholder.individualForwardSelection")}: {checkedCount}/{INDIVIDUAL_FORWARD_LIMIT}</span>
+        </button>
         {multipleActionList.map((action, idx) => (
           <div
-            className="mr-8 flex h-16 w-16 cursor-pointer flex-col items-center justify-center rounded-md bg-white last:mr-0"
+            className="flex h-16 w-16 cursor-pointer flex-col items-center justify-center rounded-md bg-white"
             key={action.title}
             onClick={() => actionClick(idx)}
           >

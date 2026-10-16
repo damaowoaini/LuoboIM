@@ -347,6 +347,38 @@
     "mentionAll": "所有人",
     "forward": "转发",
     "mergeForward": "合并转发",
+    "individualForward": "逐条转发",
+    "individualForwardSelection": "已选（仅逐条）",
+    "individualForwardLimit": "逐条转发每次选1–20条消息，不会截断选择。",
+    "individualForwardInvalidSource": "消息已失效、不能保留或无法核验，请重新选择。",
+    "individualForwardStop": "停止后续发送",
+    "individualForwardStopRequested": "已停止后续发送。已发出的消息会继续等待结果，不会自动重发。",
+    "individualForwardItem": "第{{index}}条",
+    "individualForwardConfirmedTotal": "已确认发送（含附言）",
+    "individualForwardReceipts": "逐条转发回执",
+    "individualForwardNoReplay": "本次操作已提交，不能再次发送。请先核实未确认项；不会自动重发。",
+    "individualForwardAdditional": "附言",
+    "individualForwardTarget": {
+      "user": "用户",
+      "group": "群"
+    },
+    "individualForwardState": {
+      "processing": "处理中",
+      "acknowledged": "已确认",
+      "unconfirmed": "结果未确认",
+      "rejected": "前置拒绝",
+      "not-attempted": "未尝试"
+    },
+    "individualForwardReason": {
+      "processing": "正在核对并提交，结果待定",
+      "ready": "等待提交",
+      "stopped": "操作已停止",
+      "invalid-source": "来源不能保留",
+      "permission": "目标或权限已变化",
+      "prepare": "来源或消息准备未完成",
+      "unknown": "请核实记录，不会重发",
+      "acknowledged": "已核验发送回执"
+    },
     "messageHistory": "聊天记录",
     "whosMessageHistory": "{{who}}的聊天记录",
     "launch": "发起的",
