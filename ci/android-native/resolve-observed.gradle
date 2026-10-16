@@ -170,7 +170,7 @@ gradle.projectsEvaluated {
                 def stream = new FileOutputStream(out)
                 try {
                     stream.write((JsonOutput.prettyPrint(JsonOutput.toJson(entry[1]))+'\n').getBytes('UTF-8'))
-                    stream.flush(); stream.fd.sync()
+                    stream.flush(); stream.getFD().sync()
                 } finally { stream.close() }
             }
         }

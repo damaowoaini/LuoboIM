@@ -19,7 +19,7 @@ import verify_inputs
 HERE = Path(__file__).resolve().parent
 COHORT = observer.COHORT
 BUILDER = parent.CORE_TOOLS + '/build_observed_candidate.py'
-REVISION = 'root-r4b-project-selector'
+REVISION = 'root-r5-explicit-file-descriptor-sync'
 STAGES = ['setup', 'core', 'gradle-controls', 'gradle-setup', 'apk']
 
 

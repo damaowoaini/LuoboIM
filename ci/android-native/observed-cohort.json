@@ -16,8 +16,8 @@
     },
     {
       "path": ".github/workflows/android-observed-debug.yml",
-      "bytes": 3184,
-      "sha256": "18b98fa9a62a32d54afecebeb18485c3d0ec95915f99883b7d314c9810c3bfc6"
+      "bytes": 3183,
+      "sha256": "ca8d238b6c9d693746d3e84e4fd9440def1700d2416939be344dcf225e600f0c"
     },
     {
       "path": "ci/android-native/audit.py",
@@ -81,8 +81,8 @@
     },
     {
       "path": "ci/android-native/observed_bind.py",
-      "bytes": 23647,
-      "sha256": "04db0723823143b29245a0bbb7291b759c9ca1ae073270a905f5e40e8429f9c4"
+      "bytes": 23659,
+      "sha256": "8f34e22e8767b58297fc4adfb734939650f5c6cc5068ea500f071be351610015"
     },
     {
       "path": "ci/android-native/projected-module-after.mod",
@@ -96,8 +96,8 @@
     },
     {
       "path": "ci/android-native/resolve-observed.gradle",
-      "bytes": 10224,
-      "sha256": "347c07dde8268e04b27ca4a40c2e8be4d1c1649555ea6f4193953fcb93e67116"
+      "bytes": 10229,
+      "sha256": "f94c8701852d38846c08319a018f80a3a9b2d256c7013248f3bfe6750922d70e"
     },
     {
       "path": "ci/android-native/resolve.gradle",
@@ -188,5 +188,5 @@
   "members": 428,
   "old427_r1_r2_immutable": true,
   "cold20GiB_phase4GiB_dual1GiB_cap16GiB_pollPoint2": true,
-  "controller_revision": "root-r4b-project-selector"
+  "controller_revision": "root-r5-explicit-file-descriptor-sync"
 }
