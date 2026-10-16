@@ -360,21 +360,27 @@ void main() {
         } else {
           await f.preview(tester);
         }
-        unawaited(
-          f.navigator.currentState!.push<void>(
-            MaterialPageRoute(
-              builder: (_) => const Scaffold(body: Text('外来页面')),
-            ),
-          ),
+        final approve = stage == 'source'
+          ? find.text('从相册选择')
+          : find.widgetWithText(FilledButton, '使用');
+        final owned = ModalRoute.of(tester.element(approve))!;
+        final foreign = MaterialPageRoute<void>(
+          builder: (_) => const Scaffold(body: Text('外来页面')),
         );
-        await routeFrame(tester);
+        unawaited(f.navigator.currentState!.push<void>(foreign));
+        await until(tester, () => foreign.isCurrent &&
+          foreign.animation?.status == AnimationStatus.completed);
+        var foreignRemoved = false;
+        unawaited(foreign.completed.then<void>((_) { foreignRemoved = true; }));
         f.navigator.currentState!.pop();
-        await routeFrame(tester);
-        if (stage == 'source') {
-          await tester.tap(find.text('从相册选择'));
-        } else {
-          await tester.tap(find.widgetWithText(FilledButton, '使用'));
-        }
+        await until(tester, () => foreignRemoved && owned.isCurrent &&
+          approve.hitTestable().evaluate().length == 1);
+        var ownedRemoved = false;
+        unawaited(owned.completed.then<void>((_) { ownedRemoved = true; }));
+        await tester.tap(approve.hitTestable());
+        // The source/preview must actually consume this click and leave;
+        // only then are the unchanged no-picker/no-upload assertions meaningful.
+        await until(tester, () => ownedRemoved);
         await routeFrame(tester);
         expect(f.providerRequests, isEmpty);
         expect(f.writes, isEmpty);

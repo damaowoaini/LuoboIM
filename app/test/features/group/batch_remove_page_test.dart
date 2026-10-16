@@ -236,15 +236,25 @@ void main() {
       await f.choose(tester, ['bob', 'carol']);
       await tester.tap(f.submit);
       await frame(tester);
-      unawaited(
-        f.navigator.currentState!.push<void>(
-          MaterialPageRoute(builder: (_) => const Scaffold(body: Text('外来页面'))),
-        ),
+      final confirm = find.widgetWithText(FilledButton, '确认');
+      final owned = ModalRoute.of(tester.element(confirm))!;
+      final foreign = MaterialPageRoute<void>(
+        builder: (_) => const Scaffold(body: Text('外来页面')),
       );
-      await frame(tester);
+      unawaited(f.navigator.currentState!.push<void>(foreign));
+      await until(tester, () => foreign.isCurrent &&
+        foreign.animation?.status == AnimationStatus.completed);
+      var foreignRemoved = false;
+      unawaited(foreign.completed.then<void>((_) { foreignRemoved = true; }));
       f.navigator.currentState!.pop();
-      await frame(tester);
-      await tester.tap(find.widgetWithText(FilledButton, '确认'));
+      await until(tester, () => foreignRemoved && owned.isCurrent &&
+        confirm.hitTestable().evaluate().length == 1);
+      var ownedRemoved = false;
+      unawaited(owned.completed.then<void>((_) { ownedRemoved = true; }));
+      await tester.tap(confirm.hitTestable());
+      // Completion of this exact confirmation proves its real onPressed ran;
+      // a tap intercepted by the exiting foreign route cannot satisfy this.
+      await until(tester, () => ownedRemoved);
       await frame(tester);
       expect(f.kickCalls, isEmpty);
       await f.close(tester);

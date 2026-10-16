@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v5",
-  "state": "current287_creation_analysis_r5_equivalent_braces_pending_cloud",
+  "state": "current287_owned_confirmation_fixture_pending_cloud",
   "parent_required": {
     "git_commit": "b52da23f1255f04d21dc1caf6b5950b736287bd2",
     "actual_run": 38870107437,
@@ -18,8 +18,8 @@
     "native_or_service_acceptance": false
   },
   "candidate_manifest_sha256": "7e6f55bef0f81e0b59eb033f5b30632bba484adf8d6214b5b9c3622b047c5c39",
-  "source287_digest": "99b867473443567e99d8e622b7d62bc3ac3a72c3974e8ce8d96cb584e3393be7",
-  "portable339_digest": "b72230bf055323fe5a76f0a3425b77adf38d296c0183da1a634e2ce695f06b50",
+  "source287_digest": "86e290284df603c1e182c59d469212a6dacdef602f64b238ce8358b2997715cc",
+  "portable339_digest": "a0c79a9bbca06f3ce24817abfb10397b18affc869301690f156272fa20c18402",
   "selected_delta": {
     "files": 9,
     "existing": 4,
@@ -57,7 +57,7 @@
     "root_cause": "Fixture omitted actual tenantApiProvider defining library import; no new product assertion executed",
     "accepted": false
   },
-  "source_revision": "r5 equivalent braces only at mounted setState in1 production file; all37/134/822/old785 names,102 selected expect expressions, fixture r4 bytes, runner/resource/network/dependencies unchanged.",
+  "source_revision": "Separate inherited3 hit-test evidence correction in2 testfiles only. Wait actual foreign TransitionRoute.completed, original owned current+action hitTestable, real tap, exact owned.completed; preserves all110expect expressions and all822names. Original134 target retained; full822 already covers changed2files(17+20existingcases), no new target phase.",
   "fixture_r4_manifest_sha256": "39e79136cf20e253d170d070f248208cd34ceedaa931f29ab380e7fac7e88370",
   "current287_fixture_r3_actual_failure": {
     "git_commit": "1eba065c3ac75b193c2658e8250b67e109df8955",
@@ -72,7 +72,7 @@
     "classification": "135 document-global Back lookup ambiguity;166 incomplete route removal/tap source risk;174 fake/real zone serialized signOut hypothesis;175 reentrant runAsync cascade, not independent Unicode productFAIL",
     "accepted": false
   },
-  "actual_creation_Dart_tests_scope": "This r5 revision; prior r4 target134/full822 complete PASS, analyze1info FAIL preserved above.",
+  "actual_creation_Dart_tests_scope": "This fixture metadata revision0 executed. Prior r4 target134/full822PASS but strictanalysis1info; parent r5 currentlypending at draftfreeze.",
   "analysis_r5_manifest_sha256": "ed5e62c2a994f946875817f5ee0352f44a97edb9851a73834edc87171bf989d9",
   "current287_fixture_r4_actual": {
     "git_commit": "e962194dad65a2d616d0cad79c9b91388ae9511b",
@@ -92,5 +92,15 @@
       "not_creation37": true
     },
     "accepted": false
+  },
+  "owned_confirmation_fixture_manifest_sha256": "0bea1f0b326815098bcd5021cdb57c758a6e58ee2ab436a7935a3ba6c2583e18",
+  "parent_r5_for_owned_confirmation": {
+    "git_commit": "35ff6301e04583af8930b7257b8fb7923121bfe7",
+    "run": 38877846259,
+    "job": 116897105610,
+    "source_digest": "99b867473443567e99d8e622b7d62bc3ac3a72c3974e8ce8d96cb584e3393be7",
+    "portable_digest": "b72230bf055323fe5a76f0a3425b77adf38d296c0183da1a634e2ce695f06b50",
+    "state_at_draft_freeze": "in_progress;noresultclaim;strict134_822_analyze0required",
+    "changed_product": "Only equivalent mounted-setState braces from r4; existing2 testbefore paths byteexact current."
   }
 }
