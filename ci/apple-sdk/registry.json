@@ -3,8 +3,8 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 3769,
-      "sha256": "f0089a23b7cd8dea26b50764907a0708421faa2b21faf3ade045bc5c57603faf"
+      "bytes": 5733,
+      "sha256": "5b9510a83ce605ab57636f926d9da373694457596536c3dbd5f6b7e9ce5c578d"
     },
     {
       "path": "apple_core.py",
@@ -52,9 +52,9 @@
       "sha256": "7c3c81af778d4985e01b173deff34f51c7564020867645f670ef5a4cb4868193"
     },
     {
-      "bytes": 6828,
+      "bytes": 7577,
       "path": "link_probe.py",
-      "sha256": "996e9173dc747c23d099a8502cd3bb218b95edb40dfccc6dcd3dc499c720e614"
+      "sha256": "84b2646c8e112a8c946a0dd15bc1a34fa039febf966bb6c4a6151f53d8893210"
     },
     {
       "bytes": 2318,
@@ -113,5 +113,5 @@
   ],
   "schema": "luobo.apple-sdk.cloud-registry.v1",
   "underlying_SDK_cohort": "auditable-sdk-apple-arm64-v1",
-  "controller_revision": "R7_actual_core208_plus_warm610_independent_union"
+  "controller_revision": "R8_strict_single_arm64_thin_audit_original_framework_link"
 }

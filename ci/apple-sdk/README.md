@@ -1,4 +1,33 @@
-# Apple SDK-only cloud ARM64 — R6-R1 generated-module closure
+# Apple SDK-only ARM64 — R7 actual bind / R8 link-only preparation
+
+R7 run38955829570@3ec355b8 actually completed device+simulator Go bind (exit0).
+Both actual generated tidy/list/module provenance passed the fixed632-row union;
+core8eb9 locks stayed unchanged. Each platform retained42 unchanged ordinary
+generated source files:43 before/44 after also record the expected go.mod change
+and added go.sum. The first Xcode ar audit rejected the original fat wrapper;
+only the target was single ARM64, not a byte-proven slice count. No actual SDK Swift,
+ObjC shim, SDK dylib or probe link started; this is not a Swift compile failure.
+Raw artifact12071020431 SHA271e8045baae5337f4c7efef55ea5bac28777e528264e966c948349e14a78bf2
+is separate from products12070947280 SHA763d842282bc48dc04679e26443a8c8c004e698ced4be2e8e4ca8cabd0760459.
+
+R8 preserves this full-bind lane, its original inputs/resources/network gates
+and original framework link input. The audit first requires exact ARM64 and a
+strict single-ARM64 static archive, then uses an owned thin copy for ar/file/nm/
+Mach-O member audits. The independent `ci/apple-sdk-link` manual-only lane can
+reuse only those exact R7 products and raw custody, without repeating Go bind.
+Its six new pure Python controls passed once (0.015s; guard0.213s, continuous
+1GiB/.2s,64MiB/30s). These mocked/synthetic controls do not verify product
+binaries. Both real platform link gates remain prepared/unexecuted. No App, embedding, signing or device acceptance is claimed.
+
+Both original framework plists declare MinimumOSVersion100.0. This is the fixed
+gomobile static-framework/SPM workaround, independent of the actual min15 compiler
+flags. R8 preserves and explicitly checks those exact original plist bytes; it
+must also prove static core/member platform+MinOS and no dynamic OpenIMCore
+plugin dependency. It does not turn this metadata workaround into App/iOS15
+packaging acceptance, nor silently rewrite the original plist to15.
+
+## Historical R6-R1 preparation and evidence boundary
+
 
 The explicit cloud lane remains `apple-sdk-only-cloud-arm64-r1`, SDK-only device
 and simulator arm64/min15, with no App/signing/device claim. R6 is an explicit

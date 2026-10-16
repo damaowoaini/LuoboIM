@@ -5,7 +5,7 @@ import plistlib
 import re
 
 from apple_core import command, digest, inputs, put, put_dir, read, record
-from core_binary import audit_core, macho, plugin_dependencies, MH_DYLIB, MH_EXECUTE
+from core_binary import audit_core, macho, plugin_dependencies, thin_archive, MH_DYLIB, MH_EXECUTE
 
 
 def target(kind):
@@ -27,24 +27,38 @@ def inventory(path, exclude=()):
     return rows
 
 
-def run(c, root, env, slices):
-    # These are pinned Flutter engine inputs, not an old OpenIM framework.
+def audit_framework(c, root, env, kind, framework, out):
+    """Audit a private thin copy; retain the original framework for real linking."""
+    core = framework/'OpenIMCore'
+    original = read(core)
+    command(root, 'core-arch-'+kind, [c['lipo'], '-archs', core], root, env)
+    if (root/'evidence'/('core-arch-'+kind+'.log')).read_text().strip() != 'arm64':
+        raise ValueError('exact original ARM64 core archive required')
+    thin = thin_archive(original)  # Also rejects multiple/foreign fat slices.
+    audit_path = out/'core-arm64.a'
+    put(audit_path, thin)
+    for label, argv in [('ar', [c['ar'], '-t', audit_path]), ('file', [c['file'], '-b', audit_path]),
+                        ('load', [c['otool'], '-l', audit_path]),
+                        ('symbols', [c['nm'], '-g', '--defined-only', audit_path])]:
+        command(root, 'core-'+label+'-'+kind, argv, root, env)
+        if read(core) != original or read(audit_path) != thin:
+            raise ValueError('core or private audit copy changed')
+    evidence = lambda label: (root/'evidence'/('core-'+label+'-'+kind+'.log')).read_text()
+    core_audit = audit_core(thin, kind, evidence('ar'), evidence('file'), evidence('symbols'))
+    record(out/'core-audit.json', {'core_sha256': digest(original), 'thin_sha256': digest(thin),
+           'original_framework_retained_for_link': True, **core_audit,
+           'raw_tools': {label: digest(read(root/'evidence'/('core-'+label+'-'+kind+'.log')))
+                         for label in ['arch', 'ar', 'file', 'load', 'symbols']}})
+
+
+def run(c, root, env, slices, validate_inputs=inputs):
+    # The full bind lane keeps inputs(); link-only supplies its exact consumed pins.
+    validate_inputs()
     flutter = Path(c['flutter_xcframework'])
     variants = {'device': 'ios-arm64', 'simulator': 'ios-arm64_x86_64-simulator'}
     for kind in ['device', 'simulator']:
         out = root/'link'/kind; put_dir(out)
-        core = slices[kind]/'OpenIMCore'
-        original_core = read(core)
-        for label, argv in [('ar', [c['ar'], '-t', core]), ('file', [c['file'], '-b', core]),
-                            ('load', [c['otool'], '-l', core]), ('symbols', [c['nm'], '-g', '--defined-only', core])]:
-            command(root, 'core-'+label+'-'+kind, argv, root, env)
-            if read(core) != original_core:
-                raise ValueError('core changed during actual binary audit')
-        evidence = lambda label: (root/'evidence'/('core-'+label+'-'+kind+'.log')).read_text()
-        core_audit = audit_core(original_core, kind, evidence('ar'), evidence('file'), evidence('symbols'))
-        record(out/'core-audit.json', {'core_sha256': digest(original_core), **core_audit,
-               'raw_tools': {label: digest(read(root/'evidence'/('core-'+label+'-'+kind+'.log')))
-                             for label in ['ar', 'file', 'load', 'symbols']}})
+        audit_framework(c, root, env, kind, slices[kind], out)
         sdk = c['apple_sdk'][kind]
         frameworks = ['-F', str(slices[kind].parent), '-F', str(flutter/variants[kind])]
         triple = target(kind)
@@ -89,6 +103,6 @@ def run(c, root, env, slices):
                'files': inventory(out, exclude=('modules',)), 'generated_core_framework': inventory(slices[kind]),
                'framework_declared_MinimumOSVersion': plistlib.loads(read(slices[kind]/'Info.plist')).get('MinimumOSVersion'),
                'official_gomobile_plist_100_workaround_not_a_device_acceptance': True})
-    inputs()
+    validate_inputs()
     record(root/'link-passed.json', {'targets': ['device', 'simulator'], 'arm64_only': True,
                                    'actual_Swift_ObjC_compile_and_link': True, 'runtime': False})
