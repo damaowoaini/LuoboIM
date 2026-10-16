@@ -71,9 +71,9 @@ class _GroupAnnouncementPanelState extends ConsumerState<GroupAnnouncementPanel>
       widget.groupId == _group &&
       _sourceCurrent() &&
       _groups != null &&
-      _groups!.access.isCurrent &&
-      _groups!.access.generation == _source.generation &&
-      identical(_groups!.access.session, _source.session) &&
+      _groups.access.isCurrent &&
+      _groups.access.generation == _source.generation &&
+      identical(_groups.access.session, _source.session) &&
       identical(ref.read(groupRepositoryProvider), _groups) &&
       identical(ref.read(groupAnnouncementStoreProvider), _store);
   bool get _sourceActive =>

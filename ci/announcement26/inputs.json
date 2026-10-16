@@ -1,7 +1,7 @@
 {
   "schema": "luobo.mobile.announcement26.isolated-cloud.v1",
   "cohort": "candidate359-announcement26",
-  "status": "prepared_only_r1_no_execution",
+  "status": "prepared_only_r2_nine_analysis_plus_prior_two",
   "base": {
     "cohort": "current354",
     "source_members": 354,
@@ -70,14 +70,14 @@
   },
   "candidate": {
     "manifest": {
-      "path": "references/integration/mobile-group-announcement-store-lint-r1-candidate-20261017/source-manifest.json",
-      "bytes": 6673,
-      "sha256": "c28c8a78b1400e1fafa403e16db82dcaa549e6a59ec5985097727b9aff69abd6"
+      "path": "references/integration/mobile-group-announcement-panel-lint-r2-candidate-20261017/source-manifest.json",
+      "bytes": 9048,
+      "sha256": "c924d997102cd798c80d5f2ada2f8be82b0844d1e47e892b663c4d6baa5b36b6"
     },
     "source_members": 359,
-    "source_digest": "eab40375c2cd26dc93eeabdb337d8e24884d0730f7f99c889671d5a40a8de06e",
+    "source_digest": "9259f2890ab8d7f84a4c00ffdd661cf5140b71c3fe92d4c5b368b3d86103e48d",
     "portable_members": 411,
-    "portable_digest": "b02a59af4d6e0c1d373100132e2e0cae418cb4303c8a739a68117c3534a2c5ac",
+    "portable_digest": "75b45ed4da0d2993c64d28525d2db09eba42942b33a5a0fcb71e8fe3471dab3d",
     "payload_prefix": "ci/candidates/mobile-announcement26/after",
     "selected11": [
       {
@@ -96,8 +96,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/group_announcement_panel.dart",
-        "bytes": 17056,
-        "sha256": "56545ff4b3a78a1489f8596797d2f6cd7706fd4251b626b3d7781cdab7e35ecb",
+        "bytes": 17053,
+        "sha256": "5c45548163ed6dc9fc8ef0f96dd405199e4e19bc1b8e078694772955491dbecf",
         "new": true,
         "payload_path": "ci/candidates/mobile-announcement26/after/app/lib/features/chat/presentation/group_announcement_panel.dart"
       },
@@ -158,7 +158,7 @@
         "payload_path": "ci/candidates/mobile-announcement26/after/app/test/features/chat/group_announcement_workflow_test.dart"
       }
     ],
-    "source_revision": "store-constructor-lint-r1"
+    "source_revision": "panel-lint-r2"
   },
   "target": {
     "analysis_paths": [
@@ -275,7 +275,62 @@
     "expected_owned_fixtures": 18,
     "expected_markers": 72,
     "unit6_no_sdk_cleanup_claimed": true,
-    "old2_existing_fixture_teardown_unchanged": true
+    "old2_existing_fixture_teardown_unchanged": true,
+    "analysis_run_paths": [
+      "lib/features/chat/presentation/group_announcement_panel.dart",
+      "lib/features/conversation/data/conversation_repository.dart",
+      "lib/features/conversation/domain/conversation.dart",
+      "lib/features/group/data/group_repository.dart",
+      "lib/features/group/domain/group.dart",
+      "lib/providers.dart",
+      "test/features/chat/group_announcement_fixture.dart",
+      "test/features/chat/group_announcement_store_test.dart",
+      "test/features/chat/group_announcement_workflow_test.dart"
+    ],
+    "analysis_reuse_run": "38974011605",
+    "analysis_reuse_entries": [
+      {
+        "analysis_path": "lib/features/chat/data/group_announcement_store.dart",
+        "source_pin": {
+          "path": "app/lib/features/chat/data/group_announcement_store.dart",
+          "bytes": 5012,
+          "sha256": "b5da8994042e75f703e4cae3ac3f4a4e1b773fdb166b31a46323a15d0c7a6be4"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-1.log",
+          "bytes": 60,
+          "sha256": "e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-1.resource.json",
+          "bytes": 489,
+          "sha256": "425a82b4253eebfc1c2989593b7f13adbfea7f48fecc3b02d08db43ad6af7f79"
+        },
+        "log_utf8": "Analyzing group_announcement_store.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/data/group_announcement_store.dart\"\n  ],\n  \"elapsed_seconds\": 1.812,\n  \"latched_failure\": null,\n  \"log_sha256\": \"e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2\",\n  \"minimum_free_bytes\": 90100535296,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-1\"\n}\n"
+      },
+      {
+        "analysis_path": "lib/features/chat/presentation/chat_page.dart",
+        "source_pin": {
+          "path": "app/lib/features/chat/presentation/chat_page.dart",
+          "bytes": 99227,
+          "sha256": "b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9"
+        },
+        "log_pin": {
+          "path": "announcement-analyze-2.log",
+          "bytes": 45,
+          "sha256": "ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0"
+        },
+        "resource_pin": {
+          "path": "announcement-analyze-2.resource.json",
+          "bytes": 483,
+          "sha256": "80f7d82dab8a8baab1d14610e9553ee15cb3c61934f7db52117be693fe6798cf"
+        },
+        "log_utf8": "Analyzing chat_page.dart...\nNo issues found!\n",
+        "resource_utf8": "{\n  \"child_exit_code\": 0,\n  \"command\": [\n    \"/home/runner/work/_temp/mobile-announcement26/flutter/bin/cache/dart-sdk/bin/dart\",\n    \"analyze\",\n    \"--fatal-infos\",\n    \"lib/features/chat/presentation/chat_page.dart\"\n  ],\n  \"elapsed_seconds\": 19.433,\n  \"latched_failure\": null,\n  \"log_sha256\": \"ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0\",\n  \"minimum_free_bytes\": 90089451520,\n  \"peak_workspace_allocated_bytes\": 6549504,\n  \"phase\": \"announcement-analyze-2\"\n}\n"
+      }
+    ],
+    "analysis_total_coverage": 11
   },
   "resource": {
     "initial_bytes": 4294967296,
@@ -851,6 +906,14 @@
         "bytes": 489,
         "sha256": "28d6afd66bf83b42ca2bd332f53ed6c1e8544e3c907ec014eb37181ba548de28"
       }
+    },
+    "retry_r1_actual": {
+      "run": 38974011605,
+      "job": 117218966812,
+      "static1_and2_success_reused": true,
+      "static3_failure": "3 unnecessary non-null assertions",
+      "static4to11_and_test26": "notexecuted",
+      "all_raw_frozen": "references/integration/mobile-announcement-cloud-run-38974011605/raw"
     }
   }
 }

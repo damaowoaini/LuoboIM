@@ -32,7 +32,7 @@ jobs:
           set -euo pipefail
           python3 ci/mobile-announcement.py overlay --work "$MOBILE_WORK" 2>&1 \
             | tee "$MOBILE_WORK/evidence/announcement-overlay.log"
-      - name: Analyze eleven then only new24 and direct old2 without external network
+      - name: Reuse exact prior two analyses, run remaining nine then only new24 and old2
         run: |
           set -euo pipefail
           sudo unshare --net -- python3 "$GITHUB_WORKSPACE/ci/mobile-announcement.py" netns \

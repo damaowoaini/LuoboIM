@@ -26,6 +26,10 @@ WIDGET_NAMES = ['actual group chat opens a fresh ordinary-member announcement an
 MARKERS = ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end']
 HELPERS = ['ci/mobile-source.py', 'ci/mobile-check.py', 'ci/mobile-setup.sh', 'ci/mobile/inputs.json', 'ci/mobile/required-test-names.json']
 
+RUN_ANALYSIS = ANALYSIS[2:]
+REUSE_RUN = '38974011605'
+REUSE_EXPECTED = [{'analysis_path': 'lib/features/chat/data/group_announcement_store.dart', 'source_pin': {'path': 'app/lib/features/chat/data/group_announcement_store.dart', 'bytes': 5012, 'sha256': 'b5da8994042e75f703e4cae3ac3f4a4e1b773fdb166b31a46323a15d0c7a6be4'}, 'log_pin': {'path': 'announcement-analyze-1.log', 'bytes': 60, 'sha256': 'e5c0d71055c201ca9443a5438be1a7fcf90646588c51a0b1ffca258dde61a1a2'}, 'resource_pin': {'path': 'announcement-analyze-1.resource.json', 'bytes': 489, 'sha256': '425a82b4253eebfc1c2989593b7f13adbfea7f48fecc3b02d08db43ad6af7f79'}}, {'analysis_path': 'lib/features/chat/presentation/chat_page.dart', 'source_pin': {'path': 'app/lib/features/chat/presentation/chat_page.dart', 'bytes': 99227, 'sha256': 'b77248a2b7e1b21ab340d63a9396b88e5fe55107bc300265cb931f57975d8de9'}, 'log_pin': {'path': 'announcement-analyze-2.log', 'bytes': 45, 'sha256': 'ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0'}, 'resource_pin': {'path': 'announcement-analyze-2.resource.json', 'bytes': 483, 'sha256': '80f7d82dab8a8baab1d14610e9553ee15cb3c61934f7db52117be693fe6798cf'}}]
+
 
 def sha(body):
     return hashlib.sha256(body).hexdigest()
@@ -61,8 +65,8 @@ def validate_descriptor(cfg):
             or [r['path'] for r in cfg['base']['helper_pins']] != HELPERS
             or cfg['base']['source_digest'] != '113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c'
             or cfg['base']['portable_digest'] != '81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c'
-            or cfg['candidate']['source_digest'] != 'eab40375c2cd26dc93eeabdb337d8e24884d0730f7f99c889671d5a40a8de06e'
-            or cfg['candidate']['portable_digest'] != 'b02a59af4d6e0c1d373100132e2e0cae418cb4303c8a739a68117c3534a2c5ac'
+            or cfg['candidate']['source_digest'] != '9259f2890ab8d7f84a4c00ffdd661cf5140b71c3fe92d4c5b368b3d86103e48d'
+            or cfg['candidate']['portable_digest'] != '75b45ed4da0d2993c64d28525d2db09eba42942b33a5a0fcb71e8fe3471dab3d'
             or cfg['candidate']['payload_prefix'] != PAYLOAD
             or [r['path'] for r in cfg['base']['before6']] != PRODUCT
             or [r['path'] for r in selected] != SELECTED
@@ -70,6 +74,9 @@ def validate_descriptor(cfg):
             or any(r['payload_path'] != PAYLOAD + '/' + r['path'] for r in selected)
             or cfg['candidate']['source_members'] != 359 or cfg['candidate']['portable_members'] != 411
             or cfg['target']['analysis_paths'] != ANALYSIS
+            or cfg['target']['analysis_run_paths'] != RUN_ANALYSIS
+            or cfg['target']['analysis_total_coverage'] != 11
+            or cfg['target']['analysis_reuse_run'] != REUSE_RUN
             or cfg['target']['names'] != TWENTY_SIX or len(set(TWENTY_SIX)) != 26
             or cfg['target']['new24'] != TWENTY_SIX[:24]
             or [r['name'] for r in cfg['target']['old2']] != TWENTY_SIX[24:]
@@ -119,6 +126,29 @@ def lineage_contract(cfg, base_plan):
             or unchanged['native_snapshot'] != base_plan['native_source_snapshot']):
         raise ValueError('existing dependency/tool/native contract differs')
     return True
+
+
+def reused_analysis_contract(cfg, actual_rows):
+    entries = cfg['target']['analysis_reuse_entries']
+    fields = ('analysis_path', 'source_pin', 'log_pin', 'resource_pin')
+    if ([{k: r[k] for k in fields} for r in entries] != REUSE_EXPECTED
+            or cfg['target']['analysis_reuse_run'] != REUSE_RUN):
+        raise ValueError('reused analysis identity differs')
+    actual = {r['path']: r for r in actual_rows}
+    for entry in entries:
+        source_pin = entry['source_pin']
+        if actual.get(source_pin['path']) != source_pin:
+            raise ValueError('reused analysis source body differs')
+        log = pinned(entry['log_utf8'].encode('utf-8'), entry['log_pin'])
+        resource = json.loads(pinned(entry['resource_utf8'].encode('utf-8'), entry['resource_pin']))
+        if (type(resource['child_exit_code']) is not int or resource['child_exit_code'] != 0
+                or resource['latched_failure'] is not None
+                or resource['log_sha256'] != sha(log)
+                or resource['command'][-3:] != ['analyze', '--fatal-infos', entry['analysis_path']]
+                or 'No issues found!' not in log.decode('utf-8')):
+            raise ValueError('reused analysis is not a successful fatal-info result')
+    return {'prior_run': REUSE_RUN, 'exact_source_and_raw_resource_pins': REUSE_EXPECTED,
+            'reused_successes': 2, 'not_executed_again': True}
 
 
 def descriptor():
@@ -180,6 +210,7 @@ def sources(cfg, source):
             or source.source_digest(app) != cfg['candidate']['source_digest']
             or source.source_digest(files) != cfg['candidate']['portable_digest']):
         raise ValueError('candidate359/411 aggregate differs')
+    reused_analysis_contract(cfg, source.rows(files))
     return base, files
 
 
@@ -268,7 +299,7 @@ def overlay(work):
 def phase_commands(work):
     dart = str(work/'flutter/bin/cache/dart-sdk/bin/dart')
     flutter = str(work/'flutter/bin/flutter')
-    return ([[dart, 'analyze', '--fatal-infos', path] for path in ANALYSIS],
+    return ([[dart, 'analyze', '--fatal-infos', path] for path in RUN_ANALYSIS],
             [flutter, 'test', '--no-pub', '--machine', '--concurrency=1',
              '--no-enable-vmservice', '--name', '^(?:' + '|'.join(map(re.escape, TWENTY_SIX)) + ')$'] + TESTS)
 
@@ -323,7 +354,7 @@ def run(work):
     cfg = descriptor()
     source, check = legacy()
     check.prove_namespace()
-    verify_work(work, cfg, source)
+    files = verify_work(work, cfg, source)
     guard = check.Guard(work)
     if guard.sample() < check.INITIAL or guard.reason:
         raise ValueError('initial4GiB/cap admission')
@@ -332,10 +363,14 @@ def run(work):
     counts = {}
     try:
         analyses, tests = phase_commands(work)
-        for index, command in enumerate(analyses, 1):
+        reuse_proof = reused_analysis_contract(cfg, source.rows(files))
+        check.write_json(work/'evidence/announcement-reused-analyses.json',
+                         {'proof': reuse_proof, 'raw_entries': cfg['target']['analysis_reuse_entries']})
+        for index, command in enumerate(analyses, 3):
             verify_work(work, cfg, source)
             check.guarded(command, work, guard, 'announcement-analyze-' + str(index),
                           timeout=cfg['resource']['phase_seconds'])
+        counts['analysis'] = dict(reuse_proof, executed_new=9, total_coverage=11)
         verify_work(work, cfg, source)
         log = check.guarded(tests, work, guard, 'announcement-target26',
                             timeout=cfg['resource']['phase_seconds'])
@@ -349,7 +384,7 @@ def run(work):
         verify_work(work, cfg, source)
         check.write_json(work/'evidence/announcement.summary.json', counts)
         check.write_json(work/'evidence/announcement-passed.json',
-                         {'state': 'candidate_target26_analysis11_completed',
+                         {'state': 'candidate_target26_analysis9new_plus2reused_completed',
                           'cohort': cfg['cohort'], 'source359': cfg['candidate']['source_digest'],
                           'portable411': cfg['candidate']['portable_digest'], 'counts': counts,
                           'oldCard80_Revoke58_full_not_rerun': True,
@@ -373,7 +408,7 @@ def run(work):
             thread.join()
     if guard.reason:
         raise ValueError('latched final resource failure: ' + guard.reason)
-    print(json.dumps({'state': 'candidate26_PASS_analysis11_0', 'counts': counts}))
+    print(json.dumps({'state': 'candidate26_PASS_analysis9new_plus2reused_0', 'counts': counts}))
 
 
 def run_environment(work, run_as):

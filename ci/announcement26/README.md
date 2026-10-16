@@ -1,7 +1,7 @@
 This prepared manual lane overlays only the eleven formatted announcement files
 into an exact current354/406 setup. The checked-out product stays354; the fresh
-owned source becomes candidate359/411. It runs eleven selected fatal-info analyses
-then one machine-reported target26: the complete new24 and the exact old2 listed in
+owned source becomes candidate359/411. It reuses the exact source and raw successful analyses1/2 from run38974011605,
+runs only the remaining nine selected fatal-info analyses, then target26: the complete new24 and the exact old2 listed in
 inputs.json. It cannot run Card80, group-revoke58, a full suite or the optional
 historical search reference. Full1304 is only expected arithmetic, never a result.
 
@@ -31,6 +31,9 @@ cross-device announcement acknowledgements remain outside this target.
 
 Prepared controls: `python3 ci/mobile-announcement-tools.py` contains only four new
 pure controls. Run those locally once after Root review; this workflow does not
-repeat them. Neither these controls nor this manual cloud lane has been executed.
+repeat them. The four controls already passed at6e960. Only the phase-argv/reuse control changed
+and is prepared for one targeted check; reuse the other three. The two first
+analysis successes are real; the first26 still has not run. Raw logs/resources
+are embedded with exact hashes in inputs.json; no offline-phase fetch is used.
 Future formal product359 adoption must be a separate reviewed change; historical
 354 helper identities must be pinned to their original source ref before reuse.

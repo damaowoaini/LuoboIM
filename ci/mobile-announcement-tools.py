@@ -87,8 +87,20 @@ class AnnouncementFocusedTests(unittest.TestCase):
     def test_only_analysis_eleven_then_exact_new24_old2_and_real_home(self):
         work = Path('/tmp/fresh-mobile-announcement')
         analyses, command = focused.phase_commands(work)
-        self.assertEqual([args[-1] for args in analyses], focused.ANALYSIS)
-        self.assertEqual(len(analyses), 11)
+        self.assertEqual([args[-1] for args in analyses], focused.RUN_ANALYSIS)
+        self.assertEqual(len(analyses), 9)
+        self.assertEqual(focused.RUN_ANALYSIS, focused.ANALYSIS[2:])
+        cfg = json.loads(INPUT.read_text())
+        rows = [r['source_pin'] for r in cfg['target']['analysis_reuse_entries']]
+        self.assertEqual(focused.reused_analysis_contract(cfg, rows)['reused_successes'], 2)
+        changed = copy.deepcopy(cfg)
+        changed['target']['analysis_reuse_entries'][0]['log_utf8'] += 'changed'
+        with self.assertRaisesRegex(ValueError, 'source pin differs'):
+            focused.reused_analysis_contract(changed, rows)
+        altered = copy.deepcopy(rows)
+        altered[0]['sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'source body differs'):
+            focused.reused_analysis_contract(cfg, altered)
         self.assertTrue(all(args[1:3] == ['analyze', '--fatal-infos'] for args in analyses))
         self.assertEqual(command[-4:], focused.TESTS)
         self.assertEqual(command.count('--name'), 1)
