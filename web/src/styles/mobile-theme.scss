@@ -1,0 +1,147 @@
+// Shared visual primitives only. Route selection, session, SDK and permissions
+// stay in their existing components; the small-screen chat/list switch is kept.
+html { font-family: var(--luobo-font-family); }
+button, input, textarea, select { font: inherit; }
+.ant-modal .ant-modal-content { border: 1px solid var(--gap-text); }
+a:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+
+.app-shell { min-width: 0; min-height: 0; height: 100dvh; }
+.app-workspace { position: relative; min-height: 0; min-width: 0; flex: 1; }
+.app-chat, .app-contacts { min-width: 0; min-height: 0; flex: 1; }
+.app-list-pane { flex-shrink: 0; }
+.app-topbar {
+  position: relative;
+  height: var(--searchbar-height);
+  min-height: var(--searchbar-height);
+  flex-shrink: 0;
+  padding: calc(6px + env(safe-area-inset-top, 0px)) 112px 6px 72px;
+}
+.app-global-search {
+  width: clamp(220px, 38vw, 520px);
+  min-width: 0;
+  min-height: var(--luobo-touch-target);
+  padding: 8px 16px;
+  border-radius: var(--luobo-radius-control);
+  color: white;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, .35);
+}
+.app-topbar-more {
+  margin-left: 12px;
+  display: grid;
+  place-items: center;
+  width: var(--luobo-touch-target);
+  height: var(--luobo-touch-target);
+  border-radius: var(--luobo-radius-control);
+}
+.app-topbar button:focus-visible { outline-color: white; }
+.app-nav { background: var(--luobo-surface) !important; }
+.app-nav-content { padding: 20px 8px 12px; }
+.app-nav-item {
+  min-width: var(--luobo-touch-target);
+  min-height: 52px;
+  border-radius: var(--luobo-radius-control);
+}
+.app-nav-item:hover, .app-nav-item.is-active { background: var(--primary-active); }
+.app-nav-item.is-active > div { color: var(--luobo-text); font-weight: 600; }
+.app-profile-trigger {
+  display: grid;
+  place-items: center;
+  min-width: var(--luobo-touch-target);
+  min-height: var(--luobo-touch-target);
+  margin-bottom: 20px;
+  border-radius: var(--luobo-radius-control);
+  .ant-avatar { margin-bottom: 0; }
+}
+.app-chat-header { flex-shrink: 0; min-width: 0; }
+.app-icon-button {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--luobo-touch-target);
+  min-height: var(--luobo-touch-target);
+  border-radius: var(--luobo-radius-control);
+  &:hover { background: var(--primary-active); }
+}
+.app-timeline { min-width: 0; min-height: 0; background: var(--luobo-background) !important; }
+.app-composer { min-width: 0; height: clamp(180px, 25dvh, 280px); flex-shrink: 0; }
+.app-composer #editable-div { padding-bottom: 76px; }
+.app-send-tools { min-width: 0; overflow-x: auto; flex-shrink: 0; }
+.app-send-tools button { min-width: var(--luobo-touch-target); min-height: var(--luobo-touch-target); flex-shrink: 0; }
+.app-send-tools > div { flex-shrink: 0; }
+.app-send-actions { max-width: calc(100% - 32px); flex-wrap: wrap; gap: 4px; }
+.app-send-actions .ant-btn-primary { min-height: var(--luobo-touch-target); }
+.app-contact-row { min-height: 64px; border-radius: var(--luobo-radius-control); }
+.app-contact-nav li { margin-bottom: 4px; }
+.app-contact-nav button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--luobo-touch-target);
+  padding: 12px;
+  border-radius: var(--luobo-radius-control);
+  text-align: left;
+  &:hover, &[aria-current="page"] { background: var(--primary-active); }
+}
+.app-settings-panel { min-width: 0; color: var(--luobo-text); background: var(--luobo-background); }
+.app-settings-panel .ant-btn-primary:not(.ant-btn-sm) { min-height: var(--luobo-primary-button-height); }
+.app-settings-heading { background: var(--luobo-surface); border-bottom: 1px solid var(--gap-text); }
+.app-settings-modal { max-width: calc(100vw - 32px); }
+
+@media (max-width: 900px) {
+  .app-topbar { padding-left: 20px; }
+  .app-chat-header-actions { margin-right: 0; }
+}
+@media (max-width: 600px) {
+  .ant-input, .ant-select-selection-item { font-size: 16px; }
+  .app-topbar { padding: calc(6px + env(safe-area-inset-top, 0px)) 12px 6px; }
+  .app-global-search { width: 100%; }
+  .app-topbar-content { justify-content: stretch; }
+  .app-workspace { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .app-nav {
+    position: absolute !important;
+    z-index: 30;
+    inset: auto 0 0;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: none !important;
+    height: calc(72px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--gap-text);
+    border-right: 0;
+  }
+  .app-nav-content {
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .app-profile-trigger { margin: 0 4px 0 0; flex-shrink: 0; }
+  .app-nav-items { flex-direction: row; justify-content: space-around; min-width: 0; }
+  .app-nav-item { margin: 0; width: 52px; min-height: 52px; }
+  .app-list-pane { max-width: 100%; }
+  .app-contacts { flex-direction: column !important; }
+  .app-contacts > .app-list-pane {
+    display: block !important;
+    width: 100%;
+    height: auto;
+    flex: none;
+    .app-list-pane-content { position: static; }
+    .app-list-pane-resize, .app-list-pane-border { display: none; }
+  }
+  .app-contact-nav-title { padding: 12px 16px 8px; }
+  .app-contact-nav ul { display: flex; overflow-x: auto; padding: 0 8px 8px; }
+  .app-contact-nav li { flex-shrink: 0; margin: 0 4px 0 0; }
+  .app-contact-nav button { gap: 8px; padding: 8px 12px; white-space: nowrap; }
+  .app-contact-nav img { width: 24px; height: 24px; margin: 0; }
+  .app-chat-header { padding: 0 8px !important; height: auto; min-height: 64px; line-height: 1.4; }
+  .app-chat-header-content { flex-wrap: wrap; row-gap: 4px; padding: 6px 0; }
+  .app-chat-header-actions { flex-wrap: wrap; margin-left: auto; }
+  .app-chat-header .app-icon-button { min-width: var(--luobo-touch-target); }
+  .app-composer { height: clamp(164px, 28dvh, 220px); }
+  .app-send-actions { right: 12px; bottom: 8px; }
+  .app-settings-modal { margin: 12px auto; }
+  .chat-drawer .ant-drawer-content-wrapper { min-width: 0; max-width: 100vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; }
+}

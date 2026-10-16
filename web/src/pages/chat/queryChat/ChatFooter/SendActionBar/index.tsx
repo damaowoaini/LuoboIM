@@ -180,7 +180,7 @@ const SendActionBar = ({
   };
 
   return (
-    <div className="flex items-center px-4.5 pt-2">
+    <div className="app-send-tools flex items-center px-4.5 pt-2">
       {sendActionList.map((action) => {
         const isCut = action.key === "cut";
 

@@ -1,10 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtempSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { validateReport, verifyFile, verifyLinuxBindings } from "./web-ci.mjs";
+import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller } from "./web-ci.mjs";
 
 function runFixture(callback) {
   const root = mkdtempSync(path.join(os.tmpdir(), "luobo-web-ci-"));
@@ -65,4 +65,15 @@ test("module loading errors and reporter count disagreement fail closed", () => 
   assert.throws(() => checked(data, 0, { exact: 2 }), /loading/);
   data.report.testResults[0].message = ""; data.report.numTotalTests++;
   assert.throws(() => checked(data, 0, { exact: 2 }), /counts differ/);
+});
+
+const style = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8")).mobileStyleAdoption;
+test("explicit style successor preserves the exact caller predecessor", () => verifyStyleCaller(style.before, style.after, style));
+test("style lineage refuses an unrelated caller or altered predecessor", () => {
+  assert.throws(() => verifyStyleCaller({ ...style.before, sha256: "0".repeat(64) }, style.after, style), /Unrelated/);
+  assert.throws(() => verifyStyleCaller(style.before, { ...style.after, path: "web/src/another.tsx" }, style), /Unrelated/);
+});
+test("style lineage cannot discard frozen source or use an unreviewed candidate", () => {
+  assert.throws(() => verifyStyleCaller(style.before, style.after, { ...style, frozenBefore: { ...style.frozenBefore, bytes: 1 } }), /Frozen/);
+  assert.throws(() => verifyStyleCaller(style.before, style.after, { ...style, candidateManifestSHA256: "0".repeat(64) }), /Reviewed/);
 });

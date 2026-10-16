@@ -162,14 +162,14 @@ const TopSearchBar = () => {
   }, []);
 
   return (
-    <div className="no-mobile app-drag flex h-10 min-h-[40px] items-center bg-[var(--top-search-bar)] dark:bg-[#141414]">
-      <div className="flex w-full items-center justify-center">
+    <div className="app-topbar app-drag flex items-center bg-[var(--top-search-bar)] dark:bg-[#141414]">
+      <div className="app-topbar-content flex w-full items-center justify-center">
         <button type="button" aria-label="搜索消息、联系人和群组"
-          className="app-no-drag flex h-[26px] w-1/3 cursor-pointer items-center justify-center rounded-md bg-[rgba(255,255,255,0.2)]"
+          className="app-global-search app-no-drag flex cursor-pointer items-center justify-center"
           onClick={() => globalSearchModalRef.current?.openOverlay()}
         >
           <img width={16} src={search} alt="" />
-          <span className="ml-2 text-[#D2E3F8]">{t("placeholder.search")}</span>
+          <span className="ml-2 text-white">{t("placeholder.search")}</span>
         </button>
         <Popover
           content={<ActionPopContent actionClick={actionClick} />}
@@ -180,7 +180,7 @@ const TopSearchBar = () => {
           open={actionVisible}
           onOpenChange={(vis) => setActionVisible(vis)}
         >
-          <button type="button" aria-label="更多操作" aria-expanded={actionVisible} className="app-no-drag ml-8">
+          <button type="button" aria-label="更多操作" aria-expanded={actionVisible} className="app-topbar-more app-no-drag">
           <img
             className="cursor-pointer"
             width={20}

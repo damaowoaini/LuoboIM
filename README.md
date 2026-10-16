@@ -21,7 +21,7 @@
 
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 在 push、PR 或手动触发时执行，保留成功和失败的日志、测试报告及可下载的 Web 构建。
 
-- Web：完整测试、严格类型检查、桌面类型检查、Vite 构建，以及隔离的群设置、编辑草稿 before/after 回归。见 [Web CI](ci/README.web-ci.md)。
+- Web：当前4290源码已接入与移动端一致的钉蓝主题、聊天气泡及桌面/小屏导航，等待完整689、严格类型检查、桌面类型检查和新Vite构建验收；原683和历史群设置/编辑草稿before/after证据保留。见[Web CI](ci/README.web-ci.md)。
 - Admin：锁定依赖安装、Max setup、核心测试、类型检查和后台构建。见 [后台 CI](ci/README.admin-ci.md)。
 - Mobile：当前269源码已加入全局搜索、文件结果和原消息定位，等待目标46、完整734及严格analyze的实际云验收。父版本257的[群管理64、完整688及analyze已通过](https://github.com/damaowoaini/LuoboIM/actions/runs/38854472595)，作为历史验收和恢复基线保留，不能替代269的结果。见[移动端CI](ci/mobile/README.md)。原生构建和真机验收另行进行。
 - Backend：`server`、`chart`、`route` 分别执行 Go race 测试和 vet。另有一次性 Mongo 副本集与 Redis 集成任务，强制执行 54 项事务、资源归属、会话与服务凭证用例；任意必跑项跳过或清理门禁失败都会使任务失败。见 [后端集成 CI](ci/backend-integration.README.md)。其他跳过项单列，不能计为集成验证通过。

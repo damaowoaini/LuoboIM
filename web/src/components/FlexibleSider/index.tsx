@@ -14,20 +14,20 @@ const FlexibleSider = ({
 }) => (
   <aside
     className={clsx(
-      "relative bg-white dark:text-white",
+      "app-list-pane relative bg-white",
       { "max-[600px]:hidden": needHidden },
       { "max-[600px]:!max-w-none max-[600px]:!basis-full": !needHidden },
     )}
   >
     <div
-      className={`absolute bottom-0 left-0 right-1 top-0 z-10 overflow-hidden ${
+      className={`app-list-pane-content absolute bottom-0 left-0 right-1 top-0 z-10 overflow-hidden ${
         wrapClassName ?? ""
       }`}
     >
       {children}
     </div>
-    <div className={styles.sider_resize}></div>
-    <div className={styles.sider_bar}></div>
+    <div className={`app-list-pane-resize ${styles.sider_resize}`}></div>
+    <div className={`app-list-pane-border ${styles.sider_bar}`}></div>
   </aside>
 );
 

@@ -105,6 +105,15 @@ function artifactManifest(directory) {
   return rows;
 }
 
+export function verifyStyleCaller(previous, now, style) {
+  const same = (a, b) => a?.path === b?.path && a?.bytes === b?.bytes && a?.sha256 === b?.sha256;
+  assert(style?.candidateManifestSHA256 === "23e9c373d29b18fe7575d6c5dd21abc12a4cfe0a6749778a15789365f2d34a03", "Reviewed mobile style lineage required");
+  assert(style.before.path === "web/src/pages/chat/queryChat/ChatHeader/index.tsx" && style.before.bytes === 11927 && style.before.sha256 === "9663095f6a75cbd9d9a08806f94d489e9e4da951091caba886d6443541e79132", "Exact pre-style caller required");
+  assert(style.after.path === style.before.path && style.after.bytes === 11991 && style.after.sha256 === "0fd3a5eb25b79119785755925213e53eca57820dcb6a3b4c3973ade2f9f43bd6", "Exact style successor required");
+  assert(same(previous, style.before) && same(now, style.after), "Unrelated caller/SDK pin changed");
+  assert(style.frozenBefore.path === "ci/candidates/web-direct-edit/context/ChatHeader-before-mobile-style.tsx" && style.frozenBefore.bytes === previous.bytes && style.frozenBefore.sha256 === previous.sha256, "Frozen caller predecessor differs");
+}
+
 export function verifyInputs() {
   const inputs = json(inputPath), direct = inputs.candidate, edit = inputs.editableContentAdoption;
   const same = (a, b) => a?.path === b?.path && a?.bytes === b?.bytes && a?.sha256 === b?.sha256;
@@ -160,9 +169,14 @@ export function verifyInputs() {
     const now = direct.realCallers.find((entry) => entry.path === previous.path);
     assert(now, "Missing current caller");
     if (previous.path === editor.path) assert(edit.currentAfter.some((entry) => same(entry, now)), "Current editor caller must match reviewed successor");
+    else if (previous.path === "web/src/pages/chat/queryChat/ChatHeader/index.tsx") verifyStyleCaller(previous, now, inputs.mobileStyleAdoption);
     else assert(same(previous, now), "Unrelated caller/SDK pin changed");
   }
   for (const entry of direct.realCallers) verifyFile(repo, entry);
+  const style = inputs.mobileStyleAdoption;
+  assert(style.fullMinimumTests === 689 && inputs.fullMinimumTests >= style.fullMinimumTests && style.newTests === 6 && style.requiredInputs.length === 3, "Complete mobile style regression context required");
+  verifyFile(repo, style.frozenBefore);
+  for (const entry of style.requiredInputs) verifyFile(repo, entry);
   return { inputs, linuxBindings: verifyLinuxBindings(json(path.join(web, "package-lock.json"))) };
 }
 

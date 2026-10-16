@@ -8,6 +8,7 @@ import default_group from "@/assets/images/contact/my_groups.png";
 import { useMessageStore, useUserStore } from "@/store";
 import { avatarList, getDefaultAvatar } from "@/utils/avatar";
 import { downloadFile } from "@/utils/common";
+import { mobileDesign } from "@/design/tokens";
 
 const default_avatars = avatarList.map((item) => item.name);
 
@@ -25,8 +26,8 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
     src,
     text,
     size = 42,
-    color = "#fff",
-    bgColor = "#2074de",
+    color = mobileDesign.text,
+    bgColor = mobileDesign.primarySoft,
     isgroup = false,
     isnotification,
   } = props;
@@ -82,6 +83,7 @@ const OIMAvatar: React.FC<IOIMAvatarProps> = (props) => {
     <AntdAvatar
       style={{
         backgroundColor: bgColor,
+        borderRadius: mobileDesign.radiusControl,
         minWidth: `${size}px`,
         minHeight: `${size}px`,
         lineHeight: `${size - 2}px`,

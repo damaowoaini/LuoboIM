@@ -1,7 +1,7 @@
 {
   "version": 3,
   "node": "24.21.0",
-  "fullMinimumTests": 683,
+  "fullMinimumTests": 689,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -127,8 +127,8 @@
       },
       {
         "path": "web/src/pages/chat/queryChat/ChatHeader/index.tsx",
-        "bytes": 11927,
-        "sha256": "9663095f6a75cbd9d9a08806f94d489e9e4da951091caba886d6443541e79132"
+        "bytes": 11991,
+        "sha256": "0fd3a5eb25b79119785755925213e53eca57820dcb6a3b4c3973ade2f9f43bd6"
       },
       {
         "path": "web/src/pages/chat/queryChat/index.tsx",
@@ -570,5 +570,48 @@
       "bytes": 4590,
       "sha256": "d1783c948be27edd241e205604f7a11c9dd6299a61c0e985cc5be6a6f29673e7"
     }
+  },
+  "mobileStyleAdoption": {
+    "candidateManifestSHA256": "23e9c373d29b18fe7575d6c5dd21abc12a4cfe0a6749778a15789365f2d34a03",
+    "before": {
+      "path": "web/src/pages/chat/queryChat/ChatHeader/index.tsx",
+      "bytes": 11927,
+      "sha256": "9663095f6a75cbd9d9a08806f94d489e9e4da951091caba886d6443541e79132"
+    },
+    "after": {
+      "path": "web/src/pages/chat/queryChat/ChatHeader/index.tsx",
+      "bytes": 11991,
+      "sha256": "0fd3a5eb25b79119785755925213e53eca57820dcb6a3b4c3973ade2f9f43bd6"
+    },
+    "frozenBefore": {
+      "path": "ci/candidates/web-direct-edit/context/ChatHeader-before-mobile-style.tsx",
+      "bytes": 11927,
+      "sha256": "9663095f6a75cbd9d9a08806f94d489e9e4da951091caba886d6443541e79132"
+    },
+    "requiredInputs": [
+      {
+        "path": "web/src/design/tokens.ts",
+        "bytes": 2766,
+        "sha256": "c8da9fade8c91cf5bfe79e6e0e4511da6f979702f6e5e08bf036e18df15578fe"
+      },
+      {
+        "path": "web/src/styles/mobile-theme.scss",
+        "bytes": 6238,
+        "sha256": "71197e4bebe6a4357091ae9eb7e1ae5fd86072287364a58b7a8f7a8384e24f75"
+      },
+      {
+        "path": "web/src/core/mobileStyleNavigation.test.tsx",
+        "bytes": 5890,
+        "sha256": "c70389e01e5c11878387b7bbd1348d52b794ed0e7529928a218d2e9316684f25"
+      }
+    ],
+    "fullMinimumTests": 689,
+    "newTests": 6,
+    "scope": "visual_primitives_and_semantic_wrappers_preserve_existing_actions",
+    "priorFullPassed": 683,
+    "currentSourceFiles": 4290,
+    "currentSourceDigest": "b7ddd15456d06038db09b09ff40d00953487ebb55982893d4fc5c3bd2a301358",
+    "sourceAdoptedCloudPending": true,
+    "historicalCallersBaselinePreserved": true
   }
 }

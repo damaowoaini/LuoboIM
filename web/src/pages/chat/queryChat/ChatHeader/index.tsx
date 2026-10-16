@@ -168,8 +168,8 @@ const ChatHeader = () => {
   };
 
   return (
-    <Layout.Header className="relative border-b border-b-[var(--gap-text)] !bg-white !px-3">
-      <div className="flex h-full items-center leading-none">
+    <Layout.Header className="app-chat-header relative border-b border-b-[var(--gap-text)] !bg-white !px-3">
+      <div className="app-chat-header-content flex h-full items-center leading-none">
         <div className="flex flex-1 items-center overflow-hidden">
           <OIMAvatar
             src={currentConversation?.faceURL}
@@ -186,7 +186,7 @@ const ChatHeader = () => {
           >
             <div className="relative">
               <div 
-                className="truncate text-base font-semibold cursor-pointer select-text hover:text-[#1890ff] transition-colors"
+                className="truncate text-base font-semibold cursor-pointer select-text hover:text-[var(--primary)] transition-colors"
                 onDoubleClick={handleCopyName}
                 title="双击复制用户名"
               >
@@ -218,7 +218,7 @@ const ChatHeader = () => {
         </div>
 
         {!isNotification && (
-          <div className="mr-5 flex">
+          <div className="app-chat-header-actions mr-5 flex">
             {menuList.map((menu) => {
               if (
                 (menu.idx === 0 || menu.idx === 4) &&
@@ -232,13 +232,10 @@ const ChatHeader = () => {
 
               return (
                 <Tooltip title={menu.title} key={menu.idx}>
-                  <img
-                    className="ml-5 cursor-pointer"
-                    width={20}
-                    src={menu.icon}
-                    alt=""
-                    onClick={() => menuClick(menu.idx)}
-                  />
+                  <button type="button" className="app-icon-button" aria-label={menu.title}
+                    onClick={() => menuClick(menu.idx)}>
+                    <img width={20} src={menu.icon} alt="" />
+                  </button>
                 </Tooltip>
               );
             })}

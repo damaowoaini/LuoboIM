@@ -166,14 +166,14 @@ const NavItem = ({ nav: { icon, icon_active, title, path }, onLogout }: { nav: N
         aria-label={title}
         aria-current={isActive && path !== "logout" ? "page" : undefined}
         className={clsx(
-          "mb-3 flex h-[52px] w-12 cursor-pointer flex-col items-center justify-center rounded-md",
-          { "bg-[#e9e9eb]": isActive },
+          "app-nav-item mb-3 flex h-[52px] w-12 cursor-pointer flex-col items-center justify-center",
+          { "is-active": isActive },
         )}
         onClick={tryNavigate}
         onDoubleClick={tryJumpToUnread}
       >
         <img width={20} src={isActive ? icon_active : icon} alt="" />
-        <div className="mt-1 text-xs text-gray-500">{title}</div>
+        <div className="mt-1 text-xs text-[var(--sub-text)]">{title}</div>
       </button>
     </Badge>
   );
@@ -321,11 +321,11 @@ const LeftNavBar = memo(() => {
 
   return (
     <Sider
-      className="no-mobile border-r border-gray-200 !bg-[#F4F4F4] dark:border-gray-800 dark:!bg-[#141414]"
-      width={60}
+      className="app-nav border-r border-[var(--gap-text)]"
+      width={72}
       theme="light"
     >
-      <div className="mt-6 flex h-full flex-col items-center">
+      <div className="app-nav-content flex h-full flex-col items-center">
         <Popover
           content={ProfileContent}
           trigger="click"
@@ -336,7 +336,7 @@ const LeftNavBar = memo(() => {
           open={showProfile}
           onOpenChange={(vis) => setShowProfile(vis)}
         >
-          <button type="button" aria-label="账号与个人设置" aria-expanded={showProfile}>
+          <button type="button" className="app-profile-trigger" aria-label="账号与个人设置" aria-expanded={showProfile}>
           <OIMAvatar
             className="mb-6 cursor-pointer"
             src={selfInfo.faceURL}
@@ -345,13 +345,13 @@ const LeftNavBar = memo(() => {
           </button>
         </Popover>
 
-        <div className="flex flex-1 flex-col items-center">
+        <div className="app-nav-items flex flex-1 flex-col items-center">
           {NavList.map((nav) => (
             <NavItem nav={nav} key={nav.path} />
           ))}
         </div>
 
-        <div className="mb-6">
+        <div className="app-nav-logout">
           <NavItem nav={LogoutNavItem} onLogout={tryLogout} />
         </div>
       </div>

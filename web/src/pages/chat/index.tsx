@@ -5,7 +5,7 @@ import ConversationSider from "./ConversationSider";
 
 export const Chat = () => {
   return (
-    <Layout className="flex-row">
+    <Layout className="app-chat flex-row">
       <ConversationSider />
       <Outlet />
     </Layout>

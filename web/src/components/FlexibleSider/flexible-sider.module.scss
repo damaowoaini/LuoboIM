@@ -1,5 +1,5 @@
 .sider_resize {
-  width: 300px;
+  width: var(--luobo-sidebar-width);
   min-width: 240px;
   max-width: 45vw;
   resize: horizontal;
@@ -17,6 +17,6 @@
   right: 0;
   top: 0;
   bottom: 0;
-  border-left: 1px solid #e8eaef;
+  border-left: 1px solid var(--gap-text);
   pointer-events: none;
 }

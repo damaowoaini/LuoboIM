@@ -1,5 +1,4 @@
 import { Badge } from "antd";
-import clsx from "clsx";
 import i18n, { t } from "i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -75,26 +74,21 @@ const ContactSider = () => {
 
   return (
     <FlexibleSider needHidden={true}>
-      <div className="h-full bg-white">
-        <div className="pb-3 pl-5.5 pt-5.5 text-base font-extrabold">
+      <div className="app-contact-nav h-full bg-white">
+        <div className="app-contact-nav-title pb-3 pl-5.5 pt-5.5 text-base font-extrabold">
           {t("placeholder.contact")}
         </div>
         <ul>
           {Links.map((item, index) => {
             return (
-              <li
-                key={item.path}
-                className={clsx(
-                  "mx-2 flex cursor-pointer items-center rounded-md p-3 text-sm hover:bg-[var(--primary-active)]",
-                  {
-                    "bg-[#f3f8fe]": index === selectIndex,
-                  },
-                )}
-                onClick={() => {
+              <li key={item.path} className="mx-2 text-sm">
+                <button type="button" aria-label={item.label}
+                  aria-current={index === selectIndex ? "page" : undefined}
+                  onClick={() => {
                   setSelectIndex(index);
                   navigate(String(item.path));
                 }}
-              >
+                >
                 <Badge size="small" count={getBadge(index)}>
                   <img
                     alt={item.label}
@@ -103,6 +97,7 @@ const ContactSider = () => {
                   />
                 </Badge>
                 <div className="text-sm">{item.label}</div>
+                </button>
               </li>
             );
           })}

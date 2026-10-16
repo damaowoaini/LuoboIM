@@ -82,8 +82,8 @@ export const ChangePasswordContent = ({
   };
 
   return (
-    <div className="flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between p-5">
+    <div className="app-settings-panel flex flex-col overflow-hidden">
+      <div className="app-settings-heading flex items-center justify-between p-5">
         <span className="text-base font-medium">{t("placeholder.changePassword")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer !text-[#8e9aaf]"

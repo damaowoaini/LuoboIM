@@ -49,7 +49,7 @@ const PersonalSettings: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> 
         },
       }}
       width={600}
-      className="no-padding-modal max-w-[70vw]"
+      className="no-padding-modal app-settings-modal"
       maskTransitionName=""
     >
       <PersonalSettingsContent
@@ -163,8 +163,8 @@ export const PersonalSettingsContent = ({
   };
 
   return (
-    <div className="flex max-h-[80vh] flex-col bg-[var(--chat-bubble)]">
-      <div className="flex items-center justify-between bg-[var(--gap-text)] p-5">
+    <div className="app-settings-panel flex max-h-[80vh] flex-col">
+      <div className="app-settings-heading flex items-center justify-between p-5">
         <span className="text-base font-medium">{t("placeholder.accountSetting")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"

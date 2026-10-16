@@ -145,8 +145,8 @@ export const BlackListContent = ({ closeOverlay }: { closeOverlay?: () => void }
   };
 
   return (
-    <div className="flex h-[468px] flex-col bg-[var(--chat-bubble)]">
-      <div className="flex items-center justify-between p-5">
+    <div className="app-settings-panel flex h-[468px] flex-col bg-[var(--chat-bubble)]">
+      <div className="app-settings-heading flex items-center justify-between p-5">
         <span className="text-base font-medium">{t("placeholder.blackList")}</span>
         <CloseOutlined
           className="app-no-drag cursor-pointer text-[#8e9aaf]"

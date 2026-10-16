@@ -34,12 +34,12 @@ export const MainContentLayout = () => {
       spinning={connectState.isLogining || connectState.isSyncing}
       tip={loadingTip}
     >
-      <Layout className="h-full">
+      <Layout className="app-shell h-full">
         <TopSearchBar />
         {!connectState.isConnected && <Alert banner type={connectState.isConnecting ? "info" : "warning"} showIcon
           message={connectState.isConnecting ? "正在连接消息服务…" : "消息服务连接已中断，请检查网络后重新连接。"}
           action={<Button size="small" onClick={() => window.location.reload()}>重新连接</Button>} />}
-        <Layout>
+        <Layout className="app-workspace">
           <LeftNavBar />
           <Outlet />
         </Layout>

@@ -391,7 +391,7 @@ const ChatFooter = () => {
   }, []);
 
   return (
-    <footer className="relative min-h-[25vh] bg-white py-px">
+    <footer className="app-composer relative bg-white py-px">
       <div className="flex h-full flex-col border-t border-t-[var(--gap-text)]">
         <SendActionBar
           inputFocus={inputFocus}
@@ -419,7 +419,7 @@ const ChatFooter = () => {
         >
           <div className="relative flex flex-1 flex-col overflow-y-auto">
             {quoteMessage && (
-              <div className="mx-5.5 mt-3 flex w-fit items-start rounded-md bg-[var(--chat-bubble)] px-2.5 py-2">
+              <div className="mx-5.5 mt-3 flex w-fit items-start rounded-md bg-[var(--luobo-background)] px-2.5 py-2">
                 <img
                   className="mt-px cursor-pointer"
                   width={13}
@@ -446,7 +446,7 @@ const ChatFooter = () => {
                 window.electronAPI?.ipcInvoke("showInputContextMenu")
               }
             />
-            <div className="absolute bottom-6 right-6 flex w-fit items-center justify-end">
+            <div className="app-send-actions absolute bottom-6 right-6 flex w-fit items-center justify-end">
               <span className="mr-2.5 text-xs text-[var(--sub-text)]">
                 {t("placeholder.sendShortcutkey")}
               </span>

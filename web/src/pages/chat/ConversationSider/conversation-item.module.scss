@@ -1,5 +1,7 @@
 .conversation-item {
-  @apply relative my-1 flex items-center rounded-md p-3 hover:bg-[var(--primary-active)];
+  @apply relative my-1 flex items-center p-3 hover:bg-[var(--primary-active)];
+  min-height: 72px;
+  border-radius: var(--luobo-radius-control);
 
   &-pined {
     &::after {

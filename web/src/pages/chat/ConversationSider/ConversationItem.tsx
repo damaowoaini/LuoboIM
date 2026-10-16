@@ -179,7 +179,7 @@ const ConversationItem = ({ conversation }: IConversationProps) => {
                 {getMessagePrefix()}
               </div>
               <div
-                className="truncate text-[rgba(81,94,112,0.5)]"
+                className="truncate text-[var(--sub-text)]"
                 dangerouslySetInnerHTML={{
                   __html: parseTwemoji(getLatestMessageContent()),
                 }}

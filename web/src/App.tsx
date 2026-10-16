@@ -1,4 +1,4 @@
-import { App as AntdApp, ConfigProvider, theme } from "antd";
+import { App as AntdApp, ConfigProvider } from "antd";
 import enUS from "antd/locale/en_US";
 import zhCN from "antd/locale/zh_CN";
 import { Suspense, useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { RouterProvider } from "react-router-dom";
 
 import AntdGlobalComp from "./AntdGlobalComp";
 import router from "./routes";
+import { luoboAntdTheme, mobileTokenStyles } from "./design/tokens";
 import {
   useUserStore,
   useContactStore,
@@ -55,11 +56,9 @@ function App() {
     <ConfigProvider
       button={{ autoInsertSpace: false }}
       locale={locale === "zh-CN" ? zhCN : enUS}
-      theme={{
-        // algorithm: [theme.darkAlgorithm],
-        token: { colorPrimary: "#2163e8", borderRadius: 8 },
-      }}
+      theme={luoboAntdTheme}
     >
+      <style>{mobileTokenStyles}</style>
       <QueryClientProvider client={queryClient}>
         <Suspense fallback={<div>loading...</div>}>
           <AntdApp>

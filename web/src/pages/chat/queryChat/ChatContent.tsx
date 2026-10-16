@@ -159,7 +159,7 @@ const ChatContent = ({ isNotificationSession }: { isNotificationSession: boolean
   );
 
   return (
-    <Layout.Content className="relative flex overflow-hidden !bg-white" id="chat-main">
+    <Layout.Content className="app-timeline relative flex overflow-hidden" id="chat-main">
       <div
         id="scrollableDiv"
         ref={scrollDivRef}

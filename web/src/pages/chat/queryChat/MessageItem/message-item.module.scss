@@ -9,7 +9,10 @@
     }
 
     .bubble {
-      @apply w-fit rounded-md p-2.5;
+      @apply w-fit;
+      border-radius: var(--luobo-radius-control);
+      padding: 10px 13px;
+      line-height: 1.6;
       word-break: break-word;
       background-color: var(--chat-bubble);
     }
@@ -62,7 +65,9 @@
 }
 
 .card-shadow {
-  @apply w-60 cursor-pointer overflow-hidden rounded-md shadow-md;
+  @apply w-60 cursor-pointer overflow-hidden;
+  border-radius: var(--luobo-radius-control);
+  border: 1px solid var(--gap-text);
   box-shadow: 3px 3px 8px 1px rgba(81, 94, 112, 0.1);
 }
 

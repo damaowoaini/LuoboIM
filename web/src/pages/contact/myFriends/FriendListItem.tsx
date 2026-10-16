@@ -12,7 +12,7 @@ const FriendListItem = ({
   const displayName = friend.remark || friend.nickname;
   return (
     <div
-      className="flex items-center rounded-md px-3.5 pb-3 pt-2.5 transition-colors hover:bg-[var(--primary-active)]"
+      className="app-contact-row flex items-center px-3.5 pb-3 pt-2.5 transition-colors hover:bg-[var(--primary-active)]"
       onClick={() => showUserCard(friend.userID)}
     >
       <OIMAvatar src={friend.faceURL} text={displayName} />

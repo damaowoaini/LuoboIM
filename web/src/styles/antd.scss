@@ -41,7 +41,7 @@
 
 .message-image {
   .ant-image-mask {
-    border-radius: 6px;
+    border-radius: var(--luobo-radius-control);
   }
 }
 
@@ -79,7 +79,7 @@
 
   .ant-drawer-header {
     padding: 0 24px;
-    background-color: #e8eaef;
+    background-color: var(--luobo-surface);
     border: none;
 
     .ant-drawer-header-title {
@@ -101,7 +101,7 @@
 
   .anticon-close,
   .anticon-right {
-    color: #8e9ab0;
+    color: var(--sub-text);
   }
 }
 
@@ -150,14 +150,14 @@
 .no-padding-modal {
   .ant-modal-content {
     padding: 0;
-    border-radius: 6px;
+    border-radius: var(--luobo-radius-control);
     overflow: hidden;
   }
 }
 
 .global-search-modal {
   .ant-modal-content {
-    border-radius: 16px;
+    border-radius: var(--luobo-radius-control);
   }
 
   .message-drawer-tab {
@@ -179,7 +179,7 @@
 .rtc-single-modal {
   .ant-modal-content {
     padding: 0;
-    border-radius: 16px;
+    border-radius: var(--luobo-radius-control);
     overflow: hidden;
   }
 }
@@ -222,7 +222,7 @@
 
 .no-addon-search {
   .ant-input {
-    border-radius: 6px !important;
+    border-radius: var(--luobo-radius-control) !important;
   }
   .ant-input-group-addon {
     display: none;
@@ -249,7 +249,7 @@
   }
 
   .ant-form-item-label > label {
-    color: rgba(81, 94, 112, 0.7);
+    color: var(--sub-text);
   }
 }
 
