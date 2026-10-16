@@ -1,44 +1,46 @@
 {
-  "schema": "luobo.mobile331.saved-emoji.preparation.v1",
-  "state": "refs_ci_metadata_only_targeted49_passed_no_full",
-  "source331_digest": "169caadc4e446184a3621f69ec2a06a142df2fb6a075fb26517fc43ca768cf5f",
-  "portable383_digest": "493d22158347b50773db20750872ed6b5ec881e4c716d016cc2d291f695d4ee7",
-  "reference331_digest": "c9a7aa28e58acedd2d8357ecb6a09125cb146f4a4bd2d568c49a6e96c9b6c894",
+  "schema": "luobo.mobile336.location-receive.preparation.v1",
+  "state": "refs_minimal_metadata_targeted36_actual_no_full",
+  "source336_digest": "6b7333baaf7cb4b87498601f2fd42f3dbcbf56d6703fd950ca4fd9ba6fd797a1",
+  "portable388_digest": "d42209b1279e63ffe396f3d07a8345ab837173f2aa4cef987f24ca8acbcf3486",
+  "reference336_digest": "77e272c718dc9caff1cb84baa8f5d1e2a8cc9c08245c120416c6cfa1310c6a17",
   "effective_vector": {
-    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/effective-source-vector.json",
-    "bytes": 134321,
-    "sha256": "5b8c88765429ab3bd9c9c1fff6ca8e15b1dd185828662bb358b76fcd4f2bc132"
+    "path": "references/integration/mobile-chat-location-receive-r1-candidate/effective-source-vector.json",
+    "bytes": 143554,
+    "sha256": "6d33afbc55b6b1e3764f083d8ab2b78a011d79e37bea4f4b79e9fcbc7b0aa0ba"
   },
-  "parent_preparation": {
-    "path": "references/integration/mobile331-saved-emoji-ci-candidate/before/ci/mobile/source-preparation.json",
-    "bytes": 4162,
-    "sha256": "4a908ec4ee9a45dcbc346c4beedcdcac9875b4fc88cd6b26d9573f06ea2a50ec"
+  "parent331_preparation": {
+    "path": "references/integration/mobile336-location-receive-ci-candidate/before/ci/mobile/source-preparation.json",
+    "bytes": 2890,
+    "sha256": "67882e97706b0239a3863777a3e0144c5c196c1bec67ebf26b53bd1c1cd97d31"
   },
-  "saved_emoji_r1": {
-    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/candidate-manifest.json",
-    "bytes": 16473,
-    "sha256": "37dc6ee8998ba458326cd8de26b7a4fecb9457f18a463b5ccee8e56b85a007b1"
+  "location_receive_v1": {
+    "path": "references/integration/mobile-chat-location-receive-candidate/candidate-manifest.json",
+    "bytes": 14152,
+    "sha256": "47db4688919d21b40812b72542046c3fe4ea5639282d6686d00464cffc392b19"
   },
-  "targeted_actual": {
-    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/verification-result.json",
-    "bytes": 27224,
-    "sha256": "477c8701b230e0999c0890cd9b4fb005a05c3ea2f3e6de1b82f8cc21f9660b27"
+  "location_receive_fixture_r1": {
+    "path": "references/integration/mobile-chat-location-receive-r1-candidate/candidate-manifest.json",
+    "bytes": 2796,
+    "sha256": "8d9ea741ba4c83f13cda57f3f86ee7d3463383d863107eb7bef87611bfdbaf27"
   },
+  "actual36": {
+    "path": ".qa/location-a-1/targeted-r1-result.json",
+    "bytes": 9628,
+    "sha256": "7fcc351d3568d9ac4e4a00da17e5de881446cc9f8ff01021de4c27523783d581"
+  },
+  "actualBoundary": "First36=34PASS/2fixtureERROR kept; only2 corrected fixture cases rerun2PASS;34 unaffected reused.36unique exact.8filefatal-info0 by original8 plus changed1 recheck.5prod unchanged after first run.",
   "expected_not_actual": {
-    "target386": 386,
-    "full1068": 1068,
+    "target422": 422,
+    "full1104": 1104,
     "strict_analysis": 0
   },
-  "parent323_history": "345/1027 composed expected-only; actual last cloud281/963 + local font22/background42 retained. No final full run here.",
-  "names": "exact original345/1027 composition layers +41 actual new successes. Old8 direct core cases stay in full, not counted as new41.",
-  "cleanup": "Original35recorder/14unmount,76creation/safe6,11Next AST/contracts unchanged. SavedEmoji14 widget fixtures each6ordered markers;2 entry ChatFont fixtures each4markers;25 units await SDK teardown. No generic new cleanup runner.",
-  "control": "Manual workflow_dispatch only; original37Python cases preserved (35prior+2background),2saved-emoji composition rejection cases appended. Changed Descriptor4,2existing background key-mapping and2new composition cases targeted here;8PASS total,31other checks not rerun. Protected11AST/networknamespace/resource/native/174deps/SDK51+migration1 unchanged.",
-  "public_inventory": "Strict source331/portable383, no check.sh exception. Private701B helper remains private.",
-  "execution_policy": "No per-feature full. One final full after known issues fixed and targeted checks clean. No dispatch/push/adoption by this proposal.",
-  "native_device_service_acceptance": false,
-  "root_targeted_acceptance": {
-    "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/root-targeted-acceptance.json",
-    "bytes": 692,
-    "sha256": "7652a5c7b9f3e9205e4c8cf44db340c64f60e4d253967bad4e554eb6709f2a37"
-  }
+  "parent331_history": "386/1068 remain composed expected name layers, not accepted complete execution. Original cloud281/963+local targeted source history retained.",
+  "names": "Original386 target and1068 full name composition preserved as parent layers plus36 actually successful new receiving cases.",
+  "control": "Manual-only workflow_dispatch/action pins/read permissions, original11protectedAST, netns/900s phase/4GiB cold/1GiB continuous/.2s/768MiB/native4GiB/174lock/SDK51+migration1 exact. No new cleanup parser/wrapper.",
+  "python": "39old names preserved;2new composition rejection cases. Root should run8affected/new once;33others reused. No CI tests run during this source proposal.",
+  "ledger": "No ledger change: StageA receiving does not complete sending location or map selection. StageB still required.",
+  "public_inventory": "Strict336/388; private701B check.sh stays outside public, no auxiliary exception.",
+  "execution_policy": "No per-feature full/dispatch/adoption/push; final full only after known issues fixed and targeted clean.",
+  "native_device_service_acceptance": false
 }

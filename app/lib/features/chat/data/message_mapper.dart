@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 
 import '../domain/chat_message.dart';
+import '../domain/chat_location.dart';
 import '../domain/chat_mention.dart';
 import '../domain/message_privacy.dart';
 
@@ -105,9 +106,7 @@ String? _legacySummary(_LegacyCustom custom) {
       final sound = data['soundElem'];
       if (sound is Map) {
         final duration = sound['duration'];
-        final length = duration is int && duration >= 0
-            ? ' $duration 秒'
-            : '';
+        final length = duration is int && duration >= 0 ? ' $duration 秒' : '';
         return '[标签语音]$length（当前版本暂不支持播放）';
       }
       return null;
@@ -335,6 +334,13 @@ ChatMessage _mapMessage(
       _ => MessageDelivery.sent,
     },
     avatar: secureMediaUri(item.senderFaceUrl),
+    location: kind == ChatMessageKind.location
+        ? ChatLocation.parse(
+            latitude: item.locationElem?.latitude,
+            longitude: item.locationElem?.longitude,
+            description: item.locationElem?.description,
+          )
+        : null,
     media: secureMediaUri(media),
     thumbnail: secureMediaUri(
       item.videoElem?.snapshotUrl ?? picture?.snapshotPicture?.url,

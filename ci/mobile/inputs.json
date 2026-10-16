@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v14",
-  "state": "current331_saved_emoji_targeted49_verified_final_regression_pending",
+  "schema": "luobo.mobile.portable-ci-inputs.v15",
+  "state": "current336_location_receive_targeted36_verified_final_regression_pending",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI + frozen call-records-r1 selected14 (4replacement,10new); no generation in CI + frozen saved-emoji R1 selected14 (6replacement,8new); no source generation in CI",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI + frozen call-records-r1 selected14 (4replacement,10new); no generation in CI + frozen saved-emoji R1 selected14 (6replacement,8new); no source generation in CI + Location109 receipt selected8 (3replacements,5new), fixture R1 only; no source generation in CI",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -179,6 +179,16 @@
       "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/candidate-manifest.json",
       "bytes": 16473,
       "sha256": "37dc6ee8998ba458326cd8de26b7a4fecb9457f18a463b5ccee8e56b85a007b1"
+    },
+    "location_receive_v1": {
+      "path": "references/integration/mobile-chat-location-receive-candidate/candidate-manifest.json",
+      "bytes": 14152,
+      "sha256": "47db4688919d21b40812b72542046c3fe4ea5639282d6686d00464cffc392b19"
+    },
+    "location_receive_fixture_r1": {
+      "path": "references/integration/mobile-chat-location-receive-r1-candidate/candidate-manifest.json",
+      "bytes": 2796,
+      "sha256": "8d9ea741ba4c83f13cda57f3f86ee7d3463383d863107eb7bef87611bfdbaf27"
     }
   },
   "toolchain": {
@@ -455,10 +465,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current331": 383
+    "current336": 388
   },
   "portable_digests": {
-    "current331": "493d22158347b50773db20750872ed6b5ec881e4c716d016cc2d291f695d4ee7"
+    "current336": "d42209b1279e63ffe396f3d07a8345ab837173f2aa4cef987f24ca8acbcf3486"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -918,14 +928,27 @@
         "sha256": "4a908ec4ee9a45dcbc346c4beedcdcac9875b4fc88cd6b26d9573f06ea2a50ec"
       },
       "actual_components": "cloud281/963+font22 targeted+background42 targeted; no303/985 or345/1027 full run"
+    },
+    "current331_composed_expected_only": {
+      "sourceDigest": "169caadc4e446184a3621f69ec2a06a142df2fb6a075fb26517fc43ca768cf5f",
+      "portableDigest": "493d22158347b50773db20750872ed6b5ec881e4c716d016cc2d291f695d4ee7",
+      "expected_target386": 386,
+      "expected_full1068": 1068,
+      "actual_combined_full_executed": false,
+      "actual_components": "Prior cloud281/963 + local font22/background42/savedemoji41 targeted;386/1068 were not executed",
+      "sourcePreparation": {
+        "path": "references/integration/mobile336-location-receive-ci-candidate/before/ci/mobile/source-preparation.json",
+        "bytes": 2890,
+        "sha256": "67882e97706b0239a3863777a3e0144c5c196c1bec67ebf26b53bd1c1cd97d31"
+      }
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current331",
-    "members": 331,
-    "reference_source_digest": "c9a7aa28e58acedd2d8357ecb6a09125cb146f4a4bd2d568c49a6e96c9b6c894",
+    "working_cohort": "current336",
+    "members": 336,
+    "reference_source_digest": "77e272c718dc9caff1cb84baa8f5d1e2a8cc9c08245c120416c6cfa1310c6a17",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -987,8 +1010,8 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 999641,
-    "sha256": "f1caa4f24a5ce3e7c3c687d7deae789911e935a560c5f9067b4e776716cc410a"
+    "bytes": 1197905,
+    "sha256": "feb3efee121d10760d3a0c1841f47d7deccdc73ae9af69b7c6c76bb0c8d90bd7"
   },
   "call_records_cleanup": {
     "named_fixtures": [
@@ -1500,9 +1523,9 @@
     "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
     "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
   },
-  "current331": {
-    "members": 331,
-    "source_digest": "169caadc4e446184a3621f69ec2a06a142df2fb6a075fb26517fc43ca768cf5f",
+  "current336": {
+    "members": 336,
+    "source_digest": "6b7333baaf7cb4b87498601f2fd42f3dbcbf56d6703fd950ca4fd9ba6fd797a1",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1681,8 +1704,8 @@
       },
       {
         "path": "app/lib/features/chat/data/message_mapper.dart",
-        "bytes": 12723,
-        "sha256": "f4c01d0e8d5e0c72fe330caabb2b25495126678997773f5446cc33e60e5d386f"
+        "bytes": 13004,
+        "sha256": "ecf9d166d8931f9826dc48fe04c9d023eede69c97b93f571ac34460f90966102"
       },
       {
         "path": "app/lib/features/chat/data/retained_merge_codec.dart",
@@ -1700,14 +1723,19 @@
         "sha256": "fecf039001dfa8c0f33b148e0db4c26ba9234edcd8a49a3c6880a2d9261ecab4"
       },
       {
+        "path": "app/lib/features/chat/domain/chat_location.dart",
+        "bytes": 4005,
+        "sha256": "6b1eddf79c2dfd83ceb12ffbec5d96f23359f960d99318d5af4f7f170ba3f5e4"
+      },
+      {
         "path": "app/lib/features/chat/domain/chat_mention.dart",
         "bytes": 2777,
         "sha256": "dab2567320613adb88871be72dbf5a52789ec8ce051481ce85e38bd788078173"
       },
       {
         "path": "app/lib/features/chat/domain/chat_message.dart",
-        "bytes": 4829,
-        "sha256": "7b94dda2bb771482bfdc4bcb1a95681ded7e4a2a7b001738b38f9cbb343f7573"
+        "bytes": 4957,
+        "sha256": "59a53068ac25b8ba7fd6aadc76be0eb4494c2c6ec8b1f877363d6f421b5ff587"
       },
       {
         "path": "app/lib/features/chat/domain/chat_search.dart",
@@ -1770,6 +1798,11 @@
         "sha256": "521cc19051eaf9ca2b67d01ef23a6c30dab328c3acfa4a0adb707dedda82ce4c"
       },
       {
+        "path": "app/lib/features/chat/presentation/chat_location_view.dart",
+        "bytes": 10811,
+        "sha256": "ac12ccf7844f7e0be2c39c4e0abfd31aab00ca9a21263470952f711fd21f2282"
+      },
+      {
         "path": "app/lib/features/chat/presentation/chat_media_actions.dart",
         "bytes": 13622,
         "sha256": "8f8979bc4dc216d37f83d4c255f5ed8180ceed15ee8e5ff93b4be4f52c5ff561"
@@ -1781,8 +1814,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 76522,
-        "sha256": "5b6756eccb2e11fb921f198dfa51ca2c8bb6d59ddb1fb3b99c75a5e2c29a9090"
+        "bytes": 77233,
+        "sha256": "504ad4930d90f3dfd8f1e4106f6f68f21a727444e5e8fa1faf653cc9b84b8644"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
@@ -2575,6 +2608,21 @@
         "sha256": "d282006d2afa3e10b4f6871e2a43b402e4334bcdb77e62207a7d6cb335f9ca91"
       },
       {
+        "path": "app/test/features/chat/chat_location_fixture.dart",
+        "bytes": 7407,
+        "sha256": "ea5e7f6a6a959e74a80fe8789f268778463661969216f5839a239ac768340856"
+      },
+      {
+        "path": "app/test/features/chat/chat_location_test.dart",
+        "bytes": 6785,
+        "sha256": "876245dfb71a730fb0094825742e805ff0bb46454707171836335e0d3d87ee77"
+      },
+      {
+        "path": "app/test/features/chat/chat_location_workflow_test.dart",
+        "bytes": 15359,
+        "sha256": "95ec565a5dbebc8498a5c0dc4504244b621bd3274814c6b9a063dd7b0959990b"
+      },
+      {
         "path": "app/test/features/chat/chat_page_test.dart",
         "bytes": 3650,
         "sha256": "79f8462d60784c37901260ed2b1f61db47d4c164c067d3b0c23eecb3fc597e2d"
@@ -3160,8 +3208,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 386,
-    "expected_full_tests": 1068,
+    "expected_target_tests": 422,
+    "expected_full_tests": 1104,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -3191,7 +3239,9 @@
       "test/features/chat/saved_emoji_entry_test.dart",
       "test/features/chat/saved_emoji_repository_test.dart",
       "test/features/chat/saved_emoji_store_test.dart",
-      "test/features/chat/saved_emoji_workflow_test.dart"
+      "test/features/chat/saved_emoji_workflow_test.dart",
+      "test/features/chat/chat_location_test.dart",
+      "test/features/chat/chat_location_workflow_test.dart"
     ]
   }
 }

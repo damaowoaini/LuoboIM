@@ -202,7 +202,9 @@ def worker_environment():
 
 def command(w,label,args,cwd,e):
     record(w/'evidence'/(label+'.intent.json'),dict(argv=list(map(str,args)),cwd=str(cwd)))
-    with (w/'evidence'/(label+'.log')).open('xb') as out:code=subprocess.call(list(map(str,args)),cwd=cwd,env=e,stdout=out,stderr=subprocess.STDOUT)
+    # Queries consume stdout only; preserve diagnostics separately without relaxing exact checks.
+    with (w/'evidence'/(label+'.log')).open('xb') as out, (w/'evidence'/(label+'.stderr.log')).open('xb') as err:
+        code=subprocess.call(list(map(str,args)),cwd=cwd,env=e,stdout=out,stderr=err)
     record(w/'evidence'/(label+'.result.json'),dict(exit_code=code))
     if code:raise RuntimeError('command failed '+label)
     return (w/'evidence'/(label+'.log')).read_text()

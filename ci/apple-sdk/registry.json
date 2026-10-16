@@ -17,9 +17,9 @@
       "sha256": "8565cfbe3ef3be3172aa3a49ab4f73f4611c4af37179c4ab00c3602f1621331b"
     },
     {
-      "bytes": 22688,
+      "bytes": 22837,
       "path": "cloud.py",
-      "sha256": "7ea7e9fafe7feda27d6a95aa1693f0e6f8546b3b19871619a5269061c90e6457"
+      "sha256": "74df5fbce1a94380b7d4906f554b29000bd9b28937b63ad80355451e029bdd7b"
     },
     {
       "bytes": 7950,
@@ -57,9 +57,9 @@
       "sha256": "16e8d94e0ee0c0b20dcb813210a2d12e32e288033b767db4e2ce0e4b89ba9ae2"
     },
     {
-      "bytes": 11789,
+      "bytes": 15939,
       "path": "test_cloud.py",
-      "sha256": "b5843c42af57c9c31951729aabdd4af80f786e875843f86f21acdc791120a937"
+      "sha256": "daf9b8b19e18f0f5ceaeae153e4bd308f6c69d10829204fa411a3454b87fd296"
     },
     {
       "bytes": 4782,

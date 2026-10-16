@@ -1,4 +1,5 @@
 import 'message_privacy.dart';
+import 'chat_location.dart';
 import 'chat_mention.dart';
 
 enum ChatMessageKind {
@@ -51,6 +52,7 @@ final class ChatMessage {
     this.mergedMessages = const [],
     this.mergedContentComplete = true,
     this.sourceGroupId,
+    this.location,
     this.media,
     this.thumbnail,
     this.fileName,
@@ -79,6 +81,7 @@ final class ChatMessage {
   final bool mine;
   final MessageDelivery delivery;
   final Uri? avatar;
+  final ChatLocation? location;
   final Uri? media;
   final Uri? thumbnail;
   final String? fileName;
@@ -121,6 +124,7 @@ final class ChatMessage {
     mine: mine,
     delivery: value,
     avatar: avatar,
+    location: location,
     media: media,
     thumbnail: thumbnail,
     fileName: fileName,
@@ -150,6 +154,7 @@ final class ChatMessage {
     mine: mine,
     delivery: delivery,
     avatar: avatar,
+    location: location,
     media: media,
     thumbnail: thumbnail,
     fileName: fileName,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current331 target386/full1068."""
+"""Pure Python CI gate checks, separate from current336 target422/full1104."""
 import copy
 import importlib.util
 import json
@@ -135,12 +135,12 @@ class DescriptorTests(unittest.TestCase):
             with self.assertRaises(ValueError): check.source.descriptor()
 
     def test_historical_cohorts_cannot_alias331(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323'):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current331'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current336'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -219,10 +219,29 @@ class SavedEmojiInventoryTests(BackgroundInventoryTests):
                 check.source.required_names(plan)
 
     def test_same_count_target_cannot_replace_background_case(self):
-        self.rejected_inventory(lambda n: n['current_target386'][-1].update(name='forged saved-emoji replacement'))
+        self.rejected_inventory(lambda n: n['parent_target386'][-1].update(name='forged saved-emoji replacement'))
 
     def test_same_count_parent_full_cannot_replace_original_case(self):
         self.rejected_inventory(lambda n: n['parent_full1027'][-1].update(name='forged parent replacement'))
+
+
+class LocationReceiveInventoryTests(unittest.TestCase):
+    def rejected_inventory(self, change):
+        plan = check.source.descriptor()
+        names = json.loads(check.source.regular(check.source.REPO / plan['required_test_names']['path']))
+        change(names)
+        body = json.dumps(names).encode()
+        plan = copy.deepcopy(plan)
+        plan['required_test_names'].update(bytes=len(body), sha256=check.source.sha(body))
+        with mock.patch.object(check.source, 'regular', return_value=body):
+            with self.assertRaisesRegex(ValueError, 'location receive names do not preserve'):
+                check.source.required_names(plan)
+
+    def test_same_count_target_cannot_replace_location_receive_case(self):
+        self.rejected_inventory(lambda n: next(r for r in n['current_target422'] if r['name'] == n['new_location_receive36'][0]['name']).update(name='forged location receive replacement'))
+
+    def test_same_count_parent_full_cannot_replace_original_case(self):
+        self.rejected_inventory(lambda n: n['parent_full1068'][-1].update(name='forged original full replacement'))
 
 
 class CleanupTests(unittest.TestCase):

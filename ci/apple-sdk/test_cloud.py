@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import sys
 import tarfile
 import tempfile
 from types import SimpleNamespace
@@ -150,6 +151,62 @@ class CloudInputs(unittest.TestCase):
                     self.assertEqual(cloud.main(),75)
         finally:
             for number,handler in previous.items():signal.signal(number,handler)
+
+
+class CommandStreams(unittest.TestCase):
+    def query(self, root, label, stdout, stderr, code=0):
+        program='import os;os.write(1,'+repr(stdout)+');os.write(2,'+repr(stderr)+');raise SystemExit('+str(code)+')'
+        return cloud.command(root,label,[sys.executable,'-I','-c',program],root,
+            dict(HOME=os.environ['HOME'],PATH='/usr/bin:/bin',LANG='C',TMPDIR=str(root)))
+
+    def test_real_warning_is_preserved_separately_and_query_returns_only_stdout(self):
+        with tempfile.TemporaryDirectory() as value:
+            root=Path(value).resolve();(root/'evidence').mkdir()
+            stdout=b'7b156fc5557878ad6e6a07e572694af5699c6624\n'
+            stderr=b'git: warning: synthetic cache write denied\n'
+            self.assertEqual(self.query(root,'source-object',stdout,stderr),stdout.decode())
+            self.assertEqual((root/'evidence/source-object.log').read_bytes(),stdout)
+            self.assertEqual((root/'evidence/source-object.stderr.log').read_bytes(),stderr)
+            self.assertEqual(json.loads((root/'evidence/source-object.result.json').read_text()),dict(exit_code=0))
+
+    def test_actual_setup_retains_exact_commit_admission_with_diagnostic_stderr(self):
+        class AfterExactCommit(Exception):
+            pass
+        spec=json.loads((cloud.HERE/'portable-inputs.json').read_text())
+        expected=spec['core_commit']
+        original=cloud.command
+        for stdout,accepted in [(expected+'\n',True),('unexpected-prefix\n'+expected+'\n',False),(expected.upper()+'\n',False)]:
+            with self.subTest(stdout=stdout,accepted=accepted),tempfile.TemporaryDirectory() as value:
+                root=Path(value).resolve()
+                def command(w,label,args,cwd,environment):
+                    if label=='source-object':
+                        program='import os;os.write(1,'+repr(stdout.encode())+');os.write(2,'+repr(('synthetic diagnostic '+expected+'\n').encode())+')'
+                        return original(w,label,[sys.executable,'-I','-c',program],cwd,
+                            dict(HOME=os.environ['HOME'],PATH='/usr/bin:/bin',LANG='C',TMPDIR=str(root)))
+                    if label=='mobile-module':
+                        return json.dumps(dict(Sum=spec['mobile']['h1'],GoModSum=spec['mobile']['go_mod_h1']))
+                    if label.endswith('-buildinfo'):
+                        return 'go1.27.2 '+spec['mobile']['version']+' -trimpath=true'
+                    return ''
+                with patch.object(cloud,'metadata',return_value=spec),patch.object(cloud,'download',return_value=root/'unused-archive'),patch.object(cloud,'extract_go',return_value=[]),patch.object(cloud,'extract_engine',return_value=[]),patch.object(cloud,'command',side_effect=command),patch.object(cloud,'derive_inputs',side_effect=AfterExactCommit) as derive:
+                    if accepted:
+                        with self.assertRaises(AfterExactCommit):cloud.setup(root)
+                        derive.assert_called_once()
+                    else:
+                        with self.assertRaisesRegex(ValueError,'^exact upstream commit differs$'):cloud.setup(root)
+                        derive.assert_not_called()
+                self.assertEqual((root/'evidence/source-object.log').read_text(),stdout)
+                self.assertEqual(json.loads((root/'evidence/source-object.result.json').read_text()),dict(exit_code=0))
+
+    def test_real_nonzero_keeps_both_raw_streams_and_never_returns_success(self):
+        with tempfile.TemporaryDirectory() as value:
+            root=Path(value).resolve();(root/'evidence').mkdir()
+            stdout=b'7b156fc5557878ad6e6a07e572694af5699c6624\n';stderr=b'synthetic failure\n'
+            with self.assertRaisesRegex(RuntimeError,'^command failed source-object$'):
+                self.query(root,'source-object',stdout,stderr,7)
+            self.assertEqual((root/'evidence/source-object.log').read_bytes(),stdout)
+            self.assertEqual((root/'evidence/source-object.stderr.log').read_bytes(),stderr)
+            self.assertEqual(json.loads((root/'evidence/source-object.result.json').read_text()),dict(exit_code=7))
 
 
 if __name__=='__main__':unittest.main()

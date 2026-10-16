@@ -37,6 +37,7 @@ import 'chat_media_actions.dart';
 import 'chat_batch_selection.dart';
 import 'chat_batch_widgets.dart';
 import 'chat_content_access.dart';
+import 'chat_location_view.dart';
 import 'chat_merged_messages_page.dart';
 import 'chat_call_picker.dart';
 import 'message_media.dart';
@@ -892,6 +893,26 @@ class _ChatPageState extends ConsumerState<ChatPage>
     bool Function()? portalCurrent,
   }) {
     switch (item.kind) {
+      case ChatMessageKind.location:
+        return ChatLocationView(
+          key: ValueKey((
+            controller.repository.conversationId,
+            (portal ?? item).id,
+            item.id,
+          )),
+          location: item.location,
+          changes: controller,
+          captureAccess: (routeCurrent) => ChatContentAccess(
+            repository: controller.repository,
+            root: portal ?? item,
+            child: item,
+            isRouteCurrent: () =>
+                mounted &&
+                _foreground &&
+                controller.repository.conversationId == widget.conversationId &&
+                routeCurrent(),
+          ),
+        );
       case ChatMessageKind.forwarded:
         final original = item.forwardedMessage;
         if (original == null) {
