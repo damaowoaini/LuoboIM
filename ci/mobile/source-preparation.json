@@ -3,8 +3,8 @@
   "own_files": [
     {
       "path": ".github/workflows/mobile-ci.yml",
-      "bytes": 2455,
-      "sha256": "0c280261613ea4e0d767ef000cf6c5864710fe40d3a14d991237b3c7d91fca01"
+      "bytes": 2509,
+      "sha256": "5255a95e9fc391026d2fdbed8720826f881851433c741d23e1cd8fd447c55d4b"
     },
     {
       "path": "ci/mobile-check.py",
@@ -152,7 +152,13 @@
       "sha256": "6371fb146f9fae28797b3c0bfb816697ed10131a6d20e174e6f878425a7d2c21"
     }
   ],
-  "aggregate_sha256": "10bb21cc0bf4802e0ccfed31b55438a643195009c17cdb706dd0b9926b6ad53d",
+  "aggregate_sha256": "05fcc6221d810cdd67bce0739a62f6f4e742d72157182a4dd76673bc91d17417",
   "no_product_edits": true,
-  "native_acceptance": false
+  "native_acceptance": false,
+  "ci_followup": {
+    "cause": "GitHub Actions run38844764587 validation rejected runner context in job-level env at line44",
+    "change": "Set MOBILE_WORK from RUNNER_TEMP in first run step via GITHUB_ENV; no product/source input change",
+    "prior_receipt_sha256": "be912b2566e7464ada107caf69b74aa1db29c12485b56ba1f452f5af375fe608",
+    "actual_cloud_tests_executed_in_rejected_run": 0
+  }
 }

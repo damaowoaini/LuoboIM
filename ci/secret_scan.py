@@ -27,7 +27,7 @@ PRIVATE_SUFFIXES = {
     ".log", ".dump", ".bundle", ".apk", ".ipa", ".aar", ".so", ".dylib",
     ".zip", ".gz", ".tgz", ".tar",
 }
-ACTUAL_CONFIGS = {"server/config/config.yaml", "chart/config/config.yaml"}
+ACTUAL_CONFIGS = {"server/config/config.yaml", "chart/config/config.yaml", "server/config/env"}
 PATTERNS = (
     ("private_key_material", re.compile(r"-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----")),
     ("jwt_bearer_literal", re.compile(
@@ -37,12 +37,12 @@ PATTERNS = (
     ("provider_auth_token", re.compile(
         r"\bgh[pousr]_[A-Za-z0-9]{30,}\b|\bgithub_pat_[A-Za-z0-9_]{40,}\b|\bxox[baprs]-[A-Za-z0-9-]{20,}")),
 )
-FIELD = re.compile(r"^\s*[\"']?([A-Za-z_][A-Za-z0-9_.-]*)[\"']?\s*[:=]\s*(.*?)\s*,?\s*$")
+FIELD = re.compile(r"^\s*(?:export\s+)?[\"']?([A-Za-z_][A-Za-z0-9_.-]*)[\"']?\s*[:=]\s*(.*?)\s*,?\s*$")
 SENSITIVE_FIELD = re.compile(
     r"(?:secret|password|passwd|private.?key|aes.*key|encrypt.*key|sign.*key|access.?key|app.?key|api.?key|auth.?key|hmac.*key|token)", re.I)
 REFERENCE_FIELD = re.compile(r"(?:path|file|enabled|expire|refresh|timeout|length|seconds)$", re.I)
 CONFIG_NAME = re.compile(
-    r"(?:^|/)(?:[^/]*config[^/]*\.(?:ya?ml|json|toml)|\.env(?:\.[^/]*)?|[^/]+\.properties)$", re.I)
+    r"(?:^|/)(?:[^/]*config[^/]*\.(?:ya?ml|json|toml)(?:\.template)?|env(?:\.template)?|\.env(?:\.[^/]*)?|[^/]+\.properties)$", re.I)
 
 
 def configured_literal(value):
@@ -50,6 +50,8 @@ def configured_literal(value):
     if value.lower() in {"", "null", "~", "false", "true", "[]", "{}"}:
         return False
     if "${" in value or "{{" in value:
+        return False
+    if re.fullmatch(r"\$[A-Z_][A-Z0-9_]*", value):
         return False
     return not bool(re.fullmatch(
         r"(?:REPLACE|CHANGE|YOUR|EXAMPLE|PLACEHOLDER|TODO|<)[A-Z_0-9<> -]*", value, re.I))

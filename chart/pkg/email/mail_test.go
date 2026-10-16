@@ -20,10 +20,14 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestEmail(T *testing.T) {
+	if os.Getenv("LUOBO_EMAIL_INTEGRATION") != "1" {
+		T.Skip("SMTP integration is opt-in; set LUOBO_EMAIL_INTEGRATION=1 only with an explicitly configured synthetic mail service")
+	}
 	if err := InitConfig(); err != nil {
 		panic(err)
 	}

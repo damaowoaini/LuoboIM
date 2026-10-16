@@ -22,6 +22,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 在 push、PR 或手动触发时执行，保留成功和失败的日志、测试报告及可下载的 Web 构建。
 
 - Web：完整测试、严格类型检查、桌面类型检查、Vite 构建，以及隔离的群设置候选 before/after 回归。见 [Web CI](ci/README.web-ci.md)。
+- Admin：锁定依赖安装、Max setup、核心测试、类型检查和后台构建。见 [后台 CI](ci/README.admin-ci.md)。
 - Mobile：两个独立 Linux 任务分别验证当前 548 项测试，以及预约/自定义消息候选 73 项后运行完整 621 项；同时执行 analyze。见 [移动端 CI](ci/mobile/README.md)。这些数字是固定基线和验收要求，实际是否通过以对应 Actions 结果为准。
 - Backend：`server`、`chart`、`route` 分别执行 Go race 测试和 vet。依赖实际数据库或外部服务的跳过项会单列，不能计为集成验证通过。
 

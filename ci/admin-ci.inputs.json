@@ -1,0 +1,294 @@
+{
+  "schema": 1,
+  "node": "24.21.0",
+  "coreMinimumTests": 93,
+  "coreSourceTestFiles": 22,
+  "requiredInputs": [
+    {
+      "path": "admin/package.json",
+      "bytes": 3972,
+      "sha256": "b3cc87200bed462efa190579b16c4c81e6b398f706ca6b5eaafbb4a028589f62"
+    },
+    {
+      "path": "admin/package-lock.json",
+      "bytes": 1343936,
+      "sha256": "0ae87625558ca916d13a3a26b350a93a521e08085a20c7fef30b2b5c5b6dec35"
+    },
+    {
+      "path": "admin/tsconfig.json",
+      "bytes": 796,
+      "sha256": "0cfc5ec27345629d077eb43846a457a8118f932ea5ec0ecde7a50296cf6d5462"
+    },
+    {
+      "path": "admin/vitest.config.mts",
+      "bytes": 314,
+      "sha256": "8723e64af0547c03cd517d1fb11dd4ed44aed24e5bf5528940f8ba93f6309c34"
+    },
+    {
+      "path": "admin/config/config.ts",
+      "bytes": 5594,
+      "sha256": "01b2d2ea716159cb10906eb00915153f085d43594b1c197b6d6f4d69a59e8abb"
+    },
+    {
+      "path": "admin/config/defaultSettings.ts",
+      "bytes": 643,
+      "sha256": "43ea37afd93d2de50f2f84bdcd10788ee23f878fe71f124b466f4b5e14b62775"
+    },
+    {
+      "path": "admin/config/routes.ts",
+      "bytes": 8333,
+      "sha256": "35c299de6629c133e25b66a7f0bb670e894a43b3680bc84d9464eb87a8d5040f"
+    },
+    {
+      "path": "admin/config/proxy.ts",
+      "bytes": 119,
+      "sha256": "812c8368fd5adc688751290a5f69c29ded292c54d70ab5094a9ddb0e2b80c6ff"
+    },
+    {
+      "path": "admin/config/oneapi.json",
+      "bytes": 14150,
+      "sha256": "de1e94c5864f5e6d3ce20b3edbb06611467624d389b6d5e4cab648b5b48e2c92"
+    },
+    {
+      "path": "ci/web-ci.mjs",
+      "bytes": 13086,
+      "sha256": "b7a798e89a3d88a7659e2dd466f66c4756cce5ed7bd26778d2482bc34276677e"
+    },
+    {
+      "path": "ci/web-ci.audit-reporter.mjs",
+      "bytes": 1456,
+      "sha256": "22bdb3aa12a682229435de3ff39d39973d7cb6ff0cbd66734af50e84cc900b96"
+    },
+    {
+      "path": "admin/src/core/adminAssetUpload.test.ts",
+      "bytes": 3641,
+      "sha256": "a56060c925605d45450f36557cc481e558c00a2d19453643681e1b275d8152c8"
+    },
+    {
+      "path": "admin/src/core/adminAssetUpload.ts",
+      "bytes": 2998,
+      "sha256": "70052e0617d8233fc30180517ac8a6abd22d69e2a9b2a397320d21bd82133b53"
+    },
+    {
+      "path": "admin/src/core/adminLogout.test.ts",
+      "bytes": 2233,
+      "sha256": "bccb36f6271ee5c275d4ff6a5123818ce44489d9759847156395b87dc5b7d8f1"
+    },
+    {
+      "path": "admin/src/core/adminLogout.ts",
+      "bytes": 1194,
+      "sha256": "df5733b6ab7253d8cf26bc2c6dca8bb5373df21ad74992126ef01261aaf299ef"
+    },
+    {
+      "path": "admin/src/core/adminPreview.test.ts",
+      "bytes": 5207,
+      "sha256": "e10f1b03ca61bdf1b3f3f99d836f39970b9116b91131d454e12f49f14e30d9e6"
+    },
+    {
+      "path": "admin/src/core/adminPreview.ts",
+      "bytes": 4692,
+      "sha256": "a5004676dc8077424c0e42ec611b7b41385b55989881f9a9e13c955a2ac83333"
+    },
+    {
+      "path": "admin/src/core/adminProvisioning.test.ts",
+      "bytes": 3795,
+      "sha256": "1415a92127b7018de898a6ece4f0605b42c637beb479eda48b66b43e117e62c9"
+    },
+    {
+      "path": "admin/src/core/adminProvisioning.ts",
+      "bytes": 5502,
+      "sha256": "f63f3ddf365b9b76b2f05ee417e5bcfd4b4e77011054d15d71eada6e1b33ddb4"
+    },
+    {
+      "path": "admin/src/core/adminSession.test.ts",
+      "bytes": 4415,
+      "sha256": "15f2d193cd426acfb881a54c3237d0e8c8bc5a1c33778ed82c224b7e82a89913"
+    },
+    {
+      "path": "admin/src/core/adminSession.ts",
+      "bytes": 4225,
+      "sha256": "807e94017a9617c6f301e12e0c6f2976d42967b6373398c0fe9982feafc3a7b1"
+    },
+    {
+      "path": "admin/src/core/adminUserAvatar.test.ts",
+      "bytes": 2708,
+      "sha256": "6a4045a31f98aa8b4532681b5d232718790d4e18c4ad3ca740db781b6b604821"
+    },
+    {
+      "path": "admin/src/core/adminUserAvatar.ts",
+      "bytes": 805,
+      "sha256": "c2f7d0b24a1ec9334446bcc298d208603dbcae8b4f3165a2a4779e27d3ebbd14"
+    },
+    {
+      "path": "admin/src/core/adminUserCreation.test.ts",
+      "bytes": 6944,
+      "sha256": "4bc0103558935f152331b6fb82a6d935858a8ed0649c9742e375b4215bd8dc1f"
+    },
+    {
+      "path": "admin/src/core/appletEditor.test.ts",
+      "bytes": 3436,
+      "sha256": "a575efaab3d9993b5711df1e03be64217cede2bbade6373520a67f74ef7591cb"
+    },
+    {
+      "path": "admin/src/core/appletManagement.test.ts",
+      "bytes": 1625,
+      "sha256": "f3c3172430cec33e9a0b4d18dc3aacac6f6164c515c98da8f107665c2ac5f271"
+    },
+    {
+      "path": "admin/src/core/appletManagement.ts",
+      "bytes": 2202,
+      "sha256": "de01a921bbdb04d78888766660f7b61450a2a260751df600ab9f7705420b114b"
+    },
+    {
+      "path": "admin/src/core/batchSendPage.test.ts",
+      "bytes": 4145,
+      "sha256": "e3739831e5417f03958f53667236d26fe104cde9d0a0a0258a5dcb3e5e5453d2"
+    },
+    {
+      "path": "admin/src/core/batchSendResult.test.ts",
+      "bytes": 2789,
+      "sha256": "f1e9de0e77e4b256239721f0ef576c5f0f1ce57b62cd31d521ccc4de3a0a227d"
+    },
+    {
+      "path": "admin/src/core/batchSendResult.ts",
+      "bytes": 3599,
+      "sha256": "45715d492cd8dd8da082a13f2e0b7d684215be483ae1b9ad05458dafe8f08656"
+    },
+    {
+      "path": "admin/src/core/clipboardPermission.test.ts",
+      "bytes": 3963,
+      "sha256": "900d9b172645c7b011f3febf5519fb287b8c9e5352f4aa670019045f00c5532b"
+    },
+    {
+      "path": "admin/src/core/emojiIsolation.test.ts",
+      "bytes": 1086,
+      "sha256": "3aa421578f1f44f6901cd8f1abb129ea2e3bde0f914ab7e9fa09476f69f1daab"
+    },
+    {
+      "path": "admin/src/core/groupEditor.test.ts",
+      "bytes": 6518,
+      "sha256": "9cb0ec2866733c617b89acb850328fbee5fdac09e0912005afa4dab308790f7a"
+    },
+    {
+      "path": "admin/src/core/groupMutation.test.ts",
+      "bytes": 2318,
+      "sha256": "a45da548d92d2308a27601c338eb1c70e3d7751453a4d5e87a507cb53fe046e2"
+    },
+    {
+      "path": "admin/src/core/groupMutation.ts",
+      "bytes": 1740,
+      "sha256": "e004c4c97335d63b8e93f4f019d518bb17807c64bb9b18a58145b9fb56b16810"
+    },
+    {
+      "path": "admin/src/core/invitationExport.test.ts",
+      "bytes": 3086,
+      "sha256": "e3a668b833cf9f92a4ba5c6c4f460dcf2d06f8459a40762e39aaa03cba44839e"
+    },
+    {
+      "path": "admin/src/core/invitationExport.ts",
+      "bytes": 3452,
+      "sha256": "1894d4af28e6ee70cda81d2d5f0231110a81caed700ebe8cf117b645c8173d10"
+    },
+    {
+      "path": "admin/src/core/previewContent.test.ts",
+      "bytes": 1856,
+      "sha256": "034fb0b608d94d61e5358e2cae53fd65abf806b8dc4593b6562d84cf34c31adf"
+    },
+    {
+      "path": "admin/src/core/protocol.ts",
+      "bytes": 1001,
+      "sha256": "374fd2310b9f8a7cb233683436605ffe92287c25b4e26007ec0f5ec4df88f9ee"
+    },
+    {
+      "path": "admin/src/core/storedContent.test.ts",
+      "bytes": 2017,
+      "sha256": "ad9014fd7c0837f817f20d4e48c67afb2aa36df7015d580947c3fd88a77f8181"
+    },
+    {
+      "path": "admin/src/core/userAuthenticatorDialog.test.ts",
+      "bytes": 3730,
+      "sha256": "27f4367344a4530e76904688558ed831597fba565675b31bf7f6f59a2be1bd7a"
+    },
+    {
+      "path": "admin/src/core/userManagement.test.ts",
+      "bytes": 2376,
+      "sha256": "ef95e02e35c62683308d4b35e8d00ce176da00013044cc1de29f021dd1d94792"
+    },
+    {
+      "path": "admin/src/core/userManagement.ts",
+      "bytes": 2194,
+      "sha256": "d7a1d06101b564656b10a787157bceb84db3e63a822dfc5b8ec66cc8ea03656c"
+    },
+    {
+      "path": "admin/src/core/userManagementActions.test.ts",
+      "bytes": 3493,
+      "sha256": "ddd6e2c62fe4a2693a6a9be78224c0c589827229da6f34f1585ab95ebd5da05f"
+    },
+    {
+      "path": "admin/src/core/userProfileEditor.test.ts",
+      "bytes": 3617,
+      "sha256": "b2246bda2ce75e03e42a6aa3d2c7524884a9ad2883cf44f751f6c04aa2251b19"
+    },
+    {
+      "path": "admin/public/brand.svg",
+      "bytes": 339,
+      "sha256": "0c45aad2ce11535b46e6801bcf420a42dd51030af629e54481bb3a4cc0499d07"
+    },
+    {
+      "path": "admin/public/favicon.ico",
+      "bytes": 16129,
+      "sha256": "fd66e2a19052391c7219115a249941c32808f8d0d0a86c966c7822fc0f7fba2a"
+    },
+    {
+      "path": "admin/public/icons/icon-128x128.png",
+      "bytes": 1329,
+      "sha256": "f0b3c274fcfa8ae633431256604cfea5da69e4b965eb5d061b85c51000d2516c"
+    },
+    {
+      "path": "admin/public/icons/icon-192x192.png",
+      "bytes": 1856,
+      "sha256": "c560b1a66527a5d560b58d47ace39e0833491ba95b74031f26c189f8f5d711e3"
+    },
+    {
+      "path": "admin/public/icons/icon-512x512.png",
+      "bytes": 5082,
+      "sha256": "a27c336115d1210f6670135e4d743b9e750d54e78de930340e1f06d7dd5ac729"
+    },
+    {
+      "path": "admin/public/icons/icon.png",
+      "bytes": 59128,
+      "sha256": "7ac6ed592bc333922413c5d912d3abe063848c16e2bcff84618b4f65df3130f0"
+    },
+    {
+      "path": "admin/public/logo.svg",
+      "bytes": 3896,
+      "sha256": "76f974d2754aef631d3ecba91aa1e630e422a18d03ab8dd14968a8d3a6858b54"
+    },
+    {
+      "path": "admin/public/openIM.wasm",
+      "bytes": 29267513,
+      "sha256": "9b1fde5edcc0ee84f8db03ca993aa0b431bf66c8e24a76784e59362e6a0e0790"
+    },
+    {
+      "path": "admin/public/pro_icon.svg",
+      "bytes": 677,
+      "sha256": "293f8271f46b128e22cef692525dcc723960c3b9b0ff807e5c67e4d9a5646e2a"
+    },
+    {
+      "path": "admin/public/scripts/loading.js",
+      "bytes": 5259,
+      "sha256": "9eb1edc8fbeecf7f452a0ae4f92ad890d7176383673c8a5a1bdc6f8a99ef1772"
+    },
+    {
+      "path": "admin/public/sql-wasm.wasm",
+      "bytes": 1105290,
+      "sha256": "806886f413da1a6acc1db373285adda1b6750c8d434c75a5a6042af0a65cbafd"
+    },
+    {
+      "path": "admin/public/wasm_exec.js",
+      "bytes": 20179,
+      "sha256": "18bb600e0a2bd1cd3b475d0f0b9173b568f985f7a4827ef576923c8f105fedd9"
+    }
+  ],
+  "metadataMeaning": "Input and Linux optional binding presence only; actual Ubuntu install/tests/types/build are authoritative. No source adoption/deployment."
+}

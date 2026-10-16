@@ -33,6 +33,7 @@ python3 - "$result_dir" "$module" "$test_status" "$vet_status" <<'PY'
 import collections
 import json
 from pathlib import Path
+import re
 import sys
 
 output = Path(sys.argv[1])
@@ -42,6 +43,7 @@ counts = collections.Counter()
 skips = []
 invalid_lines = 0
 events = 0
+failures = []
 with (output / "tests.jsonl").open(encoding="utf-8") as stream:
     for line in stream:
         if not line.strip():
@@ -60,6 +62,8 @@ with (output / "tests.jsonl").open(encoding="utf-8") as stream:
             continue
         kind = "subtests" if isinstance(test, str) and "/" in test else "top_tests" if test else "packages"
         counts[kind + "_" + action] += 1
+        if action == "fail":
+            failures.append({"action": action, "package": event.get("Package"), "test": test})
         if action == "skip" and test:
             skips.append({"package": event.get("Package"), "test": test})
 summary = {
@@ -74,7 +78,59 @@ summary = {
     "integration_coverage": "Skipped environment-dependent tests are not verified integration passes.",
 }
 (output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-print(json.dumps(summary, indent=2))
+
+def safe_console(text):
+    # CI has no private runtime configuration. Still redact diagnostic values and
+    # prefix every line so test output cannot issue GitHub workflow commands.
+    text = re.sub(r"-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----.*?(?:-----END (?:[A-Z0-9]+ )*PRIVATE KEY-----|\Z)",
+                  "[REDACTED_PRIVATE_KEY]", text, flags=re.S)
+    text = re.sub(r"(?<![A-Za-z0-9_-])eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{16,}",
+                  "[REDACTED_JWT]", text)
+    text = re.sub(r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{12,}|(?:AKIA|ASIA)[A-Z0-9]{16}|AKID[A-Za-z0-9]{24,40})\b",
+                  "[REDACTED_PROVIDER_CREDENTIAL]", text)
+    text = re.sub(r"([A-Za-z][A-Za-z0-9+.-]*://)[^\s/@]+(?::[^\s/@]*)?@",
+                  r"\1[REDACTED]@", text)
+    text = re.sub(r"(?i)(\b[A-Za-z0-9_.-]*(?:password|passwd|secret|token|private.?key|encryption.?key|access.?key|api.?key|app.?key|authorization)[A-Za-z0-9_.-]*[\"']?\s*[:=]\s*)(?:\"[^\"]*\"|'[^']*'|[^\s,;]+)",
+                  r"\1[REDACTED]", text)
+    text = re.sub(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
+                  "[REDACTED_EMAIL]", text)
+    text = re.sub(r"\x1b\[[0-?]*[ -/]*[@-~]", "", text)
+    text = "".join(character for character in text if character in "\n\t" or ord(character) >= 32)
+    return text
+
+
+def console_block(label, text, max_lines=160):
+    lines = safe_console(text).splitlines()
+    print("[diagnostic] " + label)
+    if len(lines) > max_lines:
+        print("[diagnostic] [earlier lines omitted; full file is in the CI artifact]")
+    for line in lines[-max_lines:]:
+        print("[diagnostic] " + line[:2000])
+
+
+console_block("Actual test/vet summary", json.dumps(summary, indent=2))
+if test_status or vet_status or invalid_lines or not events:
+    console_block("Failed JSON events", json.dumps(failures, indent=2))
+    failed_packages = {item["package"] for item in failures}
+    failed_tests = {(item["package"], item["test"]) for item in failures if item["test"]}
+    relevant_output = collections.deque(maxlen=160)
+    with (output / "tests.jsonl").open(encoding="utf-8", errors="replace") as stream:
+        for line in stream:
+            try:
+                event = json.loads(line)
+            except (ValueError, UnicodeError):
+                continue
+            if not isinstance(event, dict) or event.get("Action") != "output":
+                continue
+            key = (event.get("Package"), event.get("Test"))
+            if key in failed_tests or (not key[1] and key[0] in failed_packages):
+                relevant_output.append(str(event.get("Output", "")))
+    console_block("Failing test/package output", "".join(relevant_output))
+    for filename in ("tests.stderr.log", "vet.log"):
+        # Limit console volume while retaining the unchanged complete artifact.
+        with (output / filename).open(encoding="utf-8", errors="replace") as stream:
+            tail = collections.deque(stream, maxlen=160)
+        console_block(filename, "".join(tail))
 sys.exit(0 if test_status == vet_status == invalid_lines == 0 and events > 0 else 1)
 PY
 summary_status=$?

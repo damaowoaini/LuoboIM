@@ -34,3 +34,10 @@ app/android/key.properties
 packages/**/.dart_tool/
 packages/**/build/
 packages/**/ios/Pods/
+
+# Cloud test outputs and deployment-local configuration
+ci-output/
+ci-results/
+server/config/config.yaml
+chart/config/config.yaml
+server/config/env

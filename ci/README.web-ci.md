@@ -12,4 +12,6 @@ GitHub 触发为 push、pull_request、workflow_dispatch，只有 contents:read�
 
 锁中 Linux x64 的 rolldown 1.2.14、lightningcss 1.33.0 的 GNU/musl optional entries 已静态核齐；该锁未使用 esbuild 本体，未为 CI 换版本。现锁 1,128 entries 只有 117 含 integrity/resolved，既有完整性元数据缺口仍保留；`npm ci` 是否能从公共 registry 完整重建尚待首次 Linux 运行证明，不把本机 node_modules 当锁安装证明。
 
-Actions 使用官方发布 commit 固定：[checkout v7.0.1](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1)、[setup-node v7.0.0](https://github.com/actions/setup-node/commit/820762786026740c76f36085b0efc47a31fe5020)、[upload-artifact v7.0.0](https://github.com/actions/upload-artifact/commit/bbbca2ddaa5d8feaa63e36b76fdaad77386f024f)。本批只准备源码，未提交、推送或运行远端 CI。
+Actions 使用官方发布 commit 固定：[checkout v7.0.1](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1)、[setup-node v7.0.0](https://github.com/actions/setup-node/commit/820762786026740c76f36085b0efc47a31fe5020)、[upload-artifact v7.0.0](https://github.com/actions/upload-artifact/commit/bbbca2ddaa5d8feaa63e36b76fdaad77386f024f)。此任务不提交或推送，由主任务维护远端。
+
+首轮云运行的 full625 已通过，但候选 before/after 因冻结 fixture 注册晚于 SDK 导入，在收集阶段 Worker 未定义、各 0 用例，属于加载失败。CI config 现把同一冻结 fixture 设为 setupFiles，使既有边界 mock 在测试的真实 hook/caller 导入前注册；未修改 7 个冻结源文件或 33 个断言。本地按该配置实际得到 before9 正控通过/24 AssertionError、after33 全通过，并通过相同 JSON/JUnit/audit 完成门禁；云端重跑仍以 Actions 实际结果为准。

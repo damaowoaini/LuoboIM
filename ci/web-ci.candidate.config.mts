@@ -50,6 +50,9 @@ export default defineConfig({
     { find: /^@ant-design\/icons$/, replacement: path.join(web, "node_modules/@ant-design/icons/es/index.js") },
     { find: /^open-im-sdk-wasm$/, replacement: path.join(web, "node_modules/open-im-sdk-wasm/lib/index.js") },
   ] },
-  test: { include: ["tests/*.test.ts"], environment: "jsdom", pool: "threads",
+  // Register the frozen boundary mocks before a test's SDK/production imports.
+  // Importing fixture only at the end of a test's imports is too late for the
+  // vendor CJS entry, which starts its Worker during module evaluation.
+  test: { include: ["tests/*.test.ts"], setupFiles: [path.join(here, "tests/fixture.ts")], environment: "jsdom", pool: "threads",
     cache: false, fsModuleCache: false, maxWorkers: 1, fileParallelism: false },
 });
