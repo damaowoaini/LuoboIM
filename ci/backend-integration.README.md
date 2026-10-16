@@ -11,7 +11,7 @@ The eight packages in `backend-integration.json` run one at a time, using Go
 `-p=1`, and `-parallel=1`. Individual tests still exercise their intended
 concurrency. `go vet` runs for each package even if that package's tests fail.
 
-The contract names **53 mandatory integration top-level tests**. Missing or
+The contract names **54 mandatory integration top-level tests**. Missing or
 skipped mandatory tests, skipped descendants, malformed/empty JSON, race/test
 failures, timeouts, and vet failures all reject the job. Other skipped tests are
 listed and counted as skips, never as integration passes.
@@ -24,7 +24,7 @@ listed and counted as skips, never as integration passes.
 | `pkg/common/db/mongotx` | 1 | Request-specific transaction context, cancellation, rollback and concurrency |
 | `internal/api` | 6 | In-process HTTP with real live-token Redis status, owner rejection, booking and service proofs |
 | `pkg/common/db/controller` | 8 | Real message deletion/visibility/receipts/identity with Mongo and Redis |
-| `pkg/common/db/mgo` | 11 | Random isolated DBs for commands, membership, bootstrap, proof/CAS, nickname indexes and owner metadata including atomic same-owner/foreign CAS and unknown-owner history |
+| `pkg/common/db/mgo` | 12 | Random isolated DBs for commands, membership, bootstrap, proof/CAS, nickname indexes and owner metadata including atomic same-owner/foreign CAS, unknown-owner history and authoritative exact group-member permission reads |
 | `pkg/common/db/cache` | 3 | Version allocation, exact token revocation and monotonic int64 owner/global floors |
 
 These are existing tests and assertions. No product source or assertion is

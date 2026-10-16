@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "candidateManifestSHA256": "bb0e3bb5ef1e40980c3ee7381ecff4d9e6fc048d5812caa57e0fbb3b46e30dde",
+  "current": [
+    {
+      "path": "server/internal/rpc/group/group.go",
+      "bytes": 55005,
+      "sha256": "37a505dec983125f8135148938cbf662e4b410b5a5995897087fa12fd2aeff21"
+    },
+    {
+      "path": "server/internal/rpc/group/member_edit_authorization.go",
+      "bytes": 4851,
+      "sha256": "c0867ec3ee3d0e1665077d7d2037ac067589e038521a5965af1f7c1fe1768eea"
+    },
+    {
+      "path": "server/internal/rpc/group/member_edit_authorization_test.go",
+      "bytes": 15754,
+      "sha256": "b0b7689a286c0467acbf5e049dca4d5c2551c9626dd7ccb3ab7a11a2c90825c2"
+    },
+    {
+      "path": "server/pkg/common/db/controller/group.go",
+      "bytes": 18429,
+      "sha256": "4ca6027eff14e4e3ad8136b65d4a961aef84aec9073d3b64927c62835939cae6"
+    },
+    {
+      "path": "server/pkg/common/db/controller/group_member_permission_test.go",
+      "bytes": 1604,
+      "sha256": "15d4e2287a00b0a25d6322868c10fbc524edc4ec9e2dab6df5e4422b229ac9cd"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/group_member.go",
+      "bytes": 6521,
+      "sha256": "9e63cb6f97004ac77af3f6654d5a2b920c447ad5ecececa4541c88be68e4c57a"
+    },
+    {
+      "path": "server/pkg/common/db/mgo/group_member_permission_test.go",
+      "bytes": 2407,
+      "sha256": "11402395d32c9f8fa023fc73140d149156853bff5ccaa138320967ac07105e83"
+    },
+    {
+      "path": "server/pkg/common/db/table/relation/group_member.go",
+      "bytes": 3095,
+      "sha256": "681419f0dbba1dfd38765f5a1c203aeea9011da43375d37347492b8a07d23767"
+    }
+  ],
+  "before": {
+    "path": "ci/candidates/group-member-role/before/group.go",
+    "bytes": 57285,
+    "sha256": "22c984a8b031d72dc9381c597dc90d74957a8784be0a496cb6bb9f46e2af1efe"
+  },
+  "before_context": "Fresh after checkout with exactly old group.go restored. New direct permission DAO/helper definitions are unused by original RPC entry and retained to compile shared fixtures; original writer and notification tail preserved.",
+  "shared": {
+    "run_regex": "^(TestSetGroupMemberInfoRejectsOrdinaryRoleElevation|TestSetGroupMemberInfoPreservesLegitimateWriteAdmission|TestSetGroupMemberInfoUsesAuthoritativeRoles|TestSetGroupMemberInfoCallbackCannotElevateOrdinary|TestSetGroupMemberInfoRechecksRolesAfterCallback|TestSetGroupMemberInfoCallbackPreservesLegalBodyChanges)$",
+    "expected_failing_assertion_leaves": [
+      "TestSetGroupMemberInfoRejectsOrdinaryRoleElevation/role-only",
+      "TestSetGroupMemberInfoRejectsOrdinaryRoleElevation/with-nickname",
+      "TestSetGroupMemberInfoRejectsOrdinaryRoleElevation/batch-with-valid-other-group",
+      "TestSetGroupMemberInfoUsesAuthoritativeRoles",
+      "TestSetGroupMemberInfoCallbackCannotElevateOrdinary",
+      "TestSetGroupMemberInfoRechecksRolesAfterCallback/owner-demoted",
+      "TestSetGroupMemberInfoRechecksRolesAfterCallback/actor-left",
+      "TestSetGroupMemberInfoRechecksRolesAfterCallback/target-became-owner"
+    ],
+    "mandatory_positive_controls": [
+      "TestSetGroupMemberInfoPreservesLegitimateWriteAdmission",
+      "TestSetGroupMemberInfoCallbackPreservesLegalBodyChanges"
+    ]
+  }
+}

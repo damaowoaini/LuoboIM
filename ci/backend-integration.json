@@ -103,7 +103,8 @@
         "TestMongoGroupMemberExactSearchUsesEqualityIndexesOnSyntheticGroup",
         "TestObjectAliasPersistsOwnerAndHash",
         "TestObjectMetadataSameOwnerConcurrentUpsertAndForeignCAS",
-        "TestObjectMetadataUnknownLegacyOwnerRemainsReadOnly"
+        "TestObjectMetadataUnknownLegacyOwnerRemainsReadOnly",
+        "TestMongoGroupMemberPermissionReadIsExactAndFresh"
       ]
     },
     {

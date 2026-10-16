@@ -44,6 +44,7 @@ type GroupMemberModelInterface interface {
 	UpdateRoleLevel(ctx context.Context, groupID string, userID string, roleLevel int32) error
 	FindMemberUserID(ctx context.Context, groupID string) (userIDs []string, err error)
 	Take(ctx context.Context, groupID string, userID string) (groupMember *GroupMemberModel, err error)
+	FindForPermission(ctx context.Context, groupID string, userIDs []string) ([]*GroupMemberModel, error)
 	TakeOwner(ctx context.Context, groupID string) (groupMember *GroupMemberModel, err error)
 	SearchMember(ctx context.Context, keyword string, groupID string, pagination pagination.Pagination) (total int64, groupList []*GroupMemberModel, err error)
 	SearchMemberExact(ctx context.Context, groupID, keyword string, pagination pagination.Pagination) (int64, []*GroupMemberModel, error)

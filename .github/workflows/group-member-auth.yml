@@ -1,0 +1,62 @@
+name: Group member authorization regression
+
+on:
+  push:
+    paths:
+      - 'server/**'
+      - 'ci/group-member-auth*'
+      - 'ci/candidates/group-member-role/**'
+      - 'ci/secret_scan.py'
+      - '.github/workflows/group-member-auth.yml'
+  pull_request:
+    paths:
+      - 'server/**'
+      - 'ci/group-member-auth*'
+      - 'ci/candidates/group-member-role/**'
+      - 'ci/secret_scan.py'
+      - '.github/workflows/group-member-auth.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    name: ${{ matrix.stage }} / real RPC entry and authoritative permission reads
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        stage: [before, after]
+    env:
+      GOWORK: 'off'
+      GOTOOLCHAIN: local
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 2GiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check upload safety before disposable config
+        run: python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache-dependency-path: |
+            server/go.sum
+            server/pkg/protocol/go.sum
+      - name: Verify source pins and run isolated regression
+        run: python3 -B ci/group-member-auth-ci.py --stage '${{ matrix.stage }}'
+      - name: Preserve complete actual JSON and diagnostics
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: group-member-auth-${{ matrix.stage }}-${{ github.run_id }}
+          path: ci-results/group-member-auth-${{ matrix.stage }}/
+          if-no-files-found: warn
+          retention-days: 14

@@ -16,6 +16,7 @@ package mgo
 
 import (
 	"context"
+	"github.com/OpenIMSDK/tools/errs"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/grouphistory"
 	"time"
 
@@ -100,6 +101,20 @@ func (g *GroupMemberMgo) UpdateRoleLevel(ctx context.Context, groupID string, us
 
 func (g *GroupMemberMgo) Update(ctx context.Context, groupID string, userID string, data map[string]any) (err error) {
 	return mgoutil.UpdateOne(ctx, g.coll, bson.M{"group_id": groupID, "user_id": userID}, bson.M{"$set": data}, true)
+}
+
+// FindForPermission is a bounded exact identity read, independent of member caches.
+// An empty ID set must never degrade into a whole-group authorization query.
+func (g *GroupMemberMgo) FindForPermission(ctx context.Context, groupID string, userIDs []string) ([]*relation.GroupMemberModel, error) {
+	if groupID == "" || len(userIDs) == 0 {
+		return nil, errs.ErrArgs.Wrap("group and member IDs are required")
+	}
+	for _, id := range userIDs {
+		if id == "" {
+			return nil, errs.ErrArgs.Wrap("member ID is required")
+		}
+	}
+	return mgoutil.Find[*relation.GroupMemberModel](ctx, g.coll, bson.M{"group_id": groupID, "user_id": bson.M{"$in": userIDs}})
 }
 
 func (g *GroupMemberMgo) Find(ctx context.Context, groupIDs []string, userIDs []string, roleLevels []int32) (groupMembers []*relation.GroupMemberModel, err error) {

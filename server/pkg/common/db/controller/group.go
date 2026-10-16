@@ -41,7 +41,8 @@ type GroupDatabase interface {
 
 	TakeGroupMember(ctx context.Context, groupID string, userID string) (groupMember *relationtb.GroupMemberModel, err error)
 	TakeGroupOwner(ctx context.Context, groupID string) (*relationtb.GroupMemberModel, error)
-	FindGroupMembers(ctx context.Context, groupID string, userIDs []string) (groupMembers []*relationtb.GroupMemberModel, err error)            // *
+	FindGroupMembers(ctx context.Context, groupID string, userIDs []string) (groupMembers []*relationtb.GroupMemberModel, err error) // *
+	FindGroupMembersForPermission(ctx context.Context, groupID string, userIDs []string) ([]*relationtb.GroupMemberModel, error)
 	FindGroupMemberUser(ctx context.Context, groupIDs []string, userID string) (groupMembers []*relationtb.GroupMemberModel, err error)         // *
 	FindGroupMemberRoleLevels(ctx context.Context, groupID string, roleLevels []int32) (groupMembers []*relationtb.GroupMemberModel, err error) // *
 	FindGroupMemberAll(ctx context.Context, groupID string) (groupMembers []*relationtb.GroupMemberModel, err error)                            // *
@@ -106,6 +107,11 @@ type groupDatabase struct {
 
 func (g *groupDatabase) FindGroupMembers(ctx context.Context, groupID string, userIDs []string) ([]*relationtb.GroupMemberModel, error) {
 	return g.cache.GetGroupMembersInfo(ctx, groupID, userIDs)
+}
+
+// FindGroupMembersForPermission bypasses profile/member caches for authorization.
+func (g *groupDatabase) FindGroupMembersForPermission(ctx context.Context, groupID string, userIDs []string) ([]*relationtb.GroupMemberModel, error) {
+	return g.groupMemberDB.FindForPermission(ctx, groupID, userIDs)
 }
 
 func (g *groupDatabase) FindGroupMemberUser(ctx context.Context, groupIDs []string, userID string) ([]*relationtb.GroupMemberModel, error) {

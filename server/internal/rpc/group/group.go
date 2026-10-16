@@ -1406,99 +1406,31 @@ func (s *groupServer) CancelMuteGroup(ctx context.Context, req *pbgroup.CancelMu
 
 func (s *groupServer) SetGroupMemberInfo(ctx context.Context, req *pbgroup.SetGroupMemberInfoReq) (*pbgroup.SetGroupMemberInfoResp, error) {
 	resp := &pbgroup.SetGroupMemberInfoResp{}
-	if len(req.Members) == 0 {
-		return nil, errs.ErrArgs.Wrap("members empty")
+	identity, err := captureGroupMemberEdit(ctx, req)
+	if err != nil {
+		return nil, err
 	}
-	opUserID := mcontext.GetOpUserID(ctx)
-	if opUserID == "" {
-		return nil, errs.ErrNoPermission.Wrap("no op user id")
+	for _, member := range req.Members {
+		member.FaceURL = nil
 	}
-	isAppManagerUid := authverify.IsAppManagerUid(ctx)
-	for i := range req.Members {
-		req.Members[i].FaceURL = nil
+	if err := s.authorizeGroupMemberEdits(ctx, req); err != nil {
+		return nil, err
 	}
-	groupMembers := make(map[string][]*pbgroup.SetGroupMemberInfo)
-	for i, member := range req.Members {
-		if member.RoleLevel != nil {
-			switch member.RoleLevel.Value {
-			case constant.GroupOwner:
-				return nil, errs.ErrNoPermission.Wrap("cannot set ungroup owner")
-			case constant.GroupAdmin, constant.GroupOrdinaryUsers:
-			default:
-				return nil, errs.ErrArgs.Wrap("invalid role level")
-			}
-		}
-		groupMembers[member.GroupID] = append(groupMembers[member.GroupID], req.Members[i])
-	}
-	for groupID, members := range groupMembers {
-		temp := make(map[string]struct{})
-		userIDs := make([]string, 0, len(members)+1)
-		for _, member := range members {
-			if _, ok := temp[member.UserID]; ok {
-				return nil, errs.ErrArgs.Wrap(fmt.Sprintf("repeat group %s user %s", member.GroupID, member.UserID))
-			}
-			temp[member.UserID] = struct{}{}
-			userIDs = append(userIDs, member.UserID)
-		}
-		if _, ok := temp[opUserID]; !ok {
-			userIDs = append(userIDs, opUserID)
-		}
-		dbMembers, err := s.db.FindGroupMembers(ctx, groupID, userIDs)
-		if err != nil {
+	for _, member := range req.Members {
+		if err := CallbackBeforeSetGroupMemberInfo(ctx, member); err != nil {
 			return nil, err
 		}
-		opUserIndex := -1
-		for i, member := range dbMembers {
-			if member.UserID == opUserID {
-				opUserIndex = i
-				break
-			}
-		}
-		switch len(userIDs) - len(dbMembers) {
-		case 0:
-			if !isAppManagerUid {
-				roleLevel := dbMembers[opUserIndex].RoleLevel
-				if roleLevel != constant.GroupOwner {
-					switch roleLevel {
-					case constant.GroupAdmin:
-						for _, member := range dbMembers {
-							if member.RoleLevel == constant.GroupOwner {
-								return nil, errs.ErrNoPermission.Wrap("admin can not change group owner")
-							}
-							if member.RoleLevel == constant.GroupAdmin && member.UserID != opUserID {
-								return nil, errs.ErrNoPermission.Wrap("admin can not change other group admin")
-							}
-						}
-					case constant.GroupOrdinaryUsers:
-						for _, member := range dbMembers {
-							if !(member.RoleLevel == constant.GroupOrdinaryUsers && member.UserID == opUserID) {
-								return nil, errs.ErrNoPermission.Wrap("ordinary users can not change other role level")
-							}
-						}
-					default:
-						for _, member := range dbMembers {
-							if member.RoleLevel >= roleLevel {
-								return nil, errs.ErrNoPermission.Wrap("can not change higher role level")
-							}
-						}
-					}
-				}
-			}
-		case 1:
-			if opUserIndex >= 0 {
-				return nil, errs.ErrArgs.Wrap("user not in group")
-			}
-			if !isAppManagerUid {
-				return nil, errs.ErrNoPermission.Wrap("user not in group")
-			}
-		default:
-			return nil, errs.ErrArgs.Wrap("user not in group")
-		}
 	}
-	for i := 0; i < len(req.Members); i++ {
-		if err := CallbackBeforeSetGroupMemberInfo(ctx, req.Members[i]); err != nil {
-			return nil, err
-		}
+	if err := identity.check(ctx, req); err != nil {
+		return nil, err
+	}
+	// Callbacks may change editable fields. Re-read authority and validate the
+	// final role values before admitting any write in this batch.
+	if err := s.authorizeGroupMemberEdits(ctx, req); err != nil {
+		return nil, err
+	}
+	if err := identity.check(ctx, req); err != nil {
+		return nil, err
 	}
 	if err := s.db.UpdateGroupMembers(ctx, utils.Slice(req.Members, func(e *pbgroup.SetGroupMemberInfo) *relationtb.BatchUpdateGroupMember {
 		return &relationtb.BatchUpdateGroupMember{

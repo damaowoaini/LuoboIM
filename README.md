@@ -21,12 +21,12 @@
 
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 在 push、PR 或手动触发时执行，保留成功和失败的日志、测试报告及可下载的 Web 构建。
 
-- Web：完整测试、严格类型检查、桌面类型检查、Vite 构建，以及隔离的群设置候选 before/after 回归。见 [Web CI](ci/README.web-ci.md)。
+- Web：完整测试、严格类型检查、桌面类型检查、Vite 构建，以及隔离的群设置、编辑草稿 before/after 回归。见 [Web CI](ci/README.web-ci.md)。
 - Admin：锁定依赖安装、Max setup、核心测试、类型检查和后台构建。见 [后台 CI](ci/README.admin-ci.md)。
 - Mobile：两个独立 Linux 任务分别验证当前 548 项测试，以及预约/自定义消息候选 73 项后运行完整 621 项；同时执行 analyze。见 [移动端 CI](ci/mobile/README.md)。这些数字是固定基线和验收要求，实际是否通过以对应 Actions 结果为准。
-- Backend：`server`、`chart`、`route` 分别执行 Go race 测试和 vet。依赖实际数据库或外部服务的跳过项会单列，不能计为集成验证通过。
+- Backend：`server`、`chart`、`route` 分别执行 Go race 测试和 vet。另有一次性 Mongo 副本集与 Redis 集成任务，强制执行 54 项事务、资源归属、会话与服务凭证用例；任意必跑项跳过或清理门禁失败都会使任务失败。见 [后端集成 CI](ci/backend-integration.README.md)。其他跳过项单列，不能计为集成验证通过。
 
-候选保存在 `ci/`，通过隔离覆盖验证，不直接改写当前产品源码。云端结果不等于真机、多端媒体或线上部署验收。
+`ci/` 保留隔离候选及已采用修改的历史 before/after。CI 只验证，不自动切换产品源码或运行服务。云端结果不等于真机、多端媒体或线上部署验收。
 
 ## 配置与发布范围
 
