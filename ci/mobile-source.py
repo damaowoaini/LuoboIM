@@ -2,8 +2,8 @@
 """Verify minimal pinned source; optionally copy it to a new CI-only tree.
 
 No local task archive, mutable reference directory, native SDK binary or old
-generated cache is an input. Current294 must already be adopted in the checkout.
-The optional reference is full294 with exactly four pinned historical search baseline files.
+generated cache is an input. Current304 must already be adopted in the checkout.
+The optional reference is full304 with exactly four pinned historical search baseline files.
 """
 import argparse
 import hashlib
@@ -54,17 +54,17 @@ def source_digest(files):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v8'
-            or plan['current294']['members'] != 294
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v9'
+            or plan['current304']['members'] != 304
             or plan['sdk_portable']['members'] != 51
-            or plan['portable_members'] != {'current294': 346}
-            or plan['current294']['expected_target_tests'] != 184
-            or plan['current294']['expected_full_tests'] != 872
-            or plan['current294']['target_paths'] != ['test/features/qr', 'test/features/search', 'test/features/group/create_group_entry_test.dart', 'test/features/group/create_group_repository_test.dart', 'test/features/group/create_group_workflow_test.dart', 'test/features/group/group_creation_entry_test.dart', 'test/features/group/group_creation_entry_workflow_test.dart', 'test/features/group/chat_cid_route_test.dart', 'test/features/conversation/contact_shortcuts_test.dart']
-            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292'))):
-        raise ValueError('current294 schema v8 inventory differs; no historical aliases')
+            or plan['portable_members'] != {'current304': 356}
+            or plan['current304']['expected_target_tests'] != 234
+            or plan['current304']['expected_full_tests'] != 922
+            or plan['current304']['target_paths'] != ['test/features/qr', 'test/features/search', 'test/features/group/create_group_entry_test.dart', 'test/features/group/create_group_repository_test.dart', 'test/features/group/create_group_workflow_test.dart', 'test/features/group/group_creation_entry_test.dart', 'test/features/group/group_creation_entry_workflow_test.dart', 'test/features/group/chat_cid_route_test.dart', 'test/features/conversation/contact_shortcuts_test.dart', 'test/features/rtc/call_records_repository_test.dart', 'test/features/rtc/call_history_pipeline_test.dart', 'test/features/rtc/call_records_page_test.dart', 'test/features/rtc/call_history_lifetime_test.dart']
+            or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294'))):
+        raise ValueError('current304 schema v9 inventory differs; no historical aliases')
     reference = plan['reference_entry']
-    if (reference['working_cohort'] != 'current294' or reference['members'] != 294
+    if (reference['working_cohort'] != 'current304' or reference['members'] != 304
             or reference['default_enabled'] is not False
             or len(reference['replacement_files']) != 4
             or len({row['path'] for row in reference['replacement_files']}) != 4
@@ -72,22 +72,22 @@ def descriptor():
             or reference['expected_visible_tests'] != 2
             or reference['expected_assertion_failures'] != 1
             or reference['expected_passed'] != 1 or reference['expected_child_exit'] != 1):
-        raise ValueError('reference entry must be the explicit two-test full294 variant')
+        raise ValueError('reference entry must be the explicit two-test full304 variant')
     return plan
 
 
 def load_sources(cohort):
-    if cohort != 'current294':
-        raise ValueError('schema v8 supports current294 only; historical cohorts are not aliases')
+    if cohort != 'current304':
+        raise ValueError('schema v9 supports current304 only; historical cohorts are not aliases')
     plan = descriptor()
     selected = {}
-    for row in plan['current294']['files']:
+    for row in plan['current304']['files']:
         name = row['path']
         if name in selected or not name.startswith('app/'):
             raise ValueError('duplicate or out-of-scope current source')
         selected[name] = check(regular(REPO / safe_name(name)), row)
-    if len(selected) != 294 or source_digest(selected) != plan['current294']['source_digest']:
-        raise ValueError('current294 aggregate differs')
+    if len(selected) != 304 or source_digest(selected) != plan['current304']['source_digest']:
+        raise ValueError('current304 aggregate differs')
     actual = set()
     for prefix in ('app/lib', 'app/test', 'app/tool'):
         for directory, dirs, names in os.walk(REPO / prefix, followlinks=False):
@@ -117,7 +117,7 @@ def load_sources(cohort):
 
 
 def reference_sources(plan, files):
-    """Full346 portable closure; only the four named App source bodies differ."""
+    """Full356 portable closure; only the four named App source bodies differ."""
     result = dict(files)
     baseline = plan['reference_entry']
     for row in baseline['replacement_files']:
@@ -126,8 +126,8 @@ def reference_sources(plan, files):
             raise ValueError('reference replacement outside original production files')
         result[name] = check(regular(REPO / baseline['baseline_prefix'] / name), row)
     authored = {name: body for name, body in result.items() if name.startswith('app/')}
-    if len(authored) != 294 or source_digest(authored) != baseline['reference_source_digest']:
-        raise ValueError('reference is not the exact full294 variant')
+    if len(authored) != 304 or source_digest(authored) != baseline['reference_source_digest']:
+        raise ValueError('reference is not the exact full304 variant')
     return result
 
 
@@ -137,19 +137,46 @@ def required_names(plan):
     if item['path'] != 'ci/mobile/required-test-names.json':
         raise ValueError('required test names path differs')
     value = json.loads(check(regular(REPO / safe_name(item['path'])), item))
-    if value['schema'] != 'luobo.mobile.required-successful-names.v4' or value['cohort'] != 'current294':
+    if value['schema'] != 'luobo.mobile.required-successful-names.v5' or value['cohort'] != 'current304':
         raise ValueError('required test names identity differs')
-    for key, expected in [('parent_full854', 854), ('new_shortcuts18', 18), ('current_target184', 184)]:
+    for key, expected in [('parent_full872', 872), ('new_call_records50', 50), ('current_target234', 234)]:
         rows = value[key]
         if (not isinstance(rows, list) or len({r['name'] for r in rows}) != len(rows)
                 or any(not isinstance(r['name'], str) or not r['name']
                        or type(r['count']) is not int or r['count'] < 1 for r in rows)
                 or sum(r['count'] for r in rows) != expected):
             raise ValueError('required names inventory differs: ' + key)
-    value['current_full872'] = value['parent_full854'] + value['new_shortcuts18']
-    if len({r['name'] for r in value['current_full872']}) != len(value['current_full872']):
+    value['current_full922'] = value['parent_full872'] + value['new_call_records50']
+    if len({r['name'] for r in value['current_full922']}) != len(value['current_full922']):
         raise ValueError('new names overlap parent names')
+    cleanup_contract(plan, value)
     return value
+
+
+def cleanup_contract(plan, names):
+    contract = plan['call_records_cleanup']
+    fixtures = contract['named_fixtures']
+    repository = contract['repository_awaited_teardown_names']
+    fixture_names = {row['name'] for row in fixtures}
+    new_names = {row['name'] for row in names['new_call_records50']}
+    normal = ['recorder.begin', 'recorder.end', 'sdk.begin', 'sdk.end', 'storage.end']
+    patterns = {'unit': normal, 'page': normal + ['unmount.begin', 'unmount.end'],
+                'expected_close_failure': ['recorder.begin', 'sdk.begin', 'sdk.end', 'storage.end']}
+    if (contract['expected_fixture_instances'] != 35
+            or contract['expected_successful_recorder_closes'] != 33
+            or contract['expected_intentional_close_failures'] != 2
+            or contract['expected_page_unmounts'] != 14
+            or len(fixtures) != 35 or len(fixture_names) != 35 or len(repository) != 15
+            or len(set(repository)) != 15 or fixture_names & set(repository)
+            or fixture_names | set(repository) != new_names
+            or sum(row['kind'] == 'page' for row in fixtures) != 14
+            or sum(row['kind'] == 'expected_close_failure' for row in fixtures) != 2
+            or any(row['kind'] not in patterns or row['markers'] != patterns[row['kind']] for row in fixtures)
+            or contract['parent_creation_instances'] != 76
+            or contract['parent_creation_markers'] != ['release.begin', 'native.drained', 'sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end']
+            or contract['parent_safe_exit_markers'] != ['create.entered', 'signout.begin', 'signout.end', 'route.removed', 'create.released', 'create.returned']):
+        raise ValueError('call records cleanup source contract differs')
+    return contract
 
 
 def materialize(output, cohort):
@@ -178,7 +205,7 @@ def materialize(output, cohort):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--cohort', choices=('current294',), required=True)
+    p.add_argument('--cohort', choices=('current304',), required=True)
     p.add_argument('--output', type=Path, help='explicit fresh output; omitted means readonly')
     args = p.parse_args()
     if args.output:

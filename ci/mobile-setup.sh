@@ -5,7 +5,7 @@ set -euo pipefail
 cohort=$1
 work=$2
 repo=$(cd -- "$(dirname -- "$0")/.." && pwd -P)
-[[ "$cohort" == current294 ]]
+[[ "$cohort" == current304 ]]
 [[ "$work" == /* && ! -e "$work" && ! -L "$work" ]]
 umask 077
 mkdir -- "$work"

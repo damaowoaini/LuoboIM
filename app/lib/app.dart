@@ -44,6 +44,7 @@ import 'features/favorite/presentation/favorite_detail_page.dart';
 import 'features/favorite/presentation/favorite_categories_page.dart';
 import 'features/favorite/presentation/favorite_stats_page.dart';
 import 'features/rtc/presentation/rtc_page.dart';
+import 'features/rtc/presentation/call_records_page.dart';
 import 'providers.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -83,7 +84,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                   path.startsWith('/favorites/') ||
                   path == '/moments' ||
                   path.startsWith('/moments/') ||
-                  path == '/rtc'
+                  path == '/rtc' || path == '/calls'
               ? null
               : '/home',
       };
@@ -114,6 +115,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(path: '/rtc', builder: (_, _) => const RtcPage()),
+      GoRoute(path: '/calls', builder: (_, _) => const CallRecordsPage()),
       GoRoute(path: '/meetings', builder: (_, _) => const MeetingsPage()),
       GoRoute(path: '/meetings/bookings', builder: (_, _) => const BookingsPage()),
       GoRoute(path: '/meetings/bookings/new', builder: (_, _) => const BookingEditorPage()),

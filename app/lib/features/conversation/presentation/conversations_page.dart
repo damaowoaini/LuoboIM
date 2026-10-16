@@ -96,10 +96,10 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
       return;
     }
     final allowed = !ticket.retired && _lookupCurrent(ticket) &&
-        const ['user', 'group'].contains(choice.kind);
+        const ['user', 'group', 'calls'].contains(choice.kind);
     _lookupClosed(ticket);
     if (!allowed) return;
-    context.push('/contacts/search?kind=${choice.kind}');
+    context.push(choice.kind == 'calls' ? '/calls' : '/contacts/search?kind=${choice.kind}');
   }
 
   void _changed() {
@@ -205,6 +205,9 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
                     onCovered: () => _lookupCovered(ticket),
                     onClosed: () => _lookupClosed(ticket),
                     child: const Text('搜索加群'))),
+                PopupMenuItem<Object>(value: _LookupShortcutChoice('calls', ticket.id), height: 48,
+                  child: _LookupMenuGuard(onCovered: () => _lookupCovered(ticket),
+                    onClosed: () => _lookupClosed(ticket), child: const Text('通话记录'))),
                 const PopupMenuItem<Object>(value: 'meetings', child: Text('会议（预约与管理）')),
                 const PopupMenuItem<Object>(value: 'logout', child: Text('退出登录')),
               ];

@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v8",
-  "state": "current294_shortcuts_r1_proposed_not_run",
+  "schema": "luobo.mobile.portable-ci-inputs.v9",
+  "state": "current304_call_records_r1_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI + frozen call-records-r1 selected14 (4replacement,10new); no generation in CI",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -42,7 +42,8 @@
     "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd",
     "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257",
     "inbox_contact_shortcuts_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f",
-    "inbox_contact_shortcuts_r1_manifest_sha256": "f1aa575372ec3b4686d7c966ce969f96257b5d43874d80b15acc0aac1068c63c"
+    "inbox_contact_shortcuts_r1_manifest_sha256": "f1aa575372ec3b4686d7c966ce969f96257b5d43874d80b15acc0aac1068c63c",
+    "call_records_r1_manifest_sha256": "4f4a31bc0120bf13da2e802adbf7c29189624b4e0d2b372787e1fd88d5837aad"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -318,10 +319,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current294": 346
+    "current304": 356
   },
   "portable_digests": {
-    "current294": "7c96e8e85434447e646f06a8f5168e467387a30a0d0a3aee98dbbf6db17f9e75"
+    "current304": "7dff106424f89768faff073dfb72d569cb54839cb7b01f30b0f9ecfbd866bb66"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -355,7 +356,7 @@
       "actual_run": 38852506276,
       "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
     },
-    "reproduction": "Historical cohorts require immutable commits/inputs. v7 supports only current292. Optional original search reference keeps4 historicalbefore and1missingentryASSERTFAIL+1oldfilterPASS; no groupentrybefore2 phase is added.",
+    "reproduction": "v9 supports only current304. Historicalcohorts require immutablecommits/inputs. Originaloptional searchreference retains4before and1missingentryASSERTFAIL+1oldfilterPASS;callrecordsbeforeentry1 remains preparedonly,not defaultphase.",
     "accepted_current257": {
       "git_commit": "314ac55",
       "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
@@ -630,14 +631,22 @@
       "input_manifest_sha256": "218dc544a3ca967712ff23c930206ab53041ee8195a4f4a5367faa844767072a",
       "actual": "target166+17hidden/full854+113hidden PASS/truefooters0error0skip;allold822+29+3 namesexact;58sixmarkercleanup+safeexit6each;0hitTest/overflow;strictanalyze0;3phasechild0;0latchedgate",
       "root_review": "pending independentRootreceipt at thisdraftfreeze; no shortcutapply authorized by thisrecord"
+    },
+    "accepted_current294": {
+      "commit": "a2e59b08b125dd67e05c8cdf877235daf1933431",
+      "run": 38893402709,
+      "source_digest": "53e836c51aaebabb9f1f064344e6d0e26f384a14ccc4837911cb33584aeeb19c",
+      "portable_digest": "7c96e8e85434447e646f06a8f5168e467387a30a0d0a3aee98dbbf6db17f9e75",
+      "actual": "184/872/strictanalyze0;new18+old854 exact;76sixmarker+safeexit6each;0warnings",
+      "root_acceptance_sha256": "80c0a46710fde0adbe61ad77dcb6598a59f01a9a07d011003736371a55ad6e05"
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current294",
-    "members": 294,
-    "reference_source_digest": "a0790115407e7dfb23fd45b8850fb9ba6813deaf90740192938716b064979b4a",
+    "working_cohort": "current304",
+    "members": 304,
+    "reference_source_digest": "7a7e9e82bf71c45dd6dac930cdb528dcf8a9d08df8f785148cc3a1cde98d8029",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -673,7 +682,8 @@
     "not_a_269_full_or_native_result": true,
     "not_a_287_full_or_native_result": true,
     "not_a_291_full_or_native_result": true,
-    "not_a_292_full_or_native_result": true
+    "not_a_292_full_or_native_result": true,
+    "not_a_294_full_or_native_result": true
   },
   "auxiliary_preserved": [
     {
@@ -697,12 +707,12 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 135222,
-    "sha256": "7191899b7054300afbfdd4ea58497c48bc82af12e5dd568c008205204c53d87e"
+    "bytes": 258838,
+    "sha256": "9c2545d12bf7c3c257c1cacd1fb6a4416c3d5174a4101a8dbc883e693105f6d6"
   },
-  "current294": {
-    "members": 294,
-    "source_digest": "53e836c51aaebabb9f1f064344e6d0e26f384a14ccc4837911cb33584aeeb19c",
+  "current304": {
+    "members": 304,
+    "source_digest": "b801edb96edc607d3c6cfd05f79f9ffae3b3b9dc60375244f6ca67934bae132d",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -711,8 +721,8 @@
       },
       {
         "path": "app/lib/app.dart",
-        "bytes": 20391,
-        "sha256": "421d0445c01e816dee3c1d56a01ef82b91a5aa374d43c87aa11ddb94512b89b6"
+        "bytes": 20545,
+        "sha256": "8ddb2f3333e66e8c1a72d9ed15a3ac41f323cf392372a2a5536ddc886c69915b"
       },
       {
         "path": "app/lib/core/access/access_store.dart",
@@ -1081,8 +1091,8 @@
       },
       {
         "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 20969,
-        "sha256": "42c2041182079d87ed8232f5de0d8d0c74db7b7d280ca193131063457ae335ee"
+        "bytes": 21293,
+        "sha256": "4c950ede45ea4c88753edbe30e02ded18d0a3610454a41a1d561f4b7f14a98e4"
       },
       {
         "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
@@ -1425,6 +1435,11 @@
         "sha256": "bdca644e6233d698e630349772e5a4ee7f1dce563bbd3a946a83059c965d4dea"
       },
       {
+        "path": "app/lib/features/rtc/data/call_records_repository.dart",
+        "bytes": 9273,
+        "sha256": "cf3ed0eb05d18018fd4c14886b8531db13ee3dac16b22580fd185576c33c284b"
+      },
+      {
         "path": "app/lib/features/rtc/data/im_rtc_transport.dart",
         "bytes": 8497,
         "sha256": "7213bef7f58e47601cb051fd4fb36467098f25bf4ed7108ed6911773dc2857e3"
@@ -1440,14 +1455,34 @@
         "sha256": "ce91e6b7f95904d47d7142ce835b0781831b438644a23cd88de46c5b897b2cd5"
       },
       {
+        "path": "app/lib/features/rtc/domain/call_history_recorder.dart",
+        "bytes": 11108,
+        "sha256": "177f74b9d4f09cd279ba269d0d1ed9b105d53d68971a953f3655f924661301cb"
+      },
+      {
+        "path": "app/lib/features/rtc/domain/call_record.dart",
+        "bytes": 7917,
+        "sha256": "1a7acdc73b3827eb3c4fc8ad0e4b0e16b83e220e0eab0e53f4adf05bf8d51a62"
+      },
+      {
         "path": "app/lib/features/rtc/domain/rtc_call.dart",
         "bytes": 2160,
         "sha256": "6fdc3614db594ff8a7ef19c5a98d8cca1083dc27fe7d13e9a2679c951fc2193f"
       },
       {
         "path": "app/lib/features/rtc/domain/rtc_coordinator.dart",
-        "bytes": 13374,
-        "sha256": "ecc91b55d5748df2bcaab5bb5f3566b555b40377279d85b8184dcb7092b4d296"
+        "bytes": 14565,
+        "sha256": "92a4594c85a82088033e247bbc886906e7b32bcef0be26d39a5dca3b4c84acaf"
+      },
+      {
+        "path": "app/lib/features/rtc/presentation/call_records_page.dart",
+        "bytes": 12581,
+        "sha256": "e6b4cfabbd9862b379c911fc471a834100327903676842f3ab7861ebdd237b60"
+      },
+      {
+        "path": "app/lib/features/rtc/presentation/call_records_providers.dart",
+        "bytes": 503,
+        "sha256": "899ecc262df308c2107c52fe75ed94dbc4c243abebcecae4905a2b9221310534"
       },
       {
         "path": "app/lib/features/rtc/presentation/rtc_page.dart",
@@ -1456,8 +1491,8 @@
       },
       {
         "path": "app/lib/features/rtc/presentation/rtc_providers.dart",
-        "bytes": 572,
-        "sha256": "da0041987a21bb432f956a4ef4b94d9558b8c908b59bff53de56267dbcbd14db"
+        "bytes": 663,
+        "sha256": "c2cb7190a54090cdc945c4351bf0239bf1a9c7c87ac14bae6d3c209e8ca8ed95"
       },
       {
         "path": "app/lib/features/search/data/global_search_repository.dart",
@@ -2115,6 +2150,31 @@
         "sha256": "8a945ded02dda58794ef84a68a86fc84fbcca342152b33a26c8b81efbcfc59b3"
       },
       {
+        "path": "app/test/features/rtc/call_history_lifetime_test.dart",
+        "bytes": 5165,
+        "sha256": "072807a5981169271b55a40546dd8322320b82acea529a4858623b5dbb2543a5"
+      },
+      {
+        "path": "app/test/features/rtc/call_history_pipeline_test.dart",
+        "bytes": 15233,
+        "sha256": "7f8ec1849885aa488114a8129b18191b40fbbc1820ebdadd56b7ef833be462ae"
+      },
+      {
+        "path": "app/test/features/rtc/call_records_fixture.dart",
+        "bytes": 9514,
+        "sha256": "b1df7777a54d06412536caf8014120da11229eac14d4391c5ca2ded7f5f39758"
+      },
+      {
+        "path": "app/test/features/rtc/call_records_page_test.dart",
+        "bytes": 17187,
+        "sha256": "87a7b37b670eb7d82077e5abea9f67f0dc5cc1df6ee4b62696058a4eb6e2a601"
+      },
+      {
+        "path": "app/test/features/rtc/call_records_repository_test.dart",
+        "bytes": 11559,
+        "sha256": "3cbb7a91aaccf483ed556c8ce395e30bc912adc3b71fb5ef477218f3d3e201c4"
+      },
+      {
         "path": "app/test/features/rtc/rtc_page_test.dart",
         "bytes": 3821,
         "sha256": "a5f233156cc9db9a3682e61d7b37d35bf3d2a375851ed5471c9b331c03173ddf"
@@ -2175,8 +2235,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 184,
-    "expected_full_tests": 872,
+    "expected_target_tests": 234,
+    "expected_full_tests": 922,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -2186,7 +2246,465 @@
       "test/features/group/group_creation_entry_test.dart",
       "test/features/group/group_creation_entry_workflow_test.dart",
       "test/features/group/chat_cid_route_test.dart",
-      "test/features/conversation/contact_shortcuts_test.dart"
+      "test/features/conversation/contact_shortcuts_test.dart",
+      "test/features/rtc/call_records_repository_test.dart",
+      "test/features/rtc/call_history_pipeline_test.dart",
+      "test/features/rtc/call_records_page_test.dart",
+      "test/features/rtc/call_history_lifetime_test.dart"
     ]
+  },
+  "call_records_cleanup": {
+    "named_fixtures": [
+      {
+        "name": "actual provider and native signaling codec feed the owner SQLite recorder without opening its page",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "actual outgoing coordinator lifecycle persists a terminal call and monotonic duration across wall clock rollback",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "only a genuine incoming remote cancellation before acceptance appears in missed",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "actual incoming ring timer freezes a known missed outcome rather than a cold-start guess",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "manual incoming decline is explicit and is never classified as missed",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "outgoing cancellation and locally denied permissions stay in all without inventing missed calls",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "incoming permission failure and other-device handling are explicit non-missed outcomes",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "same-room duplicate invitation does not terminate the active record while a different room records busy separately",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "accepted incoming media completion and duplicate remote endings create exactly one terminal record",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "transport errors retain an uncertain result instead of fabricating a remote refusal",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "unaddressed expired and group invitations do not become legacy single-call history",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "logout seals old events before delayed permissions return and cold provisional remains unknown",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "stable recorder creates a fresh exact owner binding after actor login replacement",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "stable recorder creates a fresh exact owner binding after issuer login replacement",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "stable recorder creates a fresh exact owner binding after tenant login replacement",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "close awaits already frozen SQLite events after owner sealing and does not publish old completion to a new owner",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "persistence retry reuses frozen local events without repeating native dialing",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "an undrained storage failure is observable from awaited close rather than an unhandled provider future",
+        "kind": "expected_close_failure",
+        "markers": [
+          "recorder.begin",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "production inbox more menu reaches actual durable call history and back retains the inbox",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "all and missed tabs render distinct actual coordinator outcomes with stable peer identity",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "storage read error is not presented as empty and only explicit retry recovers",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "new durable RTC events mark a loaded snapshot stale and explicit refresh reads the new record",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "cancelled delete preserves its row while confirmed delete is durable and never hangs up a call",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "real history audio redial dispatches the exact stored peer through RtcCoordinator once",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "real history video redial dispatches the exact stored peer through RtcCoordinator once",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "busy changes while the owned redial sheet is open stop a second native call",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "a saved old row callback after foreign route ABA cannot renew its view ticket while a new click works",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "foreign coverage of an owned redial sheet retires its sensitive content and does not revive the old choice",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "owner replacement removes old confirmation details and its retained delete callback cannot affect either owner",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "deleting an active record does not hang up and its later real terminal event cannot resurrect it",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "leaving during a delayed initial SQLite open cannot publish old rows or errors into the inbox",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "call history and owned actions remain scrollable and accessible at 320 by 568 with large text",
+        "kind": "page",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "successfully retired owners do not accumulate across repeated real logins and the new pipeline stays writable",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "sealing releases the old credential reference before a blocked original SQLite queue finishes draining",
+        "kind": "unit",
+        "markers": [
+          "recorder.begin",
+          "recorder.end",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      },
+      {
+        "name": "failed retirement keeps only an observable generic failure while a replacement owner records normally",
+        "kind": "expected_close_failure",
+        "markers": [
+          "recorder.begin",
+          "sdk.begin",
+          "sdk.end",
+          "storage.end"
+        ]
+      }
+    ],
+    "repository_awaited_teardown_names": [
+      "attempt connected and terminal events survive a real SQLite close and reopen",
+      "durable delete tombstone blocks already queued connected and terminal events after reopen",
+      "first terminal rejects both older and forged higher connected revisions",
+      "same room with a conflicting inviter cannot create a second history row",
+      "remote initiation time is part of an immutable claim rather than a second room identity",
+      "two account SQLite files with the same peer and room remain separate",
+      "stable admission sequence pages all records without relying on end dates",
+      "a provisional to missed transition invalidates an old filter cursor instead of losing a page",
+      "insert and delete changes reject existing pagination cursors",
+      "cursor ownership filter and limits are validated before reading the database",
+      "a retired UI delete transaction rolls back and preserves the visible record",
+      "read failure is an explicit storage error and a later explicit retry can recover",
+      "a reopened writer offsets revisions and keeps known connection facts and original sequence",
+      "safe avatar storage drops signed credentials and rejects excessive identity data",
+      "database ownership metadata refuses opening another account file under a new account key"
+    ],
+    "expected_fixture_instances": 35,
+    "expected_successful_recorder_closes": 33,
+    "expected_intentional_close_failures": 2,
+    "expected_page_unmounts": 14,
+    "parent_creation_instances": 76,
+    "parent_creation_markers": [
+      "release.begin",
+      "native.drained",
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ],
+    "parent_safe_exit_markers": [
+      "create.entered",
+      "signout.begin",
+      "signout.end",
+      "route.removed",
+      "create.released",
+      "create.returned"
+    ],
+    "meaning": "Source enumeration;future raw validation per visible testID/name.15SQLite tests have realframework-awaited teardown,not syntheticcloseprints.76oldcreation instances are independent parentacceptedR1raw count;not guessed100."
   }
 }

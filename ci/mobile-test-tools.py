@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current294 target184/full872."""
+"""Pure Python CI gate checks, separate from current304 target234/full922."""
 import copy
 import importlib.util
 import json
@@ -134,13 +134,13 @@ class DescriptorTests(unittest.TestCase):
         with mock.patch.object(check.source, 'regular', return_value=json.dumps(plan).encode()):
             with self.assertRaises(ValueError): check.source.descriptor()
 
-    def test_historical_cohorts_cannot_alias294(self):
-        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292'):
+    def test_historical_cohorts_cannot_alias304(self):
+        for historical in ('current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294'):
             with self.subTest(historical=historical):
                 self.rejects(lambda p: p.update({historical: {}}))
 
     def test_wrong_full_count_cannot_pass(self):
-        self.rejects(lambda p: p['current294'].update(expected_full_tests=734))
+        self.rejects(lambda p: p['current304'].update(expected_full_tests=734))
 
     def test_reference_requires_all_four_before_files(self):
         self.rejects(lambda p: p['reference_entry']['replacement_files'].pop())
@@ -185,6 +185,60 @@ class RequiredNamesTests(unittest.TestCase):
     def test_required_count_boolean_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'invalid required'):
             check.required_name_summary(named_report(['old']), 1, [{'name': 'old', 'count': True}])
+
+
+class CleanupTests(unittest.TestCase):
+    def fixture_report(self):
+        normal = ['recorder.begin', 'recorder.end', 'sdk.begin', 'sdk.end', 'storage.end']
+        failure = ['recorder.begin', 'sdk.begin', 'sdk.end', 'storage.end']
+        contract = {
+            'named_fixtures': [
+                {'name': 'page', 'kind': 'page', 'markers': normal + ['unmount.begin', 'unmount.end']},
+                {'name': 'expected failure', 'kind': 'expected_close_failure', 'markers': failure}],
+            'repository_awaited_teardown_names': ['repository'],
+            'parent_creation_instances': 1,
+            'parent_creation_markers': ['release.begin', 'native.drained', 'sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end'],
+            'parent_safe_exit_markers': ['create.entered', 'signout.begin', 'signout.end', 'route.removed', 'create.released', 'create.returned']}
+        events = []
+        for identity, row in enumerate(contract['named_fixtures']):
+            events.append({'type': 'testStart', 'test': {'id': identity, 'name': row['name']}})
+            events += [{'type': 'print', 'testID': identity, 'message': 'call_records_cleanup ' + marker}
+                       for marker in row['markers']]
+        events.append({'type': 'testStart', 'test': {'id': 9, 'name': 'parent'}})
+        events += [{'type': 'print', 'testID': 9, 'message': prefix + marker}
+                   for prefix, markers in [('creation_fixture_cleanup ', contract['parent_creation_markers']),
+                                           ('creation_safe_exit ', contract['parent_safe_exit_markers'])]
+                   for marker in markers]
+        return contract, events
+
+    def test_cleanup_distinguishes_successful_close_and_expected_failure(self):
+        contract, events = self.fixture_report()
+        result = check.call_records_cleanup_summary('\n'.join(map(json.dumps, events)), contract)
+        self.assertEqual((result['call_record_fixtures'], result['normal_recorder_closes'],
+                          result['expected_close_failures'], result['page_unmounts'],
+                          result['parent_creation_fixtures']), (2, 1, 1, 1, 1))
+
+    def test_cleanup_rejects_missing_tail_even_after_other_tests_finish(self):
+        contract, events = self.fixture_report()
+        events = [e for e in events if e.get('message') != 'call_records_cleanup storage.end']
+        with self.assertRaisesRegex(ValueError, 'sequence differs'):
+            check.call_records_cleanup_summary('\n'.join(map(json.dumps, events)), contract)
+
+    def test_cleanup_rejects_duplicate_or_foreign_print(self):
+        contract, events = self.fixture_report()
+        for extra in [next(e for e in events if e.get('type') == 'print'),
+                      {'type': 'print', 'testID': 99, 'message': 'call_records_cleanup recorder.begin'}]:
+            with self.subTest(extra=extra):
+                with self.assertRaises(ValueError):
+                    check.call_records_cleanup_summary('\n'.join(map(json.dumps, events + [extra])), contract)
+
+    def test_cleanup_rejects_reordered_parent_sequence(self):
+        contract, events = self.fixture_report()
+        indices = [i for i, e in enumerate(events) if e.get('message', '').startswith('creation_fixture_cleanup ')]
+        a, b = indices[0:2]
+        events[a], events[b] = events[b], events[a]
+        with self.assertRaisesRegex(ValueError, 'parent creation sequence'):
+            check.call_records_cleanup_summary('\n'.join(map(json.dumps, events)), contract)
 
 
 if __name__ == '__main__':

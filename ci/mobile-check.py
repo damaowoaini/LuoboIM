@@ -312,7 +312,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full294 tree; restore exact after4 even if the reference fails."""
+    """Separate full304 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -383,9 +383,74 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after294_and_primary_source_reverified',
-                    'source_digest': plan['current294']['source_digest'],
+                   {'state': 'after304_and_primary_source_reverified',
+                    'source_digest': plan['current304']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
+
+
+def call_records_cleanup_summary(text, contract):
+    """Check source-enumerated cleanup per machine test ID after result/name gates.
+
+    Expected close failures omit recorder.end but must finish SDK/storage. The
+    repository-only tests use awaited teardown, not these fixture markers.
+    """
+    starts, call_rows, parent_rows, safe_rows = {}, {}, {}, {}
+    prefixes = [('call_records_cleanup ', call_rows),
+                ('creation_fixture_cleanup ', parent_rows),
+                ('creation_safe_exit ', safe_rows)]
+    for line in text.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        if event.get('type') == 'testStart':
+            identity = event['test']['id']
+            if identity in starts:
+                raise ValueError('cleanup duplicate test start')
+            starts[identity] = event['test'].get('name')
+        if event.get('type') != 'print':
+            continue
+        message = event.get('message', '')
+        if not isinstance(message, str):
+            continue
+        for prefix, target in prefixes:
+            if message.startswith(prefix):
+                identity = event.get('testID')
+                if identity not in starts:
+                    raise ValueError('cleanup print has no started test')
+                target.setdefault(identity, []).append(message[len(prefix):])
+    expected = {row['name']: row for row in contract['named_fixtures']}
+    actual = {}
+    for identity, markers in call_rows.items():
+        name = starts[identity]
+        if name not in expected or name in actual:
+            raise ValueError('cleanup unexpected/duplicate call-record fixture')
+        if markers != expected[name]['markers']:
+            raise ValueError('cleanup call-record sequence differs: ' + str(name))
+        actual[name] = markers
+    if set(actual) != set(expected):
+        raise ValueError('cleanup missing call-record fixture')
+    if (len(parent_rows) != contract['parent_creation_instances']
+            or any(markers != contract['parent_creation_markers'] for markers in parent_rows.values())):
+        raise ValueError('cleanup parent creation sequence/count differs')
+    expected_safe = contract['parent_safe_exit_markers']
+    if ((expected_safe and len(safe_rows) != 1)
+            or (not expected_safe and safe_rows)
+            or any(markers != expected_safe for markers in safe_rows.values())):
+        raise ValueError('cleanup parent safe-exit sequence/count differs')
+    return {'call_record_fixtures': len(actual),
+            'normal_recorder_closes': sum(row['kind'] != 'expected_close_failure'
+                                           for row in expected.values()),
+            'expected_close_failures': sum(row['kind'] == 'expected_close_failure'
+                                            for row in expected.values()),
+            'page_unmounts': sum(row['kind'] == 'page' for row in expected.values()),
+            'repository_awaited_teardown_tests': len(contract['repository_awaited_teardown_names']),
+            'parent_creation_fixtures': len(parent_rows),
+            'parent_safe_exit_sequences': len(safe_rows),
+            'all_emitted_sequences_exact': True,
+            'repository_teardown_is_framework_awaited_not_marker_proof': True}
 
 
 def run(work, cohort, reference=False):
@@ -403,19 +468,25 @@ def run(work, cohort, reference=False):
         if reference:
             counts['reference_entry'] = run_reference_entry(work, cohort, plan, tests, guard)
         verify(work, cohort)
-        target_expected = plan['current294']['expected_target_tests']
+        target_expected = plan['current304']['expected_target_tests']
         target_label = 'target' + str(target_expected)
-        log = guarded(tests + plan['current294']['target_paths'], work, guard, target_label)
+        log = guarded(tests + plan['current304']['target_paths'], work, guard, target_label)
         counts['target'] = machine_summary(log.read_text(), target_expected)
         required = source.required_names(plan)
-        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target184'])
+        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target234'])
+        cleanup = source.cleanup_contract(plan, required)
+        counts['target_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
+        write_json(work / 'evidence' / (target_label + '.cleanup.json'), counts['target_cleanup'])
         write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
         verify(work, cohort)
-        expected = plan['current294']['expected_full_tests']
+        expected = plan['current304']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
-        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full872'])
-        counts['parent854_preserved'] = True
+        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full922'])
+        counts['full_cleanup'] = call_records_cleanup_summary(log.read_text(), cleanup)
+        write_json(work / 'evidence/full.cleanup.json', counts['full_cleanup'])
+        counts['parent872_preserved'] = True
+        counts['new_call_records50_exact'] = True
         counts['parent822_plus29_plus3_preserved'] = True
         counts['new_shortcuts18_exact'] = True
         write_json(work / 'evidence/full.summary.json', counts['full'])
@@ -455,9 +526,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current294',), required=True)
+    p.add_argument('--cohort', choices=('current304',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full294 variant; exactly one entry assertion fails and one old filter passes')
+                   help='explicit full304 variant; exactly one entry assertion fails and one old filter passes')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')

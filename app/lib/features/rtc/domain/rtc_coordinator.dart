@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import '../../../core/error/app_failure.dart';
 import '../../../core/tenant/session_coordinator.dart';
 import 'rtc_call.dart';
+import 'call_record.dart';
+import 'call_history_recorder.dart';
 
 /// One call per signed-in account. Every asynchronous continuation is fenced
 /// by both the session generation and this call's monotonically increasing id.
@@ -13,6 +15,7 @@ final class RtcCoordinator extends ChangeNotifier {
     required this.session,
     required this.permissions,
     required RtcCallTransport Function() transportFactory,
+    this.history,
   }) : _factory = transportFactory {
     _states = session.changes.listen((_) => _bind());
     _accessStates = session.accessChanges.listen((_) {
@@ -24,6 +27,7 @@ final class RtcCoordinator extends ChangeNotifier {
       }
     });
     _invalidations = session.invalidations.listen((_) {
+      history?.seal();
       _finish(RtcEndReason.sessionChanged);
       _transport = null;
       unawaited(_signals?.cancel());
@@ -34,6 +38,8 @@ final class RtcCoordinator extends ChangeNotifier {
 
   final SessionCoordinator session;
   final RtcPermissionGate permissions;
+  final CallHistoryRecorder? history;
+  CallHistoryTicket? _historyCall;
   final RtcCallTransport Function() _factory;
   late final StreamSubscription<SessionSnapshot> _states;
   late final StreamSubscription<int> _accessStates;
@@ -128,6 +134,7 @@ final class RtcCoordinator extends ChangeNotifier {
       return;
     }
     _title = title.isEmpty ? inviteeIds.join('、') : title;
+    _historyCall = history?.attempt(_call!, transport.selfId, _title);
     _reason = null;
     _failure = null;
     _accepted = false;
@@ -165,6 +172,7 @@ final class RtcCoordinator extends ChangeNotifier {
         return;
       }
       _accepted = true;
+      history?.accepted(_historyCall);
       _phase = RtcPhase.connecting;
       _notify();
       await _join(request, incoming: true);
@@ -174,6 +182,7 @@ final class RtcCoordinator extends ChangeNotifier {
   }
 
   Future<void> _join(int request, {required bool incoming}) async {
+    history?.joining(_historyCall);
     final media = await _transport!.join(
       _call!,
       incoming: incoming,
@@ -244,6 +253,7 @@ final class RtcCoordinator extends ChangeNotifier {
           return;
         }
         _connectedAt = DateTime.now();
+        history?.connected(_historyCall);
         _timeout?.cancel();
         _phase = RtcPhase.active;
         _notify();
@@ -277,11 +287,14 @@ final class RtcCoordinator extends ChangeNotifier {
       if (busy) {
         _recent.add(call.roomId);
         if (_recent.length > 64) _recent.remove(_recent.first);
+        final missedBusy = history?.attempt(call, _transport!.selfId, call.inviterId);
+        history?.finish(missedBusy, RtcEndReason.busy, CallEndCause.local);
         unawaited(_endSignal(call, RtcEndAction.reject));
         return;
       }
       _call = call;
       _title = call.inviterId;
+      _historyCall = history?.attempt(call, _transport!.selfId, _title);
       _reason = null;
       _failure = null;
       _accepted = false;
@@ -296,18 +309,19 @@ final class RtcCoordinator extends ChangeNotifier {
     switch (signal.action) {
       case ImSignalAction.accepted:
         _accepted = true;
+        history?.accepted(_historyCall);
         _tryPublish(_request);
       case ImSignalAction.acceptedOnOtherDevice:
       case ImSignalAction.rejectedOnOtherDevice:
-        _finish(RtcEndReason.otherDevice);
+        _finish(RtcEndReason.otherDevice, cause: CallEndCause.remote);
       case ImSignalAction.cancelled:
-        _finish(RtcEndReason.cancelled);
+        _finish(RtcEndReason.cancelled, cause: CallEndCause.remote);
       case ImSignalAction.timedOut:
-        _finish(RtcEndReason.timedOut);
+        _finish(RtcEndReason.timedOut, cause: CallEndCause.remote);
       case ImSignalAction.rejected:
-        if (_call!.groupId.isEmpty) _finish(RtcEndReason.declined);
+        if (_call!.groupId.isEmpty) _finish(RtcEndReason.declined, cause: CallEndCause.remote);
       case ImSignalAction.hungUp:
-        if (_call!.groupId.isEmpty) _finish(RtcEndReason.hungUp);
+        if (_call!.groupId.isEmpty) _finish(RtcEndReason.hungUp, cause: CallEndCause.remote);
       default:
         break;
     }
@@ -349,7 +363,8 @@ final class RtcCoordinator extends ChangeNotifier {
             : action == RtcEndAction.reject
             ? RtcEndReason.declined
             : RtcEndReason.hungUp);
-    _finish(ending);
+    _finish(ending, cause: ending == RtcEndReason.timedOut ? CallEndCause.timer :
+      ending == RtcEndReason.disconnected ? CallEndCause.transport : CallEndCause.local);
     if (!beforeDispatch) await _endSignal(call, action);
   }
 
@@ -360,11 +375,17 @@ final class RtcCoordinator extends ChangeNotifier {
     _failure = error is AppFailure
         ? error
         : const AppFailure(FailureKind.network);
-    _finish(RtcEndReason.failed);
+    _finish(RtcEndReason.failed, cause: CallEndCause.transport);
     if (call != null && !beforeDispatch) unawaited(_endSignal(call, action));
   }
 
-  void _finish(RtcEndReason reason) {
+  void _finish(RtcEndReason reason, {CallEndCause cause = CallEndCause.local}) {
+    if (reason == RtcEndReason.sessionChanged) {
+      history?.abandon(_historyCall);
+    } else {
+      history?.finish(_historyCall, reason, cause);
+    }
+    _historyCall = null;
     ++_request;
     _timeout?.cancel();
     _timeout = null;
