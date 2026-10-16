@@ -370,7 +370,17 @@ func (s *Store) persist(ctx context.Context, cid string, message *sdkws.MsgData)
 	// Preserve pre-existing user tombstones/revokes. A global tombstone consumes
 	// the assigned slot but receives no late plaintext. A nonempty legacy slot
 	// is a bad seed/collision and aborts the whole receipt rather than overwrite.
-	filter := bson.M{"doc_id": docID, field + ".msg": nil, field + ".global_deleted": bson.M{"$ne": true}}
+	// A dotted numeric path compared with null can also match a missing field
+	// while traversing the array, even when this exact slot is occupied. Read
+	// the assigned array element explicitly in the atomic write predicate.
+	filter := bson.M{
+		"doc_id":                  docID,
+		field + ".global_deleted": bson.M{"$ne": true},
+		"$expr": bson.M{"$let": bson.M{
+			"vars": bson.M{"slot": bson.M{"$arrayElemAt": bson.A{"$msgs", index}}},
+			"in":   bson.M{"$eq": bson.A{"$$slot.msg", nil}},
+		}},
+	}
 	res, err := collection.UpdateOne(ctx, filter, bson.M{"$set": bson.M{field + ".msg": convert.MsgPb2DB(message)}})
 	if err != nil {
 		return false, err

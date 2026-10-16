@@ -189,8 +189,8 @@
     {
       "path": "ci/candidates/group-receiver/source/server/internal/messagedelivery/sequence.go",
       "target": "server/internal/messagedelivery/sequence.go",
-      "bytes": 15134,
-      "sha256": "e3e05c1b75abfd568c4b6150b2435a8492bb5af8db3f254a79c485eab56bec72",
+      "bytes": 15531,
+      "sha256": "344c3a1f8abeeca06ba82fd566d7d663f7a64a651683d248578fbcca34e8634f",
       "mode": "0o644",
       "beforeSHA256": null
     },
@@ -340,7 +340,7 @@
     }
   ],
   "effective_source_count": 989,
-  "effective_source_sha256": "2fa444f8e7dc1a719ac281d20dd370ca7cf8bb03a8b593aecf26a382b37362f7",
+  "effective_source_sha256": "f9a36488c05bd0ebf39ce5d9055008658c2303806e03fbeeae0166eaa343bd10",
   "effective_source": [
     {
       "path": "server/.dockerignore",
@@ -1804,8 +1804,8 @@
     },
     {
       "path": "server/internal/messagedelivery/sequence.go",
-      "bytes": 15134,
-      "sha256": "e3e05c1b75abfd568c4b6150b2435a8492bb5af8db3f254a79c485eab56bec72"
+      "bytes": 15531,
+      "sha256": "344c3a1f8abeeca06ba82fd566d7d663f7a64a651683d248578fbcca34e8634f"
     },
     {
       "path": "server/internal/messagedelivery/sequence_test.go",
