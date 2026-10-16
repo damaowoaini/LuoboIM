@@ -26,6 +26,7 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
   bool searching = false;
   int _lookupView = 0;
   bool _lookupMenuOpen = false;
+  _LookupPopupTicket? _pendingLookupPopup, _openedLookupPopup;
 
   @override
   void initState() {
@@ -58,14 +59,47 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
     WidgetsBinding.instance.ensureVisualUpdate();
   }
 
-  void _lookupShortcut(String kind, Object? owner, int original) {
-    if (!mounted || original != _lookupView ||
-        !controller.repository.current || owner == null ||
-        !identical(controller.repository.session.state.credentials, owner) ||
-        ModalRoute.of(context)?.isCurrent != true) {
+  bool _lookupCurrent(_LookupPopupTicket ticket) =>
+      mounted && ticket.view == _lookupView &&
+      controller.repository.current && ticket.owner != null &&
+      identical(controller.repository.session.state.credentials, ticket.owner) &&
+      ModalRoute.of(context)?.isCurrent == true;
+
+  void _lookupOpened() {
+    // itemBuilder prepared this one popup. Rebuilding the button must never
+    // mint a replacement lease for a route that is already open.
+    final ticket = _pendingLookupPopup;
+    _lookupMenuOpen = true;
+    _openedLookupPopup = ticket;
+    if (ticket != null) ticket.opened = true;
+  }
+
+  void _lookupCovered(_LookupPopupTicket ticket) {
+    if (ticket.retired || ticket.consumed) return;
+    ticket.retired = true;
+    _retireLookupShortcut();
+  }
+
+  void _lookupClosed(_LookupPopupTicket ticket) {
+    ticket.consumed = true;
+    if (identical(_openedLookupPopup, ticket)) {
+      _openedLookupPopup = null;
+      _lookupMenuOpen = false;
+    }
+    if (identical(_pendingLookupPopup, ticket)) _pendingLookupPopup = null;
+  }
+
+  void _lookupShortcut(_LookupShortcutChoice choice) {
+    final ticket = _openedLookupPopup;
+    if (ticket == null || !identical(ticket.id, choice.ticket) ||
+        !ticket.opened || ticket.consumed) {
       return;
     }
-    context.push('/contacts/search?kind=$kind');
+    final allowed = !ticket.retired && _lookupCurrent(ticket) &&
+        const ['user', 'group'].contains(choice.kind);
+    _lookupClosed(ticket);
+    if (!allowed) return;
+    context.push('/contacts/search?kind=${choice.kind}');
   }
 
   void _changed() {
@@ -114,20 +148,16 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
               if (!searching) search.clear();
             }),
           ),
-          PopupMenuButton<String>(
+          PopupMenuButton<Object>(
             tooltip: '更多操作',
-            onOpened: () { _lookupMenuOpen = true; },
-            onCanceled: () {
-              _lookupMenuOpen = false;
-              _retireLookupShortcut();
-            },
+            onOpened: _lookupOpened,
             onSelected: (value) async {
-              _lookupMenuOpen = false;
-              if (value == 'addFriend' || value == 'addGroup') {
-                _lookupShortcut(value == 'addGroup' ? 'group' : 'user', lookupOwner, lookupView);
-                _retireLookupShortcut();
+              if (value is _LookupShortcutChoice) {
+                _lookupShortcut(value);
                 return;
               }
+              final ticket = _openedLookupPopup;
+              if (ticket != null) _lookupClosed(ticket);
               if (value == 'meetings') {
                 context.push('/meetings');
                 return;
@@ -159,16 +189,26 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
                 }
               }
             },
-            itemBuilder: (_) => [
-              PopupMenuItem(value: 'addFriend', height: 48,
-                child: _LookupMenuGuard(onCovered: _retireLookupShortcut,
-                  child: const Text('添加好友'))),
-              PopupMenuItem(value: 'addGroup', height: 48,
-                child: _LookupMenuGuard(onCovered: _retireLookupShortcut,
-                  child: const Text('搜索加群'))),
-              const PopupMenuItem(value: 'meetings', child: Text('会议（预约与管理）')),
-              const PopupMenuItem(value: 'logout', child: Text('退出登录')),
-            ],
+            itemBuilder: (_) {
+              final ticket = _LookupPopupTicket(lookupOwner, lookupView);
+              _pendingLookupPopup = ticket;
+              return [
+                PopupMenuItem<Object>(
+                  value: _LookupShortcutChoice('user', ticket.id), height: 48,
+                  child: _LookupMenuGuard(
+                    onCovered: () => _lookupCovered(ticket),
+                    onClosed: () => _lookupClosed(ticket),
+                    child: const Text('添加好友'))),
+                PopupMenuItem<Object>(
+                  value: _LookupShortcutChoice('group', ticket.id), height: 48,
+                  child: _LookupMenuGuard(
+                    onCovered: () => _lookupCovered(ticket),
+                    onClosed: () => _lookupClosed(ticket),
+                    child: const Text('搜索加群'))),
+                const PopupMenuItem<Object>(value: 'meetings', child: Text('会议（预约与管理）')),
+                const PopupMenuItem<Object>(value: 'logout', child: Text('退出登录')),
+              ];
+            },
           ),
         ],
       ),
@@ -500,24 +540,51 @@ class _ConversationsPageState extends ConsumerState<ConversationsPage> {
 // Normal opening/closing of this owned popup does not retire its entry. A
 // foreign route covering the popup does: returning must not revive that choice.
 class _LookupMenuGuard extends StatefulWidget {
-  const _LookupMenuGuard({required this.onCovered, required this.child});
-  final VoidCallback onCovered;
+  const _LookupMenuGuard({required this.onCovered, required this.onClosed, required this.child});
+  final VoidCallback onCovered, onClosed;
   final Widget child;
   @override
   State<_LookupMenuGuard> createState() => _LookupMenuGuardState();
 }
 
 class _LookupMenuGuardState extends State<_LookupMenuGuard> {
-  bool covered = false;
+  bool covered = false, observingPop = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final route = ModalRoute.of(context);
+    if (!observingPop && route != null) {
+      observingPop = true;
+      final onClosed = widget.onClosed;
+      // The route owns cancellation, not whichever button widget happens to
+      // be current when PopupMenuButton's asynchronous callback runs.
+      unawaited(route.popped.then<void>((_) { onClosed(); }));
+    }
     if (!covered && route?.isActive == true && route?.isCurrent == false) {
       covered = true;
       widget.onCovered();
     }
   }
   @override
+  void dispose() {
+    widget.onClosed();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) => widget.child;
+}
+
+// Widgets carry only an opaque id. The original credential object remains in
+// this State's private popup lease and is never encoded in a route or value.
+final class _LookupPopupTicket {
+  _LookupPopupTicket(this.owner, this.view);
+  final Object id = Object();
+  final Object? owner;
+  final int view;
+  bool opened = false, retired = false, consumed = false;
+}
+final class _LookupShortcutChoice {
+  const _LookupShortcutChoice(this.kind, this.ticket);
+  final String kind;
+  final Object ticket;
 }

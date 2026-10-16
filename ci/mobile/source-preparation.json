@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.source-preparation.v8",
-  "state": "current294_inbox_contact_shortcuts_pending_cloud",
+  "state": "current294_shortcuts_r1_proposed_not_run",
   "accepted_parent287": {
     "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
     "actual_run": 38878571484,
@@ -54,7 +54,7 @@
     "analyze_required": 0
   },
   "original29_preserved": "Same29 names;all68 original workflow expect expressions preserved,new5 strengthen priorfailure. New3 directly use actualrouterProvider and realChatPage/controller, mock only existingOS/MethodChannel/HTTP seams.",
-  "reference": "Original optionalsearch defaultoff/full292 context+same4 before+same1FAIL1PASS strictparser/restore. Original groupbefore2 remains separatepreparedonly full291 plan;0execution/no parser reuse/new phase.",
+  "reference": "Originaloptional search remains defaultoff full294+same4replacements/same1namedassertFAIL1PASS strictparser; recomputed source digest a0790115407e7dfb23fd45b8850fb9ba6813deaf90740192938716b064979b4a. Shortcutbefore2 remains originalseparatepreparedonly, not executed/repurposed.",
   "identity_contract": "Page key=(state.pageKey.value,exactCID) preserves uniqueimperativepush; CID changes get freshpage+ownedpagelessretirement; sameCIDquery/metadata retains page/anchor/draft.",
   "dependency_and_gates": "SDK51+migration1/174lockeddependencies/lock/pubspec/Flutter/SQLite unchanged. 4GiBinitial/1GiB .2s/768MiB/900s/netns/9AST failureandcompletion logic unchanged.",
   "public_inventory": "Zeroexceptions;knownlocal app/tool/check.sh remains local-onlyabsentpublic.",
@@ -128,8 +128,8 @@
     "actual": "target166+17hidden/full854+113hidden PASS/truefooters0error0skip;allold822+29+3 namesexact;58sixmarkercleanup+safeexit6each;0hitTest/overflow;strictanalyze0;3phasechild0;0latchedgate",
     "root_review": "pending independentRootreceipt at thisdraftfreeze; no shortcutapply authorized by thisrecord"
   },
-  "source294_digest": "ed634fa8df97bf4e02b19797a35cdfdb5add7ea931598dc35173a25181888bc7",
-  "portable346_digest": "06234b58e6fe842d4bb46e94f0ec7a473623afb4673b542a9c7d6ca4cd803291",
+  "source294_digest": "53e836c51aaebabb9f1f064344e6d0e26f384a14ccc4837911cb33584aeeb19c",
+  "portable346_digest": "7c96e8e85434447e646f06a8f5168e467387a30a0d0a3aee98dbbf6db17f9e75",
   "shortcut_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f",
   "current_delta": {
     "production_existing": 3,
@@ -137,5 +137,22 @@
     "actual_new_Dart_tests": 0,
     "prepared_new_cases": 18
   },
-  "shortcut_before2": "Separatepreparedonlysamefull294compilationcontextwith3originalbeforebodies;onlyfirst2missingentryassertions,count2FAILexpected;no undefinedcallback/compile/load/timeout accepted productRED. Not default phase/not originalsearch reference."
+  "shortcut_before2": "Separatepreparedonlysamefull294compilationcontextwith3originalbeforebodies;onlyfirst2missingentryassertions,count2FAILexpected;no undefinedcallback/compile/load/timeout accepted productRED. Not default phase/not originalsearch reference.",
+  "shortcut_r1_manifest_sha256": "f1aa575372ec3b4686d7c966ce969f96257b5d43874d80b15acc0aac1068c63c",
+  "shortcut_r1_scope": "2existing only: original opened popup opaque ticket, exact popped/dispose closure, real router delegate URI observers/go->go baseline, actual opened positive/negative+immediate reopen;18 names/old92 expectations preserved after authorized observer/generic substitutions;107 resulting expect expressions.",
+  "current294_shortcuts_v1_actual_failure": {
+    "commit": "5abdb1f4f025864cfc1105aa4cdf9bba1c8c8c9f",
+    "run": 38890973634,
+    "job": 116940120276,
+    "artifactID": 12041244085,
+    "ZIP_bytes": 29843,
+    "ZIP_sha256": "2bfcf711863d1dd0c198367a8df901a5c7593af3a83a3802687d6fa3cbb9d4ef",
+    "agent_verification_sha256": "e6b5908505af37e4e9d5347c38164a4baa1d3f6991a7b6802f4956daffa6bcd0",
+    "root_failure_review_sha256": "5b99f33d6f3fd61bf6be8391723e6e7c6fa0ee28b283a7c2332ee5af6147e4bb",
+    "source294_digest": "ed634fa8df97bf4e02b19797a35cdfdb5add7ea931598dc35173a25181888bc7",
+    "portable346_digest": "06234b58e6fe842d4bb46e94f0ec7a473623afb4673b542a9c7d6ca4cd803291",
+    "actual": "target178PASS6ERROR/18hiddenPASS0skipfalsefooter;original166allPASS,new12PASS6ERROR;full872/analyzeNOTSTARTED;76ordered6markerfixtures,0hitTestwarning",
+    "errors": "first4wrongURIobserver;onepush/goStateassumption;oneownedpopuptimeoutbeforeguardassert.IndependentpinnedframeworkrisknotclaimingobservedguardASSERT."
+  },
+  "actual_shortcut_r1_Dart_tests": 0
 }

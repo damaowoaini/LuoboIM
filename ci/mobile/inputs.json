@@ -1,6 +1,6 @@
 {
   "schema": "luobo.mobile.portable-ci-inputs.v8",
-  "state": "current294_inbox_contact_shortcuts_pending_cloud",
+  "state": "current294_shortcuts_r1_proposed_not_run",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -41,7 +41,8 @@
     "chat_cid_page_key_fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd",
     "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd",
     "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257",
-    "inbox_contact_shortcuts_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f"
+    "inbox_contact_shortcuts_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f",
+    "inbox_contact_shortcuts_r1_manifest_sha256": "f1aa575372ec3b4686d7c966ce969f96257b5d43874d80b15acc0aac1068c63c"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -320,7 +321,7 @@
     "current294": 346
   },
   "portable_digests": {
-    "current294": "06234b58e6fe842d4bb46e94f0ec7a473623afb4673b542a9c7d6ca4cd803291"
+    "current294": "7c96e8e85434447e646f06a8f5168e467387a30a0d0a3aee98dbbf6db17f9e75"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -636,7 +637,7 @@
     "default_enabled": false,
     "working_cohort": "current294",
     "members": 294,
-    "reference_source_digest": "580a761639e054932844ff3485930566b2a81881ec2bcf7967597c6232f0ae8e",
+    "reference_source_digest": "a0790115407e7dfb23fd45b8850fb9ba6813deaf90740192938716b064979b4a",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -701,7 +702,7 @@
   },
   "current294": {
     "members": 294,
-    "source_digest": "ed634fa8df97bf4e02b19797a35cdfdb5add7ea931598dc35173a25181888bc7",
+    "source_digest": "53e836c51aaebabb9f1f064344e6d0e26f384a14ccc4837911cb33584aeeb19c",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1080,8 +1081,8 @@
       },
       {
         "path": "app/lib/features/conversation/presentation/conversations_page.dart",
-        "bytes": 18513,
-        "sha256": "0b64052cb0905daa3da06c1aabd3375813a6d8d5c34f6b2a75d2be000d19cc27"
+        "bytes": 20969,
+        "sha256": "42c2041182079d87ed8232f5de0d8d0c74db7b7d280ca193131063457ae335ee"
       },
       {
         "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
@@ -1815,8 +1816,8 @@
       },
       {
         "path": "app/test/features/conversation/contact_shortcuts_test.dart",
-        "bytes": 17460,
-        "sha256": "e8d2ed6d8dfc51d56b2283c5d7360b15baac43602fa44bbb30a697f157a1acd3"
+        "bytes": 20985,
+        "sha256": "0bf8955f453aad07a7506f6b351b4b7d14adfa8d5d1fb2d1295691c869e07099"
       },
       {
         "path": "app/test/features/conversation/conversation_repository_test.dart",

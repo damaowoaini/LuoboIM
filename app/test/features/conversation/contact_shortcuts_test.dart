@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:imapp/app.dart';
 import 'package:imapp/features/contacts/contacts_providers.dart';
 import 'package:imapp/features/contacts/data/contacts_repository.dart';
@@ -17,8 +18,14 @@ import '../../core/im/sdk_harness.dart';
 import 'contact_shortcuts_fixture.dart';
 
 String? hint(WidgetTester tester) => tester.widget<TextField>(find.byType(TextField)).decoration?.hintText;
-PopupMenuButton<String> menuWidget(WidgetTester tester) => tester.widget<PopupMenuButton<String>>(
-  find.byWidgetPredicate((widget) => widget is PopupMenuButton<String> && widget.tooltip == '更多操作'));
+PopupMenuButton<Object> menuWidget(WidgetTester tester) => tester.widget<PopupMenuButton<Object>>(
+  find.byWidgetPredicate((widget) => widget is PopupMenuButton<Object> && widget.tooltip == '更多操作'));
+Finder currentMenuText(String text) => find.byElementPredicate((element) {
+  final widget = element.widget;
+  return widget is Text && widget.data == text && ModalRoute.of(element)?.isCurrent == true;
+});
+Object menuValue(WidgetTester tester, String text) => tester.widget<PopupMenuItem<Object>>(
+  find.ancestor(of: currentMenuText(text), matching: find.byType(PopupMenuItem<Object>))).value!;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +37,9 @@ void main() {
       final original = tester.state<State<ConversationsPage>>(find.byType(ConversationsPage));
       await f.choose(tester, '添加好友');
       expect(f.router, same(f.container.read(routerProvider)));
-      expect(f.router.routeInformationProvider.value.uri.toString(), '/contacts/search?kind=user');
+      expect(f.router.state.uri.toString(), '/contacts/search?kind=user');
       expect(hint(tester), '输入完整账号 ID');
+      expect(GoRouterState.of(tester.element(find.byType(ContactSearchPage))).uri, f.router.state.uri);
       expect(f.http.requests, isEmpty);
       await f.back(tester);
       expect(tester.state<State<ConversationsPage>>(find.byType(ConversationsPage)), same(original));
@@ -52,7 +60,8 @@ void main() {
       await tester.tap(target);
       await f.until(tester, () => find.byType(ContactSearchPage).evaluate().length == 1);
       await f.ready(tester, find.byType(ContactSearchPage));
-      expect(f.router.routeInformationProvider.value.uri.toString(), '/contacts/search?kind=group');
+      expect(f.router.state.uri.toString(), '/contacts/search?kind=group');
+      expect(GoRouterState.of(tester.element(find.byType(ContactSearchPage))).uri, f.router.state.uri);
       expect(hint(tester), '输入完整群 ID');
       expect(f.http.requests, isEmpty);
       expect(f.sdkWrites, 0);
@@ -75,7 +84,8 @@ void main() {
       await f.until(tester, () => find.byType(GroupPage).evaluate().length == 1);
       await f.ready(tester, find.byType(GroupPage));
       expect(tester.widget<GroupPage>(find.byType(GroupPage)).groupId, 'group-a');
-      expect(f.router.routeInformationProvider.value.uri.path, '/contacts/groups/group-a');
+      expect(f.router.state.uri.path, '/contacts/groups/group-a');
+      expect(GoRouterState.of(tester.element(find.byType(GroupPage))).uri, f.router.state.uri);
       expect(f.sdkWrites, 0);
       expect(tester.takeException(), isNull);
     } finally { await f.close(tester); }
@@ -96,7 +106,9 @@ void main() {
       await f.ready(tester, find.byType(UserProfilePage));
       await f.until(tester, () => f.http.requests.length == 2);
       await f.until(tester, () => find.widgetWithText(SelectableText, 'ID：7031156314').evaluate().length == 1);
-      expect(f.router.routeInformationProvider.value.uri.path, '/contacts/user/7031156314');
+      expect(f.router.state.uri.path, '/contacts/user/7031156314');
+      expect(tester.widget<UserProfilePage>(find.byType(UserProfilePage)).userId, '7031156314');
+      expect(GoRouterState.of(tester.element(find.byType(UserProfilePage))).uri, f.router.state.uri);
       expect(f.http.requests.every((request) => request.uri.path == '/chat/user/find/full'), isTrue);
       expect(f.entry.creation.base.sdk.calls.where((call) => call.method == 'getUsersInfo'), isNotEmpty);
       expect(f.sdkWrites, 0);
@@ -136,7 +148,12 @@ void main() {
     final f = ContactShortcutsFixture();
     try {
       await f.mount(tester);
-      await f.choose(tester, '添加好友');
+      // An imperative push owns a unique page key. Start this separate
+      // same-pattern update on a real go page before dispatching the read.
+      f.router.go('/contacts/search?kind=user');
+      await f.until(tester, () => find.byType(ContactSearchPage).evaluate().length == 1);
+      await f.ready(tester, find.byType(ContactSearchPage));
+      expect(f.router.state.uri.toString(), '/contacts/search?kind=user');
       final pending = f.deferred();
       f.reply = (_) => pending.future;
       await f.search(tester, '7031156314');
@@ -185,13 +202,16 @@ void main() {
     final f = ContactShortcutsFixture();
     try {
       await f.mount(tester);
-      final selected = menuWidget(tester).onSelected!;
+      await f.menu(tester);
+      final popup = ModalRoute.of(tester.element(find.text('添加好友')))!;
       await tester.runAsync(() => f.entry.creation.base.sdk.callback(ListenerType.conversationListener, {
         'type': 'onConversationChanged',
         'data': jsonEncode([{...SdkHarness.conversation(id: 'origin-cid'), 'unreadCount': 0}]),
       }));
       await f.frame(tester);
-      selected('addFriend');
+      expect(popup.isCurrent, isTrue);
+      expect(find.text('添加好友').hitTestable(), findsOneWidget);
+      await tester.tap(find.text('添加好友').hitTestable());
       await f.until(tester, () => find.byType(ContactSearchPage).evaluate().length == 1);
       await f.ready(tester, find.byType(ContactSearchPage));
       expect(hint(tester), '输入完整账号 ID');
@@ -231,7 +251,12 @@ void main() {
       final f = ContactShortcutsFixture();
       try {
         await f.mount(tester);
+        await f.menu(tester);
         final oldSelected = menuWidget(tester).onSelected!;
+        final friend = menuValue(tester, '添加好友');
+        final group = menuValue(tester, '搜索加群');
+        expect(find.text('添加好友').hitTestable(), findsOneWidget);
+        expect(find.text('搜索加群').hitTestable(), findsOneWidget);
         await tester.runAsync(() => f.entry.creation.base.signInOther(
           user: change == 'actor' ? 'other' : 'alice',
           tenant: change == 'tenant' ? 'other-tenant' : 'fixture-tenant',
@@ -239,7 +264,7 @@ void main() {
         ));
         await f.frame(tester);
         final before = f.router.routeInformationProvider.value.uri;
-        oldSelected('addFriend'); oldSelected('addGroup');
+        oldSelected(friend); oldSelected(group);
         await f.frame(tester);
         expect(f.router.routeInformationProvider.value.uri, before);
         expect(find.byType(ContactSearchPage), findsNothing);
@@ -254,9 +279,16 @@ void main() {
     final f = ContactShortcutsFixture();
     try {
       await f.mount(tester);
+      await f.menu(tester);
       final oldSelected = menuWidget(tester).onSelected!;
+      final choice = menuValue(tester, '搜索加群');
+      final popup = ModalRoute.of(tester.element(find.text('搜索加群')))!;
       await f.coverAndReturn(tester);
-      oldSelected('addGroup');
+      await f.ready(tester, find.text('搜索加群'));
+      expect(popup.isCurrent, isTrue);
+      Navigator.of(tester.element(find.text('搜索加群'))).pop();
+      await f.entry.creation.removedRoute(tester, popup);
+      oldSelected(choice);
       await f.frame(tester);
       expect(find.byType(ContactSearchPage), findsNothing);
       await f.choose(tester, '搜索加群');
@@ -292,10 +324,25 @@ void main() {
       await f.mount(tester);
       await f.menu(tester);
       final popup = ModalRoute.of(tester.element(find.text('搜索加群')))!;
+      var oldCompleted = false;
+      unawaited(popup.completed.then<void>((_) { oldCompleted = true; }));
       Navigator.of(tester.element(find.text('搜索加群'))).pop();
-      await f.entry.creation.removedRoute(tester, popup);
-      await f.frame(tester);
-      await f.choose(tester, '搜索加群');
+      await tester.pump();
+      expect(oldCompleted, isFalse);
+      // The public widget API opens the real second popup immediately while
+      // the first route is still reversing. Its late disposal must not consume
+      // the new popup's ticket. No product/session store is injected.
+      tester.state<PopupMenuButtonState<Object>>(find.byWidgetPredicate(
+        (widget) => widget is PopupMenuButton<Object> && widget.tooltip == '更多操作')).showButtonMenu();
+      await f.until(tester, () => currentMenuText('搜索加群').evaluate().length == 1);
+      await f.ready(tester, currentMenuText('搜索加群'));
+      final nextPopup = ModalRoute.of(tester.element(currentMenuText('搜索加群')))!;
+      expect(nextPopup, isNot(same(popup)));
+      await f.until(tester, () => oldCompleted);
+      expect(currentMenuText('搜索加群').hitTestable(), findsOneWidget);
+      await tester.tap(currentMenuText('搜索加群').hitTestable());
+      await f.until(tester, () => find.byType(ContactSearchPage).evaluate().length == 1);
+      await f.ready(tester, find.byType(ContactSearchPage));
       expect(hint(tester), '输入完整群 ID');
       expect(f.http.requests, isEmpty);
       expect(f.sdkWrites, 0);
@@ -307,8 +354,14 @@ void main() {
     final f = ContactShortcutsFixture();
     try {
       await f.mount(tester);
+      await f.menu(tester);
       final selected = menuWidget(tester).onSelected!;
-      selected('addFriend'); selected('addFriend');
+      final choice = menuValue(tester, '添加好友');
+      expect(find.text('添加好友').hitTestable(), findsOneWidget);
+      await tester.tap(find.text('添加好友').hitTestable());
+      // Re-enter only the real opened value after the actual tap. A new
+      // onSelected widget closure cannot create another ticket for this route.
+      selected(choice); selected(choice);
       await f.until(tester, () => find.byType(ContactSearchPage).evaluate().length == 1);
       await f.ready(tester, find.byType(ContactSearchPage));
       expect(find.byType(ContactSearchPage, skipOffstage: false), findsOneWidget);
@@ -326,7 +379,7 @@ void main() {
       await f.mount(tester, width: 320, height: 568);
       await f.menu(tester);
       for (final text in ['添加好友', '搜索加群']) {
-        final target = find.widgetWithText(PopupMenuItem<String>, text).hitTestable();
+        final target = find.widgetWithText(PopupMenuItem<Object>, text).hitTestable();
         expect(target, findsOneWidget);
         expect(tester.getSize(target).height, greaterThanOrEqualTo(44));
         expect(tester.getRect(target).right, lessThanOrEqualTo(320));
