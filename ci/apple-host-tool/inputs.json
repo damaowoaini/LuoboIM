@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "identity": "apple-r9-xcode164-host-tool-proof-v1",
+  "state": "source_only_no_link_admission",
+  "developer": "/Applications/Xcode_16.4.app/Contents/Developer",
+  "tool": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
+  "exact_version": "Xcode 16.4\nBuild version 16F6",
+  "bundle_identifier": "com.apple.dt.Xcode",
+  "bundle_version": "16.4",
+  "bundle_build": "16F6",
+  "shim": {
+    "path": "/usr/bin/xcodebuild",
+    "bytes": 119024,
+    "sha256": "abf710b16406c11b70090ada0a2804562c13376dd459242a0bab56022edddfca"
+  },
+  "borrowed": [
+    {
+      "path": "ci/apple-sdk/resource_dual.py",
+      "bytes": 7394,
+      "sha256": "d1d872e0c2b394d73549f0ed071c457ee5019c41b90277c748c328b0219e7718"
+    },
+    {
+      "path": "ci/apple-sdk-link/custody.py",
+      "bytes": 9781,
+      "sha256": "c242cbcc956b498b33a13dc18f87234212486616235b93de8443c63da7aac7f3"
+    }
+  ],
+  "source_files": [
+    {
+      "path": "ci/apple-host-tool/run.py",
+      "bytes": 11469,
+      "sha256": "d382595fa3003b81e17a67eee97eb01640d8c1bf2a7ff608473bf748ff4ed8df",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/apple-host-tool/test_run.py",
+      "bytes": 3302,
+      "sha256": "c7d4ee73e53169c0f29241e493188d5e921eab3e26321ea32ffc8b71acd24a6c",
+      "mode": "0o644"
+    },
+    {
+      "path": ".github/workflows/apple-host-tool-proof.yml",
+      "bytes": 1989,
+      "sha256": "1db5f3a1d04c6cc622c8a6a44e23cefdf2bc3b9f4bb5c4dd994879bf6d497f49",
+      "mode": "0o644"
+    }
+  ],
+  "limits": {
+    "initial_and_continuous_min_free_bytes": 1073741824,
+    "poll_seconds": 0.2,
+    "all_owned_bytes": 67108864,
+    "timeout_seconds": 30,
+    "host_member_bytes": 67108864,
+    "log_member_bytes": 65536
+  },
+  "new_tool_bytes": "First observed on actual cloud probe, signature checked and kept immutable across queries; not accepted for link hostpins until independent Root review.",
+  "revision": "r1_host_stream_cap_and_fixed_real_tool_hardlink_proof",
+  "host_tool_contract": {
+    "stream_cap_bytes": 67108864,
+    "copy_or_upload_host_binary": false,
+    "new_hardlink_exception_only": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
+    "original_system_exceptions": [
+      "/usr/bin/xcodebuild",
+      "/usr/bin/codesign"
+    ],
+    "repo_sources_nlink": 1,
+    "identity": "dev, inode, mode, uid, gid, nlink, size, mtime_ns, ctime_ns; same fd before/after and original path lstat; no symlink/canonical path; actual nlink recorded",
+    "signature": "same Apple anchor verification/display and exact bundle/version; immutable tool bytes/stat before and after all queries",
+    "probe": "metadata queries only: codesign2 and version2; no build/link; new bytes require Root review before any link hostpin"
+  }
+}

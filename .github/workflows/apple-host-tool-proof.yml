@@ -1,0 +1,51 @@
+name: Apple R9 host-tool proof only
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: Fixed Xcode16.4 real tool and shim comparison; no build or products
+        required: true
+        type: choice
+        options: [apple-r9-xcode164-host-tool-proof-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apple-r9-host-tool-proof-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  host-tool-proof:
+    runs-on: macos-15
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select existing fixed Python and fresh owned root
+        run: |
+          umask 077
+          python="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
+          test -x "$python"
+          test "$(uname -m)" = arm64
+          echo "HOST_PROOF_PYTHON=$python" >> "$GITHUB_ENV"
+          echo "HOST_PROOF_WORK=$RUNNER_TEMP/luobo-apple-r9-host-tool" >> "$GITHUB_ENV"
+      - name: Verify independent source pins without native execution
+        run: '"$HOST_PROOF_PYTHON" -B ci/apple-host-tool/run.py --identity apple-r9-xcode164-host-tool-proof-v1'
+      - name: Apple source and actual sandboxed version queries only
+        run: '"$HOST_PROOF_PYTHON" -B ci/apple-host-tool/run.py --identity apple-r9-xcode164-host-tool-proof-v1 --execute --work "$HOST_PROOF_WORK"'
+      - name: Preserve only metadata and bounded raw query evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-r9-host-tool-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.HOST_PROOF_WORK }}/activation.json
+            ${{ env.HOST_PROOF_WORK }}/resource.json
+            ${{ env.HOST_PROOF_WORK }}/probe-raw.log
+            ${{ env.HOST_PROOF_WORK }}/evidence/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn
