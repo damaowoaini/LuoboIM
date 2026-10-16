@@ -247,7 +247,10 @@ def reference_entry_summary(text, child_exit, reference):
             errors.append(event)
         elif kind == 'done':
             footers.append(event.get('success'))
-    visible = {starts[key]: (key, event) for key, event in finished.items() if not event['hidden']}
+    visible_rows = [(starts[key], key, event) for key, event in finished.items() if not event['hidden']]
+    if len(visible_rows) != 2 or len({row[0] for row in visible_rows}) != 2:
+        raise ValueError('reference requires exactly two distinct visible test names')
+    visible = {name: (key, event) for name, key, event in visible_rows}
     fail_name, pass_name = reference['failed_test_name'], reference['passed_test_name']
     if (child_exit != reference['expected_child_exit'] or len(footers) != 1
             or footers[0] is not False or set(starts) != set(finished)

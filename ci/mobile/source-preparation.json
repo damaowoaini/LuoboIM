@@ -1,10 +1,10 @@
 {
   "schema": "luobo.mobile.source-preparation.v3",
-  "state": "current269_source_adoption_prepared_pending_actual_cloud46_full734_analyze",
+  "state": "current269_fixture_r2_and_reference_parser_r2_prepared_pending_cloud",
   "parent_public_commit": "7d8a9cd42fb009f0d51747c9728e1ed442fa410e",
   "root_final_base_must_match_before_CI_and257_rows": true,
-  "source269_digest": "61c5faec6515a1aeeeb5621ee828748e2a47ee62b9fc2901aadc0cedd37a0cf9",
-  "portable321_digest": "a7ede4a134ee2e55c920e4a282249c1bddd2f9bfac6f5c9b9d877f3e82faad83",
+  "source269_digest": "19c7b1b7dd22677df7c5bdd2b7ea86022a25df3d25c16f95d9e568e377282285",
+  "portable321_digest": "03c8897fb16d787f4fb37b390a2981256b715a5e005f80f1b7e3fe2567085cf9",
   "global_search_v1_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
   "global_search_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
   "selected_source_delta": {
@@ -27,8 +27,7 @@
   },
   "actual_this_revision": {
     "Dart_Flutter_format_pubget_tests_native": 0,
-    "new_product_cases": 0,
-    "Python_gate_tests": 0
+    "pure_Python_evidence": "Separate immutable draft validation receipt; not part of46/734."
   },
   "accepted_history": {
     "git_commit": "314ac55",
@@ -44,5 +43,27 @@
   "auxiliary": "Preexisting local-only app/tool/check.sh retained locally at exact known SHA; absent from public tree and portable runtime, never executed. Public CI authored inventory has zero auxiliary exceptions.",
   "unchanged_contract": "Official framework/engine/Dart and locked packages/SQLite raw SHA; new HOME/TMP/pubcache; setup-only networking; fresh Linux netns; reporter strict completion;4GiB initial/1GiB .2s/768MiB source+reference allocation/900s phase;latched failures win receipts",
   "native_acceptance": false,
-  "root_ci_correction": "Remove draft assumption that local-only developer wrapper exists in public tree; preserve strict authored-source inventory."
+  "root_ci_correction": "Public inventory remains strict; local-only app/tool/check.sh absent in public and never required or copied.",
+  "parent_inputs_sha256": "b2f9d3acc3901743bb7c06acc856d386410981a5b83ff5f62ed201da1b1d4c2e",
+  "followup_delta": {
+    "modified_test_files": 1,
+    "production_files": 0,
+    "dependencies": 0,
+    "fixture_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
+    "optional_parser": "reject duplicate visible names instead of dictionary collapse; existing exact1FAIL/1PASS contract retained",
+    "same_test_names_and_expectations": true,
+    "selected9_extra_job": false,
+    "diagnostics": "bounded runAsync + captureTheme + phase markers in two actual ChatPage tests inside mandatory46"
+  },
+  "prior_current269_incomplete": {
+    "git_commit": "5e2e12dc8da9091bfe9f8f7c928f299bcd4b7bd1",
+    "actual_run": 38857855453,
+    "job": 116833247279,
+    "source_digest": "61c5faec6515a1aeeeb5621ee828748e2a47ee62b9fc2901aadc0cedd37a0cf9",
+    "portable_digest": "a7ede4a134ee2e55c920e4a282249c1bddd2f9bfac6f5c9b9d877f3e82faad83",
+    "inputs_sha256": "b2f9d3acc3901743bb7c06acc856d386410981a5b83ff5f62ed201da1b1d4c2e",
+    "artifact_zip_sha256": "13480f2dd7ca3c9d2eff1f8045fa3fd8b098e17e8c82316abe65efe2996358af",
+    "actual": "target:7 visiblePASS,0 assertion failures,2 error completions,no terminal footer; phase900s timeout; child0 not accepted; full734/analyze not started",
+    "root_cause": "pending; fixture-r2 is a bounded async/theme diagnostic, not a proven fix"
+  }
 }

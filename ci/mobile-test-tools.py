@@ -75,6 +75,16 @@ class ReferenceReporterTests(unittest.TestCase):
         result = self.run_report(reference_report())
         self.assertEqual((result['passed'], result['assertion_failed'], result['hidden_successful_loads']), (1, 1, 1))
 
+    def test_reference_rejects_duplicate_visible_positive_name(self):
+        events = reference_report()
+        name = check.source.descriptor()['reference_entry']['passed_test_name']
+        events[-1:-1] = [
+            {'type': 'testStart', 'test': {'id': 99, 'name': name}},
+            {'type': 'testDone', 'testID': 99, 'hidden': False, 'skipped': False, 'result': 'success'},
+        ]
+        with self.assertRaisesRegex(ValueError, 'exactly two distinct'):
+            self.run_report(events)
+
     def test_reference_rejects_hidden_load_failure(self):
         events = reference_report(); events[1]['result'] = 'error'
         with self.assertRaises(ValueError): self.run_report(events)

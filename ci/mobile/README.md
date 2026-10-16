@@ -24,7 +24,7 @@ sudo unshare --net -- bash "$PWD/ci/mobile-netns.sh" \
   "$(id -un)" "$PWD" "$RUNNER_TEMP/mobile-current269" current269
 ```
 
-纯Python工具单元22项单列，不计入46/734。这里的个数是prepared，须以实际日志为准。
+纯Python工具单元23项单列，不计入46/734。这里的个数是prepared，须以实际日志为准。
 
 ## 可选参考入口（默认关闭）
 
@@ -60,3 +60,18 @@ workflow always上传evidence，包括失败日志/summary/resource，不上传�
 
 本轮只证明源码单元/组件/分析。真实native空CID全局搜索语义、全量分配内存边界、隐藏
 会话及文件OS打开/原消息定位仍需独立设备探针；public core源码不是原opaque4ABI证明。
+
+## fixture-r2 / optional parser-r2 follow-up
+
+run38857855453原始900s中止、7个普通用例通过、两项widget错误及无footer均保留，
+不能算46通过；full734/analyze未开始。根因仍待定位。此轮仅修改
+`global_source_navigation_test.dart`，保留全部9个名称/expect及总46断言：
+两项真实ChatPage显式runAsync做有界初始化/清理、使用已有captureTheme，记录
+startup/mount/settle/assertions/unmount/cleanup阶段；45s单项超时未被放大。
+未替换真实ChatPage、未删正例/跳过、未新建selected9替代阶段。
+默认push仍强制target46→full734→analyze，原网络/资源/工具链门禁不变。
+
+可选reference parser另收紧：必须恰好两个不同visible test名称；同名额外ID
+不再被dict折叠隐藏。新增1项纯Python反例，原严格1具名断言FAIL+1正控PASS不变。
+修改后的reference摘要随同一个测试文件重算；仍是同269上下文的4原生产文件
+参考变体，绝非旧257 full。此修订的Dart执行、根因证明和native验收仍未完成。
