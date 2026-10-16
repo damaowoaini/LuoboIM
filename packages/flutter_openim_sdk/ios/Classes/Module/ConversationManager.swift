@@ -29,6 +29,8 @@ public class ConversationManager: BaseServiceManager {
         self["setConversationMsgDestructTime"] = setConversationMsgDestructTime
         self["hideAllConversations"] = hideAllConversations
         self["searchConversation"] = searchConversation
+        // Match the public Dart channel name while preserving the legacy entry.
+        self["searchConversations"] = searchConversation
         self["setConversationEx"] = setConversationEx
     }
     

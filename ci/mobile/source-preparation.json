@@ -1,538 +1,68 @@
 {
-  "schema": "luobo.mobile.source-preparation.v11",
-  "state": "current310_booking_capability_fixture_r1_pending_cloud",
-  "source310_digest": "82d6003e35ea82bb6af5c9f65e8e136496e5b4c57ae4310dfd3e13932bdd8e17",
-  "portable362_digest": "ddc5b027387872be6452c53cdb77f4703a7bc82e9e2e0cb2bbc044a47496534e",
-  "capability_candidate": {
-    "path": "references/integration/meeting-booking-capability-v1-candidate/candidate-manifest.json",
-    "bytes": 5535,
-    "sha256": "8748f020710df3f5382dcf5d5cebb972238e3771f40174523c1c749870e1a330"
-  },
+  "schema": "luobo.mobile.source-preparation.v12",
+  "state": "current316_font_and_booking_lint_adopted_local_targeted_only_final_regression_pending",
+  "source316_digest": "9450b7bd8b2c65a53461f5eebba39b037bea8f83f6f2d134a07c4274721e203b",
+  "portable368_digest": "82fc3b8b03839aa6456a62f72df71806a3940b70770ebaa8fa291abd58f4497f",
+  "reference316_digest": "fe85a08bd28a4906e8148f17542f242a0bc4eca8eb76c615a40685f3c0dc2cc1",
   "effective_vector": {
-    "path": "references/integration/mobile310-booking-capability-fixture-r1-candidate/effective-source-vector.json",
-    "bytes": 58281,
-    "sha256": "2484ea857f3258fd0729cfe1663054fdc0debbcbbf6bd948c679e40bd448be3b"
+    "path": "references/integration/mobile316-font-ci-candidate/effective-source-vector.json",
+    "bytes": 59428,
+    "sha256": "b843992e2126971502e348ffcb053d2dfe9a083517d60bf8fce4cb05d1c3537c"
+  },
+  "parent_preparation_before": {
+    "path": "references/integration/mobile316-font-ci-candidate/before/ci/mobile/source-preparation.json",
+    "bytes": 33696,
+    "sha256": "46c0635c87b63030cc66103f816d4c92d2c4aaee9492e278d0309fd2e3de72d2"
+  },
+  "font_frozen": {
+    "path": "references/integration/mobile-chat-font-size-candidate/candidate-manifest.json",
+    "bytes": 6321,
+    "sha256": "6ec06bc6b94d6041d375bf4a3699b85b3d8130f803e9ca3a501d6a24c9f89624"
+  },
+  "booking_lint_frozen": {
+    "path": "references/integration/mobile-booking-capability-lint-r2-candidate/candidate-manifest.json",
+    "bytes": 2043,
+    "sha256": "6f6718bc79385e1ca4af3ef922d48abf0ba5f4904673fa9bf79ef6f637588838"
+  },
+  "actual_font_targeted": {
+    "Root_actual_log": {
+      "path": "references/integration/batch-fixes-20261016/font-local-attempt3/tests.log",
+      "bytes": 19454,
+      "sha256": "f341ba81cbea20969fcfc16533d02932bcdcd3216ed1542f66f413b201f56bf8"
+    },
+    "visible_success": 22,
+    "hidden_success": 3,
+    "error": 0,
+    "skip": 0,
+    "unique_true_footer": true,
+    "new22_exact": true,
+    "SDK_cleanup_instances": 11,
+    "cleanup_markers": [
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ],
+    "pure_scaler_widget_has_no_SDK": true,
+    "command_elapsed_seconds_Root_report": 13.37,
+    "all8_Dart_files_fatal_infos_analysis_Root_report": "PASS0",
+    "actual_new_target303_full985": false
+  },
+  "parent310_business_result": {
+    "path": "references/integration/cloud-mobile-ci/run-38914699809-agent/root-result-review.json",
+    "bytes": 842,
+    "sha256": "4c4e8b793372c9f567ed74c798f962c46bdc8844e285f3b4ec91b1f5382de5d1"
   },
   "expected_not_actual": {
-    "target281": 281,
-    "full963": 963,
-    "strictanalysis": 0,
-    "new_capability8": 8,
-    "parent273": 273,
-    "parent955": 955
+    "target303": 303,
+    "full985": 985,
+    "strict_analysis": 0
   },
-  "names": "Exact old955 plus8; target original273 plus the one new8-case test file. All original922/Next29/meeting4 named rows preserved. No names fabricated from accepted full955.",
-  "cleanup": "Original35callrecords(33normal2expectedfailure)/14unmount,76creation+safe6,11Next SDK four-marker sequences,16unit awaited teardown+2geometry unchanged. New8 unit tests each register addTearDown(f.close) that joins controller repository journal before provider, API/session and ownedfolder close; no synthetic markers/native acceptance claim.",
-  "gates": "Same35Python/9guard AST+bothcleanup parsers,4GiB initial/1GiB .2/cap768MiB/900s/netns;SDK51/migration1/174deps exact. No new controller branch.",
-  "reference": "Same explicit defaultoff4replacements/entry2 strict1namedassertFAIL1oldfilterPASS in full310 context, recomputed source digest; no new beforephase.",
-  "public_inventory": "No localhelper exception or copied check.sh; strict business source only.",
-  "product_limit": "Source/loopbackSQLite tests do not prove deployed scheduling or device/media/admission/invitation. Description capability never substitutes server authorization.",
-  "old_source_preparation": {
-    "schema": "luobo.mobile.source-preparation.v10",
-    "state": "current309_next_unread_ready_fixture_r4_pending_cloud",
-    "source309_digest": "f7bc63903e7c1638f2a8753131b8a32588a9cc0535686fd4df8677b962385bbb",
-    "portable361_digest": "74ddbcee72da1760dfccc3447ed458090745840808772d9b6ff7db691808cf9d",
-    "next_unread_candidate": {
-      "path": "references/integration/mobile-next-unread-r5-parent-candidate/candidate-manifest.json",
-      "bytes": 15696,
-      "sha256": "161f9c374eb04b80e79cffd2f18ed26ac324ab4f5f5a9d2cf3477d0a6ea4ea58"
-    },
-    "meeting_candidate": {
-      "path": "references/integration/mobile-meeting-booking-entry-r2-candidate/candidate-manifest.json",
-      "bytes": 2645,
-      "sha256": "fbc9d6423f26f34f41e4c1a6d5b4592f9503ccb8c66ffabf0f42cef67a9ec3cb"
-    },
-    "combined_vector": {
-      "path": "references/integration/mobile309-next-unread-ready-r4-candidate/effective-source-vector.json",
-      "bytes": 58081,
-      "sha256": "cdca6e664179ab6fd788dd43f33153babaed1f747e0f5de1209a4e679d616cc4"
-    },
-    "source_delta": {
-      "next_unread9": 9,
-      "meeting2": 2,
-      "selected11": 11,
-      "source_added5": 5
-    },
-    "accepted_parent_R5": {
-      "path": "references/integration/cloud-mobile-ci/run-38905415839-agent/root-acceptance.json",
-      "bytes": 4589,
-      "sha256": "1096f3fc47877635843af94af05748e9deaab500a30909356ac2398e7cc2d37e"
-    },
-    "expected_not_actual": {
-      "target273": 273,
-      "full955": 955,
-      "new_next29": 29,
-      "new_meeting4": 4,
-      "all_meeting_routes10": 10,
-      "strict_analyze": 0
-    },
-    "required_names": "Exact old922+next29+meeting4 full; original234+next29+wholemeeting10 target. 6 old meeting names come from accepted R5 machine suite, not guessed.",
-    "cleanup": {
-      "fixture_names": [
-        "actual inbox more menu exposes an accessible next unread entry without replacing existing actions",
-        "ordinary message and contacts tab navigation remains available without reading or marking unread",
-        "real message tab double tap reveals the muted unread beyond the first SDK page at large text",
-        "actual next unread menu reaches the end then wraps to the original CID without opening chat",
-        "canceling the actual search switch confirmation preserves the typed filter and performs no full read",
-        "explicitly switching to all conversations finds a hidden-by-filter unread and retains the search draft for reopening",
-        "typing a new filter retires an already dispatched complete read before any old result can scroll",
-        "manual scrolling cancels an admitted pending unread seek and its late reply cannot take the scroll position back",
-        "foreign route coverage and return cannot revive a dispatched unread view but a new explicit action can work",
-        "SDK deletion before the unread reply retires the original CID and never redirects to its shifted row index",
-        "owner replacement retires both a dispatched page read and retained old message-tab callbacks"
-      ],
-      "markers": [
-        "sdk.begin",
-        "sdk.end",
-        "unmount.begin",
-        "unmount.end"
-      ],
-      "unit_names": [
-        "next unread reads the entire SDK inbox beyond forty and preserves muted ordering without writes",
-        "next unread complete empty snapshot differs from a native read failure",
-        "next unread rejects duplicate conversation identities rather than claiming a complete cycle",
-        "next unread keeps the original query ticket through a delayed native reply",
-        "next unread source cannot renew its owner after real logout and login starts",
-        "next unread original CID revision prevents private preview observation after a concurrent clear",
-        "next unread admission rejects a quarantined CID instead of replacing the original cut with a fresh lease",
-        "next unread issuer replacement cannot adopt an old in-flight native snapshot",
-        "next unread tenant replacement cannot adopt an old in-flight native snapshot",
-        "next unread cycles the complete ordered inbox including muted rows and wraps by CID",
-        "next unread does not advance its CID anchor until actual row reveal succeeds",
-        "next unread handles a single unread and a complete all-read inbox without changing counts",
-        "next unread prevents concurrent complete reads while allowing a later explicit new intent",
-        "SDK unread changes retire a pending next-unread request before refresh debounce",
-        "next unread replaces an older paginated response without allowing its late append to corrupt the snapshot",
-        "deleting the previous anchor CID uses the real current viewport anchor on a new explicit cycle"
-      ],
-      "geometry_names": [
-        "real production seek reveals a variable-height sliver target by measured geometry rather than an average height",
-        "production measured seek stops after its original view ticket retires during an actual scroll animation"
-      ],
-      "source_counts": {
-        "SDK_fixture11": 11,
-        "unit16": 16,
-        "geometry2": 2
-      },
-      "SDK_storage_tail": "next_unread_cleanup sdk.end follows awaited closeUnit -> SdkHarness.dispose: real SessionCoordinator.dispose, gateway.dispose, then owned support directory recursive delete. No additional own SQLite database exists in this feature.",
-      "sdk_dispose_primary": {
-        "path": "Newchat-openim/app/test/core/im/sdk_harness.dart",
-        "bytes": 8228,
-        "sha256": "be8ecae48cdd344757a9b4a9e3805272dbb43e84fa35657ea460bee983ed5b56"
-      },
-      "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
-      "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
-    },
-    "old_control_primitives": "All old9 protected AST and callrecords cleanup parser exact. 4GiB initial/1GiB .2/cap768MiB/phase900s/netns/SDK51/migration1/174locks/completion unchanged.",
-    "optional_search_reference": "Defaultoff, same4 historical replacements+same1assertFAIL1filterPASS parser; combined309 digest recomputed.",
-    "next_unread_before_entry2": "Prepared only, not an automatic workflow phase or replacement for search reference.",
-    "public_inventory": "Zero auxiliary exceptions; local tool/check.sh absent public.",
-    "booking_limit": "Release catalog remains empty; routing does not enable scheduling writes/media/catalog. Existing room Detail->Editor stays and must pass old tests.",
-    "old_source_preparation": {
-      "schema": "luobo.mobile.source-preparation.v9",
-      "state": "current304_call_records_lint_r5_pending_cloud",
-      "accepted_parent294": {
-        "commit": "a2e59b08b125dd67e05c8cdf877235daf1933431",
-        "run": 38893402709,
-        "source_digest": "53e836c51aaebabb9f1f064344e6d0e26f384a14ccc4837911cb33584aeeb19c",
-        "portable_digest": "7c96e8e85434447e646f06a8f5168e467387a30a0d0a3aee98dbbf6db17f9e75",
-        "actual": "184/872/strictanalyze0;new18+old854 exact;76sixmarker+safeexit6each;0warnings",
-        "root_acceptance_sha256": "80c0a46710fde0adbe61ad77dcb6598a59f01a9a07d011003736371a55ad6e05"
-      },
-      "source304_digest": "0c7f1c676d45f1cf5eda8ddc04db070ac58fe275de2022ba0b639bed0153fdd8",
-      "portable356_digest": "db14c253f5bd2e3db582079c05128a4e21af9443c03a337e3610cbfee58de7bb",
-      "candidate_manifest": {
-        "path": "references/integration/mobile-call-records-r5-lint-candidate/candidate-manifest.json",
-        "bytes": 7787,
-        "sha256": "8c14f0e0b0c8f860eac1074eeb7d527317db46f935399cc79b56ba1f1e69e5b6"
-      },
-      "current_delta": {
-        "selected": 14,
-        "existing": 4,
-        "new": 10,
-        "production": 9,
-        "test_fixture": 5,
-        "new_cases_prepared": 50,
-        "actual_new_cases": 0
-      },
-      "expected_not_actual": {
-        "target": 234,
-        "full": 922,
-        "strictanalysis": 0
-      },
-      "required_names": "original184+50 exacttarget;original872+50 exactfull. Original872 source test rows allSHA unchanged. Counts never replace successfulname multisets.",
-      "cleanup_contract": {
-        "source_enumerated_named_new_fixtures": 35,
-        "success_recorder_end": 33,
-        "intentional_expected_closefailure": 2,
-        "owned_page_unmount": 14,
-        "repository_framework_awaited_teardown": 15,
-        "old_creation_actual_reference": 76,
-        "state": "preparedonly;future actualraw/testIDs required"
-      },
-      "gates": "9protectedAST exact,old28helper assertions preserved,4newcleanup helper tests prepared;officialtoolchain/174locks/SDK51/migration1/resources/netns/fullcompletion unchanged",
-      "reference": "Original optional search defaultoff/same4 replacements/strict1assertFAIL1oldfilterPASS/restoration; new source304digest 9d58f575aeeba73ec5c538eb599b107dd4188fce7b716aa57e1da79e5ea8760b. No extra referencephase.",
-      "check_sh": "Strict public authored inventory has zeroexceptions;701B known localhelper remains localonly,notcopied/required/uploaded.",
-      "old_history_preparation": {
-        "schema": "luobo.mobile.source-preparation.v8",
-        "state": "current294_shortcuts_r1_proposed_not_run",
-        "accepted_parent287": {
-          "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
-          "actual_run": 38878571484,
-          "job": 116899482457,
-          "source_digest": "86e290284df603c1e182c59d469212a6dacdef602f64b238ce8358b2997715cc",
-          "portable_digest": "a0c79a9bbca06f3ce24817abfb10397b18affc869301690f156272fa20c18402",
-          "actual_target_passed": 134,
-          "actual_full_passed": 822,
-          "actual_analyze_issues": 0,
-          "old785_and_new37_success_name_multisets_exact": true,
-          "strengthened3_hitTest_warnings": 0,
-          "artifact_zip_sha256": "30b58b10baa38e2ce51010f351d68229b31fe6c2866ecfb745787b872ca69b0f",
-          "agent_verification_sha256": "69218bb8944743d8ac6610f696d258ae3677027bde85c1b7a4fcadef3d7cec87",
-          "root_acceptance_sha256": "cc014244d795b4747a2e409a1f03ef1b51ea3e858cf331507d239a914cf98d44",
-          "original_inputs_sha256": "467d5d19bdc6cff9610a2c47b76d5795fc6300a16e7a407ca99742204b89e2a9"
-        },
-        "current291_actual_failure": {
-          "commit": "8ec31e84f57b1c61c198a9c10157de5824b152ab",
-          "run": 38882772904,
-          "job": 116913210368,
-          "source291_digest": "9438367ab2fc8085aa1267a61fb03296ad60c647072fc44a0c1906aa512e00e2",
-          "portable343_digest": "c1dad7ddc93db08c23565e09b2493a17f72e09954a84bb38735057abfc0a5b08",
-          "artifact_zip_sha256": "22db3f2ad1508ee576ee951f948e2e7f44c5bb35b2e769b51c1d7dfb7bda2866",
-          "agent_verification_sha256": "6165d55afe4a7cca78034414dcc094785a2ae29e87e8ec7fe3629491f0cb6ad1",
-          "root_failure_review_sha256": "bc1d7e4464b6e799af01c65dda9c143456157c5e40085ef1c49343c36352e300",
-          "actual": "target163:162PASS1bounded-conditionERROR;16hiddenPASS;allnamescompleted;old134PASS,new28/1;0skip;falsefooter;full851/analyze notstarted",
-          "confirmed_source": "go_router defaultpatternpagekey preserves associatedpageless routes; ChatPage latefinalcontroller firstCID. New composition must also preserve imperativepush state.pageKey.",
-          "accepted": false
-        },
-        "candidate_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
-        "source292_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
-        "portable344_digest": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08",
-        "delta": {
-          "existing": 3,
-          "new": 1,
-          "production_Dart": 1,
-          "test_and_fixture": 3
-        },
-        "default_cloud_sequence": [
-          "unchanged28Python",
-          "strict294_346",
-          "officialFlutter_enforce_lockfile",
-          "target184_original166_plus18_exact_names",
-          "full872_original854_plus18_exact_names",
-          "strictanalyze0"
-        ],
-        "actual_new3_Dart_tests": 0,
-        "expected_not_actual": {
-          "target": 184,
-          "full": 872,
-          "analyze_required": 0
-        },
-        "original29_preserved": "Same29 names;all68 original workflow expect expressions preserved,new5 strengthen priorfailure. New3 directly use actualrouterProvider and realChatPage/controller, mock only existingOS/MethodChannel/HTTP seams.",
-        "reference": "Originaloptional search remains defaultoff full294+same4replacements/same1namedassertFAIL1PASS strictparser; recomputed source digest a0790115407e7dfb23fd45b8850fb9ba6813deaf90740192938716b064979b4a. Shortcutbefore2 remains originalseparatepreparedonly, not executed/repurposed.",
-        "identity_contract": "Page key=(state.pageKey.value,exactCID) preserves uniqueimperativepush; CID changes get freshpage+ownedpagelessretirement; sameCIDquery/metadata retains page/anchor/draft.",
-        "dependency_and_gates": "SDK51+migration1/174lockeddependencies/lock/pubspec/Flutter/SQLite unchanged. 4GiBinitial/1GiB .2s/768MiB/900s/netns/9AST failureandcompletion logic unchanged.",
-        "public_inventory": "Zeroexceptions;knownlocal app/tool/check.sh remains local-onlyabsentpublic.",
-        "native_service_acceptance": false,
-        "current292_actual_failure": {
-          "commit": "e66daa13011a8affa94b151c4020dcb2868d2990",
-          "run": 38884973381,
-          "job": 116920393682,
-          "source292_digest": "9a5f121c46bff5131cc8aaf00f299f70385d32fb6e5f9ab4c943d4200fb3fbb4",
-          "portable344_digest": "7a35bb7ec45d998fa1f64e5e5526f33275cb459d0841b4eebd8cfff870908929",
-          "artifact_zip_sha256": "b5c6106668b9a4b963181fc335dd6ad27c389a9c52ec23e0fe76f95d9e56b3a2",
-          "agent_verification_sha256": "879bd98dc2a8cd60e73336ea5e77442a6a02cbefc94c9d281fec450b508c9372",
-          "actual": "target166:164PASS2fixtureFinderERROR/17hiddenPASS0skipfalsefooter;old134+29PASS,newproductionfirstPASS;full854/analyze notstarted",
-          "errors": [
-            "chat_cid_route_test118 Too many elements during go transition",
-            "chat_cid_route_test172 Too many elements during repeatedpush transition"
-          ],
-          "product_causal_evidence": "Prior failed group expansion retry and actualproductionrouter first case passed;exact2groupreads+3ownedcompleted/newCIDcontroller/metadata/history assertions completed. Not full854 acceptance.",
-          "cleanup": "58fixture instances each6markersordered;0hitTest/overflowwarnings",
-          "accepted": false
-        },
-        "fixture_r2_manifest_sha256": "6e289b40416651dd164cb204ddc704884675592728b39e16c2b417b2bfa5efbd",
-        "fixture_r2_scope": "Only2test/fixture files:exactCID+currentRoute incoming finder;realanimation/sourceTransitionRoute.completed;preserve3names/all47expect and allold822+29. Equivalentbraces around multiline manualrouter assignment;not anactualanalysisFAIL claim. Product andrunner unchanged.",
-        "actual_r2_Dart_tests": 0,
-        "current292_fixture_r2_actual_failure": {
-          "commit": "b6510c439d5f0cbdcce85869f695285e30f8e933",
-          "run": 38886359953,
-          "job": 116924951994,
-          "ZIP_sha256": "a03a0f619fe4a77647e9d24847192fff37f84a4e950bb32cb873581d34566c8c",
-          "agent_verification_sha256": "df3c2848f25ecc8b0e7c7a1cefabf4c563236786fc7fee470e1ddb029b1b3da7",
-          "root_failure_review_sha256": "c26ad90133de6548eb7e3814590660e5872fc4fa5d4bb679fc89041de086fe19",
-          "actual": "target166PASS/17hidden/truefooter;full853PASS1oldclearfixtureERROR/113hidden/falsefooter;all29+3passboth;analysisnotstarted",
-          "cause": "oldtesttapclearcenter396,634.5outside800x600;actualsettingshasSingleChildScrollView;confirm0matchedaftermissedtap",
-          "not_claimed": "CIDrevocationassertionsafterfailedconfirmdidnotruninfull;notall854PASS"
-        },
-        "clear_menu_fixture_r3_manifest_sha256": "9e5bd964fb9e5360c1beb3d1fcce0f1843f569cdb9594a7f8c8a2ba3d4beeecd",
-        "clear_menu_r3_scope": "Onlyoldclearvariantactualscroll/hitTest/owned-sheet-completedbarrier;14expectpreserved3added;no product/runner/name/resourcechange",
-        "actual_r3_Dart_tests": 0,
-        "current292_clear_menu_r3_actual": {
-          "commit": "1a9ec3a33cf5a264d4d0e2e266dafac4bebe1e6e",
-          "run": 38887695138,
-          "job": 116929353370,
-          "artifactID": 12040872287,
-          "ZIP_bytes": 96848,
-          "ZIP_sha256": "a363eecf26318313311ef886633a9b6f32ae7c961a75bdb7087b39e4c4a85f23",
-          "verification_sha256": "7a25dc4b12671bf1f7722c078fd7da1c60e8b8f6907e1a4c7cf08fdff3c80094",
-          "source292_digest": "524af72fc57424854b4b426526fb292b6a465bfeb385e526742496abbb31c126",
-          "portable344_digest": "fd107538a56276af605e7c712e451b78015497f43561b7065880abedab12d3a1",
-          "actual": "166PASS17hidden/full854PASS113hidden;truefooters0errors0skip;old822+29+3 exact;0hitTest/overflow;58six-marker cleanups+safeexit6 each;analyze3info/child1",
-          "analysis_issues": [
-            "group_creation_action.dart89 braces",
-            "group_creation_action.dart117 explicitmounted",
-            "group_creation_action.dart121 nullawareelement"
-          ],
-          "accepted_workflow": false
-        },
-        "group_entry_analysis_r4_manifest_sha256": "22ca8bf359f9fca386e6e65b524f175bd7a1e3b959fa181b7cde3464a383d257",
-        "analysis_r4_scope": "Onlyexistinggroup_creation_action:equivalentbraces;explicitmounted&&originalcurrentbeforeNavigator;[?selectedPeer].Zerochangesalltests/names/runner/locks/resources/network.",
-        "actual_analysis_r4_Dart_tests": 0,
-        "current292_analysis_r4_parent": {
-          "commit": "59f3f511481422d31f449e37963315589d3d4d49",
-          "run": 38889622983,
-          "job": 116935677596,
-          "artifactID": 12041486536,
-          "ZIP_bytes": 97752,
-          "ZIP_sha256": "7ff61e770ae4e58775ea39bf5cc4a5bb500eb08830d58b4e8a43d5fdd127b430",
-          "verification_sha256": "32228f341df41d1effe5fb90b28d134b110b44a4d68eb98cf4a7ca90036025c8",
-          "source292_digest": "cb14335f869b38af1884b24b6c6c88b57d6c87508340febefc2d17de3941a133",
-          "portable344_digest": "9a205fa7b84ff70ea30b666e6bbea4f5b5a374e3488d82cc6b9735717c31eb08",
-          "input_manifest_sha256": "218dc544a3ca967712ff23c930206ab53041ee8195a4f4a5367faa844767072a",
-          "actual": "target166+17hidden/full854+113hidden PASS/truefooters0error0skip;allold822+29+3 namesexact;58sixmarkercleanup+safeexit6each;0hitTest/overflow;strictanalyze0;3phasechild0;0latchedgate",
-          "root_review": "pending independentRootreceipt at thisdraftfreeze; no shortcutapply authorized by thisrecord"
-        },
-        "source294_digest": "53e836c51aaebabb9f1f064344e6d0e26f384a14ccc4837911cb33584aeeb19c",
-        "portable346_digest": "7c96e8e85434447e646f06a8f5168e467387a30a0d0a3aee98dbbf6db17f9e75",
-        "shortcut_manifest_sha256": "7c8173e254a0010f031d5514bce5abc25032844a9acc1526142b81ba936a196f",
-        "current_delta": {
-          "production_existing": 3,
-          "new_test_and_fixture": 2,
-          "actual_new_Dart_tests": 0,
-          "prepared_new_cases": 18
-        },
-        "shortcut_before2": "Separatepreparedonlysamefull294compilationcontextwith3originalbeforebodies;onlyfirst2missingentryassertions,count2FAILexpected;no undefinedcallback/compile/load/timeout accepted productRED. Not default phase/not originalsearch reference.",
-        "shortcut_r1_manifest_sha256": "f1aa575372ec3b4686d7c966ce969f96257b5d43874d80b15acc0aac1068c63c",
-        "shortcut_r1_scope": "2existing only: original opened popup opaque ticket, exact popped/dispose closure, real router delegate URI observers/go->go baseline, actual opened positive/negative+immediate reopen;18 names/old92 expectations preserved after authorized observer/generic substitutions;107 resulting expect expressions.",
-        "current294_shortcuts_v1_actual_failure": {
-          "commit": "5abdb1f4f025864cfc1105aa4cdf9bba1c8c8c9f",
-          "run": 38890973634,
-          "job": 116940120276,
-          "artifactID": 12041244085,
-          "ZIP_bytes": 29843,
-          "ZIP_sha256": "2bfcf711863d1dd0c198367a8df901a5c7593af3a83a3802687d6fa3cbb9d4ef",
-          "agent_verification_sha256": "e6b5908505af37e4e9d5347c38164a4baa1d3f6991a7b6802f4956daffa6bcd0",
-          "root_failure_review_sha256": "5b99f33d6f3fd61bf6be8391723e6e7c6fa0ee28b283a7c2332ee5af6147e4bb",
-          "source294_digest": "ed634fa8df97bf4e02b19797a35cdfdb5add7ea931598dc35173a25181888bc7",
-          "portable346_digest": "06234b58e6fe842d4bb46e94f0ec7a473623afb4673b542a9c7d6ca4cd803291",
-          "actual": "target178PASS6ERROR/18hiddenPASS0skipfalsefooter;original166allPASS,new12PASS6ERROR;full872/analyzeNOTSTARTED;76ordered6markerfixtures,0hitTestwarning",
-          "errors": "first4wrongURIobserver;onepush/goStateassumption;oneownedpopuptimeoutbeforeguardassert.IndependentpinnedframeworkrisknotclaimingobservedguardASSERT."
-        },
-        "actual_shortcut_r1_Dart_tests": 0
-      },
-      "native_service_acceptance": false,
-      "fixture_r2": {
-        "failure": {
-          "path": "references/integration/cloud-mobile-ci/run-38898318098-agent/verification.json",
-          "bytes": 5148,
-          "sha256": "5bb2393e42fd78788dfd05ec164f10af70e3c9f887f2031a3a3a03d74f0c575e"
-        },
-        "source_delta": "fixture-local extension only",
-        "production_tests_names220expects_unchanged": true,
-        "reference_source304_digest": "5699ff9109cbc0e3deab1d8cedfa74a4ee6b6bd91a0024737c74d6eb985694ac",
-        "actual_this_revision": 0
-      },
-      "current_revision_R3": {
-        "selected": 3,
-        "production": 0,
-        "tests_fixture": 3,
-        "actual_Dart_execution": 0,
-        "original50_names": true,
-        "old220_preserved": true,
-        "additional_observations": 2,
-        "changes": "actualFuture bridge returns runAsync before waiting; same original page operations; real remaining timer, no fixed sleep or product Timer changes",
-        "causality": "source-backed only; cloud must prove all50 and full922 with exact success names, cleanup and strict0"
-      },
-      "actual_parent_R2": {
-        "run": 38899133951,
-        "job": 116966759676,
-        "commit": "117afec4f5f2bbf9d4c4ec058309a9f19924cbac",
-        "root_review": {
-          "path": "references/integration/cloud-mobile-ci/run-38899133951-agent/root-failure-review.json",
-          "bytes": 14013,
-          "sha256": "9b4d9ccdb740c100626d7539dd8575d61332e70230cd41160213010054ba0a0f"
-        },
-        "agent_review": {
-          "path": "references/integration/cloud-mobile-ci/run-38899133951-agent/verification.json",
-          "bytes": 6137,
-          "sha256": "3c39f58447c02c7f0fa710df4b69a9a66a42dfa6173aa312e4c0b3d86eb96b4e"
-        },
-        "actual": "218PASS+4ERROR;21hiddenPASS;244start/243done;missingdonefooter;new34PASS/4ERROR/12unstarted;old184exact;900.149phasetimeout child0;full/analyze notstarted",
-        "cause_boundary": "timer/queue scheduling diagnoses are source-backed hypotheses, not R3 runtime proof; four actual outcomes remain separately preserved"
-      },
-      "actual_parent_R3": {
-        "run": 38902412585,
-        "job": 116977614395,
-        "commit": "410d4b59fc8ea384f28ca847deb03dc2f94f5c29",
-        "review": {
-          "path": "references/integration/cloud-mobile-ci/run-38902412585-agent/verification.json",
-          "bytes": 5629,
-          "sha256": "8f93b162a93c9cba24c4c5e01a72eee807fad5aba6957bf24fecc3b941d8e7b3"
-        },
-        "artifact_sha256": "c33ef413c6dbe4fa59193bfb92dfc5095e6816d466e2dd4290137e6f9230392f",
-        "actual": "target234 232PASS2ERROR/22hiddenPASS/falsefooter;old184exact/new48PASS2ERROR;lifetime3PASS;35newcleanup/14unmount+76parent/safe6exact;105.935s child1/noresourcegate;full/analyze notstarted",
-        "confirmed_product_errors": [
-          "retained delete callback ancestor lookup from deactivated builder context",
-          "actual deletion IconButton height40 below44"
-        ]
-      },
-      "current_revision_R4": {
-        "selected_production": 1,
-        "test_fixture_changed": 0,
-        "all50_names222_expects": "exact unchanged",
-        "actual_Dart_execution": 0,
-        "two_fix_scope": "captured owned route+navigator in original sheet finish;explicit44x44/density/taptarget"
-      },
-      "actual_parent_R4": {
-        "run": 38903862919,
-        "job": 116982452406,
-        "commit": "20a217a4304c3be3b6f4e81bba8427bbb8554985",
-        "review": {
-          "path": "references/integration/cloud-mobile-ci/run-38903862919-agent/verification.json",
-          "bytes": 8067,
-          "sha256": "bb596a08b9dba8e2438ec322f9bcd2957a0106df4d1571a545f6b1945259eb9a"
-        },
-        "artifact_sha256": "5893969e58688f157adcc23a4749851ae6714d322e54fd9deaa1fbf8350ee1a0",
-        "actual": "target234/full922 allPASS;old872+new50 exact;22/118hiddenPASS;truefooters0error0skip/warnings;all35recorders14unmounts76creation/safe6both exact;strictanalysis22infochild1",
-        "info_counts": {
-          "prefer_initializing_formals": 1,
-          "braces": 10,
-          "avoid_print": 11
-        }
-      },
-      "current_revision_R5": {
-        "selected_prod": 3,
-        "selected_test_fixture": 4,
-        "all50_names222expects_and11markers": "exact unchanged",
-        "actual_Dart_execution": 0,
-        "equivalent_lint": "constructor redirect1,braces10,synchronous debugPrintSynchronously11; no lint ignore/analysis gate change"
-      }
-    },
-    "actual_new_Dart_tests": 0,
-    "whitespace_r1": {
-      "manifest": {
-        "path": "references/integration/mobile-next-unread-whitespace-r1-candidate/candidate-manifest.json",
-        "bytes": 2379,
-        "sha256": "09db54c6808377776e53953d3fc10c57b7ffd1f42a88604e2e80b06d5dc424e4"
-      },
-      "parent_source309": "91b684138d753dae86e8e10c2a3fcef5d943a7c84d6769ec5486832f6d5e0d39",
-      "parent_portable361": "e60c1968ba84afa6b59bfe2a38346492a9b56c4ac0eeb10f2561495e05b77850",
-      "reason": "Root git diff --check line148 trailing U+0020;only this byte removed before first push",
-      "old_frozen_payloads_unchanged": true,
-      "actual_new_Dart_tests": 0
-    },
-    "fixture_r2": {
-      "manifest": {
-        "path": "references/integration/mobile309-next-unread-meeting-fixture-r2-candidate/candidate-manifest.json",
-        "bytes": 4287,
-        "sha256": "d7d6f4521793b3edcee6de266065697680ff46180bff5526c9a3409711df7f4e"
-      },
-      "selected_test_files": 3,
-      "production_changed": 0,
-      "all33new_names_and273955requirements": "unchanged",
-      "repository_contract": "Two impossible post-global-quarantine snapshot expectations explicitly replaced by sync sessionExpired,zero-read,oldcut/private-unobserved assertions;successful-clear snapshot checks unchanged",
-      "actual_new_Dart_tests": 0
-    },
-    "actual_parent_R1": {
-      "commit": "4758b30b6ac315f5e37e0b9fe436d7683769c868",
-      "run": 38907998095,
-      "job": 116996371640,
-      "agent": {
-        "path": "references/integration/cloud-mobile-ci/run-38907998095-agent/verification.json",
-        "bytes": 6630,
-        "sha256": "3bbfbd004a6a6d2da4840dd19eebc8b42bc3bc0d0060154802a82f907906ab76"
-      },
-      "Root": {
-        "path": "references/integration/cloud-mobile-ci/run-38907998095-agent/root-failure-review.json",
-        "bytes": 19330,
-        "sha256": "769d4bccf67997fe1ebef72488cd542aceaaee6af09d432304550f6b2e30f1fc"
-      },
-      "actual": "target273 completed265PASS8ERROR/26hiddenPASS/falsefooter;old234+oldmeeting6allPASS;Next24/5,newmeeting1/3;cleanup11Next+35/14+76safe6exact;126.972child1noresourcegate;full955/analyze notstarted"
-    },
-    "cleanup_print_r3": {
-      "manifest": {
-        "path": "references/integration/mobile309-cleanup-print-r3-candidate/candidate-manifest.json",
-        "bytes": 2784,
-        "sha256": "e9dd7755bf031faf0aba3a84d2bd580dd175bdfcdc4b4c937129c9cfedf74570"
-      },
-      "before_virtual_post_R2": true,
-      "scope": "Exact four print -> debugPrintSynchronously plus explicit foundation show import; messages/ordering/await/cleanup/name/count contracts unchanged.",
-      "production_changed": 0,
-      "actual_Dart_tests": 0
-    },
-    "ready_fixture_r4": {
-      "manifest": {
-        "path": "references/integration/mobile309-next-unread-ready-r4-candidate/candidate-manifest.json",
-        "bytes": 2455,
-        "sha256": "3ea461dadef3b05f5c6f8d52c0b366285350d910b278f2c4fb07c741a9cdb90e"
-      },
-      "scope": "Bounded unfiltered finder exactlyone AND hitTestable exactlyone before originaltester.element/ownedroute animationbarrier",
-      "all_names_expect_bodies_unchanged": true,
-      "actual_Dart_tests": 0
-    },
-    "actual_parent_R2_R3": {
-      "commit": "358b87307e096e4708d8996dbc51688d2d7efba6",
-      "run": 38910383268,
-      "job": 117004422061,
-      "agent": {
-        "path": "references/integration/cloud-mobile-ci/run-38910383268-agent/verification.json",
-        "bytes": 6228,
-        "sha256": "ba8e2b1b703a4aeb5ff4a659eb668d94aa66850c2e59d703a4b921c3057c84df"
-      },
-      "actual": "273completed272PASS1ERROR/26hiddenPASS/0skipfalsefooter;old234+meeting10allPASS;full955/analyze notstarted"
-    }
-  },
-  "actual_Dart_tests": 0,
-  "main_public_modified": false,
-  "accepted_parent309": {
-    "commit": "e5d2410f095dab391c8ccc3b226b7b8b6988cdfb",
-    "run": 38911518860,
-    "job": 117008268019,
-    "root_acceptance": {
-      "path": "references/integration/cloud-mobile-ci/run-38911518860-agent/root-acceptance.json",
-      "bytes": 6378,
-      "sha256": "a8110fe0899cdfe0b9759b5b9435632ceec8d415bb5b9486b5b75a3cc96ac742"
-    },
-    "source309": "f7bc63903e7c1638f2a8753131b8a32588a9cc0535686fd4df8677b962385bbb",
-    "portable361": "74ddbcee72da1760dfccc3447ed458090745840808772d9b6ff7db691808cf9d",
-    "actual": "273PASS+26hidden/full955PASS+121hidden/strictanalyze0;allrequiredname multisets/cleanup exact;0errors0skip0warning;3resource child0/nogate",
-    "public_HEAD_context": "3bf70123f0a8a05eb63f952f75486a3f1a96b9d6",
-    "non_mobile_HEAD_change": "Only native8 changed after accepted mobile commit; all13 mobile/CI before and full309/SDK51 checked in bothtrees."
-  },
-  "frozen_prior_CI": {
-    "path": "references/integration/mobile310-booking-capability-ci-candidate/ci-adoption-manifest.json",
-    "bytes": 8184,
-    "sha256": "489b3c5187dad1de06ee8429f5ea18071a885bf0c9279af6442ed75c1ab402c5"
-  },
-  "fixture_r1": {
-    "manifest": {
-      "path": "references/integration/mobile310-booking-capability-fixture-r1-candidate/candidate-manifest.json",
-      "bytes": 2491,
-      "sha256": "ff547063f8da9c770331bf6fbbdf671e73f969e175c72e3835759f3f79263c14"
-    },
-    "scope": "localnonnullable awaitedreturn; original8names/allassertions unchanged;production0",
-    "actual_Dart_tests": 0
-  },
-  "actual_first310": {
-    "commit": "527ba5266137917328d7f51b5f372c4b7dbf1c1f",
-    "run": 38913502807,
-    "job": 117014972642,
-    "agent": {
-      "path": "references/integration/cloud-mobile-ci/run-38913502807-agent/verification.json",
-      "bytes": 6722,
-      "sha256": "ce74d3b2fbfc8eaca633411bceea5938fd622d63828c8fa71a1f7888b41100fc"
-    },
-    "actual": "273parentPASS+1visibleloaderERROR/26hiddenPASS/300startdonefalsefooter;8newunrun;full963/analyze notstarted"
-  }
+  "names": "Exact original281/963 plus all22 locally successful font names; every older name row/multiplicity retained. No hidden load can replace a visible case.",
+  "cleanup": "Existing35 recorder/14unmount,76creation/safe6,11Next parsers unchanged. Newfont local log proves11SDK four-marker teardowns; pure nonlinear widget has no SDK. No new cleanup parser.",
+  "control": "Same35Python checks,9guardAST+2cleanup parsers,4GiB admission/1GiB .2/cap768MiB/900s/netns;SDK51/migration1/174lockeddeps unchanged.",
+  "execution_policy": "workflow_dispatch only preserved from current queued workflow. No full per feature/batch; once after all known issues fixed and targeted checks clean. No dispatch/push/localfull in this draft.",
+  "reference": "Defaultoff exact4 historical search replacements in full316; strict1namedassertFAIL1oldfilterPASS parser unchanged.",
+  "public_inventory": "Strict business inventory, no check.sh exception. Private helper remains private; public absent.",
+  "native_service_acceptance": false
 }

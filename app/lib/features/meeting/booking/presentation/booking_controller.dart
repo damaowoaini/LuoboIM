@@ -10,10 +10,14 @@ import '../domain/booking_view.dart';
 enum BookingAvailability { unsupported, checking, ready, unavailable }
 
 final class BookingController extends ChangeNotifier {
-  BookingController(this.repository, {required bool released, bool requireCapability = false,
-    DateTime Function()? now, Stream<int>? invalidations, Stream<int>? accessChanges})
+  BookingController(MeetingBookingRepository repository, {required bool released,
+    bool requireCapability = false, DateTime Function()? now,
+    Stream<int>? invalidations, Stream<int>? accessChanges})
+    : this._(repository, released, requireCapability, now, invalidations, accessChanges);
+  BookingController._(this.repository, bool released, this._requireCapability,
+    DateTime Function()? now, Stream<int>? invalidations, Stream<int>? accessChanges)
     : availability = released ? BookingAvailability.checking : BookingAvailability.unsupported,
-      _released = released, _requireCapability = requireCapability, now = now ?? DateTime.now {
+      _released = released, now = now ?? DateTime.now {
     _invalidations = invalidations?.listen((_) => retire());
     _accessChanges = accessChanges?.listen((_) => retire());
   }
@@ -137,7 +141,9 @@ final class BookingController extends ChangeNotifier {
   }
   Future<BookingReceipt?> recover(String id, {bool retry = false, bool resolve = false}) async {
     if (!usable || !_released || _busy.contains('intent:$id') ||
-        (_requireCapability && (retry || resolve) && !canWrite)) return null;
+        (_requireCapability && (retry || resolve) && !canWrite)) {
+      return null;
+    }
     final key = 'intent:$id'; _busy.add(key); notice = null; _emit();
     try {
       // A local prepare failure may leave only this mounted controller's frozen

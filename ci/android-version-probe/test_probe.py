@@ -41,6 +41,10 @@ def dependency(group, name, version):
     return '<dependency><groupId>' + group + '</groupId><artifactId>' + name + '</artifactId><version>' + version + '</version></dependency>'
 
 
+def jvm_api_variant(data):
+    return next(v for v in data['variants'] if v['name']=='jvmApiElements-published')
+
+
 class ProbeTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -50,6 +54,36 @@ class ProbeTests(unittest.TestCase):
         self.inputs['metadata_pins'] = []
     def recorder(self, bodies=None):
         return broker.Recorder(self.work, self.inputs, Budget(), Origin(bodies or {}))
+
+    def pair_recorder(self, child_change=None, parent_change=None, spec_change=None,
+            repin_child=False, repin_parent=False):
+        inputs = json.loads((HERE / 'inputs.json').read_text())
+        pair = inputs['published_component_pairs'][0]
+        bodies = {}
+        for side, name, change, repin in (
+                ('child','kotlinx-coroutines-core-jvm-1.8.0.module',child_change,repin_child),
+                ('parent','kotlinx-coroutines-core-1.8.0.module',parent_change,repin_parent)):
+            body = (HERE / 'fixtures' / name).read_bytes()
+            self.assertEqual(broker.digest(body),pair[side]['sha256'])
+            if change:
+                data = json.loads(body); change(data); body = json.dumps(data).encode()
+            if repin:
+                # Synthetic reviewed-input copies reach link/identity checks beyond
+                # the real immutable hash gate. Actual shipped inputs are untouched.
+                pair[side].update(bytes=len(body),sha256=broker.digest(body))
+                pin = next(x for x in inputs['metadata_pins'] if x['path']==pair[side]['path'])
+                pin.update(bytes=len(body),sha256=broker.digest(body))
+            bodies[pair[side]['path']] = (200,body)
+        if spec_change:
+            spec_change(pair)
+        self.pair_turn = getattr(self,'pair_turn',0) + 1
+        work = self.work / ('pair-' + str(self.pair_turn)); work.mkdir()
+        r = broker.Recorder(work,inputs,Budget(),Origin(bodies))
+        # Existing fixed transitive authority; actual POM->grant behavior is
+        # already covered by the original unchanged test_actual_POM... method.
+        r.grant(*pair['child']['coordinate'][:2],broker.constraint('1.8.0'),
+            {'kind':'published-metadata','coordinate':'unit:already-authorized:1'})
+        return r,pair['child']['path'],pair['parent']['path']
 
     def actual_report_fixture(self):
         configs, responses, events = [], [], []
@@ -270,6 +304,155 @@ class ProbeTests(unittest.TestCase):
         (self.work/'evidence/online-actual.json').write_text(json.dumps(actual))
         with self.assertRaisesRegex(ValueError,'fourth rich selector|root/configuration'):
             probe.verify_graph(self.work,'online',self.inputs,responses,events)
+
+    def test_real_KMP_pair_learns_only_authorized_leaf(self):
+        r,path,parent = self.pair_recorder()
+        row = r.obtain(path)
+        self.assertEqual(r.states[path],'validated'); self.assertEqual(r.states[parent],'validated')
+        self.assertEqual(r.origin.calls,[path,parent])
+        self.assertEqual(r.pair_proofs[path]['parent_response']['kind'],'source-only')
+        self.assertEqual(len(r.pair_proofs[path]['verified_links']),3)
+        expected = {(x['group'],x['module']) for x in r.inputs['roots']} | {
+            ('org.jetbrains.kotlinx','kotlinx-coroutines-core-jvm'),('org.jetbrains.kotlinx','kotlinx-coroutines-bom'),
+            ('org.jetbrains','annotations'),('org.jetbrains.kotlin','kotlin-stdlib')}
+        self.assertEqual(set(r.versions),expected)
+        self.assertEqual(row['body']['sha256'],'ff6a22da40040938751db0ae21177e76517dbf126a76796f5426727bf76c1228')
+        self.assertIn('kotlinx-coroutines-core-jvm-1.8.0.jar',r.files[('org.jetbrains.kotlinx','kotlinx-coroutines-core-jvm','1.8.0')])
+        self.assertIsNone(r.failure)
+
+    def test_proof_only_parent_cannot_be_client_metadata(self):
+        r,path,parent = self.pair_recorder()
+        with self.assertRaisesRegex(ValueError,'internal_parent_proof_not_client_metadata'):
+            r.admit_client(parent)
+        self.assertEqual(r.origin.calls,[])
+
+    def test_pair_real_child_or_parent_hash_change_refused(self):
+        for side in ('child','parent'):
+            with self.subTest(side=side):
+                changes={side+'_change':lambda x:x.update(createdBy={'synthetic':'changed'})}
+                r,path,parent = self.pair_recorder(**changes)
+                with self.assertRaisesRegex(ValueError,'published_root_metadata_pin_mismatch'):
+                    r.obtain(path)
+                self.assertNotIn(path,r.cache); self.assertEqual(r.states[path],'rejected')
+                self.assertNotIn(('org.jetbrains','annotations'),r.versions)
+
+    def test_pair_unknown_component_identity_or_version_refused(self):
+        for key,value in (('module','unreviewed-component'),('version','1.8.1')):
+            with self.subTest(field=key):
+                r,path,parent = self.pair_recorder(child_change=lambda x:x['component'].update({key:value}),repin_child=True)
+                with self.assertRaisesRegex(ValueError,'published_pair_child_component'):
+                    r.obtain(path)
+                self.assertEqual(r.origin.calls,[path]); self.assertNotIn(path,r.cache)
+
+    def test_pair_forward_cross_origin_absolute_and_query_urls_refused(self):
+        for bad in ('https://outside.example/a.module',
+                'https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.8.0/kotlinx-coroutines-core-1.8.0.module',
+                '../../kotlinx-coroutines-core/1.8.0/kotlinx-coroutines-core-1.8.0.module?synthetic=1',
+                '../../kotlinx-coroutines-core/1.8.0/kotlinx-coroutines-core-1.8.0.module#fragment',
+                '../../kotlinx-coroutines-core/1.8.0/%6botlinx-coroutines-core-1.8.0.module'):
+            with self.subTest(URL=bad):
+                r,path,parent = self.pair_recorder(child_change=lambda x:x['component'].update(url=bad),repin_child=True,
+                    spec_change=lambda x:x['child']['published_component'].update(url=bad))
+                with self.assertRaisesRegex(ValueError,'published_pair_link_refused'):
+                    r.obtain(path)
+                self.assertEqual(r.origin.calls,[path]); self.assertNotIn(path,r.cache)
+
+    def test_pair_wrong_missing_backlink_or_attributes_refused(self):
+        def missing(x): del jvm_api_variant(x)['available-at']
+        for change in (missing,
+                lambda x:jvm_api_variant(x)['available-at'].update(module='unreviewed-leaf'),
+                lambda x:jvm_api_variant(x)['attributes'].update({'org.gradle.usage':'unreviewed-usage'})):
+            r,path,parent = self.pair_recorder(parent_change=change,repin_parent=True)
+            with self.assertRaisesRegex(ValueError,'published_pair_backlink_or_attributes'):
+                r.obtain(path)
+            self.assertNotIn(path,r.cache); self.assertNotIn(('org.jetbrains','annotations'),r.versions)
+
+    def test_pair_reverse_cross_origin_link_refused_even_with_same_tuple(self):
+        bad='https://outside.example/unreviewed.module'
+        r,path,parent = self.pair_recorder(parent_change=lambda x:jvm_api_variant(x)['available-at'].update(url=bad),repin_parent=True,
+            spec_change=lambda x:x['links'][0]['available_at'].update(url=bad))
+        with self.assertRaisesRegex(ValueError,'published_pair_link_refused'):
+            r.obtain(path)
+        self.assertNotIn(path,r.cache)
+
+    def test_unknown_component_pair_is_not_general_exception(self):
+        r,path,parent = self.pair_recorder(); r.inputs['published_component_pairs']=[]
+        with self.assertRaisesRegex(ValueError,'unreviewed_published_component_pair'):
+            r.obtain(path)
+        self.assertEqual(r.origin.calls,[path]); self.assertNotIn(path,r.cache)
+
+    def test_exact_pair_cannot_hide_fourth_rich_dependency(self):
+        r,path,parent = self.pair_recorder(
+            child_change=lambda x:x['variants'][0]['dependencies'][0]['version'].update(requires='[1,2)'),repin_child=True)
+        with self.assertRaisesRegex(ValueError,'unreviewed_rich_metadata_edge'):
+            r.obtain(path)
+        self.assertEqual(r.states[path],'rejected'); self.assertNotIn(path,r.cache)
+        calls=list(r.origin.calls)
+        with self.assertRaisesRegex(ValueError,'pending_or_rejected_response_not_servable'):
+            r.obtain(path)
+        with self.assertRaisesRegex(ValueError,'broker_failure_latched'):
+            r.obtain(parent)
+        self.assertEqual(r.origin.calls,calls)
+
+    def test_rejected_metadata_retry_retains_witness_without_cache_revival(self):
+        path='/maven2/org/bouncycastle/bcpg-jdk18on/1.80/bcpg-jdk18on-1.80.pom'
+        wrong=pom('wrong.group','bcpg-jdk18on','1.80')
+        r=self.recorder({path:(200,wrong)})
+        with self.assertRaisesRegex(ValueError,'POM_identity_mismatch'): r.obtain(path)
+        r.origin.bodies[path]=(200,pom('org.bouncycastle','bcpg-jdk18on','1.80'))
+        with self.assertRaisesRegex(ValueError,'pending_or_rejected_response_not_servable'): r.obtain(path)
+        self.assertEqual(r.origin.calls,[path]); self.assertEqual(r.cache,{})
+        self.assertEqual((r.work/r.observations[path]['body']['path']).read_bytes(),wrong)
+        r.snapshot('rejected-unit'); snapshot=json.loads((r.work/'evidence/broker/rejected-unit.json').read_text())
+        self.assertEqual(snapshot['responses'],[])
+        self.assertEqual(snapshot['rejection_codes'],{path:'POM_identity_mismatch'})
+        self.assertEqual(len(snapshot['rejected_responses']),1)
+
+    def test_pending_response_is_not_servable_during_origin_read(self):
+        path='/maven2/org/bouncycastle/bcpg-jdk18on/1.80/bcpg-jdk18on-1.80.pom'
+        r=self.recorder(); seen=[]
+        def origin_read(request,limit):
+            try: r.obtain(path)
+            except ValueError as error: seen.append(str(error))
+            return 200,pom('org.bouncycastle','bcpg-jdk18on','1.80')
+        r.origin.get=origin_read
+        r.obtain(path)
+        self.assertEqual(seen,['pending_or_rejected_response_not_servable'])
+        self.assertEqual(r.states[path],'validated')
+
+    def test_untrusted_error_text_and_nonadmitted_paths_are_not_public_evidence(self):
+        self.assertEqual(broker.refusal_code(ValueError('untrusted /query?synthetic=1')),'metadata_or_IO_refused')
+        self.assertEqual(broker.refusal_code(ValueError('POM_identity_mismatch')),'POM_identity_mismatch')
+        r=self.recorder()
+        with self.assertRaisesRegex(ValueError,'unsafe_maven_path'):
+            r.obtain('/maven2/org/bouncycastle/bcpg/1/a.pom?synthetic=1')
+        self.assertEqual(r.states,{}); self.assertEqual(r.rejections,{})
+        self.assertEqual(r.observations,{}); self.assertEqual(r.origin.calls,[])
+
+    def test_prevalidated_parent_body_tamper_refused_before_child_grants(self):
+        r,path,parent = self.pair_recorder(); row=r.obtain(parent)
+        p=r.work/row['body']['path']; body=p.read_bytes(); p.write_bytes(b'x'+body[1:])
+        with self.assertRaisesRegex(ValueError,'captured_body_bytes_changed'):
+            r.obtain(path)
+        self.assertEqual(r.states[path],'rejected'); self.assertNotIn(path,r.cache)
+        self.assertNotIn(('org.jetbrains','annotations'),r.versions)
+
+    def test_arbitrary_ASCII_word_is_not_a_trusted_refusal_enum(self):
+        self.assertEqual(broker.refusal_code(ValueError('syntheticCredentialAlpha123')),'metadata_or_IO_refused')
+        self.assertEqual(broker.refusal_code(ValueError('ordinaryASCIIword')),'metadata_or_IO_refused')
+
+    def test_origin_ASCII_word_never_enters_public_rejection_or_snapshot(self):
+        path='/maven2/org/bouncycastle/bcpg-jdk18on/1.80/bcpg-jdk18on-1.80.pom'
+        r=self.recorder()
+        def origin_failure(request,limit): raise ValueError('syntheticCredentialAlpha123')
+        r.origin.get=origin_failure
+        with self.assertRaisesRegex(ValueError,'syntheticCredentialAlpha123'): r.obtain(path)
+        self.assertEqual(r.failure,'metadata_or_IO_refused')
+        self.assertEqual(r.rejections,{path:'metadata_or_IO_refused'})
+        r.snapshot('opaque-origin-unit')
+        body=(r.work/'evidence/broker/opaque-origin-unit.json').read_text()
+        self.assertNotIn('syntheticCredentialAlpha123',body)
+        self.assertEqual(json.loads(body)['rejection_codes'],{path:'metadata_or_IO_refused'})
 
 
 if __name__ == '__main__':

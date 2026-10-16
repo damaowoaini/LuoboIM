@@ -1,4 +1,6 @@
 {
+  "R12_root_design_review_sha256": "741571833e257d50bc7f6ff2655e5bf94611308adc5d3664d9e9a97f51b49a2c",
+  "R12_source_plan_manifest_sha256": "87284b6788ae747d6aafcfed620deaa67458539cb90a85204444cb093d33161f",
   "borrowed_scope": "Only Job.tool, netns and support primitives; import closure audit/verify_inputs and exact toolchain, plus workflow secret_scan. No parent CLI/stage called.",
   "cohort": "current257-rich-version-provenance-v1",
   "entry": "readonly default; explicit acquire then offline only; no native dispatch",
@@ -34,14 +36,24 @@
       "sha256": "266a89fe31cbd9c40aa566a8f8f1404d9a04fed2a9a736a6cafac7e9142eede5"
     },
     {
-      "bytes": 23059,
+      "bytes": 30290,
       "path": "ci/android-version-probe/broker.py",
-      "sha256": "330d3bd05bc990fa11e151f23cfa11158734354defde7560c0e952536cb103cd"
+      "sha256": "0615c47d401ca697455589303c3149ea740d4126736d1e335b51f4c9e9a64f2c"
     },
     {
-      "bytes": 8321,
+      "bytes": 40513,
+      "path": "ci/android-version-probe/fixtures/kotlinx-coroutines-core-1.8.0.module",
+      "sha256": "144eecd5365de3e30d7b46226c058051e39955b5c189e31fa4c7cffb99d620ba"
+    },
+    {
+      "bytes": 4278,
+      "path": "ci/android-version-probe/fixtures/kotlinx-coroutines-core-jvm-1.8.0.module",
+      "sha256": "ff6a22da40040938751db0ae21177e76517dbf126a76796f5426727bf76c1228"
+    },
+    {
+      "bytes": 12548,
       "path": "ci/android-version-probe/inputs.json",
-      "sha256": "ab543be0333d34d645183cfdbb958759f8deea836e59c8d0ea619f04c7af37a6"
+      "sha256": "9d66add1f0b6a4fee8979406002f86de9afac37b4f097b486445543ef71f96d0"
     },
     {
       "bytes": 485,
@@ -54,14 +66,14 @@
       "sha256": "349b09908302a83894d28b63ddc396c7d98892060b73f15b4f443a4038a08818"
     },
     {
-      "bytes": 21149,
+      "bytes": 21259,
       "path": "ci/android-version-probe/run.py",
-      "sha256": "2e213a2623ae14aebf3b38d935a27789b8121dc2e2b08fad921f760147b9320b"
+      "sha256": "72a57601d15ec2ff7150778fc56520b654767a02a1faba5085cf3eaaf1e35605"
     },
     {
-      "bytes": 16454,
+      "bytes": 28072,
       "path": "ci/android-version-probe/test_probe.py",
-      "sha256": "f574932c8c7bf008843ad954b96a69719a80d7a1e1f77770875dc6f7285cea96"
+      "sha256": "af468f06cbf352109d8a8b156ecb306df49107426425ca1f57364b50ab8bfbbc"
     },
     {
       "bytes": 6600,
@@ -69,11 +81,12 @@
       "sha256": "86b539008eb65f4b81840ea20f13587ca3e87c3cf5796a039ae5d9af4fcd91da"
     }
   ],
-  "fixture_revision": "R1-only actual urllib response-shaped mock; no producer/broker/controller semantics change",
+  "fixture_revision": "Original39 method/assert AST exact;2 new targeted methods prepared; Root owns execution",
+  "implementation_revision": "R12_R1_fixed_finite_refusal_enum_only",
   "native_execution": false,
-  "parent_candidate_manifest_sha256": "6dcca3c27f9d86521cf2b320fafae0a02827c89a040b0572e8b23095ae2e117b",
+  "parent_candidate_manifest_sha256": "28d576fec3d0c64982d0d29ac9209f0c0dd5eadc6a9a96dfc53f86de2d509138",
   "root_review_sha256": "63302f7ca8b00e46aee9b652b32cd9cda3bd6dda590835aab8b41ef0421ad2d3",
   "schema": 1,
   "source_plan_manifest_sha256": "4dfb943077d149a2721db6ad44a75be9432d0824b7f564b6e24b49fe37adca7b",
-  "state": "frozen_source_only_pending_actual_execution"
+  "state": "frozen_R12_source_only_pending_Root_units_and_actual_online_offline"
 }

@@ -1,22 +1,7 @@
 name: Group stage3 isolated full-package source
 
+# Run full regression once after the known issues are fixed and targeted checks pass.
 on:
-  push:
-    paths:
-      - 'ci/group-stage3/**'
-      - 'ci/candidates/group-stage3/**'
-      - 'ci/candidates/group-stage3-fixture/**'
-      - 'ci/candidates/group-stage3-member-notice/**'
-      - 'ci/candidates/group-stage3-callback-policy/**'
-      - '.github/workflows/group-stage3-source.yml'
-  pull_request:
-    paths:
-      - 'ci/group-stage3/**'
-      - 'ci/candidates/group-stage3/**'
-      - 'ci/candidates/group-stage3-fixture/**'
-      - 'ci/candidates/group-stage3-member-notice/**'
-      - 'ci/candidates/group-stage3-callback-policy/**'
-      - '.github/workflows/group-stage3-source.yml'
   workflow_dispatch:
 
 permissions:

@@ -9,6 +9,7 @@ import ssl
 import stat
 import threading
 import urllib.error
+from urllib.parse import urljoin, urlsplit
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -16,6 +17,31 @@ ORIGIN = 'https://repo.maven.apache.org'
 TOKEN = re.compile(r'[A-Za-z0-9_][A-Za-z0-9_.-]{0,159}\Z')
 FIXED = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}\Z')
 MAX_BODY = 128 * 1024 ** 2
+# Values are explicitly reviewed internal diagnostics. Exception-text syntax
+# never establishes trust; all other words, messages and exception types fold
+# to the single fallback below.
+REFUSAL_CODES = frozenset({
+    'HTTP_authority_or_header_refused', 'HTTP_event_limit', 'POM_identity_mismatch',
+    'XML_external_entity_refused', 'available_at_origin_or_identity', 'broker_did_not_stop',
+    'broker_failure_latched', 'captured_body_bytes_changed', 'captured_body_path_changed',
+    'captured_body_stat_changed', 'conflicting_published_artifact_pin',
+    'delivered_bytes_differ_from_captured_origin', 'duplicate_metadata_JSON_key',
+    'external_module_file_URL', 'incomplete_module_path', 'internal_parent_proof_not_client_metadata',
+    'invalid_module_identity', 'invalid_published_artifact_checksum', 'metadata_authority_node_limit',
+    'metadata_depth_or_count_limit', 'module_metadata_identity', 'origin_aggregate_body_limit',
+    'origin_body_contract_or_limit', 'pending_or_rejected_response_not_servable',
+    'published_artifact_size_limit', 'published_pair_backlink_or_attributes',
+    'published_pair_child_component', 'published_pair_child_pin_mismatch', 'published_pair_link_refused',
+    'published_pair_parent_component', 'published_pair_parent_pin_mismatch',
+    'published_pair_parent_source_only_pin', 'published_pair_variant_set',
+    'published_root_metadata_pin_mismatch', 'recursive_POM_property', 'unapproved_artifact_name',
+    'unapproved_module_version', 'unapproved_version_listing', 'unknown_metadata_version_constraint',
+    'unresolved_POM_property', 'unreviewed_POM_parent_inheritance',
+    'unreviewed_published_component_pair', 'unreviewed_rich_metadata_edge', 'unsafe_maven_path',
+    'upstream_body_limit', 'upstream_http_failure', 'upstream_length_mismatch',
+    'upstream_origin_or_encoding_changed', 'upstream_redirect_refused', 'upstream_status_refused',
+    'version_listing_identity', 'version_listing_limit',
+})
 
 
 def digest(body):
@@ -73,6 +99,14 @@ def unique_json(body):
     return json.loads(body, object_pairs_hook=pairs)
 
 
+def refusal_code(error):
+    """Only bounded enums may enter public failure evidence, never error text."""
+    code = str(error) if isinstance(error, ValueError) else None
+    if code in REFUSAL_CODES:
+        return code
+    return 'metadata_or_IO_refused'
+
+
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         raise ValueError('upstream_redirect_refused')
@@ -120,6 +154,7 @@ class Recorder:
     def __init__(self, work, inputs, budget, origin):
         self.work, self.inputs, self.budget, self.origin = Path(work), inputs, budget, origin
         self.cache, self.versions, self.ranged, self.files, self.sources, self.file_pins = {}, {}, set(), {}, {}, {}
+        self.states, self.observations, self.rejections, self.pair_proofs = {}, {}, {}, {}
         self.sequence, self.bytes, self.failure = 0, 0, None
         for root in inputs['roots']:
             self.grant(root['group'], root['module'], root['constraint'], {'kind': 'reviewed-generator', 'scope': root['configuration']})
@@ -168,33 +203,99 @@ class Recorder:
             return 'checksum' if suffix else 'artifact', (group, module, version)
         raise ValueError('unapproved_artifact_name')
 
+    def admit_client(self, path):
+        result = self.admit(path)
+        if any(x['path'] == path and x.get('proof_only') for x in self.inputs['metadata_pins']):
+            raise ValueError('internal_parent_proof_not_client_metadata')
+        return result
+
     def obtain(self, path, depth=0):
         self.budget.check()
-        if depth > 8 or len(self.cache) >= 2048:
+        if depth > 8 or len(self.states) >= 2048:
             raise ValueError('metadata_depth_or_count_limit')
         kind, coordinate = self.admit(path)
+        if self.states.get(path) in ('pending', 'rejected'):
+            raise ValueError('pending_or_rejected_response_not_servable')
+        if self.failure is not None:
+            raise ValueError('broker_failure_latched')
         if path in self.cache:
             return self.cache[path]
-        limit = MAX_BODY if kind == 'artifact' else 4 * 1024 ** 2
-        status, body = self.origin.get(path, limit)
-        if not isinstance(body, bytes) or len(body) > limit:
-            raise ValueError('origin_body_contract_or_limit')
-        if status not in (200, 404):
-            raise ValueError('upstream_status_refused')
-        self.bytes += len(body)
-        if self.bytes > 1024 ** 3:
-            raise ValueError('origin_aggregate_body_limit')
-        expected = next((x for x in self.inputs['metadata_pins'] if x['path'] == path), None)
-        if expected and (status != 200 or len(body) != expected['bytes'] or digest(body) != expected['sha256']):
-            raise ValueError('published_root_metadata_pin_mismatch')
-        storage = ('body-cache/artifacts/' if kind == 'artifact' else 'evidence/broker/raw/') + digest(path.encode()) + '.body'
-        write_new(self.work / storage, body)
-        row = {'upstream': ORIGIN + path, 'path': path, 'status': status, 'kind': kind,
-            'body': {'path': storage, 'bytes': len(body), 'sha256': digest(body)}}
-        self.cache[path] = row
-        if status == 200 and kind in ('metadata', 'listing'):
-            self.learn(path, kind, coordinate, body, row['body'], depth)
-        return row
+        self.states[path] = 'pending'
+        try:
+            limit = MAX_BODY if kind == 'artifact' else 4 * 1024 ** 2
+            status, body = self.origin.get(path, limit)
+            if not isinstance(body, bytes) or len(body) > limit:
+                raise ValueError('origin_body_contract_or_limit')
+            if status not in (200, 404):
+                raise ValueError('upstream_status_refused')
+            self.bytes += len(body)
+            if self.bytes > 1024 ** 3:
+                raise ValueError('origin_aggregate_body_limit')
+            storage = ('body-cache/artifacts/' if kind == 'artifact' else 'evidence/broker/raw/') + digest(path.encode()) + '.body'
+            write_new(self.work / storage, body)
+            row = {'upstream': ORIGIN + path, 'path': path, 'status': status, 'kind': kind,
+                'body': {'path': storage, 'bytes': len(body), 'sha256': digest(body)}}
+            self.observations[path] = row
+            expected = next((x for x in self.inputs['metadata_pins'] if x['path'] == path), None)
+            if expected and (status != 200 or len(body) != expected['bytes'] or digest(body) != expected['sha256']):
+                raise ValueError('published_root_metadata_pin_mismatch')
+            if status == 200 and kind in ('metadata', 'listing'):
+                self.learn(path, kind, coordinate, body, row['body'], depth)
+            self.cache[path], self.states[path] = row, 'validated'
+            return row
+        except BaseException as error:
+            self.states[path] = 'rejected'
+            self.rejections[path] = refusal_code(error)
+            self.failure = self.failure or self.rejections[path]
+            raise
+
+    def published_pair(self, path, coordinate, body, depth):
+        """One pinned KMP pair, not a general component-identity exception."""
+        specs = self.inputs.get('published_component_pairs', [])
+        if len(specs) != 1 or specs[0]['child']['path'] != path or tuple(specs[0]['child']['coordinate']) != coordinate:
+            raise ValueError('unreviewed_published_component_pair')
+        spec = specs[0]
+        child, parent = spec['child'], spec['parent']
+        if len(body) != child['bytes'] or digest(body) != child['sha256']:
+            raise ValueError('published_pair_child_pin_mismatch')
+        data = unique_json(body)
+        if data['formatVersion'] != '1.1' or data['component'] != child['published_component']:
+            raise ValueError('published_pair_child_component')
+
+        def link(base, literal, expected, target):
+            parsed = urlsplit(literal)
+            if (literal != expected or parsed.scheme or parsed.netloc or parsed.query or parsed.fragment
+                    or '%' in literal or '\\' in literal or urljoin(ORIGIN + base, literal) != ORIGIN + target):
+                raise ValueError('published_pair_link_refused')
+            clean_path(target)
+
+        link(path, data['component']['url'], child['published_component']['url'], parent['path'])
+        pin = self.source_only.get(parent['path'])
+        if not pin or not pin.get('proof_only') or any(pin[k] != parent[k] for k in ('bytes','sha256')):
+            raise ValueError('published_pair_parent_source_only_pin')
+        row = self.obtain(parent['path'], depth + 1)
+        if row['status'] != 200 or any(row['body'][k] != parent[k] for k in ('bytes','sha256')):
+            raise ValueError('published_pair_parent_pin_mismatch')
+        with self.open_body(row) as stream:
+            parent_data = unique_json(stream.read(4 * 1024 ** 2 + 1))
+        if (parent_data['formatVersion'] != '1.1' or parent_data['component'] != parent['component']
+                or len(parent_data['variants']) != parent['variants']):
+            raise ValueError('published_pair_parent_component')
+        if len(data['variants']) != len(spec['links']) or len(spec['links']) != 3:
+            raise ValueError('published_pair_variant_set')
+        for expected in spec['links']:
+            children = [v for v in data['variants'] if v['name'] == expected['name']]
+            parents = [v for v in parent_data['variants'] if v['name'] == expected['name']]
+            if (len(children) != 1 or len(parents) != 1 or children[0]['attributes'] != expected['attributes']
+                    or parents[0]['attributes'] != expected['attributes']
+                    or parents[0].get('available-at') != expected['available_at']):
+                raise ValueError('published_pair_backlink_or_attributes')
+            link(parent['path'], parents[0]['available-at']['url'], expected['available_at']['url'], path)
+        proof = {'requested_coordinate': list(coordinate), 'published_component': data['component'],
+            'child_body': self.observations[path]['body'], 'parent_response': row, 'verified_links': spec['links'],
+            'scope': 'same_acquire_internal_parent_proof_only_no_Gradle_consumption_or_parent_grants'}
+        self.pair_proofs[path] = proof
+        return proof
 
     def learn(self, path, kind, coordinate, body, authority, depth):
         group, module, version = coordinate
@@ -216,12 +317,13 @@ class Recorder:
         if path.endswith('.module'):
             data = unique_json(body)
             c = data['component']
-            if (c['group'], c['module'], c['version']) != coordinate or len(data['variants']) > 128:
+            if len(data['variants']) > 128:
                 raise ValueError('module_metadata_identity')
+            if (c['group'], c['module'], c['version']) != coordinate:
+                source['published_component_proof'] = self.published_pair(path, coordinate, body, depth)
             for variant in data['variants']:
                 if 'available-at' in variant:
                     a = variant['available-at']
-                    from urllib.parse import urljoin
                     target = '/maven2/' + a['group'].replace('.', '/') + '/' + a['module'] + '/' + a['version'] + '/' + a['module'] + '-' + a['version'] + '.module'
                     if not fixed(a['version']) or urljoin(ORIGIN + path, a['url']) != ORIGIN + target:
                         raise ValueError('available_at_origin_or_identity')
@@ -326,6 +428,8 @@ class Recorder:
             'origin': ORIGIN, 'responses': list(self.cache.values()), 'requests': self.sequence,
             'body_bytes': self.bytes, 'failure': self.failure, 'source_authority': self.sources,
             'published_artifact_pins': self.file_pins,
+            'response_states': self.states, 'rejected_responses': [self.observations[p] for p in self.rejections if p in self.observations],
+            'rejection_codes': self.rejections, 'published_component_proofs': self.pair_proofs,
             'network_boundary': 'online Gradle configured only for literal loopback repository; not an OS-wide egress-denial claim'})
 
 
@@ -341,13 +445,14 @@ class Broker:
             def log_message(self, *args):
                 pass
             def send_error(self, code, message=None, explain=None):
-                recorder.failure = 'HTTP_protocol_refused'
+                recorder.failure = recorder.failure or 'HTTP_protocol_refused'
                 try:
                     self.send_response(code); self.send_header('Content-Length','0')
                     self.send_header('Connection','close'); self.end_headers()
                 finally:
                     recorder.event({'method':self.command if getattr(self,'command',None) in ('GET','HEAD') else 'OTHER',
                         'response':None,'HTTP_status':code,'delivered_body_bytes':0,'complete_GET':False,
+                        'safe_request_path':None,
                         'generated_error_body_sha256':digest(b''),'failure':recorder.failure})
                     self.close_connection = True
             def do_GET(self):
@@ -355,9 +460,10 @@ class Broker:
             def do_HEAD(self):
                 self.handle_body(True)
             def do_CONNECT(self):
-                recorder.failure = 'HTTP_method_refused'
+                recorder.failure = recorder.failure or 'HTTP_method_refused'
                 self.send_response(405); self.send_header('Content-Length', '0'); self.end_headers()
                 recorder.event({'method': self.command, 'response': None, 'HTTP_status':405,
+                    'safe_request_path':None,
                     'delivered_body_bytes':0, 'complete_GET':False, 'generated_error_body_sha256':digest(b''),
                     'failure':recorder.failure})
                 self.close_connection = True
@@ -369,6 +475,7 @@ class Broker:
             do_TRACE = do_CONNECT
             def handle_body(self, head):
                 sent, row, http_status, started, partial_unknown = 0, None, 502, False, False
+                safe_path = None
                 actual_hash = hashlib.sha256()
                 try:
                     self.connection.settimeout(30)
@@ -378,6 +485,9 @@ class Broker:
                             or self.headers.get('Content-Length') not in (None, '0') or self.headers.get('Transfer-Encoding')
                             or any(self.headers.get(k) is not None for k in ('Authorization', 'Proxy-Authorization', 'Cookie', 'Range'))):
                         raise ValueError('HTTP_authority_or_header_refused')
+                    recorder.admit(self.path) # Retain only a normalized already-authorized public path.
+                    safe_path = self.path
+                    recorder.admit_client(self.path)
                     row = recorder.obtain(self.path)
                     with recorder.open_body(row) as stream:
                         self.send_response(row['status']); self.send_header('Content-Length', str(row['body']['bytes']))
@@ -393,7 +503,7 @@ class Broker:
                 except (BrokenPipeError, ConnectionResetError):
                     partial_unknown = True
                 except BaseException as error:
-                    recorder.failure = type(error).__name__ + ':' + (str(error) if isinstance(error, ValueError) else 'origin_or_IO_failure')
+                    recorder.failure = recorder.failure or refusal_code(error)
                     if not started:
                         try:
                             self.send_response(502); self.send_header('Content-Length', '0')
@@ -403,6 +513,7 @@ class Broker:
                 finally:
                     try:
                         recorder.event({'method': 'HEAD' if head else 'GET', 'response': row,
+                            'safe_request_path':safe_path,
                             'HTTP_status':http_status,
                             'generated_error_body_sha256':digest(b'') if row is None else None,
                             'delivered_body_bytes': sent, 'confirmed_body_sha256':actual_hash.hexdigest(),

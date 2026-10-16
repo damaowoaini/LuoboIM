@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v11",
-  "state": "current310_booking_capability_fixture_r1_pending_cloud",
+  "schema": "luobo.mobile.portable-ci-inputs.v12",
+  "state": "current316_font_and_booking_lint_adopted_local_targeted_only_final_regression_pending",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -99,6 +99,40 @@
       "path": "references/integration/mobile310-booking-capability-fixture-r1-candidate/candidate-manifest.json",
       "bytes": 2491,
       "sha256": "ff547063f8da9c770331bf6fbbdf671e73f969e175c72e3835759f3f79263c14"
+    },
+    "chat_font_candidate": {
+      "path": "references/integration/mobile-chat-font-size-candidate/candidate-manifest.json",
+      "bytes": 6321,
+      "sha256": "6ec06bc6b94d6041d375bf4a3699b85b3d8130f803e9ca3a501d6a24c9f89624"
+    },
+    "booking_capability_lint_r2": {
+      "path": "references/integration/mobile-booking-capability-lint-r2-candidate/candidate-manifest.json",
+      "bytes": 2043,
+      "sha256": "6f6718bc79385e1ca4af3ef922d48abf0ba5f4904673fa9bf79ef6f637588838"
+    },
+    "font_targeted_local": {
+      "Root_actual_log": {
+        "path": "references/integration/batch-fixes-20261016/font-local-attempt3/tests.log",
+        "bytes": 19454,
+        "sha256": "f341ba81cbea20969fcfc16533d02932bcdcd3216ed1542f66f413b201f56bf8"
+      },
+      "visible_success": 22,
+      "hidden_success": 3,
+      "error": 0,
+      "skip": 0,
+      "unique_true_footer": true,
+      "new22_exact": true,
+      "SDK_cleanup_instances": 11,
+      "cleanup_markers": [
+        "sdk.begin",
+        "sdk.end",
+        "unmount.begin",
+        "unmount.end"
+      ],
+      "pure_scaler_widget_has_no_SDK": true,
+      "command_elapsed_seconds_Root_report": 13.37,
+      "all8_Dart_files_fatal_infos_analysis_Root_report": "PASS0",
+      "actual_new_target303_full985": false
     }
   },
   "toolchain": {
@@ -375,10 +409,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current310": 362
+    "current316": 368
   },
   "portable_digests": {
-    "current310": "ddc5b027387872be6452c53cdb77f4703a7bc82e9e2e0cb2bbc044a47496534e"
+    "current316": "82fc3b8b03839aa6456a62f72df71806a3940b70770ebaa8fa291abd58f4497f"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -815,14 +849,19 @@
         "sha256": "ce74d3b2fbfc8eaca633411bceea5938fd622d63828c8fa71a1f7888b41100fc"
       },
       "actual": "273parentPASS+1visibleloaderERROR/26hiddenPASS/300startdonefalsefooter;8newunrun;full963/analyze notstarted"
+    },
+    "current310_businessPASS_strict2infos": {
+      "path": "references/integration/cloud-mobile-ci/run-38914699809-agent/root-result-review.json",
+      "bytes": 842,
+      "sha256": "4c4e8b793372c9f567ed74c798f962c46bdc8844e285f3b4ec91b1f5382de5d1"
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current310",
-    "members": 310,
-    "reference_source_digest": "42e9deed9d11b7da42cb37f87acf5ceb881ca8691b2b6d41840ad1563a326e0f",
+    "working_cohort": "current316",
+    "members": 316,
+    "reference_source_digest": "fe85a08bd28a4906e8148f17542f242a0bc4eca8eb76c615a40685f3c0dc2cc1",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -883,8 +922,8 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 466993,
-    "sha256": "f4f515b2f0b6d86deb87a67f55359ff0fcbf3d09bf8a877a86d6bc3825b6d053"
+    "bytes": 632908,
+    "sha256": "5806e134d1e10bdb09dc712da437ee1cb2cc7ab2f7ba28c052afe4d63d7ace50"
   },
   "call_records_cleanup": {
     "named_fixtures": [
@@ -1396,9 +1435,9 @@
     "no_marker_equivalence": "Unit16 finally awaits SDK dispose; geometry2 finally unmounts and disposes its own ScrollController. Required machine success/zero errors is mandatory; no synthetic marker claim for those18.",
     "parent_cleanup": "callrecords35 (33 normal2expectedfailures,14unmounts),repo15 awaitteardown;creation76+safeexit6 exact and separate unchanged."
   },
-  "current310": {
-    "members": 310,
-    "source_digest": "82d6003e35ea82bb6af5c9f65e8e136496e5b4c57ae4310dfd3e13932bdd8e17",
+  "current316": {
+    "members": 316,
+    "source_digest": "9450b7bd8b2c65a53461f5eebba39b037bea8f83f6f2d134a07c4274721e203b",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -1556,6 +1595,11 @@
         "sha256": "9be658add45afe824261f7e1e2d006694ac6652ae74a108f70ca7011ded41106"
       },
       {
+        "path": "app/lib/features/chat/data/chat_reading_preferences.dart",
+        "bytes": 5025,
+        "sha256": "5c89cdefde7fd731172604d6eb73c59a6382262d6d72b3fc81a6749cef6d94a3"
+      },
+      {
         "path": "app/lib/features/chat/data/chat_repository.dart",
         "bytes": 38493,
         "sha256": "377b0185655ab8c34bc0b5e97167c261c4f3ae85dfa939ebf4bd6602497d42f6"
@@ -1631,6 +1675,11 @@
         "sha256": "22fd2ea7a4e78e1500f9876f76c04e8bf7d697443da0dce45abe3a763ed49728"
       },
       {
+        "path": "app/lib/features/chat/presentation/chat_font_size_page.dart",
+        "bytes": 9243,
+        "sha256": "6232716d5659470cf99f9e7cba6816fc6653c1187da6dc2a5478a39249681759"
+      },
+      {
         "path": "app/lib/features/chat/presentation/chat_forward_page.dart",
         "bytes": 8761,
         "sha256": "521cc19051eaf9ca2b67d01ef23a6c30dab328c3acfa4a0adb707dedda82ce4c"
@@ -1647,8 +1696,8 @@
       },
       {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 62835,
-        "sha256": "2cf6cd75dc37ce9fe855ef3e0cdaa19c7ddf8c8e76b4d8a1da16c4bf10f6055d"
+        "bytes": 66213,
+        "sha256": "3ea907161fea1fd21b09f3dcf348b29cb15c80522ad5ca665df0207b143061ac"
       },
       {
         "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
@@ -1912,8 +1961,8 @@
       },
       {
         "path": "app/lib/features/meeting/booking/presentation/booking_controller.dart",
-        "bytes": 8894,
-        "sha256": "c50d96748917dfd1423b2363dfd8ac7f9a2d23d6dca748210f9817ac1f00be8e"
+        "bytes": 9147,
+        "sha256": "16077a2406c68d33a8daa6e05ddc8fa6e8df8f3f2a0a0902adaa7968763ce1ea"
       },
       {
         "path": "app/lib/features/meeting/booking/presentation/booking_detail_page.dart",
@@ -2222,8 +2271,8 @@
       },
       {
         "path": "app/lib/providers.dart",
-        "bytes": 6668,
-        "sha256": "66a403b9bd379bb7377e81fb80ba9983a0921bffd52575f04cb67571e21c6ab5"
+        "bytes": 6944,
+        "sha256": "32ddb9d5e441e4c3e68db42227fe66513535ee9b2556fdf241de09dc1c54a354"
       },
       {
         "path": "app/pubspec.lock",
@@ -2391,6 +2440,21 @@
         "sha256": "f7fcd841c389bbaeac2806f0920742697b714dfd4319b002d805c2e40f9b7f88"
       },
       {
+        "path": "app/test/features/chat/chat_font_entry_test.dart",
+        "bytes": 4690,
+        "sha256": "9278f9576bec50f0e1f81d9bf9af67293fae034988701c26c1ff861a7958f409"
+      },
+      {
+        "path": "app/test/features/chat/chat_font_fixture.dart",
+        "bytes": 7081,
+        "sha256": "46726962cbb4204c912e3212c06a2b62241f093a5d7f1dfd734dd0c84517b5e0"
+      },
+      {
+        "path": "app/test/features/chat/chat_font_size_page_test.dart",
+        "bytes": 6659,
+        "sha256": "86b1abec4987d928d50298bb8c10af12b572e171264bd41920323f30532a272c"
+      },
+      {
         "path": "app/test/features/chat/chat_forward_page_test.dart",
         "bytes": 10091,
         "sha256": "d282006d2afa3e10b4f6871e2a43b402e4334bcdb77e62207a7d6cb335f9ca91"
@@ -2404,6 +2468,11 @@
         "path": "app/test/features/chat/chat_read_receipt_test.dart",
         "bytes": 11833,
         "sha256": "e472469ca1955545ba40d2dd8f0a31f9e39780401fc4720c35b1c861498630a3"
+      },
+      {
+        "path": "app/test/features/chat/chat_reading_preferences_test.dart",
+        "bytes": 4745,
+        "sha256": "6e664ad811f03de718166f324c0f9e225594fc018e6d1e8a5a76bbc1e065c549"
       },
       {
         "path": "app/test/features/chat/chat_search_page_test.dart",
@@ -2951,8 +3020,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 281,
-    "expected_full_tests": 963,
+    "expected_target_tests": 303,
+    "expected_full_tests": 985,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -2971,7 +3040,10 @@
       "test/features/conversation/next_unread_controller_test.dart",
       "test/features/conversation/next_unread_page_test.dart",
       "test/features/meeting/meeting_routes_test.dart",
-      "test/features/meeting/booking/booking_capability_discovery_test.dart"
+      "test/features/meeting/booking/booking_capability_discovery_test.dart",
+      "test/features/chat/chat_reading_preferences_test.dart",
+      "test/features/chat/chat_font_size_page_test.dart",
+      "test/features/chat/chat_font_entry_test.dart"
     ]
   }
 }

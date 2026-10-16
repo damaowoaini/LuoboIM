@@ -45,7 +45,8 @@ def readonly():
     registry = read(HERE / 'cohort.json')
     if registry['cohort'] != COHORT or registry['native_execution'] is not False:
         raise ValueError('exact provenance-only cohort required')
-    own = ['broker.py', 'run.py', 'producer.gradle', 'inputs.json', 'test_probe.py', 'offline.sh']
+    own = ['broker.py', 'run.py', 'producer.gradle', 'inputs.json', 'test_probe.py', 'offline.sh',
+        'fixtures/kotlinx-coroutines-core-jvm-1.8.0.module', 'fixtures/kotlinx-coroutines-core-1.8.0.module']
     expected = {'ci/android-version-probe/' + x for x in own} | {
         '.github/workflows/android-rich-version-provenance.yml', 'ci/secret_scan.py',
         *('ci/android-native/' + x for x in ('run.py','support.py','audit.py','verify_inputs.py','toolchain.json'))}

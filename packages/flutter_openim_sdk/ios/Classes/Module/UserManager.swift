@@ -15,6 +15,8 @@ public class UserManager: BaseServiceManager {
         self["getUserStatus"] = getUserStatus
         self["getUsersInfoWithCache"] = getUsersInfoWithCache
         self["setSelfInfoEx"] = setSelfInfoEx
+        // Match the public Dart channel name without changing its payload or callback.
+        self["setSelfUserInfoEx"] = setSelfInfoEx
     }
 
     func setUserListener(methodCall: FlutterMethodCall, result: @escaping FlutterResult){

@@ -1,4 +1,6 @@
 {
+  "R12_root_design_review_sha256": "741571833e257d50bc7f6ff2655e5bf94611308adc5d3664d9e9a97f51b49a2c",
+  "R12_source_plan_manifest_sha256": "87284b6788ae747d6aafcfed620deaa67458539cb90a85204444cb093d33161f",
   "cohort": "current257-rich-version-provenance-v1",
   "metadata_pins": [
     {
@@ -27,6 +29,20 @@
       "bytes": 1348,
       "path": "/maven2/org/bouncycastle/bcutil-jdk18on/1.80/bcutil-jdk18on-1.80.pom",
       "sha256": "421a7de4bfeb9c5b38b1fc47c426a087d90878955d4107f5b7a82eb1d7b747b6"
+    },
+    {
+      "bootstrap": false,
+      "bytes": 4278,
+      "path": "/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.8.0/kotlinx-coroutines-core-jvm-1.8.0.module",
+      "sha256": "ff6a22da40040938751db0ae21177e76517dbf126a76796f5426727bf76c1228"
+    },
+    {
+      "bootstrap": false,
+      "bytes": 40513,
+      "path": "/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.8.0/kotlinx-coroutines-core-1.8.0.module",
+      "proof_only": true,
+      "sha256": "144eecd5365de3e30d7b46226c058051e39955b5c189e31fa4c7cffb99d620ba",
+      "source_only": true
     }
   ],
   "native_fullbind_device_current_mobile_acceptance": false,
@@ -72,6 +88,94 @@
       "path": "official-gradle/DefaultImmutableVersionConstraint.java",
       "sha256": "33a55f35d061fbdacbec46ac256c667db8c7b94c9cbc70810f78ddf1cd276644",
       "url": "https://raw.githubusercontent.com/gradle/gradle/44f4e8d3122ee6e7cbf5a248d7e20b4ca666bda3/platforms/software/dependency-management/src/main/java/org/gradle/api/internal/artifacts/dependencies/DefaultImmutableVersionConstraint.java"
+    }
+  ],
+  "published_component_pairs": [
+    {
+      "child": {
+        "bytes": 4278,
+        "coordinate": [
+          "org.jetbrains.kotlinx",
+          "kotlinx-coroutines-core-jvm",
+          "1.8.0"
+        ],
+        "path": "/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.8.0/kotlinx-coroutines-core-jvm-1.8.0.module",
+        "published_component": {
+          "attributes": {
+            "org.gradle.status": "release"
+          },
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "url": "../../kotlinx-coroutines-core/1.8.0/kotlinx-coroutines-core-1.8.0.module",
+          "version": "1.8.0"
+        },
+        "sha256": "ff6a22da40040938751db0ae21177e76517dbf126a76796f5426727bf76c1228"
+      },
+      "formatVersion": "1.1",
+      "links": [
+        {
+          "attributes": {
+            "org.gradle.category": "library",
+            "org.gradle.libraryelements": "jar",
+            "org.gradle.usage": "java-api",
+            "org.jetbrains.kotlin.platform.type": "jvm"
+          },
+          "available_at": {
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "url": "../../kotlinx-coroutines-core-jvm/1.8.0/kotlinx-coroutines-core-jvm-1.8.0.module",
+            "version": "1.8.0"
+          },
+          "name": "jvmApiElements-published"
+        },
+        {
+          "attributes": {
+            "org.gradle.category": "library",
+            "org.gradle.libraryelements": "jar",
+            "org.gradle.usage": "java-runtime",
+            "org.jetbrains.kotlin.platform.type": "jvm"
+          },
+          "available_at": {
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "url": "../../kotlinx-coroutines-core-jvm/1.8.0/kotlinx-coroutines-core-jvm-1.8.0.module",
+            "version": "1.8.0"
+          },
+          "name": "jvmRuntimeElements-published"
+        },
+        {
+          "attributes": {
+            "org.gradle.category": "documentation",
+            "org.gradle.dependency.bundling": "external",
+            "org.gradle.docstype": "sources",
+            "org.gradle.libraryelements": "jar",
+            "org.gradle.usage": "java-runtime",
+            "org.jetbrains.kotlin.platform.type": "jvm"
+          },
+          "available_at": {
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "url": "../../kotlinx-coroutines-core-jvm/1.8.0/kotlinx-coroutines-core-jvm-1.8.0.module",
+            "version": "1.8.0"
+          },
+          "name": "jvmSourcesElements-published"
+        }
+      ],
+      "parent": {
+        "bytes": 40513,
+        "component": {
+          "attributes": {
+            "org.gradle.status": "release"
+          },
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": "1.8.0"
+        },
+        "path": "/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/1.8.0/kotlinx-coroutines-core-1.8.0.module",
+        "sha256": "144eecd5365de3e30d7b46226c058051e39955b5c189e31fa4c7cffb99d620ba",
+        "variants": 64
+      },
+      "provenance": "Exact child from failed R11 compact; parent independently captured for approved R12 design. At runtime parent is freshly captured in the same acquire as child as internal source proof, never claimed old-run or Gradle consumption."
     }
   ],
   "rich": [

@@ -24,6 +24,13 @@ import 'core/storage/consent_store.dart';
 import 'core/storage/secure_credential_store.dart';
 import 'core/tenant/session_coordinator.dart';
 import 'features/auth/data/auth_repository.dart';
+import 'features/chat/data/chat_reading_preferences.dart';
+
+final chatReadingStoreProvider = Provider<ChatReadingPreferencesStore>((ref) {
+  final store = ChatReadingPreferencesStore(); // Preferences platform remains lazy.
+  ref.onDispose(store.dispose);
+  return store;
+});
 
 final appConfigProvider = Provider<AppConfig>(
   (ref) => AppConfig.fromEnvironment(),

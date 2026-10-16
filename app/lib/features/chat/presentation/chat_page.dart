@@ -18,6 +18,8 @@ import '../../favorite/favorite_providers.dart';
 import '../../rtc/presentation/rtc_providers.dart';
 import '../../conversation/data/conversation_repository.dart';
 import '../data/chat_repository.dart';
+import '../data/chat_reading_preferences.dart';
+import 'chat_font_size_page.dart';
 import '../domain/chat_message.dart';
 import '../domain/chat_mention.dart';
 import '../../group/data/group_repository.dart';
@@ -78,6 +80,24 @@ class _ChatPageState extends ConsumerState<ChatPage>
   String _readSignature = '';
   final Set<String> _voiceReadAttempted = {};
   Timer? _audioExpiry;
+  late final ChatReadingPreferences _readingPreferences;
+  StreamSubscription<ChatReadingChange>? _readingChanges;
+  double _fontFactor = defaultChatFontFactor;
+  bool _fontReadFailed = false;
+  int _fontRead = 0, _fontIntent = 0;
+
+  Future<void> _loadReadingPreferences() async {
+    final ticket = ++_fontRead;
+    try {
+      final factor = await _readingPreferences.read();
+      if (!mounted || ticket != _fontRead || !_readingPreferences.current) return;
+      setState(() { _fontFactor = factor; _fontReadFailed = false; });
+    } catch (_) {
+      if (!mounted || ticket != _fontRead || !_readingPreferences.current) return;
+      setState(() => _fontReadFailed = true);
+    }
+  }
+
 
   @override
   void initState() {
@@ -102,6 +122,17 @@ class _ChatPageState extends ConsumerState<ChatPage>
         now: widget.now,
       ),
     );
+    _readingPreferences = ChatReadingPreferences(
+      ref.read(chatReadingStoreProvider), controller.repository.session);
+    _readingChanges = _readingPreferences.store.changes.listen((change) {
+      if (!mounted || !_readingPreferences.current ||
+          change.accountKey != _readingPreferences.accountKey) {
+        return;
+      }
+      ++_fontRead; // An older initial read cannot overwrite this acknowledged save.
+      setState(() { _fontFactor = change.factor; _fontReadFailed = false; });
+    });
+    unawaited(_loadReadingPreferences());
     selection = ChatBatchSelection(controller)..addListener(_changed);
     controller.addListener(_changed);
     input.addListener(_inputChanged);
@@ -273,6 +304,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    ++_fontRead; ++_fontIntent;
+    unawaited(_readingChanges?.cancel());
     selection.removeListener(_changed);
     selection.dispose();
     controller.removeListener(_changed);
@@ -698,6 +731,13 @@ class _ChatPageState extends ConsumerState<ChatPage>
   }
 
   Widget _content(
+    ChatMessage item, {
+    ChatMessage? portal,
+    bool Function()? portalCurrent,
+  }) => ChatReadingTextScale(factor: _fontFactor,
+      child: _readingContent(item, portal: portal, portalCurrent: portalCurrent));
+
+  Widget _readingContent(
     ChatMessage item, {
     ChatMessage? portal,
     bool Function()? portalCurrent,
@@ -1584,10 +1624,23 @@ class _ChatPageState extends ConsumerState<ChatPage>
       return;
     }
     final creationOwner = controller.repository.session.state.credentials;
+    final fontTicket = ++_fontIntent;
+    final fontOrigin = ModalRoute.of(context);
+    final fontNavigator = Navigator.of(context);
+    ModalRoute<dynamic>? fontSheet;
+    bool fontCurrent() => mounted && !_leaving && fontTicket == _fontIntent &&
+        _readingPreferences.current &&
+        identical(controller.repository.session.state.credentials, creationOwner) &&
+        controller.repository.conversationId == widget.conversationId &&
+        controller.conversation?.id == item.id;
+
     final action = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
+      builder: (context) => ChatFontRouteGuard(
+        onRoute: (route) => fontSheet = route,
+        onCovered: () { ++_fontIntent; },
+        child: SafeArea(
         child: SingleChildScrollView(
           child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1614,6 +1667,18 @@ class _ChatPageState extends ConsumerState<ChatPage>
               onTap: () => Navigator.pop(context, 'search'),
             ),
             ListTile(
+              leading: const Icon(Icons.text_fields),
+              title: const Text('聊天字号'),
+              subtitle: _fontReadFailed ? const Text('字号读取失败，打开后可重试') : null,
+              onTap: () {
+                final route = fontSheet, navigator = fontSheet?.navigator;
+                if (fontCurrent() && route?.isCurrent == true && route?.isActive == true &&
+                    navigator != null && navigator.mounted) {
+                  navigator.pop('font');
+                }
+              },
+            ),
+            ListTile(
               title: Text(item.pinned ? '取消置顶' : '置顶会话'),
               onTap: () => Navigator.pop(context, 'pin'),
             ),
@@ -1631,8 +1696,21 @@ class _ChatPageState extends ConsumerState<ChatPage>
           ],
           ),
         ),
-      ),
+      )),
     );
+    if (action == 'font') {
+      final sheet = fontSheet;
+      if (sheet != null) await sheet.completed;
+      if (!mounted || !fontCurrent() || fontOrigin == null || !fontOrigin.isCurrent ||
+          !fontOrigin.isActive || !fontNavigator.mounted ||
+          !identical(fontOrigin.navigator, fontNavigator)) {
+        return;
+      }
+      await fontNavigator.push<void>(MaterialPageRoute<void>(
+        builder: (_) => ChatFontSizePage(preferences: _readingPreferences,
+          sourceCurrent: fontCurrent)));
+      return;
+    }
     if (action == null || !mounted || !_acceptsPortal(lease)) return;
     if (action == 'search') {
       await playback.pause();
