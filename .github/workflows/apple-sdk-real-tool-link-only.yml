@@ -1,0 +1,73 @@
+name: Apple R10 SDK real-tool link-only audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        description: Reuse exact R7 SDK and accepted real Xcode tool; Swift/ObjC link only
+        required: true
+        type: choice
+        options: [apple-sdk-r10-real-tool-link-only-arm64-v1]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: apple-sdk-r10-link-only-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sdk-link-arm64:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select fixed Python and fresh private root
+        run: |
+          umask 077
+          python="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
+          test -x "$python"
+          test "$(uname -m)" = arm64
+          echo "LINK_PYTHON=$python" >> "$GITHUB_ENV"
+          echo "LINK_WORK=$RUNNER_TEMP/luobo-apple-r10-link-only" >> "$GITHUB_ENV"
+      - name: Verify independent exact link source closure
+        run: '"$LINK_PYTHON" -B ci/apple-sdk-link-real/run.py --identity apple-sdk-r10-real-tool-link-only-arm64-v1 --stage readonly'
+      - name: Reuse only exact original R7 products and raw proof
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: '"$LINK_PYTHON" -B ci/apple-sdk-link-real/run.py --identity apple-sdk-r10-real-tool-link-only-arm64-v1 --stage acquire --work "$LINK_WORK"'
+      - name: First real ARM64 archive audit and device simulator Swift ObjC links
+        run: '"$LINK_PYTHON" -B ci/apple-sdk-link-real/run.py --identity apple-sdk-r10-real-tool-link-only-arm64-v1 --stage link --work "$LINK_WORK"'
+      - name: Preserve bounded raw audit and source evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-sdk-real-link-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.LINK_WORK }}/activation.json
+            ${{ env.LINK_WORK }}/*-resource.json
+            ${{ env.LINK_WORK }}/*-raw.log
+            ${{ env.LINK_WORK }}/evidence/
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/evidence/
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/*-passed.json
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/consumed-inputs.json
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/link/*/core-audit.json
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/link/*/linked-binary-audit.json
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/link/*/outputs.json
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Retain only newly linked SDK images separately
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-sdk-real-link-products-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/link/*/libflutter_openim_sdk.dylib
+            ${{ env.LINK_WORK }}/.qa/apple-link-only-1/link/*/probe
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn

@@ -1,0 +1,829 @@
+{
+  "schema": "luobo.apple.r10-real-tool-link-only.v1",
+  "identity": "apple-sdk-r10-real-tool-link-only-arm64-v1",
+  "parent": {
+    "run": 38955829570,
+    "job": 117158329424,
+    "head": "3ec355b8a75bdd5d3eca69bfc1ca175b8da0e182",
+    "artifacts": [
+      {
+        "kind": "raw",
+        "id": 12071020431,
+        "name": "apple-sdk-raw-38955829570-1",
+        "bytes": 1501559,
+        "sha256": "271e8045baae5337f4c7efef55ea5bac28777e528264e966c948349e14a78bf2",
+        "members_cap": 1024,
+        "decoded_cap": 33554432,
+        "member_cap": 8388608
+      },
+      {
+        "kind": "products",
+        "id": 12070947280,
+        "name": "apple-sdk-products-38955829570-1",
+        "bytes": 217059758,
+        "sha256": "763d842282bc48dc04679e26443a8c8c004e698ced4be2e8e4ca8cabd0760459",
+        "members_cap": 1024,
+        "decoded_cap": 536870912,
+        "member_cap": 268435456
+      }
+    ]
+  },
+  "source_files": [
+    {
+      "path": "ci/apple-sdk/link_probe.py",
+      "bytes": 7577,
+      "sha256": "84b2646c8e112a8c946a0dd15bc1a34fa039febf966bb6c4a6151f53d8893210"
+    },
+    {
+      "path": "ci/apple-sdk/README.md",
+      "bytes": 5733,
+      "sha256": "5b9510a83ce605ab57636f926d9da373694457596536c3dbd5f6b7e9ce5c578d"
+    },
+    {
+      "path": "ci/apple-sdk/registry.json",
+      "bytes": 3658,
+      "sha256": "3a2d2bc78b47650baaf41cd3088c557b630c022a20c1180f5c9f486cb6875b7a"
+    },
+    {
+      "path": "ci/apple-sdk/apple_core.py",
+      "bytes": 18653,
+      "sha256": "c6e52c2afcc16350f52981c86112b4eaf65efe11e911810f725c0fcb03940fd3"
+    },
+    {
+      "path": "ci/apple-sdk/core_binary.py",
+      "bytes": 7950,
+      "sha256": "76c87f6e12678f4588636793995245330e6022d8a6340ace285486b3ba36f1f9"
+    },
+    {
+      "path": "ci/apple-sdk/resource_dual.py",
+      "bytes": 7394,
+      "sha256": "d1d872e0c2b394d73549f0ed071c457ee5019c41b90277c748c328b0219e7718"
+    },
+    {
+      "path": "ci/apple-sdk/flutter-engine-members.json",
+      "bytes": 10010,
+      "sha256": "158e949f65cf4162f5d17552cb90bc2035f7fee669ef71ff11c7afd45549411d"
+    },
+    {
+      "path": "ci/apple-sdk-link/run.py",
+      "bytes": 14909,
+      "sha256": "4fbf3556540490bd8635e2135ddd4064b2f39cfc88fe15c08de02bfd46ee5dca"
+    },
+    {
+      "path": "ci/apple-sdk-link/custody.py",
+      "bytes": 9781,
+      "sha256": "c242cbcc956b498b33a13dc18f87234212486616235b93de8443c63da7aac7f3"
+    },
+    {
+      "path": "ci/apple-sdk-link/test_run.py",
+      "bytes": 13688,
+      "sha256": "43133536cd8ebd6219e2049b199bd44951e1a0d4934672043b159d3ec4ff5a83"
+    },
+    {
+      "path": "ci/apple-sdk-link/README.md",
+      "bytes": 3690,
+      "sha256": "7091c1542aa0d2b557d6cc004e4f48b2c4344ca22a2159b30b70866393209952"
+    },
+    {
+      "path": ".github/workflows/apple-sdk-link-only.yml",
+      "bytes": 3172,
+      "sha256": "0191c619ac9d00784b8a769d387778d7520cb02b5b3d58d5359c46754b1bf254"
+    },
+    {
+      "path": "ci/apple-sdk-link/inputs.json",
+      "bytes": 30353,
+      "sha256": "119843922429492a3b945f0dc1a2f96747fbac517e8ebabcaacdf0427c438c30"
+    },
+    {
+      "path": "ci/apple-host-tool/run.py",
+      "bytes": 11626,
+      "sha256": "ef4fef688a380c0d7c39c078e812e91f89adee77b8fda1d0203cef2128cfca94"
+    },
+    {
+      "path": "ci/apple-host-tool/inputs.json",
+      "bytes": 2825,
+      "sha256": "67039526f13db66964ef875c18fa04958e1b97ad3535e99818e05ee8a4546015"
+    },
+    {
+      "path": "ci/apple-sdk-link-real/run.py",
+      "bytes": 18927,
+      "sha256": "dff6340dd2774ffc4493194ae10635162b8907fffab217608da3f495f6fcc940"
+    },
+    {
+      "path": "ci/apple-sdk-link-real/test_run.py",
+      "bytes": 3646,
+      "sha256": "c5dc66454093b675be942eb37ceb6c248eb14748ae0d32272ab784d98985b3fe"
+    },
+    {
+      "path": ".github/workflows/apple-sdk-real-tool-link-only.yml",
+      "bytes": 3258,
+      "sha256": "75d9f6cb7b9022917d998d0aa05977be121dbf67a26fa94286b1864b39327397"
+    }
+  ],
+  "bridge_files": [
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/BaseCallback.swift",
+      "relative": "BaseCallback.swift",
+      "bytes": 511,
+      "sha256": "b884523efd1fb1bebeefd6af93ab488399b06b21de111dbfcd950a723264e4b1"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/CommonUtil.swift",
+      "relative": "CommonUtil.swift",
+      "bytes": 466,
+      "sha256": "ddb4f29bd968d53203f6a7c682d2f133a743724a54bd290bb7908099f364f95a"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/FlutterOpenimSdkPlugin.h",
+      "relative": "FlutterOpenimSdkPlugin.h",
+      "bytes": 94,
+      "sha256": "1e03fe1b956b3181921ceefd6e37485f55c228c1b7522c77356cf1de932c179a"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/FlutterOpenimSdkPlugin.m",
+      "relative": "FlutterOpenimSdkPlugin.m",
+      "bytes": 627,
+      "sha256": "50cf8e363ea68990ea7510ec1c9cc817c7b312cbf64f3b86694313dac7a35581"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/JsonUtil.swift",
+      "relative": "JsonUtil.swift",
+      "bytes": 714,
+      "sha256": "6f8b101fbfb9efd8397c435b91a4832a62402229f5394c2ac6439743788412b4"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/LocalVideoTools.swift",
+      "relative": "LocalVideoTools.swift",
+      "bytes": 2518,
+      "sha256": "3e9c3e13331672864f751a0ef6f9f4edd278d0fd77d2dccb762f1aeab5c5d07d"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/BaseServiceManager.swift",
+      "relative": "Module/BaseServiceManager.swift",
+      "bytes": 1121,
+      "sha256": "6e59425d8f920ba4f5524fa6ab6c1ae0417965693f6dc45c596d784586978c0d"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/ConversationManager.swift",
+      "relative": "Module/ConversationManager.swift",
+      "bytes": 10466,
+      "sha256": "49ddb295b4f2a1286f7af2b16fe2a7cc08ef7e07a79e18d60505afc5cb45236d"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/FriendshipManager.swift",
+      "relative": "Module/FriendshipManager.swift",
+      "bytes": 6976,
+      "sha256": "bd63727d716d313ca40d162b8b117f0ff13ed830a2a4db8ab38d5da5a2413d9e"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/GroupManager.swift",
+      "relative": "Module/GroupManager.swift",
+      "bytes": 12572,
+      "sha256": "f1f489d48037afd2769b1b75203715880f4a8c726fe5e478d899251f99af7231"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/IMManager.swift",
+      "relative": "Module/IMManager.swift",
+      "bytes": 10011,
+      "sha256": "55ac72020c4cee66e6174586397a7e74c894ba1501fc12e9d2db5356c9df1993"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/MessageManager.swift",
+      "relative": "Module/MessageManager.swift",
+      "bytes": 22991,
+      "sha256": "a19dec948f08700fe87cda8ca682fe2f6a1255820175c90f5f6723edab1de91f"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/OrganizationManager.swift",
+      "relative": "Module/OrganizationManager.swift",
+      "bytes": 3000,
+      "sha256": "010f19b25746567b8644880fbc283dc4ae6b9b3e5124d9735094ab4af612b74f"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/SignalingManager.swift",
+      "relative": "Module/SignalingManager.swift",
+      "bytes": 8203,
+      "sha256": "7b163f0f32b34cfad0efdca58ece6ce8321a787e52b49d05353117b3c3dc3433"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/UserManager.swift",
+      "relative": "Module/UserManager.swift",
+      "bytes": 3767,
+      "sha256": "0ce567a7adf147d30b4fb9041dbc12a411443b0b0438914c4a509a6e134f8124"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Module/WorkMomentsManager.swift",
+      "relative": "Module/WorkMomentsManager.swift",
+      "bytes": 1898,
+      "sha256": "5db2df5d8f6def2bee430a4821a091c0c1375ab3ba3fe98e0523ee79b911053b"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Reachability.swift",
+      "relative": "Reachability.swift",
+      "bytes": 15306,
+      "sha256": "67528bb6347e949611c2fda570a69f0598137da2ae6d1cf5a048575c8d84993b"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/SwiftFlutterOpenimSdkPlugin.swift",
+      "relative": "SwiftFlutterOpenimSdkPlugin.swift",
+      "bytes": 2755,
+      "sha256": "1f252f7581ca5fc3c25253604a69a9a2f4fba86a44ca09156c42c2e48a52065c"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Util/Any+Extension.swift",
+      "relative": "Util/Any+Extension.swift",
+      "bytes": 435,
+      "sha256": "381d5f114b2a289cdfe640080a801f712ea0fbcc51951509c68a3952857ec2c8"
+    },
+    {
+      "path": "packages/flutter_openim_sdk/ios/Classes/Util/FlutterMethodCall+Extension.swift",
+      "relative": "Util/FlutterMethodCall+Extension.swift",
+      "bytes": 2819,
+      "sha256": "24b9b1c6b3e4112fb7a4176858b200db38a6e72ed7422c4386648b32c441ebf4"
+    }
+  ],
+  "core_sum": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f",
+  "raw_markers": [
+    {
+      "path": "activation.json",
+      "bytes": 213,
+      "sha256": "04d448fb753fd19fedea7c99e76eb1d93f8ce877a64a5f721b6d72abd6461b7d"
+    },
+    {
+      "path": "setup/controller/inputs.json",
+      "bytes": 50470,
+      "sha256": "248fdbd461f850040697f5d811f16b6c3d34fc60cdf4a481efe7052694985769"
+    },
+    {
+      "path": "setup/controller/manifest.json",
+      "bytes": 1503,
+      "sha256": "fb107ab2cca0766c0f15c0cf2d74b2887f03a270f89203dffdb3508a14a28ba8"
+    },
+    {
+      "path": "evidence/setup-derived.json",
+      "bytes": 343,
+      "sha256": "54f17d858696257d7b6043cdb60fa4dc1733ff8c31e3cbacfabf5f5a5fd47bc0"
+    },
+    {
+      "path": "evidence/download-engine-actual.json",
+      "bytes": 415,
+      "sha256": "061d21dcce2ce8c8f1b58902596664dd6171bf2e52b992d078a3faa800d76659"
+    },
+    {
+      "path": ".qa/apple-cloud-1/prepared.json",
+      "bytes": 510,
+      "sha256": "2144429a4f20795785a50581b75190f5e481e7374d9053cf5cefffdd49700dff"
+    },
+    {
+      "path": ".qa/apple-cloud-1/core/go.mod",
+      "bytes": 1477,
+      "sha256": "f4285ff3dc6494c7f4de65f0679c3fb4c092e060555bd1791a01d830a2d55b62"
+    },
+    {
+      "path": ".qa/apple-cloud-1/core/go.sum",
+      "bytes": 18776,
+      "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/apple-bind.result.json",
+      "bytes": 21,
+      "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/apple-bind.intent.json",
+      "bytes": 470,
+      "sha256": "e3f298221a4e8ff945f062ac38b146f4e84fbc3b0f1337f6622868fb44eb5dd4"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/core-locks-after.json",
+      "bytes": 366,
+      "sha256": "08b0aee0641c98d241d41f0c65c7106183596bae8df3bbdf68abfc7efab8fae5"
+    },
+    {
+      "path": ".qa/apple-cloud-1/OpenIMCore.xcframework/Info.plist",
+      "bytes": 1167,
+      "sha256": "eba502adeb426c8a1b5c40f5145b27250155efd9a794b1d544d6f2c3d11d765b"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/ios/result.json",
+      "bytes": 34484,
+      "sha256": "8dc6bfbb7d9be9336047429bd9e1b4d6f07551dbd29e410a1fad880adb648882"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/ios/selected-graph.result.json",
+      "bytes": 21,
+      "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/ios/selected-graph.log",
+      "bytes": 24021,
+      "sha256": "868883f529e1a4a7b465567a1aaae8f7c67f5069f0bcd4a9d092a01b8f47bd9c"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/ios/module-provenance.json",
+      "bytes": 32871,
+      "sha256": "3f58e8e080dfab958ed88abc1e21207cd7dd0b9b6a9efd1db65864346b9be675"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/ios/before/manifest.json",
+      "bytes": 7205,
+      "sha256": "ca6bdc33d03485eeec1740a0982afe2890fa00930f884660eb2dfc30054963c6"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/ios/after/manifest.json",
+      "bytes": 7356,
+      "sha256": "35399155257b41f44a89e0eaaea99152d4df050b98b8cfd1d17fac5058c13bfb"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/iossimulator/result.json",
+      "bytes": 34484,
+      "sha256": "e8c104dcaadb4f5c3ab6ad8317f12d71311ddba2d5ea2bf4b02102ded5a7d4f8"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/iossimulator/selected-graph.result.json",
+      "bytes": 21,
+      "sha256": "81868a6e94ffc0178bf833deb1c9013d9fab4ee95ddb876a5e8ec4f1d26376d2"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/iossimulator/selected-graph.log",
+      "bytes": 24039,
+      "sha256": "2710bdd0169af3c2567f5113a5a6bdd15476e503975761109e7a7b39dbcf6711"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/iossimulator/module-provenance.json",
+      "bytes": 32871,
+      "sha256": "0459ea0ff073e057a3e7f5e9bfe200335a94409acbd96a2880d7b938daaeb005"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/iossimulator/before/manifest.json",
+      "bytes": 7205,
+      "sha256": "ca6bdc33d03485eeec1740a0982afe2890fa00930f884660eb2dfc30054963c6"
+    },
+    {
+      "path": ".qa/apple-cloud-1/evidence/generated/iossimulator/after/manifest.json",
+      "bytes": 7356,
+      "sha256": "35399155257b41f44a89e0eaaea99152d4df050b98b8cfd1d17fac5058c13bfb"
+    },
+    {
+      "path": ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Info.plist",
+      "bytes": 561,
+      "sha256": "6eee2c496d4830d2561146d4dc8df0e7f79c49ced3e3b5a5684cac291432f919"
+    },
+    {
+      "path": ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Info.plist",
+      "bytes": 561,
+      "sha256": "6eee2c496d4830d2561146d4dc8df0e7f79c49ced3e3b5a5684cac291432f919"
+    }
+  ],
+  "product_members": [
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/Info.plist",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Headers/OpenIMCore.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Headers/Open_im_sdk.objc.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Headers/Open_im_sdk_callback.objc.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Headers/Universe.objc.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Headers/ref.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Info.plist",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/Modules/module.modulemap",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64-simulator/OpenIMCore.framework/OpenIMCore",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Headers/OpenIMCore.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Headers/Open_im_sdk.objc.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Headers/Open_im_sdk_callback.objc.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Headers/Universe.objc.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Headers/ref.h",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Info.plist",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/Modules/module.modulemap",
+    ".qa/apple-cloud-1/OpenIMCore.xcframework/ios-arm64/OpenIMCore.framework/OpenIMCore",
+    "setup/archives/engine.zip",
+    "setup/archives/go.tar.gz"
+  ],
+  "engine": {
+    "bytes": 93100875,
+    "crc32c_base64": "P+VkbQ==",
+    "generation": "1791396521564477",
+    "md5_base64": "j94FhFKfVk/7jYLp2zX5WA==",
+    "official_SHA256_preexisting": false,
+    "sha256": "536f7df16f472b13d58354da464b47191b44215660a797d217fe8eaf557a8f58",
+    "url": "https://storage.googleapis.com/flutter_infra_release/flutter/deb287481e3ce9468f3434937ced4240a70539ca/ios/artifacts.zip?generation=1791396521564477"
+  },
+  "engine_files": [
+    {
+      "bytes": 41445760,
+      "path": "ios-arm64/Flutter.framework/Flutter",
+      "sha256": "758cfe1366fc95cb745ab6349fb32e5de2131c4c0cb9ba203da519e4e2e64374"
+    },
+    {
+      "bytes": 921,
+      "path": "ios-arm64/Flutter.framework/Headers/Flutter.h",
+      "sha256": "c1f5b26a03d82c2451dbec13b8645bb56df3df3d80592f98171ba204e15d4a36"
+    },
+    {
+      "bytes": 2283,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterAppDelegate.h",
+      "sha256": "ebf60356f3456e2054548d873f08674ea2cdb5d7518d7530a328b5e81d867ba3"
+    },
+    {
+      "bytes": 3761,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterBinaryMessenger.h",
+      "sha256": "1170e4e2dfbba82a724246abfaaf561ea63d6dc2bc7b2a210b0195b41261332f"
+    },
+    {
+      "bytes": 1724,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterCallbackCache.h",
+      "sha256": "d21f7ebcae4afabf26a13b221817ecebe4ccf50a20d3cf5a7c7032de06dcc035"
+    },
+    {
+      "bytes": 18414,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterChannels.h",
+      "sha256": "920d7de42def64b88e9fc29e150532ec3a15b80f55643a6aa012d59fae2e19a2"
+    },
+    {
+      "bytes": 15290,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterCodecs.h",
+      "sha256": "672aa51d8b996e915ebd57a7cbd59d974ad51604bbb33232b2c4a20b269a7853"
+    },
+    {
+      "bytes": 3914,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterDartProject.h",
+      "sha256": "53cabfd086edf6ae0ed8732c09d530213b49753c7c2e3865c7ed1a63cddf1fab"
+    },
+    {
+      "bytes": 21724,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterEngine.h",
+      "sha256": "29528cda49a2619ac88f2a31be72b314af4e543918315dfaf11e5622c200742a"
+    },
+    {
+      "bytes": 4755,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterEngineGroup.h",
+      "sha256": "4aacef231a815c427753d2c9df6842117b2b1f63f5ea0ba643e810c7a3dd95fe"
+    },
+    {
+      "bytes": 3927,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterHeadlessDartRunner.h",
+      "sha256": "9e6663669bc5097af281fe14f5a3e4362f15708edc2f902d03e098e6e51620bd"
+    },
+    {
+      "bytes": 536,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterHourFormat.h",
+      "sha256": "43848b1528212ffe441493f22e0ecf362f49ff1a645557f3ae8d15422407b6b6"
+    },
+    {
+      "bytes": 1823,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterMacros.h",
+      "sha256": "79b0551d265c52701b378851718ab7b6db7afbecf561b73c2954988554e80f99"
+    },
+    {
+      "bytes": 1966,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterPlatformViews.h",
+      "sha256": "d1a53db8ce90729ce6669b8560e6e3f5d1a51849132a8c0f304449410745d8fe"
+    },
+    {
+      "bytes": 19326,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterPlugin.h",
+      "sha256": "349bc734c4eec7babf27b476f7c7a3bcfa01f4b0114bfbc7eae8ed9b09947838"
+    },
+    {
+      "bytes": 5318,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h",
+      "sha256": "f8f327fb94838f655de9153c09022dfc9625dd3fbc0e1a7b1c89aa033a1ca0d9"
+    },
+    {
+      "bytes": 893,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterSceneDelegate.h",
+      "sha256": "1bdbab65e137d7695d6b391e3ffeecbadd2dda103795f72ec47452b8b9a3fa06"
+    },
+    {
+      "bytes": 8387,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterSceneLifeCycle.h",
+      "sha256": "b4d90b84efbe3ce2f8db38397e312fe7f0c97d0ad7bbca8763a24b6ebf2d2217"
+    },
+    {
+      "bytes": 2263,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterTexture.h",
+      "sha256": "25ca4de1af6cbfac729e50f7462eb5d4de72f87a2ea545a9da1cab21707f23c6"
+    },
+    {
+      "bytes": 10734,
+      "path": "ios-arm64/Flutter.framework/Headers/FlutterViewController.h",
+      "sha256": "e2336e4d76c2899c2aa71d253a64dd292183b3ebaba237681a95ce2bac09a9a5"
+    },
+    {
+      "bytes": 1076,
+      "path": "ios-arm64/Flutter.framework/Info.plist",
+      "sha256": "97bc153e729ad85f3d0c8203a445a9e1dbb2bd58c6d24911a7c089c027d66ba5"
+    },
+    {
+      "bytes": 95,
+      "path": "ios-arm64/Flutter.framework/Modules/module.modulemap",
+      "sha256": "d158eb891a59ec065968fff498c00f3093e18ba2e8301e0c857ccbe63db8b46b"
+    },
+    {
+      "bytes": 845,
+      "path": "ios-arm64/Flutter.framework/PrivacyInfo.xcprivacy",
+      "sha256": "9f95d7e7862a4b56b66ed926bd6d622d2a6545a827d19847278b438d571d4212"
+    },
+    {
+      "bytes": 7070,
+      "path": "ios-arm64/Flutter.framework/_CodeSignature/CodeResources",
+      "sha256": "e8f892c17976e52ba51740fa329954e4045720daf11295a42f46b9e9b5f45531"
+    },
+    {
+      "bytes": 864880,
+      "path": "ios-arm64/Flutter.framework/icudtl.dat",
+      "sha256": "325a86063d26334c2eabe1743cea073b612540fbf3d8fc2ef0b5708e3763a8c7"
+    },
+    {
+      "bytes": 87642928,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Flutter",
+      "sha256": "ef99d01ad721b16f3427b6cf521808e5156673ff555c27a7094454ebb29941b0"
+    },
+    {
+      "bytes": 921,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/Flutter.h",
+      "sha256": "c1f5b26a03d82c2451dbec13b8645bb56df3df3d80592f98171ba204e15d4a36"
+    },
+    {
+      "bytes": 2283,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterAppDelegate.h",
+      "sha256": "ebf60356f3456e2054548d873f08674ea2cdb5d7518d7530a328b5e81d867ba3"
+    },
+    {
+      "bytes": 3761,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterBinaryMessenger.h",
+      "sha256": "1170e4e2dfbba82a724246abfaaf561ea63d6dc2bc7b2a210b0195b41261332f"
+    },
+    {
+      "bytes": 1724,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterCallbackCache.h",
+      "sha256": "d21f7ebcae4afabf26a13b221817ecebe4ccf50a20d3cf5a7c7032de06dcc035"
+    },
+    {
+      "bytes": 18414,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterChannels.h",
+      "sha256": "920d7de42def64b88e9fc29e150532ec3a15b80f55643a6aa012d59fae2e19a2"
+    },
+    {
+      "bytes": 15290,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterCodecs.h",
+      "sha256": "672aa51d8b996e915ebd57a7cbd59d974ad51604bbb33232b2c4a20b269a7853"
+    },
+    {
+      "bytes": 3914,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterDartProject.h",
+      "sha256": "53cabfd086edf6ae0ed8732c09d530213b49753c7c2e3865c7ed1a63cddf1fab"
+    },
+    {
+      "bytes": 21724,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterEngine.h",
+      "sha256": "29528cda49a2619ac88f2a31be72b314af4e543918315dfaf11e5622c200742a"
+    },
+    {
+      "bytes": 4755,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterEngineGroup.h",
+      "sha256": "4aacef231a815c427753d2c9df6842117b2b1f63f5ea0ba643e810c7a3dd95fe"
+    },
+    {
+      "bytes": 3927,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterHeadlessDartRunner.h",
+      "sha256": "9e6663669bc5097af281fe14f5a3e4362f15708edc2f902d03e098e6e51620bd"
+    },
+    {
+      "bytes": 536,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterHourFormat.h",
+      "sha256": "43848b1528212ffe441493f22e0ecf362f49ff1a645557f3ae8d15422407b6b6"
+    },
+    {
+      "bytes": 1823,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterMacros.h",
+      "sha256": "79b0551d265c52701b378851718ab7b6db7afbecf561b73c2954988554e80f99"
+    },
+    {
+      "bytes": 1966,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterPlatformViews.h",
+      "sha256": "d1a53db8ce90729ce6669b8560e6e3f5d1a51849132a8c0f304449410745d8fe"
+    },
+    {
+      "bytes": 19326,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterPlugin.h",
+      "sha256": "349bc734c4eec7babf27b476f7c7a3bcfa01f4b0114bfbc7eae8ed9b09947838"
+    },
+    {
+      "bytes": 5318,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterPluginAppLifeCycleDelegate.h",
+      "sha256": "f8f327fb94838f655de9153c09022dfc9625dd3fbc0e1a7b1c89aa033a1ca0d9"
+    },
+    {
+      "bytes": 893,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterSceneDelegate.h",
+      "sha256": "1bdbab65e137d7695d6b391e3ffeecbadd2dda103795f72ec47452b8b9a3fa06"
+    },
+    {
+      "bytes": 8387,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterSceneLifeCycle.h",
+      "sha256": "b4d90b84efbe3ce2f8db38397e312fe7f0c97d0ad7bbca8763a24b6ebf2d2217"
+    },
+    {
+      "bytes": 2263,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterTexture.h",
+      "sha256": "25ca4de1af6cbfac729e50f7462eb5d4de72f87a2ea545a9da1cab21707f23c6"
+    },
+    {
+      "bytes": 10734,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Headers/FlutterViewController.h",
+      "sha256": "e2336e4d76c2899c2aa71d253a64dd292183b3ebaba237681a95ce2bac09a9a5"
+    },
+    {
+      "bytes": 1076,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Info.plist",
+      "sha256": "97bc153e729ad85f3d0c8203a445a9e1dbb2bd58c6d24911a7c089c027d66ba5"
+    },
+    {
+      "bytes": 95,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/Modules/module.modulemap",
+      "sha256": "d158eb891a59ec065968fff498c00f3093e18ba2e8301e0c857ccbe63db8b46b"
+    },
+    {
+      "bytes": 845,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/PrivacyInfo.xcprivacy",
+      "sha256": "9f95d7e7862a4b56b66ed926bd6d622d2a6545a827d19847278b438d571d4212"
+    },
+    {
+      "bytes": 7070,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/_CodeSignature/CodeResources",
+      "sha256": "e8f892c17976e52ba51740fa329954e4045720daf11295a42f46b9e9b5f45531"
+    },
+    {
+      "bytes": 864880,
+      "path": "ios-arm64_x86_64-simulator/Flutter.framework/icudtl.dat",
+      "sha256": "325a86063d26334c2eabe1743cea073b612540fbf3d8fc2ef0b5708e3763a8c7"
+    }
+  ],
+  "native": {
+    "developer": "/Applications/Xcode_16.4.app/Contents/Developer",
+    "apple_sdk": {
+      "device": "/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk",
+      "simulator": "/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
+    },
+    "ar": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar",
+    "file": "/usr/bin/file",
+    "otool": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-otool",
+    "nm": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-nm",
+    "lipo": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo",
+    "aliases": {
+      "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/otool": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-otool",
+      "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend"
+    },
+    "xcodebuild": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild"
+  },
+  "host_pins": [
+    {
+      "bytes": 356421520,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend",
+      "sha256": "bf77cc8826cd1a74f1a9734c5c63a182bd26b9472682b58f01e435cc064e1bc8"
+    },
+    {
+      "bytes": 264942528,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "sha256": "4c458256bcdf913774de1bb4a37768244d3b41f32ad55afb2dfec3432f46f4fe"
+    },
+    {
+      "bytes": 4344144,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld",
+      "sha256": "648a8aac7f6f829a42305d24dddd7a3cfa48ee0bd9d4e7ec1ded5c51edea372b"
+    },
+    {
+      "bytes": 226192,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo",
+      "sha256": "1cd322ae54394e71eefceda6a74946ef0ff678924f890de7520341c34133ef84"
+    },
+    {
+      "bytes": 138992,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar",
+      "sha256": "f362372395c1dd8ef349b6ceaad3b7958f1207a32e95d285721eba4c84ca55ae"
+    },
+    {
+      "bytes": 29681456,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-nm",
+      "sha256": "1fbc38dab9a9bce506c32ba2a6e7be281645aaf7e9c47526b3693d6c9f388ccd"
+    },
+    {
+      "bytes": 137664,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-otool",
+      "sha256": "1cb32a54070f97a9a33bad5f16bbd6b5d5cb69fb4164d46a419197f405853a24"
+    },
+    {
+      "bytes": 118864,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/git",
+      "sha256": "7f30f076d0e9c38f772a76449fca9da8cf97f6a3d43b94c90a00e4f9ce7ad39e"
+    },
+    {
+      "bytes": 551104,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/file",
+      "sha256": "926f3fdd8fefe73b596806f6844a4d62b7c4e6bc5e247f6cbd22e5b6424881dd"
+    },
+    {
+      "bytes": 102560,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/sandbox-exec",
+      "sha256": "2ff75194b3e5689debee061c69f27f873ca21ff8fc54b7d49cbf5f2fb673f6ea"
+    },
+    {
+      "bytes": 117392,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/xcrun",
+      "sha256": "5fa85ff21b06b348024e1ab8b71585c37f8d7b3b5daeca0f43de597b3b455a72"
+    },
+    {
+      "bytes": 152096,
+      "official_system_hardlink": true,
+      "path": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
+      "sha256": "d4f152f2a753c94e0e7935c8ebbe6b2609979e1df7898422b577d0076383d08b"
+    },
+    {
+      "bytes": 2854,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist",
+      "sha256": "e806133c5c4ebfce0bc53659e98b6cc06ddafb1d1b933800e3ca890753c65fb9"
+    },
+    {
+      "bytes": 2297,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/SDKSettings.plist",
+      "sha256": "32e765ce8dc192103a947647429422464ed8433371f616609819db7b10a85bbe"
+    },
+    {
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
+      "bytes": 182656,
+      "sha256": "d9a999fe2691cec2b6f84a7cce4b84f83d4b28a1d8261851ecebde80c38825cb",
+      "official_system_hardlink": true
+    },
+    {
+      "path": "/Applications/Xcode_16.4.app/Contents/Info.plist",
+      "bytes": 32979,
+      "sha256": "cd2c5ad123051dfbbfc316a048bb376b253af190bd10ae37c797d3e5c165cad8",
+      "official_system_hardlink": false
+    },
+    {
+      "path": "/Applications/Xcode_16.4.app/Contents/version.plist",
+      "bytes": 521,
+      "sha256": "b44fcf33ce9e1ac6759f5e71f682bcf734743e6ecd8ad6263116338236b25926",
+      "official_system_hardlink": false
+    },
+    {
+      "path": "/usr/bin/codesign",
+      "bytes": 378144,
+      "sha256": "1ee421cb4ddc493c4a5312294a36c4f76742381abdd7e46d745ecd62db9839b5",
+      "official_system_hardlink": true
+    }
+  ],
+  "proof_boundary": "R10 explicit real-tool successor: original R7 bind/products/engine50/bridge20 reused without Go. R9 exact Apple-signed xcodebuild/codesign/bundle sources are rechecked before and after, then actual18Swift+ObjC device/simulator compile/link audits remain pending. No App/signing/device/SDK rebuild claim.",
+  "accepted_host_tool": {
+    "run": 38964539967,
+    "job": 117187621336,
+    "head": "87a4f0b979cab6cde4518fb50e58379bff92bf60",
+    "artifact_id": 12073169467,
+    "artifact_sha256": "f96a0b5f7180f2bab1f5219bf6dd7386ebd3df44b70b420870d64d592d4a899c",
+    "root_acceptance_sha256": "a054589c0bf0628bf232f19f6976a429ddc6ea6e5fcbfe52c8ff5774bd96aeaf",
+    "host_pins": [
+      {
+        "path": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
+        "bytes": 182656,
+        "sha256": "d9a999fe2691cec2b6f84a7cce4b84f83d4b28a1d8261851ecebde80c38825cb",
+        "official_system_hardlink": true
+      },
+      {
+        "path": "/Applications/Xcode_16.4.app/Contents/Info.plist",
+        "bytes": 32979,
+        "sha256": "cd2c5ad123051dfbbfc316a048bb376b253af190bd10ae37c797d3e5c165cad8",
+        "official_system_hardlink": false
+      },
+      {
+        "path": "/Applications/Xcode_16.4.app/Contents/version.plist",
+        "bytes": 521,
+        "sha256": "b44fcf33ce9e1ac6759f5e71f682bcf734743e6ecd8ad6263116338236b25926",
+        "official_system_hardlink": false
+      },
+      {
+        "path": "/usr/bin/codesign",
+        "bytes": 378144,
+        "sha256": "1ee421cb4ddc493c4a5312294a36c4f76742381abdd7e46d745ecd62db9839b5",
+        "official_system_hardlink": true
+      }
+    ],
+    "source_before_after_5_exact": true,
+    "original_shim_control": {
+      "exit_code": 0,
+      "strict_clean_match": false
+    },
+    "original_shim_not_used_as_version_success": true,
+    "accepted_as": "Only independently accepted official source and clean sandboxed metadata, not Swift/ObjC/link or App acceptance."
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "schema": "luobo.mobile.group-revoke.V3.isolated-cloud5.v1",
+  "cohort": "candidate354-group-revoke-v3",
+  "status": "prepared_only_no_cloud",
+  "base": {
+    "cohort": "current351",
+    "source_members": 351,
+    "source_digest": "fc2644ca9333596900be65f95fe0250f2d2106bb8429bc8f2f595c501bb2aba6",
+    "portable_members": 403,
+    "portable_digest": "3e87bd5ae01e2b9ee24b483981585820ab1b1e9745ba7cad66a42c0f8bb40ed9",
+    "helper_pins": [
+      {
+        "path": "ci/mobile-source.py",
+        "bytes": 24083,
+        "sha256": "d03b10de829ee16d09604ce97fc2aa478ba7a2a3d69cf268faaba2896a8a6713"
+      },
+      {
+        "path": "ci/mobile-check.py",
+        "bytes": 31646,
+        "sha256": "e03b2a635513784263d3e42f2335582bf82c26e2133c99a6c32abb55f2f9f201"
+      },
+      {
+        "path": "ci/mobile-setup.sh",
+        "bytes": 7067,
+        "sha256": "6d3c750dd611e1a0930def2ae0f14afe1e1f1c47ea3549b2665b41264c421265"
+      },
+      {
+        "path": "ci/mobile/inputs.json",
+        "bytes": 166634,
+        "sha256": "f09379c90e329ab507e5457da942c7e9447648507cfeeb44a09dc81f19c1b55a"
+      },
+      {
+        "path": "ci/mobile/required-test-names.json",
+        "bytes": 1751622,
+        "sha256": "3dcaf7ece4587bb1bdfcf291fe10112be84607d4ed9834dc6d247128b747ffbf"
+      }
+    ],
+    "before3": [
+      {
+        "path": "app/lib/features/chat/data/chat_repository.dart",
+        "bytes": 50484,
+        "sha256": "4c1dfa2d10ca21f2d6ac302dacc5aeb1c9b897f9923c2ef5a4219165d1e2efdb"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_controller.dart",
+        "bytes": 22967,
+        "sha256": "d8a9e14bc26a25eb86c88dbffc95a04e7ff5463e7629021571f3e8274a1297c9"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 87839,
+        "sha256": "08869981fe618ef7661fb120b96de5f017c6439c9dac32f2ff3fcc269526fb4b"
+      }
+    ]
+  },
+  "candidate": {
+    "manifest_sha256": "88f56b2c18547415c3001e3693d0f42095b1c7b0d74005a3b4799906565cf60e",
+    "source_members": 354,
+    "source_digest": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
+    "portable_members": 406,
+    "portable_digest": "81f0628bda255611d9a624aee518d1a77e63cd1dfdc07d91f9a932c33c7f199c",
+    "payload_prefix": "ci/candidates/mobile-group-revoke-v3/after",
+    "selected6": [
+      {
+        "path": "app/lib/features/chat/data/chat_repository.dart",
+        "bytes": 62522,
+        "sha256": "10a85b1089918f7dccf30afe73ad8e11654ec6b53c0a06b51fabe19358d4113f",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-group-revoke-v3/after/app/lib/features/chat/data/chat_repository.dart"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_controller.dart",
+        "bytes": 24936,
+        "sha256": "9790c4561e52fbf0a1396b50d7704945b967d83d093a1356869989c6670b6f92",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-group-revoke-v3/after/app/lib/features/chat/presentation/chat_controller.dart"
+      },
+      {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 98364,
+        "sha256": "6c48c1224cb98870a38ada5e7b0c05dc944321a762bbda19cc40f38c42a68590",
+        "new": false,
+        "payload_path": "ci/candidates/mobile-group-revoke-v3/after/app/lib/features/chat/presentation/chat_page.dart"
+      },
+      {
+        "path": "app/test/features/chat/group_revoke_fixture.dart",
+        "bytes": 10773,
+        "sha256": "61eb1863cfddf10108bccf8efd99fbc82493d98e20686551bda2a86cd82ee3c8",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-group-revoke-v3/after/app/test/features/chat/group_revoke_fixture.dart"
+      },
+      {
+        "path": "app/test/features/chat/group_revoke_repository_test.dart",
+        "bytes": 18730,
+        "sha256": "0091e9bbf1f0c56dd31be0910d0ee417ab348a653af8224293bb07edde360a00",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-group-revoke-v3/after/app/test/features/chat/group_revoke_repository_test.dart"
+      },
+      {
+        "path": "app/test/features/chat/group_revoke_workflow_test.dart",
+        "bytes": 16238,
+        "sha256": "f5e11ef3e487122efca82c3660c2ec1dab1b72cdf8b2d6aea4cee930b47f61fd",
+        "new": true,
+        "payload_path": "ci/candidates/mobile-group-revoke-v3/after/app/test/features/chat/group_revoke_workflow_test.dart"
+      }
+    ]
+  },
+  "target": {
+    "analysis_paths": [
+      "lib/features/chat/presentation/chat_controller.dart",
+      "lib/features/chat/presentation/chat_page.dart",
+      "test/features/chat/group_revoke_workflow_test.dart"
+    ],
+    "test_path": "test/features/chat/group_revoke_workflow_test.dart",
+    "names": [
+      "an unannounced downgrade is denied by the final real role lookup after an enabled confirm",
+      "same ChatPage State CID ABA cannot renew its original enabled confirmation",
+      "foreground loss retires moderation synchronously and withdraws its confirm on the next frame",
+      "foreign coverage and return retire old confirm while a new explicit moderation still works",
+      "late successful revoke ACK does not pop a foreign route or claim the dispatched write was cancelled"
+    ],
+    "expected_tests": 5,
+    "cleanup_prefix": "group_revoke_cleanup ",
+    "cleanup_markers": [
+      "sdk.begin",
+      "sdk.end",
+      "unmount.begin",
+      "unmount.end"
+    ]
+  },
+  "resource": {
+    "initial_bytes": 4294967296,
+    "floor_bytes": 1073741824,
+    "allocated_cap_bytes": 805306368,
+    "poll_seconds": 0.2,
+    "phase_seconds": 120
+  },
+  "provenance": {
+    "V2_actual59": "57PASS2productUIERROR; new55+old2green; all57newfourmarkers228; .qa/group-revoke-v1-1/tests59-first-result.json sha332628d0d2bac059acd0e310080609ebee9b3f9dfc50ab4d371ce34045154824",
+    "V3_local_attempt": "0child coldgate4091207680B<4294967296B; .qa/group-revoke-v3-1-not-started.json sha2dbe89f8452abfb316512a5d0743146a10f118f06430e37026a9d58361c09bb1",
+    "required": "No main/public app adoption, no current354 historical identity, no old40repo/old2/Card85/60/full. Onlymanual firstV3changed3 then5. Preserve current351 normalworkflow history exact."
+  }
+}
