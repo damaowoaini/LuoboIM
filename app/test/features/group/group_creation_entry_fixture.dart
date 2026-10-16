@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:imapp/app.dart';
+import 'package:imapp/core/app_runtime.dart';
 import 'package:imapp/core/network/tenant_api.dart';
 import 'package:imapp/core/tenant/session_access.dart';
 import 'package:imapp/features/chat/presentation/chat_page.dart';
@@ -33,6 +35,7 @@ final class GroupEntryFixture {
   Future<void> Function()? beforeVerification;
   late CreationSurface surface;
   final cleanups = <void Function()>[];
+  bool _providerOwnsRouter = false;
 
   Completer<void> deferred() {
     final value = Completer<void>();
@@ -61,6 +64,7 @@ final class GroupEntryFixture {
 
   Future<void> mount(WidgetTester tester, CreationSurface value, {
     bool group = false, double width = 360, double height = 640,
+    bool productionRouter = false,
   }) async {
     surface = value;
     await tester.runAsync(() => start(group: group));
@@ -69,12 +73,20 @@ final class GroupEntryFixture {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     final theme = await captureTheme(tester);
-    creation.router = GoRouter(initialLocation: value == CreationSurface.chat ? '/chat/origin-cid' : '/', routes: [
+    _providerOwnsRouter = productionRouter;
+    if (productionRouter) creation.base.sdk.runtime.phase = AppPhase.online;
+    if (!productionRouter) creation.router = GoRouter(initialLocation: value == CreationSurface.chat ? '/chat/origin-cid' : '/', routes: [
       GoRoute(path: '/', builder: (_, _) => value == CreationSurface.contacts
         ? const ContactsPage() : const ConversationsPage()),
-      GoRoute(path: '/chat/:id', builder: (_, state) => state.pathParameters['id'] == 'origin-cid'
-        ? const ChatPage(conversationId: 'origin-cid')
-        : Scaffold(body: Text('accepted-chat:${state.pathParameters['id']}'))),
+      // Same CID-owned page contract as the actual routerProvider. The
+      // destination label is observation-only; separate route tests use the
+      // unmodified production router and real ChatPage on both sides.
+      GoRoute(path: '/chat/:id', pageBuilder: (_, state) {
+        final cid = state.pathParameters['id']!;
+        return MaterialPage<void>(key: ValueKey((state.pageKey.value, cid)), child: cid == 'origin-cid'
+          ? const ChatPage(conversationId: 'origin-cid')
+          : Scaffold(body: Text('accepted-chat:$cid')));
+      }),
       GoRoute(path: '/contacts/groups', builder: (_, _) => const Scaffold(body: Text('group-list'))),
       GoRoute(path: '/blank', builder: (_, _) => const Scaffold(body: Text('blank-route'))),
     ]);
@@ -84,13 +96,18 @@ final class GroupEntryFixture {
       tenantApiProvider.overrideWithValue(creation.base.api),
       contactsRepositoryProvider.overrideWith((_) => creation.contacts),
       groupRepositoryProvider.overrideWith((_) => creation.repository),
-    ], child: Builder(builder: (context) {
+    ], child: Consumer(builder: (context, ref, _) {
       creation.container = ProviderScope.containerOf(context, listen: false);
+      if (productionRouter) creation.router = ref.watch(routerProvider);
       return MaterialApp.router(theme: theme, routerConfig: creation.router,
         builder: (context, child) => MediaQuery(data: MediaQuery.of(context)
           .copyWith(textScaler: TextScaler.linear(1.5)), child: child!));
     })));
     await creation.frame(tester);
+    if (productionRouter) {
+      creation.router!.go(value == CreationSurface.chat ? '/chat/origin-cid' : '/home');
+      await creation.frame(tester);
+    }
     if (value == CreationSurface.chat) {
       await until(tester, () => find.byTooltip('聊天设置').evaluate().isNotEmpty &&
         find.text('同名好友').evaluate().isNotEmpty);
@@ -130,6 +147,8 @@ final class GroupEntryFixture {
   Future<void> coverAndReturn(WidgetTester tester) => creation.coverAndReturn(tester);
   Future<void> close(WidgetTester tester) async {
     for (final finish in cleanups) { finish(); }
+    // routerProvider owns its router; CreationFixture owns only its manual one.
+    if (_providerOwnsRouter) creation.router = null;
     await creation.close(tester);
   }
 }

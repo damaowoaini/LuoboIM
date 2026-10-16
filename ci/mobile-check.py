@@ -312,7 +312,7 @@ def reference_entry_summary(text, child_exit, reference):
 
 
 def run_reference_entry(work, cohort, plan, tests, guard):
-    """Separate full291 tree; restore exact after4 even if the reference fails."""
+    """Separate full292 tree; restore exact after4 even if the reference fails."""
     _, current, _ = source.load_sources(cohort)
     reference = source.reference_sources(plan, current)
     root = work / 'source-reference-entry'
@@ -383,8 +383,8 @@ def run_reference_entry(work, cohort, plan, tests, guard):
         verify_tree(current)
         verify(work, cohort)
         write_json(work / 'evidence/reference-after-restored.json',
-                   {'state': 'after291_and_primary_source_reverified',
-                    'source_digest': plan['current291']['source_digest'],
+                   {'state': 'after292_and_primary_source_reverified',
+                    'source_digest': plan['current292']['source_digest'],
                     'restored_existing_files': 4, 'native_or_full257_result': False})
 
 
@@ -403,20 +403,21 @@ def run(work, cohort, reference=False):
         if reference:
             counts['reference_entry'] = run_reference_entry(work, cohort, plan, tests, guard)
         verify(work, cohort)
-        target_expected = plan['current291']['expected_target_tests']
+        target_expected = plan['current292']['expected_target_tests']
         target_label = 'target' + str(target_expected)
-        log = guarded(tests + plan['current291']['target_paths'], work, guard, target_label)
+        log = guarded(tests + plan['current292']['target_paths'], work, guard, target_label)
         counts['target'] = machine_summary(log.read_text(), target_expected)
         required = source.required_names(plan)
-        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target163'])
+        counts['target_names'] = required_name_summary(log.read_text(), target_expected, required['current_target166'])
         write_json(work / 'evidence' / (target_label + '.summary.json'), counts['target'])
         verify(work, cohort)
-        expected = plan['current291']['expected_full_tests']
+        expected = plan['current292']['expected_full_tests']
         log = guarded(tests, work, guard, 'full' + str(expected))
         counts['full'] = machine_summary(log.read_text(), expected)
-        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full851'])
+        counts['full_names'] = required_name_summary(log.read_text(), expected, required['current_full854'])
         counts['parent822_preserved'] = True
         counts['new_group_entry29_exact'] = True
+        counts['new_chat_route3_exact'] = True
         write_json(work / 'evidence/full.summary.json', counts['full'])
         verify(work, cohort)
         guarded([flutter, 'analyze', '--no-pub', '--fatal-infos', '--fatal-warnings'],
@@ -454,9 +455,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=('verify', 'run'))
     p.add_argument('--work', type=Path, required=True)
-    p.add_argument('--cohort', choices=('current291',), required=True)
+    p.add_argument('--cohort', choices=('current292',), required=True)
     p.add_argument('--reference-before-entry', action='store_true',
-                   help='explicit full291 variant; exactly one entry assertion fails and one old filter passes')
+                   help='explicit full292 variant; exactly one entry assertion fails and one old filter passes')
     a = p.parse_args()
     if not a.work.is_absolute() or a.work.resolve() != a.work or not a.work.is_dir():
         raise ValueError('canonical fresh CI root required')

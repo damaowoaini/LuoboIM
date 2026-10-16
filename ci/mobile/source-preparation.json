@@ -1,7 +1,7 @@
 {
-  "schema": "luobo.mobile.source-preparation.v6",
-  "state": "current291_group_creation_entries_pending_cloud",
-  "parent_required": {
+  "schema": "luobo.mobile.source-preparation.v7",
+  "state": "current292_chat_cid_page_key_source_only_pending_cloud",
+  "accepted_parent287": {
     "git_commit": "db817c2377d82fecaaf0043e85f6a8519b6821ed",
     "actual_run": 38878571484,
     "job": 116899482457,
@@ -17,47 +17,46 @@
     "root_acceptance_sha256": "cc014244d795b4747a2e409a1f03ef1b51ea3e858cf331507d239a914cf98d44",
     "original_inputs_sha256": "467d5d19bdc6cff9610a2c47b76d5795fc6300a16e7a407ca99742204b89e2a9"
   },
-  "candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
-  "source291_digest": "9438367ab2fc8085aa1267a61fb03296ad60c647072fc44a0c1906aa512e00e2",
-  "portable343_digest": "c1dad7ddc93db08c23565e09b2493a17f72e09954a84bb38735057abfc0a5b08",
-  "selected_delta": {
-    "files": 7,
+  "current291_actual_failure": {
+    "commit": "8ec31e84f57b1c61c198a9c10157de5824b152ab",
+    "run": 38882772904,
+    "job": 116913210368,
+    "source291_digest": "9438367ab2fc8085aa1267a61fb03296ad60c647072fc44a0c1906aa512e00e2",
+    "portable343_digest": "c1dad7ddc93db08c23565e09b2493a17f72e09954a84bb38735057abfc0a5b08",
+    "artifact_zip_sha256": "22db3f2ad1508ee576ee951f948e2e7f44c5bb35b2e769b51c1d7dfb7bda2866",
+    "agent_verification_sha256": "6165d55afe4a7cca78034414dcc094785a2ae29e87e8ec7fe3629491f0cb6ad1",
+    "root_failure_review_sha256": "bc1d7e4464b6e799af01c65dda9c143456157c5e40085ef1c49343c36352e300",
+    "actual": "target163:162PASS1bounded-conditionERROR;16hiddenPASS;allnamescompleted;old134PASS,new28/1;0skip;falsefooter;full851/analyze notstarted",
+    "confirmed_source": "go_router defaultpatternpagekey preserves associatedpageless routes; ChatPage latefinalcontroller firstCID. New composition must also preserve imperativepush state.pageKey.",
+    "accepted": false
+  },
+  "candidate_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
+  "source292_digest": "9a5f121c46bff5131cc8aaf00f299f70385d32fb6e5f9ab4c943d4200fb3fbb4",
+  "portable344_digest": "7a35bb7ec45d998fa1f64e5e5526f33275cb459d0841b4eebd8cfff870908929",
+  "delta": {
     "existing": 3,
-    "new": 4,
-    "production_Dart": 4,
-    "new_test_files": 2,
-    "new_fixture_files": 1,
-    "dependency_metadata": 0
+    "new": 1,
+    "production_Dart": 1,
+    "test_and_fixture": 3
   },
   "default_cloud_sequence": [
-    "unchanged28_Python_reporter_descriptor_name_gates",
-    "strict_source291_portable343",
-    "official_Flutter_pubget_enforce_lockfile",
-    "target163_exact_accepted134_plus_new29_names",
-    "full851_exact_accepted822_plus_new29_names",
-    "analyze_zero_infos_warnings"
+    "unchanged28_Python_gates",
+    "strict292_344",
+    "officialFlutter_pinned_pubget_enforce_lockfile",
+    "target166_old134_plus29_plus3_exactnames",
+    "full854_accepted822_plus29_plus3_exactnames",
+    "strictanalyze0"
   ],
-  "counts_are_prepared_not_actual": true,
-  "actual_new_group_entry_Dart_tests": 0,
-  "optional_search_reference": "Defaultoff;full291 replace4 original search-before; same original search entry2 only; strict1assertFAIL/1oldfilterPASS; exactafter4 restore and primary291/343 verify. Not group-entry before2 and not historical287full.",
-  "group_entry_before2_proposal": {
-    "state": "prepared_not_executed_not_integrated_in_default_or_reference_CI",
-    "context": "full291 after compilation context; replace only original chat_page.dart and conversations_page.dart with frozen before2; retain new selector/action APIs",
-    "test_path": "test/features/group/group_creation_entry_test.dart",
-    "expected_product_assertion_failures": 2,
-    "actual": null,
-    "reject_as_product_RED": [
-      "compiler/load failure",
-      "undefined callback",
-      "timeout",
-      "panic"
-    ],
-    "restore": "exact after2 and all291 authored/343 portable before continuing",
-    "decision": "Root may authorize a separate phase later; no reference parser rewrite in this draft"
+  "actual_new3_Dart_tests": 0,
+  "expected_not_actual": {
+    "target": 166,
+    "full": 854,
+    "analyze_required": 0
   },
-  "resource_and_network": "Unchanged4GiBinitial/1GiB .2s/768MiB/900s, processgroup/latchedfailure/strictmachinefooter; setup-onlynetwork/freshnetns/0hostfixtures/noinheritedcredentials.",
-  "dependency_proof": "App pubspec/lock all174 package versions/archiveSHA and direct classifications unchanged from accepted287; SDK51+migration1/official Flutter/SQLite unchanged. Enforced cloud lock remains mandatory.",
-  "public_inventory": "Zeroexceptions; local-only app/tool/check.sh absent public/notcopied/notrequired/notexecuted",
-  "policy_boundary": "Entry preflight uses authenticated verification/status with statusOnly:true, and accepts status1 only. Separate backend minimal-response candidate is not proof of CreateGroup realtime verification/VIP authorization or SQL-to-IM projection.",
-  "acceptance_limit": "Linux unit/widget+MethodChannel/HTTP mocks and strict analysis only; native/device/service mutation pending; current source/app/CI unchanged by this draft."
+  "original29_preserved": "Same29 names;all68 original workflow expect expressions preserved,new5 strengthen priorfailure. New3 directly use actualrouterProvider and realChatPage/controller, mock only existingOS/MethodChannel/HTTP seams.",
+  "reference": "Original optionalsearch defaultoff/full292 context+same4 before+same1FAIL1PASS strictparser/restore. Original groupbefore2 remains separatepreparedonly full291 plan;0execution/no parser reuse/new phase.",
+  "identity_contract": "Page key=(state.pageKey.value,exactCID) preserves uniqueimperativepush; CID changes get freshpage+ownedpagelessretirement; sameCIDquery/metadata retains page/anchor/draft.",
+  "dependency_and_gates": "SDK51+migration1/174lockeddependencies/lock/pubspec/Flutter/SQLite unchanged. 4GiBinitial/1GiB .2s/768MiB/900s/netns/9AST failureandcompletion logic unchanged.",
+  "public_inventory": "Zeroexceptions;knownlocal app/tool/check.sh remains local-onlyabsentpublic.",
+  "native_service_acceptance": false
 }

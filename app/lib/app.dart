@@ -228,14 +228,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/chat/:conversationId',
-        builder: (_, state) {
+        pageBuilder: (_, state) {
           final cid = state.pathParameters['conversationId']!;
           final id = state.uri.queryParameters['message'];
-          return ChatPage(
-            conversationId: cid,
-            sourceMessageId: id,
-            sourceCurrent: globalSourceGuard(cid, id, state.extra,
-                fromGlobal: state.uri.queryParameters['source'] == 'global'),
+          // A different chat owns a different Navigator page, including any
+          // pageless settings/selection/editor routes above the previous chat.
+          // Preserve go_router push identity as well: same-CID query/metadata
+          // updates keep the page, while repeated imperative pushes stay unique.
+          return MaterialPage<void>(
+            key: ValueKey((state.pageKey.value, cid)),
+            child: ChatPage(
+              conversationId: cid,
+              sourceMessageId: id,
+              sourceCurrent: globalSourceGuard(cid, id, state.extra,
+                  fromGlobal: state.uri.queryParameters['source'] == 'global'),
+            ),
           );
         },
       ),

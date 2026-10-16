@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.portable-ci-inputs.v6",
-  "state": "current291_group_creation_entries_pending_cloud",
+  "schema": "luobo.mobile.portable-ci-inputs.v7",
+  "state": "current292_chat_cid_page_key_pending_cloud",
   "digest_algorithm": "SHA256 of UTF-8 json.dumps(rows sorted by path, ensure_ascii=False, sort_keys=True, separators=(comma,colon)); each row has path, bytes, sha256.",
   "provenance": {
     "current257_root_source_manifest": {
@@ -13,7 +13,7 @@
       "booking_v8_r2_manifest": "476c913a19e66b7f4cc720af2e9e97879ea85697de399da4fc0aeaadc77e31bd",
       "group_combined_manifest": "5f5cdbdb0082a89649b8b28209e6cae97fd913ffe358034e9d742b03c2878071"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI",
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI",
     "global_search_candidate_manifest_sha256": "f542626e1bf28f9ebf7af31cbb1175a2a26c7c0d9d77e3233ac4424b07e481ad",
     "global_search_source_r1_manifest_sha256": "b1798280d9603d267d5b788ca01db76f819c2a2109de153538ad316f871e7a2d",
     "global_search_fixture_r2_manifest_sha256": "c0ccd163172aeaee6066bc54b16eef1431c6f67508bd024c954910dd708ace22",
@@ -36,7 +36,8 @@
     "create_group_avatar_fixture_r4_manifest_sha256": "39e79136cf20e253d170d070f248208cd34ceedaa931f29ab380e7fac7e88370",
     "create_group_avatar_analysis_r5_manifest_sha256": "ed5e62c2a994f946875817f5ee0352f44a97edb9851a73834edc87171bf989d9",
     "owned_confirmation_fixture_manifest_sha256": "0bea1f0b326815098bcd5021cdb57c758a6e58ee2ab436a7935a3ba6c2583e18",
-    "group_creation_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb"
+    "group_creation_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
+    "chat_cid_page_key_r1_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689"
   },
   "toolchain": {
     "repository": "https://github.com/flutter/flutter.git",
@@ -312,10 +313,10 @@
     "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
   },
   "portable_members": {
-    "current291": 343
+    "current292": 344
   },
   "portable_digests": {
-    "current291": "c1dad7ddc93db08c23565e09b2493a17f72e09954a84bb38735057abfc0a5b08"
+    "current292": "7a35bb7ec45d998fa1f64e5e5526f33275cb459d0841b4eebd8cfff870908929"
   },
   "sqlite_linux": {
     "package": "sqlite3",
@@ -349,7 +350,7 @@
       "actual_run": 38852506276,
       "actual": "target76/full624PASS; analyze17issuesFAIL; not accepted"
     },
-    "reproduction": "Historical cohorts require their immutable commit/inputs. Schema v6 supports current291 only. Optional search reference uses full291 with exactly4 historical search-before files and executes only original search entry2 (1assertFAIL/1oldfilterPASS); not the new group-entry before2.",
+    "reproduction": "Historical cohorts require immutable commits/inputs. v7 supports only current292. Optional original search reference keeps4 historicalbefore and1missingentryASSERTFAIL+1oldfilterPASS; no groupentrybefore2 phase is added.",
     "accepted_current257": {
       "git_commit": "314ac55",
       "source_digest": "b593f96d8301d6849cd7e85c93445814f4310e4f727ed99daf6144b00248cf54",
@@ -551,14 +552,27 @@
       "agent_verification_sha256": "69218bb8944743d8ac6610f696d258ae3677027bde85c1b7a4fcadef3d7cec87",
       "root_acceptance_sha256": "cc014244d795b4747a2e409a1f03ef1b51ea3e858cf331507d239a914cf98d44",
       "original_inputs_sha256": "467d5d19bdc6cff9610a2c47b76d5795fc6300a16e7a407ca99742204b89e2a9"
+    },
+    "current291_group_entry_first_failure": {
+      "commit": "8ec31e84f57b1c61c198a9c10157de5824b152ab",
+      "run": 38882772904,
+      "job": 116913210368,
+      "source291_digest": "9438367ab2fc8085aa1267a61fb03296ad60c647072fc44a0c1906aa512e00e2",
+      "portable343_digest": "c1dad7ddc93db08c23565e09b2493a17f72e09954a84bb38735057abfc0a5b08",
+      "artifact_zip_sha256": "22db3f2ad1508ee576ee951f948e2e7f44c5bb35b2e769b51c1d7dfb7bda2866",
+      "agent_verification_sha256": "6165d55afe4a7cca78034414dcc094785a2ae29e87e8ec7fe3629491f0cb6ad1",
+      "root_failure_review_sha256": "bc1d7e4464b6e799af01c65dda9c143456157c5e40085ef1c49343c36352e300",
+      "actual": "target163:162PASS1bounded-conditionERROR;16hiddenPASS;allnamescompleted;old134PASS,new28/1;0skip;falsefooter;full851/analyze notstarted",
+      "confirmed_source": "go_router defaultpatternpagekey preserves associatedpageless routes; ChatPage latefinalcontroller firstCID. New composition must also preserve imperativepush state.pageKey.",
+      "accepted": false
     }
   },
   "reference_entry": {
     "state": "explicit_optional_search_reference_only_not_historical_full_or_group_entry_baseline",
     "default_enabled": false,
-    "working_cohort": "current291",
-    "members": 291,
-    "reference_source_digest": "2da296525658a10b8d64e377044f85cfe9d2c002420854101b3852c15deae9b3",
+    "working_cohort": "current292",
+    "members": 292,
+    "reference_source_digest": "b366ccecea58aa3f787caf3843736415df35e23099a50e5f7fae62027c1052af",
     "replacement_files": [
       {
         "path": "app/lib/app.dart",
@@ -592,7 +606,8 @@
     "expected_child_exit": 1,
     "not_a_257_full_or_native_result": true,
     "not_a_269_full_or_native_result": true,
-    "not_a_287_full_or_native_result": true
+    "not_a_287_full_or_native_result": true,
+    "not_a_291_full_or_native_result": true
   },
   "auxiliary_preserved": [
     {
@@ -616,12 +631,12 @@
   },
   "required_test_names": {
     "path": "ci/mobile/required-test-names.json",
-    "bytes": 129185,
-    "sha256": "cf597471ae20590f9e66036a64ff7c1466e28748dcb20c5f94229cf29600781f"
+    "bytes": 130355,
+    "sha256": "0eb7f56d7abb522f5ea4e9efae60e33b1b24db64c260011dc702d9320436928a"
   },
-  "current291": {
-    "members": 291,
-    "source_digest": "9438367ab2fc8085aa1267a61fb03296ad60c647072fc44a0c1906aa512e00e2",
+  "current292": {
+    "members": 292,
+    "source_digest": "9a5f121c46bff5131cc8aaf00f299f70385d32fb6e5f9ab4c943d4200fb3fbb4",
     "files": [
       {
         "path": "app/analysis_options.yaml",
@@ -630,8 +645,8 @@
       },
       {
         "path": "app/lib/app.dart",
-        "bytes": 19717,
-        "sha256": "6123d8013a7fd7d735f492340cff141b8dbde76b601d21b3c0e72dcfb71b2b99"
+        "bytes": 20156,
+        "sha256": "1f4aeb54d1a87f6874a0fc5de2cd514670d9476557e347e9f63a5c0d65edcb60"
       },
       {
         "path": "app/lib/core/access/access_store.dart",
@@ -1794,6 +1809,11 @@
         "sha256": "e9fefa91061b6f04971fae679e5d92f49476911a1d417b80792026a716ce2635"
       },
       {
+        "path": "app/test/features/group/chat_cid_route_test.dart",
+        "bytes": 11175,
+        "sha256": "82a601ada84e2c10c1adf98ed09176487f07675a788e74da98b29d75c2eddf0a"
+      },
+      {
         "path": "app/test/features/group/create_group_entry_test.dart",
         "bytes": 5362,
         "sha256": "2118a18799c3407e1760b0abf6009f366bea237d11d067dd767eda53f5c1d235"
@@ -1835,8 +1855,8 @@
       },
       {
         "path": "app/test/features/group/group_creation_entry_fixture.dart",
-        "bytes": 6309,
-        "sha256": "aaf332d1e8cf3fda0fe6b4d5b2530ecab1f9a68f84f38cc70ef041df33df0279"
+        "bytes": 7300,
+        "sha256": "49a0e8646784399ba84dc813f916eca30196d7334fa33bc60068c45168b2b523"
       },
       {
         "path": "app/test/features/group/group_creation_entry_test.dart",
@@ -1845,8 +1865,8 @@
       },
       {
         "path": "app/test/features/group/group_creation_entry_workflow_test.dart",
-        "bytes": 15374,
-        "sha256": "ef1ae68a13e25935eecacf66aa02983a4982af3609fda11440bc56823e306fd8"
+        "bytes": 16289,
+        "sha256": "7b8e7a686f28e19cb2eeb92b580180089363e4fe3c9c81a42b90077c815a1e11"
       },
       {
         "path": "app/test/features/meeting/booking/booking_controller_test.dart",
@@ -2079,8 +2099,8 @@
         "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
       }
     ],
-    "expected_target_tests": 163,
-    "expected_full_tests": 851,
+    "expected_target_tests": 166,
+    "expected_full_tests": 854,
     "target_paths": [
       "test/features/qr",
       "test/features/search",
@@ -2088,7 +2108,8 @@
       "test/features/group/create_group_repository_test.dart",
       "test/features/group/create_group_workflow_test.dart",
       "test/features/group/group_creation_entry_test.dart",
-      "test/features/group/group_creation_entry_workflow_test.dart"
+      "test/features/group/group_creation_entry_workflow_test.dart",
+      "test/features/group/chat_cid_route_test.dart"
     ]
   }
 }

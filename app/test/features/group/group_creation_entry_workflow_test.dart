@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imapp/core/error/app_failure.dart';
@@ -266,8 +268,21 @@ void main() {
       await f.creation.tap(tester, '创建群聊');
       await f.until(tester, () => find.textContaining('群已创建，暂时无法打开会话').evaluate().isNotEmpty);
       expect(f.creation.creates, hasLength(1));
+      final editor = ModalRoute.of(tester.element(find.byType(CreateGroupPage)))!;
+      var editorCompleted = false;
+      unawaited(editor.completed.then<void>((_) { editorCompleted = true; }));
+      final firstReads = f.creation.base.sdk.calls.where((call) => call.method == 'getOneConversation' &&
+        (call.arguments as Map)['sourceID'] == 'created-group').toList();
+      expect(firstReads, hasLength(1));
       f.creation.conversationReply = null; await f.creation.tap(tester, '重试打开会话');
       await f.until(tester, () => find.text('accepted-chat:created-cid').evaluate().isNotEmpty);
+      await f.until(tester, () => editorCompleted);
+      expect(f.creation.router!.routeInformationProvider.value.uri.path, '/chat/created-cid');
+      final reads = f.creation.base.sdk.calls.where((call) => call.method == 'getOneConversation' &&
+        (call.arguments as Map)['sourceID'] == 'created-group').toList();
+      expect(reads, hasLength(2));
+      expect(find.byType(CreateGroupPage), findsNothing);
+      expect(find.byType(SelectContactsPage), findsNothing);
       expect(f.creation.creates, hasLength(1));
     } finally { await f.close(tester); }
   });

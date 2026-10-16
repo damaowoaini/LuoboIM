@@ -1,6 +1,6 @@
 {
-  "schema": "luobo.mobile.required-successful-names.v2",
-  "cohort": "current291",
+  "schema": "luobo.mobile.required-successful-names.v3",
+  "cohort": "current292",
   "parent_full822": [
     {
       "name": "/login stays scrollable at 320pt and 200% text",
@@ -3409,7 +3409,21 @@
       "count": 1
     }
   ],
-  "current_target163": [
+  "new_chat_route3": [
+    {
+      "name": "production router replaces a different CID and retires the owned group creation stack after read retry",
+      "count": 1
+    },
+    {
+      "name": "production router keeps a same-CID query and metadata update on the existing anchored page and draft",
+      "count": 1
+    },
+    {
+      "name": "production router preserves unique page identity for repeated CID and A B A imperative pushes",
+      "count": 1
+    }
+  ],
+  "current_target166": [
     {
       "name": "CID clear begun after dispatch blocks unknown late IDs before privacy observe",
       "count": 1
@@ -3887,6 +3901,18 @@
       "count": 1
     },
     {
+      "name": "production router keeps a same-CID query and metadata update on the existing anchored page and draft",
+      "count": 1
+    },
+    {
+      "name": "production router preserves unique page identity for repeated CID and A B A imperative pushes",
+      "count": 1
+    },
+    {
+      "name": "production router replaces a different CID and retires the owned group creation stack after read retry",
+      "count": 1
+    },
+    {
       "name": "public user hydration rejects a mismatched native ID",
       "count": 1
     },
@@ -4075,7 +4101,10 @@
     "parent_required_names_sha256": "e71206a1d7fef5551319225da6324919c7347e78204faf473e4b80d248aa7102",
     "group_entry_candidate_manifest_sha256": "5880ae76c0daece1365da9096b6e30f2e433d45ba61afec1d1190efd3a6526eb",
     "prepared29_names_sha256": "acbd3843b1a11dbaf4040eadf97c994f82e864dc794fc96276a9c8c5cf416fe1",
-    "group_entry_names_prepared_not_run": true
+    "group_entry_names_prepared_not_run": true,
+    "previous_current291_required_names_sha256": "cf597471ae20590f9e66036a64ff7c1466e28748dcb20c5f94229cf29600781f",
+    "chat_cid_page_key_r1_candidate_manifest_sha256": "dfc3e55b8782d754716d8a6b20d461d42879155707d2d48bfc7a4dfa4941d689",
+    "new3_prepared_0Dart": true
   },
-  "meaning": "Full851 must exactly preserve the accepted822 successful visible name multiset plus29 prepared entry/workflow cases. Target163 must exactly preserve accepted134 plus29; hidden loads never substitute a case. No new Dart result is claimed."
+  "meaning": "Full854 exactly accepted822+original29+new3 with multiplicity; current291 first target162/1 is historical failure, not accepted851. Target166 exactly old134+29+3. Names are required future successful outcomes, not claimed results."
 }
