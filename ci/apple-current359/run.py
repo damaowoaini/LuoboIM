@@ -39,7 +39,7 @@ def borrowed_helper(row, name):
 
 
 xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 20918, 'sha256': '644351abdc5c93da1fee65f30e94d44a9ebe162b404d62a050b9a98dc9e8c2ae'}, 'current359_owned_xcrun_adapter')
-cache_resource = borrowed_helper({'path': 'ci/apple-current359/cache_resource.py', 'bytes': 4206, 'sha256': 'd0c891d1aae11e0e16055bbd83ce366294a7705501219a99985eda6dd52590ee'}, 'current359_exact_cache_resource')
+cache_resource = borrowed_helper({'path': 'ci/apple-current359/cache_resource.py', 'bytes': 4639, 'sha256': 'c10e12df95014cb3107fca9974bd955ac88b0b1248e7bf211471208d77867996'}, 'current359_exact_cache_resource')
 
 packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes': 10141, 'sha256': '7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248'}, 'apple359_common_packaging')
 pod_selector = borrowed_helper({'path': 'ci/apple-current354/pod_selector.py', 'bytes': 5603, 'sha256': '820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769'}, 'apple359_reviewed117_selector')

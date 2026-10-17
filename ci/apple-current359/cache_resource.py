@@ -42,6 +42,9 @@ def allocated_cache_leaves(row, check_directory):
 def run(guard, adapter, work, arguments):
     """One independently loaded guard module, one command, restored on every exit."""
     work = Path(work)
+    record_basename = Path(arguments.record).name
+    if not re.fullmatch(r'[a-z][a-z0-9-]*\.json', record_basename):
+        raise ValueError('fixed lowercase JSON resource record basename required')
     row = adapter.cache_boundary(work)
     private = adapter.private_cache_path(work).parent
     private_row = {'canonical': str(private), 'uid': row['uid'],
@@ -52,7 +55,8 @@ def run(guard, adapter, work, arguments):
             or Path(arguments.secondary_root) != secondary
             or arguments.secondary_cap_mib != 64 or arguments.min_free_mib < 1024):
         raise ValueError('unchanged work/cache caps and free disk floor required')
-    scope = {'schema': 1, 'secondary_allocation_scope': 'new-exact-xcrun-cache-leaves',
+    scope = {'schema': 1, 'resource_record_basename': record_basename,
+             'secondary_allocation_scope': 'new-exact-xcrun-cache-leaves',
              'canonical': str(secondary), 'uid': row['uid'],
              'directory_identity': row['directory_identity'],
              'protected_preexisting_leaf_count': len(row['protected_preexisting']),
@@ -62,7 +66,9 @@ def run(guard, adapter, work, arguments):
              'private_cache_root': str(private),
              'private_cache_counted_under_same_secondary_cap': True,
              'file_bodies_read': False, 'files_deleted': False}
-    target = work/'evidence/cache-resource-scope.json'
+    # Retain every phase's scope independently. O_EXCL also refuses a repeated
+    # phase before the original guard can truncate its earlier log or receipt.
+    target = work/'evidence'/('cache-resource-scope-'+record_basename)
     fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
     with os.fdopen(fd, 'w') as output:
         json.dump(scope, output, sort_keys=True, indent=2)
