@@ -1,10 +1,11 @@
-name: Fresh owned actual14 graph / fresh2top3sub / cleanup reused / cross-source7top16sub
+name: Fresh owned actual14 graph / launcher1top0sub + original2top3sub / current3top3sub / cleanup reused / cross-source7top16sub
 
 on:
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: backend-fullgraph-${{ github.ref }}
@@ -37,7 +38,9 @@ jobs:
           umask 077
           python3 -B ci/backend-fullgraph/run.py --admit
       - id: controller
-        name: Build actual14 plus two auxiliaries; failed+unstarted four scenarios; fresh2top3sub only
+        name: Launcher1top0sub then build actual14 plus two auxiliaries; original2top3sub and four scenarios; current3top3sub
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           umask 077
           python3 -B ci/group-effects/resource_guard.py \
@@ -135,3 +138,31 @@ jobs:
           path: ci-results/backend-fullgraph-compact/
           if-no-files-found: warn
           retention-days: 14
+      - id: minio_fixture
+        name: Seal only source-built MinIO fixture after exact source tool use and cleanup checks
+        if: always() && (steps.controller.outcome == 'success' || steps.controller.outcome == 'failure')
+        run: |
+          umask 077
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/minio-fixture-seal-private.log" \
+            --record "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/minio-fixture-seal.resource.json" \
+            --min-free-mib 1024 --timeout 60 --poll-interval .2 \
+            --allocated-root "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --max-allocated-mib 16384 \
+            -- python3 -B ci/backend-fullgraph/minio_build.py --seal-fixture
+          if test -f "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/minio-fixture-artifact-ready.json"; then
+            echo 'prepared=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Preserve only the fixed fixture tool receipt and manifest for seven days
+        if: always() && steps.minio_fixture.outcome == 'success' && steps.minio_fixture.outputs.prepared == 'true'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: backend-fullgraph-minio-fixture-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/work/minio-source-build/minio
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/work/minio-source-build/build-receipt.json
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/work/minio-source-build/manifest.json
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 7

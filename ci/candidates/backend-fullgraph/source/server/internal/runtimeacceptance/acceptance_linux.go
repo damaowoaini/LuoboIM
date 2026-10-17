@@ -59,6 +59,11 @@ type AcceptanceResult struct {
 	DataReadySHA256          string                     `json:"dataReadySHA256,omitempty"`
 	KnownAdmissionSHA256     string                     `json:"knownAdmissionSHA256,omitempty"`
 	ActualStartedRoles       int                        `json:"actualStartedRoles"`
+	LegacyStartupStage       string                     `json:"legacyStartupStage,omitempty"`
+	LegacyChildRetained      bool                       `json:"legacyChildRetained"`
+	LocalCleanupObserved     bool                       `json:"localCleanupObserved"`
+	LocalCleanupState        string                     `json:"localCleanupState,omitempty"`
+	LocalCleanupFailureClass string                     `json:"localCleanupFailureClass,omitempty"`
 	ReaderPhases             []ReaderPhaseObservation   `json:"readerPhases"`
 	ReaderServed             []ActualReaderEndpoint     `json:"readerServed"`
 	Cancellation             *CancellationObservation   `json:"cancellation,omitempty"`
@@ -140,6 +145,23 @@ func observeBootstrapFailure(err error) string {
 	}
 }
 
+// Only local retained Wait/Close outcomes are summarized here, never raw errors
+// or a canonical business drain. The original error remains joined unchanged.
+func observeLocalCleanupFailure(err error) string {
+	switch {
+	case err == nil:
+		return "none"
+	case errors.Is(err, context.Canceled):
+		return "cancelled"
+	case errors.Is(err, context.DeadlineExceeded):
+		return "deadline"
+	case errors.Is(err, ownedcontrol.ErrOwnedEvidence):
+		return "owned-evidence"
+	default:
+		return "other"
+	}
+}
+
 // RunAcceptance is one non-retrying scenario in one freshly created plane.
 // Both success and failure are collected from actual source processes; a
 // missing fixture, malformed bootstrap or failed startup never passes a case.
@@ -154,10 +176,20 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	defer func() {
 		cleanup, stop := context.WithTimeout(context.Background(), 120*time.Second)
 		defer stop()
-		runErr = errors.Join(runErr, cleanupAcceptanceSession(cleanup, session))
+		localCleanupErr := cleanupAcceptanceSession(cleanup, session)
+		runErr = errors.Join(runErr, localCleanupErr)
 		if boot != nil {
 			runErr = errors.Join(runErr, boot.Close(cleanup))
 		}
+		result.LocalCleanupState = "no-session"
+		if session != nil {
+			result.LocalCleanupState = "incomplete"
+			if session.CleanupComplete() {
+				result.LocalCleanupState = "complete"
+			}
+		}
+		result.LocalCleanupFailureClass = observeLocalCleanupFailure(localCleanupErr)
+		result.LocalCleanupObserved = true
 		if runErr != nil {
 			result.Accepted = false
 			result.FailureSHA256 = digestBytes([]byte(runErr.Error()))
@@ -190,6 +222,10 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	result.BusinessPermissions = boot.BusinessPermissions
 	result.Phase = "actual-hold-import-and-fourteen-original-processes"
 	session, e = Start(ctx, boot.Inputs)
+	if session != nil {
+		result.LegacyStartupStage = session.legacyStartupStage
+		result.LegacyChildRetained = session.legacyChildRetained
+	}
 	if e != nil {
 		if session != nil {
 			result.Phase = session.Phase

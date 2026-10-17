@@ -21,6 +21,42 @@ import (
 	"time"
 )
 
+// ServiceStartupObservation is a finite description of the original call path.
+// It carries no authority, callback, PID, private path or error text.
+type ServiceStartupStage string
+
+const (
+	startupLauncherEnter     ServiceStartupStage = "launcher-enter"
+	startupLauncherAdmission ServiceStartupStage = "launcher-admission"
+	startupLauncherState     ServiceStartupStage = "launcher-state"
+	startupLauncherRole      ServiceStartupStage = "launcher-role"
+	startupSpec              ServiceStartupStage = "spec"
+	startupReceipt           ServiceStartupStage = "receipt"
+	startupBinary            ServiceStartupStage = "binary"
+	startupBootstrap         ServiceStartupStage = "bootstrap"
+	startupWork              ServiceStartupStage = "work"
+	startupEnvironment       ServiceStartupStage = "environment"
+	startupOwnerFiles        ServiceStartupStage = "owner-files"
+	startupExec              ServiceStartupStage = "exec"
+	startupProcessIdentity   ServiceStartupStage = "process-identity"
+	startupProcessImage      ServiceStartupStage = "process-image"
+	startupLauncherPersist   ServiceStartupStage = "launcher-persist"
+	startupAwaitExit         ServiceStartupStage = "await-exit"
+	startupAwaitIdentity     ServiceStartupStage = "await-identity"
+	startupAwaitAnnouncement ServiceStartupStage = "await-announcement"
+	startupAwaitContext      ServiceStartupStage = "await-context"
+)
+
+type ServiceStartupObservation struct {
+	Stage ServiceStartupStage
+}
+
+func observeServiceStartup(observation *ServiceStartupObservation, stage ServiceStartupStage) {
+	if observation != nil {
+		observation.Stage = stage
+	}
+}
+
 // ServiceSpec is chosen by the source-owned fresh deployment launcher. There is
 // no adopt-by-arbitrary-PID API: only an actual exec.Cmd started here owns Stop.
 // Binary/source pins are taken from the reviewed build receipt, not child JSON.
@@ -294,14 +330,22 @@ func sameProcess(a, b ProcessOwner) bool {
 func startOwnedService(ctx context.Context, spec ServiceSpec) (*OwnedService, error) {
 	return startOwnedServiceEnvironment(ctx, spec, nil)
 }
+func startOwnedServiceWithObservation(ctx context.Context, spec ServiceSpec, observation *ServiceStartupObservation) (*OwnedService, error) {
+	return startOwnedServiceRuntimeEnvironmentObserved(ctx, spec, nil, nil, observation)
+}
 func startOwnedServiceEnvironment(ctx context.Context, spec ServiceSpec, reader *historyReaderExecution) (*OwnedService, error) {
 	return startOwnedServiceRuntimeEnvironment(ctx, spec, reader, nil)
 }
 
 func startOwnedServiceRuntimeEnvironment(ctx context.Context, spec ServiceSpec, reader *historyReaderExecution, runtime *namespaceRuntimeExecution) (*OwnedService, error) {
+	return startOwnedServiceRuntimeEnvironmentObserved(ctx, spec, reader, runtime, nil)
+}
+func startOwnedServiceRuntimeEnvironmentObserved(ctx context.Context, spec ServiceSpec, reader *historyReaderExecution, runtime *namespaceRuntimeExecution, observation *ServiceStartupObservation) (*OwnedService, error) {
+	observeServiceStartup(observation, startupSpec)
 	if ctx == nil || spec.Role == "" || !filepath.IsAbs(spec.BinaryPath) || !isSHA(spec.BinarySHA256) || !isSHA(spec.SourceSHA256) || !isSHA(spec.BuildReceiptSHA256) || !isSHA(spec.BootstrapSHA256) || !strings.HasPrefix(spec.BootstrapEnvironmentKey, "LUOBO_") || !strings.HasPrefix(spec.BootstrapSHAEnvironmentKey, "LUOBO_") || spec.BootstrapSHAEnvironmentKey == spec.BootstrapEnvironmentKey || strings.ContainsAny(spec.BootstrapEnvironmentKey+spec.BootstrapSHAEnvironmentKey, "=\x00") {
 		return nil, ErrOwnedEvidence
 	}
+	observeServiceStartup(observation, startupReceipt)
 	receipt, err := boundedFile(spec.BuildReceiptPath, 64*1024, true)
 	if err != nil || sha(receipt) != spec.BuildReceiptSHA256 {
 		return nil, ErrOwnedEvidence
@@ -318,6 +362,7 @@ func startOwnedServiceRuntimeEnvironment(ctx context.Context, spec ServiceSpec, 
 	if dec.Decode(&built) != nil || built.Schema != 1 || built.SourceSHA256 != spec.SourceSHA256 || built.BinarySHA256 != spec.BinarySHA256 || built.BinaryBytes < 1 || !isSHA(built.ToolchainSHA256) {
 		return nil, ErrOwnedEvidence
 	}
+	observeServiceStartup(observation, startupBinary)
 	canonical, err := filepath.EvalSymlinks(spec.BinaryPath)
 	if err != nil || canonical != spec.BinaryPath {
 		return nil, ErrOwnedEvidence
@@ -327,20 +372,24 @@ func startOwnedServiceRuntimeEnvironment(ctx context.Context, spec ServiceSpec, 
 		return nil, ErrOwnedEvidence
 	}
 	binary = nil
+	observeServiceStartup(observation, startupBootstrap)
 	bootstrap, err := boundedFile(spec.BootstrapPath, 1024*1024, true)
 	if err != nil || sha(bootstrap) != spec.BootstrapSHA256 {
 		return nil, ErrOwnedEvidence
 	}
 	bootstrap = nil
+	observeServiceStartup(observation, startupWork)
 	work, identity, err := privateParent(filepath.Join(spec.Work, "owner.json"))
 	if err != nil || work != spec.Work {
 		return nil, ErrOwnedEvidence
 	}
 	_ = identity
+	observeServiceStartup(observation, startupEnvironment)
 	privateEnvironment, err := loadOwnedServiceEnvironment(spec)
 	if err != nil {
 		return nil, ErrOwnedEvidence
 	}
+	observeServiceStartup(observation, startupOwnerFiles)
 	var random [32]byte
 	if _, err = rand.Read(random[:]); err != nil {
 		return nil, err
@@ -386,6 +435,7 @@ func startOwnedServiceRuntimeEnvironment(ctx context.Context, spec ServiceSpec, 
 	output := &boundedServiceOutput{file: stdout}
 	cmd.Stdout = output
 	cmd.Stderr = output
+	observeServiceStartup(observation, startupExec)
 	if err = cmd.Start(); err != nil {
 		stdout.Close()
 		return nil, err
@@ -400,8 +450,13 @@ func startOwnedServiceRuntimeEnvironment(ctx context.Context, spec ServiceSpec, 
 		}
 		close(s.done)
 	}()
+	observeServiceStartup(observation, startupProcessIdentity)
 	actual, err := processIdentity(cmd.Process.Pid)
-	if err != nil || actual.Executable != spec.BinaryPath || actualImage(cmd.Process.Pid, spec.BinaryPath, spec.BinarySHA256) != nil {
+	identityOK := err == nil && actual.Executable == spec.BinaryPath
+	if identityOK {
+		observeServiceStartup(observation, startupProcessImage)
+	}
+	if !identityOK || actualImage(cmd.Process.Pid, spec.BinaryPath, spec.BinarySHA256) != nil {
 		s.mu.Lock()
 		signalErr := s.signalStopOnceLocked()
 		s.mu.Unlock()
@@ -417,6 +472,17 @@ func startOwnedServiceRuntimeEnvironment(ctx context.Context, spec ServiceSpec, 
 	return s, nil
 }
 func (s *OwnedService) AwaitAnnouncement(ctx context.Context) (ProcessOwner, RuntimeAnnouncement, error) {
+	return s.awaitAnnouncement(ctx, nil)
+}
+
+// The original retained handle and original error are returned without wrapping.
+func (s *OwnedService) AwaitAnnouncementWithObservation(ctx context.Context) (ProcessOwner, RuntimeAnnouncement, ServiceStartupObservation, error) {
+	var observation ServiceStartupObservation
+	owner, announcement, err := s.awaitAnnouncement(ctx, &observation)
+	return owner, announcement, observation, err
+}
+func (s *OwnedService) awaitAnnouncement(ctx context.Context, observation *ServiceStartupObservation) (ProcessOwner, RuntimeAnnouncement, error) {
+	observeServiceStartup(observation, startupAwaitIdentity)
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.joined {
@@ -430,15 +496,19 @@ func (s *OwnedService) AwaitAnnouncement(ctx context.Context) (ProcessOwner, Run
 	for {
 		select {
 		case <-ctx.Done():
+			observeServiceStartup(observation, startupAwaitContext)
 			return ProcessOwner{}, RuntimeAnnouncement{}, ctx.Err()
 		case <-s.done:
+			observeServiceStartup(observation, startupAwaitExit)
 			return ProcessOwner{}, RuntimeAnnouncement{}, ErrOwnedEvidence
 		default:
 		}
+		observeServiceStartup(observation, startupAwaitIdentity)
 		current, err := processIdentity(s.owner.PID)
 		if err != nil || !sameProcess(s.owner, current) {
 			return ProcessOwner{}, RuntimeAnnouncement{}, ErrOwnedEvidence
 		}
+		observeServiceStartup(observation, startupAwaitAnnouncement)
 		if _, err = os.Lstat(s.announcementPath); err == nil {
 			a, server, hash, err := readOwnedAnnouncement(s.announcementPath, s.owner.OwnerNonce, s.owner.Role)
 			if err != nil || a.BootstrapSHA256 != s.owner.BootstrapSHA256 {
@@ -451,6 +521,7 @@ func (s *OwnedService) AwaitAnnouncement(ctx context.Context) (ProcessOwner, Run
 		}
 		select {
 		case <-ctx.Done():
+			observeServiceStartup(observation, startupAwaitContext)
 			return ProcessOwner{}, RuntimeAnnouncement{}, ctx.Err()
 		case <-tick.C:
 		}

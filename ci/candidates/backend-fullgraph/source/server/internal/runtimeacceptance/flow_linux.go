@@ -56,6 +56,8 @@ type Session struct {
 	State                         namespaceimport.State
 	Runtime                       *ActualGraphRun
 	Legacy                        []*ownedcontrol.OwnedService
+	legacyStartupStage            string
+	legacyChildRetained           bool
 	journal                       namespaceimport.Journal
 	cleanupMu                     sync.Mutex
 	localExited                   map[*ownedcontrol.OwnedService]bool
@@ -110,14 +112,19 @@ func Start(ctx context.Context, in Inputs) (*Session, error) {
 	// Actual original executables, Start/Serve/owner announcements and joins.
 	for _, spec := range in.LegacySpecs {
 		out.Phase = "actual-owned-legacy-start-" + spec.Role
-		child, e := in.Launcher.Start(ctx, spec)
+		out.legacyChildRetained = false
+		child, observation, e := in.Launcher.StartWithObservation(ctx, spec)
+		out.legacyStartupStage = string(observation.Stage)
 		if child != nil {
 			out.Legacy = append(out.Legacy, child)
+			out.legacyChildRetained = true
 		}
 		if e != nil {
 			return out, e
 		}
-		if _, _, e = child.AwaitAnnouncement(ctx); e != nil {
+		_, _, observation, e = child.AwaitAnnouncementWithObservation(ctx)
+		out.legacyStartupStage = string(observation.Stage)
+		if e != nil {
 			return out, e
 		}
 	}

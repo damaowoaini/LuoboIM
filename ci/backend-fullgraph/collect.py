@@ -11,13 +11,17 @@ def public_terminal(raw,scenario):
  if value.get('version')!='owned-fullgraph-token-v2-result-v1' or value.get('scenario')!=scenario or type(value.get('accepted')) is not bool:raise ValueError('finite actual terminal result required')
  bootstrap=value.get('bootstrapStage','')
  if bootstrap not in ('','plane-inputs','mongo','redis','kafka','kafka-coordinator','config','service-plan','capture-inputs','launcher-probe'):raise ValueError('closed bootstrap stage required')
+ startup=value.get('legacyStartupStage','');retained=value.get('legacyChildRetained',False)
+ observed=value.get('localCleanupObserved',False);cleanup=value.get('localCleanupState','');cleanup_kind=value.get('localCleanupFailureClass','')
+ if startup not in ('', 'launcher-enter', 'launcher-admission', 'launcher-state', 'launcher-role', 'spec', 'receipt', 'binary', 'bootstrap', 'work', 'environment', 'owner-files', 'exec', 'process-identity', 'process-image', 'launcher-persist', 'await-exit', 'await-identity', 'await-announcement', 'await-context') or type(retained) is not bool or not startup and retained or startup.startswith('await-') and not retained:raise ValueError('closed original legacy startup facts required')
+ if type(observed) is not bool or cleanup not in ('','no-session','complete','incomplete') or cleanup_kind not in ('','none','deadline','cancelled','owned-evidence','other') or observed!=bool(cleanup) or bool(cleanup)!=bool(cleanup_kind) or cleanup=='no-session' and (cleanup_kind!='none' or startup):raise ValueError('closed original local cleanup facts required')
  phase=value.get('phase','');kind=value.get('failureClass','');failure=value.get('failureSHA256','')
  tag=value.get('bootstrapFailureTag','')
  if tag not in ('','mongo-auth','mongo-unauthorized','mongo-not-primary','mongo-namespace-exists','mongo-other','kafka-auth','kafka-topic-or-cluster-authorization','kafka-unsupported-version','kafka-coordinator-unavailable','kafka-other','permission','no-space','not-found','connection-refused','deadline','cancel','other') or tag and phase!='actual-resource-bootstrap':raise ValueError('closed original bootstrap failure tag required')
  import re
  if not re.fullmatch('[a-z0-9-]{1,128}',phase) or kind not in ('','source-error-private','owned-evidence-rejected','commit-unconfirmed','deadline','cancelled') or failure and not re.fullmatch('[0-9a-f]{64}',failure):raise ValueError('unsafe terminal enum/hash')
  if any(v and not re.fullmatch('[0-9a-f]{64}',v) for v in (value.get('sourceSHA256',''),value.get('resourcePlaneSHA256',''))) or type(value.get('actualStartedRoles',0)) is not int or not 0<=value.get('actualStartedRoles',0)<=14:raise ValueError('finite source/role fields required')
- return {'version':value['version'],'scenario':scenario,'accepted':value['accepted'],'phase':phase,'bootstrapStage':bootstrap,'bootstrapFailureTag':tag,'failureClass':kind,'failureSHA256':failure,'sourceSHA256':value.get('sourceSHA256',''),'resourcePlaneSHA256':value.get('resourcePlaneSHA256',''),'actualStartedRoles':value.get('actualStartedRoles',0),'originalResultSHA256':run.sha(raw),'rawErrorText':False}
+ return {'version':value['version'],'scenario':scenario,'accepted':value['accepted'],'phase':phase,'bootstrapStage':bootstrap,'bootstrapFailureTag':tag,'failureClass':kind,'failureSHA256':failure,'sourceSHA256':value.get('sourceSHA256',''),'resourcePlaneSHA256':value.get('resourcePlaneSHA256',''),'actualStartedRoles':value.get('actualStartedRoles',0),'legacyStartupStage':startup,'legacyChildRetained':retained,'localCleanupObserved':observed,'localCleanupState':cleanup,'localCleanupFailureClass':cleanup_kind,'originalResultSHA256':run.sha(raw),'rawErrorText':False}
 
 def pack(out):
  files=list(out.iterdir());total=0;bodies=[]
@@ -38,6 +42,9 @@ def pack(out):
    target.flush();os.fsync(target.fileno())
   manifest.append({'path':name,'bytes':len(body),'sha256':hashlib.sha256(body).hexdigest()})
  run.write(compact/'custody.json',{'files':manifest,'bodyBytes':total,'privateLogs':0,'binaries':0,'credentials':0,'decodedLimitBytes':64<<20,'compressedLimitBytes':16<<20})
+
+def checked_launcher_evidence(out):
+ return run.check_launcher_names(json.loads(run.regular(out/'launcher-names.json',65536)))
 
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
@@ -87,8 +94,12 @@ def collect():
  controller=run.REPO/'ci-results/backend-fullgraph-controller.resource.json'
  monitor=json.loads(run.regular(controller)) if controller.exists() else {}
  summary=out/'summary.json';main=json.loads(run.regular(summary)) if summary.exists() else {}
- accepted=not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ launcher_accepted=False
+ try:
+  checked_launcher_evidence(out);launcher_accepted=True
+ except Exception:failed=True
+ accepted=launcher_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherControlAccepted':launcher_accepted,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  pack(out)
  return 0 if accepted else 1
 

@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "state": "FROZEN_FINAL_SOURCE",
-  "scope": "fresh_cleanup5top12sub_plus_original_graph2top3sub_and_four_planes_prior_unbound_child1_only_no_deployment",
+  "scope": "launcher1top0sub_plus_original_graph2top3sub_current3top3sub_and_four_planes_prior_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1575,
-    "digest": "384bd358980d66cbdc2cd037a41bdce3637394383efa301b5719047098e857ca"
+    "digest": "868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,23 +42,23 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 49259,
-      "sha256": "6540da2003f01df40cb84c530e42630712da48d8e439e8034ac531687cd8da37"
+      "bytes": 52083,
+      "sha256": "b3a9e8dae645981a2e790ca731f6964da34fa75d6866b4eb9bcd922f1a78ba17"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 30112,
-      "sha256": "c6a232f7872160d8078fbfd67d8624a3b5889c514ef09eddf8466c55ab7aebea"
+      "bytes": 31675,
+      "sha256": "4eda79579af59cb9117845d73dca181f2316f0dbb0995ec35b811e7c0e3c0712"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
-      "bytes": 7360,
-      "sha256": "a4f062e946aa93dee82e5fd46977dec087c807660bfd3ff8c36cddf295ab3b08"
+      "bytes": 31924,
+      "sha256": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3"
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 27752,
-      "sha256": "62a9f4034031672921bb29b702432ff16f9dbfb3613ec7fdadf56565a7c5fe4c"
+      "bytes": 47615,
+      "sha256": "488094f3ba368ae6ca9d2b1787e60c289e0ba84a3bf1ccb9a90820765b68987b"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -72,8 +72,8 @@
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",
-      "bytes": 8472,
-      "sha256": "8c36204002c3818ba4d37e4e4ae58431d7f4c4c6bd1abdd2ee68a5337e61e48f"
+      "bytes": 10587,
+      "sha256": "0cb2001d161268e862966072dab50f2a3d561fbb0673e514c2cca1de06f26abf"
     }
   ],
   "overlay": [
@@ -855,6 +855,13 @@
       "beforeSHA256": null
     },
     {
+      "target": "server/internal/namespaceimport/ownedcontrol/launcher_linux.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/launcher_linux.go",
+      "bytes": 14298,
+      "sha256": "63c7059a40bfaa14fcc218e512826903dd143f795e5abdd32220b718222fc67a",
+      "beforeSHA256": "7d26b39bff7ce3538d9394dae377e87d48660771d8cb46af148882f48bbe9f2d"
+    },
+    {
       "target": "server/internal/namespaceimport/ownedcontrol/materializer_capture_identity_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/materializer_capture_identity_linux.go",
       "bytes": 6188,
@@ -1046,8 +1053,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/process_linux.go",
-      "bytes": 21624,
-      "sha256": "5d8667911b53a4174a9689b8f4e081ec3f14ca5f17409b7ba5a183ec6c828c96",
+      "bytes": 25278,
+      "sha256": "fc6327fc984871a5fc14efddc2c9d263b5c8a2c7ee3548afe74699db1c473aae",
       "beforeSHA256": "5802ed409efa8c3c449942f9544c033b88302921473a2bb5855c85e8364432f5"
     },
     {
@@ -1277,8 +1284,8 @@
     {
       "target": "server/internal/namespaceinventory/import_workspace.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceinventory/import_workspace.go",
-      "bytes": 16097,
-      "sha256": "52b567b233fb3b78b06beb1c2b67eb4045146cb629b0bf38816d082b70c3a88f",
+      "bytes": 16322,
+      "sha256": "c46bbac326fae9e5c7706376de8f44caa5c8753022813b765c096557b7187593",
       "beforeSHA256": null
     },
     {
@@ -1347,8 +1354,8 @@
     {
       "target": "server/internal/runtimeacceptance/acceptance_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/acceptance_linux.go",
-      "bytes": 18217,
-      "sha256": "f1757396d59276726e89a08cdc070b3396ebb37d013f71ffde6ea042e787cb8e",
+      "bytes": 19643,
+      "sha256": "a4960852d2f94537f71e1215d65d41678075f1cc0aba3c5e623407c89f4ba7f9",
       "beforeSHA256": null
     },
     {
@@ -1375,8 +1382,8 @@
     {
       "target": "server/internal/runtimeacceptance/flow_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/flow_linux.go",
-      "bytes": 11805,
-      "sha256": "17367f17dab6821e95fd9fc1ab5bcaa8ee6ecc3db10eac3d0068908095d41b0c",
+      "bytes": 12110,
+      "sha256": "adca411f4ea6481f66eda4eb2b716775cf3c41ad9179c7b3043bc7006e3621d4",
       "beforeSHA256": null
     },
     {
@@ -1758,6 +1765,7 @@
     "server/internal/namespaceimport/ownedcontrol/history_reader_binding_linux_test.go",
     "server/internal/namespaceimport/ownedcontrol/history_reader_launch_linux.go",
     "server/internal/namespaceimport/ownedcontrol/history_readiness_source_linux.go",
+    "server/internal/namespaceimport/ownedcontrol/launcher_linux.go",
     "server/internal/namespaceimport/ownedcontrol/materializer_capture_identity_linux.go",
     "server/internal/namespaceimport/ownedcontrol/materializer_history_preparation_linux.go",
     "server/internal/namespaceimport/ownedcontrol/materializer_history_preparation_linux_test.go",
@@ -4178,5 +4186,26 @@
     ],
     "copyBinaries": false,
     "neverAcceptedProduct20Provider": true
-  }
+  },
+  "minioFixturePolicy": {
+    "version": "owned-minio-fixture-artifact-v1",
+    "enabled": true,
+    "binaryLimitBytes": 268435456,
+    "archiveLimitBytes": 269484032,
+    "metadataLimitBytes": 65536,
+    "downloadSeconds": 300,
+    "names": [
+      "minio",
+      "build-receipt.json",
+      "manifest.json"
+    ],
+    "retentionDays": 7,
+    "compressionLevel": 1,
+    "fixtureOnly": true,
+    "runtimeAccepted": false,
+    "readyPermit": false,
+    "copyBinary": false,
+    "sameRepositoryOnly": true
+  },
+  "minioFixtureBinding": null
 }

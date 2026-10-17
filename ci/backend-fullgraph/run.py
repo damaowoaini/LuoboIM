@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Fresh owned full graph only. No old binary, test receipt, DB or external deployment is adopted."""
+"""Fresh owned graph; no old product binary, runtime result, DB or external deployment is adopted."""
 import argparse,hashlib,importlib.util,json,os,re,stat,subprocess,sys,time,shutil
 from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE={'members': 1575, 'digest': '384bd358980d66cbdc2cd037a41bdce3637394383efa301b5719047098e857ca'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
+FINAL_SOURCE={'members': 1575, 'digest': '868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -107,10 +107,11 @@ def verify():
  for row in c['controllerPins']:pin(row)
  if catalog['scope']!='fresh_owned_fullgraph_compatibility_fixture_only_no_production_default' or catalog['minio']['mode']!='source-elf' or catalog['minio']['status']!='historical_unmaintained_test_only':raise ValueError('explicit source-MinIO fixture required')
  if catalog['images']['minio']!=catalog['images']['redis'] or catalog['images']['keeper']!=catalog['images']['redis']:raise ValueError('known Redis base must remain explicit')
+ module('ci/backend-fullgraph/minio_build.py','fullgraph_fixed_fixture_policy').fixture_policy(c)
  return c,bodies,recipe,parent,old,catalog
 
 def project_go_test_events(raw,phase):
- if phase not in {'pending-two-original-oracles'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
+ if phase not in {'pending-two-original-oracles','launcher-ownedcontrol'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
  events=[];digest=hashlib.sha256();total=0;head=bytearray()
  for line in raw.splitlines():
   event=json.loads(line)
@@ -196,6 +197,22 @@ def audit_target_union(original,cleanup):
  if len(prior)!=1 or full&prior or len(full)!=22 or len(new_names)!=6 or len(all_names-new_names)!=17 or len(all_names)!=23:raise ValueError('complete original5top12sub and new2top4sub obligations cannot shrink')
  receipt=dict(CLEANUP_REUSE,topPASS=0,subPASS=1,namedCompletions=[{'package':pkg,'name':name} for pkg,name in sorted(prior)])
  return {'source':FINAL_SOURCE,'topPASS':4,'subPASS':6,'skip':0,'fail':0,'namedCompletions':[{'package':pkg,'name':name} for pkg,name in sorted(actual)],'cleanupReuse':receipt,'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True}}
+
+def check_launcher_names(value):
+ expected=[{'package':'internal/namespaceimport/ownedcontrol','name':'TestOwnedLauncherHoldPersistsAndCannotPrepareMetadata'}]
+ if not isinstance(value,dict) or set(value)!={'source','topPASS','subPASS','skip','fail','namedCompletions'} or value.get('source')!=FINAL_SOURCE or value.get('namedCompletions')!=expected:raise ValueError('exact current-source launcher completion required')
+ if any(type(value.get(key)) is not int or value[key]!=count for key,count in [('topPASS',1),('subPASS',0),('skip',0),('fail',0)]):raise ValueError('launcher exact1top0sub without fail or skip required')
+ return value
+
+def run_launcher_control(go,environment,command,parent,out):
+ targets={'internal/namespaceimport/ownedcontrol':['TestOwnedLauncherHoldPersistsAndCannotPrepareMetadata']}
+ pattern='^TestOwnedLauncherHoldPersistsAndCannotPrepareMetadata$'
+ raw=command('launcher-ownedcontrol',[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run',pattern,'./internal/namespaceimport/ownedcontrol'],240,environment)
+ events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()]
+ actual=parent.audit(events,0,targets)
+ receipt=check_launcher_names(dict(source=FINAL_SOURCE,**{key:actual[key] for key in ('topPASS','subPASS','skip','fail','namedCompletions')}))
+ write(out/'launcher-names.json',receipt)
+ return receipt
 
 def load_cleanup_reuse(out):
  # Root accepted actual2top3sub at575; observer-only bootstrap additions do
@@ -307,6 +324,7 @@ def source_post(root,bodies,c,template):
  return post
 
 def run():
+ fixture_token=os.environ.pop('GH_TOKEN',None)  # API-only; never inherited by Go/Docker/operator children.
  if any(os.environ.get(k)!=v for k,v in {'GITHUB_ACTIONS':'true','RUNNER_ENVIRONMENT':'github-hosted','RUNNER_OS':'Linux','GOTOOLCHAIN':'local','GOWORK':'off'}.items()) or os.getuid()==0:raise ValueError('disposable hosted nonroot Linux only')
  c,bodies,recipe,parent,old,catalog=verify();started=time.monotonic();temporary=Path(os.environ['RUNNER_TEMP']);allocation=allocation_root();root=allocation/'work'
  if temporary.resolve()!=temporary or allocation.resolve()!=allocation or root.exists() or os.statvfs(temporary).f_bavail*os.statvfs(temporary).f_frsize<c['resource']['initialBytes']:raise ValueError('fresh owned root and initial floor required')
@@ -345,7 +363,7 @@ def run():
     raw=regular(folder/'stderr',32<<20) if (folder/'stderr').exists() else b''
     write(out/(f'compile-failure-{command_index:04d}.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
    fixture_observations=None
-   if label=='pending-two-original-oracles' or label in {scope['label'] for scope in CLEANUP_SCOPES}:
+   if label in {'pending-two-original-oracles','launcher-ownedcontrol'} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
     raw_events=regular(folder/'stdout',32<<20)
     if label=='cleanup-runtimeacceptance':
      fixture_observations=runtime_cleanup_observations(raw_events,label)
@@ -363,8 +381,13 @@ def run():
   if command('go-version',[go,'version'],15,env).decode().strip()!='go version go1.27.2 linux/amd64':raise ValueError('exact Go1.27.2 required')
   tool_sha=sha(regular(Path(go).resolve()))
   if tool_sha!=tools['go']['sha256']:raise ValueError('Go command differs from observed original tool')
+  reused_fixture=None
+  if c['minioFixtureBinding'] is not None:
+   reused_fixture=builder.receive(root,catalog,c['minioFixtureBinding'],tool_sha,fixture_token,os.environ['GITHUB_REPOSITORY'])
+  fixture_token=None
   command('app-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off')
+  launcher_audit=run_launcher_control(go,offline,command,parent,out)
   cleanup_audit=load_cleanup_reuse(out)
   binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
   entries=[{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]+c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'}]
@@ -378,7 +401,13 @@ def run():
    binaries.append({'role':role,'path':str(binary),'sha256':sha(raw),'sourceSHA256':FINAL_SOURCE['digest'],'receiptPath':str(receiptpath),'receiptSHA256':receiptsha,'services':selectors.SERVICES.get(role,[]),'components':selectors.COMPONENTS.get(role,[])})
    write(out/('compiled-'+role+'.json'),{'role':role,'package':entry['package'],'source':FINAL_SOURCE,'bytes':len(raw),'sha256':sha(raw),'executed':False})
   builds={'version':'source-bound-fullgraph-builds-v1','sourceSHA256':FINAL_SOURCE['digest'],'binaries':[b for b in binaries if b['role'] in ROLES],'legacyMessageTransfer':next(b for b in binaries if b['role']=='msgtransfer-legacy')};buildpath=private/'builds.json';buildsha=write(buildpath,builds);operator=next(b['path'] for b in binaries if b['role']=='acceptance-operator')
-  minio,receipt=builder.build(root,catalog,command,go,tool_sha,env);write(out/'source-minio-build.json',receipt)
+  if c['minioFixtureBinding'] is None:
+   minio,receipt=builder.build(root,catalog,command,go,tool_sha,env)
+   write(out/'source-minio-acquisition.json',{'mode':'original-source-build','fixtureOnly':True,'productRuntimeAccepted':False})
+  else:
+   minio,receipt=reused_fixture
+   write(out/'source-minio-acquisition.json',{'mode':'root-accepted-fixture-artifact','fixtureOnly':True,'productRuntimeAccepted':False,'artifactID':c['minioFixtureBinding']['artifactID'],'rootAcceptanceSHA256':c['minioFixtureBinding']['rootAcceptanceSHA256'],'freshMinioCompile':False})
+  write(out/'source-minio-build.json',receipt)
   for image in sorted(set(catalog['images'].values())):command('image-acquire-'+str(len(results))+'-'+sha(image.encode())[:10],['/usr/bin/docker','--host','unix:///var/run/docker.sock','pull','--platform','linux/amd64',image],600)
   for scenario in SCENARIOS:
    if c['resource']['controllerSeconds']-(time.monotonic()-started)<c['resource']['scenarioSeconds']+180:raise ValueError('complete operator-context plus original cleanup budget required before new plane')
@@ -409,7 +438,10 @@ def run():
   expected={tops['pkg/common/startrpc'][0]+'/'+s for s in ('registered-not-serving-before-readiness','known-readiness-still-keeps-writer-fence')}|{tops['pkg/common/startrpc'][1]+'/required-token-only'}
   if {r['name'] for r in audit['namedCompletions'] if '/' in r['name']}!=expected:raise ValueError('exact original two tops/three children required')
   write(out/'oracle-names.json',audit)
-  targeted_audit=audit_current_oracles(audit,cleanup_audit);write(out/'targeted-names.json',targeted_audit)
+  targeted_audit=audit_current_oracles(audit,cleanup_audit)
+  launcher_audit=check_launcher_names(launcher_audit)
+  targeted_audit=dict(targeted_audit,topPASS=targeted_audit['topPASS']+1,namedCompletions=sorted(targeted_audit['namedCompletions']+launcher_audit['namedCompletions'],key=lambda row:(row['package'],row['name'])),launcherDirect=dict(topCount=1,subCount=0,source=FINAL_SOURCE))
+  write(out/'targeted-names.json',targeted_audit)
  except BaseException as error:primary=error;raise
  finally:
   post=source_post(root,bodies,c,template)
@@ -421,7 +453,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'targetedTopPASS':2,'targetedSubPASS':3,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':1,'launcherSubPASS':0,'targetedTopPASS':3,'targetedSubPASS':3,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

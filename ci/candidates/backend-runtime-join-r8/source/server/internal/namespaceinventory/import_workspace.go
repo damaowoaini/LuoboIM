@@ -272,6 +272,10 @@ func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor
 	// The original head is not replaced until EVERY final touched-set tree and
 	// registry tree has been persisted by the same O_EXCL+file/directory fsync.
 	ctx, batch := newProgressIndexContext(ctx, w.dir)
+	// A larger node quantum changes only this Commit's unpublished spill timing.
+	// The 2MiB byte cap, <=64 mutations and final flush stay unchanged; raw
+	// progress keeps its default 256-node quantum.
+	batch.maxNodes = 1024
 	defer batch.close()
 	// Only descriptors already derived in THIS locked Commit are accumulated.
 	// First reads still authenticate the original registry; each mutation keeps
