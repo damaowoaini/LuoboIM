@@ -674,6 +674,21 @@ def main():
     guard = load(REPO/'ci/apple-sdk/resource_dual.py', 'current359_single_resource_guard')
     def interrupted(_number, _frame): raise InterruptedError('current359 native guard interrupted')
     for number in [signal.SIGTERM, signal.SIGINT]: signal.signal(number, interrupted)
+    if a.stage == 'acquire':
+        preflight = borrowed_helper({'path': 'ci/apple-current359/tool_preflight.py', 'bytes': 8602, 'sha256': '39c6301939fed230f068ce3cf40ed29966c172277da9c48dac2c55fc3b215e79'}, 'current359_actual_cli_preflight')
+        q = preflight.prepare(work, xcrun_adapter, HERE/'xcrun_adapter.py', sys.executable,
+                              sha(HERE/'lane.json'), os.environ.get('GITHUB_SHA'), spec['source_ref'])
+        args = ['/usr/bin/sandbox-exec', '-f', str(q/'preflight.sb'), sys.executable, '-B',
+                str(HERE/'tool_preflight.py'), '--worker', str(q)]
+        code = guard.run(SimpleNamespace(command=args, cwd=q, log=work/'evidence/tool-preflight-raw.log',
+             record=work/'evidence/tool-preflight-resource.json', min_free_mib=1024, poll_interval=.2,
+             allocated_root=q, max_allocated_mib=64, timeout=120,
+             secondary_root=None, secondary_cap_mib=None))
+        # Copy only these bounded public command/source records, never an env or
+        # private fixture. Preserve failure before refusing expensive acquire.
+        shutil.copytree(q/'evidence', work/'evidence/tool-preflight')
+        if code != 0 or not (q/'evidence/complete.json').is_file():
+            raise ValueError('actual CLI preflight failed; acquisition not started')
     args = ['/usr/bin/sandbox-exec', '-f', str(work/(a.stage+'.sb')), sys.executable, '-B',
             str(HERE/'run.py'), '--identity', IDENTITY, '--stage', a.stage, '--work', str(work), '--worker']
     return guard.run(SimpleNamespace(command=args, cwd=work, log=work/(a.stage+'-raw.log'),

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "state": "native_controller_source_checks_passed_actual_native_pending",
+  "changes": {
+    "Android": "Preserve ABI14 App and each22 registered plugin; independently bind BC4 to actual Flutter included-build KGP CodeSource and exact two FileCollection publishing consumers",
+    "Apple": "Run actual original ARM adapter/Xcode and system Git tool probes under same sandbox before costly acquisition; preserve failed probe output and stop acquisition"
+  },
+  "local": {
+    "newTopPASS": 2,
+    "newSubPASS": 20,
+    "fail": 0,
+    "skip": 0,
+    "AndroidMetadata": "PASS",
+    "AppleMetadata": "PASS",
+    "nativeCLIExecutions": 0
+  },
+  "historicalActual": {
+    "AndroidRun": 39015055946,
+    "AndroidResult": "Gradle BUILD SUCCESSFUL, post-Gradle tooling ownership gate FAIL",
+    "AppleRun": 39014210137,
+    "AppleResult": "native configuration resolve FAIL; tool/cache cause unproven"
+  },
+  "runtimeAccepted": false,
+  "APKAppAccepted": false,
+  "fullRegression": false,
+  "afterReviewDispatch": "Use each original manual native workflow exactly once with this reviewed controller; backend cloud99 run39021272216 is independent"
+}

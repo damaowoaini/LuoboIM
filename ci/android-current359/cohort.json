@@ -183,9 +183,9 @@
       "sha256": "576eff19f1c473842aca471f5191eaba77033f250bfae553c54d0a3e6a42509b"
     },
     {
-      "bytes": 8415,
       "path": "ci/android-current359/classpaths_current.py",
-      "sha256": "49239bba20e5ae4cb10f03f1ebb297d77a17c5ef0e4dc2eae5a279c687e9c941"
+      "bytes": 8534,
+      "sha256": "4e840c0f158f1a211997db6f6c8b7b541a9e1553ae31fed88ab5208bb14d120a"
     },
     {
       "bytes": 101802,
@@ -208,9 +208,9 @@
       "sha256": "ed0894e5ef85da81c7693597fb62707b99f6a2b2a8e1312df5e63f90c794e6f5"
     },
     {
-      "bytes": 20761,
       "path": "ci/android-current359/plugin_scope.py",
-      "sha256": "51698b9faf32499e2afa593dd758a751a14b205efb4dacff1016d42104904c6e"
+      "bytes": 20849,
+      "sha256": "c2915dac64c7dd204ef404624f5127764798901677539ee8dc5e63f8826947b7"
     },
     {
       "bytes": 11062,
@@ -228,9 +228,9 @@
       "sha256": "25699bc89f48b00bbe58e40d7bbe8a103358015e60b0c874ca0a5ee0eebe290b"
     },
     {
-      "bytes": 45240,
       "path": "ci/android-current359/resolve.gradle",
-      "sha256": "f4b8f4f61ebe40859ef487f5e3fd402395c8b37af13b606926cf1437dc9536f0"
+      "bytes": 46753,
+      "sha256": "bfe1250130ee8bb867128fa5861428dd5ea5d90c5fb5b82f118fc375eb62b344"
     },
     {
       "bytes": 71217,
@@ -243,9 +243,9 @@
       "sha256": "3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3"
     },
     {
-      "bytes": 10081,
       "path": "ci/android-current359/rich_current.py",
-      "sha256": "6a17588836b2db887340c252cb0ed0179974dad3a8abf8bb78310f060b6e45c5"
+      "bytes": 10464,
+      "sha256": "7db6e5a21b7c318d6477a6f0755dd93d0e083857fd74b035a219048277402930"
     },
     {
       "bytes": 31948,
@@ -271,9 +271,24 @@
       "path": "ci/android-current359/test_maven_file_origins.py",
       "bytes": 21473,
       "sha256": "c1732f8950b49f90a4491675eb0e1ac7e30eed56cf66d1ef7da739a56461f586"
+    },
+    {
+      "path": "ci/android-current359/kgp_owner_model.py",
+      "bytes": 6009,
+      "sha256": "e17967ae814e6bb6fd68e1d31a3cd6a9902e85aefd3523cd04cd16429ac9c500"
+    },
+    {
+      "path": "ci/android-current359/kgp-owner-witness.gradle",
+      "bytes": 4445,
+      "sha256": "83b3e7368636455766e7da0b3db4e7be8349cf83f972049c08804e33ca616174"
+    },
+    {
+      "path": "ci/android-current359/test_kgp_owner_model.py",
+      "bytes": 3295,
+      "sha256": "5a4a3c7ed926b6f2eece41df67cd9f9d4c069bb50d0b6cdfe5d7582407067d5f"
     }
   ],
-  "controller_revision": "null2-plugin-scope-v2-init-shadow-stacktrace-exact-configuration-root",
+  "controller_revision": "actual-source-owned-KGP-publishing-tooling-not-App-or-plugin-compilation",
   "core_compatibility": {
     "Go_protocol_SDK_native_source_subset_exact": true,
     "new_App_Go_build_or_current_Go_version_claim": false,
@@ -501,5 +516,13 @@
       "name": "webview_flutter_wkwebview",
       "version": "3.25.1"
     }
-  ]
+  ],
+  "publishing_owner_scope": {
+    "AppABI": true,
+    "registered_pluginABI": 22,
+    "tooling_owner": "fixed Flutter Gradle included build",
+    "source18": "unchanged full14+4",
+    "compilation_BC4_claim": false,
+    "runtime_or_APK_accepted": false
+  }
 }

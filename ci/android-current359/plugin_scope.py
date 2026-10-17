@@ -327,7 +327,7 @@ def reports(work, here, inputs, phase, require_all):
                 validate_report(catalog, entry, rich.sha(body), value)
                 values.append(value); pins.append({'path': str(p.relative_to(work)), 'sha256': s.sha(p)})
     seen = [(v['project'], v['configuration']) for v in values]
-    wanted = {(entry['project'], c) for entry in seal['entries'] for c in CONFIGS}
+    wanted = {(entry['project'], rich.kgp_owner_model.ABI) for entry in seal['entries']}
     if len(set(seen)) != len(seen) or require_all and set(seen) != wanted:
         raise ValueError('complete registered plugin configuration reports required')
     return {'seal_sha256': rich.sha(body), 'reports': pins, 'actual_project_configurations': seen,
@@ -340,13 +340,13 @@ def bind_origins(work, here, inputs):
     proof = reports(work, here, inputs, 'metadata', True)
     s.write_json(Path(work) / 'evidence/plugin-rich-origin-binding.json', {
         **proof, 'App_origin_binding_sha256': s.sha(Path(work) / 'evidence/rich-origin-binding.json'),
-        'template_catalog_sha256': rich.CATALOG_SHA, 'actual_registered_configurations': 44})
+        'template_catalog_sha256': rich.CATALOG_SHA, 'actual_registered_configurations': len(proof['actual_project_configurations'])})
 
 
 def require_origin_binding(work, here, inputs):
     rich.require_origin_binding(work, here)
     proof = reports(work, here, inputs, 'metadata', True)
     expected = {**proof, 'App_origin_binding_sha256': s.sha(Path(work) / 'evidence/rich-origin-binding.json'),
-                'template_catalog_sha256': rich.CATALOG_SHA, 'actual_registered_configurations': 44}
+                'template_catalog_sha256': rich.CATALOG_SHA, 'actual_registered_configurations': len(proof['actual_project_configurations'])}
     if json.loads(rich.read(Path(work) / 'evidence/plugin-rich-origin-binding.json', 16 << 20)) != expected:
         raise ValueError('registered plugin graph/source/origin proof changed')

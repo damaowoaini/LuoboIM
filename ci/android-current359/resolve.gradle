@@ -362,8 +362,23 @@ if (pluginEntries.size()!=22 || pluginSlots.size()!=22 ||
             !(it.project ==~ /:[a-z][a-z0-9_]*/) })
     throw new GradleException('finite exact plugin slots required')
 def pluginFactory = new GroovyShell(getClass().classLoader).evaluate(new String(pluginScript,'UTF-8'))
+def toolingField=catalog.actual_kgp_tooling_owner
+if (toolingField==null || toolingField.script_sha256!='83b3e7368636455766e7da0b3db4e7be8349cf83f972049c08804e33ca616174')
+    throw new GradleException('source-pinned KGP owner witness required')
+def toolingScript=Base64.decoder.decode(toolingField.script_base64)
+if (toolingScript.length>32*1024 || digestBytes(toolingScript)!=toolingField.script_sha256)
+    throw new GradleException('KGP witness script body differs')
+def toolingFactory=new GroovyShell(getClass().classLoader).evaluate(new String(toolingScript,'UTF-8'))
+def toolingWitness=toolingFactory(owned,toolingField,localRef,fileDigest)
+def toolingSource=new LinkedHashMap(richSource)
+toolingSource.scope=new LinkedHashMap(richSource.scope)
+toolingSource.scope.putAll([project:':',project_relative:'flutter/packages/flutter_tools/gradle',
+    root_relative:'flutter/packages/flutter_tools/gradle',
+    sources:toolingField.source_files.collectEntries { k,v -> [(k):v.sha256] }])
+def toolingGate=pluginFactory(owned,toolingSource,localRef,fileDigest,richField.catalog_sha256)
 def pluginGates = [:]
 def richFor = { p,c ->
+    if (toolingWitness.scoped(p,c)) return [gate:toolingGate,entry:null,tooling:true]
     def entry=pluginEntries[p.path]
     if (entry==null) return [gate:richGate,entry:null]
     if (!pluginGates.containsKey(p.path)) {
@@ -376,7 +391,7 @@ def richFor = { p,c ->
     [gate:pluginGates[p.path],entry:entry]
 }
 def richPersist = { c,proof,String family,String pluginSlot=null ->
-    if ((pluginSlot==null ? !(family in ['rich-consumed','rich-refused']) :
+    if ((pluginSlot==null ? !(family in ['rich-consumed','rich-refused','kgp-tooling-owner']) :
             (!pluginSlots.containsKey(pluginSlot) || !(family in ['plugin-rich-consumed','plugin-rich-refused']))) ||
             !richSource.configurations.any { it.name==c.name } ||
             !(richPhase in ['metadata','apk']))
@@ -429,7 +444,12 @@ def richWrite = { p,c ->
         }
         throw failure
     }
-    richPersist(c,decorate(proof),selected.entry==null ? 'rich-consumed' : 'plugin-rich-consumed',selected.entry?.slot)
+    if (selected.tooling==true) {
+        def witness=toolingWitness.audit(p,c,proof)
+        richPersist(c,witness,'kgp-tooling-owner')
+    } else {
+        richPersist(c,decorate(proof),selected.entry==null ? 'rich-consumed' : 'plugin-rich-consumed',selected.entry?.slot)
+    }
 }
 // END independent R12 consumer.
 def selectorIdentity = { selector ->
@@ -545,6 +565,9 @@ gradle.beforeProject { p ->
     } }
 }
 gradle.projectsEvaluated {
+    def p=gradle.rootProject
+    def c=p.configurations.findByName('kotlinBouncyCastleConfiguration')
+    if (c!=null && toolingWitness.scoped(p,c)) c.resolve()
     gradle.rootProject.tasks.named('dependencies').configure {
         doLast {
             def rows = []

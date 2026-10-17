@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import stat
+import kgp_owner_model
 
 CATALOG_SHA = '00d559f734c28560b9f18a27ef2fedfd5488c7eb9fa0a6d8d18930d0927d2cc7'
 SCRIPT_SHA = '3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3'
@@ -118,7 +119,7 @@ def reports(work, here, phase, require_all):
                 raise ValueError('rich report filename differs')
             values.append(value);pins.append({'path':str(path.relative_to(work)),'sha256':sha(body)})
     names=[x['configuration'] for x in values]
-    if len(set(names))!=len(names) or (require_all and set(names)!={c['name'] for c in catalog['configurations']}):
+    if len(set(names))!=len(names) or (require_all and set(names)!={kgp_owner_model.ABI}):
         raise ValueError('complete actual rich configurations required')
     return catalog,values,pins
 
@@ -173,9 +174,11 @@ def bind_origins(work, here, write_json):
     work=Path(work);catalog,_,pins=reports(work,here,'metadata',True)
     origin=read(work/'evidence/dependency-origin-audit.json')
     selected=verify_origin_rows(catalog,json.loads(origin))
+    tooling=kgp_owner_model.require_report(work,here,catalog,'metadata',read)
     write_json(work/'evidence/rich-origin-binding.json',{'catalog_sha256':CATALOG_SHA,
         'origin_receipt_sha256':sha(origin),'actual_metadata_reports':pins,
-        'checked_artifact_rows':len(selected),'runtime_or_App_claim':False})
+        'checked_artifact_rows':len(selected),'runtime_or_App_claim':False,
+        'actual_publishing_tooling_owner':tooling})
 
 
 def require_origin_binding(work,here):
@@ -186,9 +189,12 @@ def require_origin_binding(work,here):
             or value['actual_metadata_reports']!=pins or value['checked_artifact_rows']!=18):
         raise ValueError('independent rich origin binding changed')
     verify_origin_rows(catalog,json.loads(body))
+    if value['actual_publishing_tooling_owner']!=kgp_owner_model.require_report(work,here,catalog,'metadata',read):
+        raise ValueError('actual tooling source/body proof changed')
 
 
 def check_apk_reports(work,here):
     require_origin_binding(work,here)
-    _,values,_=reports(work,here,'apk',False)
+    catalog,values,_=reports(work,here,'apk',False)
+    kgp_owner_model.require_report(work,here,catalog,'apk',read)
     return [v['configuration'] for v in values]  # unused configs are not claimed consumed
