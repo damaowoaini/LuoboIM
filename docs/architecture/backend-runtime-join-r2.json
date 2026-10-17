@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "state": "two_failed_source_repairs_locally_checked_cloud_pending_not_deployed",
+  "source": {
+    "members": 1324,
+    "digest": "79764348e1502237a08b039cc521708aea27f97f086672c05a819754bbeeb8f4"
+  },
+  "base": {
+    "members": 1324,
+    "digest": "2a793e505b4fc9b4c7232acd3230df852f3740a0e7feb056d014a51f89da5e58"
+  },
+  "changes": [
+    "Reset independently reused owner duplicate map instead of invalid redeclaration",
+    "Recognize first HELD absence before strict private-document decoding; existing corrupt/symlink/foreign documents still refuse"
+  ],
+  "priorActual": {
+    "run": 39021272216,
+    "attempt": 1,
+    "head": "518d0ccdca337665cbf3586ed85b9e3b32bacc18",
+    "artifactSHA256": "8adb8a54ed2084cd9f84ce8c44c88ee7c6b4168a7050da182e93e0248680aed1",
+    "namedTopPASS": 29,
+    "namedSubPASS": 33,
+    "whole99Accepted": false,
+    "fixtureCollectCleanup": "both actual workflow success"
+  },
+  "local": {
+    "actualGofmtParseFiles": 2,
+    "newPythonControllerTests": "2 PASS",
+    "GoExecuted": 0,
+    "DBExecuted": 0
+  },
+  "nextTarget": {
+    "topTests": 70,
+    "packages": 7,
+    "scope": "one failed Hold top plus69 unstarted tops; prior29 named passes reused"
+  },
+  "fullRegression": false,
+  "runtimeChanged": false,
+  "workflow": ".github/workflows/backend-runtime-join-r2-targeted.yml"
+}
