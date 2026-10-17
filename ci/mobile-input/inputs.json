@@ -3,8 +3,8 @@
   "cohort": "current363",
   "source_members": 363,
   "portable_members": 415,
-  "source_digest": "9b643457758a52f6bc6751e00a7ab11793e1cd0cc71348af365544a4642d0ae3",
-  "portable_digest": "074ffe22871b22ae901d6d1d38de3806b1913fb0623d8356084e49ca818f20c2",
+  "source_digest": "ccec31d13c6e64bb4d0c9ff0b1b85baae3d50d198c743d34e9935a053d17ecd8",
+  "portable_digest": "30879a35431337689eced3a9b5ce9a7c528342740be0be502053100b7be24d7d",
   "source_rows": [
     {
       "path": "app/analysis_options.yaml",
@@ -1203,8 +1203,8 @@
     },
     {
       "path": "app/test/features/chat/chat_typing_workflow_test.dart",
-      "bytes": 9845,
-      "sha256": "a39a9cfb67dd1d1116f55b9cf6008bb263b7ad118c85102b180681f1e7666bd1"
+      "bytes": 10203,
+      "sha256": "1dc61062ada773338406ffdd85cdc6241df258c54647cb039a020cd2a17484ca"
     },
     {
       "path": "app/test/features/chat/conversation_history_clear_race_test.dart",
@@ -1946,8 +1946,8 @@
       "before": null,
       "after": {
         "path": "app/test/features/chat/chat_typing_workflow_test.dart",
-        "bytes": 9845,
-        "sha256": "a39a9cfb67dd1d1116f55b9cf6008bb263b7ad118c85102b180681f1e7666bd1"
+        "bytes": 10203,
+        "sha256": "1dc61062ada773338406ffdd85cdc6241df258c54647cb039a020cd2a17484ca"
       }
     },
     {
@@ -2149,8 +2149,8 @@
     },
     {
       "path": "ci/mobile-input.py",
-      "bytes": 39920,
-      "sha256": "693462cd6d8b6c67282c3e0b132e38c727e30b0f38698fd8006426210c391e3d"
+      "bytes": 39925,
+      "sha256": "fb222ba93b6919c70c5f03c5b1c9cab85edc148a21c68a81126b0cdc29f0a4f4"
     },
     {
       "path": "ci/mobile-input-vm.py",
@@ -2250,13 +2250,13 @@
   "cloud_analysis_paths": [],
   "local_validation_reuse": {
     "state": "actual_changed_analysis1_PASS_and_prior_exact_analysis12_reused_no_widget_acceptance",
-    "source363": "9b643457758a52f6bc6751e00a7ab11793e1cd0cc71348af365544a4642d0ae3",
-    "portable415": "074ffe22871b22ae901d6d1d38de3806b1913fb0623d8356084e49ca818f20c2",
-    "rootUnionReceiptSHA256": "ffe43641cd29a7e0a7623277d8def0f9c64953aff037424461f42c391d7076d0",
+    "source363": "ccec31d13c6e64bb4d0c9ff0b1b85baae3d50d198c743d34e9935a053d17ecd8",
+    "portable415": "30879a35431337689eced3a9b5ce9a7c528342740be0be502053100b7be24d7d",
+    "rootUnionReceiptSHA256": "14efeba9a121c1224f3fd7bfad483518cfff4f059a7b10c419f6c1f443a88b83",
     "productManifest": {
-      "path": "references/integration/mobile363-pumpwidget-returned-format-r8-candidate-20261018/candidate-manifest.json",
-      "bytes": 6909,
-      "sha256": "4d4ab449ea98c5ed9488e68cd4b04976759457c79b007e1e2f68b542b51bf603"
+      "path": "references/integration/mobile363-cancel-tracked-format-r9-candidate-20261018/candidate-manifest.json",
+      "bytes": 6894,
+      "sha256": "a6ac2d79722ff205c5ef92d5fd5a3cf40803a61e111100ebe5f12bb0900b1879"
     },
     "analyses13": [
       {
@@ -2272,10 +2272,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-1.json",
           "bytes": 71,
           "sha256": "18033316813064dee6a5f730f82bb7f270204681d4b1b62a213379aff0c6fc74"
         },
         "raw": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-1.log",
           "bytes": 44,
           "sha256": "9c14f6f73cf2f269c61d0315cba22ad33daff0f8c11b43a7c65a752feabe290b"
         },
@@ -2294,10 +2296,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-2.json",
           "bytes": 78,
           "sha256": "10399b2ef70ae05d564431131fb2cd9bb82c94fda9780888278277a75c4174f0"
         },
         "raw": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-2.log",
           "bytes": 51,
           "sha256": "a0b1300c2d71e0588aa2f170559617ef3b2fd512fb46ba1f6d72dae47dcb87a6"
         },
@@ -2316,10 +2320,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-3-r2.json",
           "bytes": 89,
           "sha256": "5743c27daceec9dc699233ed6b21324e58eed92d187f4d782e892fc85cd1952f"
         },
         "raw": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-3-r2.log",
           "bytes": 51,
           "sha256": "c8fa4a17426d25074647fd0ebb014ae85fd318b3c59bf96fd45db484ba979cd6"
         },
@@ -2338,10 +2344,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-4-r2.json",
           "bytes": 91,
           "sha256": "f797a69f0878e3342f675db594df5149d9914a8561c6cac756ad6fabf671446d"
         },
         "raw": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-4-r2.log",
           "bytes": 45,
           "sha256": "ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0"
         },
@@ -2360,10 +2368,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-5-r2.json",
           "bytes": 104,
           "sha256": "1bb1397b23586c6a1da89645b1e4d671c3f869eb71d3bcf2c710902849ca19e5"
         },
         "raw": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-5-r2.log",
           "bytes": 58,
           "sha256": "7c67012298ed461cade2f18e8b24fce056b29877b828aba92b6f40981ba2ceca"
         },
@@ -2382,10 +2392,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-6-r2.json",
           "bytes": 105,
           "sha256": "c78e2e1183f97da991750440fd36a15ea326ef7e966f6e49b3871a3cae0a9704"
         },
         "raw": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-6-r2.log",
           "bytes": 59,
           "sha256": "fdf715bb704feff4c75c0f209716f85dd9ff1217efb91a41739bd8c450e5fe97"
         },
@@ -2404,10 +2416,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile363-failed-fixture-analysis3-r4-1/analysis-1.json",
           "bytes": 75,
           "sha256": "c5716bcebc7c6f20a6776227107a4f928b7b579c1f01fff3a0020e43d3b3c352"
         },
         "raw": {
+          "path": ".qa/mobile363-failed-fixture-analysis3-r4-1/analysis-1.log",
           "bytes": 47,
           "sha256": "db0f2e31d5491365c30e0a179318efaa4a428ac9620e86afbab1bb999dfc2a1b"
         },
@@ -2426,10 +2440,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile363-failed-fixture-analysis3-r4-1/analysis-2.json",
           "bytes": 88,
           "sha256": "0b50f8ba5af4bd1c91f35d7f812762eaf71f3deba27c7d7dd5ec243521c59f0b"
         },
         "raw": {
+          "path": ".qa/mobile363-failed-fixture-analysis3-r4-1/analysis-2.log",
           "bytes": 54,
           "sha256": "a508c3f2d32a03c3aa7d7be2947be52b50ae3da10d394a90f6c5a336b8abad87"
         },
@@ -2448,10 +2464,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile363-fixture-r5-analysis4-1/analysis-1.json",
           "bytes": 91,
           "sha256": "dd161811f6a2fb11905f81be9607294ca3350bbebfc431f336bd34b81fa5923e"
         },
         "raw": {
+          "path": ".qa/mobile363-fixture-r5-analysis4-1/analysis-1.log",
           "bytes": 57,
           "sha256": "dccd34a6953be363762f4a6206fb609751a1bcedcdf7fa37a9523b35f652b90d"
         },
@@ -2470,10 +2488,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-8.json",
           "bytes": 95,
           "sha256": "51596d3315ef71893fd7a25ff1da10e7ac0b1c095afb7dc51aa8a5ba44485958"
         },
         "raw": {
+          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-8.log",
           "bytes": 61,
           "sha256": "267674432886d9e59755760b0984d4e5346cde0c453995509c7b18c703a18933"
         },
@@ -2483,8 +2503,8 @@
         "path": "test/features/chat/chat_typing_workflow_test.dart",
         "source": {
           "path": "app/test/features/chat/chat_typing_workflow_test.dart",
-          "bytes": 9845,
-          "sha256": "a39a9cfb67dd1d1116f55b9cf6008bb263b7ad118c85102b180681f1e7666bd1"
+          "bytes": 10203,
+          "sha256": "1dc61062ada773338406ffdd85cdc6241df258c54647cb039a020cd2a17484ca"
         },
         "result": {
           "path": "test/features/chat/chat_typing_workflow_test.dart",
@@ -2492,14 +2512,16 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile363-cancel-r9-analysis1-1/analysis-1.json",
           "bytes": 95,
           "sha256": "f6fa328ae5c7718c067ed309808fc0395ff8a2baba4db77c1e9bd7a00845b817"
         },
         "raw": {
+          "path": ".qa/mobile363-cancel-r9-analysis1-1/analysis-1.log",
           "bytes": 61,
           "sha256": "ba6eee91af6034e5f509835101f4944608fa4079d023c0a225a859a2214692ac"
         },
-        "execution": "exact_unchanged_file_reused"
+        "execution": "new_analysis1"
       },
       {
         "path": "test/features/chat/group_revoke_fixture.dart",
@@ -2514,14 +2536,16 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile363-returned-r8-analysis1-1/analysis-1.json",
           "bytes": 90,
           "sha256": "3fd45f7a94e16163cc6ecb47c3733eb3d4d8c8b7204e611f02043cdbb3b5d521"
         },
         "raw": {
+          "path": ".qa/mobile363-returned-r8-analysis1-1/analysis-1.log",
           "bytes": 56,
           "sha256": "c52f6a5d2438b05866311c6ca0bfb2ed84358fe3abe391d3a1f68662dfb0aaed"
         },
-        "execution": "new_analysis1"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "test/features/chat/group_revoke_workflow_test.dart",
@@ -2536,10 +2560,12 @@
           "noIssues": true
         },
         "resultReceipt": {
+          "path": ".qa/mobile363-fixture-r6-analysis2-1/analysis-2.json",
           "bytes": 96,
           "sha256": "4fea04eb50888c6a9ac2db4e39292f47c803278d31ff6ff84836853f6eeaa048"
         },
         "raw": {
+          "path": ".qa/mobile363-fixture-r6-analysis2-1/analysis-2.log",
           "bytes": 62,
           "sha256": "90d913b13778475ae756bba87639b5bd57a5ac03c9bce38991b12e7d1036455f"
         },
@@ -2547,7 +2573,7 @@
       }
     ],
     "new_analysis_paths1": [
-      "test/features/chat/group_revoke_fixture.dart"
+      "test/features/chat/chat_typing_workflow_test.dart"
     ],
     "reused_analysis_paths12": [
       "lib/core/im/im_event.dart",
@@ -2560,7 +2586,7 @@
       "test/features/chat/chat_input_fixture.dart",
       "test/features/chat/chat_location_fixture.dart",
       "test/features/chat/chat_reedit_workflow_test.dart",
-      "test/features/chat/chat_typing_workflow_test.dart",
+      "test/features/chat/group_revoke_fixture.dart",
       "test/features/chat/group_revoke_workflow_test.dart"
     ],
     "gateway1": {
@@ -2593,14 +2619,17 @@
       }
     },
     "resource": {
-      "bytes": 932,
-      "sha256": "756a16823aa3cd50dd9b5fe82711ac8636b377bd59817c9d515557defb9c8053"
+      "path": ".qa/mobile363-cancel-r9-analysis1-1/analysis1.resource.json",
+      "bytes": 925,
+      "sha256": "55dd1d82378fa5035aa22f4c257be50fcc8ba63953e33cf2ef88bbcfefc1db7c"
     },
     "formatResource": {
-      "bytes": 1125,
-      "sha256": "d85daae6ee7da50aa0269c7c7e3d5628750f758c13a0fd5d087abd9928699caa"
+      "path": ".qa/mobile363-cancel-r9-analysis1-1/format1.resource.json",
+      "bytes": 1111,
+      "sha256": "1fecf8ebd1c83345047623bc4201c95a597f697be2fa6f83755fd320dff726ce"
     },
     "script": {
+      "path": ".qa/mobile363-cancel-r9-analysis1-1/analysis1.py",
       "bytes": 1058,
       "sha256": "79d01886e3a3edfefec498671ea8964e10e8f67d9fe35e3f2e5322deb3179faf"
     },

@@ -1,0 +1,364 @@
+#!/usr/bin/env python3
+"""Fresh owned full graph only. No old binary, test receipt, DB or external deployment is adopted."""
+import argparse,hashlib,importlib.util,json,os,re,stat,subprocess,sys,time,shutil
+from pathlib import Path
+from collections import Counter
+REPO=Path(__file__).resolve().parents[2]
+INPUTS=Path(__file__).with_name('inputs.json')
+FINAL_SOURCE={'members': 1573, 'digest': '47c38899d5cc41155a72d36fdc38d2444dc4c86e769f3c9f9dc3a2595fcefee6'}  # Exact Root-reviewed formatted R3 source; execution remains manual-only.
+SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
+REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
+RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
+SCENARIOS=('reader-registered-cancel','reader-writer-fence-cancel','ack','redis-unknown')
+ROLES=('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth','rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user')
+CLEANUP_SCOPES=[{'label': 'cleanup-ownedcontrol', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths', 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['canonical-first', 'runtime-first', 'local-first', 'unbound_start_failure_only_waits_original_done'], 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit': ['unknown-middle-child-does-not-strand-later-original-owner', 'good-drains-retained-and-unknown-never-gets-a-join', 'repeat-Stop-does-not-renew-signal-or-erase-failure']}}}, {'label': 'cleanup-runtimeacceptance', 'targets': {'internal/runtimeacceptance': ['TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup']}, 'requiredSubtests': {'internal/runtimeacceptance': {'TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup': ['cancel-audit-before-stop', 'timeout-before-local-wait-complete']}}}]
+GRAPH_TARGETS={'pkg/common/startrpc': ['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence', 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']}
+GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
+
+
+def sha(raw):return hashlib.sha256(raw).hexdigest()
+def regular(p,maximum=128<<20):
+ p=Path(p)
+ if p.resolve()!=p:raise ValueError('canonical bounded regular file required')
+ fd=os.open(p,os.O_RDONLY|os.O_NOFOLLOW)
+ try:
+  before=os.fstat(fd)
+  if not stat.S_ISREG(before.st_mode) or before.st_size>maximum:raise ValueError('bounded regular file required')
+  chunks=[];left=maximum+1
+  while left:
+   block=os.read(fd,min(1<<20,left))
+   if not block:break
+   chunks.append(block);left-=len(block)
+  raw=b''.join(chunks);after=os.fstat(fd);current=p.lstat()
+  keys=lambda v:(v.st_dev,v.st_ino,v.st_mode,v.st_size,v.st_mtime_ns,v.st_ctime_ns)
+  if keys(before)!=keys(after) or keys(before)!=keys(current) or len(raw)!=before.st_size:raise ValueError('file body/mode changed while reading')
+  return raw
+ finally:os.close(fd)
+
+def pin(row):
+ p=REPO/row['path'];raw=regular(p)
+ if len(raw)!=row['bytes'] or sha(raw)!=row['sha256'] or stat.S_IMODE(p.stat().st_mode)!=0o644:raise ValueError('pinned input differs')
+ return raw
+def module(path,label):
+ s=importlib.util.spec_from_file_location(label,REPO/path);v=importlib.util.module_from_spec(s);s.loader.exec_module(v);return v
+def write(path,value):
+ raw=(json.dumps(value,separators=(',',':'),ensure_ascii=False)+'\n').encode()
+ fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+ with os.fdopen(fd,'wb') as f:
+  if f.write(raw)!=len(raw):raise ValueError('short metadata write')
+  f.flush();os.fsync(f.fileno())
+ fd=os.open(path.parent,os.O_RDONLY|os.O_DIRECTORY)
+ try:os.fsync(fd)
+ finally:os.close(fd)
+ return sha(raw)
+def check_locked(c):
+ if FINAL_SOURCE is None or c.get('state')!='FROZEN_FINAL_SOURCE' or c.get('source')!=FINAL_SOURCE or c.get('sourceReviewAccepted') is not True:raise ValueError('Root final formatted whole-source identity required; prepare-only cannot execute')
+ if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
+ if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
+ if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN:raise ValueError('exact cleanup3/9 plus original graph2/3 selection required')
+def validate_entries(bodies,c):
+    rows = c['entrypoints']
+    if len(rows) != 14 or len({r['role'] for r in rows}) != 14 or len({r['package'] for r in rows}) != 14:
+        raise ValueError('fourteen actual distinct main packages required')
+    families = Counter(r['lifecycleFamily'] for r in rows)
+    if families != Counter({'rpc':10,'api':1,'crontask':1,'msggateway':1,'msgtransfer-managed':1}):
+        raise ValueError('actual five lifecycle families required')
+    if [r['package'] for r in rows] != c['compileOnlyPackages']:
+        raise ValueError('compile list is not actual fourteen mains')
+    for row in rows:
+        raw = bodies.get(row['target']); identity = row['actualMain']
+        if (raw is None or row['target'] != 'server/'+row['package'].removeprefix('./')+'/main.go'
+                or row['package'].startswith('./cmd/') is not True
+                or len(raw) != identity['bytes'] or sha(raw) != identity['sha256']
+                or row['outputName'] != row['role'] or not re.fullmatch('[a-z][a-z0-9-]*',row['outputName'])):
+            raise ValueError('actual main identity or owned binary output differs')
+    for family in c['lifecycleFamilies']:
+        for key in ('command','ownedOwner'):
+            binding=family[key];raw=bodies.get(binding['target']);identity=binding['source']
+            if raw is None or len(raw)!=identity['bytes'] or sha(raw)!=identity['sha256']:
+                raise ValueError('actual lifecycle dispatch/owner source differs')
+    group = next(r for r in rows if r['role'] == 'rpc-group')
+    if b'StartSvrManaged' not in bodies[group['target']]:
+        raise ValueError('actual managed group entry cannot be replaced by old main')
+
+def verify():
+ c=json.loads(regular(INPUTS));check_locked(c)
+ for row in c['dependencies']:pin(row)
+ parent=module(c['sourceProvider'],'fullgraph_actual_source_parent');old,bodies,recipe=parent.verify()
+ if old['source']!=c['parent']:raise ValueError('explicit parent identity differs')
+ parent_bodies=dict(bodies);bodies=dict(bodies);seen=set()
+ for r in c['overlay']:
+  target=r['target'];preimage=bodies.get(target)
+  if target in seen or r['path']!=SOURCE_ROOT+target or r['beforeSHA256']!=(sha(preimage) if preimage is not None else None):raise ValueError('exact final overlay preimage required')
+  seen.add(target);bodies[target]=pin(r)
+ actual={str(p.relative_to(REPO)) for p in (REPO/SOURCE_ROOT).rglob('*') if p.is_file() or p.is_symlink()}
+ if seen!=set(c['allowedOverlayTargets']) or actual!={r['path'] for r in c['overlay']} or len(bodies)!=FINAL_SOURCE['members'] or recipe.digest(recipe.rows(bodies))!=FINAL_SOURCE['digest']:raise ValueError('whole final source vector differs')
+ for t in ('server/go.mod','server/go.sum','server/config/config.example.yaml'):
+  if bodies[t]!=parent_bodies[t]:raise ValueError('original app module locks/config changed')
+ if not REQUIRED_GRAPH_SOURCE<=set(bodies):raise ValueError('actual graph and original oracle implementation required')
+ if set(c['sourceModes'])!=set(bodies) or any(type(v) is not int or v not in (0o644,0o755) for v in c['sourceModes'].values()):raise ValueError('whole final source mode vector required')
+ validate_entries(bodies,c['entrypointContract'])
+ catalog=json.loads(pin(c['catalog']))
+ for row in c['controllerPins']:pin(row)
+ if catalog['scope']!='fresh_owned_fullgraph_compatibility_fixture_only_no_production_default' or catalog['minio']['mode']!='source-elf' or catalog['minio']['status']!='historical_unmaintained_test_only':raise ValueError('explicit source-MinIO fixture required')
+ if catalog['images']['minio']!=catalog['images']['redis'] or catalog['images']['keeper']!=catalog['images']['redis']:raise ValueError('known Redis base must remain explicit')
+ return c,bodies,recipe,parent,old,catalog
+
+def project_go_test_events(raw,phase):
+ if phase not in {'pending-two-original-oracles'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
+ events=[];digest=hashlib.sha256();total=0;head=bytearray()
+ for line in raw.splitlines():
+  event=json.loads(line)
+  events.append({k:event[k] for k in ('Time','Action','Package','Test','Elapsed') if k in event})
+  if event.get('Action')=='build-output' and event.get('Test') in (None,''):
+   output=event.get('Output')
+   if not isinstance(output,str):raise ValueError('public Go build-output must be a string')
+   block=output.encode('utf-8');digest.update(block);total+=len(block)
+   head.extend(block[:max(0,65536-len(head))])
+ if len(events)>4096:raise ValueError('finite original oracle event bound')
+ diagnostic=None
+ if total:
+  text=bytes(head).decode('utf-8','ignore')
+  diagnostic={'phase':phase,'publicSourceOnly':True,'selection':'go-test-build-output-without-Test-only','completeBytes':total,'completeSHA256':digest.hexdigest(),'diagnostic':text,'truncated':len(text.encode('utf-8'))<total}
+ return events,diagnostic
+
+def run_cleanup_controls(go,environment,command,parent,out):
+ results=[]
+ for scope in CLEANUP_SCOPES:
+  names=sorted(name for tops in scope['targets'].values() for name in tops)
+  pattern='^('+'|'.join(re.escape(name) for name in names)+')$'
+  raw=command(scope['label'],[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run',pattern]+['./'+pkg for pkg in scope['targets']],240,environment)
+  events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()]
+  result=parent.audit(events,0,scope['targets'])
+  actual={(row['package'],row['name']) for row in result['namedCompletions'] if '/' in row['name']}
+  expected={(pkg,top+'/'+child) for pkg,tops in scope['requiredSubtests'].items() for top,subs in tops.items() for child in subs}
+  if actual!=expected:raise ValueError('all actual cleanup descendants required')
+  write(out/(scope['label']+'-names.json'),result);results.append(result)
+ union={'topPASS':sum(row['topPASS'] for row in results),'subPASS':sum(row['subPASS'] for row in results),'namedCompletions':[name for row in results for name in row['namedCompletions']]}
+ if (union['topPASS'],union['subPASS'])!=(3,9):raise ValueError('exact cleanup3top9sub required')
+ write(out/'cleanup-names.json',union)
+ return union
+
+def audit_target_union(original,cleanup):
+ entries=original['namedCompletions']+cleanup['namedCompletions'];actual=Counter((row['package'],row['name']) for row in entries)
+ expected={(pkg,top) for pkg,tops in GRAPH_TARGETS.items() for top in tops}
+ expected|={(pkg,top+'/'+child) for pkg,tops in GRAPH_TARGETS.items() for top in tops for child in GRAPH_CHILDREN[top]}
+ for scope in CLEANUP_SCOPES:
+  expected|={(pkg,top) for pkg,tops in scope['targets'].items() for top in tops}
+  expected|={(pkg,top+'/'+child) for pkg,tops in scope['requiredSubtests'].items() for top,subs in tops.items() for child in subs}
+ if set(actual)!=expected or any(count!=1 for count in actual.values()) or len(expected)!=17:raise ValueError('exact graph2/3 and cleanup3/9 union required')
+ return {'topPASS':5,'subPASS':12,'skip':0,'fail':0,'namedCompletions':[{'package':pkg,'name':name} for pkg,name in sorted(actual)]}
+
+def public_cleanup(row):
+ if row['version']!='owned-fullgraph-resource-cleanup-v1' or type(row['accepted']) is not bool or not re.fullmatch('[0-9a-f]{32}',row['nonce']) or any(not re.fullmatch('[0-9a-f]{64}',v) for v in row['exactContainerIDs']):raise ValueError('exact resource cleanup receipt required')
+ return {'version':row['version'],'ownerNonceSHA256':sha(row['nonce'].encode()),'exactContainerIDs':row['exactContainerIDs'],'unconfirmedIDs':row['unconfirmedIDs'],'accepted':row['accepted']}
+
+def check_business_permissions(value):
+ if not isinstance(value,dict) or set(value)!={'version','principals'} or value.get('version')!='owned-fullgraph-business-permissions-v1':raise ValueError('actual finite business permission evidence required')
+ rows=value['principals']
+ fields={'role','redisWhoami','redisClientInfo','redisAclGetUserError','redisConfigGetError','redisForeignKeyError','kafkaOriginalTopics','kafkaAclDescribeError','kafkaForeignTopicError','kafkaConnectionClosed'}
+ if not isinstance(rows,list) or len(rows)!=2:raise ValueError('both original business principals required')
+ finite=[]
+ for role,row in zip(('legacy','runtime'),rows):
+  if not isinstance(row,dict) or set(row)!=fields or row.get('role')!=role:raise ValueError('exact business principal evidence required')
+  if any(row.get(k) is not True for k in ('redisWhoami','redisClientInfo','kafkaOriginalTopics','kafkaConnectionClosed')):raise ValueError('actual original identity/topics and connection close required')
+  if any(row.get(k)!='NOPERM' for k in ('redisAclGetUserError','redisConfigGetError','redisForeignKeyError')):raise ValueError('typed Redis NOPERM required; absence or transport errors never pass')
+  if type(row.get('kafkaAclDescribeError')) is not int or row['kafkaAclDescribeError']!=31 or type(row.get('kafkaForeignTopicError')) is not int or row['kafkaForeignTopicError']!=29:raise ValueError('typed Kafka cluster/topic authorization refusal required')
+  finite.append({key:row[key] for key in sorted(fields)})
+ return {'version':'owned-fullgraph-business-permissions-v1','principals':finite}
+
+def check_cancel(value,scenario,source,builds,plane_sha):
+ permissions=check_business_permissions(value.get("businessPermissions"))
+ # The concrete original operator must actually cancel its retained group.
+ # Exact cancellation fields are frozen with the final oracle source, never
+ # inferred from a non-serving snapshot or from container disappearance.
+ if value.get('version')!='owned-fullgraph-token-v2-result-v1' or value.get('scenario')!=scenario or value.get('accepted') is not True or value.get('sourceSHA256')!=source or value.get('resourcePlaneSHA256')!=plane_sha or value.get('phase')!='actual-prerelease-cancel-and-original-joins-accepted' or value.get('freshPlaneOnly') is not True or value.get('knownAdmissionSHA256','') or value.get('actualTokenRPCDispatched')!=0:raise ValueError('actual prerelease cancellation required')
+ phase='registered-not-serving-before-readiness' if scenario=='reader-registered-cancel' else 'known-readiness-still-keeps-writer-fence'
+ expected={'rpc-msg','rpc-conversation'} if scenario=='reader-registered-cancel' else set(ROLES)
+ cancellation=value.get('cancellation')
+ if not isinstance(cancellation,dict) or cancellation.get('pausedPhase')!=phase or cancellation.get('actualPreparedRoles')!=len(expected) or value.get('actualStartedRoles')!=0 or value.get('roles') not in (None,[]) or value.get('readerServed') not in (None,[]):raise ValueError('original prerelease roles/fence differ')
+ if any(cancellation.get(k) is not True for k in ('knownAdmissionAbsent','readerDiscoveryAbsentBefore','readerDiscoveryAbsentAfter','originalStopReturnedError')):raise ValueError('actual original cancellation refusal required')
+ if scenario=='reader-registered-cancel' and value.get('dataReadySHA256','') or scenario=='reader-writer-fence-cancel' and not re.fullmatch('[0-9a-f]{64}',value.get('dataReadySHA256','')):raise ValueError('exact original readiness boundary differs')
+ phases=value['readerPhases']
+ names=['registered-not-serving-before-readiness','known-readiness-still-keeps-writer-fence'][:1 if len(expected)==2 else 2]
+ if [r['phase'] for r in phases]!=names or any(r['bothActualConnectionsNotServing'] is not True for r in phases):raise ValueError('real registered listener observations required')
+ rows=cancellation['roles'];by={b['role']:b for b in builds['binaries']}
+ if len(rows)!=len(expected) or {r['role'] for r in rows}!=expected or len({r['pid'] for r in rows})!=len(rows) or len({r['ownerNonceSHA256'] for r in rows})!=len(rows):raise ValueError('all original launched roles must be retained')
+ for row in rows:
+  if row['sourceSHA256']!=source or row['binarySHA256']!=by[row['role']]['sha256'] or not row['startToken'] or any(row.get(k) is not True for k in ('actualAbsent','announcementAbsent','canonicalDrainAbsent','privateReleaseAbsent','originalWaitObserved')):raise ValueError('actual cancellation join/absence differs')
+ return {'scenario':scenario,'accepted':True,'source':source,'originalLaunchedRoles':len(rows),'actualAbsentRoles':len(rows),'noAdmission':True,'noRelease':True,'tokenRPCDispatches':0,'businessPermissions':permissions,'originalResultSHA256':None}
+
+def check_result(value,scenario,source,builds,plane_sha):
+ if scenario.startswith('reader-'):return check_cancel(value,scenario,source,builds,plane_sha)
+ permissions=check_business_permissions(value.get('businessPermissions'))
+ if (value['version']!='owned-fullgraph-token-v2-result-v1' or value['scenario']!=scenario or value['accepted'] is not True or value['sourceSHA256']!=source or value['resourcePlaneSHA256']!=plane_sha or value['actualStartedRoles']!=14 or not value['freshPlaneOnly'] or value['actualTokenRPCDispatched']!=1 or not value['rawPushRejected'] or not value['actualUserReadExact'] or not value['redisKeyPresentBefore'] or not value['redisKeyAbsentAfter'] or value['mongoMessageCount']!=0):raise ValueError('actual complete fullgraph result required')
+ rows=value['roles'];by={b['role']:b for b in builds['binaries']}
+ if len(rows)!=14 or {r['role'] for r in rows}!=set(ROLES) or len({r['pid'] for r in rows})!=14 or len({r['ownerNonceSHA256'] for r in rows})!=14:raise ValueError('fourteen original distinct process owners required')
+ for r in rows:
+  if not r['actualAbsent'] or r['sourceSHA256']!=source or r['binarySHA256']!=by[r['role']]['sha256']:raise ValueError('original process/binary/source or cleanup differs')
+  expected=not(scenario=='redis-unknown' and r['role']=='push')
+  if r['canonicalDrain']!=expected or expected and not re.fullmatch('[0-9a-f]{64}',r.get('drainSHA256','')):raise ValueError('unknown must never become canonical drain')
+ phases=value['readerPhases'];names=['registered-not-serving-before-readiness','known-readiness-still-keeps-writer-fence','known-admission-without-private-release-still-not-serving']
+ if len(phases)!=3 or [r['phase'] for r in phases]!=names or any(not r['bothActualConnectionsNotServing'] for r in phases):raise ValueError('actual staged reader fences required')
+ served=value.get('readerServed')
+ if not isinstance(served,list) or len(served)!=2 or {r['role'] for r in served}!={'rpc-msg','rpc-conversation'}:raise ValueError('same actual readers must respond after release')
+ original={r['role']:r for r in phases[0]['endpoints']}
+ for row in served:
+  before=original[row['role']]
+  if any(row.get(k)!=before.get(k) for k in ('pid','startToken','endpoint','configurationSHA256','listenerInode')) or any(row.get(k) is not True for k in ('actualTCPConnected','originalListenerRetained','actualUnimplementedAfterRelease')):raise ValueError('release must use same original listener and owner')
+ loss=value['ackLoss'];unknown=scenario=='redis-unknown'
+ if loss.get('version')!='real-redis-exact-del-ack-loss-v1' or loss.get('exactDeleteRequests')!=int(unknown) or loss.get('actualReplyDiscarded')!=unknown or loss.get('transportFailure') is not False or unknown and loss.get('actualUpstreamIntegerOne') is not True:raise ValueError('exact actual Redis ACK outcome required')
+ if value['actualTokenRPCSucceeded']!=(scenario=='ack') or value['canonicalShutdown']!=(scenario=='ack') or value['unknownOwnerRetained']!=(scenario=='redis-unknown'):raise ValueError('known/unknown boundary differs')
+ return {'scenario':scenario,'accepted':True,'source':source,'actualStartedRoles':14,'actualAbsentRoles':14,'readerPhases':names,'tokenRPCDispatches':1,'tokenSucceeded':value['actualTokenRPCSucceeded'],'canonicalShutdown':value['canonicalShutdown'],'unknownOwnerRetained':value['unknownOwnerRetained'],'mongoMessageCount':0,'businessPermissions':permissions,'originalResultSHA256':None}
+
+def tool_snapshot():
+ names={'python':sys.executable,'go':shutil.which('go'),'gcc':shutil.which('gcc'),'git':'/usr/bin/git','docker':'/usr/bin/docker','sudo':'/usr/bin/sudo','nsenter':'/usr/bin/nsenter','setpriv':'/usr/bin/setpriv','env':'/usr/bin/env'}
+ result={}
+ for role,path in names.items():
+  if path is None:raise ValueError('required hosted tool absent')
+  p=Path(path).resolve();raw=regular(p)
+  result[role]={'path':str(p),'bytes':len(raw),'sha256':sha(raw),'mode':stat.S_IMODE(p.stat().st_mode)}
+ return result
+
+def job_identity():
+ return {'version':'owned-fullgraph-ci-allocation-v1','uid':os.getuid(),'runID':os.environ['GITHUB_RUN_ID'],'attempt':os.environ['GITHUB_RUN_ATTEMPT'],'head':os.environ['GITHUB_SHA']}
+def allocation_root():
+ run,attempt=os.environ['GITHUB_RUN_ID'],os.environ['GITHUB_RUN_ATTEMPT']
+ if not run.isdecimal() or not attempt.isdecimal() or not re.fullmatch('[0-9a-f]{40}',os.environ['GITHUB_SHA']):raise ValueError('exact original hosted attempt required')
+ return Path(os.environ['RUNNER_TEMP'])/('backend-fullgraph-'+run+'-'+attempt)
+def admit():
+ c,_,_,_,_,_=verify();root=allocation_root()
+ if root.resolve()!=root or root.exists() or os.statvfs(root.parent).f_bavail*os.statvfs(root.parent).f_frsize<c['resource']['initialBytes']:raise ValueError('fresh allocation and cold4GiB admission required')
+ root.mkdir(mode=0o700);write(root/'allocation-owner.json',job_identity())
+ out=REPO/'ci-results';out.mkdir(exist_ok=True)
+ write(out/'backend-fullgraph-admission.json',{'accepted':True,'minimumInitialBytes':c['resource']['initialBytes'],'source':c['source'],'businessDeployment':False})
+
+def source_post(root,bodies,c,template):
+ post={'accepted':False,'source':FINAL_SOURCE}
+ try:
+  for target,raw in bodies.items():
+   p=root/target
+   if regular(p)!=raw or stat.S_IMODE(p.stat().st_mode)!=c['sourceModes'][target]:raise ValueError('whole source or mode drift')
+  if regular(root/'server/config/config.yaml')!=template or stat.S_IMODE((root/'server/config/config.yaml').stat().st_mode)!=0o600:raise ValueError('generated example config drift')
+  verify();post['accepted']=True
+ except Exception as error:post['exceptionType']=type(error).__name__
+ return post
+
+def run():
+ if any(os.environ.get(k)!=v for k,v in {'GITHUB_ACTIONS':'true','RUNNER_ENVIRONMENT':'github-hosted','RUNNER_OS':'Linux','GOTOOLCHAIN':'local','GOWORK':'off'}.items()) or os.getuid()==0:raise ValueError('disposable hosted nonroot Linux only')
+ c,bodies,recipe,parent,old,catalog=verify();started=time.monotonic();temporary=Path(os.environ['RUNNER_TEMP']);allocation=allocation_root();root=allocation/'work'
+ if temporary.resolve()!=temporary or allocation.resolve()!=allocation or root.exists() or os.statvfs(temporary).f_bavail*os.statvfs(temporary).f_frsize<c['resource']['initialBytes']:raise ValueError('fresh owned root and initial floor required')
+ if json.loads(regular(allocation/'allocation-owner.json'))!=job_identity():raise ValueError('original allocation admission differs')
+ root.mkdir(mode=0o700);private=root/'private';private.mkdir(mode=0o700);out=REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=False)
+ write(private/'job-owner.json',{'version':'owned-fullgraph-ci-job-v1','uid':os.getuid(),'runID':os.environ['GITHUB_RUN_ID'],'attempt':os.environ['GITHUB_RUN_ATTEMPT'],'head':os.environ['GITHUB_SHA'],'source':FINAL_SOURCE})
+ for target,raw in bodies.items():
+  p=root/target;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw);p.chmod(c['sourceModes'][target])
+ template=bodies['server/config/config.example.yaml'];(root/'server/config/config.yaml').write_bytes(template);(root/'server/config/config.yaml').chmod(0o600)
+ write(private/'source-materialized.json',{'source':FINAL_SOURCE,'accepted':True})
+ primary=None
+ try:
+  tools=tool_snapshot();write(out/'tools-before.json',tools)
+  builder=module('ci/backend-fullgraph/minio_build.py','owned_minio_source_builder');resources=module('ci/backend-fullgraph/resources.py','owned_fullgraph_resources');selectors=module('ci/backend-fullgraph/selectors.py','owned_fullgraph_selectors')
+  command_index=0
+  def command(label,argv,timeout,env=None,cwd=None):
+   nonlocal command_index
+   command_index+=1;remaining=c['resource']['controllerSeconds']-(time.monotonic()-started)
+   if remaining<1:raise ValueError('controller budget exhausted')
+   timeout=max(1,int(min(timeout,remaining)));folder=private/(f'{command_index:04d}-'+label);folder.mkdir(mode=0o700)
+   args=[sys.executable,'-B',str(REPO/'ci/group-effects/capture.py'),'--stdout',str(folder/'stdout'),'--stderr',str(folder/'stderr'),'--']
+   if env is not None:args+=['/usr/bin/env','-i']+[k+'='+v for k,v in env.items()]
+   args+=argv
+   wrapped=[sys.executable,'-B',str(REPO/'ci/group-effects/resource_guard.py'),'--cwd',str(cwd or root/'server'),'--log',str(folder/'guard.log'),'--record',str(folder/'resource.json'),'--min-free-mib','1024','--timeout',str(timeout),'--poll-interval','.2','--allocated-root',str(root),'--max-allocated-mib','16384','--']+args
+   child=subprocess.run(wrapped,check=False,timeout=timeout+30);resource=json.loads(regular(folder/'resource.json'))
+   failed=child.returncode!=0 or resource.get('status')!='passed' or resource.get('exit_code')!=0
+   raw_custody={}
+   for name in ('stdout','stderr'):
+    try:
+     value=regular(folder/name,32<<20);raw_custody[name]={'bytes':len(value),'sha256':sha(value),'private':True}
+    except Exception as error:raw_custody[name]={'private':True,'exceptionType':type(error).__name__}
+   write(out/(f'phase-{command_index:04d}.json'),{'phase':label,'exitCode':child.returncode,'resource':resource,'rawCustody':raw_custody})
+   if failed and (label.startswith('compile-') or label=='minio-source-compile'):
+    # These commands run solely on reviewed public source, before any private
+    # resource credentials/configs exist. No operator/DB/SDK text is selected.
+    raw=regular(folder/'stderr',32<<20) if (folder/'stderr').exists() else b''
+    write(out/(f'compile-failure-{command_index:04d}.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
+   if label=='pending-two-original-oracles' or label in {scope['label'] for scope in CLEANUP_SCOPES}:
+    events,diagnostic=project_go_test_events(regular(folder/'stdout',32<<20),label)
+    if diagnostic is not None:write(out/(f'go-test-compile-diagnostic-{command_index:04d}.json'),diagnostic)
+    write(out/('oracle-events.json' if label=='pending-two-original-oracles' else label+'-events.json'),events)
+   if failed:raise ValueError('actual phase failed; private raw retained')
+   return regular(folder/'stdout',32<<20)
+  env={'PATH':os.environ['PATH'],'HOME':os.environ['HOME'],'GOTOOLCHAIN':'local','GOWORK':'off','GOENV':'off','GOAUTH':'off','GOMAXPROCS':'2','GOMEMLIMIT':'900MiB','CGO_ENABLED':'1'}
+  for key,name in [('GOMODCACHE','modcache'),('GOCACHE','buildcache'),('GOPATH','gopath'),('TMPDIR','tmp')]:
+   p=root/name;p.mkdir(mode=0o700);env[key]=str(p)
+  env['GOTMPDIR']=env['TMPDIR'];results=[]
+  env['GOROOT']=command('go-root',['go','env','GOROOT'],15,env).decode().strip();go=str(Path(env['GOROOT'])/'bin/go')
+  if command('go-version',[go,'version'],15,env).decode().strip()!='go version go1.27.2 linux/amd64':raise ValueError('exact Go1.27.2 required')
+  tool_sha=sha(regular(Path(go).resolve()))
+  if tool_sha!=tools['go']['sha256']:raise ValueError('Go command differs from observed original tool')
+  command('app-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
+  offline=dict(env,GOPROXY='off',GOSUMDB='off');binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
+  entries=c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'},{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]
+  for entry in entries:
+   role=entry['role'];binary=binroot/role;remaining=1200-(time.monotonic()-build_start)
+   if remaining<1:raise ValueError('actual14 and auxiliary compile budget exhausted')
+   command('compile-'+role,[go,'build','-mod=readonly','-p=1','-o',str(binary),entry['package']],int(remaining),offline)
+   raw=builder.stable(binary)
+   if raw[:6]!=b'\x7fELF\x02\x01' or len(raw)<20 or raw[18:20]!=b'\x3e\x00':raise ValueError('actual linux amd64 executable required')
+   receipt={'schema':1,'sourceSHA256':FINAL_SOURCE['digest'],'binarySHA256':sha(raw),'binaryBytes':len(raw),'toolchainSHA256':tool_sha};receiptpath=binroot/(role+'-receipt.json');receiptsha=write(receiptpath,receipt)
+   binaries.append({'role':role,'path':str(binary),'sha256':sha(raw),'sourceSHA256':FINAL_SOURCE['digest'],'receiptPath':str(receiptpath),'receiptSHA256':receiptsha,'services':selectors.SERVICES.get(role,[]),'components':selectors.COMPONENTS.get(role,[])})
+   write(out/('compiled-'+role+'.json'),{'role':role,'package':entry['package'],'source':FINAL_SOURCE,'bytes':len(raw),'sha256':sha(raw),'executed':False})
+  builds={'version':'source-bound-fullgraph-builds-v1','sourceSHA256':FINAL_SOURCE['digest'],'binaries':[b for b in binaries if b['role'] in ROLES],'legacyMessageTransfer':next(b for b in binaries if b['role']=='msgtransfer-legacy')};buildpath=private/'builds.json';buildsha=write(buildpath,builds);operator=next(b['path'] for b in binaries if b['role']=='acceptance-operator')
+  minio,receipt=builder.build(root,catalog,command,go,tool_sha,env);write(out/'source-minio-build.json',receipt)
+  cleanup_audit=run_cleanup_controls(go,offline,command,parent,out)
+  for image in sorted(set(catalog['images'].values())):command('image-acquire-'+str(len(results))+'-'+sha(image.encode())[:10],['/usr/bin/docker','--host','unix:///var/run/docker.sock','pull','--platform','linux/amd64',image],600)
+  for scenario in SCENARIOS:
+   if c['resource']['controllerSeconds']-(time.monotonic()-started)<c['resource']['scenarioSeconds']+180:raise ValueError('complete operator-context plus original cleanup budget required before new plane')
+   plane=None;scenario_error=None
+   try:
+    plane=resources.Plane(root/('plane-'+scenario),catalog['images'],minio_source=minio)
+    claim=plane.prepare();plane_path=plane.private/'plane.json';cred=plane.private/'credentials.json';work=root/('scenario-'+scenario);work.mkdir(mode=0o700)
+    p={'version':'owned-fullgraph-acceptance-v1','scenario':scenario,'work':str(work),'planePath':str(plane_path),'planeSHA256':sha(regular(plane_path)),'credentialsPath':str(cred),'credentialsSHA256':sha(regular(cred)),'buildsPath':str(buildpath),'buildsSHA256':buildsha};pp=private/(scenario+'-input.json');psha=write(pp,p)
+    keeper=next(r for r in claim['observations'] if r['role']=='keeper');groups=','.join(str(g) for g in sorted(set(os.getgroups()+[os.getgid()])))
+    args=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--','/usr/bin/setpriv','--reuid',str(os.getuid()),'--regid',str(os.getgid()),'--groups',groups,'--no-new-privs','--','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+os.environ['HOME'],'TMPDIR='+str(work),operator,'--private-input',str(pp),'--private-input-sha256',psha]
+    write(work/'operator-intent.json',{'version':'owned-fullgraph-operator-intent-v1','scenario':scenario,'privateInputSHA256':psha,'operatorSHA256':next(b['sha256'] for b in binaries if b['role']=='acceptance-operator'),'sourceSHA256':FINAL_SOURCE['digest']})
+    command('runtime-'+scenario,args,1380)
+    result_path=work/'result.json';raw=regular(result_path,1<<20);value=json.loads(raw);safe=check_result(value,scenario,FINAL_SOURCE['digest'],builds,p['planeSHA256']);safe['originalResultSHA256']=sha(raw);write(out/(scenario+'-result.json'),safe);results.append((scenario,result_path,sha(raw)))
+   except BaseException as error:scenario_error=error;raise
+   finally:
+    if plane is not None:
+     try:
+      cleanup=plane.cleanup()
+      write(out/('resource-cleanup-'+scenario+'.json'),public_cleanup(cleanup))
+     except Exception:
+      if scenario_error is None:raise
+  tests_env=dict(offline,LUOBO_FULLGRAPH_SOURCE_SHA256=FINAL_SOURCE['digest'])
+  for scenario,path,pin_sha in results:
+   prefix='LUOBO_FULLGRAPH_'+scenario.upper().replace('-','_');tests_env[prefix+'_RESULT']=str(path);tests_env[prefix+'_SHA256']=pin_sha
+  pattern='^(TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence|TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit)$/^(registered-not-serving-before-readiness|known-readiness-still-keeps-writer-fence|required-token-only)$'
+  raw=command('pending-two-original-oracles',[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run',pattern,'./pkg/common/startrpc'],240,tests_env)
+  events=[json.loads(x) for x in raw.decode().splitlines() if x.strip()];tops={'pkg/common/startrpc':['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence','TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']};audit=parent.audit(events,0,tops)
+  expected={tops['pkg/common/startrpc'][0]+'/'+s for s in ('registered-not-serving-before-readiness','known-readiness-still-keeps-writer-fence')}|{tops['pkg/common/startrpc'][1]+'/required-token-only'}
+  if {r['name'] for r in audit['namedCompletions'] if '/' in r['name']}!=expected:raise ValueError('exact original two tops/three children required')
+  write(out/'oracle-names.json',audit)
+  targeted_audit=audit_target_union(audit,cleanup_audit);write(out/'targeted-names.json',targeted_audit)
+ except BaseException as error:primary=error;raise
+ finally:
+  post=source_post(root,bodies,c,template)
+  try:
+   after=tool_snapshot();write(out/'tools-after.json',after)
+   if after!=tools:raise ValueError('hosted tool body/mode changed')
+  except Exception as error:post['accepted']=False;post['toolExceptionType']=type(error).__name__
+  try:write(out/'source-post.json',post)
+  except Exception:
+   if primary is None:raise
+  if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':3,'cleanupSubPASS':9,'targetedTopPASS':5,'targetedSubPASS':12,'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ return 0
+
+if __name__=='__main__':
+ p=argparse.ArgumentParser();g=p.add_mutually_exclusive_group();g.add_argument('--verify',action='store_true');g.add_argument('--admit',action='store_true');a=p.parse_args()
+ if a.verify:
+  c,_,_,_,_,_=verify();print(json.dumps({'source':c['source'],'actualRun':False,'Go':0,'DB':0,'containers':0}))
+ elif a.admit:admit()
+ else:raise SystemExit(run())

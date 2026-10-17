@@ -143,7 +143,19 @@ void main() {
         debugPrintSynchronously(
           'chat_input_typing_negative events.cancel.begin',
         );
-        await events?.cancel();
+        Object? cancelError;
+        StackTrace? cancelStack;
+        await tester.runAsync(() async {
+          try {
+            await events?.cancel();
+          } catch (error, stack) {
+            cancelError = error;
+            cancelStack = stack;
+          }
+        });
+        if (cancelError != null) {
+          Error.throwWithStackTrace(cancelError!, cancelStack!);
+        }
         debugPrintSynchronously('chat_input_typing_negative events.cancel.end');
         f.revoke.base.traceActual = true;
         await f.close(tester);

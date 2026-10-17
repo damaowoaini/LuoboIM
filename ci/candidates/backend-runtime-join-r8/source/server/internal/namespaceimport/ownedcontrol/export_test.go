@@ -155,7 +155,12 @@ func (c *historicalMongoSyntheticControl) Acquire(ctx context.Context, r namespa
 	}
 	// Observe only the actual immutable clock recorded by BeginCapture. These
 	// checks cannot repair/backdate the raw session or manufacture a valid cut.
-	capturedAt := c.fixture.Source.materializer.snapshot.Identity().CapturedAt
+	stamp, e := c.fixture.Source.materializer.snapshot.CaptureStamp(ctx, c.fixture.Source.live)
+	if e != nil {
+		c.acquireFailure = e
+		return namespaceimport.FenceObservation{}, e
+	}
+	capturedAt := stamp.CapturedAt
 	if capturedAt.Before(c.acquireFence.IssuedAt) || capturedAt.Before(c.stoppedAt) {
 		c.acquireFailure = namespaceimport.ErrUntrusted
 		return namespaceimport.FenceObservation{}, c.acquireFailure

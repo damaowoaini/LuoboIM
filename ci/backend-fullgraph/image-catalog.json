@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "state": "FROZEN_METADATA_SOURCE_BUILD_NOT_EXECUTED",
+  "scope": "fresh_owned_fullgraph_compatibility_fixture_only_no_production_default",
+  "platform": {
+    "os": "linux",
+    "architecture": "amd64"
+  },
+  "images": {
+    "mongo": "docker.io/library/mongo@sha256:8332f93f6cb881db35f58caaea2e986e6044f97a3cf2629515875361b3ae359c",
+    "redis": "docker.io/library/redis@sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+    "zookeeper": "docker.io/library/zookeeper@sha256:749c096a749200b273b8a7833b78847862c1764ed094571f6ad9b9dd87728b36",
+    "kafka": "docker.io/apache/kafka@sha256:5862db4a63a6dd7d46fd14771b10a1b39e069c2c47f17d8e4640f960720a0ead",
+    "keeper": "docker.io/library/redis@sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+    "minio": "docker.io/library/redis@sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f"
+  },
+  "officialImages": [
+    {
+      "role": "mongo",
+      "repository": "docker.io/library/mongo",
+      "tagProvenance": "8.0.15",
+      "pull": "docker.io/library/mongo@sha256:8332f93f6cb881db35f58caaea2e986e6044f97a3cf2629515875361b3ae359c",
+      "linuxAMD64Manifest": "sha256:8332f93f6cb881db35f58caaea2e986e6044f97a3cf2629515875361b3ae359c",
+      "indexOrPinnedManifest": "sha256:8332f93f6cb881db35f58caaea2e986e6044f97a3cf2629515875361b3ae359c",
+      "configDigest": "sha256:075ea1e18b77712810999d1eb971c818c4ed3dd6716b42285320c15c3c79198f",
+      "entrypoint": [
+        "docker-entrypoint.sh"
+      ],
+      "cmd": [
+        "mongod"
+      ],
+      "volumes": [
+        "/data/configdb",
+        "/data/db"
+      ],
+      "user": null,
+      "metadataObservation": {
+        "path": "references/integration/backend-fullgraph-image-catalog-20261017/mongo-observation.json",
+        "bytes": 2212,
+        "sha256": "6d27672731f56607fc8f7f5b21679ff11660e337c9bdfa0c8c9f8b8005d7364b"
+      },
+      "imageExecutionObserved": false
+    },
+    {
+      "role": "redis",
+      "repository": "docker.io/library/redis",
+      "tagProvenance": "8.2.2",
+      "pull": "docker.io/library/redis@sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+      "linuxAMD64Manifest": "sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+      "indexOrPinnedManifest": "sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+      "configDigest": "sha256:466e5b1da2ef27f8c769875a8b17a50edcb0731ac9207b47b0e22306d95362bd",
+      "entrypoint": [
+        "docker-entrypoint.sh"
+      ],
+      "cmd": [
+        "redis-server"
+      ],
+      "volumes": [
+        "/data"
+      ],
+      "user": null,
+      "metadataObservation": {
+        "path": "references/integration/backend-fullgraph-image-catalog-20261017/redis-observation.json",
+        "bytes": 1920,
+        "sha256": "710130c137236e7da879d6425ab9ba15e8178b69396d6b256ab7929ea01d557f"
+      },
+      "imageExecutionObserved": false
+    },
+    {
+      "role": "zookeeper",
+      "repository": "docker.io/library/zookeeper",
+      "tagProvenance": "3.9.6",
+      "pull": "docker.io/library/zookeeper@sha256:749c096a749200b273b8a7833b78847862c1764ed094571f6ad9b9dd87728b36",
+      "linuxAMD64Manifest": "sha256:749c096a749200b273b8a7833b78847862c1764ed094571f6ad9b9dd87728b36",
+      "indexOrPinnedManifest": "sha256:5bad433c71701a1d788b4df86c921d91bfb65c23a1443bcb18a80f40373ae9d9",
+      "configDigest": "sha256:89e314efe78d38c8b026a555f5f4ee6a2dd2a5a0984ab0e0fea7504f53667b24",
+      "entrypoint": [
+        "/docker-entrypoint.sh"
+      ],
+      "cmd": [
+        "zkServer.sh",
+        "start-foreground"
+      ],
+      "volumes": [
+        "/data",
+        "/datalog",
+        "/logs"
+      ],
+      "user": null,
+      "metadataObservation": {
+        "path": "references/integration/backend-fullgraph-image-catalog-20261017/zookeeper-3.9.6-observation.json",
+        "bytes": 2456,
+        "sha256": "0576b1098505f4764620bf385e4e6535a1827955cb591b42ef6107984eb56c67"
+      },
+      "imageExecutionObserved": false
+    },
+    {
+      "role": "kafka",
+      "repository": "docker.io/apache/kafka",
+      "tagProvenance": "3.9.1",
+      "pull": "docker.io/apache/kafka@sha256:5862db4a63a6dd7d46fd14771b10a1b39e069c2c47f17d8e4640f960720a0ead",
+      "linuxAMD64Manifest": "sha256:5862db4a63a6dd7d46fd14771b10a1b39e069c2c47f17d8e4640f960720a0ead",
+      "indexOrPinnedManifest": "sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed",
+      "configDigest": "sha256:44a48f9d78af26959fa4d61accb9be35f939a79bfdae05cad6df4baca8e22eeb",
+      "entrypoint": [
+        "/__cacert_entrypoint.sh"
+      ],
+      "cmd": [
+        "/etc/kafka/docker/run"
+      ],
+      "volumes": [
+        "/etc/kafka/secrets",
+        "/mnt/shared/config",
+        "/var/lib/kafka/data"
+      ],
+      "user": "appuser",
+      "metadataObservation": {
+        "path": "references/integration/backend-fullgraph-image-catalog-20261017/kafka-observation.json",
+        "bytes": 2191,
+        "sha256": "2cf9f639101289245787500c727d71364f899f7565928d27ff322b5012ef3550"
+      },
+      "imageExecutionObserved": false
+    }
+  ],
+  "keeper": {
+    "source": "same_accepted_redis_8.2.2_base",
+    "image": "docker.io/library/redis@sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+    "entrypoint": [
+      "/bin/sleep"
+    ],
+    "argv": [
+      "2147483647"
+    ],
+    "proof": [
+      "Redis official v8.2.2 Debian Dockerfile FROM debian:bookworm-slim",
+      "Debian official Bookworm coreutils filelist /bin/sleep",
+      "Entrypoint override directly execs sleep; never Redis daemon/entrypoint"
+    ],
+    "cloudActualStartStillRequired": true
+  },
+  "minio": {
+    "mode": "source-elf",
+    "status": "historical_unmaintained_test_only",
+    "productionDefaultChanged": false,
+    "baseImage": "docker.io/library/redis@sha256:3e3982fbc94dd878eaafd21c068aa8ed9f6246440676849cca46bf46f9c4012f",
+    "repository": "https://github.com/minio/minio",
+    "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
+    "tree": "376b09b793c57170a905208e64590164d8ab7a3b",
+    "goMod": {
+      "path": "references/integration/backend-fullgraph-image-catalog-20261017/minio-archive-go.mod",
+      "bytes": 12539,
+      "sha256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702"
+    },
+    "goSum": {
+      "path": "references/integration/backend-fullgraph-image-catalog-20261017/minio-archive-go.sum",
+      "bytes": 81711,
+      "sha256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4"
+    },
+    "toolchainVersion": "go1.27.2",
+    "cgoEnabled": "0",
+    "buildArgv": [
+      "go",
+      "build",
+      "-mod=readonly",
+      "-p=1",
+      "-trimpath",
+      "-buildvcs=false",
+      "-o",
+      "OWNED_OUTPUT",
+      "./"
+    ],
+    "offlineCompileRequired": true,
+    "expectedELFSHA256": null,
+    "ELFSHAFirstObservedInCloud": true,
+    "sourceDigestContract": "SHA256(canonical JSON sorted list {path,mode,bytes,sha256} of all exact tracked source files; regular bodies SHA256 and symlink literal targets only after contained-target validation; compare entire vector pre/post)",
+    "receiptVersion": "owned-minio-source-build-receipt-v1",
+    "receiptKeysInCanonicalOrder": [
+      "version",
+      "repository",
+      "commit",
+      "sourceDigestSHA256",
+      "goModSHA256",
+      "goSumSHA256",
+      "toolchainSHA256",
+      "cgoEnabled",
+      "binarySHA256",
+      "binaryBytes"
+    ],
+    "dtoVersion": "owned-minio-source-elf-v1",
+    "privateMount": "/source-minio/minio",
+    "mountReadOnly": true,
+    "entrypoint": "/source-minio/minio",
+    "registryAlternative": "image mode mutually exclusive; no available vendor image substituted or fabricated",
+    "bearerProof": {
+      "path": "references/integration/backend-fullgraph-image-catalog-20261017/minio-standard-bearer-proof.json",
+      "bytes": 1764,
+      "sha256": "56852af511c27c0af466cb8402eaea728070c3d35343cc526bb9e33f2f048997"
+    },
+    "archiveSource": {
+      "path": "references/integration/backend-fullgraph-image-catalog-20261017/minio-official-archive-source.json",
+      "bytes": 2575,
+      "sha256": "35b5738018e073b542a32ed1557040d64eff991c483eec724d3e6a782168efbb"
+    }
+  },
+  "knownRequiredResourceSourceChanges": [
+    "Kafka exact /etc/kafka/secrets and /mnt/shared/config declared volumes owned tmpfs in broker and format containers",
+    "Kafka LOG_DIR=/owned-data/logs for actual nonroot UID",
+    "ZK explicit /usr/bin/env\u2192zkServer.sh /task/zoo.cfg avoids default root config/myid writes",
+    "Source MinIO binary stableFD/source/receipt + exact readonly mount/entrypoint validation"
+  ],
+  "officialSources": [
+    {
+      "path": "references/integration/backend-fullgraph-image-catalog-20261017/official-source-observations.json",
+      "bytes": 3670,
+      "sha256": "9ce7828360805546c98009653d0537214395ec71c00dec85b5a3a28eee96793c"
+    },
+    {
+      "path": "references/integration/backend-fullgraph-image-catalog-20261017/zookeeper396-source-observations.json",
+      "bytes": 1158,
+      "sha256": "945c85f7643e45dac576db524da671efd5556a944f591b430a21f668dc689d5f"
+    }
+  ],
+  "layersDownloaded": 0,
+  "imagePulls": 0,
+  "containersStarted": 0,
+  "GoExecutions": 0,
+  "graphExecutable": false,
+  "graphSourceIdentity": "WAIT_ROOT_FORMAT_FINAL_VECTOR; catalog alone never unlocks graph"
+}

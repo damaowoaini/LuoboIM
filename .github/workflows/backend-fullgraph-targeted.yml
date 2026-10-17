@@ -1,0 +1,62 @@
+name: Fresh owned actual14 graph / original2 plus cleanup3 / exact5top12sub
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-fullgraph-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  actual-graph:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 210
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Exact Root-frozen source and reviewed graph admission
+        run: |
+          umask 077
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/backend-fullgraph/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Cold4GiB admission into one fresh task allocation
+        run: |
+          umask 077
+          python3 -B ci/backend-fullgraph/run.py --admit
+      - name: Build actual14 plus two auxiliaries; four fresh graph scenarios; exact5top12sub
+        run: |
+          umask 077
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/controller-private.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/backend-fullgraph-controller.resource.json" \
+            --min-free-mib 1024 --timeout 10800 --poll-interval .2 \
+            --allocated-root "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --max-allocated-mib 16384 \
+            -- python3 -B ci/backend-fullgraph/run.py
+      - name: Always exact-ID resource cleanup and independent original runtime absence
+        if: always()
+        run: |
+          umask 077
+          python3 -B ci/backend-fullgraph/collect.py
+      - name: Only bounded finite public receipts; no ELF/private source/config/logs
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: backend-fullgraph-receipts-${{ github.run_id }}
+          path: ci-results/backend-fullgraph-compact/
+          if-no-files-found: warn
+          retention-days: 14

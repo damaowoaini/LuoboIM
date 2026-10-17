@@ -3,7 +3,7 @@
   "state": "FROZEN_CAPTURE_ORDER_REPAIR5",
   "source": {
     "members": 1556,
-    "digest": "cc3425c0f40b7b60e7e1f285c21c26f8f2597b977b362650de695c610fed342b"
+    "digest": "bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85"
   },
   "repairTargets": {
     "internal/namespaceimport/ownedcontrol": [
@@ -439,8 +439,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/export_test.go",
       "beforeSHA256": "5b793dd0b0a707432097b3e23b992615614a7909ee0997ebdb9b8ed57f8d2d7c",
-      "afterSHA256": "45ed49034e80047ec24bde917a065b11e69d6d34286c4f8760aaea74a6c28c52",
-      "afterBytes": 10846,
+      "afterSHA256": "58ebe79b0f9d3a22fa43ca0151cd7d0e5acd5b8fcb23f4d458fdd92d06198701",
+      "afterBytes": 10983,
       "mode": 420,
       "production": false
     }
@@ -597,7 +597,7 @@
       "derivation": "previousSplitRepairRun.passedTargets; exact original source only"
     }
   ],
-  "sourceDeltaSHA256": "46928b87690e12f3b33a2b46bd62c36a6846cb1adc9fe44fc39cb27bb2fcfc14",
+  "sourceDeltaSHA256": "f0b924526bd57868777a936c338b8bc85eef31b4f6fbe7c9f33f01b5827bb909",
   "latestRepairRun": {
     "schema": 1,
     "head": "1dbe0412baa8a3a04199a5ab80a559dcdf126e65",
