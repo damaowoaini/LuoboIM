@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "state": "FROZEN_SOURCE",
-  "scope": "backend_history_controller_progress_and_corrupt_commit_child_repair2_reuse86_no_deployment",
+  "scope": "backend_history_derived_commit_batch_image_repair13_reuse76_no_deployment",
   "base": {
     "members": 1407,
     "digest": "5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9"
   },
   "source": {
-    "members": 1556,
-    "digest": "fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a"
+    "members": 1557,
+    "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -1566,7 +1566,8 @@
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_stop_all_linux_test.go": 420,
     "server/internal/namespaceimport/ownedcontrol/process_environment_linux.go": 420,
     "server/internal/namespaceimport/ownedcontrol/process_environment_linux_test.go": 420,
-    "server/internal/namespaceinventory/import_read_scope.go": 420
+    "server/internal/namespaceinventory/import_read_scope.go": 420,
+    "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go": 420
   },
   "dependencies": [
     {
@@ -2554,10 +2555,17 @@
       "beforeSHA256": null
     },
     {
+      "target": "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go",
+      "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go",
+      "beforeSHA256": null,
+      "bytes": 3908,
+      "sha256": "80b653eb9cf2a943bc70da2eb81751891ceade8a6258ee3b16fd9e609d79217e"
+    },
+    {
       "target": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/process_linux.go",
-      "bytes": 19774,
-      "sha256": "d13d875753587f98f2852b636bf6b11ca4e43e511d0ef53eefef42cab6dadf1b",
+      "bytes": 21543,
+      "sha256": "d420ab2f5d856d44a53a972673dfa505683172b8468d4aa2cddf96cd9db514f2",
       "beforeSHA256": "5802ed409efa8c3c449942f9544c033b88302921473a2bb5855c85e8364432f5"
     },
     {
@@ -2767,8 +2775,8 @@
     {
       "target": "server/internal/namespaceinventory/import_workspace.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_workspace.go",
-      "bytes": 14461,
-      "sha256": "1a9d975d2aac8fdc0745659db1f970bbb417efee5580f36304077f0cd15fda47",
+      "bytes": 15504,
+      "sha256": "1897772ead76e68c3e3023ace6523d9c998a34c6283325e75a260d22366ceb6f",
       "beforeSHA256": null
     },
     {
@@ -2781,9 +2789,16 @@
     {
       "target": "server/internal/namespaceinventory/import_workspace_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_workspace_test.go",
-      "bytes": 6451,
-      "sha256": "b2e6781274277a7a656a85c83a6360b7d5d59a6154a58ed46d8a850bf6a22877",
+      "bytes": 11176,
+      "sha256": "7783acda4bcfc70362ddbf313caee34f9b7845d2568d3bd3d4bd5e0b741df681",
       "beforeSHA256": null
+    },
+    {
+      "target": "server/internal/namespaceinventory/progress_batch.go",
+      "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/progress_batch.go",
+      "beforeSHA256": "275768fedbe6c8fd078f398c7a5f3f8351695a4f982db6cb18dfadd5189927cf",
+      "bytes": 5971,
+      "sha256": "0b6f15c3c93f4f3232e1145accdc04ca2f6a934488ae791529329f32caba8db5"
     },
     {
       "target": "server/internal/rpc/conversation/conversaion.go",
@@ -3161,6 +3176,7 @@
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_types.go",
     "server/internal/namespaceimport/ownedcontrol/process_environment_linux.go",
     "server/internal/namespaceimport/ownedcontrol/process_environment_linux_test.go",
+    "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go",
     "server/internal/namespaceimport/ownedcontrol/process_linux.go",
     "server/internal/namespaceimport/ownedcontrol/snapshot_history_segments_linux.go",
     "server/internal/namespaceimport/ownedcontrol/snapshot_validator_linux.go",
@@ -3194,6 +3210,7 @@
     "server/internal/namespaceinventory/import_workspace.go",
     "server/internal/namespaceinventory/import_workspace_boundary_test.go",
     "server/internal/namespaceinventory/import_workspace_test.go",
+    "server/internal/namespaceinventory/progress_batch.go",
     "server/internal/rpc/conversation/conversaion.go",
     "server/internal/rpc/group/managed_start.go",
     "server/internal/rpc/msg/server.go",
@@ -3232,93 +3249,72 @@
   "finalFormatProof": {
     "parentFormattedSource": {
       "members": 1556,
-      "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
-    },
-    "parentFormatProof": {
-      "productManifest": {
-        "bytes": 3936,
-        "sha256": "973c20bcd6097c8bfadb8df24b99d3cb154e01320ef9925b21f5c9c6d22a6ed2"
-      },
-      "formattedSource": {
-        "members": 1556,
-        "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
-      },
-      "incrementalFormattedParsedGo": 3,
-      "previousFormattedOrCompiledGoExactReused": 204,
-      "exactActualR7GoReused": [
-        "server/internal/rpc/third/owned_provider_test.go",
-        "server/pkg/common/db/cache/owned_connection_setup_redis_test.go",
-        "server/pkg/common/db/cache/owned_source_redis.go",
-        "server/pkg/common/db/s3/cos/cos.go"
-      ],
-      "GoCompilationOrTests": 0,
-      "incrementalDiagnosticFormat": {
-        "formattedLeafBytes": 28521,
-        "formattedLeafSHA256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
-        "rawCandidateManifestSHA256": "ad28eb3cc66aacadd4c948109e406148f57fe4f920d1f1d3c42f0765c836ce3a",
-        "rootFormatReceiptPath": ".qa/backend-controller-adapter-diagnostic-batch-1/formatted.json",
-        "rootFormatReceiptSHA256": "147cc0ade4b6a174d06e71132154756ef06ba67a43a3d5e387485b2975f2a33c",
-        "rootFormatReceiptBytes": 1401
-      },
-      "parentFormattedSource": {
-        "members": 1556,
-        "digest": "3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc"
-      },
-      "incrementalCaptureScopeFormat": {
-        "rootFormatReceiptPath": ".qa/backend-capture-cleanup-six-build-batch-1/formatted.json",
-        "rootFormatReceiptSHA256": "b38708bd44c56fe7a47acce233bf6e5be08ad71a5ea071286ec50e30e59d53bf",
-        "rootFormatReceiptBytes": 2611,
-        "selectedLeaves": [
-          {
-            "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-            "bytes": 14083,
-            "sha256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
-            "formatChanged": false
-          },
-          {
-            "sourceTarget": "server/internal/namespaceinventory/import_read_scope.go",
-            "bytes": 2993,
-            "sha256": "f0d26184584b3381678d6f18eb30e0c41edfa4d982d477b1c0a94fc7c141e314",
-            "formatChanged": false
-          },
-          {
-            "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-            "bytes": 26168,
-            "sha256": "91d405521a2f990d6fb1342acd6879b89c9bd4036a2e26a446dfb32a78472e96",
-            "formatChanged": false
-          }
-        ]
-      }
-    },
-    "formattedSource": {
-      "members": 1556,
       "digest": "fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a"
     },
-    "incrementalFormattedParsedGo": 2,
+    "formattedSource": {
+      "members": 1557,
+      "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
+    },
+    "incrementalFormattedParsedGo": 5,
     "GoCompilationOrTests": 0,
     "rootFormatReceipt": {
-      "path": ".qa/backend-failed-fixture-finite-diagnostics-batch-1/formatted-backend.json",
-      "bytes": 1735,
-      "sha256": "4a3d6fadd4d4a67db093f7fe581460f62635c8e220acc3b60eb7cfcc7796b257"
+      "path": ".qa/backend-index-batch-owned-image-repair-batch-1/formatted-all.json",
+      "bytes": 8609,
+      "sha256": "880bc840e258969d75f70a495f7c7afd147470c1f633bca31361f8214bf203e5"
+    },
+    "rootFinalSources": {
+      "path": ".qa/backend-index-batch-owned-image-repair-batch-1/final-formatted-sources.json",
+      "bytes": 610,
+      "sha256": "e16f95ec915742554bdc1f582a1a4995fe7119fe79e4f2b7fb7ba6fbd7582e0a"
     },
     "selectedLeaves": [
       {
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-        "bytes": 27088,
-        "sha256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
+        "sourceTarget": "server/internal/namespaceinventory/import_workspace.go",
+        "bytes": 15504,
+        "sha256": "1897772ead76e68c3e3023ace6523d9c998a34c6283325e75a260d22366ceb6f",
         "formatChanged": false,
-        "manifestSHA256": "d6f0c95cdfc22c84ce4576d8789e98557b47538e63db7f70a00ee435c77f45b5"
+        "beforeSourceSHA256": "1a9d975d2aac8fdc0745659db1f970bbb417efee5580f36304077f0cd15fda47",
+        "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
       },
       {
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
-        "bytes": 32546,
-        "sha256": "060394fc3c8fe32269bb8a3ea0e84ec55922ddfcb114624a4e7f402b9b0b6670",
+        "sourceTarget": "server/internal/namespaceinventory/progress_batch.go",
+        "bytes": 5971,
+        "sha256": "0b6f15c3c93f4f3232e1145accdc04ca2f6a934488ae791529329f32caba8db5",
+        "formatChanged": false,
+        "beforeSourceSHA256": "275768fedbe6c8fd078f398c7a5f3f8351695a4f982db6cb18dfadd5189927cf",
+        "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
+      },
+      {
+        "sourceTarget": "server/internal/namespaceinventory/import_workspace_test.go",
+        "bytes": 11176,
+        "sha256": "7783acda4bcfc70362ddbf313caee34f9b7845d2568d3bd3d4bd5e0b741df681",
         "formatChanged": true,
-        "manifestSHA256": "1296f1131794c84566af4c76bff63369e5e84736732d1137a27d294c9abf6618"
+        "beforeSourceSHA256": "b2e6781274277a7a656a85c83a6360b7d5d59a6154a58ed46d8a850bf6a22877",
+        "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
+      },
+      {
+        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go",
+        "bytes": 3908,
+        "sha256": "80b653eb9cf2a943bc70da2eb81751891ceade8a6258ee3b16fd9e609d79217e",
+        "formatChanged": true,
+        "beforeSourceSHA256": null,
+        "manifestSHA256": "e41ac251e26ebadd539ccff6a1e1f7ba71423de6f8b9efe31d9c7ab84d38949a"
+      },
+      {
+        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
+        "bytes": 21543,
+        "sha256": "d420ab2f5d856d44a53a972673dfa505683172b8468d4aa2cddf96cd9db514f2",
+        "formatChanged": true,
+        "beforeSourceSHA256": "d13d875753587f98f2852b636bf6b11ca4e43e511d0ef53eefef42cab6dadf1b",
+        "manifestSHA256": "e41ac251e26ebadd539ccff6a1e1f7ba71423de6f8b9efe31d9c7ab84d38949a"
       }
-    ]
+    ],
+    "graphSourceSeparate": {
+      "members": 1575,
+      "digest": "52ddd8742eef822c04d14b99f6ccf47acd12f43c7df06d98fe6fe389da231b58"
+    }
   },
-  "selectionSHA256": "0a433ed0706953bbadb348c0841926d4dd672c36c8fdb3f1e48023741a61cf9d",
+  "selectionSHA256": "6dc72abd068bd09c48e2fc13a6aa0a8b94f55e4153faf191c1a2b3b0d1ed962e",
   "priorPassedTargets": {
     "internal/api": [
       "TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope",
@@ -3628,6 +3624,7 @@
       "TestNamespaceRuntimeMongoTargetRequiresOriginalCatalogAndIdentity",
       "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
       "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+      "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation",
       "TestOwnedServicePrivateEnvironmentKeepsIdentityAndRejectsOwnerOverrides"
     ],
     "internal/namespaceinventory": [
@@ -3993,6 +3990,7 @@
       "TestNamespaceRuntimeMongoTargetRequiresOriginalCatalogAndIdentity",
       "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
       "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+      "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation",
       "TestOwnedServicePrivateEnvironmentKeepsIdentityAndRejectsOwnerOverrides"
     ],
     "internal/namespaceinventory": [
@@ -4099,6 +4097,10 @@
         "isolated_read_schema_fixture_preserves_base_gap_and_notification_domain",
         "reopened_actual_reader_rechecks_immutable_evidence_and_missing_marker",
         "original_captured_rows_remain_byte_exact_and_missing_proof_stays_visible"
+      ],
+      "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation": [
+        "actual-original-image-and-bounded-file-pins",
+        "real-fd-path-stability-and-mid-read-cancellation"
       ]
     },
     "internal/messagedelivery": {
@@ -4126,7 +4128,9 @@
         "resume_rejects_a_public_lock_without_changing_its_mode",
         "same_invocation_scope_rejects_foreign_workspace_source_and_retired_context",
         "scope_source_change_still_fails_actual_commit_and_final_snapshot_check",
-        "scope_private_file_tamper_cannot_bypass_commit_or_final_recheck"
+        "scope_private_file_tamper_cannot_bypass_commit_or_final_recheck",
+        "batched_commit_persists_every_final_set_and_omits_intermediate_indexes",
+        "batch_final_index_flush_failure_never_publishes_an_unresolved_root"
       ]
     },
     "pkg/common/startrpc": {
@@ -4527,15 +4531,15 @@
   },
   "repairPlan": {
     "path": "ci/backend-runtime-join-r8/repair-plan.json",
-    "bytes": 48852,
-    "sha256": "8a76f25b2ff149f48139e63f38773cc21446eb0e71ea918693939858ff692fe7",
+    "bytes": 54380,
+    "sha256": "ccd0db21d4065ab2e23dd5ba5789224e0c51f49d987a08ad976abaf0e9fb2769",
     "mode": 420
   },
   "repairControllerPins": [
     {
       "path": "ci/backend-runtime-join-r8/test_repair.py",
-      "bytes": 14614,
-      "sha256": "0e7f16dd329346ccddf3113616f36fb450de835def43e9f3d29ff6c7a85562e3",
+      "bytes": 15016,
+      "sha256": "5bf77f0c4199ae753de56b514906488e21587268fb8173893f5642a36a647a8d",
       "mode": 420
     }
   ]

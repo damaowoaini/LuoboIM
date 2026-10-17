@@ -11,11 +11,11 @@ run=load('run');builder=load('minio_build');resources=load('resources')
 
 class FullGraphControls(unittest.TestCase):
  def test_prepare_lock_fresh_scope_and_unknown_cannot_alias_old_pass_or_canonical(self):
-  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'ownedcontrolReuse':copy.deepcopy(run.OWNEDCONTROL_REUSE),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN)}
+  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN)}
   with mock.patch.object(run,'FINAL_SOURCE',None),self.assertRaises(ValueError):run.check_locked(c)
   with mock.patch.object(run,'FINAL_SOURCE',source):
    run.check_locked(c)
-   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('cleanupReuse',{}),('cleanupReuse',dict(run.CLEANUP_REUSE,source=source)),('cleanupReuse',dict(run.CLEANUP_REUSE,head='f'*40)),('cleanupReuse',dict(run.CLEANUP_REUSE,reviewSHA256='f'*64)),('ownedcontrolReuse',{}),('ownedcontrolReuse',dict(run.OWNEDCONTROL_REUSE,source=source)),('ownedcontrolReuse',dict(run.OWNEDCONTROL_REUSE,reviewSHA256='f'*64)),('originalTargets',{}),('requiredOriginalSubtests',{})]:
+   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('cleanupReuse',{}),('cleanupReuse',dict(run.CLEANUP_REUSE,source=source)),('cleanupReuse',dict(run.CLEANUP_REUSE,head='f'*40)),('cleanupReuse',dict(run.CLEANUP_REUSE,reviewSHA256='f'*64)),('ownedcontrolReuse',{'stale':'must-not-reuse-changed-production'}),('originalTargets',{}),('requiredOriginalSubtests',{})]:
     bad=copy.deepcopy(c);bad[key]=value
     with self.subTest(key=key),self.assertRaises(ValueError):run.check_locked(bad)
   cleanup={'version':'owned-fullgraph-resource-cleanup-v1','nonce':'a'*32,'exactContainerIDs':['b'*64],'unconfirmedIDs':[],'accepted':True}
@@ -190,8 +190,8 @@ class FullGraphControls(unittest.TestCase):
      top_pattern,child_pattern=[__import__('re').compile(part) for part in argv[argv.index('-run')+1].split('/')]
      self.assertTrue(all(top_pattern.fullmatch(top) for tops in scope['targets'].values() for top in tops))
      self.assertTrue(all(child_pattern.fullmatch(child) for tops in scope['requiredSubtests'].values() for subs in tops.values() for child in subs))
-     self.assertTrue(all(top_pattern.fullmatch(top) is None for tops in run.GRAPH_TARGETS.values() for top in tops));self.assertIsNone(top_pattern.fullmatch(run.CLEANUP_REUSE['top']))
-     self.assertNotEqual(label,'cleanup-ownedcontrol');self.assertIsNone(top_pattern.fullmatch(run.OWNEDCONTROL_REUSE['top']))
+     self.assertTrue(all(top_pattern.fullmatch(top) is None for tops in run.GRAPH_TARGETS.values() for top in tops))
+     self.assertIsNone(child_pattern.fullmatch('unbound_start_failure_only_waits_original_done'))
      rows=events(scope['targets'],scope['requiredSubtests'])
      if mode=='missing-child' and len(calls)==1:
       removed=next(row['Test'] for row in rows if row.get('Test') and '/' in row['Test']);rows=[row for row in rows if row.get('Test')!=removed]
@@ -201,11 +201,11 @@ class FullGraphControls(unittest.TestCase):
      with self.assertRaises(ValueError):run.run_cleanup_controls('/owned/go',{'GOPROXY':'off'},command,parent,out)
      self.assertFalse((out/'cleanup-names.json').exists());continue
     result=run.run_cleanup_controls('/owned/go',{'GOPROXY':'off'},command,parent,out)
-    self.assertEqual(calls,[scope['label'] for scope in run.CLEANUP_SCOPES]);self.assertEqual((result['topPASS'],result['subPASS']),(1,2))
+    self.assertEqual(calls,[scope['label'] for scope in run.CLEANUP_SCOPES]);self.assertEqual((result['topPASS'],result['subPASS']),(5,12))
     original_required={pkg:{top:run.GRAPH_CHILDREN[top] for top in tops} for pkg,tops in run.GRAPH_TARGETS.items()}
     original=parent.audit(events(run.GRAPH_TARGETS,original_required),0,run.GRAPH_TARGETS)
-    union=run.audit_target_union(original,result);self.assertEqual((union['topPASS'],union['subPASS']),(3,5))
-    self.assertEqual(union['cleanupReuse']['source'],run.CLEANUP_REUSE['source']);self.assertEqual((union['cleanupReuse']['topPASS'],union['cleanupReuse']['subPASS']),(1,4));self.assertEqual(union['originalObligation'],{'topCount':5,'subCount':12,'crossSource':True});self.assertEqual((union['ownedcontrolReuse']['topPASS'],union['ownedcontrolReuse']['subPASS']),(1,3));self.assertEqual(union['ownedcontrolReuse']['source'],run.OWNEDCONTROL_REUSE['source'])
+    union=run.audit_target_union(original,result);self.assertEqual((union['topPASS'],union['subPASS']),(7,15))
+    self.assertEqual(union['cleanupReuse']['source'],run.CLEANUP_REUSE['source']);self.assertEqual((union['cleanupReuse']['topPASS'],union['cleanupReuse']['subPASS']),(0,1));self.assertEqual(union['originalObligation'],{'topCount':5,'subCount':12,'crossSource':True});self.assertNotIn('ownedcontrolReuse',union);self.assertEqual(union['newSafety'],{'topCount':2,'subCount':4});self.assertEqual(union['completeObligation'],{'topCount':7,'subCount':16,'crossSource':True})
     bad=copy.deepcopy(result);bad['namedCompletions'].pop()
     with self.assertRaises(ValueError):run.audit_target_union(original,bad)
     bad=copy.deepcopy(result);bad['namedCompletions'].append(bad['namedCompletions'][0])
@@ -214,5 +214,30 @@ class FullGraphControls(unittest.TestCase):
    command=mock.Mock(side_effect=ValueError('actual phase failed; private raw retained'))
    with self.assertRaises(ValueError):run.run_cleanup_controls('/owned/go',{},command,parent,Path(folder).resolve())
    self.assertEqual(command.call_count,1)
+
+ def test_unbound_child_reuse_never_supplies_a_current_parent_or_changed_cleanup(self):
+  def names(targets,children):
+   rows=[]
+   for pkg,tops in targets.items():
+    for top in tops:
+     rows.append({'package':pkg,'name':top})
+     rows.extend({'package':pkg,'name':top+'/'+child} for child in children.get(pkg,{}).get(top,[]))
+   return rows
+  cleanup={'namedCompletions':[row for scope in run.CLEANUP_SCOPES for row in names(scope['targets'],scope['requiredSubtests'])]}
+  original={'namedCompletions':names(run.GRAPH_TARGETS,{pkg:{top:run.GRAPH_CHILDREN[top] for top in tops} for pkg,tops in run.GRAPH_TARGETS.items()})}
+  result=run.audit_target_union(original,cleanup)
+  self.assertEqual((result['topPASS'],result['subPASS']),(7,15));self.assertEqual(len(result['namedCompletions']),22)
+  self.assertEqual((result['cleanupReuse']['topPASS'],result['cleanupReuse']['subPASS']),(0,1));self.assertEqual(len(result['cleanupReuse']['namedCompletions']),1)
+  reused=result['cleanupReuse']['namedCompletions'][0]
+  self.assertTrue(reused['name'].endswith('/unbound_start_failure_only_waits_original_done'))
+  self.assertNotIn(reused,result['namedCompletions']);self.assertNotIn('ownedcontrolReuse',result)
+  self.assertEqual(result['originalObligation'],{'topCount':5,'subCount':12,'crossSource':True});self.assertEqual(result['completeObligation'],{'topCount':7,'subCount':16,'crossSource':True})
+  bad=copy.deepcopy(cleanup);bad['namedCompletions'].append(reused)
+  with self.assertRaises(ValueError):run.audit_target_union(original,bad)
+  for removed in ('TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths/canonical-first','TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/unknown-middle-child-does-not-strand-later-original-owner'):
+   bad=copy.deepcopy(cleanup);bad['namedCompletions']=[row for row in bad['namedCompletions'] if row['name']!=removed]
+   # Old receipts remain historical facts; they cannot fill a current-source gap.
+   bad['priorSourcePassed']=[{'package':run.CLEANUP_REUSE['package'],'name':removed}]
+   with self.assertRaises(ValueError):run.audit_target_union(original,bad)
 
 if __name__=='__main__':unittest.main()

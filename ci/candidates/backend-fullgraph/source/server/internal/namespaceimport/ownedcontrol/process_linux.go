@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -108,6 +109,18 @@ func (w *boundedServiceOutput) Write(p []byte) (int, error) {
 	return original, nil
 }
 func actualImage(pid int, path, expected string) error {
+	return actualImageContext(context.Background(), pid, path, expected)
+}
+
+// The caller still owns the fresh process identity check. A fixed buffer bounds
+// image memory without reusing a hash from another process or earlier attempt.
+func actualImageContext(ctx context.Context, pid int, path, expected string) error {
+	if ctx == nil {
+		return ErrOwnedEvidence
+	}
+	if e := ctx.Err(); e != nil {
+		return e
+	}
 	before, e := processIdentity(pid)
 	if e != nil || before.Executable != path {
 		return ErrOwnedEvidence
@@ -117,17 +130,69 @@ func actualImage(pid int, path, expected string) error {
 		return e
 	}
 	defer f.Close()
-	image, e := f.Stat()
-	at, e2 := os.Stat(path)
-	if e != nil || e2 != nil || !image.Mode().IsRegular() || !os.SameFile(image, at) || image.Size() < 1 || image.Size() > 256*1024*1024 {
-		return ErrOwnedEvidence
-	}
-	body, e := io.ReadAll(io.LimitReader(f, 256*1024*1024+1))
-	if e != nil || int64(len(body)) != image.Size() || sha(body) != expected {
-		return ErrOwnedEvidence
+	if e = verifyImageFile(ctx, f, path, expected); e != nil {
+		return e
 	}
 	after, e := processIdentity(pid)
 	if e != nil || !sameProcess(before, after) {
+		return ErrOwnedEvidence
+	}
+	return ctx.Err()
+}
+
+func sameImageFileState(a, b os.FileInfo) bool {
+	if a == nil || b == nil || !os.SameFile(a, b) || a.Mode() != b.Mode() || a.Size() != b.Size() || !a.ModTime().Equal(b.ModTime()) {
+		return false
+	}
+	x, ok := a.Sys().(*syscall.Stat_t)
+	y, ok2 := b.Sys().(*syscall.Stat_t)
+	return ok && ok2 && x.Uid == y.Uid && x.Gid == y.Gid && x.Nlink == y.Nlink && x.Ctim == y.Ctim
+}
+
+func verifyImageFile(ctx context.Context, f *os.File, path, expected string) error {
+	if ctx == nil || f == nil || !isSHA(expected) {
+		return ErrOwnedEvidence
+	}
+	if e := ctx.Err(); e != nil {
+		return e
+	}
+	image, e := f.Stat()
+	at, e2 := os.Stat(path)
+	if e != nil || e2 != nil || !image.Mode().IsRegular() || !sameImageFileState(image, at) || image.Size() < 1 || image.Size() > 256*1024*1024 {
+		return ErrOwnedEvidence
+	}
+	h := sha256.New()
+	var buffer [32 * 1024]byte
+	var count int64
+	for {
+		if e = ctx.Err(); e != nil {
+			return e
+		}
+		limit := len(buffer)
+		if remaining := image.Size() + 1 - count; remaining < int64(limit) {
+			limit = int(remaining)
+		}
+		n, readErr := f.Read(buffer[:limit])
+		if n > 0 {
+			count += int64(n)
+			if count > image.Size() {
+				return ErrOwnedEvidence
+			}
+			_, _ = h.Write(buffer[:n])
+		}
+		if readErr == io.EOF {
+			break
+		}
+		if readErr != nil || n == 0 {
+			return ErrOwnedEvidence
+		}
+	}
+	if e = ctx.Err(); e != nil {
+		return e
+	}
+	after, e := f.Stat()
+	current, pathErr := os.Stat(path)
+	if e != nil || pathErr != nil || !sameImageFileState(image, after) || !sameImageFileState(image, current) || count != image.Size() || hex.EncodeToString(h.Sum(nil)) != expected {
 		return ErrOwnedEvidence
 	}
 	return nil

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -182,6 +183,136 @@ func TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture(t *testin
 		info, e := os.Lstat(lockPath)
 		if e != nil || info.Mode().Perm() != 0644 {
 			t.Fatal("resume silently changed lock custody", e)
+		}
+	})
+	t.Run("batched commit persists every final set and omits intermediate indexes", func(t *testing.T) {
+		fresh, e := OpenImportWorkspace(ctx, snapshot, source, filepath.Join(privateFixtureDir(t), "batched"), header, policy, false)
+		if e != nil {
+			t.Fatal(e)
+		}
+		oracleDir := filepath.Join(privateFixtureDir(t), "old-index-writer")
+		if e = os.Mkdir(oracleDir, 0700); e != nil {
+			t.Fatal(e)
+		}
+		oracle := progressStore{oracleDir}
+		sets := map[string]derivedSet{}
+		changes := []DerivedMutation{}
+		oracleRoot := ""
+		for n := 0; n < 16; n++ {
+			setID := DerivedSetID("batch-oracle", string(rune('a'+n%2)))
+			key := jsonSHA(n)
+			raw, marshalErr := json.Marshal(struct {
+				Row int `json:"row"`
+			}{n})
+			if marshalErr != nil {
+				t.Fatal(marshalErr)
+			}
+			changes = append(changes, DerivedMutation{SetID: setID, Key: key, Value: raw})
+			// The old non-batch immutable writer is the canonical disk oracle,
+			// not a copy of the new Commit/flush implementation.
+			valueSHA, saveErr := oracle.save("derived-value", json.RawMessage(raw))
+			if saveErr != nil {
+				t.Fatal(saveErr)
+			}
+			set := sets[setID]
+			set.Root, e = oracle.put(ctx, set.Root, key, derivedValue{valueSHA})
+			if e != nil {
+				t.Fatal(e)
+			}
+			set.Count++
+			sets[setID] = set
+			oracleRoot, e = oracle.put(ctx, oracleRoot, setID, set)
+			if e != nil {
+				t.Fatal(e)
+			}
+		}
+		before, expected, e := fresh.Checkpoint(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		after, headSHA, e := fresh.Commit(ctx, expected, before.Phase, before.Cursor, before.Subcursor, changes)
+		if e != nil || after.SetsRoot != oracleRoot || after.Sequence != before.Sequence+1 {
+			t.Fatal("batch changed original COW root/checkpoint", e)
+		}
+		countIndexes := func(dir string) int {
+			entries, e := os.ReadDir(dir)
+			if e != nil {
+				t.Fatal(e)
+			}
+			count := 0
+			for _, entry := range entries {
+				if strings.HasPrefix(entry.Name(), "index-") {
+					count++
+				}
+			}
+			return count
+		}
+		if countIndexes(fresh.dir) >= countIndexes(oracleDir) {
+			t.Fatal("unused intermediate index objects were persisted")
+		}
+		reopened, e := OpenImportWorkspace(ctx, snapshot, source, fresh.dir, header, policy, true)
+		if e != nil {
+			t.Fatal(e)
+		}
+		actual, actualSHA, e := reopened.Checkpoint(ctx)
+		if e != nil || actual != after || actualSHA != headSHA {
+			t.Fatal("batch head not durable across reopen", e)
+		}
+		for _, change := range changes {
+			entry, found, e := reopened.ReadEntry(ctx, change.SetID, change.Key)
+			var expectedValue, actualValue struct {
+				Row int `json:"row"`
+			}
+			if e != nil || !found || DecodeStrict(change.Value, &expectedValue) != nil || DecodeStrict(entry.Value, &actualValue) != nil || actualValue != expectedValue {
+				t.Fatal("a final touched set tree or private value was not durable", e)
+			}
+		}
+	})
+	t.Run("batch final index flush failure never publishes an unresolved root", func(t *testing.T) {
+		fresh, e := OpenImportWorkspace(ctx, snapshot, source, filepath.Join(privateFixtureDir(t), "flush-failure"), header, policy, false)
+		if e != nil {
+			t.Fatal(e)
+		}
+		before, expected, e := fresh.Checkpoint(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		oracleDir := filepath.Join(privateFixtureDir(t), "flush-oracle")
+		if e = os.Mkdir(oracleDir, 0700); e != nil {
+			t.Fatal(e)
+		}
+		oracle := progressStore{oracleDir}
+		setID, key, raw := DerivedSetID("batch-failure", "set"), jsonSHA("batch-key"), json.RawMessage(`{"batch":true}`)
+		valueSHA, e := oracle.save("derived-value", raw)
+		if e != nil {
+			t.Fatal(e)
+		}
+		setRoot, e := oracle.put(ctx, "", key, derivedValue{valueSHA})
+		if e != nil {
+			t.Fatal(e)
+		}
+		registryRoot, e := oracle.put(ctx, "", setID, derivedSet{Root: setRoot, Count: 1})
+		if e != nil {
+			t.Fatal(e)
+		}
+		wrong, e := os.OpenFile((progressStore{fresh.dir}).objectPath("index", registryRoot), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+		if e != nil {
+			t.Fatal(e)
+		}
+		_, writeErr := wrong.WriteString("{}\n")
+		syncErr, closeErr := wrong.Sync(), wrong.Close()
+		if writeErr != nil || syncErr != nil || closeErr != nil {
+			t.Fatal("actual private index fault could not be established", writeErr, syncErr, closeErr)
+		}
+		if _, _, e = fresh.Commit(ctx, expected, before.Phase, before.Cursor, before.Subcursor, []DerivedMutation{{SetID: setID, Key: key, Value: raw}}); !errors.Is(e, ErrPrivate) {
+			t.Fatal("real final index flush failure was hidden", e)
+		}
+		actual, actualSHA, e := fresh.Checkpoint(ctx)
+		if e != nil || actual != before || actualSHA != expected {
+			t.Fatal("failed index flush advanced original head", e)
+		}
+		if _, found, e := fresh.ReadEntry(ctx, setID, key); e != nil || found {
+			t.Fatal("unpublished staged root became visible", e)
 		}
 	})
 	if source.pageCalls != calls {

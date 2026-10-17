@@ -80,35 +80,64 @@ func (s *OwnedService) StopForLocalCleanup(ctx context.Context) (LocalChildExit,
 	select {
 	case <-s.done:
 	default:
-		current, e := processIdentity(s.owner.PID)
-		if e != nil || !sameProcess(current, s.owner) || actualImage(s.owner.PID, s.owner.Executable, s.owner.BinarySHA256) != nil {
-			return empty, ErrOwnedEvidence
-		}
+		// Once an original signal was attempted, there is no new OS action to
+		// authorize. Only the retained Wait and actual PID absence may finish it.
 		if !s.stopSignalAttempted {
-			if _, e = os.Lstat(path); errors.Is(e, os.ErrNotExist) {
-				if _, e = privateJSON(path, expected); e != nil {
-					return empty, e
-				}
-				maySignal = true
-			} else if e != nil {
-				return empty, e
+			current, e := processIdentity(s.owner.PID)
+			if e != nil || !sameProcess(current, s.owner) {
+				e = ErrOwnedEvidence
 			} else {
-				var saved intent
-				if _, e = readCanonical(path, &saved); e != nil || saved != expected {
-					return empty, ErrOwnedEvidence
-				}
+				e = actualImageContext(ctx, s.owner.PID, s.owner.Executable, s.owner.BinarySHA256)
 			}
-			if maySignal {
-				if e = s.signalStopOnceLocked(); e != nil {
+			if e != nil {
+				// The original cmd may finish while procfs/image checks are in
+				// progress. This permits only its local exit path, never a signal.
+				select {
+				case <-s.done:
+				default:
 					return empty, e
+				}
+			} else {
+				select {
+				case <-s.done:
+				default:
+					if e = ctx.Err(); e != nil {
+						return empty, e
+					}
+					if _, e = os.Lstat(path); errors.Is(e, os.ErrNotExist) {
+						if _, e = privateJSON(path, expected); e != nil {
+							return empty, e
+						}
+						maySignal = true
+					} else if e != nil {
+						return empty, e
+					} else {
+						var saved intent
+						if _, e = readCanonical(path, &saved); e != nil || saved != expected {
+							return empty, ErrOwnedEvidence
+						}
+					}
+					if maySignal {
+						if e = s.signalStopOnceLocked(); e != nil {
+							return empty, e
+						}
+					}
 				}
 			}
 		}
 	}
 	select {
 	case <-s.done:
-	case <-ctx.Done():
-		return empty, ctx.Err()
+	default:
+		select {
+		case <-s.done:
+		case <-ctx.Done():
+			select {
+			case <-s.done:
+			default:
+				return empty, ctx.Err()
+			}
+		}
 	}
 	if _, e := processIdentity(s.owner.PID); !os.IsNotExist(e) {
 		return empty, ErrOwnedEvidence

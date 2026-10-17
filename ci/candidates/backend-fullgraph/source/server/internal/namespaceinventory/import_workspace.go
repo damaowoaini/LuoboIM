@@ -267,6 +267,14 @@ func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor
 	if !validDerived(next) {
 		return st, "", ErrInvalid
 	}
+	// A Commit is one bounded durability unit. Stage only its index COW nodes;
+	// immutable derived values still use the original immediate private writer.
+	// The original head is not replaced until EVERY final touched-set tree and
+	// registry tree has been persisted by the same O_EXCL+file/directory fsync.
+	ctx, batch := newProgressIndexContext(ctx, w.dir)
+	defer batch.close()
+	setSlots := map[string]int{}
+	finalRoots := make([]string, 0, len(changes)+1)
 	store := progressStore{w.dir}
 	seen := map[string]bool{}
 	for _, change := range changes {
@@ -310,6 +318,21 @@ func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor
 		if e != nil {
 			return st, "", e
 		}
+		if slot, exists := setSlots[change.SetID]; exists {
+			finalRoots[slot] = set.Root
+		} else {
+			setSlots[change.SetID] = len(finalRoots)
+			finalRoots = append(finalRoots, set.Root)
+		}
+	}
+	if next.SetsRoot != "" {
+		finalRoots = append(finalRoots, next.SetsRoot)
+	}
+	// The registry's leaf values contain set roots, unlike ordinary radix child
+	// edges. Supply each touched set explicitly; unchanged set roots are already
+	// durable. At most64 mutations imply at most65 additional roots.
+	if e = batch.flush(ctx, progressState{}, finalRoots...); e != nil {
+		return st, "", e
 	}
 	if e = w.checkFresh(ctx); e != nil {
 		return st, "", e
