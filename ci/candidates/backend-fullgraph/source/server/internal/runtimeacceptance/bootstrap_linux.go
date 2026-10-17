@@ -25,6 +25,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// BootstrapStage is finite observation only; it conveys no readiness or permit.
+type BootstrapStage string
+
+const (
+	bootstrapPlaneInputs   BootstrapStage = "plane-inputs"
+	bootstrapMongo         BootstrapStage = "mongo"
+	bootstrapRedis         BootstrapStage = "redis"
+	bootstrapKafka         BootstrapStage = "kafka"
+	bootstrapConfig        BootstrapStage = "config"
+	bootstrapServicePlan   BootstrapStage = "service-plan"
+	bootstrapCaptureInputs BootstrapStage = "capture-inputs"
+	bootstrapLauncherProbe BootstrapStage = "launcher-probe"
+)
+
 type PrivatePlan struct {
 	Version           string `json:"version"`
 	Scenario          string `json:"scenario"`
@@ -35,7 +49,17 @@ type PrivatePlan struct {
 	CredentialsSHA256 string `json:"credentialsSHA256"`
 	BuildsPath        string `json:"buildsPath"`
 	BuildsSHA256      string `json:"buildsSHA256"`
+	bootstrapStage    *BootstrapStage
 }
+
+// The pointer is bound by this invocation of RunAcceptance, never by JSON.
+// PrepareFresh is synchronous; no observer work survives the original call.
+func (p PrivatePlan) observeBootstrapStage(stage BootstrapStage) {
+	if p.bootstrapStage != nil {
+		*p.bootstrapStage = stage
+	}
+}
+
 type Builds struct {
 	Version               string           `json:"version"`
 	SourceSHA256          string           `json:"sourceSHA256"`
@@ -141,6 +165,7 @@ func freshKafkaConfig(user, password string) *sarama.Config {
 // Namespace/history/Ready markers are NEVER written here. The real held writer
 // must prepare those later, after true joins/drain/credential exclusion.
 func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
+	p.observeBootstrapStage(bootstrapPlaneInputs)
 	if ctx == nil || ctx.Done() == nil || canonicalDirectory(p.Work) != nil {
 		return nil, ownedcontrol.ErrOwnedEvidence
 	}
@@ -170,6 +195,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 			return out, ownedcontrol.ErrOwnedEvidence
 		}
 	}
+	p.observeBootstrapStage(bootstrapMongo)
 	// Initial root auth already came from the real Mongo image's fresh initdb.
 	initial, e := connectMongo(ctx, mongoURI(c["mongoAdminUser"], c["mongoAdminPassword"], "admin", true))
 	if e != nil {
@@ -248,6 +274,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 	if e != nil {
 		return out, e
 	}
+	p.observeBootstrapStage(bootstrapRedis)
 	out.AdminRedis = redisClient(c["redisAdminUser"], c["redisAdminPassword"])
 	out.LegacyRedis = redisClient(c["redisLegacyUser"], c["redisLegacyPassword"])
 	out.RuntimeRedis = redisClient(c["redisRuntimeUser"], c["redisRuntimePassword"])
@@ -282,6 +309,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 		return out, ownedcontrol.ErrOwnedEvidence
 	}
 	mongoVersion := digestBytes(append([]byte{byte(originalUserID.Type)}, originalUserID.Value...))
+	p.observeBootstrapStage(bootstrapKafka)
 	topics := []string{"fullgraph_" + out.Resource.Nonce + "_allocation", "fullgraph_" + out.Resource.Nonce + "_persistence", "fullgraph_" + out.Resource.Nonce + "_push"}
 	groups := []string{"fullgraph_" + out.Resource.Nonce + "_online", "fullgraph_" + out.Resource.Nonce + "_offline", "fullgraph_" + out.Resource.Nonce + "_push"}
 	client, e := sarama.NewClient([]string{"127.0.0.1:9092"}, freshKafkaConfig(c["kafkaAdminUser"], c["kafkaAdminPassword"]))
@@ -413,6 +441,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 	out.ManagerID = "fullgraph_manager_" + out.Resource.Nonce
 	out.TokenUserID = "fullgraph_token_" + out.Resource.Nonce
 	out.TokenPlatform = 5
+	p.observeBootstrapStage(bootstrapConfig)
 	runtimeDirectory, e := out.writeConfiguration("runtime-config", false, "127.0.0.1:6379", topics, groups)
 	if e != nil {
 		return out, e
@@ -430,6 +459,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 	if e != nil {
 		return out, e
 	}
+	p.observeBootstrapStage(bootstrapServicePlan)
 	serviceWork := filepath.Join(p.Work, "services")
 	if e = os.Mkdir(serviceWork, 0700); e != nil {
 		return out, e
@@ -441,6 +471,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 	if !exactJSON(out.Services.WriterIdentities, cfgImport.Writers) {
 		return out, ownedcontrol.ErrOwnedEvidence
 	}
+	p.observeBootstrapStage(bootstrapCaptureInputs)
 	for _, name := range []string{"launcher", "capture-private", "capture-raw-parent", "capture-derived-parent"} {
 		if e = os.Mkdir(filepath.Join(p.Work, name), 0700); e != nil {
 			return out, e
@@ -461,6 +492,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 	if e != nil {
 		return out, e
 	}
+	p.observeBootstrapStage(bootstrapLauncherProbe)
 	live, e := namespaceinventory.NewLiveSource(db, out.AdminRedis, binding, namespaceinventory.DefaultLimits())
 	if e != nil {
 		return out, e

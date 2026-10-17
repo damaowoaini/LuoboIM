@@ -12,8 +12,10 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
+	"github.com/IBM/sarama"
 	"github.com/OpenIMSDK/protocol/constant"
 	pbpush "github.com/OpenIMSDK/protocol/push"
 	"github.com/OpenIMSDK/protocol/sdkws"
@@ -24,6 +26,7 @@ import (
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceinventory"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/rpcmiddleware"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -45,6 +48,8 @@ type AcceptanceResult struct {
 	Version                  string                     `json:"version"`
 	Scenario                 string                     `json:"scenario"`
 	Phase                    string                     `json:"phase"`
+	BootstrapStage           BootstrapStage             `json:"bootstrapStage,omitempty"`
+	BootstrapFailureTag      string                     `json:"bootstrapFailureTag,omitempty"`
 	Accepted                 bool                       `json:"accepted"`
 	ResourcePlaneSHA256      string                     `json:"resourcePlaneSHA256"`
 	HeaderSHA256             string                     `json:"headerSHA256,omitempty"`
@@ -79,12 +84,70 @@ type originalRole struct {
 	announcement ownedcontrol.RuntimeAnnouncement
 }
 
+// observeBootstrapFailure classifies only the original PrepareFresh error.
+// Labels are observations, not unique root causes; provider text stays private.
+func observeBootstrapFailure(err error) string {
+	if err == nil {
+		return ""
+	}
+	switch {
+	case errors.Is(err, context.Canceled):
+		return "cancel"
+	case errors.Is(err, context.DeadlineExceeded):
+		return "deadline"
+	}
+	var command mongo.CommandError
+	if errors.As(err, &command) {
+		switch command.Code {
+		case 18:
+			return "mongo-auth"
+		case 13:
+			return "mongo-unauthorized"
+		case 10107, 13435, 10058:
+			return "mongo-not-primary"
+		case 48:
+			return "mongo-namespace-exists"
+		default:
+			return "mongo-other"
+		}
+	}
+	var broker sarama.KError
+	if errors.As(err, &broker) {
+		switch broker {
+		case sarama.ErrSASLAuthenticationFailed:
+			return "kafka-auth"
+		case sarama.ErrTopicAuthorizationFailed, sarama.ErrClusterAuthorizationFailed:
+			return "kafka-topic-or-cluster-authorization"
+		case sarama.ErrUnsupportedVersion:
+			return "kafka-unsupported-version"
+		default:
+			return "kafka-other"
+		}
+	}
+	switch {
+	case errors.Is(err, os.ErrPermission):
+		return "permission"
+	case errors.Is(err, syscall.ENOSPC):
+		return "no-space"
+	case errors.Is(err, os.ErrNotExist):
+		return "not-found"
+	case errors.Is(err, syscall.ECONNREFUSED):
+		return "connection-refused"
+	default:
+		return "other"
+	}
+}
+
 // RunAcceptance is one non-retrying scenario in one freshly created plane.
 // Both success and failure are collected from actual source processes; a
 // missing fixture, malformed bootstrap or failed startup never passes a case.
 func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResult, runErr error) {
 	result = AcceptanceResult{Version: "owned-fullgraph-token-v2-result-v1", Scenario: plan.Scenario, Phase: "actual-resource-bootstrap", ResourcePlaneSHA256: plan.PlaneSHA256, FreshPlaneOnly: true}
+	plan.bootstrapStage = &result.BootstrapStage
 	boot, e := PrepareFresh(ctx, plan)
+	if e != nil {
+		result.BootstrapFailureTag = observeBootstrapFailure(e)
+	}
 	var session *Session
 	defer func() {
 		cleanup, stop := context.WithTimeout(context.Background(), 120*time.Second)

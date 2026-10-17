@@ -11,11 +11,11 @@ run=load('run');builder=load('minio_build');resources=load('resources')
 
 class FullGraphControls(unittest.TestCase):
  def test_prepare_lock_fresh_scope_and_unknown_cannot_alias_old_pass_or_canonical(self):
-  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'cleanupCompleteScopes':copy.deepcopy(run.CLEANUP_COMPLETE_SCOPES),'cleanupRecentReuse':copy.deepcopy(run.CLEANUP_RECENT_REUSE),'cleanupFixtureRepair':copy.deepcopy(run.CLEANUP_FIXTURE_REPAIR),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN)}
+  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'cleanupCompleteScopes':copy.deepcopy(run.CLEANUP_COMPLETE_SCOPES),'cleanupRecentReuse':copy.deepcopy(run.CLEANUP_RECENT_REUSE),'cleanupFixtureRepair':copy.deepcopy(run.CLEANUP_FIXTURE_REPAIR),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN),'cleanupPassedReuse':copy.deepcopy(run.CLEANUP_PASSED_REUSE),'cleanupTestsToRun':[]}
   with mock.patch.object(run,'FINAL_SOURCE',None),self.assertRaises(ValueError):run.check_locked(c)
   with mock.patch.object(run,'FINAL_SOURCE',source):
    run.check_locked(c)
-   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('cleanupReuse',{}),('cleanupReuse',dict(run.CLEANUP_REUSE,source=source)),('cleanupReuse',dict(run.CLEANUP_REUSE,head='f'*40)),('cleanupReuse',dict(run.CLEANUP_REUSE,reviewSHA256='f'*64)),('cleanupRecentReuse',dict(run.CLEANUP_RECENT_REUSE,source=source)),('cleanupRecentReuse',dict(run.CLEANUP_RECENT_REUSE,head='f'*40)),('cleanupRecentReuse',dict(run.CLEANUP_RECENT_REUSE,reviewSHA256='f'*64)),('cleanupFixtureRepair',dict(run.CLEANUP_FIXTURE_REPAIR,productionChanges=1)),('cleanupCompleteScopes',[]),('ownedcontrolReuse',{'stale':'must-not-reuse-changed-production'}),('originalTargets',{}),('requiredOriginalSubtests',{})]:
+   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('cleanupPassedReuse',{}),('cleanupTestsToRun',['old-passed']),('cleanupReuse',{}),('cleanupReuse',dict(run.CLEANUP_REUSE,source=source)),('cleanupReuse',dict(run.CLEANUP_REUSE,head='f'*40)),('cleanupReuse',dict(run.CLEANUP_REUSE,reviewSHA256='f'*64)),('cleanupRecentReuse',dict(run.CLEANUP_RECENT_REUSE,source=source)),('cleanupRecentReuse',dict(run.CLEANUP_RECENT_REUSE,head='f'*40)),('cleanupRecentReuse',dict(run.CLEANUP_RECENT_REUSE,reviewSHA256='f'*64)),('cleanupFixtureRepair',dict(run.CLEANUP_FIXTURE_REPAIR,productionChanges=1)),('cleanupCompleteScopes',[]),('ownedcontrolReuse',{'stale':'must-not-reuse-changed-production'}),('originalTargets',{}),('requiredOriginalSubtests',{})]:
     bad=copy.deepcopy(c);bad[key]=value
     with self.subTest(key=key),self.assertRaises(ValueError):run.check_locked(bad)
   cleanup={'version':'owned-fullgraph-resource-cleanup-v1','nonce':'a'*32,'exactContainerIDs':['b'*64],'unconfirmedIDs':[],'accepted':True}
@@ -136,10 +136,23 @@ class FullGraphControls(unittest.TestCase):
   with self.assertRaises(ValueError):run.project_go_test_events(json.dumps({'Action':'build-output','Output':7}).encode(),'cleanup-runtimeacceptance')
   syntax=ast.parse(Path(run.__file__).read_bytes());orchestration=next(node for node in syntax.body if isinstance(node,ast.FunctionDef) and node.name=='run')
   calls=[node for node in ast.walk(orchestration) if isinstance(node,ast.Call)]
-  cleanup_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='run_cleanup_controls')
+  cleanup_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='load_cleanup_reuse')
+  self.assertFalse(any(isinstance(n.func,ast.Name) and n.func.id=='run_cleanup_controls' for n in calls))
   compile_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='command' and node.args and isinstance(node.args[0],ast.BinOp) and isinstance(node.args[0].left,ast.Constant) and node.args[0].left.value=='compile-')
   minio_line=next(node.lineno for node in calls if isinstance(node.func,ast.Attribute) and isinstance(node.func.value,ast.Name) and node.func.value.id=='builder' and node.func.attr=='build')
   self.assertLess(cleanup_line,compile_line);self.assertLess(cleanup_line,minio_line)
+  with tempfile.TemporaryDirectory() as directory:
+   out=Path(directory);reused=run.load_cleanup_reuse(out)
+   self.assertEqual(reused,run.CLEANUP_PASSED_REUSE)
+   self.assertEqual(json.loads((out/'cleanup-passed-reuse.json').read_bytes()),reused)
+  original_names=[{'package':pkg,'name':top} for pkg,tops in run.GRAPH_TARGETS.items() for top in tops]
+  original_names += [{'package':pkg,'name':top+'/'+child} for pkg,tops in run.GRAPH_TARGETS.items() for top in tops for child in run.GRAPH_CHILDREN[top]]
+  original={'namedCompletions':original_names}
+  fresh=run.audit_current_oracles(original,reused)
+  self.assertEqual((fresh['topPASS'],fresh['subPASS'],fresh['actualCleanupTestsDispatched']),(2,3,0))
+  self.assertEqual(fresh['namedCompletions'],original_names)
+  self.assertEqual(fresh['completeObligation'],{'topCount':7,'subCount':16,'crossSource':True})
+  with self.assertRaises(ValueError):run.audit_current_oracles(original,dict(reused,reviewSHA256='f'*64))
   # The exact collector helper keeps closed fixture observations on failure,
   # never arbitrary runtime Output, error strings, paths or foreign test data.
   top='TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup';package='github.com/openimsdk/open-im-server/v3/internal/runtimeacceptance';marker='LUOBO_RUNTIME_CLEANUP_DIAG_V1 '

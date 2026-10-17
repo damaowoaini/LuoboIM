@@ -9,11 +9,15 @@ run=importlib.util.module_from_spec(spec);spec.loader.exec_module(run)
 def public_terminal(raw,scenario):
  value=json.loads(raw)
  if value.get('version')!='owned-fullgraph-token-v2-result-v1' or value.get('scenario')!=scenario or type(value.get('accepted')) is not bool:raise ValueError('finite actual terminal result required')
+ bootstrap=value.get('bootstrapStage','')
+ if bootstrap not in ('','plane-inputs','mongo','redis','kafka','config','service-plan','capture-inputs','launcher-probe'):raise ValueError('closed bootstrap stage required')
  phase=value.get('phase','');kind=value.get('failureClass','');failure=value.get('failureSHA256','')
+ tag=value.get('bootstrapFailureTag','')
+ if tag not in ('','mongo-auth','mongo-unauthorized','mongo-not-primary','mongo-namespace-exists','mongo-other','kafka-auth','kafka-topic-or-cluster-authorization','kafka-unsupported-version','kafka-other','permission','no-space','not-found','connection-refused','deadline','cancel','other') or tag and phase!='actual-resource-bootstrap':raise ValueError('closed original bootstrap failure tag required')
  import re
  if not re.fullmatch('[a-z0-9-]{1,128}',phase) or kind not in ('','source-error-private','owned-evidence-rejected','commit-unconfirmed','deadline','cancelled') or failure and not re.fullmatch('[0-9a-f]{64}',failure):raise ValueError('unsafe terminal enum/hash')
  if any(v and not re.fullmatch('[0-9a-f]{64}',v) for v in (value.get('sourceSHA256',''),value.get('resourcePlaneSHA256',''))) or type(value.get('actualStartedRoles',0)) is not int or not 0<=value.get('actualStartedRoles',0)<=14:raise ValueError('finite source/role fields required')
- return {'version':value['version'],'scenario':scenario,'accepted':value['accepted'],'phase':phase,'failureClass':kind,'failureSHA256':failure,'sourceSHA256':value.get('sourceSHA256',''),'resourcePlaneSHA256':value.get('resourcePlaneSHA256',''),'actualStartedRoles':value.get('actualStartedRoles',0),'originalResultSHA256':run.sha(raw),'rawErrorText':False}
+ return {'version':value['version'],'scenario':scenario,'accepted':value['accepted'],'phase':phase,'bootstrapStage':bootstrap,'bootstrapFailureTag':tag,'failureClass':kind,'failureSHA256':failure,'sourceSHA256':value.get('sourceSHA256',''),'resourcePlaneSHA256':value.get('resourcePlaneSHA256',''),'actualStartedRoles':value.get('actualStartedRoles',0),'originalResultSHA256':run.sha(raw),'rawErrorText':False}
 
 def pack(out):
  files=list(out.iterdir());total=0;bodies=[]
@@ -187,7 +191,105 @@ def prepare_product_artifact():
  print(json.dumps({'kind':'fullgraph-product-artifact-prepared-v1','manifestSHA256':manifest_sha,'binaryCount':len(products),'totalBinaryBytes':total,'uploadedOrDeployedByScript':False},separators=(',',':')))
  return 0
 
+BUILD_ONLY_POLICY={'enabled':True,'kind':'fullgraph-fourteen-product-build-only-elf-v1','runtimeAccepted':False,'readyPermit':False,'perBinaryLimitBytes':PRODUCT_FILE_LIMIT,'totalBinaryLimitBytes':PRODUCT_TOTAL_LIMIT,'retentionDays':7,'compressionLevel':1,'allowedBasenames':sorted([*run.ROLES,'manifest.json']),'copyBinaries':False,'neverAcceptedProduct20Provider':True}
+def checked_build_only_evidence(compact,c,allocation):
+ # Separate from accepted producer. A normal runtime failure does not become
+ # a successful graph or canonical exclusion, even when its public ELF builds
+ # are perfectly reusable. Existing compact custody is never rewritten.
+ custody=json.loads(run.regular(compact/'custody.json',1<<20));names=[r['path'] for r in custody['files']]
+ if len(names)>256 or len(names)!=len(set(names)) or any(Path(n).name!=n for n in names) or {p.name for p in compact.iterdir()}!=set(names)|{'custody.json'}:raise ValueError('exact original compact custody required')
+ evidence={};total=0
+ for row in custody['files']:
+  raw=run.regular(compact/row['path'],1<<20);total+=len(raw)
+  if len(raw)!=row['bytes'] or run.sha(raw)!=row['sha256']:raise ValueError('compact evidence body drift')
+  evidence[row['path']]=raw
+ if total>8<<20 or total!=custody['bodyBytes'] or any(custody[k]!=0 for k in ('binaries','credentials','privateLogs')):raise ValueError('bounded public metadata required')
+ def read(name):return json.loads(evidence[name])
+ post=read('source-post.json');before=read('tools-before.json');after=read('tools-after.json');monitor=read('backend-fullgraph-controller.resource.json');collection=read('collection.json')
+ if post.get('accepted') is not True or post.get('source')!=c['source'] or before!=after:raise ValueError('source/mode/locks/config/controller/tools post exact required')
+ def guard(record,root,failed=False):
+  floor=record.get('minimum_observed_free_bytes');size=record.get('maximum_observed_task_allocated_bytes')
+  if record.get('guard_revision')!=2 or record.get('environment_values_recorded') is not False or record.get('allocated_root')!=str(root) or record.get('minimum_free_required_bytes')!=1<<30 or type(floor) is not int or floor<1<<30 or record.get('max_allocated_allowed_bytes')!=16<<30 or type(size) is not int or not 0<=size<=16<<30:raise ValueError('original healthy resource/owner boundary required')
+  if failed:
+   if record.get('status')!='failed' or type(record.get('exit_code')) is not int or not 1<=record['exit_code']<=125:raise ValueError('normal finite nonzero controller/runtime only')
+  elif record.get('status')!='passed' or record.get('exit_code')!=0:raise ValueError('actual build phase success required')
+ guard(monitor,allocation,True)
+ phases=[read(name) for name in names if __import__('re').fullmatch('phase-[0-9]{4}\\.json',name)]
+ failed=[row for row in phases if row.get('exitCode')!=0]
+ if len(failed)!=1 or failed[0].get('phase') not in {'runtime-'+s for s in run.SCENARIOS}:raise ValueError('one actual runtime failure after complete builds required')
+ for row in phases:
+  guard(row['resource'],allocation/'work',row in failed)
+  if type(row.get('exitCode')) is not int or row['exitCode']!=row['resource']['exit_code']:raise ValueError('original command and resource exits differ')
+ for role in run.ROLES:
+  compiled=read('compiled-'+role+'.json');actual=[p for p in phases if p.get('phase')=='compile-'+role]
+  entry=next(r for r in c['entrypointContract']['entrypoints'] if r['role']==role)
+  if len(actual)!=1 or actual[0]['exitCode']!=0 or compiled.get('source')!=c['source'] or compiled.get('role')!=role or compiled.get('package')!=entry['package'] or compiled.get('executed') is not False:raise ValueError('fourteen exact actual compilation receipts required')
+  guard(actual[0]['resource'],allocation/'work')
+ if collection.get('started') is not True or collection.get('controllerPassed') is not False or collection.get('originalRetainedRuntimeJoinRequired') is not True or collection.get('containerAbsenceIsNotRuntimeDrain') is not True:raise ValueError('original always collection required')
+ rows=collection['scenarios']
+ if [r['scenario'] for r in rows]!=list(run.SCENARIOS) or not any(r.get('runtimeAttempted') for r in rows):raise ValueError('actual scenario attempt required')
+ finite=[]
+ for row in rows:
+  started=row.get('resourceStarted');attempted=row.get('runtimeAttempted');runtime=row.get('runtimeCleanupAccepted')
+  if any(type(x) is not bool for x in (started,attempted,runtime)):raise ValueError('actual cleanup booleans required')
+  if started:
+   cleanup=row.get('resourceCleanup',{})
+   if cleanup.get('accepted') is not True or cleanup.get('unconfirmedIDs')!=[]:raise ValueError('original owned container cleanup unresolved')
+  elif attempted:raise ValueError('runtime without original resource owner')
+  boundary='not-started'
+  if attempted:
+   terminal=read('terminal-'+row['scenario']+'.json')
+   if 'terminalExceptionType' in row or terminal.get('version')!='owned-fullgraph-token-v2-result-v1' or terminal.get('scenario')!=row['scenario'] or type(terminal.get('accepted')) is not bool or terminal.get('rawErrorText') is not False or terminal.get('sourceSHA256') not in ('',c['source']['digest']):raise ValueError('actual finite runtime terminal required')
+   failed_here=failed[0]['phase']=='runtime-'+row['scenario']
+   if terminal['accepted']==failed_here:raise ValueError('actual runtime terminal and command outcome differ')
+   if runtime:
+    if type(row.get('actualAbsentRoles')) is not int or not 0<row['actualAbsentRoles']<=14:raise ValueError('original collector PID absence required')
+    boundary='canonical-runtime-cleanup'
+   else:
+    # RunAcceptance sets source identity after PrepareFresh returns and only
+    # then calls Start. A zero role count alone never proves no child started.
+    if terminal.get('phase')!='actual-resource-bootstrap' or type(terminal.get('actualStartedRoles')) is not int or terminal['actualStartedRoles']!=0 or terminal.get('sourceSHA256')!='' or terminal.get('bootstrapStage') not in ('plane-inputs','mongo','redis','kafka','config','service-plan','capture-inputs','launcher-probe') or terminal.get('bootstrapFailureTag') not in ('mongo-auth','mongo-unauthorized','mongo-not-primary','mongo-namespace-exists','mongo-other','kafka-auth','kafka-topic-or-cluster-authorization','kafka-unsupported-version','kafka-other','permission','no-space','not-found','connection-refused','deadline','cancel','other'):raise ValueError('only exact pre-Start PrepareFresh failure may lack canonical cleanup')
+    boundary='pre-start-PrepareFresh-failure'
+  finite.append({'scenario':row['scenario'],'resourceStarted':started,'runtimeAttempted':attempted,'resourceCleanupAccepted':bool(started and row.get('resourceCleanup',{}).get('accepted')),'runtimeCleanupAccepted':runtime,'runtimeBoundary':boundary,'canonicalRuntimeAccepted':False})
+ return {'tools':before,'custodySHA256':run.sha(run.regular(compact/'custody.json',1<<20)),'collectionSHA256':run.sha(evidence['collection.json']),'sourcePostSHA256':run.sha(evidence['source-post.json']),'controllerStatus':monitor['status'],'controllerExitCode':monitor['exit_code'],'failedRuntimePhase':failed[0]['phase'],'cleanup':finite,'compiled':{role:read('compiled-'+role+'.json') for role in run.ROLES}}
+
+def prepare_build_only_product_artifact():
+ c,bodies,_,_,_,_=run.verify();inputs_raw=run.regular(run.INPUTS,1<<20)
+ if c.get('buildOnlyArtifactPolicy')!=BUILD_ONLY_POLICY:raise ValueError('explicit build-only Root policy required')
+ allocation=run.allocation_root();root=allocation/'work';directory=root/'bin';private=root/'private'
+ for path in (allocation,root,directory,private):
+  info=path.lstat()
+  if path.resolve()!=path or not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:raise ValueError('original private allocation required')
+ if json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original hosted job owner required')
+ proof=checked_build_only_evidence(run.REPO/'ci-results/backend-fullgraph-compact',c,allocation)
+ if run.tool_snapshot()!=proof['tools']:raise ValueError('tool identity changed after cleanup')
+ builds=json.loads(run.regular(private/'builds.json',1<<20))
+ if builds.get('version')!='source-bound-fullgraph-builds-v1' or builds.get('sourceSHA256')!=c['source']['digest'] or [r['role'] for r in builds['binaries']]!=list(run.ROLES):raise ValueError('fourteen original source-bound build entries required')
+ original_names=set(run.ROLES)|{'acceptance-operator','msgtransfer-legacy'};expected=original_names|{name+'-receipt.json' for name in original_names}
+ if {p.name for p in directory.iterdir()}!=expected:raise ValueError('closed original build inventory required')
+ entries={r['role']:r for r in c['entrypointContract']['entrypoints']};products=[]
+ for row in builds['binaries']:
+  role=row['role'];path=directory/role;rp=directory/(role+'-receipt.json')
+  if row['path']!=str(path) or row['receiptPath']!=str(rp) or row['sourceSHA256']!=c['source']['digest']:raise ValueError('original build path/source differs')
+  raw=run.regular(rp,65536);product=product_elf_metadata(path)
+  receipt={'schema':1,'sourceSHA256':c['source']['digest'],'binarySHA256':product['sha256'],'binaryBytes':product['bytes'],'toolchainSHA256':proof['tools']['go']['sha256']}
+  compiled=proof['compiled'][role]
+  if run.sha(raw)!=row['receiptSHA256'] or json.loads(raw)!=receipt or row['sha256']!=product['sha256'] or compiled['sha256']!=product['sha256'] or compiled['bytes']!=product['bytes']:raise ValueError('actual ELF/public and private build receipts differ')
+  products.append(dict(product,package=entries[role]['package'],buildReceiptSHA256=row['receiptSHA256']))
+ total=sum(p['bytes'] for p in products)
+ if total>PRODUCT_TOTAL_LIMIT:raise ValueError('fourteen product ELF total exceeds2GiB')
+ staged_post=run.source_post(root,bodies,c,bodies['server/config/config.example.yaml'])
+ if staged_post.get('accepted') is not True:raise ValueError('original staged body/mode/locks/config changed while sealing')
+ after_c,after_bodies,_,_,_,_=run.verify()
+ if after_c!=c or run.regular(run.INPUTS,1<<20)!=inputs_raw or after_bodies!=bodies or run.tool_snapshot()!=proof['tools'] or {p.name for p in directory.iterdir()}!=expected:raise ValueError('final original source/controller/tools/inventory drift')
+ job=run.job_identity()
+ manifest={'schema':1,'kind':BUILD_ONLY_POLICY['kind'],'runtimeAccepted':False,'readyPermit':False,'source':c['source'],'head':job['head'],'runID':job['runID'],'attempt':job['attempt'],'controllerStatus':proof['controllerStatus'],'controllerExitCode':proof['controllerExitCode'],'failedRuntimePhase':proof['failedRuntimePhase'],'actualJobConclusion':'not-observed-by-producer','cleanup':proof['cleanup'],'locks':{n:run.sha(bodies['server/'+n]) for n in ('go.mod','go.sum')},'toolSHA256':{n:v['sha256'] for n,v in proof['tools'].items()},'controllerInputsSHA256':run.sha(inputs_raw),'controllerPins':c['controllerPins'],'compactCustodySHA256':proof['custodySHA256'],'independentCollectionSHA256':proof['collectionSHA256'],'sourcePostSHA256':proof['sourcePostSHA256'],'binaries':products,'totalBinaryBytes':total,'perBinaryLimitBytes':PRODUCT_FILE_LIMIT,'totalBinaryLimitBytes':PRODUCT_TOTAL_LIMIT,'GOOS':'linux','GOARCH':'amd64','CGO_ENABLED':'1','deploymentABIValidated':False,'uploadedOrDeployedByScript':False,'configsLogsKeysAuxiliariesIncluded':False}
+ digest=run.write(directory/'manifest.json',manifest)
+ print(json.dumps({'kind':'fullgraph-build-only-unaccepted-artifact-prepared-v1','runtimeAccepted':False,'readyPermit':False,'manifestSHA256':digest,'binaryCount':14,'totalBinaryBytes':total,'uploadedOrDeployedByScript':False},separators=(',',':')))
+ return 0
+
 if __name__=='__main__':
+ if sys.argv[1:]==['--prepare-build-only-product-artifact']:raise SystemExit(prepare_build_only_product_artifact())
  if sys.argv[1:]==['--prepare-product-artifact']:raise SystemExit(prepare_product_artifact())
  if sys.argv[1:]:raise SystemExit('unsupported collector arguments')
  raise SystemExit(collect())

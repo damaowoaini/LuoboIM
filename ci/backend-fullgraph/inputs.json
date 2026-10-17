@@ -4,7 +4,7 @@
   "scope": "fresh_cleanup5top12sub_plus_original_graph2top3sub_and_four_planes_prior_unbound_child1_only_no_deployment",
   "source": {
     "members": 1575,
-    "digest": "57513d328ed76c6a1091d8caee531b7a6d5d952982f9621849369aa7e46e6bd6"
+    "digest": "7e5c8bbb12a5de0b06a23c2408847c2701dbc84a25631d6876e74dfb16f28d2d"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 47007,
-      "sha256": "bae0e864adff0b2a74c0d48a84c1d47ae19e9251e3be3f4853699dbee2cbf006"
+      "bytes": 49244,
+      "sha256": "1d0ab601e68dce2363967ab5d747264ef0820aa2f6020913a5ab92ee548645c4"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 17379,
-      "sha256": "cf164d3fecf319324430ebc636d12453aa315c1a8ec9b56b36da8fb9df3233fa"
+      "bytes": 30008,
+      "sha256": "d09ba7e11e9014833f7a2249dbb76d2b3e9f4b03e338c35ddd0f6714f47d9e07"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 25395,
-      "sha256": "8598fceb81307cb467e310cd30bef41ac73eb9c1f4f25c39914389ad3f158ae0"
+      "bytes": 26616,
+      "sha256": "4955eb61a9bcb3be91ce2113f54c44e4cc96d799698fcec857355a1270d8bd0e"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -72,8 +72,8 @@
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",
-      "bytes": 5273,
-      "sha256": "8c5a0081b5b094014bba13f99002dc5452a6b737d10ca692fb5ac08d02f36051"
+      "bytes": 8472,
+      "sha256": "8c36204002c3818ba4d37e4e4ae58431d7f4c4c6bd1abdd2ee68a5337e61e48f"
     }
   ],
   "overlay": [
@@ -1347,15 +1347,15 @@
     {
       "target": "server/internal/runtimeacceptance/acceptance_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/acceptance_linux.go",
-      "bytes": 16382,
-      "sha256": "41f8c9f513c3556360e9d3c3aff9727a86f0ba74dcb13246b9da00d58466026c",
+      "bytes": 18125,
+      "sha256": "b48f430725e25474dbd96c1ffeb1c0c320dfcd526a72ec011c1dc9eea1260d24",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/bootstrap_linux.go",
-      "bytes": 28690,
-      "sha256": "4019b810cd99688c36d5eb8ebd4902d90bb962f62b46a8edc7a46a5d1d50053b",
+      "bytes": 29912,
+      "sha256": "a393f8b284c62ec18d61016ae1430c714cdb13faed3d502603fb001fbc6449d3",
       "beforeSHA256": null
     },
     {
@@ -4101,5 +4101,82 @@
     "afterSHA256": "bcf11c0283992a27812fa20666dad5d7ecb95d514e5bb0e0ceee7816279030b8",
     "bytes": 6777,
     "productionChanges": 0
+  },
+  "cleanupPassedReuse": {
+    "run": 39062533742,
+    "job": 117483277540,
+    "head": "756f82e2b90310020e197ee7848eb34c50c40766",
+    "source": {
+      "members": 1575,
+      "digest": "57513d328ed76c6a1091d8caee531b7a6d5d952982f9621849369aa7e46e6bd6"
+    },
+    "reviewSHA256": "01060ed44de69cd19b42b645e384a99a6dd2f0ddcfb7aa8ec434b18ca90257cf",
+    "artifact": {
+      "artifact": 12112670650,
+      "run": 39062533742,
+      "attempt": 1,
+      "head": "756f82e2b90310020e197ee7848eb34c50c40766",
+      "sha256": "3eb9a5a1a223210c9222c712a8de4074b03d5606dd72137aaf07b891a29c6581",
+      "bytes": 54487,
+      "exactAPIDigest": true,
+      "files": 69,
+      "binariesDownloaded": false
+    },
+    "topPASS": 2,
+    "subPASS": 3,
+    "namedCompletions": [
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths/local-first"
+      },
+      {
+        "package": "internal/runtimeacceptance",
+        "name": "TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup"
+      },
+      {
+        "package": "internal/runtimeacceptance",
+        "name": "TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup/cancel-audit-before-stop"
+      },
+      {
+        "package": "internal/runtimeacceptance",
+        "name": "TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup/timeout-before-local-wait-complete"
+      }
+    ],
+    "sourceToolsPostExact": true,
+    "runtimeAccepted": false
+  },
+  "cleanupTestsToRun": [],
+  "buildOnlyArtifactPolicy": {
+    "enabled": true,
+    "kind": "fullgraph-fourteen-product-build-only-elf-v1",
+    "runtimeAccepted": false,
+    "readyPermit": false,
+    "perBinaryLimitBytes": 268435456,
+    "totalBinaryLimitBytes": 2147483648,
+    "retentionDays": 7,
+    "compressionLevel": 1,
+    "allowedBasenames": [
+      "api",
+      "crontask",
+      "manifest.json",
+      "msggateway",
+      "msgtransfer-managed",
+      "push",
+      "rpc-auth",
+      "rpc-conversation",
+      "rpc-encryption",
+      "rpc-friend",
+      "rpc-group",
+      "rpc-msg",
+      "rpc-rtc",
+      "rpc-third",
+      "rpc-user"
+    ],
+    "copyBinaries": false,
+    "neverAcceptedProduct20Provider": true
   }
 }
