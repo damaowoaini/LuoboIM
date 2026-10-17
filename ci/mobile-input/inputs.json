@@ -2150,12 +2150,12 @@
     {
       "path": "ci/mobile-input.py",
       "bytes": 39925,
-      "sha256": "fb222ba93b6919c70c5f03c5b1c9cab85edc148a21c68a81126b0cdc29f0a4f4"
+      "sha256": "2e1993f28be8de964f680e4c48359086a703fcbe2ca0cc9339896cc44fe9db04"
     },
     {
       "path": "ci/mobile-input-vm.py",
-      "bytes": 20913,
-      "sha256": "9cc50c7a5b368bd004bb8de2fe346f0622839fee4bb612b3479bb726d92e281d"
+      "bytes": 29374,
+      "sha256": "ae45ee63b40bb6363bc0e32a17be7654a19b51a4ffc80a258898b520ad0becd4"
     },
     {
       "path": ".github/workflows/mobile-input-vm-diagnostic.yml",
@@ -3835,6 +3835,18 @@
     "uploadPrivateURI": false,
     "defaultNoVMServiceAccepted": false,
     "isolateStateObserved": false,
-    "freshConnectionPerSample": true
+    "freshConnectionPerSample": true,
+    "terminalOutcomes": {
+      "version": "owned-vm-terminal-outcomes-v1",
+      "completedOnly": "original-selected-testDone-completion-at-safe-boundary-no-prior-failure-exit0-strict-machine-sampler-joined",
+      "captured": "existing-two-owner-bound-samples-required",
+      "unknownFailureRemainsRefused": true,
+      "defaultNoVMServiceAccepted": false,
+      "reporterBytesLimit": 8388608,
+      "historicalWrapperExitMustNotBeRewritten": true,
+      "inFlightCaptureFailureNeverReclassified": true,
+      "completionAtExistingSafeChecksOnly": true,
+      "firstRealFailureWins": true
+    }
   }
 }

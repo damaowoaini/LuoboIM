@@ -1,4 +1,4 @@
-name: Backend capture-order repair5 split2 only / prior-source14 builds retained / source-bound66+6+7+4
+name: Backend failed controller1 with private CPU profile / same-source12 and prior76 retained
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   targeted:
-    name: Exact controller1 then default-fixture4 / old-source66+6+7+4 and14 retained / graph pending
+    name: Exact failed controller1 + static CPU top30 / actual88 and old14 retained / graph pending
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - name: Capture-order repair affected contract2 and variable-scope dispatcher1 only
+      - name: Controller CPU new1 and directly affected repair controls3 only
         run: |
           python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
           python3 -B ci/backend-runtime-join-r8/test_repair.py
@@ -56,7 +56,7 @@ jobs:
             --record "$GITHUB_WORKSPACE/ci-results/backend-runtime-join-r8-prepare.resource.json" \
             --min-free-mib 1024 --timeout 600 --poll-interval .2 \
             -- bash ci/backend-integration.sh prepare
-      - name: Only isolated controller1 then directly affected shared-fixture4; no main rebuild or new binary
+      - name: Only failed controller1 + offline CPU top30; no green12/main rebuild or raw profile upload
         run: python3 -B ci/backend-runtime-join-r8/run.py
       - name: Always collect owned fixture residuals
         if: always()

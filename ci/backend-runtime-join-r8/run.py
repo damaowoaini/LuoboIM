@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Exact derived Commit and process image repairs; affected13, actual prior76 retained."""
+"""Same source: one failed controller with private CPU profile; actual88 retained."""
 import argparse
 from collections import Counter
 from contextlib import contextmanager
 import hashlib, importlib.util, json, os
 from pathlib import Path, PurePosixPath
 import re, stat, subprocess, sys, time
+from decimal import Decimal, InvalidOperation
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
-SCOPE = 'backend_history_derived_commit_batch_image_repair13_reuse76_no_deployment'
+SCOPE = 'backend_history_controller_cpu1_reuse88_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
 FINAL = {'members': 1557, 'digest': '7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
@@ -25,7 +26,7 @@ REPAIR_DELTA_SHA = 'accb86e6a6ea0a2ae0a2de4ec44e771fef54d039ff50a223a877fe676eb1
 DIRECT_PRIOR = {('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient')}
 DIRECT_CURRENT = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish')}
 LATEST_REPAIR_PROOF_SHA = '2b6e93f014f13bf8e0a7830b7b94f15b02149f78c24229066b03629c3bbae3ff'
-REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}, {'label': 'targeted-tests-ownedcontrol-commit-image', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture', 'TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget', 'TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish', 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit', 'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}}, {'label': 'targeted-tests-namespaceinventory-commit', 'targets': {'internal/namespaceinventory': ['TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume', 'TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture', 'TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence', 'TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts', 'TestOriginalMongoCatalogRetainsCompleteSealedRawCustody']}}]
+REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}]
 LAST_BOUNDED_CAPTURE_SHA = 'f46d40ff9d90a2ad8ae981e3915f93fb0d5c4f00b57235ac01d47174cd87fd10'
 LAST_CAPTURE_STAMP_PROOF_SHA = 'ecb9f9fc71be15e4a0571308d0650b29799522dff2a5be59e3463691aa4c81fc'
 PREVIOUS_SPLIT_REPAIR_PROOF_SHA = '3e74a2121b5d9bf45c01d0e9b6c58e26d10a8dbe208547c9b3aef9120892c585'
@@ -251,7 +252,7 @@ def check_repair(c, p):
     proof = p['acceptedPreviousRun']; current = p['previousRepairRun']; latest = p['latestRepairRun']; split = p['previousSplitRepairRun']; stamp = p['lastCaptureStampRun']
     old = {'members':1555,'digest':'686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
     before = {'members':1555,'digest':'68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
-    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_COMMIT_IMAGE_REPAIR13' or p.get('source') != c['source']
+    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_CONTROLLER_CPU1_REUSE88' or p.get('source') != c['source']
             or sha(canonical(proof)) != REUSE_PROOF_SHA or p['reuseProofSHA256'] != REUSE_PROOF_SHA
             or proof['source'] != old or proof['run'] != 39041607488 or proof['attempt'] != 1
             or proof['head'] != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
@@ -321,6 +322,24 @@ def check_repair(c, p):
             or p['newCorruptCommitAssertionPreviouslyExecuted'] is not True
             or pairs(p['directlyAffectedCommitTargets']) != COMMIT_DIRECT or pairs(p['directlyAffectedImageTargets']) != IMAGE_DIRECT or pairs(p['newImageTargets']) != IMAGE_NEW):
         raise ValueError('actual last failure/PASS and exact Commit/image impact required')
+    recent = p['lastCommitImageRun']
+    if (sha(canonical(recent)) != LAST_COMMIT_IMAGE_SHA or p['lastCommitImageRunSHA256'] != LAST_COMMIT_IMAGE_SHA
+            or recent['source'] != c['source'] or (recent['run'],recent['job'],recent['head']) != (39060694518,117477868215,'f48bd32eeea5b31568fe2e2e03ea56a47c655264')
+            or (recent['actualTopPASS'],recent['actualSubPASS'],recent['actualTopFAIL']) != (12,49,1)
+            or not recent['sourceAndControllerPostExact'] or recent['wholeAccepted'] is not False
+            or recent['currentMainBuilds'] != 0 or recent['newRuntimeDeployed'] is not False
+            or (recent['residualMongo'],recent['residualRedis'],recent['ownedCleanupExit']) != (0,0,0)
+            or recent['rootReceipt']['sha256'] != 'aa1f4d440779f8986e33498ec9e611cbdea5d2e7ad9f67e214c4447a98634dbc'
+            or p['cpuProfile'] != CPU_PROFILE):
+        raise ValueError('actual same-source12 PASS and failed controller/profile contract required')
+    recent_named = {(r['package'],r['name']) for r in recent['namedPASS']}
+    recent_pass = pairs(p['lastCommitImagePassedTargets'])
+    expected_named = recent_pass | {(package,top+'/'+child) for package,top in recent_pass for child in c['requiredSubtests'].get(package,{}).get(top,[])}
+    if (len(recent_named) != 61 or len(recent['namedPASS']) != 61 or not expected_named <= recent_named
+            or {(package,name) for package,name in recent_named if '/' not in name} != recent_pass
+            or any((package,name.split('/')[0]) not in recent_pass for package,name in recent_named)
+            or recent_pass != (COMMIT_DIRECT | IMAGE_DIRECT | IMAGE_NEW) - pairs(recent['failedTargets'])):
+        raise ValueError('same-source twelve tops require exact49 children; failed parent cannot be reused')
     universe = pairs(c['targets'])
     passed, failed = pairs(proof['passedTargets']), pairs(proof['failedTargets'])
     current_pass, current_fail, current_incomplete = pairs(current['passedTargets']), pairs(current['failedTargets']), pairs(current['incompleteTargets'])
@@ -343,13 +362,13 @@ def check_repair(c, p):
             or split_pass & split_fail or len(split_pass) != 4 or len(split_fail) != 1 or pairs(split['incompleteTargets'])
             or split_pass | split_fail != latest_fail or capture_direct & split_pass
             or not capture_direct <= (passed - old_direct) | (current_pass - current_direct) | latest_pass
-            or stamp_pass != capture_direct or stamp_fail != split_fail or active != COMMIT_DIRECT | IMAGE_DIRECT | IMAGE_NEW or len(active) != 13
+            or stamp_pass != capture_direct or stamp_fail != split_fail or active != pairs(recent['failedTargets']) or len(active) != 1
             or pairs(bounded['passedTargets']) != capture_direct - pairs(bounded['failedTargets'])
-            or reused != (((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass | pairs(bounded['passedTargets']) | pairs(progress['passedTargets'])) - COMMIT_DIRECT - IMAGE_DIRECT or len(reused) != 76
+            or reused != (((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass | pairs(bounded['passedTargets']) | pairs(progress['passedTargets'])) - COMMIT_DIRECT - IMAGE_DIRECT | recent_pass or len(reused) != 88
             or active & (reused | pending) or active | reused | pending != universe
             or pairs(p['pendingRequiredTokenTargets']) != {PENDING_TOKEN} or pairs(c['pendingTargets']) != {PENDING_TOKEN}
-            or p['sourceReuse'] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 65, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 5, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 2, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}]):
-        raise ValueError('repair13/reuse76/positive1/required-token1 must retain exact original names')
+            or p['sourceReuse'] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 65, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 5, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 2, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1557, 'digest': '7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a'}, 'run': 39060694518, 'retainedTopCount': 12, 'retainedSubCount': 49, 'derivation': 'lastCommitImageRun.namedPASS exact current source; failed controller is not reused'}]):
+        raise ValueError('controller1/reuse88/positive1/required-token1 must retain exact original names')
     entries = proof['compiledEntries']
     if (entries['completed'] != 14 or entries['uploadedBinaries'] is not False or entries['executed'] is not False
             or [(r['role'],r['package']) for r in entries['entries']] != [(r['role'],r['package']) for r in c['entrypoints']]):
@@ -358,10 +377,10 @@ def check_repair(c, p):
             or p['sourceDeltaSHA256'] != REPAIR_DELTA_SHA or sha(canonical(p['sourceDelta'])) != REPAIR_DELTA_SHA):
         raise ValueError('exact formatted bounded Commit/process image repair leaves required')
     if p['executionScopes'] != REPAIR_SCOPES:
-        raise ValueError('exact controller1/owned7/inventory5 scopes required')
+        raise ValueError('only original failed controller scope required')
     scoped = [pair for scope in REPAIR_SCOPES for pair in pairs(scope['targets'])]
-    if len(scoped) != 13 or len(set(scoped)) != 13 or set(scoped) != active:
-        raise ValueError('repair scopes must partition exact thirteen source-affected tops')
+    if len(scoped) != 1 or len(set(scoped)) != 1 or set(scoped) != active:
+        raise ValueError('only the original failed controller may execute')
     overlay = {r['target']:r for r in c['overlay']}
     for row in p['sourceDelta']:
         now = overlay.get(row['target'])
@@ -467,12 +486,115 @@ def extract_controller_diagnostic(events):
     if trace['calls'].get('source.progress-inspect',{}).get('calls',0) != len(samples): raise ValueError('progress sampling cost mismatch')
     return d
 
-def execute_repair_scopes(active, command, environment, output):
+CPU_PROFILE = {'schema': 'controller-cpu-static-top30-v1', 'scope': 'targeted-tests-ownedcontrol-controller', 'nodeCount': 30, 'profileReadCapBytes': 33554432, 'binaryReadCapBytes': 268435456, 'reportReadCapBytes': 65536, 'toolSeconds': 60, 'phaseSeconds': 2250, 'unit': 'ns', 'privateRawOnly': True, 'mainResultPreserved': True}
+LAST_COMMIT_IMAGE_SHA = '94cdd549a76ca995e39d8188df6fd6e0340ab30593a42d7892233e5740739c0b'
+
+
+def owned_cpu_file(path, root, limit, load=False):
+    # Stable owned leaf admission. This is a read cap; the original16GiB guard
+    # remains the writer/phase bound. No raw profile or ELF leaves private work.
+    if root.resolve(strict=True) != root or not root.is_dir() or path.parent != root or path.resolve(strict=True) != path:
+        raise ValueError('private CPU leaf rejected')
+    before = path.lstat()
+    if (not stat.S_ISREG(before.st_mode) or before.st_uid != os.getuid() or before.st_nlink != 1
+            or before.st_mode & 0o022 or not 0 < before.st_size <= limit):
+        raise ValueError('private CPU body rejected')
+    identity = lambda s:(s.st_dev,s.st_ino,s.st_mode,s.st_uid,s.st_gid,s.st_nlink,s.st_size,s.st_mtime_ns,s.st_ctime_ns)
+    digest = hashlib.sha256(); total = 0; chunks = []; prefix = b''
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    with os.fdopen(fd,'rb') as handle:
+        if identity(os.fstat(handle.fileno())) != identity(before): raise ValueError('CPU leaf changed before read')
+        while True:
+            chunk = handle.read(min(1 << 20,limit+1-total))
+            if not chunk: break
+            total += len(chunk)
+            if total > limit: raise ValueError('CPU body grew beyond cap')
+            digest.update(chunk)
+            if not prefix: prefix = chunk[:4]
+            if load: chunks.append(chunk)
+        after = os.fstat(handle.fileno())
+    if identity(before) != identity(after) or identity(before) != identity(path.lstat()) or total != before.st_size:
+        raise ValueError('CPU body changed during read')
+    return {'bytes':total,'sha256':digest.hexdigest(),'mode':stat.S_IMODE(before.st_mode)}, b''.join(chunks) if load else prefix
+
+
+def parse_cpu_top30(raw):
+    if not raw or len(raw) > CPU_PROFILE['reportReadCapBytes']: raise ValueError('CPU text cap')
+    lines = raw.decode('utf-8','strict').splitlines(); rows = []; table = False
+    number = r'(?:[0-9]+(?:\.[0-9]+)?(?:e[+-]?[0-9]+)?)'
+    row_pattern = re.compile(r'^\s*('+number+r'(?:ns)?)\s+('+number+r')%\s+('+number+r')%\s+('+number+r'(?:ns)?)\s+('+number+r')%\s+(.+?)(?:[ ]+(\(inline\)))?[ ]*$')
+    def numeric(text, percent=False):
+        value = Decimal(text if percent else text.removesuffix('ns'))
+        if not value.is_finite() or value < 0 or value > (100 if percent else 2**63-1): raise ValueError('CPU number rejected')
+        if not percent and value != value.to_integral_value(): raise ValueError('CPU unit must be integral ns')
+        return float(value) if percent else int(value)
+    for line in lines:
+        if not table:
+            if line.split() == ['flat','flat%','sum%','cum','cum%']: table = True
+            continue  # All File/Time/path/header text stays private.
+        if not line.strip(): continue
+        m = row_pattern.fullmatch(line)
+        if m is None or len(rows) >= 30: raise ValueError('CPU table shape or node cap rejected')
+        symbol = m[6].strip(' ')
+        if (not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_ ./*()\[\],;{}+~·:\-]{0,511}',symbol)
+                or '..' in symbol or '://' in symbol or (':' in symbol and not symbol.startswith(('type:','go:')))):
+            raise ValueError('CPU static function identifier rejected')
+        row = {'function':symbol,'inline':bool(m[7]),'flatNS':numeric(m[1]),'flatPercent':numeric(m[2],True),
+               'sumPercent':numeric(m[3],True),'cumulativeNS':numeric(m[4]),'cumulativePercent':numeric(m[5],True)}
+        if any((r['function'],r['inline']) == (symbol,row['inline']) for r in rows): raise ValueError('duplicate CPU function')
+        rows.append(row)
+    if not table or not rows: raise ValueError('CPU table missing')
+    return rows
+
+
+def collect_controller_cpu(command, environment, root, output, remaining):
+    deadline = time.monotonic() + remaining
+    result = {'schema':CPU_PROFILE['schema'],'state':'input-rejected','rows':[],
+              'rawProfileUploaded':False,'testELFUploaded':False,'mainResultPreserved':True}
+    try:
+        binary = root/'controller.test'; profile = root/'controller.cpu.pprof'
+        elf, magic = owned_cpu_file(binary,root,CPU_PROFILE['binaryReadCapBytes'])
+        body, header = owned_cpu_file(profile,root,CPU_PROFILE['profileReadCapBytes'])
+        if magic != b'\x7fELF' or header[:2] != b'\x1f\x8b': raise ValueError('CPU inputs rejected')
+        result.update(binary=elf,profile=body)
+        available = int(deadline-time.monotonic())
+        if available < 1:
+            result['state'] = 'budget-exhausted'
+        else:
+            if os.getuid() <= 0 or os.getgid() < 0 or environment.get('GOPROXY') != 'off' or environment.get('GOSUMDB') != 'off':
+                raise ValueError('offline nonroot CPU tool required')
+            keys = ('PATH','GOROOT','GOTOOLCHAIN','GOWORK','GOENV','CGO_ENABLED','HOME','GOAUTH','GOMAXPROCS','GOMEMLIMIT','GOMODCACHE','GOCACHE','GOPATH','TMPDIR','GOTMPDIR','GOPROXY','GOSUMDB')
+            env = {k:environment[k] for k in keys if k in environment}; env['PPROF_TMPDIR'] = str(root)
+            isolation = ['sudo','-n','unshare','--net','--','setpriv','--reuid='+str(os.getuid()),'--regid='+str(os.getgid()),'--clear-groups','--','env','-i']
+            argv = isolation + [k+'='+v for k,v in sorted(env.items())] + ['go','tool','pprof','-top','-cum','-nodecount=30','-symbolize=none','-unit=ns',str(binary),str(profile)]
+            result['state'] = 'tool-rejected'
+            folder, code = command('pprof-controller-cpu',argv,min(60,available))
+            result['toolExitCode'] = code
+            result['state'] = 'input-changed'
+            elf_after,_ = owned_cpu_file(binary,root,CPU_PROFILE['binaryReadCapBytes'])
+            body_after,_ = owned_cpu_file(profile,root,CPU_PROFILE['profileReadCapBytes'])
+            if elf_after != elf or body_after != body: raise ValueError('CPU inputs changed after tool')
+            if code == 0:
+                result['state'] = 'report-rejected'
+                _,raw = owned_cpu_file(folder/'stdout.jsonl',folder,CPU_PROFILE['reportReadCapBytes'],True)
+                result['rows'] = parse_cpu_top30(raw); result['state'] = 'complete'
+            else: result['state'] = 'tool-rejected'
+    except (OSError,ValueError,TypeError,UnicodeError,InvalidOperation,subprocess.SubprocessError):
+        pass  # Only finite state is public; original Go outcome was already latched.
+    try:
+        write(output/'cpu-top30.json',result)
+    except OSError:
+        result['state'] = 'summary-write-failed'
+    return result
+
+
+def execute_repair_scopes(active, command, environment, output, profile_root=None):
     # One original2250s phase budget, the exact reviewed process scopes. A normal
     # Go nonzero still retains/audits that scope and runs the remaining scopes.
     # The original command guard raises on latched resource/owner failures.
     deadline = time.monotonic() + RESOURCE['testPhaseSeconds']
     results = []
+    cpu_state = 'not-requested'
     for scope in active['scopes']:
         remaining = int(deadline - time.monotonic())
         if remaining < 1:
@@ -482,6 +604,8 @@ def execute_repair_scopes(active, command, environment, output):
         if 'child' in scope: pattern += '/^' + re.escape(scope['child']) + '$'
         args = ['env', '-i'] + [key+'='+value for key,value in environment.items()]
         args += ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=180s', '-run', pattern]
+        if profile_root is not None:
+            args += ['-cpuprofile',str(profile_root/'controller.cpu.pprof'),'-o',str(profile_root/'controller.test')]
         args += ['./'+package for package in scope['targets']]
         folder, code = command(scope['label'], args, remaining)
         raw = regular(folder/'stdout.jsonl')
@@ -504,17 +628,20 @@ def execute_repair_scopes(active, command, environment, output):
             write(folder/'controller-diagnostic.json',diagnostic)
             result['diagnosticAccepted'] = diagnostic['accepted']
             result['accepted'] = result['accepted'] and diagnostic['accepted']
-        result.update(label=scope['label'], stdoutSHA256=sha(raw), stdoutBytes=len(raw))
+        result.update(label=scope['label'], exitCode=code, stdoutSHA256=sha(raw), stdoutBytes=len(raw))
         write(folder/'result.json',result)
         results.append(result)
+        # Latch exact Go/result before any diagnostic; diagnostic failures never replace it.
+        if profile_root is not None:
+            cpu_state = collect_controller_cpu(command,environment,profile_root,folder,int(deadline-time.monotonic()))['state']
     accepted = bool(active['scopes']) and len(results) == len(active['scopes']) and all(result['accepted'] for result in results)
     union = {'accepted':accepted, 'phaseBudgetSeconds':RESOURCE['testPhaseSeconds'],
-             'goTestTimeoutSeconds':RESOURCE['testGoTimeoutSeconds'], 'processes':results,
+             'goTestTimeoutSeconds':RESOURCE['testGoTimeoutSeconds'], 'cpuProfileState':cpu_state, 'processes':results,
              'topPASS':sum(result.get('topPASS',0) for result in results),
              'subPASS':sum(result.get('subPASS',0) for result in results),
              'namedCompletions':[entry for result in results if result['accepted']
                                  for entry in result['namedCompletions']],
-             'allSelectedThirteenAccepted':accepted,'originalRawRetained':True}
+             'allSelectedControllerAccepted':accepted,'originalRawRetained':True}
     write(output/'targeted-tests-union.json',union)
     return union
 
@@ -594,8 +721,8 @@ def run():
             if remaining < 1:
                 raise ValueError('controller budget exhausted')
             timeout = max(1, int(min(remaining, timeout)))
-            folder = output / label
-            folder.mkdir()
+            folder = (profile_root if label == 'pprof-controller-cpu' else output) / label
+            folder.mkdir(mode=0o700)
             capture = [sys.executable, '-B', str(REPO / 'ci/group-effects/capture.py'), '--stdout', str(folder / 'stdout.jsonl'), '--stderr', str(folder / 'stderr.log'), '--'] + argv
             wrapped = [sys.executable, '-B', str(REPO / 'ci/group-effects/resource_guard.py'), '--cwd', str(work / 'server'), '--log', str(folder / 'guard.log'), '--record', str(folder / 'resource.json'), '--min-free-mib', '1024', '--timeout', str(timeout), '--poll-interval', '.2', '--allocated-root', str(work), '--max-allocated-mib', '16384', '--'] + capture
             child = subprocess.run(wrapped, check=False, timeout=timeout + 30)
@@ -619,12 +746,14 @@ def run():
         fixtures.update(LUOBO_INTEGRATION_MONGO_URI=MONGO, LUOBO_INTEGRATION_REDIS_SOCKET=str(socket), LUOBO_BOOKING_TEST_REDIS_ADDR='127.0.0.1:36379')
         testenv = dict(env, GOPROXY='off', GOSUMDB='off', **fixtures)
         write(output/'compiled-entries.json', {'completed': 0, 'currentEntryBuildReexecuted': False, 'reusedActual14BuildSource': repair['acceptedPreviousRun']['source'], 'reusedActual14BuildRun': repair['acceptedPreviousRun']['run'], 'uploadedBinaries': False, 'executed': False})
-        result = execute_repair_scopes(active, command, testenv, output)
-    write(output / 'summary.json', {'state': 'derived_commit_image_repair13_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 65, 'previousRepairTopPASSReused': 5, 'latestRepairTopPASSReused': 2, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 0, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
+        profile_root = work/'private-profile'
+        profile_root.mkdir(mode=0o700)
+        result = execute_repair_scopes(active, command, testenv, output, profile_root)
+    write(output / 'summary.json', {'state': 'controller_cpu1_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 65, 'previousRepairTopPASSReused': 5, 'latestRepairTopPASSReused': 2, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 0, 'sameSourceCommitImageTopPASSReused': 12, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
     return 0 if result['accepted'] else 1
 
 if __name__ == '__main__':
     p=argparse.ArgumentParser(); p.add_argument('--verify',action='store_true'); a=p.parse_args()
     if a.verify:
-        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':13, 'retainedPriorSourceTop':65, 'retainedPreviousRepairSourceTop':5, 'retainedLatestRepairSourceTop':2, 'retainedPreviousSplitSourceTop':4,'retainedLastCaptureStampSourceTop':0,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
+        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':1, 'retainedSameSourceTop':12, 'totalRetainedTop':88, 'retainedPriorSourceTop':65, 'retainedPreviousRepairSourceTop':5, 'retainedLatestRepairSourceTop':2, 'retainedPreviousSplitSourceTop':4,'retainedLastCaptureStampSourceTop':0,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
     else: raise SystemExit(run())

@@ -184,4 +184,132 @@ class VMWaitControls(unittest.TestCase):
                     self.assertNotIn('frames',row);self.assertNotIn('objects',row);self.assertNotIn('vars',row)
         self.assertEqual(v.sample_failure(secret,ValueError(secret)),{'failureStage':'other','failureReason':'other'})
 
+    def test_exact_completed_widget_raw_is_distinct_from_required_hang_samples_and_never_default_acceptance(self):
+        # Exact uploaded/redacted machine stream; no Flutter/Popen/VM is invoked.
+        raw = (
+            b'{"protocolVersion":"0.1.1","runnerVersion":null,"pid":4248,"type":"start","time":0}\n'
+            b'{"suite":{"id":0,"platform":"vm","path":"/home/runner/work/_temp/mobile-current363-input/source/app/test/features/chat/chat_typing_workflow_test.dart"},"type":"suite","time":0}\n'
+            b'{"test":{"id":1,"name":"loading /home/runner/work/_temp/mobile-current363-input/source/app/test/features/chat/chat_typing_workflow_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":1}\n'
+            b'{"count":1,"time":6,"type":"allSuites"}\n'
+            b'Shell: [INFO:flutter/shell/common/switches.cc(263)] VM Service port specified was malformed. Will default to 0\n'
+            b'\n'
+            b'[{"event":"test.startedProcess","params":{"vmServiceUri":"<diagnostic-uri-redacted>"}}]\n'
+            b'{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":19771}\n'
+            b'{"group":{"id":2,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":null,"column":null,"url":null},"type":"group","time":19773}\n'
+            b'{"test":{"id":3,"name":"wrong-peer wrong-recipient malformed and offline typing never enters history or the active header","suiteID":0,"groupIDs":[2],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":105,"root_column":3,"root_url":"file:///home/runner/work/_temp/mobile-current363-input/source/app/test/features/chat/chat_typing_workflow_test.dart"},"type":"testStart","time":19774}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_typing_negative mounted","type":"print","time":20956}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_typing_negative incoming.complete","type":"print","time":21077}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_typing_negative body.checked","type":"print","time":21090}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_typing_negative events.cancel.begin","type":"print","time":21090}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_typing_negative events.cancel.end","type":"print","time":21091}\n'
+            b'{"testID":3,"messageType":"print","message":"group_revoke_cleanup sdk.begin","type":"print","time":21092}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_sdk_dispose session.begin","type":"print","time":21093}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_sdk_dispose session.end","type":"print","time":21096}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_sdk_dispose gateway.begin","type":"print","time":21096}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_sdk_dispose gateway.end","type":"print","time":21098}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_sdk_dispose handler.cleared","type":"print","time":21098}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_sdk_dispose storage.begin","type":"print","time":21098}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_sdk_dispose storage.end","type":"print","time":21102}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_actual sdk.wrapper.end","type":"print","time":21102}\n'
+            b'{"testID":3,"messageType":"print","message":"group_revoke_cleanup sdk.end","type":"print","time":21102}\n'
+            b'{"testID":3,"messageType":"print","message":"group_revoke_cleanup unmount.begin","type":"print","time":21102}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_unmount pumpWidget.before","type":"print","time":21103}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_unmount pumpWidget.returned","type":"print","time":21151}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_unmount pumpWidget.after","type":"print","time":21151}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_unmount pumpAndSettle.before","type":"print","time":21152}\n'
+            b'{"testID":3,"messageType":"print","message":"chat_input_unmount pumpAndSettle.after","type":"print","time":21153}\n'
+            b'{"testID":3,"messageType":"print","message":"group_revoke_cleanup unmount.end","type":"print","time":21153}\n'
+            b'{"testID":3,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":21166}\n'
+            b'{"success":true,"type":"done","time":21201}\n'
+        )
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),'fd7086564f4b3386fe3dd24c333822819e1b5cdd92588f0bdeb7e167c1cdb242')
+        cfg=json.loads((v.ROOT/'ci/mobile-input/inputs.json').read_bytes())
+        summary=v.selected_widget_summary(raw.decode(),cfg)
+        self.assertEqual(summary['tests']['passed'],1);self.assertEqual(summary['tests']['hidden'],1)
+        self.assertTrue(summary['tests']['complete_success_footer']);self.assertTrue(summary['cleanup']['exact_owned_four_marker_sequences'])
+        # Historical replay proves this selected widget only. Original72/0/0
+        # and ValueError cannot be upgraded with an invented child-exit field.
+        historical={'originalChildExitCode':None,'samplerJoined':True,'selectedMachineComplete':True,'defaultNoVMServiceAccepted':False,'samplerTerminal':'failed','attemptedSamples':0,'acceptedSamples':0,'exceptionType':'ValueError'}
+        self.assertEqual(v.terminal_state(historical),'refused')
+        historical['originalChildExitCode']=0;historical['completionRequested']=True
+        self.assertEqual(v.terminal_state(historical),'refused')
+        external=threading.Event();complete=threading.Event();stop=v.CompletionStop(external,complete)
+        self.assertFalse(stop.is_set());complete.set()
+        with self.assertRaises(v._OriginalComplete):stop.is_set()
+        external.set();self.assertTrue(stop.is_set())
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder).resolve();progress={}
+            with mock.patch.object(v,'socket_owner') as owner,mock.patch.object(v,'ReadOnlyVM') as client:
+                with self.assertRaises(v._OriginalComplete):
+                    v.collect('http://127.0.0.1:40123/opaqueAuthCode=/',types.SimpleNamespace(poll=lambda:None),work,work/'unused-private',threading.Event(),complete,progress)
+                owner.assert_not_called();client.assert_not_called()
+            self.assertFalse(progress['socketOwnerVerified']);self.assertFalse(progress['getVMVerified'])
+        # Controlled outcomes are future policy controls, not historical facts.
+        completed={'originalChildExitCode':0,'samplerJoined':True,'selectedMachineComplete':True,'defaultNoVMServiceAccepted':False,'samplerTerminal':'completed-stop','captureStarted':False,'completionRequested':True,'attemptedSamples':0,'acceptedSamples':0,'failureLatched':False,'socketOwnerVerified':False,'getVMVerified':False,'externalStopObserved':False}
+        self.assertEqual(v.terminal_state(completed),'completed-only')
+        self.assertEqual(v.terminal_state(dict(completed,captureStarted=True,attemptedSamples=1,acceptedSamples=1,socketOwnerVerified=True,getVMVerified=True)),'completed-only')
+        for changes in ({'originalChildExitCode':1},{'originalChildExitCode':None},{'samplerJoined':False},{'selectedMachineComplete':False},{'defaultNoVMServiceAccepted':True},{'completionRequested':False},{'externalStopObserved':True},{'attemptedSamples':1,'acceptedSamples':0},{'samplerTerminal':'failed'},{'exceptionType':'ValueError'}):
+            with self.subTest(changes=changes):self.assertEqual(v.terminal_state(dict(completed,**changes)),'refused')
+        original={'pid':123,'start':20,'uid':os.getuid(),'pgrp':55,'session':55,'exe':'/owned/flutter_tester','ticks':100}
+        for failure_first in (False,True):
+            with self.subTest(failure_first=failure_first),tempfile.TemporaryDirectory() as folder:
+                work=Path(folder).resolve();private=work/'private';private.mkdir(mode=0o700);(work/'evidence').mkdir()
+                v.write_private(private/'original-child.json',original)
+                completion=threading.Event();progress={};clients=[]
+                class Client:
+                    def __init__(self,port,path,check,deadline):self.check=check;self.closed=False;clients.append(self);check()
+                    def rpc(self,method,params):
+                        self.check()
+                        if method=='getVM':return {'type':'VM','pid':123,'isolates':[{'name':'main','id':'isolates/1'}]}
+                        completion.set()
+                        if failure_first:raise ValueError('service-closed')
+                        # Matches ReadOnlyVM's real post-response safe owner check.
+                        self.check()
+                        return {'type':'Stack','frames':[],'asyncCausalFrames':[]}
+                    def close(self):self.closed=True
+                with mock.patch.object(v,'socket_owner',return_value=original),mock.patch.object(v,'ReadOnlyVM',Client):
+                    with self.assertRaises(v._SamplerFailure if failure_first else v._OriginalComplete):
+                        v.collect('http://127.0.0.1:40123/opaqueAuthCode=/',types.SimpleNamespace(pid=123,poll=lambda:None),work,private,threading.Event(),completion,progress)
+                self.assertTrue(all(client.closed for client in clients));self.assertTrue(progress['socketOwnerVerified']);self.assertTrue(progress['getVMVerified'])
+                self.assertEqual(progress['failureLatched'],failure_first)
+                if failure_first:self.assertEqual(progress['terminalFailureReason'],'service-closed')
+                current=dict(completed,captureStarted=True,**progress)
+                if failure_first:current['samplerTerminal']='failed'
+                self.assertEqual(v.terminal_state(current),'refused' if failure_first else 'completed-only')
+        phase={'phase':'input-typing-vm-diagnostic1','expected_names':[v.TARGET],'expected_tests':1,'accepted':True,'latched_failure':None,'summary':summary,
+               'source_post':{'accepted':True,'source363':cfg['source_digest'],'portable415':cfg['portable_digest'],'authored_bodies':415,'current_inventory_exact':True}}
+        def written(diagnostic,selected):
+            with tempfile.TemporaryDirectory() as folder:
+                work=Path(folder).resolve();(work/'evidence').mkdir()
+                v.write_private(work/'evidence/input-vm-wait-diagnostic.json',diagnostic)
+                v.write_terminal_pass(work,[selected],cfg['source_digest'],cfg['portable_digest'])
+                evidence=work/'evidence';files={p.name:json.loads(p.read_bytes()) for p in evidence.iterdir()}
+                self.assertNotIn('input-scoped-passed.json',files)
+                return files
+        files=written(completed,phase);record=files['input-vm-completed-test.json']
+        self.assertTrue(record['selectedTestPassed']);self.assertEqual(record['vmCapture'],'not_needed_after_complete')
+        self.assertFalse(record['profiledTestPassed']);self.assertFalse(record['defaultNoVMServiceAccepted'])
+        self.assertEqual((record['vmWait']['attemptedSamples'],record['vmWait']['acceptedSamples']),(0,0));self.assertNotIn('input-vm-profiled-passed.json',files)
+        captured=dict(completed,samplerTerminal='captured',captureStarted=True,attemptedSamples=2,acceptedSamples=2,socketOwnerVerified=True,getVMVerified=True)
+        files=written(captured,phase);self.assertIn('input-vm-profiled-passed.json',files);self.assertNotIn('input-vm-completed-test.json',files)
+        self.assertEqual(v.terminal_state(dict(captured,exceptionType='ValueError')),'refused')
+        for selected in [dict(phase,latched_failure='phase_timeout'),dict(phase,accepted=False),dict(phase,phase='input-typing-diagnostic1'),dict(phase,source_post=dict(phase['source_post'],accepted=False)),dict(phase,source_post=dict(phase['source_post'],source363='0'*64))]:
+            with self.subTest(phase=selected),self.assertRaises(ValueError):written(completed,selected)
+        events=[]
+        for line in raw.decode().splitlines():
+            try:value=json.loads(line)
+            except ValueError:continue
+            if isinstance(value,dict):events.append(value)
+        variants=[]
+        variants.append([e for e in events if e.get('type')!='done'])
+        variants.append([dict(e,success=False) if e.get('type')=='done' else e for e in events])
+        variants.append([*events[:-1],next(e for e in events if e.get('type')=='testStart' and e.get('test',{}).get('name')==v.TARGET),events[-1]])
+        variants.append([dict(e,testID=9999) if e.get('type')=='testDone' and e.get('hidden') is False else e for e in events])
+        variants.append([dict(e,skipped=True) if e.get('type')=='testDone' and e.get('hidden') is False else e for e in events])
+        variants.append([*events[:-1],{'type':'error','testID':3,'error':'PRIVATE_DO_NOT_EXPORT'},events[-1]])
+        variants.append([e for e in events if e.get('message')!='group_revoke_cleanup sdk.end'])
+        variants.append([*events[:-1],{'type':'print','testID':3,'message':'A RenderFlex overflowed by 10 pixels'},events[-1]])
+        for rows in variants:
+            with self.subTest(variant=len(rows)),self.assertRaises(ValueError):v.selected_widget_summary('\n'.join(json.dumps(e) for e in rows),cfg)
+
 if __name__=='__main__':unittest.main(verbosity=2)

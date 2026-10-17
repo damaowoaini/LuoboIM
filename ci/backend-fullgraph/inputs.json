@@ -4,7 +4,7 @@
   "scope": "fresh_cleanup5top12sub_plus_original_graph2top3sub_and_four_planes_prior_unbound_child1_only_no_deployment",
   "source": {
     "members": 1575,
-    "digest": "52ddd8742eef822c04d14b99f6ccf47acd12f43c7df06d98fe6fe389da231b58"
+    "digest": "57513d328ed76c6a1091d8caee531b7a6d5d952982f9621849369aa7e46e6bd6"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,8 +42,8 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 42388,
-      "sha256": "0356aaf79469fa630e1286bf3ce5299192046559556ce18d67fd54e45b02e608"
+      "bytes": 47007,
+      "sha256": "bae0e864adff0b2a74c0d48a84c1d47ae19e9251e3be3f4853699dbee2cbf006"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 23531,
-      "sha256": "3fa65e9a4b1cb391468d3f1a23b23bceb5d3591771788deb24b5d5008fa08c0d"
+      "bytes": 25395,
+      "sha256": "8598fceb81307cb467e310cd30bef41ac73eb9c1f4f25c39914389ad3f158ae0"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -72,8 +72,8 @@
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",
-      "bytes": 5260,
-      "sha256": "5206387a53eec33cc2d991158752cc286608e790dc279d8af0d8633b2b310e8d"
+      "bytes": 5273,
+      "sha256": "8c5a0081b5b094014bba13f99002dc5452a6b737d10ca692fb5ac08d02f36051"
     }
   ],
   "overlay": [
@@ -1067,8 +1067,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
-      "bytes": 5624,
-      "sha256": "4f40dfe1837207983cf907d3ed161e6c6c1c3493cec39c557512d1d5bde9cedd",
+      "bytes": 6777,
+      "sha256": "bcf11c0283992a27812fa20666dad5d7ecb95d514e5bb0e0ceee7816279030b8",
       "beforeSHA256": null
     },
     {
@@ -3890,31 +3890,13 @@
       "label": "cleanup-ownedcontrol",
       "targets": {
         "internal/namespaceimport/ownedcontrol": [
-          "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
-          "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths",
-          "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation",
-          "TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal"
+          "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths"
         ]
       },
       "requiredSubtests": {
         "internal/namespaceimport/ownedcontrol": {
-          "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit": [
-            "unknown-middle-child-does-not-strand-later-original-owner",
-            "good-drains-retained-and-unknown-never-gets-a-join",
-            "repeat-Stop-does-not-renew-signal-or-erase-failure"
-          ],
           "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths": [
-            "canonical-first",
-            "runtime-first",
             "local-first"
-          ],
-          "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation": [
-            "actual-original-image-and-bounded-file-pins",
-            "real-fd-path-stability-and-mid-read-cancellation"
-          ],
-          "TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal": [
-            "cancelled-validation-keeps-live-child-unsignalled",
-            "same-original-wait-during-image-validation-is-local-only"
           ]
         }
       }
@@ -3980,5 +3962,144 @@
     "compressionLevel": 1,
     "copyBinaries": false,
     "deploymentAccepted": false
+  },
+  "cleanupCompleteScopes": [
+    {
+      "label": "cleanup-ownedcontrol",
+      "targets": {
+        "internal/namespaceimport/ownedcontrol": [
+          "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+          "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths",
+          "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation",
+          "TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal"
+        ]
+      },
+      "requiredSubtests": {
+        "internal/namespaceimport/ownedcontrol": {
+          "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit": [
+            "unknown-middle-child-does-not-strand-later-original-owner",
+            "good-drains-retained-and-unknown-never-gets-a-join",
+            "repeat-Stop-does-not-renew-signal-or-erase-failure"
+          ],
+          "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths": [
+            "canonical-first",
+            "runtime-first",
+            "local-first"
+          ],
+          "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation": [
+            "actual-original-image-and-bounded-file-pins",
+            "real-fd-path-stability-and-mid-read-cancellation"
+          ],
+          "TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal": [
+            "cancelled-validation-keeps-live-child-unsignalled",
+            "same-original-wait-during-image-validation-is-local-only"
+          ]
+        }
+      }
+    },
+    {
+      "label": "cleanup-runtimeacceptance",
+      "targets": {
+        "internal/runtimeacceptance": [
+          "TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup"
+        ]
+      },
+      "requiredSubtests": {
+        "internal/runtimeacceptance": {
+          "TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup": [
+            "cancel-audit-before-stop",
+            "timeout-before-local-wait-complete"
+          ]
+        }
+      }
+    }
+  ],
+  "cleanupRecentReuse": {
+    "run": 39060706865,
+    "job": 117477900963,
+    "head": "f48bd32eeea5b31568fe2e2e03ea56a47c655264",
+    "source": {
+      "members": 1575,
+      "digest": "52ddd8742eef822c04d14b99f6ccf47acd12f43c7df06d98fe6fe389da231b58"
+    },
+    "reviewSHA256": "41a7f45b3323effb1529bf6e417bbe31cd53cc41fbe354f260cccc335d346794",
+    "artifact": {
+      "artifact": 12111770451,
+      "run": 39060706865,
+      "attempt": 1,
+      "head": "f48bd32eeea5b31568fe2e2e03ea56a47c655264",
+      "sha256": "483cdf79808816f7778eaedb27378e09d85b903370964f66ab083d75b4e8e714",
+      "bytes": 9702,
+      "exactAPIDigest": true,
+      "files": 12,
+      "binariesDownloaded": false
+    },
+    "topPASS": 3,
+    "subPASS": 9,
+    "namedCompletions": [
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/unknown-middle-child-does-not-strand-later-original-owner"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/good-drains-retained-and-unknown-never-gets-a-join"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/repeat-Stop-does-not-renew-signal-or-erase-failure"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/actual-original-image-and-bounded-file-pins"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/real-fd-path-stability-and-mid-read-cancellation"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal/cancelled-validation-keeps-live-child-unsignalled"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal/same-original-wait-during-image-validation-is-local-only"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths/canonical-first"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths/runtime-first"
+      }
+    ],
+    "partialChildParent": {
+      "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths": [
+        "canonical-first",
+        "runtime-first"
+      ]
+    },
+    "oldParentFAILNotReused": true,
+    "sourceAndToolsPostExact": true
+  },
+  "cleanupFixtureRepair": {
+    "target": "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
+    "beforeSHA256": "4f40dfe1837207983cf907d3ed161e6c6c1c3493cec39c557512d1d5bde9cedd",
+    "afterSHA256": "bcf11c0283992a27812fa20666dad5d7ecb95d514e5bb0e0ceee7816279030b8",
+    "bytes": 6777,
+    "productionChanges": 0
   }
 }

@@ -32,7 +32,7 @@ FINAL_PORTABLE = '30879a35431337689eced3a9b5ce9a7c528342740be0be502053100b7be24d
 LOCAL_REUSE_SHA = '06d10baf4cec974f32af7eae7be228c6ffc0023422fbc80ae824f1dea3b71605'
 ORIGINAL_CLOUD15_SHA = 'b2438f78ab68b2e34c111cc8052e85e1563c3fcc0c136a397acb80bcc87387ba'
 CLOUD_REUSE_SHA = '8fe4cd26676632f2dc83032daac6d136b01e33b2d332e6bac5cd8257890c0e28'
-VM_DIAGNOSTIC_SHA = 'a39037c339eefa4722c0ac4d132f7f78be6979e32ab04df7d8c74d01c0e733a1'
+VM_DIAGNOSTIC_SHA = '2e36b5d515473426644f7f8cf11d2a0c7465501b3e2e3ded39148f9f86a8a6e8'
 SOURCE_POST_SECONDS = 30
 RESOURCE = {'initial_bytes': 4294967296, 'floor_bytes': 1073741824,
             'allocated_cap_bytes': 805306368, 'poll_seconds': .2, 'phase_seconds': 120}
@@ -599,7 +599,7 @@ def run(work, vm_diagnostic=False):
             raise ValueError('targeted continuation failed')
     if vm_diagnostic:
         diagnostic = module('owned_mobile_vm_diagnostic', REPO/'ci/mobile-input-vm.py')
-        diagnostic.write_profiled_pass(work, phases, FINAL_SOURCE, FINAL_PORTABLE)
+        diagnostic.write_terminal_pass(work, phases, FINAL_SOURCE, FINAL_PORTABLE)
         return
     CHECK.write_json(work/'evidence/input-scoped-passed.json',
                      {'state': 'current363_diagnostic1_with_explicit_prior25', 'phases': phases,

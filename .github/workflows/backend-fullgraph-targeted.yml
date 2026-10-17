@@ -1,4 +1,4 @@
-name: Fresh owned actual14 graph / original2 plus cleanup5 / fresh7top15sub
+name: Fresh owned actual14 graph / fresh4top6sub / cross-source7top16sub
 
 on:
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
         run: |
           umask 077
           python3 -B ci/backend-fullgraph/run.py --admit
-      - name: Build actual14 plus two auxiliaries; four fresh graph scenarios; fresh7top15sub
+      - name: Build actual14 plus two auxiliaries; four fresh scenarios; fresh4top6sub and source-bound reuse
         run: |
           umask 077
           python3 -B ci/group-effects/resource_guard.py \

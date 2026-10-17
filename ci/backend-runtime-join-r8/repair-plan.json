@@ -1,27 +1,13 @@
 {
   "schema": 1,
-  "state": "FROZEN_COMMIT_IMAGE_REPAIR13",
+  "state": "FROZEN_CONTROLLER_CPU1_REUSE88",
   "source": {
     "members": 1557,
     "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
   },
   "repairTargets": {
     "internal/namespaceimport/ownedcontrol": [
-      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
-      "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
-      "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
-      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
-      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
-      "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
-      "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
-    ],
-    "internal/namespaceinventory": [
-      "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume",
-      "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture",
-      "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence",
-      "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts",
-      "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
+      "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate"
     ]
   },
   "actualPassedTargets": {
@@ -83,21 +69,33 @@
       "TestProspectivePageNeedsOriginalRootAndActualSemanticValidation"
     ],
     "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
       "TestHistoricalOpenBaseIsClosedAtCutWithoutFillingFutureGap",
+      "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
       "TestHistoricalSegmentLocatorsUseActualCollectionAndNeverInferEpochOrRange",
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
       "TestHistoricalTypedLineagePreservesOriginalClaimsAndProtocol",
+      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
       "TestHistoryEpochRetirementCannotBeMintedFromDTOOrPreparedExit",
       "TestHistoryReadinessPrivateSessionRetainsIdentityAndUnknownIntent",
       "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient",
       "TestNamespaceRuntimeCompleteRoleAndActualOwnerHandlesAreMandatory",
       "TestNamespaceRuntimeMongoTargetRequiresOriginalCatalogAndIdentity",
       "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
+      "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+      "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation",
       "TestOwnedServicePrivateEnvironmentKeepsIdentityAndRejectsOwnerOverrides"
     ],
     "internal/namespaceinventory": [
       "TestImportCaptureStampDoesNotRenewOnResumeOrSourceDrift",
+      "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume",
       "TestImportOutputDocumentKeepsPrivateCustodyAcrossReopenAndTamper",
-      "TestImportWorkspaceRejectsSnapshotChildrenAndAliasesBeforeWrite"
+      "TestImportWorkspaceRejectsSnapshotChildrenAndAliasesBeforeWrite",
+      "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture",
+      "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence",
+      "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts",
+      "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
     ],
     "internal/rpc/rtc": [
       "TestOwnedRTCOriginalSDKLookupWaitsForActualUserServeAndOwnerCancel",
@@ -622,6 +620,16 @@
       "run": 39048615208,
       "retainedTopCount": 4,
       "derivation": "previousSplitRepairRun.passedTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets"
+    },
+    {
+      "source": {
+        "members": 1557,
+        "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
+      },
+      "run": 39060694518,
+      "retainedTopCount": 12,
+      "retainedSubCount": 49,
+      "derivation": "lastCommitImageRun.namedPASS exact current source; failed controller is not reused"
     }
   ],
   "sourceDeltaSHA256": "accb86e6a6ea0a2ae0a2de4ec44e771fef54d039ff50a223a877fe676eb177b0",
@@ -743,32 +751,6 @@
       "targets": {
         "internal/namespaceimport/ownedcontrol": [
           "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate"
-        ]
-      }
-    },
-    {
-      "label": "targeted-tests-ownedcontrol-commit-image",
-      "targets": {
-        "internal/namespaceimport/ownedcontrol": [
-          "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-          "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
-          "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
-          "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
-          "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
-          "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
-          "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
-        ]
-      }
-    },
-    {
-      "label": "targeted-tests-namespaceinventory-commit",
-      "targets": {
-        "internal/namespaceinventory": [
-          "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume",
-          "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture",
-          "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence",
-          "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts",
-          "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
         ]
       }
     }
@@ -1246,5 +1228,311 @@
       ]
     }
   },
-  "partialChildReuse": {}
+  "partialChildReuse": {},
+  "lastCommitImageRun": {
+    "run": 39060694518,
+    "job": 117477868215,
+    "head": "f48bd32eeea5b31568fe2e2e03ea56a47c655264",
+    "source": {
+      "members": 1557,
+      "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
+    },
+    "actualTopPASS": 12,
+    "actualSubPASS": 49,
+    "actualTopFAIL": 1,
+    "sourceAndControllerPostExact": true,
+    "currentMainBuilds": 0,
+    "newRuntimeDeployed": false,
+    "wholeAccepted": false,
+    "namedPASS": [
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/pristine_descriptor_crash_recovery_and_changed_source_options"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/real_commit_custody_failure_never_becomes_normal_capture_pending"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/canonical_bodies_original_base_future_and_missing-proof_disposition"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/completed_workspace_reopens_at_exact_page_and_original_capture_time"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/caller-mutated_inventory_and_foreign_index_fail"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/reviewed_source_trust_cannot_change_mid-capture_or_resume"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/live_identity_restart_and_lost_exclusion_still_reject"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/first_page_consumes64_actual_sorted_leaves_without_truncating"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/continuation_uses_real_Store_receipt_id_cursor_and_closes_last_leaf"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/inconsistent_checkpoint_is_not_used_as_source_authority"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex/same-immutable-source-and-new-progress-reuses-binding"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex/resumed-materializer-is-a-new-object"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex/changed-live-identity-refuses-before-reuse"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex/changed-evidence-and-lost-exclusion-refuse"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex/changed-empty-collection-index-cannot-relabel-sealed-absence"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/unknown-middle-child-does-not-strand-later-original-owner"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/good-drains-retained-and-unknown-never-gets-a-join"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/repeat-Stop-does-not-renew-signal-or-erase-failure"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/actual-original-image-and-bounded-file-pins"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/real-fd-path-stability-and-mid-read-cancellation"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves0"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves1"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves3"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves64"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves65"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody/finite-original-catalog-does-not-recapture-history"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody/unsealed-catalog-is-not-runtime-identity"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody/redirected-derived-catalog-entry-is-rejected"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody/original-body-tamper-remains-visible"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence/incomplete_original_index_cannot_certify_absence"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence/exact_original_row_and_absence_without_recapture"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence/post-seal_lookup_root_mutation_is_rejected"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence/source_restart_rejects_present_and_absence"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence/original_raw_body_tamper_rejected"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence/unknown_collection_is_not_sealed_absence"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts/actual-sealed-sequence-and-document"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts/unsealed-index-does-not-claim-absence"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts/two-real-branches-cannot-own-one-sequence"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts/post-seal-index-mutation-cannot-select-another-source"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/reopen_exact_checkpoint_and_private_body"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/stale_expected_state_and_missing_value_CAS_rejected"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/actual_source_restart_rejects_derived_read"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/same_invocation_scope_rejects_foreign_workspace_source_and_retired_context"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/scope_source_change_still_fails_actual_commit_and_final_snapshot_check"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/scope_private_file_tamper_cannot_bypass_commit_or_final_recheck"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/resume_never_creates_a_missing_private_lock"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/resume_rejects_a_public_lock_without_changing_its_mode"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/batched_commit_persists_every_final_set_and_omits_intermediate_indexes"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture/batch_final_index_flush_failure_never_publishes_an_unresolved_root"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture"
+      }
+    ],
+    "failedTargets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate"
+      ]
+    },
+    "rootReceipt": {
+      "path": ".qa/backend-index-batch-owned-image-repair-batch-1/root-backend-batch12-pass-controller-still-cpu-deadline-review.json",
+      "sha256": "aa1f4d440779f8986e33498ec9e611cbdea5d2e7ad9f67e214c4447a98634dbc"
+    },
+    "residualMongo": 0,
+    "residualRedis": 0,
+    "ownedCleanupExit": 0
+  },
+  "lastCommitImageRunSHA256": "94cdd549a76ca995e39d8188df6fd6e0340ab30593a42d7892233e5740739c0b",
+  "lastCommitImagePassedTargets": {
+    "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+      "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
+      "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+      "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
+    ],
+    "internal/namespaceinventory": [
+      "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume",
+      "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture",
+      "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence",
+      "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts",
+      "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
+    ]
+  },
+  "cpuProfile": {
+    "schema": "controller-cpu-static-top30-v1",
+    "scope": "targeted-tests-ownedcontrol-controller",
+    "nodeCount": 30,
+    "profileReadCapBytes": 33554432,
+    "binaryReadCapBytes": 268435456,
+    "reportReadCapBytes": 65536,
+    "toolSeconds": 60,
+    "phaseSeconds": 2250,
+    "unit": "ns",
+    "privateRawOnly": true,
+    "mainResultPreserved": true
+  }
 }

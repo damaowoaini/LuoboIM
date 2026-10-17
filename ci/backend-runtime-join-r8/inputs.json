@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "state": "FROZEN_SOURCE",
-  "scope": "backend_history_derived_commit_batch_image_repair13_reuse76_no_deployment",
+  "scope": "backend_history_controller_cpu1_reuse88_no_deployment",
   "base": {
     "members": 1407,
     "digest": "5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9"
@@ -4531,15 +4531,15 @@
   },
   "repairPlan": {
     "path": "ci/backend-runtime-join-r8/repair-plan.json",
-    "bytes": 54380,
-    "sha256": "ccd0db21d4065ab2e23dd5ba5789224e0c51f49d987a08ad976abaf0e9fb2769",
+    "bytes": 67745,
+    "sha256": "140742efa053be68c02b4df6da330bdde3037967a7279bfa7fd5f32cdace9397",
     "mode": 420
   },
   "repairControllerPins": [
     {
       "path": "ci/backend-runtime-join-r8/test_repair.py",
-      "bytes": 15016,
-      "sha256": "5bf77f0c4199ae753de56b514906488e21587268fb8173893f5642a36a647a8d",
+      "bytes": 19571,
+      "sha256": "9381a6ebf9c3837a842d244001a03395df85faecd1838aaf0797aee851a8fb35",
       "mode": 420
     }
   ]

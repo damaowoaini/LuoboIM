@@ -136,8 +136,43 @@ func TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths(t *testing.T) {
 					_, _ = s.StopForLocalCleanup(ctx)
 				}
 			}
-			call(first)
-			waitCleanupFile(t, count)
+			if first == "local-first" {
+				func() {
+					ctx, cancel := context.WithCancel(context.Background())
+					defer cancel()
+					// The original fixture phase still has one3s bound. The
+					// actual context-aware ELF validation precedes SIGTERM;
+					// only the observed original child signal starts the30ms
+					// cancellation window for its retained Wait.
+					phase := time.NewTimer(3 * time.Second)
+					defer phase.Stop()
+					returned := make(chan struct{})
+					go func() {
+						_, _ = s.StopForLocalCleanup(ctx)
+						close(returned)
+					}()
+					// Even Fatal/phase failure must finish the SAME retained
+					// Stop call before cleanup may remove its private files.
+					defer func() {
+						cancel()
+						<-returned
+					}()
+					waitCleanupFile(t, count)
+					afterSignal := time.AfterFunc(30*time.Millisecond, cancel)
+					defer afterSignal.Stop()
+					select {
+					case <-returned:
+						if ctx.Err() == nil {
+							t.Fatal("original local Wait returned before observed-signal cancellation")
+						}
+					case <-phase.C:
+						t.Fatal("original local cleanup exceeded its retained child phase")
+					}
+				}()
+			} else {
+				call(first)
+				waitCleanupFile(t, count)
+			}
 			call("canonical-first")
 			call("runtime-first")
 			call("local-first")
