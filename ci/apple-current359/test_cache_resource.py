@@ -24,7 +24,7 @@ def resource_guard():
 
 class CacheResourceControls(unittest.TestCase):
     def test_actual_guard_ignores_unrelated_shared_temp_and_retains_the_original_caps(self):
-        for variant in ['valid', 'cache-cap', 'primary-cap', 'free-disk']:
+        for variant in ['valid', 'cache-cap', 'private-cache-cap', 'primary-cap', 'free-disk']:
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as tmp:
                 parent = Path(tmp).resolve()
                 root = parent/'T'; root.mkdir(mode=0o700)
@@ -33,10 +33,13 @@ class CacheResourceControls(unittest.TestCase):
                 old = root/'xcrun_db-OldABC12'; old.write_bytes(b'preexisting cache remains intact')
                 new = root/'xcrun_db-NewABC12'; new.write_bytes(b'new exact permitted leaf')
                 work = parent/'owned'; (work/'evidence').mkdir(parents=True)
+                private = work/'xcode/ToolCache'; private.mkdir(mode=0o700, parents=True)
+                private_cache = private/'xcrun_db'; private_cache.write_bytes(b'job private cache'); private_cache.chmod(0o600)
                 row = {'canonical': str(root), 'uid': os.getuid(),
                        'directory_identity': xcrun_adapter.cache_directory_identity(root, os.getuid()),
                        'protected_preexisting': [old.name]}
                 adapter = SimpleNamespace(cache_boundary=lambda p: copy.deepcopy(row),
+                    private_cache_path=xcrun_adapter.private_cache_path,
                     cache_directory_identity=xcrun_adapter.cache_directory_identity)
                 guard = resource_guard()
                 original = guard.allocated
@@ -56,7 +59,9 @@ class CacheResourceControls(unittest.TestCase):
                 measurement = cache_resource.allocated_cache_leaves
 
                 def measured(*args):
-                    return 65*1048576 if variant == 'cache-cap' else measurement(*args)
+                    if variant == 'cache-cap' or (variant == 'private-cache-cap' and args[0]['canonical'] == str(private)):
+                        return 65*1048576
+                    return measurement(*args)
 
                 disk = SimpleNamespace(f_bavail=512, f_frsize=1024*1024)
                 actual_statvfs = guard.os.statvfs
@@ -74,7 +79,7 @@ class CacheResourceControls(unittest.TestCase):
                 if variant == 'valid':
                     self.assertEqual(code, 0); start.assert_called_once()
                     self.assertEqual(receipt['status'], 'passed')
-                    self.assertEqual(receipt['maximum_observed_secondary_allocated_bytes'], new.stat().st_blocks*512)
+                    self.assertEqual(receipt['maximum_observed_secondary_allocated_bytes'], (new.stat().st_blocks+private_cache.stat().st_blocks)*512)
                 else:
                     self.assertEqual(code, 75); start.assert_not_called()
                     self.assertTrue(receipt['status'].startswith('not_started_'))
@@ -82,6 +87,8 @@ class CacheResourceControls(unittest.TestCase):
                 self.assertEqual((root/'unrelated-runner-cache'/'existing').read_bytes(), b'never scan this body')
                 scope = json.loads((work/'evidence/cache-resource-scope.json').read_text())
                 self.assertEqual(scope['secondary_cap_bytes'], 64*1048576)
+                self.assertTrue(scope['private_cache_counted_under_same_secondary_cap'])
+                self.assertEqual(scope['private_cache_root'], str(private))
                 self.assertFalse(scope['files_deleted'])
                 self.assertFalse(scope['process_exclusive_cache_ownership_claimed'])
 

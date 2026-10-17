@@ -22,7 +22,8 @@ class BootstrapEnvironment(unittest.TestCase):
         def exists(path):
             return False if path in guarded_home else original_exists(path)
         with tempfile.TemporaryDirectory() as temp:
-            work = Path(temp)
+            work = Path(temp).resolve()
+            (work/'xcode/ToolCache').mkdir(mode=0o700, parents=True)
             with mock.patch.object(driver.pod_selector, 'recheck', return_value=pod), \
                     mock.patch.object(Path, 'exists', exists), \
                     mock.patch.dict(os.environ, {'PATH': '/untrusted', 'HTTPS_PROXY': 'https://untrusted.invalid'}):
@@ -34,12 +35,12 @@ class BootstrapEnvironment(unittest.TestCase):
             self.assertEqual(actual['CFFIXED_USER_HOME'], str(work/'cf-home'))
             self.assertEqual(actual['GIT_CONFIG_GLOBAL'], '/dev/null')
             self.assertEqual(actual['xcrun_nocache'], '1')
+            self.assertEqual(actual['xcrun_db'], str(driver.xcrun_adapter.private_cache_path(work)))
             self.assertNotIn('HTTPS_PROXY', actual)
-            # The exact hosted-user cache boundary has its own real-FS control.
-            # All three workers must include that same sealed narrow rule, while
-            # retaining original source/activation and package-network denials.
-            grant = '(allow file-write* (regex #"^/private/var/folders/ab/abcdefghijklmnopqrst/T/xcrun_db-[A-Za-z0-9]{8}$"))'
-            with mock.patch.object(driver.xcrun_adapter, 'cache_profile', return_value=grant) as boundary:
+            # No shared cache write exception: all three actual workers retain
+            # original source/activation and package-network denials.
+            grant = '(deny file-write* (subpath "/private/var/folders/ab/abcdefghijklmnopqrst/T"))'
+            with mock.patch.object(driver.xcrun_adapter, 'private_cache_profile', return_value=grant) as boundary:
                 for stage in ['acquire', 'resolve', 'package']:
                     profile = driver.profile(work, stage).decode()
                     self.assertIn('(deny file-write*)', profile)
@@ -50,6 +51,35 @@ class BootstrapEnvironment(unittest.TestCase):
                 self.assertEqual(boundary.call_count, 3)
                 self.assertEqual(boundary.call_args.args, (work,))
                 self.assertNotIn('allow network-outbound', driver.profile(work, 'package').decode())
+
+    def test_private_tool_cache_rejects_foreign_inode_alias_and_permissions_without_reading_bodies(self):
+        adapter = driver.xcrun_adapter
+        with tempfile.TemporaryDirectory() as temp:
+            work = Path(temp).resolve()
+            root = work/'xcode/ToolCache'; root.mkdir(mode=0o700, parents=True)
+            path = root/'xcrun_db'
+            self.assertEqual(adapter.private_cache_path(work), path)
+            path.write_bytes(b'original private cache'); path.chmod(0o600)
+            self.assertEqual(adapter.private_cache_path(work), path)
+            with mock.patch.object(Path, 'read_bytes', side_effect=AssertionError('no cache body read')):
+                self.assertEqual(adapter.private_cache_path(work), path)
+            path.chmod(0o644)
+            with self.assertRaises(ValueError): adapter.private_cache_path(work)
+            path.chmod(0o600)
+            link = root/'other'; os.link(path, link)
+            with self.assertRaises(ValueError): adapter.private_cache_path(work)
+            link.unlink(); path.unlink()
+            path.symlink_to(work/'missing')
+            with self.assertRaises(ValueError): adapter.private_cache_path(work)
+            path.unlink(); root.chmod(0o755)
+            with self.assertRaises(ValueError): adapter.private_cache_path(work)
+            root.chmod(0o700)
+            aliases = ['/private/var/folders/ab/abcdefghijklmnopqrst/T', '/var/folders/ab/abcdefghijklmnopqrst/T']
+            with mock.patch.object(adapter, 'cache_boundary', return_value=dict(canonical=aliases[0], lexical=aliases[1])):
+                profile = adapter.private_cache_profile(work)
+            for alias in aliases:
+                self.assertIn('(deny file-write* (subpath '+driver.json.dumps(alias)+'))', profile)
+            self.assertNotIn('allow', profile)
 
     def test_actual_bootstrap_requires_exact_read_query_signature_stable_tool_and_clean_result(self):
         with tempfile.TemporaryDirectory() as temp:

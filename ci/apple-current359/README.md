@@ -164,3 +164,10 @@ Prepared only two new real-filesystem controls and two directly affected old
 controls (loaded owner/hybrid positive and the R6 rejection diagnostics).
 No controls, Python imports/parse, Pod/Ruby/native commands, downloads, cloud
 dispatch or adoption have been executed for R7.
+
+
+### Private xcrun cache successor
+
+R19's four real commands exited zero but the original sealed user cache already contained `xcrun_db`; its intended write denial rejected Apple's rename. The source successor sets Apple's `xcrun_db` environment variable to the exact absolute `work/xcode/ToolCache/xcrun_db` for both direct preflight commands and all native worker environments. The installed adapter requires that same original value before the unchanged ARM exec. The private directory is checked for canonical ownership and mode, and its cache rejects symlinks, hardlinks, foreign ownership and public permissions.
+
+Every active sandbox now denies writes through both aliases of the original Darwin user temporary directory. The private cache is charged to the existing primary allocation cap and added to the same64MiB secondary measurement; the shared guard and cap comparisons remain unchanged. No cache bodies are read or existing user cache files moved or deleted. Original CLI argv, output, stderr, source and native approval gates remain unchanged. Hosted Xcode consumption of this environment override still requires one short actual preflight; local controller checks are not native evidence.

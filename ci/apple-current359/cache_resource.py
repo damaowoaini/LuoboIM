@@ -1,4 +1,4 @@
-"""Account only the exact new xcrun cache leaves admitted by the sealed policy.
+"""Account exact cache leaves in the sealed shared and task-private directories.
 
 Darwin's per-user T directory is shared with runner tools. Its unrelated existing
 subtrees are not this command's allocations. The unchanged resource guard still
@@ -43,6 +43,10 @@ def run(guard, adapter, work, arguments):
     """One independently loaded guard module, one command, restored on every exit."""
     work = Path(work)
     row = adapter.cache_boundary(work)
+    private = adapter.private_cache_path(work).parent
+    private_row = {'canonical': str(private), 'uid': row['uid'],
+                   'directory_identity': adapter.cache_directory_identity(private, row['uid']),
+                   'protected_preexisting': []}
     secondary = Path(row['canonical'])
     if (work.resolve(strict=True) != work or Path(arguments.allocated_root) != work
             or Path(arguments.secondary_root) != secondary
@@ -55,6 +59,8 @@ def run(guard, adapter, work, arguments):
              'secondary_cap_bytes': 64 * 1048576,
              'unrelated_shared_subtrees_counted': False,
              'process_exclusive_cache_ownership_claimed': False,
+             'private_cache_root': str(private),
+             'private_cache_counted_under_same_secondary_cap': True,
              'file_bodies_read': False, 'files_deleted': False}
     target = work/'evidence/cache-resource-scope.json'
     fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
@@ -65,7 +71,8 @@ def run(guard, adapter, work, arguments):
 
     def measured(root):
         if root is not None and Path(root) == secondary:
-            return allocated_cache_leaves(row, adapter.cache_directory_identity)
+            return (allocated_cache_leaves(row, adapter.cache_directory_identity)
+                    + allocated_cache_leaves(private_row, adapter.cache_directory_identity))
         return original(root)
 
     # The original guard's lifecycle and every cap comparison stay intact. This

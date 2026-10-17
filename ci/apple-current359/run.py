@@ -38,8 +38,8 @@ def borrowed_helper(row, name):
     return load(REPO/row['path'], name)
 
 
-xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 19364, 'sha256': '74d676cead63125c624281fbaced5abb3c7f15b56db647e46eb7aa9e90d2e0ed'}, 'current359_owned_xcrun_adapter')
-cache_resource = borrowed_helper({'path': 'ci/apple-current359/cache_resource.py', 'bytes': 3730, 'sha256': 'bf7f181cb8e474d06bdfe34c07818e2ac497fd0453d85a97e502a2c3c44c292d'}, 'current359_exact_cache_resource')
+xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 20918, 'sha256': '644351abdc5c93da1fee65f30e94d44a9ebe162b404d62a050b9a98dc9e8c2ae'}, 'current359_owned_xcrun_adapter')
+cache_resource = borrowed_helper({'path': 'ci/apple-current359/cache_resource.py', 'bytes': 4206, 'sha256': 'd0c891d1aae11e0e16055bbd83ce366294a7705501219a99985eda6dd52590ee'}, 'current359_exact_cache_resource')
 
 packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes': 10141, 'sha256': '7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248'}, 'apple359_common_packaging')
 pod_selector = borrowed_helper({'path': 'ci/apple-current354/pod_selector.py', 'bytes': 5603, 'sha256': '820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769'}, 'apple359_reviewed117_selector')
@@ -92,7 +92,8 @@ def env(work, selected):
              COCOAPODS_SKIP_UPDATE_MESSAGE='true', FLUTTER_SUPPRESS_ANALYTICS='true',
              DART_SUPPRESS_ANALYTICS='true', GIT_CONFIG_NOSYSTEM='1',
              GIT_CONFIG_GLOBAL='/dev/null', GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1',
-             PYTHONDONTWRITEBYTECODE='1', xcrun_nocache='1')
+             PYTHONDONTWRITEBYTECODE='1', xcrun_nocache='1',
+             xcrun_db=str(xcrun_adapter.private_cache_path(work)))
     if any((Path(e['HOME'])/n).exists() for n in ['.flutter_settings', '.flutter_tool_state', '.dart-tool']):
         raise ValueError('ambient Flutter/Dart home state refused; HOME remains real')
     return e
@@ -621,7 +622,7 @@ def package(work, lane, spec):
 def profile(work, stage):
     text = '(version 1)(allow default)(deny network*)(deny file-write*)'
     text += '(allow file-write* (subpath '+json.dumps(str(work))+') (literal "/dev/null"))'
-    text += xcrun_adapter.cache_profile(work)
+    text += xcrun_adapter.private_cache_profile(work)
     if stage in {'acquire', 'resolve'}:
         text += '(allow network-outbound (remote ip "*:443") (remote ip "*:53") (literal "/private/var/run/mDNSResponder"))'
     protected = ['acquire.sb', 'resolve.sb', 'package.sb', 'activation.json', 'tool-adapters']
@@ -680,7 +681,7 @@ def main():
     def interrupted(_number, _frame): raise InterruptedError('current359 native guard interrupted')
     for number in [signal.SIGTERM, signal.SIGINT]: signal.signal(number, interrupted)
     if a.stage in {'acquire', 'preflight'}:
-        preflight = borrowed_helper({'path': 'ci/apple-current359/tool_preflight.py', 'bytes': 9066, 'sha256': '730b9619e9280922a662071ad661828235046726ac2af136e0a76c1d220a110e'}, 'current359_actual_cli_preflight')
+        preflight = borrowed_helper({'path': 'ci/apple-current359/tool_preflight.py', 'bytes': 9134, 'sha256': 'c81470f2c5ddc38659e7f246a793af18ff2802f037365a7ccf0f6ef1cc9291a9'}, 'current359_actual_cli_preflight')
         q = preflight.prepare(work, xcrun_adapter, HERE/'xcrun_adapter.py', sys.executable,
                               sha(HERE/'lane.json'), os.environ.get('GITHUB_SHA'), spec['source_ref'])
         args = ['/usr/bin/sandbox-exec', '-f', str(q/'preflight.sb'), sys.executable, '-B',

@@ -37,7 +37,8 @@ def environment(work):
              DEVELOPER_DIR=DEVELOPER, LANG='en_US.UTF-8', CI='true',
              GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL='/dev/null',
              GIT_TERMINAL_PROMPT='0', GIT_NO_REPLACE_OBJECTS='1',
-             PYTHONDONTWRITEBYTECODE='1', xcrun_nocache='1')
+             PYTHONDONTWRITEBYTECODE='1', xcrun_nocache='1',
+             xcrun_db=str(work/'xcode/ToolCache/xcrun_db'))
     return e
 
 
@@ -147,7 +148,7 @@ def prepare(parent, adapter, adapter_path, python, lane_sha, head, source_ref):
         'controller_head': head, 'source_ref': source_ref, 'scope': 'actual-cli-preflight-only'})
     profile = '(version 1)(allow default)(deny network*)(deny file-write*)'
     profile += '(allow file-write* (subpath '+json.dumps(str(work))+') (literal "/dev/null"))'
-    profile += adapter.cache_profile(work)
+    profile += adapter.private_cache_profile(work)
     for name in ['activation.json','tool-adapters','preflight.sb']:
         profile += '(deny file-write* (subpath '+json.dumps(str(work/name))+'))'
     put(work/'preflight.sb',profile.encode())

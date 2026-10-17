@@ -16,15 +16,13 @@
     "latest_observed": {
       "actualVersionCommands": 4,
       "allCommandExitCodes": 0,
-      "artifactSHA256": "b7df22c850aef21a6dfa665b4b49b41776e331e30ab5dcc8762e0396683e16e3",
+      "artifactSHA256": "6e713758dd30ddd6ca3ce230ba649b267eeae5a22fb499c9610d97774c18ca5d",
       "attempt": 1,
-      "finalCacheRenameStderrRefused": true,
       "fullBuildStarted": false,
-      "head": "e9933f83c62767ab3a120523fec0b3cdbd11e7ec",
-      "observedDeniedDestination": "same original Darwin UID T directory / exact xcrun_db",
+      "head": "0d2ae9705000e241c258e1a31044a25fe223a3af",
       "preflightPassed": false,
-      "run": 39027598213,
-      "temporaryLeafCreationReachedRename": true
+      "protectedExistingFinalCache": true,
+      "run": 39029490121
     },
     "network": "deny",
     "original_ARM_probe_unchanged": true,
@@ -275,9 +273,9 @@
   ],
   "own_inputs": [
     {
-      "bytes": 11481,
+      "bytes": 12688,
       "path": "ci/apple-current359/README.md",
-      "sha256": "c952048ee6a4270733d3e5142c5104fa9f7292573814a30d512d172049b9bb85"
+      "sha256": "0a0024145be1a103007e1edc61616e977401c195f8fadb47d45678ad5cb05c6a"
     },
     {
       "bytes": 9182,
@@ -300,9 +298,9 @@
       "sha256": "088468334147bbf6d778a041eb352972c890b66155ad1fd4f1e035e31b9a60cf"
     },
     {
-      "bytes": 42734,
+      "bytes": 42809,
       "path": "ci/apple-current359/run.py",
-      "sha256": "ff04c0ec12a667a8b988ffe28e1d19205633f0a7524cb698eb68bc217072e421"
+      "sha256": "00bfb1badda27c9e2cb049d81dd613e95f959fb9059a7a73100ea63f266607d7"
     },
     {
       "bytes": 3474,
@@ -320,9 +318,9 @@
       "sha256": "1bc3e0a6e67e86797dc6f74c1caa0526fc366c5ac41fa9f6e2c05bd9c154b3ea"
     },
     {
-      "bytes": 6399,
+      "bytes": 8293,
       "path": "ci/apple-current359/test_tool_environment.py",
-      "sha256": "637625b7d19918d905557871402106c48f4995ba65fb15da1ce29cca0daee8aa"
+      "sha256": "cd24edb48d6e9274352d3fb4e5edf9577d319b5a148a8cb73a9043f13a7c0c28"
     },
     {
       "bytes": 2749,
@@ -340,9 +338,9 @@
       "sha256": "7e4087dee844f76ced62815772322be4f9b8d28cdd69fee234c7abb71513ada7"
     },
     {
-      "bytes": 19364,
+      "bytes": 20918,
       "path": "ci/apple-current359/xcrun_adapter.py",
-      "sha256": "74d676cead63125c624281fbaced5abb3c7f15b56db647e46eb7aa9e90d2e0ed"
+      "sha256": "644351abdc5c93da1fee65f30e94d44a9ebe162b404d62a050b9a98dc9e8c2ae"
     },
     {
       "bytes": 5245,
@@ -350,36 +348,36 @@
       "sha256": "8b64c05115c2df27c1dffad6ae35caf817a7801f905c06f1f77bf00530095664"
     },
     {
-      "bytes": 9066,
+      "bytes": 9134,
       "path": "ci/apple-current359/tool_preflight.py",
-      "sha256": "730b9619e9280922a662071ad661828235046726ac2af136e0a76c1d220a110e"
+      "sha256": "c81470f2c5ddc38659e7f246a793af18ff2802f037365a7ccf0f6ef1cc9291a9"
     },
     {
-      "bytes": 1980,
+      "bytes": 2594,
       "path": "ci/apple-current359/test_tool_preflight.py",
-      "sha256": "78e27384295c35244887317e2ecfd3057dc3d83bec9946e9f66ed4b4063ccbc6"
+      "sha256": "513419d73c4a7e8e061cb44693551742ac3e795c406f8ad5af12b4b9a90e31c5"
     },
     {
-      "bytes": 8462,
+      "bytes": 9094,
       "path": "ci/apple-current359/test_xcrun_entry.py",
-      "sha256": "aa83b87c9759094b53eb94f30910d56413f02423ab66b6bcf69700889e1105e1"
+      "sha256": "2e1983de215cda64a5cfb1e90d47e09b8eaf6a14db628eab066311777bf11996"
     },
     {
-      "bytes": 3730,
+      "bytes": 4206,
       "path": "ci/apple-current359/cache_resource.py",
-      "sha256": "bf7f181cb8e474d06bdfe34c07818e2ac497fd0453d85a97e502a2c3c44c292d"
+      "sha256": "d0c891d1aae11e0e16055bbd83ce366294a7705501219a99985eda6dd52590ee"
     },
     {
-      "bytes": 7050,
+      "bytes": 7684,
       "path": "ci/apple-current359/test_cache_resource.py",
-      "sha256": "8bbbcb98fcdef54d8e3dcc01b3a40edee642c15f044a76ec1bf4226b4847bf17"
+      "sha256": "f2b6c4e6ad302e8f2fdf83349e656de58c757859543582265603657d1aa7c72b"
     }
   ],
   "owned_xcrun_adapter": {
     "CFFIXED_USER_HOME": "work/cf-home",
     "HOME_reassigned": false,
     "PATH_prepend": "work/tool-adapters only",
-    "actual_xcode_flag_CF_cache_and_internal_xcrun_consumption": "R18 actual ARM/version commands exit0; bounded temporary leaf creation succeeds, final rename refused; dependency resolution remains unverified",
+    "actual_xcode_flag_CF_cache_and_internal_xcrun_consumption": "R19 actual four tools exit0/ARM proven; sealed existing final cache denied rename. Private absolute environment override successor not yet observed on hosted Xcode.",
     "admitted_project_operations": [
       "-resolvePackageDependencies",
       "-list",
@@ -401,13 +399,10 @@
     "required_option": "--no-cache",
     "responses_synthesized": false,
     "sandbox_additional_external_write_grants": {
-      "HOME_reassigned": false,
-      "SBPL_exact_leaf_syntax": "eight explicit alphanumeric character classes; both verified aliases of same original UID directory; existing paths denied in both spellings",
-      "leaf": "xcrun_db-[A-Za-z0-9]{8} temporary leaves; exact xcrun_db final destination only if absent in original sealed inventory",
-      "preexisting_cache_paths": "deny temporary and final cache paths individually in both validated aliases; no cache bodies read",
-      "scope": "current UID confstr(65537) canonical private /var/folders/*/*/T only",
-      "secondary_allocation_cap_bytes": 67108864,
-      "unknown_path_or_shape": "refuse"
+      "hosted_consumption_verified": false,
+      "policy": "deny all writes through both sealed original Darwin-user T aliases; original existing cache stays untouched",
+      "private_cache": "work/xcode/ToolCache/xcrun_db; exact absolute xcrun_db environment for direct tools and native workers; private primary allocation accounting",
+      "root": "none"
     },
     "schema": 1,
     "scheme_policy": {
@@ -517,7 +512,7 @@
     "all_owned_cap_bytes": 17179869184,
     "cold_bytes": 21474836480,
     "continuous_floor_bytes": 1073741824,
-    "darwin_cache_measurement": "Only new exact xcrun_db-[A-Za-z0-9]{8} leaves admitted by immutable adapter boundary; excludes protected preexisting leaves and unrelated shared T subtrees. Keep64MiB cap and1GiB global free floor; no body reads/deletion/exclusive ownership claim.",
+    "darwin_cache_measurement": "Private work/xcode/ToolCache exact leaves are counted in both original primary allocated-root and original64MiB secondary cap, combined with the original shared exact-new-leaf observer. Both shared aliases deny all writes. No bodies read or existing cache modified.",
     "estimate_not_measured": true,
     "phase_bytes": 4294967296,
     "poll_seconds": 0.2,

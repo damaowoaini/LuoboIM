@@ -33,6 +33,7 @@ class ActualEntryBoundary(unittest.TestCase):
             (work/'activation.json').write_text(json.dumps({'identity': a.IDENTITY}))
             class ReplacedProcess(Exception): pass
             with mock.patch.object(a, '__file__', str(script)), \
+                    mock.patch.dict(os.environ, {'xcrun_db':str(a.private_cache_path(work))}), \
                     mock.patch.object(a.sys, 'argv', [str(script), 'xcodebuild', '-version']), \
                     mock.patch.object(a.Path, 'cwd', return_value=work), \
                     mock.patch.object(a, 'cache_boundary', return_value={}) as boundary, \
@@ -48,6 +49,14 @@ class ActualEntryBoundary(unittest.TestCase):
             self.assertEqual(rows[0]['real_tool'], '/usr/bin/xcrun')
             self.assertEqual(rows[0]['tool_argv'], ['--no-cache','xcodebuild','-version'])
             self.assertIs(rows[0]['response_synthesized'], False)
+            with mock.patch.object(a, '__file__', str(script)), \
+                    mock.patch.object(a.Path, 'cwd', return_value=work), \
+                    mock.patch.object(a, 'cache_boundary', return_value={}), \
+                    mock.patch.dict(os.environ, {'xcrun_db':'/tmp/foreign-cache'}), \
+                    mock.patch.object(a.os, 'execv') as refused:
+                with self.assertRaisesRegex(ValueError, 'private tool cache environment'):
+                    a.main()
+                refused.assert_not_called()
             for value in ['/tmp/python;bad', '/tmp/python$(bad)', '/tmp/../python', 'python3']:
                 with self.subTest(value=value):
                     with self.assertRaises(ValueError): a.script_body(source.read_bytes(), value)

@@ -282,6 +282,35 @@ def cache_profile(work):
     return text
 
 
+def private_cache_path(work):
+    # Apple's shipped libxcrun accepts xcrun_db as an absolute cache filename.
+    # Bind every shim and direct tool to this job's private directory instead
+    # of renaming over another process's existing Darwin-user cache.
+    work = Path(work)
+    path = owned(work, str(work/'xcode/ToolCache/xcrun_db'), work)
+    directory = path.parent
+    info = directory.lstat()
+    if (not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid()
+            or stat.S_IMODE(info.st_mode) != 0o700):
+        raise ValueError('private owned tool cache directory required')
+    if path.exists():
+        info = path.lstat()
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid()
+                or info.st_nlink != 1 or stat.S_IMODE(info.st_mode) & 0o077
+                or info.st_size > 64 << 20):
+            raise ValueError('private owned tool cache file required')
+    return path
+
+
+def private_cache_profile(work):
+    # No write exception in the original user T directory is necessary after
+    # redirection. Keep both validated aliases entirely read-only. The private
+    # cache is already covered by the original primary allocation guard.
+    row = cache_boundary(work)
+    return ''.join('(deny file-write* (subpath '+json.dumps(p)+'))'
+                   for p in dict.fromkeys([row['canonical'], row['lexical']]))
+
+
 def check(work, source_path, python):
     work = Path(work)
     path = work/'tool-adapters/xcrun'
@@ -293,7 +322,7 @@ def check(work, source_path, python):
             or st.st_nlink != 1 or st.st_uid != os.getuid() or st.st_size != len(expected)
             or path.read_bytes() != expected):
         raise ValueError('installed source-pinned adapter differs')
-    for relative in ['cf-home', 'xcode/DerivedData', 'xcode/PackageCache', 'evidence/xcrun-adapter']:
+    for relative in ['cf-home', 'xcode/DerivedData', 'xcode/PackageCache', 'xcode/ToolCache', 'evidence/xcrun-adapter']:
         target = work/relative
         if target.resolve(strict=True) != target or not target.is_dir():
             raise ValueError('owned adapter support directory differs')
@@ -306,7 +335,7 @@ def check(work, source_path, python):
 
 def install(work, source_path, python):
     work = Path(work)
-    for relative in ['tool-adapters', 'cf-home', 'xcode/DerivedData', 'xcode/PackageCache',
+    for relative in ['tool-adapters', 'cf-home', 'xcode/DerivedData', 'xcode/PackageCache', 'xcode/ToolCache',
                      'evidence/xcrun-adapter']:
         (work/relative).mkdir(mode=0o700, parents=True, exist_ok=False)
     path = work/'tool-adapters/xcrun'
@@ -346,6 +375,8 @@ def main():
         raise ValueError('fixed CI-owned activation required')
     cwd = Path.cwd()
     cache_boundary(work)
+    if os.environ.get('xcrun_db') != str(private_cache_path(work)):
+        raise ValueError('original private tool cache environment required')
     argv, public = forwarding(work, sys.argv[1:], cwd)
     audit(work, public, cwd)
     # The only execution boundary. stdout/stderr/exit/signal behavior belongs to Apple.
