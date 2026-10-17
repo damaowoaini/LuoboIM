@@ -1,6 +1,6 @@
 # Current359 / source535 Android core-reuse candidate
 
-固定业务359/portable411、Android输入535、178锁及 native7，源 ref `bdffc675e6ec0f193bcb5cf786859a7746869061`。原354/530、历史257/428入口和原 `db185c` catalog/consumer均保留原身份。
+固定业务359/portable411、Android输入535、178锁及 native7，源 ref `0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1`。原354/530、历史257/428入口和原 `db185c` catalog/consumer均保留原身份。
 
 本目录 `rich-catalog.json` 仅从 Root 已接受38983280410的完整online/offline图派生生产四键；继承原scope/finite3/declarations/edges/metadata37/ID18/JAR字节SHA/origin，只更新实际16POM的三个String属性。两项GMM不变，display不入catalog。首14与原生失败原件逐项完全一致只是来源链比对，不从失败raw授权。新collector/consumer命名空间显式传递，不改旧全局变量；原Groovy gate整字复用、resolver仅更换固定catalogSHA，保全部typed/file/SDK未知拒绝。
 
@@ -11,3 +11,9 @@
 手动workflow默认context SHA为空，所有执行阶段在任何新work/凭证/下载前要求精确冻结cohort完整SHA。它绑定源码范围；Root完成本候选源码/新pure审查后才给字面量，不新增向用户索要确认。默认readonly仅核源，不构建。持续1GiB/.2s、cold20GiB/后续4GiB、全owned16GiB及原阶段timeout不降低。真实HOME、explicit task caches/JVM/Android config、Git/proxy隔离与offline netns不变。
 
 本候选仅源码准备：新4纯控制、readonly、下载、native/APK均未执行。旧pure52/SDK/21/6不重跑；设备/签名/服务、实际16KiB设备及iOS均未接受。完整App单测1304与native工作分开，不新增full回归。
+
+## null2 / plugin-scope 显式后继
+
+当前身份 `current359-null2-plugin-scope-v2` 固定已发布 `0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1`；业务359/portable411/Android535数量不变，仅 privacy模型与原同文件测试两行源码pin改变。旧bdffc/原359身份和原生结果仍是历史，不算本身份成功。当前Dart仅已验new4+direct2/analysis2；full1308未执行，无新原生结果。
+
+合成f3776344冻结的plugin-scope11：21份独立官方pub源+localSDK、44配置、原App14+BC4/18 catalogue逐字保留；这组plugin控制/Gradle3从未执行，不复用为绿。新的source_ref/source535摘要依次绑定plugin contract、Python helper、Groovy registry校验、fixture resolver摘要、cohort和netns/workflow。原AAR/SDK/native7/178锁、HOME/资源/netns/原7负例不变。

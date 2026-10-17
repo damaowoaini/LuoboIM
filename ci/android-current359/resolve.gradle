@@ -330,12 +330,58 @@ def richSource = new JsonSlurper().parseText(new String(richBytes,'UTF-8'))
 def richFactory = new GroovyShell(getClass().classLoader).evaluate(new String(richScript,'UTF-8'))
 def richGate = richFactory(owned,richSource,localRef,fileDigest,richField.catalog_sha256)
 def richPhase = gradle.startParameter.taskNames == ['assembleDebug'] ? 'apk' : 'metadata'
-def richPersist = { c,proof,String family ->
-    if (!(family in ['rich-consumed','rich-refused']) ||
+// Independent package archives are sealed before any application model. This
+// registry authorizes only exact source/project/configuration tuples, not a graph.
+def pluginField = catalog.registered_plugin_rich_consumer
+if (pluginField == null || pluginField.keySet() !=
+        (['contract_sha256','seal_sha256','registry','script_sha256','script_base64'] as Set) ||
+        pluginField.contract_sha256 != 'ed0894e5ef85da81c7693597fb62707b99f6a2b2a8e1312df5e63f90c794e6f5' ||
+        pluginField.script_sha256 != 'b7f3571cce6289303a9916aaeecb0d9afae899ed1e8f74ec72f90b803f59b545')
+    throw new GradleException('fixed independent plugin source registry required')
+def pluginSealFile = new File(owned,'evidence/plugin-source-seal.json')
+if (pluginSealFile.canonicalFile != pluginSealFile ||
+        !Files.isRegularFile(pluginSealFile.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+        Files.getOwner(pluginSealFile.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal ||
+        Files.getAttribute(pluginSealFile.toPath(),'unix:nlink',LinkOption.NOFOLLOW_LINKS)!=1 ||
+        pluginSealFile.length()>16*1024*1024 || fileDigest(pluginSealFile)!=pluginField.seal_sha256)
+    throw new GradleException('independent plugin source seal differs')
+def pluginSeal = new JsonSlurper().parse(pluginSealFile)
+def pluginRegistry = pluginField.registry
+def pluginScript = Base64.decoder.decode(pluginField.script_base64)
+if (pluginScript.length>32*1024 || digestBytes(pluginScript)!=pluginField.script_sha256 ||
+        pluginRegistry.schema!=1 || pluginRegistry.contract_sha256!=pluginField.contract_sha256 ||
+        pluginRegistry.source_ref!='0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1' ||
+        pluginRegistry.source_digest!='e56ccf115d0299ef01241fc6f871af3e938fcdf356d77c7caa67191b026c87c2' ||
+        pluginRegistry.root_relative!='source/app/android' || pluginRegistry.entries.size()!=22 ||
+        pluginRegistry.any { k,v -> pluginSeal[k]!=v })
+    throw new GradleException('plugin source registry identity differs')
+def pluginEntries = pluginRegistry.entries.collectEntries { [(it.project):it] }
+def pluginSlots = pluginRegistry.entries.collectEntries { [(it.slot):it] }
+if (pluginEntries.size()!=22 || pluginSlots.size()!=22 ||
+        pluginRegistry.entries.any { it.slot!=digestBytes(it.project.getBytes('UTF-8')) ||
+            !(it.project ==~ /:[a-z][a-z0-9_]*/) })
+    throw new GradleException('finite exact plugin slots required')
+def pluginFactory = new GroovyShell(getClass().classLoader).evaluate(new String(pluginScript,'UTF-8'))
+def pluginGates = [:]
+def richFor = { p,c ->
+    def entry=pluginEntries[p.path]
+    if (entry==null) return [gate:richGate,entry:null]
+    if (!pluginGates.containsKey(p.path)) {
+        def scopedSource=new LinkedHashMap(richSource)
+        scopedSource.scope=new LinkedHashMap(richSource.scope)
+        scopedSource.scope.putAll([project:entry.project,project_relative:entry.project_relative,
+            root_relative:pluginRegistry.root_relative,sources:entry.gate_sources])
+        pluginGates[p.path]=pluginFactory(owned,scopedSource,localRef,fileDigest,richField.catalog_sha256)
+    }
+    [gate:pluginGates[p.path],entry:entry]
+}
+def richPersist = { c,proof,String family,String pluginSlot=null ->
+    if ((pluginSlot==null ? !(family in ['rich-consumed','rich-refused']) :
+            (!pluginSlots.containsKey(pluginSlot) || !(family in ['plugin-rich-consumed','plugin-rich-refused']))) ||
             !richSource.configurations.any { it.name==c.name } ||
             !(richPhase in ['metadata','apk']))
         throw new GradleException('finite rich evidence destination required')
-    def directory = new File(owned,'evidence/'+family+'/'+richPhase)
+    def directory = new File(owned,'evidence/'+family+'/'+richPhase+(pluginSlot==null ? '' : '/'+pluginSlot))
     Files.createDirectories(directory.toPath())
     if (directory.canonicalFile != directory || Files.getOwner(directory.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal)
         throw new GradleException('owned rich report directory required')
@@ -352,10 +398,38 @@ def richPersist = { c,proof,String family ->
     } finally { channel.close() }
     def parentChannel=java.nio.channels.FileChannel.open(directory.toPath(),java.nio.file.StandardOpenOption.READ)
     try { parentChannel.force(true) } finally { parentChannel.close() }
+    // The newly introduced project directory chain must also be durable.
+    if (pluginSlot!=null) {
+        def current=directory.parentFile
+        while (true) {
+            if (current.canonicalFile!=current || !current.toPath().startsWith(owned.toPath()) ||
+                    Files.getOwner(current.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal)
+                throw new GradleException('owned plugin report ancestor required')
+            def ancestor=java.nio.channels.FileChannel.open(current.toPath(),java.nio.file.StandardOpenOption.READ)
+            try { ancestor.force(true) } finally { ancestor.close() }
+            if (current==owned) break
+            current=current.parentFile
+        }
+    }
 }
 def richWrite = { p,c ->
-    def proof = richGate.audit(p,c,{ refused -> richPersist(c,refused,'rich-refused') })
-    richPersist(c,proof,'rich-consumed')
+    def selected=richFor(p,c)
+    def decorate = { value -> selected.entry==null ? value : value +
+        [plugin_seal_sha256:pluginField.seal_sha256,plugin_origin:selected.entry.origin] }
+    def proof
+    try { proof = selected.gate.audit(p,c,{ refused ->
+        richPersist(c,decorate(refused),selected.entry==null ? 'rich-refused' : 'plugin-rich-refused',selected.entry?.slot) }) }
+    catch (Exception failure) {
+        if (selected.entry!=null) {
+            def target=new File(owned,'evidence/plugin-rich-refused/'+richPhase+'/'+selected.entry.slot+'/'+c.name+'.json')
+            if (!target.exists()) {
+                try { richPersist(c,decorate(selected.gate.diagnostic(p,c,'graph')),'plugin-rich-refused',selected.entry.slot) }
+                catch (Exception evidenceFailure) { failure.addSuppressed(evidenceFailure) }
+            }
+        }
+        throw failure
+    }
+    richPersist(c,decorate(proof),selected.entry==null ? 'rich-consumed' : 'plugin-rich-consumed',selected.entry?.slot)
 }
 // END independent R12 consumer.
 def selectorIdentity = { selector ->
@@ -392,8 +466,21 @@ gradle.beforeProject { p ->
     observeRepositories(p.repositories)
     observeRepositories(p.buildscript.repositories)
     [p.configurations,p.buildscript.configurations].each { configs -> configs.all { c ->
-        if (richGate.scoped(p,c)) {
-            c.incoming.beforeResolve { richGate.declarations(p,c) }
+        def selected=richFor(p,c)
+        if (selected.gate.scoped(p,c)) {
+            c.incoming.beforeResolve {
+                try { selected.gate.declarations(p,c) }
+                catch (Exception failure) {
+                    if (selected.entry!=null) {
+                        try {
+                            def observed=selected.gate.diagnostic(p,c,'declaration') +
+                                [plugin_seal_sha256:pluginField.seal_sha256,plugin_origin:selected.entry.origin]
+                            richPersist(c,observed,'plugin-rich-refused',selected.entry.slot)
+                        } catch (Exception evidenceFailure) { failure.addSuppressed(evidenceFailure) }
+                    }
+                    throw failure
+                }
+            }
             c.incoming.afterResolve { richWrite(p,c) }
         }
         // Official Gradle9.3.1 DependencySubstitutions covers transitive
@@ -403,7 +490,14 @@ gradle.beforeProject { p ->
             logger.lifecycle('LUOBO_SELECTOR_REQUEST ' + JsonOutput.toJson(
                     [project:p.path, configuration:c.name, requested:requested]))
             if (d.requested instanceof ModuleComponentSelector) {
-                if (richGate.isRich(d.requested.versionConstraint)) richGate.requested(p,c,d.requested)
+                if (richGate.isRich(d.requested.versionConstraint)) {
+                    def selected=richFor(p,c)
+                    if (!selected.gate.scoped(p,c))
+                        logger.lifecycle('LUOBO_PLUGIN_SCOPE_REFUSAL ' + JsonOutput.toJson(
+                            [reason:'unregistered-project-or-config',project:p.path.take(256),
+                             configuration:c.name.take(256),source_seal_sha256:pluginField.seal_sha256]))
+                    selected.gate.requested(p,c,d.requested)
+                }
                 else checkModule(d.requested.group, d.requested.module, d.requested.version)
             }
             // No coordinate exemption and no useTarget/version substitution.

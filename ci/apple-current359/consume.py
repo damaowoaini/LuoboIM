@@ -11,11 +11,11 @@ import struct
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-IDENTITY = 'current359-apple-source-consumer-v1'
-REF = 'bdffc675e6ec0f193bcb5cf786859a7746869061'
-SOURCE = '2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899'
-PORTABLE = '71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3'
-FILES = '6a2afa1e149846517cdecf94fef4838aaaf1f05c346654bf18804f955d588b95'
+IDENTITY = 'current359-null2-apple-source-consumer-v2'
+REF = '0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1'
+SOURCE = '633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199'
+PORTABLE = '66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb'
+FILES = '1f3cb96a3b21e4fa5b66cab4eef5c2dbbfb76cba4ecb1df9a22c72c6800c7857'
 
 
 def digest(body):

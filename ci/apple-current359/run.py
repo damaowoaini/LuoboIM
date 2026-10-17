@@ -22,7 +22,7 @@ import consume
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-IDENTITY = 'current359-apple-native-resolution-v1'
+IDENTITY = 'current359-null2-apple-native-resolution-v2'
 GIB = 1024**3
 
 

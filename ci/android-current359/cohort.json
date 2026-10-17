@@ -1,5 +1,5 @@
 {
-  "App_full_regression": "Root accepted scoped announcement19+exact7 reuse and11analysis; aggregate1304 UNRUN; no native/device/service acceptance",
+  "App_full_regression": "Root accepted null2 new4+direct2/analysis2 and prior scoped announcement19+7/11static; aggregate1308 UNRUN; no native/device/service acceptance",
   "borrowed_inputs": [
     {
       "bytes": 4458,
@@ -163,39 +163,59 @@
     }
   ],
   "business_members": 359,
-  "business_rows_digest": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+  "business_rows_digest": "633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199",
   "catalogue_approval": {
     "catalog_sha256": "00d559f734c28560b9f18a27ef2fedfd5488c7eb9fa0a6d8d18930d0927d2cc7",
     "graph_sha256": "e70247c7426c9c0afc7891eac6e10a3cb49b7fccc0ec99e17ffc041bc87c4c5e",
     "native_or_App_accepted": false,
     "root_acceptance_sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
   },
-  "cohort": "current359-immutable-core-reuse-v1",
+  "cohort": "current359-null2-plugin-scope-v2",
   "controller_inputs": [
     {
-      "bytes": 4815,
+      "bytes": 5374,
       "path": ".github/workflows/android-current359-debug.yml",
-      "sha256": "a939db52f61307eada5b544d927cb7a1b5d70b31363ad3930263c2e50785b9c8"
+      "sha256": "be208fa07af35bbc6363b94e4073eb7c80d2dfceb35bfef012ad17e6ffdec08b"
     },
     {
-      "bytes": 2341,
+      "bytes": 3164,
       "path": "ci/android-current359/README.md",
-      "sha256": "bf0efb8b33ffbdbfc31b16509fa951811809939b657643041c5c0b6e461453e9"
+      "sha256": "576eff19f1c473842aca471f5191eaba77033f250bfae553c54d0a3e6a42509b"
     },
     {
-      "bytes": 8296,
+      "bytes": 8415,
       "path": "ci/android-current359/classpaths_current.py",
-      "sha256": "3f1c96b6cdcd4902fdbfc7dfe5c85452637fa06584c6c7432f865ff21b420bf4"
+      "sha256": "49239bba20e5ae4cb10f03f1ebb297d77a17c5ef0e4dc2eae5a279c687e9c941"
     },
     {
-      "bytes": 101803,
+      "bytes": 101802,
       "path": "ci/android-current359/inputs.json",
-      "sha256": "dd61867b134b22d43bdd6b83bbaae5dc3d036c6d81d9af7bcd3c6bcec4ce3b8c"
+      "sha256": "c5f6dec1c01c30fc5bf5b45e24a8095e0b3550b84effd2758954749f8da748b5"
     },
     {
-      "bytes": 589,
+      "bytes": 587,
       "path": "ci/android-current359/netns.sh",
-      "sha256": "9dace0ed59dce211f55d49b9d99abb14eba9ca389ed037a2e9b70ad3e029b5c9"
+      "sha256": "f1c18723df2e754a4a42fbb886ee8c780e4a71069ead43c6bce1a26b134abfb9"
+    },
+    {
+      "bytes": 10593,
+      "path": "ci/android-current359/plugin-rich-consumer.gradle",
+      "sha256": "b7f3571cce6289303a9916aaeecb0d9afae899ed1e8f74ec72f90b803f59b545"
+    },
+    {
+      "bytes": 35983,
+      "path": "ci/android-current359/plugin-scope-inputs.json",
+      "sha256": "ed0894e5ef85da81c7693597fb62707b99f6a2b2a8e1312df5e63f90c794e6f5"
+    },
+    {
+      "bytes": 20761,
+      "path": "ci/android-current359/plugin_scope.py",
+      "sha256": "51698b9faf32499e2afa593dd758a751a14b205efb4dacff1016d42104904c6e"
+    },
+    {
+      "bytes": 11062,
+      "path": "ci/android-current359/plugin_scope_fixture.py",
+      "sha256": "754f7002b9d20160005549938c767f4e34b9035cf8d73ed5d4ae5921f5b22c14"
     },
     {
       "bytes": 1384,
@@ -208,9 +228,9 @@
       "sha256": "25699bc89f48b00bbe58e40d7bbe8a103358015e60b0c874ca0a5ee0eebe290b"
     },
     {
-      "bytes": 36364,
+      "bytes": 42452,
       "path": "ci/android-current359/resolve.gradle",
-      "sha256": "00e49cc73c2831c825a43f392145ec7b974518414e2f7adb759324e17b3519cd"
+      "sha256": "e1f006cc05b7855200833037f402add01e39085bbe89b1b0f6b62eceb88ebb70"
     },
     {
       "bytes": 71217,
@@ -228,17 +248,22 @@
       "sha256": "6a17588836b2db887340c252cb0ed0179974dad3a8abf8bb78310f060b6e45c5"
     },
     {
-      "bytes": 26588,
+      "bytes": 30716,
       "path": "ci/android-current359/run.py",
-      "sha256": "ca8e74372fb629b59b0b9190bb95ee74923c7ae351947c8be745adcd42e046eb"
+      "sha256": "d14ce9d05c9670ffe098a092027a006ac3ccb380a2c36ac47d2f2b492ac502d0"
     },
     {
-      "bytes": 7560,
+      "bytes": 14659,
       "path": "ci/android-current359/test_identity.py",
-      "sha256": "f576115d09037d3e7d35feb173a06f8cf656992297d8b90c3c3ed2b05219172b"
+      "sha256": "ae64ac0a9467a005cdadcc5854d380955aee1f296c52b2366cab40a2b2b5a6ab"
+    },
+    {
+      "bytes": 6706,
+      "path": "ci/android-current359/test_plugin_scope.py",
+      "sha256": "a13fb415c15df6939c521de76486edf3eaccdd41896a394ec8391ec21cd9ca41"
     }
   ],
-  "controller_revision": "repository-lifecycle-r1-early-fixed-content-then-readonly",
+  "controller_revision": "null2-published-source-plugin-scope-v2-with-post-builtin-controls3",
   "core_compatibility": {
     "Go_protocol_SDK_native_source_subset_exact": true,
     "new_App_Go_build_or_current_Go_version_claim": false,
@@ -249,7 +274,7 @@
     "original_source_members": 530,
     "original_source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e"
   },
-  "execution_gate": "Manual exact complete cohort SHA must be supplied after Root source/new4 review; no additional user permission flow",
+  "execution_gate": "Manual exact complete successor cohort SHA after Root source/new+direct control review; historical context SHA cannot activate this identity",
   "flutter_environment_sources": [
     {
       "bytes": 6531,
@@ -269,9 +294,9 @@
   ],
   "locked_packages": 178,
   "mobile_source_declaration_at_ref": {
-    "bytes": 189923,
+    "bytes": 193400,
     "path": "ci/mobile/inputs.json",
-    "sha256": "652fc6f50a172ff2db82f8fd460440f9b79938905fc8aacb3894a10329d441f3"
+    "sha256": "df60daca701faef61c14eed46ce86f760062002f6b4e417e287c58f133f75df4"
   },
   "native_source_snapshot": {
     "Kotlin_compile_Swift_parse_typecheck_passed": true,
@@ -325,7 +350,37 @@
   },
   "original_context_sha256": "ee8bf199ae2993f572a639d9d8392214cb6f81e802ffa1f4b1cf0408e5d51cf9",
   "original_core_spec_sha256": "cd23f824dd932ddc8d75769818239712f841bfef0a057ba18ad17668e7bd9792",
-  "portable_digest": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3",
+  "plugin_builtin_controls": {
+    "Gradle_home": "selector-gradle-home",
+    "actual_Gradle_executed": false,
+    "cases": [
+      "two-projects-positive",
+      "changed-plugin-source",
+      "unregistered-project"
+    ],
+    "complete": "evidence/plugin-controls-complete.json",
+    "completion_requires": "actual guarded exit/resource/log SHA plus unchanged original fixture.check for every case",
+    "fixture": {
+      "bytes": 11062,
+      "path": "ci/android-current359/plugin_scope_fixture.py",
+      "sha256": "754f7002b9d20160005549938c767f4e34b9035cf8d73ed5d4ae5921f5b22c14"
+    },
+    "mandatory_preseal_after_builtin_before_production_models": true,
+    "owned_outputs_policy_unchanged": true,
+    "production_Gradle_home_unchanged": "gradle-cache"
+  },
+  "plugin_source_scope": {
+    "App_original18_still_required": true,
+    "actual_plugin_graphs_accepted": false,
+    "changed_business_rows": 2,
+    "contract_sha256": "ed0894e5ef85da81c7693597fb62707b99f6a2b2a8e1312df5e63f90c794e6f5",
+    "localSDK": 1,
+    "nonbusiness176_unchanged": true,
+    "project_bound_configurations_expected": 44,
+    "pub_packages": 21,
+    "source535_unchanged": false
+  },
+  "portable_digest": "66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb",
   "portable_members": 411,
   "pub_lock_after": {
     "bytes": 42399,
@@ -344,16 +399,65 @@
       "039a35aefab7747c557242fa216c9ea11743b604"
     ],
     "after_use": "read-only URL/object/filter/scope validation",
+    "current_source535_business_changes": 2,
     "early_once": "beforeSettings/beforeProject existing+whenObjectAdded;fixedfilter freeze",
     "fixed_Gradle": "9.3.1",
-    "new_actual_Gradle1": "prepared_UNRUN;Root authorization required",
-    "source535_and_AAR_unchanged": true
+    "historical_source535_and_AAR_unchanged": true,
+    "new_actual_Gradle1": "prepared_UNRUN;Root authorization required"
   },
   "schema": "luobo.android.current359-context.v1",
   "shared_source_identity": "Historical354/530 and257/428 libraries remain separate; no old App/native acceptance alias",
-  "source_digest": "32cbb2322bcec324fd83f4e8d10574cb2bb26ea6a13502ff44d86d932ecadbd5",
+  "source_digest": "e56ccf115d0299ef01241fc6f871af3e938fcdf356d77c7caa67191b026c87c2",
   "source_members": 535,
-  "source_ref": "bdffc675e6ec0f193bcb5cf786859a7746869061",
+  "source_ref": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1",
+  "source_successor": {
+    "Root_scoped_Dart_acceptance": {
+      "bytes": 5666,
+      "path": "references/integration/mobile-attached-info-null-format-r1-candidate-20261017/root-test-acceptance.json",
+      "sha256": "45e2535988680575ff4ca39b064a6982f297fdf08612b46cfec827f4274a154b"
+    },
+    "actual_Dart": {
+      "analysis_files": 2,
+      "direct_old": 2,
+      "new": 4
+    },
+    "business_digest": "633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199",
+    "delta2": [
+      {
+        "after": {
+          "bytes": 18789,
+          "path": "app/lib/core/privacy/message_privacy.dart",
+          "sha256": "c0da515e6ca3b935ac7b96c3dbae5302125c72e0c2ad38727bd84539b4f3073a"
+        },
+        "before": {
+          "bytes": 18768,
+          "path": "app/lib/core/privacy/message_privacy.dart",
+          "sha256": "a63582d594e96a3f16c6bde0e085ef4c67c5c2e7a23758b0a3f79d4c8396d00e"
+        },
+        "path": "app/lib/core/privacy/message_privacy.dart"
+      },
+      {
+        "after": {
+          "bytes": 13002,
+          "path": "app/test/features/chat/message_privacy_test.dart",
+          "sha256": "6a80b8f4e79d2457ebb6799475b4fce6a81b6c76b8037e2b56365354bc275c90"
+        },
+        "before": {
+          "bytes": 8160,
+          "path": "app/test/features/chat/message_privacy_test.dart",
+          "sha256": "b65542e5e27f3161e64d89d20ef8a3d6026818a65413593885880e34e6879eaf"
+        },
+        "path": "app/test/features/chat/message_privacy_test.dart"
+      }
+    ],
+    "full1308_executed": false,
+    "historical_business_digest": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+    "historical_portable_digest": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3",
+    "historical_source_ref": "bdffc675e6ec0f193bcb5cf786859a7746869061",
+    "native_result_inherited": false,
+    "portable_digest": "66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb",
+    "source_ref": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1"
+  },
   "webview_archive_identities": [
     {
       "archive_sha256": "d53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111",

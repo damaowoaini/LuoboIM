@@ -6,7 +6,7 @@ on:
       cohort:
         type: choice
         required: true
-        options: [current359-apple-native-resolution-v1]
+        options: [current359-null2-apple-native-resolution-v2]
 
 permissions:
   contents: read
@@ -33,13 +33,13 @@ jobs:
           echo "APPLE_APP_PYTHON=$python" >> "$GITHUB_ENV"
           echo "APPLE_APP_WORK=$RUNNER_TEMP/luobo-apple-current359" >> "$GITHUB_ENV"
       - name: Verify independent current359 source controller
-        run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-apple-native-resolution-v1 --stage readonly'
+        run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-null2-apple-native-resolution-v2 --stage readonly'
       - name: Exact source477 original core engine and hosted dependency acquisition
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-apple-native-resolution-v1 --stage acquire --work "$APPLE_APP_WORK"'
+        run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-null2-apple-native-resolution-v2 --stage acquire --work "$APPLE_APP_WORK"'
       - name: Real SPM and fallback CocoaPods native resolution without App compilation
-        run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-apple-native-resolution-v1 --stage resolve --work "$APPLE_APP_WORK"'
+        run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-null2-apple-native-resolution-v2 --stage resolve --work "$APPLE_APP_WORK"'
       - name: Preserve compact raw and native resolution evidence on failure as well
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f

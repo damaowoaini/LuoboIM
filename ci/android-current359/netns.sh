@@ -13,4 +13,4 @@ ip link set lo up
 [[ $(ip -o link show | wc -l) == 1 ]]
 [[ -z $(ip -4 route show default) && -z $(ip -6 route show default) ]]
 exec runuser -u "$owner" -- python3 -B "$repo/ci/android-current359/run.py" \
-  --cohort current359-immutable-core-reuse-v1 --stage "$stage" --work "$work" --approved-context-sha256 "$approved"
+  --cohort current359-null2-plugin-scope-v2 --stage "$stage" --work "$work" --approved-context-sha256 "$approved"

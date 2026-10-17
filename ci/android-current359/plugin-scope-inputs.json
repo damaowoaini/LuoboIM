@@ -1,0 +1,745 @@
+{
+  "App_catalog_sha256": "00d559f734c28560b9f18a27ef2fedfd5488c7eb9fa0a6d8d18930d0927d2cc7",
+  "App_scope_sources": {
+    "app/android/app/build.gradle.kts": "34544975abb19c80b8bc650fa00a487ff176ef0743ab3f4e6392c465e244f95e",
+    "app/android/build.gradle.kts": "6a26dba2cb8dfba1e74f540b0d17a89d96c1301d3c3bfda14348bed257fddcba",
+    "app/android/settings.gradle.kts": "a4b5e2c0a9b1b28eb08854e97706146542c7d950b77dd1290d0cc9d26f4369b8"
+  },
+  "archive_limits": {
+    "decoded_sum": 536870912,
+    "each": 16777216,
+    "file_each": 16777216,
+    "files_sum": 20000,
+    "sum": 134217728
+  },
+  "authorization": "source seal only; every actual selected graph must still equal fixed App14/BC4 templates; never learn live graph",
+  "configurations": [
+    "kotlinAbiValidationCompatClasspath",
+    "kotlinBouncyCastleConfiguration"
+  ],
+  "locked_package_count": 178,
+  "old_App_library_sha256": "3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3",
+  "plugin_library_sha256": "b7f3571cce6289303a9916aaeecb0d9afae899ed1e8f74ec72f90b803f59b545",
+  "projects": [
+    {
+      "archive_sha256": "f9e7711a0e24ca8b40f5d7ac374c3c6e55016f3157912badd18199cdbbca5c4d",
+      "archive_url": "https://pub.dev/api/archives/audio_session-0.2.4.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "audio_session",
+      "package_relative": "pub-cache/hosted/pub.dev/audio_session-0.2.4",
+      "project": ":audio_session",
+      "project_relative": "pub-cache/hosted/pub.dev/audio_session-0.2.4/android",
+      "slot": "04764fbefa44cc8af3c253d42b99e59b3cde12c15e32d2f843c34c0fa241b557",
+      "version": "0.2.4"
+    },
+    {
+      "archive_sha256": "d7749fd36d8b404a4935612b94eca7c3ce3705377ab678e24ff2a4301436f741",
+      "archive_url": "https://pub.dev/api/archives/connectivity_plus-7.3.2.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "connectivity_plus",
+      "package_relative": "pub-cache/hosted/pub.dev/connectivity_plus-7.3.2",
+      "project": ":connectivity_plus",
+      "project_relative": "pub-cache/hosted/pub.dev/connectivity_plus-7.3.2/android",
+      "slot": "8d2626346d538a790cc1598ad8bfd6ba72296fc8f06f9309961688cb1d469971",
+      "version": "7.3.2"
+    },
+    {
+      "archive_sha256": "ade1c36f8355d6284c98e4a47992ea263887ed3d1acb281e37635dd45f04c4aa",
+      "archive_url": "https://pub.dev/api/archives/device_info_plus-13.3.0.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "device_info_plus",
+      "package_relative": "pub-cache/hosted/pub.dev/device_info_plus-13.3.0",
+      "project": ":device_info_plus",
+      "project_relative": "pub-cache/hosted/pub.dev/device_info_plus-13.3.0/android",
+      "slot": "fb67f2be1faea1cba96b285ef95d4ca996e4efe692cfec8af28bccf3c6eda300",
+      "version": "13.3.0"
+    },
+    {
+      "archive_sha256": "d670cd0ce77a2e785b18d8b4d0a8d6a222d6a813ec9b7ddf2790a1b4fb6fa92c",
+      "archive_url": "https://pub.dev/api/archives/file_selector_android-0.5.2+11.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "file_selector_android",
+      "package_relative": "pub-cache/hosted/pub.dev/file_selector_android-0.5.2+11",
+      "project": ":file_selector_android",
+      "project_relative": "pub-cache/hosted/pub.dev/file_selector_android-0.5.2+11/android",
+      "slot": "bddfcda64e4c3bf5e5332e4a09dc92ff58ed58379d029198c6337e3621da9593",
+      "version": "0.5.2+11"
+    },
+    {
+      "kind": "local-source535",
+      "package": "flutter_openim_sdk",
+      "package_relative": "source/packages/flutter_openim_sdk",
+      "project": ":flutter_openim_sdk",
+      "project_relative": "source/packages/flutter_openim_sdk/android",
+      "slot": "f31e8a82f07b14f8a491d6a82adfc55e362d227058ae42956d700879077f20ee",
+      "source_rows": [
+        {
+          "bytes": 7427,
+          "path": "packages/flutter_openim_sdk/android/build.gradle",
+          "sha256": "b39683c1f56b7be051604516c35d18f3b108934e1a258986fd21313bcec2122e"
+        },
+        {
+          "bytes": 219,
+          "path": "packages/flutter_openim_sdk/android/consumer-rules.pro",
+          "sha256": "63ad5a5cd89782c937212bd930fe13fc3e535cf63f8e55db68869f809c4a00f8"
+        },
+        {
+          "bytes": 125,
+          "path": "packages/flutter_openim_sdk/android/gradle.properties",
+          "sha256": "8fd71f443eb10ef38e2a1edc6970a6c4367f91a9aa615dc39d68862067a68f25"
+        },
+        {
+          "bytes": 200,
+          "path": "packages/flutter_openim_sdk/android/gradle/wrapper/gradle-wrapper.properties",
+          "sha256": "aedd2422b4144e0f970b5ba2701186fc5c92cfa0b1c07d22af7e88391c51eaa9"
+        },
+        {
+          "bytes": 40,
+          "path": "packages/flutter_openim_sdk/android/settings.gradle",
+          "sha256": "c4612f20324d6908692e6f2616f825530d1a08108b481d5e73d1cdb35af2986d"
+        },
+        {
+          "bytes": 201,
+          "path": "packages/flutter_openim_sdk/android/src/main/AndroidManifest.xml",
+          "sha256": "5b0cc06e032fffc9b662d71e760ef86ff88705e17edc658725755813c53273df"
+        },
+        {
+          "bytes": 5854,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/FlutterOpenimSdkPlugin.java",
+          "sha256": "7894ac65ab19c13cee9906da637cb4572765790c891633dc705cf90e3bf9ea47"
+        },
+        {
+          "bytes": 3847,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/LocalVideoTools.java",
+          "sha256": "e56dbdc075df4ca44640c8f93e83b7f30677489fd2c6c509f88b79e441324dea"
+        },
+        {
+          "bytes": 3066,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/Connectivity.java",
+          "sha256": "34b9e6361461f3e5fa4f5a12aa3c8191c7bcf6428ba46c97951a07bc09de544d"
+        },
+        {
+          "bytes": 3373,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/ConnectivityListener.java",
+          "sha256": "1fa11192358eb1aa2c6410bd7a1c2a8a66c7383087f160305fb84f9c6758fccd"
+        },
+        {
+          "bytes": 1909,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/connectivity/VisibilityListener.java",
+          "sha256": "1ff9655b889aae324f11ae53d0508ac3f4d851330bd8698723d83ec3b3225e3a"
+        },
+        {
+          "bytes": 3427,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnAdvancedMsgListener.java",
+          "sha256": "c55d9a656e0db0ae6a3768b8800d38903838b2ae13fd402a0ca0fca9c17ecbf0"
+        },
+        {
+          "bytes": 707,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnBaseListener.java",
+          "sha256": "42a48ee67a126a06b5f6c1da888c26fe2bb33a3c534d00705688702f654cc0c1"
+        },
+        {
+          "bytes": 862,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnConnListener.java",
+          "sha256": "1cc012ea5615bee2fcf7abd7305fccb7347dad36eef766aa655457712fcf49ab"
+        },
+        {
+          "bytes": 1275,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnConversationListener.java",
+          "sha256": "9870f9b9180fc0a99383715e0bb0503f8535ff1675861d682de563418738bd24"
+        },
+        {
+          "bytes": 367,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnCustomBusinessListener.java",
+          "sha256": "69dd92ffb7d5f6345aea17c01bb76b4296cb5a041f29fd3c89afbd98ed7b7159"
+        },
+        {
+          "bytes": 1492,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnFriendshipListener.java",
+          "sha256": "cca66e797db094c59a9ae7779ce8c1e93a9718e4512fd1b800ff893804c94a55"
+        },
+        {
+          "bytes": 1795,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnGroupListener.java",
+          "sha256": "30a7695f9cbf034aab8dac5b91e0af5c4e93bd75d91dc45e002ef3eac8d295c3"
+        },
+        {
+          "bytes": 1029,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnListenerForService.java",
+          "sha256": "882d3cb65fba79af9a5d150abbf0c29bc5c92d071d8b315949c29c109bc2d16f"
+        },
+        {
+          "bytes": 431,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnMessageKvInfoListener.java",
+          "sha256": "2aabe12ad6b831ebca83d47bbef72c35f428a2d1b7acb1146be9aa1f1866188d"
+        },
+        {
+          "bytes": 1283,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnMsgSendListener.java",
+          "sha256": "7e0f0df12dc27a551004be2be324bf8c77c955d7d6555393c154082024ef85ed"
+        },
+        {
+          "bytes": 1995,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnSignalingListener.java",
+          "sha256": "f5834aa7da214842a976693597a3217d8e1c7df675c82ee12d4757aa9c2ab914"
+        },
+        {
+          "bytes": 3752,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUploadFileListener.java",
+          "sha256": "03f2fbc92b47fa45f4c6a411d590ac73c184a260cf04533f632ce7100e7427a5"
+        },
+        {
+          "bytes": 825,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUploadLogsListener.java",
+          "sha256": "d0090d5e14e1aa57b7a9522752032fed8ae7ce04a0171883fcd74b40c04e8cb0"
+        },
+        {
+          "bytes": 459,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/listener/OnUserListener.java",
+          "sha256": "1eacdf518dccc640725ea24edb798162c8670544d6d93aa5dae2370441b87034"
+        },
+        {
+          "bytes": 747,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/BaseManager.java",
+          "sha256": "b7d432d46d7640fc07ddb57a9d8ea9624ada1ba5a927b537f427ba8da48eff8d"
+        },
+        {
+          "bytes": 8565,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/ConversationManager.java",
+          "sha256": "d3a3fcf576eec2fb1f6116c70a1cd8e3c394c5b9fe165c002091f8e3a853a7c6"
+        },
+        {
+          "bytes": 4882,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/FriendshipManager.java",
+          "sha256": "e700f3d6151cba2b1e01da31c76b1f1d901c6e5483d7775d1189496bab6b60cd"
+        },
+        {
+          "bytes": 10430,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/GroupManager.java",
+          "sha256": "99741eec783961c93482432603cde146315cf0b7ffed9271f12abb44b5bbed86"
+        },
+        {
+          "bytes": 3735,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/IMManager.java",
+          "sha256": "4a3922c21d4abea3e70441f512dbed5ec831838d86a009df5b41e1ec9714bb54"
+        },
+        {
+          "bytes": 21723,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/MessageManager.java",
+          "sha256": "6c96a896aaf34adebe10874d77e925d2c86f07e5c6e0ed0db9a176a7e76cacae"
+        },
+        {
+          "bytes": 5465,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/SignalingManager.java",
+          "sha256": "dd43c022d62e1922d09f2f6dff8e378a61cd8614d41af1724a67f7656c24c788"
+        },
+        {
+          "bytes": 3082,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/manager/UserManager.java",
+          "sha256": "7beaced6b4450d3fc0174a1ec5c58fa07fea597ee99c4072992993e881935c98"
+        },
+        {
+          "bytes": 1950,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/util/CommonUtil.java",
+          "sha256": "f6b8e402ba431b42902c1e0323d7d87290c9e2a8b554e6ef1cbdef48ab119c27"
+        },
+        {
+          "bytes": 556,
+          "path": "packages/flutter_openim_sdk/android/src/main/java/io/openim/flutter_openim_sdk/util/JsonUtil.java",
+          "sha256": "1c097fa8e65194a7f0226d92822f29e0a0acc1fda70fc4491ad36401638ccf2e"
+        },
+        {
+          "bytes": 1826,
+          "path": "packages/flutter_openim_sdk/lib/flutter_openim_sdk.dart",
+          "sha256": "6d172fefef2f4587f542c1cc755dbee883f1fe9f3f0ff52c5b3f52f8e349e43f"
+        },
+        {
+          "bytes": 74,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/allow_type.dart",
+          "sha256": "40a204b1d4c117ae0070784e928cd9b4cf3bc4cbba4f953d1f6a2fcf4150e220"
+        },
+        {
+          "bytes": 301,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/conversation_type.dart",
+          "sha256": "5b4f2ccbd5ba12947c5db2978c71bca82e44044a1cbed328e79048ffc70b6e7f"
+        },
+        {
+          "bytes": 386,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/group_at_type.dart",
+          "sha256": "2f8381e45825ebe02b3933ffe43c5b421d286c23bdbdd3694a16e9ddf73b7032"
+        },
+        {
+          "bytes": 230,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/group_member_filter.dart",
+          "sha256": "630c5588e89e2aef497b409420b664ac911cb97e93608036ca971269bde1513b"
+        },
+        {
+          "bytes": 192,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/group_role_level.dart",
+          "sha256": "eeb99bfb139292ed04f51520de02c7b4623f41027ac68352e5fa2d2d15815fa3"
+        },
+        {
+          "bytes": 148,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/group_status.dart",
+          "sha256": "7acc19c57130d7360aeaf96acec4eb6f17f72f82f1fe0caf45713cfec3bcc0fd"
+        },
+        {
+          "bytes": 188,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/group_type.dart",
+          "sha256": "60bf0667cfca31093b1ea43b9111bb09a09999c684ee913f606ea866cb53c4bd"
+        },
+        {
+          "bytes": 386,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/group_verification.dart",
+          "sha256": "4ee8a3e8dbda6b0306a1c1ddad6d2ea5c160412bc5f622dfd227a53904438e0f"
+        },
+        {
+          "bytes": 344,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/im_platform.dart",
+          "sha256": "d5002983752430cf03d281c199c7807c022c03fc6e97a20421dce22fe36dc55a"
+        },
+        {
+          "bytes": 102,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/join_source.dart",
+          "sha256": "93c163333b5c41fdc86cf97d738877f0d772c3341746c8ec97a3a2ea5fced086"
+        },
+        {
+          "bytes": 966,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/listener_type.dart",
+          "sha256": "d98f84e7a09ea8c74b915818c77e5cc47b75cf8e96f7b708acac835a2dd7c2a8"
+        },
+        {
+          "bytes": 104,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/login_status.dart",
+          "sha256": "3a8633023ad67b45765e313f1225cdf679ac4a5bda350c06cf8f17690e6141b9"
+        },
+        {
+          "bytes": 242,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/message_status.dart",
+          "sha256": "4363365e4c72b3b3cd011eb390eb11bfe1422883d84d7336c2b7fc262566e67e"
+        },
+        {
+          "bytes": 4187,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/message_type.dart",
+          "sha256": "32d26337478668f4bab3a7e13d785b267c4e63f6d83176c15584a8a6d095ea25"
+        },
+        {
+          "bytes": 116,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/receive_message_opt.dart",
+          "sha256": "b585a65491ffe2a15b038e4821219cd6e605cd3857979f9266951e42f9a6177b"
+        },
+        {
+          "bytes": 72,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/relationship.dart",
+          "sha256": "99a02e96c1c210f97542425f0cfde228784af86b9984f9d61b5414a78f3ff263"
+        },
+        {
+          "bytes": 4896,
+          "path": "packages/flutter_openim_sdk/lib/src/enum/sdk_error_code.dart",
+          "sha256": "19f95e488daa548bb1080e4ca2e7ef0eca1c48e3b29d4e1e0a20c4ae648cfc33"
+        },
+        {
+          "bytes": 2428,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/advanced_msg_listener.dart",
+          "sha256": "9a5caf502155f19463523f06034a49dc3cbe51ba7d3164ef65813d76c620fea2"
+        },
+        {
+          "bytes": 1053,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/connect_listener.dart",
+          "sha256": "2bfe0ec04328b97a48785228b89c955f69566f0fa4e9dab84d11ca6e586a723e"
+        },
+        {
+          "bytes": 1242,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/conversation_listener.dart",
+          "sha256": "3846e87b7788e5051256b55053cef08e2852b0198aa9126f6333f6f084ec0e68"
+        },
+        {
+          "bytes": 243,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/custom_business_listener.dart",
+          "sha256": "b8abc1d45fcc5f7e5e0ef7bbd84dbfb75af038f83d182c793fc4678197c94e6a"
+        },
+        {
+          "bytes": 2038,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/friendship_listener.dart",
+          "sha256": "41c19fbceee8f9b50a1786dc3380b931ba477ece2c9063486a8c45d6718132eb"
+        },
+        {
+          "bytes": 2471,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/group_listener.dart",
+          "sha256": "fae5327454d0a84cc629cf01cd9d7fd6ff69e93fac337075b216f110499e5770"
+        },
+        {
+          "bytes": 1129,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/listener_for_service.dart",
+          "sha256": "7fc5a117160ab5b070ee94aefbfcd2f24eb88cb20ec2c8352eeec221e8d5dc5f"
+        },
+        {
+          "bytes": 310,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/message_kv_info_listener.dart",
+          "sha256": "fee8e2a9aa46cbf549d9164c37c3afbc53727f6f2b2470ed2278b7425120db6a"
+        },
+        {
+          "bytes": 314,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/msg_send_progress_listener.dart",
+          "sha256": "882a03165869559ef5a3e5d61bae2543dc356a32c80e8593ee62dbff0c5fda76"
+        },
+        {
+          "bytes": 2939,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/signaling_listener.dart",
+          "sha256": "96bef0fb7188d75bd0b352f81e5756cdbb0619e2dc5a0beae51e51bc376a10a5"
+        },
+        {
+          "bytes": 1758,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/upload_file_listener.dart",
+          "sha256": "7d42b533be8196198607292b877f9108b7dcde706f8232adc029cb174d7fea9d"
+        },
+        {
+          "bytes": 618,
+          "path": "packages/flutter_openim_sdk/lib/src/listener/user_listener.dart",
+          "sha256": "e506dc653bf5a65e08c469870f9ccf0ebc0bf6cd628116275cae9b5f17fd030c"
+        },
+        {
+          "bytes": 604,
+          "path": "packages/flutter_openim_sdk/lib/src/logger.dart",
+          "sha256": "1dd33f80233868cfa9ad71b69d785f961081fb823261f117db715a6a36ca9133"
+        },
+        {
+          "bytes": 12682,
+          "path": "packages/flutter_openim_sdk/lib/src/manager/im_conversation_manager.dart",
+          "sha256": "b56a5152ed39fd7539dbf93900b2c7af6b4ea2cdb07f74e6b6fed02771e7999f"
+        },
+        {
+          "bytes": 7869,
+          "path": "packages/flutter_openim_sdk/lib/src/manager/im_friendship_manager.dart",
+          "sha256": "3ebae5cb4ed8fa3087714250797606aada16e3401cde9364a11a6773771e325d"
+        },
+        {
+          "bytes": 18777,
+          "path": "packages/flutter_openim_sdk/lib/src/manager/im_group_manager.dart",
+          "sha256": "7c31aa3c4fa9d53ba1ca44dfbaaf2d24accaa627117ff6e3a55d325740fcb29d"
+        },
+        {
+          "bytes": 27017,
+          "path": "packages/flutter_openim_sdk/lib/src/manager/im_manager.dart",
+          "sha256": "a57afb44fb24b819cb522dfbbec0513b7c553859c094a822b94a03a974c9bc0b"
+        },
+        {
+          "bytes": 31563,
+          "path": "packages/flutter_openim_sdk/lib/src/manager/im_message_manager.dart",
+          "sha256": "896938466e9d93c484ba6387074d10139fa9fffcb91e9535623ada4174df3956"
+        },
+        {
+          "bytes": 10188,
+          "path": "packages/flutter_openim_sdk/lib/src/manager/im_signaling_manager.dart",
+          "sha256": "6a586404453380dfb15b07a706d536bd4c0d83f7563be00f84fa555f4fa164b4"
+        },
+        {
+          "bytes": 4301,
+          "path": "packages/flutter_openim_sdk/lib/src/manager/im_user_manager.dart",
+          "sha256": "703c96eef6aa00a98169d7339de25eef3b2a136d78cd4ddb669339863de09df4"
+        },
+        {
+          "bytes": 4952,
+          "path": "packages/flutter_openim_sdk/lib/src/models/conversation_info.dart",
+          "sha256": "559b288b7b80459c05de231610939f94a0972e72f26f078b75269be40510fab2"
+        },
+        {
+          "bytes": 10514,
+          "path": "packages/flutter_openim_sdk/lib/src/models/group_info.dart",
+          "sha256": "10c23e72969d8c11e71dfbedd5250ad39c9a72b0e25172c3bc9c0f0c97f24e86"
+        },
+        {
+          "bytes": 1146,
+          "path": "packages/flutter_openim_sdk/lib/src/models/init_config.dart",
+          "sha256": "33e3ad80fccd93dab15f3b14830c35cf47f51435ab2ca3224811628e68029df2"
+        },
+        {
+          "bytes": 5464,
+          "path": "packages/flutter_openim_sdk/lib/src/models/meeting_info.dart",
+          "sha256": "538235d95997f6a2c41ee89544dda6faf281386604b4fac610131e3787e4c290"
+        },
+        {
+          "bytes": 37894,
+          "path": "packages/flutter_openim_sdk/lib/src/models/message.dart",
+          "sha256": "f8ded4b316ee739db334fbc50b7e1dbca23e7f1f731fd8b2fca6d53f68589ed1"
+        },
+        {
+          "bytes": 11746,
+          "path": "packages/flutter_openim_sdk/lib/src/models/notification_info.dart",
+          "sha256": "c6f70e31dea5ae4acab82802fcf9c07fbbb4674272cc651406ae2d8870f2eba7"
+        },
+        {
+          "bytes": 3619,
+          "path": "packages/flutter_openim_sdk/lib/src/models/search_info.dart",
+          "sha256": "10921415efae75c7c2330def43b987daf4fa5b939fa8d6fd7397f38157d479f7"
+        },
+        {
+          "bytes": 6099,
+          "path": "packages/flutter_openim_sdk/lib/src/models/signaling_info.dart",
+          "sha256": "c2c96af4260d39b47bd3fcd3cbecac849c7502a174c36e8171e67d053bcd86c6"
+        },
+        {
+          "bytes": 10680,
+          "path": "packages/flutter_openim_sdk/lib/src/models/user_info.dart",
+          "sha256": "f1628f73760f4e6749f2826a263b1461d6a6b9b0d037d71029ae0933c9dad44f"
+        },
+        {
+          "bytes": 291,
+          "path": "packages/flutter_openim_sdk/lib/src/openim.dart",
+          "sha256": "f1ce2af68f16300f64c82ad972da985f31cfe74b0154ed631b97f5d8c7341236"
+        },
+        {
+          "bytes": 521,
+          "path": "packages/flutter_openim_sdk/lib/src/utils.dart",
+          "sha256": "de2e9970b01c58825f7d050bb1d9b377ede16fc61377f67db1154a4320899907"
+        },
+        {
+          "bytes": 2187,
+          "path": "packages/flutter_openim_sdk/pubspec.yaml",
+          "sha256": "0e36e2e27e5e3e77c398858647d95ed41ec79c98d67e2934341deba0a427a1ad"
+        },
+        {
+          "bytes": 2516,
+          "path": "packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart",
+          "sha256": "039c73a2f9556611f23744e031682f0b6b4298ab31f0859cf79c7090f64a78ee"
+        },
+        {
+          "bytes": 11356,
+          "path": "packages/flutter_openim_sdk/tool/native_core/UPSTREAM-LICENSE-APACHE-2.0",
+          "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
+        },
+        {
+          "bytes": 18776,
+          "path": "packages/flutter_openim_sdk/tool/native_core/acquired-go.sum",
+          "sha256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f"
+        },
+        {
+          "bytes": 16877,
+          "path": "packages/flutter_openim_sdk/tool/native_core/build_candidate.py",
+          "sha256": "44d5d7d713e1f3e536db405318998ff618beb1ce6e25030269ba3557f373c32c"
+        },
+        {
+          "bytes": 19159,
+          "path": "packages/flutter_openim_sdk/tool/native_core/build_observed_candidate.py",
+          "sha256": "84c5977a57b2830385824abaecb1bf29ecb4f593454b724a554b86747346c079"
+        },
+        {
+          "bytes": 21153,
+          "path": "packages/flutter_openim_sdk/tool/native_core/candidate-source-manifest.json",
+          "sha256": "c4311042854604c113ce484b327349c9ff566b80ba326fc071d358cdbaa67447"
+        },
+        {
+          "bytes": 142887,
+          "path": "packages/flutter_openim_sdk/tool/native_core/patches/0001-enterprise-protocol-compat.patch",
+          "sha256": "dcbc80f89ce07eaac8a2c28c23e1cbaef0db9c2c79cacffdaa020d61a356e1f7"
+        },
+        {
+          "bytes": 17958,
+          "path": "packages/flutter_openim_sdk/tool/native_core/patches/0002-debug-fixture-tls-only.patch",
+          "sha256": "72bb5adddedf262be493afa08bd4091a5dafc3a5596799b5a2fa7f272c37e0b3"
+        },
+        {
+          "bytes": 2838,
+          "path": "packages/flutter_openim_sdk/tool/native_core/qa-fixture-source-manifest.json",
+          "sha256": "a9d23ebeac7ca7ed637628838b96ac79ba61e6f238e3392c108a10e2529b02ce"
+        }
+      ]
+    },
+    {
+      "archive_sha256": "3854fe5e3bff0b113c658f260b90c95dea17c92db0f2addeac2e343dd9969785",
+      "archive_url": "https://pub.dev/api/archives/flutter_plugin_android_lifecycle-2.0.35.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "flutter_plugin_android_lifecycle",
+      "package_relative": "pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.35",
+      "project": ":flutter_plugin_android_lifecycle",
+      "project_relative": "pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.35/android",
+      "slot": "4a333bf0fe0ec4434e1a00778f2db2728f384751cf2e99eb9460b3dab6fff11f",
+      "version": "2.0.35"
+    },
+    {
+      "archive_sha256": "d4e1fb6b2cb524868929e78dc0282fa000554b22060fb53789dc481c9fc95bb8",
+      "archive_url": "https://pub.dev/api/archives/flutter_secure_storage-11.2.0.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "flutter_secure_storage",
+      "package_relative": "pub-cache/hosted/pub.dev/flutter_secure_storage-11.2.0",
+      "project": ":flutter_secure_storage",
+      "project_relative": "pub-cache/hosted/pub.dev/flutter_secure_storage-11.2.0/android",
+      "slot": "d8abc7e2d9fe9e213e5666b52ad1f154c79bcf8e37afd5fd6743d546d7c1e2f1",
+      "version": "11.2.0"
+    },
+    {
+      "archive_sha256": "ebf5ceef2897caae425ed65a38b2961c29d9d9a626159418ed460e1a65038c00",
+      "archive_url": "https://pub.dev/api/archives/flutter_webrtc-1.6.2+hotfix.4.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "flutter_webrtc",
+      "package_relative": "pub-cache/hosted/pub.dev/flutter_webrtc-1.6.2+hotfix.4",
+      "project": ":flutter_webrtc",
+      "project_relative": "pub-cache/hosted/pub.dev/flutter_webrtc-1.6.2+hotfix.4/android",
+      "slot": "7204557f52a4a64edc22b17d90f0b6fdc7c39f281e6064668a604881bc604e6f",
+      "version": "1.6.2+hotfix.4"
+    },
+    {
+      "archive_sha256": "8a7823d5d3e884f7780829d85d92110d072bdcd9ed48e2be158d2abe91a912d4",
+      "archive_url": "https://pub.dev/api/archives/image_picker_android-0.8.13+25.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "image_picker_android",
+      "package_relative": "pub-cache/hosted/pub.dev/image_picker_android-0.8.13+25",
+      "project": ":image_picker_android",
+      "project_relative": "pub-cache/hosted/pub.dev/image_picker_android-0.8.13+25/android",
+      "slot": "78c011a3e36921ec340a413c133215c421bc189e98b39e375f41fe96ccd501e6",
+      "version": "0.8.13+25"
+    },
+    {
+      "archive_sha256": "6b9ca0602fef0230e83149afbe3f9f8227e94f2bbe84a1da4f14d699742f402d",
+      "archive_url": "https://pub.dev/api/archives/jni-1.1.0.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "jni",
+      "package_relative": "pub-cache/hosted/pub.dev/jni-1.1.0",
+      "project": ":jni",
+      "project_relative": "pub-cache/hosted/pub.dev/jni-1.1.0/android",
+      "slot": "f968acbc2220cef1a0c570c8fcc9b02e8cffc1fbd37e5206d93741898e0844e8",
+      "version": "1.1.0"
+    },
+    {
+      "archive_sha256": "0dd33d67797560f66e961a6053882d4df54bd345bf063b8fe7ea133f7ad8b191",
+      "archive_url": "https://pub.dev/api/archives/jni_flutter-1.0.4+1.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "jni_flutter",
+      "package_relative": "pub-cache/hosted/pub.dev/jni_flutter-1.0.4+1",
+      "project": ":jni_flutter",
+      "project_relative": "pub-cache/hosted/pub.dev/jni_flutter-1.0.4+1/android",
+      "slot": "fa46d1cccd2d0fd437e65dcfc51beb6363fd596d95f4467a6f84e3f68e77061d",
+      "version": "1.0.4+1"
+    },
+    {
+      "archive_sha256": "e60aa97b233ddea025e13dfac59195207f528fa5e9e4a4a49a8c0766701e5fe6",
+      "archive_url": "https://pub.dev/api/archives/just_audio-0.10.6.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "just_audio",
+      "package_relative": "pub-cache/hosted/pub.dev/just_audio-0.10.6",
+      "project": ":just_audio",
+      "project_relative": "pub-cache/hosted/pub.dev/just_audio-0.10.6/android",
+      "slot": "98ec39eb5b07f428dfdd6f64a323ed595c9763a1fe7833a96533c94db61b585a",
+      "version": "0.10.6"
+    },
+    {
+      "archive_sha256": "1d2ae53abac63fdf8ac2c3f37529094b920048e5e459f29c1140b885d0cdf325",
+      "archive_url": "https://pub.dev/api/archives/livekit_client-2.13.1.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "livekit_client",
+      "package_relative": "pub-cache/hosted/pub.dev/livekit_client-2.13.1",
+      "project": ":livekit_client",
+      "project_relative": "pub-cache/hosted/pub.dev/livekit_client-2.13.1/android",
+      "slot": "c2864842cd3392ed36af49b024ed8ed383ac0f6adaf04e41b38a51a7c0572324",
+      "version": "2.13.1"
+    },
+    {
+      "archive_sha256": "5a51ea79f0cf8293f616a5d08baae185b59b5e6bb24df01f2a63037ade0bade0",
+      "archive_url": "https://pub.dev/api/archives/mobile_scanner-7.4.2.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "mobile_scanner",
+      "package_relative": "pub-cache/hosted/pub.dev/mobile_scanner-7.4.2",
+      "project": ":mobile_scanner",
+      "project_relative": "pub-cache/hosted/pub.dev/mobile_scanner-7.4.2/android",
+      "slot": "96fb91a372806de5964bfb54334c32e0fcd924ebcee42d0f203ad540f9c03598",
+      "version": "7.4.2"
+    },
+    {
+      "archive_sha256": "b1ce660f4d0dcaffdf2605a19544c129fb5adda4e6fd039992ae356c4e437039",
+      "archive_url": "https://pub.dev/api/archives/permission_handler_android-14.1.0.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "permission_handler_android",
+      "package_relative": "pub-cache/hosted/pub.dev/permission_handler_android-14.1.0",
+      "project": ":permission_handler_android",
+      "project_relative": "pub-cache/hosted/pub.dev/permission_handler_android-14.1.0/android",
+      "slot": "3dc15c51ff60ea983eade52da3469c69bb84e34c7adf87e7115007ac2f0301b4",
+      "version": "14.1.0"
+    },
+    {
+      "archive_sha256": "f5080279259c4ad769590f1c165762eaa4e414178adc2e2fab137103228e07ac",
+      "archive_url": "https://pub.dev/api/archives/record_android-2.2.0.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "record_android",
+      "package_relative": "pub-cache/hosted/pub.dev/record_android-2.2.0",
+      "project": ":record_android",
+      "project_relative": "pub-cache/hosted/pub.dev/record_android-2.2.0/android",
+      "slot": "f0062b71d1b144ff4269221f582b0cd6b082b18c5cd555971bd88a9c1e4fbef5",
+      "version": "2.2.0"
+    },
+    {
+      "archive_sha256": "db40767f130189d53f3ae8a6393c217ff4a492da1baff718a9873679c0c00224",
+      "archive_url": "https://pub.dev/api/archives/share_plus-13.3.1.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "share_plus",
+      "package_relative": "pub-cache/hosted/pub.dev/share_plus-13.3.1",
+      "project": ":share_plus",
+      "project_relative": "pub-cache/hosted/pub.dev/share_plus-13.3.1/android",
+      "slot": "bcc48201cc119a3035a8d3419319a007e7dfac33ff95aec3ae8cec81cf574742",
+      "version": "13.3.1"
+    },
+    {
+      "archive_sha256": "1e12aafe408aa50da80edfd679a2a6bf63ba7ab37c7fa98286da459a757b3399",
+      "archive_url": "https://pub.dev/api/archives/shared_preferences_android-2.4.28.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "shared_preferences_android",
+      "package_relative": "pub-cache/hosted/pub.dev/shared_preferences_android-2.4.28",
+      "project": ":shared_preferences_android",
+      "project_relative": "pub-cache/hosted/pub.dev/shared_preferences_android-2.4.28/android",
+      "slot": "9e8c9ead21f5cbab0dc97f822775b465e76154b5d3f99478d96bb11fa7db5c0c",
+      "version": "2.4.28"
+    },
+    {
+      "archive_sha256": "e4f659c14bdd14464127fcd234a7a96f61fe0f539b8568e5a38f99f5a568a835",
+      "archive_url": "https://pub.dev/api/archives/sqflite_android-2.4.4+1.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "sqflite_android",
+      "package_relative": "pub-cache/hosted/pub.dev/sqflite_android-2.4.4+1",
+      "project": ":sqflite_android",
+      "project_relative": "pub-cache/hosted/pub.dev/sqflite_android-2.4.4+1/android",
+      "slot": "f5cf72b345c52941da35ae4496064904f35794c7767400ff9cb05fc9c509a346",
+      "version": "2.4.4+1"
+    },
+    {
+      "archive_sha256": "611e87fb320b70d1dd721dc46af89c98aceccea9b31fde49e084591414e0c610",
+      "archive_url": "https://pub.dev/api/archives/url_launcher_android-6.3.33.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "url_launcher_android",
+      "package_relative": "pub-cache/hosted/pub.dev/url_launcher_android-6.3.33",
+      "project": ":url_launcher_android",
+      "project_relative": "pub-cache/hosted/pub.dev/url_launcher_android-6.3.33/android",
+      "slot": "7f8dd0743e5259a1b9ed26b46d608a4941788adcfa15e0d77d9710dee87fcd9a",
+      "version": "6.3.33"
+    },
+    {
+      "archive_sha256": "d27054dea34d748a44f06d433a57005d2aac69944485b0abbaed3303dbcfa3f1",
+      "archive_url": "https://pub.dev/api/archives/video_player_android-2.12.2.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "video_player_android",
+      "package_relative": "pub-cache/hosted/pub.dev/video_player_android-2.12.2",
+      "project": ":video_player_android",
+      "project_relative": "pub-cache/hosted/pub.dev/video_player_android-2.12.2/android",
+      "slot": "455c81b7f1bb7148e5925ad86f35aa471d161f68e02f7fe1343f2cd89cf682a1",
+      "version": "2.12.2"
+    },
+    {
+      "archive_sha256": "ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter_android-4.12.0.tar.gz",
+      "kind": "locked-official-pub-archive",
+      "package": "webview_flutter_android",
+      "package_relative": "pub-cache/hosted/pub.dev/webview_flutter_android-4.12.0",
+      "project": ":webview_flutter_android",
+      "project_relative": "pub-cache/hosted/pub.dev/webview_flutter_android-4.12.0/android",
+      "slot": "0d0efcd5a0399d9b38bfa83a1f9dfec94d1325400c38f9208d08887653df6ae5",
+      "version": "4.12.0"
+    }
+  ],
+  "pub_lock": {
+    "bytes": 42399,
+    "path": "app/pubspec.lock",
+    "sha256": "0e678e98a6efc7cbb34c6c3a58f8b890171bd443c2b61e6f5ec525853c4f34fa"
+  },
+  "root_relative": "source/app/android",
+  "schema": 1,
+  "source535_digest": "e56ccf115d0299ef01241fc6f871af3e938fcdf356d77c7caa67191b026c87c2",
+  "source_ref": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1"
+}

@@ -1,57 +1,57 @@
 {
   "files": [
     {
-      "bytes": 2691,
+      "bytes": 2715,
       "path": ".github/workflows/apple-current359-resolve.yml",
-      "sha256": "a707e00af70215bd03546dd318fb3d46fb6cce8ca9f9526a81e5def62cc06c53"
+      "sha256": "258074231f89bd5208dbf7ee4a280d80df62cc370d38b8df4e9ccfa7cf087320"
     },
     {
-      "bytes": 8267,
+      "bytes": 9218,
       "path": "ci/apple-current359/README.md",
-      "sha256": "65f8cb7243b492d25baf27efe260ab12db19f76cc604324deee8cf1ee95cbaba"
+      "sha256": "41b542014471576f33c641b2f4517c098b40745e9a9935d0df7ee810925a8264"
     },
     {
-      "bytes": 9176,
+      "bytes": 9182,
       "path": "ci/apple-current359/consume.py",
-      "sha256": "3f02b36096e4d61c7eb8a82a59d26b4968274254472a50d7e52bdd9522f3e213"
+      "sha256": "66b9b78666e36d753310bbc853e10f784a3123379992debb8fd8fc52789b5c37"
     },
     {
-      "path": "ci/apple-current359/gem_audit.py",
       "bytes": 22508,
+      "path": "ci/apple-current359/gem_audit.py",
       "sha256": "06155d52e8c6c57a93719f8077e8e56673238ee41c0d907d92da15e8d1df6de9"
     },
     {
-      "path": "ci/apple-current359/gem_probe.rb",
       "bytes": 2458,
+      "path": "ci/apple-current359/gem_probe.rb",
       "sha256": "94994f0277a1385d5e748ea56c66fff32afb780389c90536f1bdf48d9d1d81e0"
     },
     {
-      "bytes": 206038,
+      "bytes": 208157,
       "path": "ci/apple-current359/inputs.json",
-      "sha256": "3cbabbffca956f018a54469740f6ef5e244d92bd3feca1df6ad5ff25670f5393"
+      "sha256": "088468334147bbf6d778a041eb352972c890b66155ad1fd4f1e035e31b9a60cf"
     },
     {
-      "bytes": 13740,
+      "bytes": 13746,
       "path": "ci/apple-current359/lane.json",
-      "sha256": "3e1509f9f32b72a8d804d16074c32dbd4b1901b74ed4a67b9cc1b594d143fd5d"
+      "sha256": "f995bb21a430c604fd78d3c4253856508560de6e96c1c289f1bd67e96918dc6c"
     },
     {
-      "bytes": 32359,
+      "bytes": 32365,
       "path": "ci/apple-current359/run.py",
-      "sha256": "2813dafd848aae426d45c3451ec4d168ac766c86ddecdb21bc1119fc50f32ea8"
+      "sha256": "4a7229c1e86fb4459a2985fd6b57b96d92dfcc9654a26b3f1a41d8d458cd60da"
     },
     {
-      "bytes": 2662,
+      "bytes": 3474,
       "path": "ci/apple-current359/test_consumer.py",
-      "sha256": "1c330baaf75bd5919d32d3536a31942aebd976b6c22b9dd60789590c72dbb66b"
+      "sha256": "5211ac3726d85494455a40075c58c557ee9640c96e60f0f6962465050c84828b"
     },
     {
-      "path": "ci/apple-current359/test_gem_audit.py",
       "bytes": 20164,
+      "path": "ci/apple-current359/test_gem_audit.py",
       "sha256": "06d9581ee626bea121a968f7c6939d161a67bfd25cf0df7d7dadf3c2e7c04b72"
     }
   ],
-  "identity": "current359-apple-native-resolution-v1",
+  "identity": "current359-null2-apple-native-resolution-v2",
   "schema": 1,
   "self_pin": "registry excluded from self hash; activation pins lane,Root pins registry"
 }

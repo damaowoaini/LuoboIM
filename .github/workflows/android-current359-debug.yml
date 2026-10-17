@@ -5,7 +5,7 @@ on:
       cohort:
         type: choice
         required: true
-        options: [current359-immutable-core-reuse-v1]
+        options: [current359-null2-plugin-scope-v2]
       context_sha256:
         description: Exact frozen ci/android-current359/cohort.json SHA after source and targeted-control review
         type: string
@@ -62,6 +62,15 @@ jobs:
           compression-level: 0
           retention-days: 14
           if-no-files-found: warn
+      - name: Keep independently checked public plugin source archives separately
+        if: always() && hashFiles(format('{0}/evidence/plugin-source-seal.json', env.ANDROID_WORK)) != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current359-plugin-source-origins-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.ANDROID_WORK }}/downloads/plugin-source-origins/*.tar.gz
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: error
       - name: Preserve compact current raw before products
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f

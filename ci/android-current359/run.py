@@ -19,6 +19,8 @@ import current_reuse as recovery
 import support as s
 import verify_inputs
 import rich_current
+import plugin_scope
+import plugin_scope_fixture
 import classpaths_current as classpaths
 
 parent=generic.parent
@@ -28,8 +30,8 @@ home_admission=generic.home_admission
 check_flutter_environment_sources=generic.check_flutter_environment_sources
 check_current_packages=generic.check_current_packages
 
-COHORT='current359-immutable-core-reuse-v1'
-SOURCE_REF='bdffc675e6ec0f193bcb5cf786859a7746869061'
+COHORT='current359-null2-plugin-scope-v2'
+SOURCE_REF='0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1'
 STAGES=['setup','restore','preseal','gradle-setup','apk']
 
 
@@ -117,6 +119,7 @@ def metadata():
         if p.stat().st_size!=row['bytes']or s.sha(p)!=row['sha256']:
             raise ValueError('explicit359 source controller or borrowed input differs')
     require_core_equivalence(inputs,original,context)
+    plugin_scope.contract(HERE,inputs)
     check_catalogue(context)
     if (context['original_core_spec_sha256']!=s.sha(generic.HERE/'core-reuse.json')
             or context['original_context_sha256']!=s.sha(generic.HERE/'current-app-cohort.json')
@@ -287,6 +290,7 @@ class Job(generic.Job):
             'Go_acquisition_or_command':False,'gomobile_or_gobind_acquisition_or_command':False,
             'core_builder_or_metadata_warm':False,'original_core_tool_identity_from_imported_receipts':True})
         self.verify()
+        plugin_scope.produce(self,HERE)
 
     def cmd(self,args,cwd,env,label,timeout=900,reject=None,stdin=None):
         # Original helper calls provide legacy *intent* env. Validate those
@@ -294,7 +298,7 @@ class Job(generic.Job):
         executable=Path(args[0])
         if executable in (self.w/'go/bin/go',self.w/'mobile-tools/gomobile',self.w/'mobile-tools/gobind'):
             raise ValueError('Go and bind tools are not current359 App tools')
-        binding=None
+        binding=None;plugin_before=None
         if label=='flutter-init':sdk_sources.produce(self,args,cwd,env,timeout,reject,stdin)
         if label=='flutter-config':
             home_admission(os.environ['HOME'])
@@ -308,6 +312,7 @@ class Job(generic.Job):
                     or list(map(str,args))!=list(map(str,expected)) or cwd!=self.w/'source/app/android'
                     or env!=parent.environment(self.w,False) or timeout!=1800 or reject is not None or stdin is not None):
                 raise ValueError('inherited production dependency boundary differs')
+            plugin_before=plugin_scope.verified(self.w,HERE,self.inputs,self.b)[1]
             args=list(args);args[args.index('-I')+1]=HERE/'resolve.gradle'
             binding=classpaths.verified_catalog(self.w);self._typed_resolver_dispatch=True
         elif label=='assemble-debug':
@@ -316,6 +321,8 @@ class Job(generic.Job):
                     or timeout!=1800 or reject is not None or stdin is not None):
                 raise ValueError('fixed production APK dispatch required')
             rich_current.require_origin_binding(self.w,HERE)
+            plugin_scope.require_origin_binding(self.w,HERE,self.inputs)
+            plugin_before=plugin_scope.verified(self.w,HERE,self.inputs,self.b)[1]
             binding=classpaths.verified_catalog(self.w);args=list(args)+['-I',HERE/'resolve.gradle']
         if binding is not None:
             args=list(args)+['-DluoboClasspathCatalog='+str(binding[0]),'-DluoboClasspathCatalogSha256='+binding[1]]
@@ -334,15 +341,67 @@ class Job(generic.Job):
                     check_current_packages(self.w,self.context))
             if label=='assemble-debug':
                 s.write_json(self.w/'evidence/rich-apk-consumed.json',{'actual_configurations':
-                    rich_current.check_apk_reports(self.w,HERE),'unused_configurations_not_claimed':True})
+                    rich_current.check_apk_reports(self.w,HERE),
+                    'actual_plugin_configurations':plugin_scope.reports(self.w,HERE,self.inputs,'apk',False),
+                    'unused_configurations_not_claimed':True})
             return result
         finally:
+            if plugin_before is not None and plugin_scope.verified(self.w,HERE,self.inputs,self.b)[1]!=plugin_before:
+                raise ValueError('independent plugin source seal changed during actual Gradle dispatch')
             if binding is not None and classpaths.verified_catalog(self.w)!=binding:
                 raise ValueError('producer catalog changed during actual Gradle dispatch')
 
     def preseal(self):
         parent.netns();self.verify()
         classpaths.seal(self,generic.HERE,HERE)
+        self.plugin_controls()
+
+    def plugin_controls(self):
+        if os.geteuid()==0 or (self.w/'plugin-scope-controls').exists():
+            raise ValueError('ordinary-user fresh plugin controls required')
+        before=classpaths.verified_catalog(self.w)
+        cases=plugin_scope_fixture.prepare(self.w,HERE)
+        expected=[('two-projects-positive',None),
+            ('changed-plugin-source','plugin rich independently sealed source differs'),
+            ('unregistered-project','dynamic dependency version refused')]
+        if [(c['case'],c['expected_rejection'])for c in cases]!=expected:
+            raise ValueError('exact three plugin controls required')
+        results=[]
+        for case in cases:
+            owner=self.w/'plugin-scope-controls'/case['case'];root=owner/'project'
+            tail=['--offline','--gradle-user-home',str(owner/'gradle-home'),
+                '--project-cache-dir',str(owner/'project-cache'),'-I',str(root/'control-init.gradle'),
+                'checkRegisteredPluginScope']
+            if (case['cwd']!=str(root) or case['command_tail']!=tail
+                    or case['synthetic_only']is not True or case['production18_or_App_not_claimed']is not True):
+                raise ValueError('fixed owned plugin control dispatch required')
+            # The sealed selector cache is separate from production gradle-cache.
+            # Keep the original owned-output audit's two-root policy unchanged.
+            tail[2]=str(self.w/'selector-gradle-home')
+            env=parent.environment(self.w,True)
+            env['GRADLE_USER_HOME']=str(self.w/'selector-gradle-home')
+            args=[self.w/'gradle/bin/gradle','--no-daemon','--max-workers=1','--no-watch-fs',
+                '--console=plain','-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m',*tail]
+            label='plugin-control-'+case['case']
+            log=self.cmd(args,root,env,label,120,case['expected_rejection'])
+            resource_path=self.w/'evidence'/(label+'.resource.json');resource=read(resource_path)
+            if (type(resource.get('exit_code'))is not int or resource.get('expectation_met')is not True
+                    or resource.get('error')is not None or resource.get('latched_failure')is not None
+                    or resource.get('expected_rejection')!=case['expected_rejection']
+                    or resource.get('log_sha256')!=s.sha(log)):
+                raise ValueError('actual plugin control resource proof required')
+            checked=plugin_scope_fixture.check(case,log,self.w,resource['exit_code'])
+            self.b.check()
+            results.append({'case':case['case'],'actual_exit_code':resource['exit_code'],
+                'resource_sha256':s.sha(resource_path),'log_sha256':s.sha(log),**checked})
+        self.verify()
+        if classpaths.verified_catalog(self.w)!=before:
+            raise ValueError('builtin preseal changed during plugin controls')
+        self.b.check()
+        s.write_json(self.w/'evidence/plugin-controls-complete.json',{'state':'passed',
+            'cohort':COHORT,'cases':results,'actual_Gradle_controls':3,'offline':True,
+            'Gradle_home':'selector-gradle-home','production_Gradle_home_unchanged':'gradle-cache',
+            'synthetic_file_Maven_not_production18':True,'native_or_App_acceptance':False})
 
     def gradle_prepare(self):
         check_catalogue(self.context)
@@ -351,6 +410,7 @@ class Job(generic.Job):
             result=parent.Job.gradle_prepare(self)
             if self._typed_resolver_dispatch is not True:raise ValueError('production resolver not dispatched')
             rich_current.bind_origins(self.w,HERE,s.write_json)
+            plugin_scope.bind_origins(self.w,HERE,self.inputs)
             return result
         finally:self._typed_resolver_dispatch=None
 

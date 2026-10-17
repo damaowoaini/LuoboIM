@@ -1,7 +1,7 @@
 # current359 iOS native resolution only
 
 Independent current359/477/178/20 source consumer: product ref
-`bdffc675e6ec0f193bcb5cf786859a7746869061`, business359/portable411 exactly from the
+`0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1`, business359/portable411 exactly from the
 accepted announcement source. Actual targeted acceptance is19+7 prior cases and
 11 static coverage, not fresh26/full1304/native359. Historical current354/472,
 its lane/controller and both failed cloud runs remain separate and unchanged.
@@ -123,3 +123,9 @@ control through the real auditor; it proves a valid baseline and exercises
 selected file/directory, system target, private/outside targets, missing target,
 and an overlong relative entry. The original two controls remain byte-identical
 and are not rerun. This R6 has executed no controls/Ruby/native/cloud work.
+
+## null2 published-source successor
+
+Identity `current359-null2-apple-native-resolution-v2` / consumer `current359-null2-apple-source-consumer-v2` fixes published `0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1`. Source477/business359/portable411 replace exactly the same two Dart rows;475 other rows,178 packages, SDK51/native7/core17/engine50/20 implementations stay exact. Former bdffc consumer and all354/359 native reports retain their original identity. New4+direct2 and analysis2 are Dart-only accepted scope; full1308 and this native identity are unexecuted.
+
+Current adopted R6 gem probe/auditor/tests and strict1.17 official/tool pins are borrowed byte-identically. Bounded symlink diagnostics continue refusing links; no Gem root or source grant changes. Null native approval still rejects before any App command. Only the two directly affected consumer controls are proposed; prior selector2/packaging6/consumer3/gem controls are not repeated.

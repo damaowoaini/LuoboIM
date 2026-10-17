@@ -1,5 +1,5 @@
 {
-  "cohort": "current359-immutable-core-reuse-v1",
+  "cohort": "current359-null2-plugin-scope-v2",
   "files": [
     {
       "bytes": 111,
@@ -217,9 +217,9 @@
       "sha256": "358da9046802d6a72e464043f0333463686ef970cff64c618ea8d1475f193f22"
     },
     {
-      "bytes": 18768,
+      "bytes": 18789,
       "path": "app/lib/core/privacy/message_privacy.dart",
-      "sha256": "a63582d594e96a3f16c6bde0e085ef4c67c5c2e7a23758b0a3f79d4c8396d00e"
+      "sha256": "c0da515e6ca3b935ac7b96c3dbae5302125c72e0c2ad38727bd84539b4f3073a"
     },
     {
       "bytes": 509,
@@ -1437,9 +1437,9 @@
       "sha256": "919108c90536dd960155b80248c34000aad481702007ad72900a9be5ce335758"
     },
     {
-      "bytes": 8160,
+      "bytes": 13002,
       "path": "app/test/features/chat/message_privacy_test.dart",
-      "sha256": "b65542e5e27f3161e64d89d20ef8a3d6026818a65413593885880e34e6879eaf"
+      "sha256": "6a80b8f4e79d2457ebb6799475b4fce6a81b6c76b8037e2b56365354bc275c90"
     },
     {
       "bytes": 15653,
@@ -2679,5 +2679,5 @@
   ],
   "members": 535,
   "schema": "luobo.android.current359-inputs.v1",
-  "source_digest": "32cbb2322bcec324fd83f4e8d10574cb2bb26ea6a13502ff44d86d932ecadbd5"
+  "source_digest": "e56ccf115d0299ef01241fc6f871af3e938fcdf356d77c7caa67191b026c87c2"
 }
