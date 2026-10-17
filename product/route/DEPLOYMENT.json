@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "service": "萝卜对话租户路由",
+  "module": "openim-route-service",
+  "upstream_source": {
+    "repository": "http://gitlab.chuanim.com/openim/route-service",
+    "branch": "master",
+    "commit": "0d68bc733920d5cff8394ccbc8e8298cdc02ee8b"
+  },
+  "configuration": {
+    "file": ".env.example",
+    "policy": "仅从环境变量读取；不加载旧生产config.yaml；示例没有真实密钥",
+    "required": [
+      "ROUTE_MYSQL_PASSWORD",
+      "ROUTE_ADMIN_TOKEN (at least 32 characters)"
+    ],
+    "reverse_proxy": "ROUTE_TRUSTED_PROXIES必须只配置真实反向代理CIDR；空值不信任任何XFF/X-Real-IP",
+    "cors": "ROUTE_ALLOWED_ORIGINS只能配置精确HTTPS origin；浏览器同源与native请求不依赖CORS",
+    "otp_authority": "租户chart负责发码、校验、用途/账号/区号绑定、限频、失败冷却、最终原子核销；route不再生成/存储公开OTP或替换forwardCode",
+    "registration_auth": "Per-tenant ROUTE_UPSTREAM_SECRETS JSON map (serverID -> >=32-character secret). Chart matching LUOBO_ROUTE_SHARED_SECRET. Missing tenant secret disables registration and never falls back to unsigned writes."
+  },
+  "build": {
+    "go_minimum": "1.27.2",
+    "commands": [
+      "go mod download",
+      "go test -race ./...",
+      "go vet ./...",
+      "go build -trimpath -o route-service ."
+    ],
+    "container": "Dockerfile exists; container image build/runtime not yet verified"
+  },
+  "migration": {
+    "schema": "sql/init.sql has original schema DDL only, no production data or seeds",
+    "initialization": "Back up DB first; ./route-service -migrate creates missing tables via GORM and exits. Existing model schema retained. Do not run against production without backup and reviewed diff.",
+    "existing_binding_keys": "Old user_id stores phone only without country; preserve unchanged as read-only routing fallback. Tenant chart still authenticates exact areaCode+phone, so a fallback does not assign ownership.",
+    "new_binding_keys": "phone:{normalized +area}:{phone}; email:{base64url SHA256(lowercase email)}; all fit old VARCHAR(50). No automatic reassignment/mass rewrite.",
+    "rollback": "Before initial rollout preserve existing DB dump and old binary/config privately. New country/email keys are additive records; do not erase them or restore old snapshot over new writes without a reconciliation window.",
+    "repair": "Unknown network outcome preserves reservation and original tenant. Retry same registration identity/invitation queries an HMAC-signed receipt; registered+IM provisioned+same ID/identity enables idempotent binding and instructs fresh login. Manual /route/bind rejects pending intent instead of double-counting. Never release an uncertain reservation only because it is old.",
+    "registration_intent": "Additive registration_intent table: UUIDv4, canonical account key, tenant, invite, state, upstream user ID and 60-second processing lease only. No credential, OTP or request payload. Pending reservations are included in existing capacity/usage counters."
+  },
+  "management": {
+    "authentication": "X-Route-Admin-Token or Authorization: Bearer; fail closed when configured secret is shorter than 32 characters",
+    "preserved_endpoints": [
+      "GET /api/route/server?code=",
+      "GET /api/route/server?user_id= (admin required)",
+      "POST /api/route/bind (admin required)",
+      "GET /api/route/servers (admin required)"
+    ],
+    "binding": "Server row lock + invite row lock + binding insertion + usage counters in one transaction; repeated identical binding does not increment counters",
+    "source": "api/router.go; service/route_service.go"
+  },
+  "runbook": [
+    "Provision MySQL database and least-privilege account; supply secrets using deployment secret manager",
+    "Initialize/review schema on a copied DB; configure servers/default tenant/invitation rows through existing administration workflow",
+    "Configure route ingress TLS and actual proxy CIDRs, configure chart trusted route egress addresses for reported client IP",
+    "Configure tenant chart real email/SMS provider and verification-purpose migration; disabled-provider fake success is not acceptable",
+    "Configure per-tenant HMAC registration secrets in route and chart, migrate additive intent/receipt schemas; validate lost-response and restart recovery with synthetic accounts.",
+    "Run ./route-service -check-config, then ./route-service",
+    "Probe GET /api/health and execute phone/email register→login→reset→old-session rejection in isolated staging",
+    "Use route management credential only from trusted administrator backend; never ship it to end-user Web or App bundles"
+  ],
+  "acceptance_limits": [
+    "Three isolated MySQL 8.4.11 saga tests pass (concurrent quota, release, recovery/idempotence, ownership conflict); deployed nginx/HMAC route→chart→IM end-to-end remains pending.",
+    "SMS adapters are preserved and tested with fake transports; public OTP is chart-owned; real SMS/email delivery not yet verified",
+    "In-memory route IP limiter is process-local; tenant chart authoritative account/purpose/IP throttles must be configured across replicas",
+    "No live device/Web end-to-end or production rollout is claimed"
+  ]
+}

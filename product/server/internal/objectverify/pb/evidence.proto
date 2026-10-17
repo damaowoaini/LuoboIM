@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package luobo.internal.object;
+option go_package = "github.com/openimsdk/open-im-server/v3/internal/objectverify/pb;pb";
+
+// Private service: deliberately separate from the external OpenIM SDK protocol.
+service EvidenceVerifier {
+  rpc Verify(VerifyRequest) returns (VerifyResponse);
+}
+message VerifyRequest {
+  string owner_user_id = 1;
+  repeated string urls = 2;
+}
+message VerifyResponse {
+  bool valid = 1;
+}

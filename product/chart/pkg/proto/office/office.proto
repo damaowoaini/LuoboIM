@@ -1,0 +1,326 @@
+syntax = "proto3";
+package OpenIMChat.office;
+import "pub/sdkws.proto";
+import "common/common.proto";
+option go_package = "github.com/OpenIMSDK/chat/pkg/proto/office";
+
+message TagUser {
+  string userID = 1;
+  string userName = 2;
+}
+
+message Tag {
+  string tagID = 1;
+  string tagName = 2;
+  repeated OpenIMChat.common.UserPublicInfo users = 3;
+  repeated string groupIDs = 4;
+  int64 createTime = 5;
+}
+
+message GetUserTagsReq{
+  string userID = 1;
+}
+
+message GetUserTagsResp{
+  repeated Tag tags = 1;
+}
+
+message CreateTagReq {
+  string tagName = 1;
+  string userID = 2;
+  repeated string userIDs = 3;
+  repeated string groupIDs = 4;
+}
+
+message CreateTagResp {
+}
+
+message DeleteTagReq {
+  string tagID = 2;
+}
+
+message DeleteTagResp {
+}
+
+message SetTagReq {
+  string tagID = 2;
+  string name = 3;
+  repeated string addUserIDs = 4;
+  repeated string delUserIDs = 5;
+  repeated string addGroupIDs = 6;
+  repeated string delGroupIDs = 7;
+}
+
+message SetTagResp {
+}
+
+message SendMsg2TagReq {
+  repeated string tagIDs = 1;
+  repeated string userIDs = 2;
+  repeated string groupIDs = 3;
+  string sendID = 4;
+  int32 senderPlatformID = 5;
+  string content = 6;
+}
+
+message SendMsg2TagResp {
+  OpenIMChat.common.UserPublicInfo sendUser = 1;
+  repeated string recvUserIDs = 2;
+  repeated string recvGroupIDs = 3;
+  string content = 4;
+}
+
+message GetTagSendLogsReq {
+  OpenIMServer.sdkws.RequestPagination pagination = 1;
+  string userID = 2;
+}
+
+message TagSendLog {
+  string id = 1;
+  repeated Tag tags = 2;
+  repeated OpenIMChat.common.UserPublicInfo users = 3;
+  repeated string groupIDs = 4;
+  string content = 5;
+  int64 sendTime = 6;
+}
+
+message GetTagSendLogsResp {
+  repeated TagSendLog tagSendLogs = 1;
+}
+
+message DelTagSendLogReq {
+  repeated string ids = 1;
+}
+
+message DelTagSendLogResp {
+}
+
+message GetUserTagByIDReq {
+  string tagID = 1;
+}
+
+message GetUserTagByIDResp {
+  Tag tag = 1;
+}
+
+message Comment {
+  string commentID = 1;
+  string userID = 2;
+  string nickname = 3;
+  string faceURL = 4;
+  string replyUserID = 5;
+  string replyNickname = 6;
+  string replyFaceURL = 7;
+  string content = 8;
+  int64  createTime = 9;
+}
+
+message PermissionGroup {
+  string groupName = 1;
+  string groupID = 2;
+}
+
+message WorkMomentUser {
+  string userID = 1;
+  string userName = 2;
+}
+
+message Meta {
+  string original = 1;
+  string thumb = 2;
+  int32 width = 3;
+  int32 height = 4;
+}
+
+message WorkMomentContent {
+  repeated Meta metas = 1;
+  string text = 2;
+  int32 type = 3;
+}
+
+message LikeUserInfo {
+  string  userID = 1;
+  string  account = 2;
+  string  email = 3;
+  string  nickname = 4;
+  string  faceURL = 5;
+  int32  gender = 6;
+  int32  level = 7;
+  int64 likeTime = 8;
+}
+
+message WorkMoment {
+  string workMomentID = 1;
+  string userID = 2;
+  string nickname = 3;
+  string faceURL = 4;
+  WorkMomentContent content = 5;
+  repeated LikeUserInfo likeUsers = 6;
+  repeated Comment comments = 7;
+  int32 permission = 8;
+  repeated OpenIMChat.common.UserPublicInfo permissionUsers = 9;
+  repeated OpenIMChat.common.UserPublicInfo atUsers = 10;
+  int64 createTime = 11;
+}
+
+message CreateOneWorkMomentReq {
+  string workMomentID = 1;
+  string userID = 2;
+  WorkMomentContent content = 3;
+  repeated string likeUserIDs = 4;
+  repeated Comment comments = 5;
+  int32 permission = 6;
+  repeated string permissionUserIDs = 7;
+  repeated string permissionGroupIDs = 8;
+  repeated string atUserIDs = 9;
+  int64 createTime = 10;
+}
+
+message CreateOneWorkMomentResp {
+  WorkMoment workMoment = 1;
+}
+
+message DeleteOneWorkMomentReq {
+  string workMomentID = 1;
+  string userID = 2;
+}
+
+message DeleteOneWorkMomentResp {
+  repeated string userIDs = 1;
+}
+
+message LikeOneWorkMomentReq {
+  string userID = 1;
+  string WorkMomentID = 2;
+  bool like = 3;
+}
+
+message LikeOneWorkMomentResp {
+  WorkMoment workMoment = 1;
+}
+
+message CommentOneWorkMomentReq {
+  string userID = 1;
+  string workMomentID = 2;
+  string replyUserID = 3;
+  string content = 4;
+}
+
+message CommentOneWorkMomentResp {
+  string commentID = 1;
+  WorkMoment workMoment = 2;
+}
+
+message DeleteCommentReq {
+  string workMomentID = 1;
+  string commentID = 2;
+}
+
+message DeleteCommentResp {
+  repeated string userIDs = 1;
+  WorkMoment workMoment = 2;
+}
+
+message GetWorkMomentByIDReq {
+  string workMomentID = 1;
+}
+
+message GetWorkMomentByIDResp {
+  WorkMoment workMoment = 2;
+}
+
+message GetUserSendWorkMomentsReq {
+  string userID = 1;
+  OpenIMServer.sdkws.RequestPagination pagination = 2;
+}
+
+message GetUserSendWorkMomentsResp {
+  repeated WorkMoment workMoments = 1;
+}
+
+message GetUserRecvWorkMomentsReq {
+  string userID = 1;
+  repeated string friendIDs = 2;
+  OpenIMServer.sdkws.RequestPagination pagination = 3;
+}
+
+message GetUserRecvWorkMomentsResp {
+  repeated WorkMoment workMoments = 1;
+}
+
+message FindRelevantWorkMomentsReq {
+  string userID = 1;
+  OpenIMServer.sdkws.RequestPagination pagination = 2;
+}
+
+message WorkMomentLog {
+  string workMomentID = 1;
+  string userID = 2;
+  string nickname = 3;
+  string faceURL = 4;
+  WorkMomentContent content = 5;
+  repeated LikeUserInfo likeUsers = 6;
+  repeated Comment comments = 7;
+  int32 permission = 8;
+  repeated OpenIMChat.common.UserPublicInfo permissionUsers = 9;
+  repeated OpenIMChat.common.UserPublicInfo atUsers = 10;
+  int64 createTime = 11;
+  int32 type = 12;
+}
+
+message FindRelevantWorkMomentsResp {
+  repeated WorkMomentLog workMoments = 1;
+}
+
+message GetUnreadWorkMomentsCountReq {
+  string userID = 1;
+}
+
+message GetUnreadWorkMomentsCountResp {
+  int32 total = 1;
+}
+
+message ReadWorkMomentsReq {
+  string userID = 1;
+  int32 type = 2;
+}
+
+message ReadWorkMomentsResp {
+}
+
+
+message WorkMomentNotificationMsg {
+  int32 notificationMsgType = 1;
+  string workMomentID = 2;
+  WorkMomentContent content = 3;
+  string userID = 4;
+  string nickname = 5;
+  string faceURL = 6;
+  int64 createTime = 7;
+}
+
+service Office {
+  rpc GetUserTags(GetUserTagsReq) returns(GetUserTagsResp);
+  rpc CreateTag(CreateTagReq) returns(CreateTagResp);
+  rpc DeleteTag(DeleteTagReq) returns(DeleteTagResp);
+  rpc SetTag(SetTagReq) returns(SetTagResp);
+  rpc SendMsg2Tag(SendMsg2TagReq) returns(SendMsg2TagResp);
+  rpc GetTagSendLogs(GetTagSendLogsReq) returns(GetTagSendLogsResp);
+  rpc DelTagSendLog(DelTagSendLogReq) returns(DelTagSendLogResp);
+  rpc GetUserTagByID(GetUserTagByIDReq) returns(GetUserTagByIDResp);
+
+  rpc CreateOneWorkMoment(CreateOneWorkMomentReq) returns(CreateOneWorkMomentResp);
+  rpc DeleteOneWorkMoment(DeleteOneWorkMomentReq) returns(DeleteOneWorkMomentResp);
+  rpc LikeOneWorkMoment(LikeOneWorkMomentReq) returns(LikeOneWorkMomentResp);
+  rpc CommentOneWorkMoment(CommentOneWorkMomentReq) returns(CommentOneWorkMomentResp);
+  rpc DeleteComment(DeleteCommentReq) returns(DeleteCommentResp);
+  rpc GetWorkMomentByID(GetWorkMomentByIDReq) returns(GetWorkMomentByIDResp);
+
+  rpc GetUserSendWorkMoments(GetUserSendWorkMomentsReq) returns(GetUserSendWorkMomentsResp);
+  rpc GetUserRecvWorkMoments(GetUserRecvWorkMomentsReq) returns(GetUserRecvWorkMomentsResp);
+
+  rpc FindRelevantWorkMoments(FindRelevantWorkMomentsReq)returns(FindRelevantWorkMomentsResp);
+  rpc GetUnreadWorkMomentsCount(GetUnreadWorkMomentsCountReq)returns(GetUnreadWorkMomentsCountResp);
+  rpc ReadWorkMoments(ReadWorkMomentsReq)returns(ReadWorkMomentsResp);
+}
+

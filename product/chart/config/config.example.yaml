@@ -1,0 +1,193 @@
+# Public source example. All credential/key scalars are intentionally empty.
+# CI copies this example only for isolated source tests; it provisions no services.
+# Configure deployment credentials separately; do not commit local runtime YAML.
+# Durable IM account provisioning is always enabled. Central route binding is
+# explicit; a false setting reports direct_only rather than claiming a binding.
+# LUOBO_ROUTE_SHARED_SECRET is the dedicated tenant service secret (>=32 bytes).
+adminProvisioning:
+  enabled: false
+  serverID: ""
+  routeURL: ""
+  allowLoopbackHTTP: false
+
+# Match the IM issuer for this tenant. Management capabilities fail closed until set.
+adminDelegation:
+  issuer: ""
+
+# Copyright © 2023 OpenIM open source community. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# OpenIM Server should be started before this configuration is applied
+envs:
+  discovery: "zookeeper" # ENVS_DISCOVERY, e.g., zookeeper, etcd...
+
+# Zookeeper configuration - used for service discovery and coordination
+zookeeper:
+  schema: openim # ZOOKEEPER_SCHEMA, the schema to use in Zookeeper
+  zkAddr:
+    - 127.0.0.1:12181 # ZOOKEEPER_ADDRESS and ZOOKEEPER_PORT, Zookeeper address and port
+  username: "" # ZOOKEEPER_USERNAME, Username for Zookeeper authentication
+  password: ""
+
+# Configuration for the chat API service
+chatApi:
+  openImChatApiPort: [ 10008 ] # Port for OpenIM Chat API
+  listenIP: # CHAT_API_LISTEN_IP, IP address to listen on for Chat API
+
+# Configuration for the admin API service
+adminApi:
+  openImAdminApiPort: [ 10009 ] # Port for OpenIM Admin API
+  listenIP: # ADMIN_API_LISTEN_IP, IP address to listen on for Admin API
+
+# RPC configuration for service communication
+rpc:
+  registerIP: # RPC_REGISTER_IP, IP address to register with Zookeeper for RPC
+  listenIP:   # RPC_LISTEN_IP, IP address to listen on for RPC (default 0.0.0.0)
+
+# Ports for RPC services
+rpcPort:
+  openImAdminPort: [ 30200 ] # Port for OpenIM Admin RPC service
+  openImChatPort: [ 30300 ] # Port for OpenIM Chat RPC service
+  openImOfficePort: [ 30400 ]
+
+# Names for RPC services registration
+rpcRegisterName:
+  openImAdminName: admin # Name for OpenIM Admin RPC service
+  openImChatName: chat   # Name for OpenIM Chat RPC service
+  openImOfficeName: office
+  openImRtcName: Rtc
+
+# MySQL database configuration - used for storing OpenIM data
+mysql:
+  address: [ 127.0.0.1:13306 ]            # MYSQL_ADDRESS and MYSQL_PORT, MySQL server address and port
+  username: root                          # MYSQL_USERNAME, Username for MySQL
+  password: ""
+  database: openIM_v3                     # MYSQL_DATABASE, Database name
+  maxOpenConn: 1000                       # Max open connections
+  maxIdleConn: 100                        # Max idle connections
+  maxLifeTime: 60                         # Max lifetime of connections in seconds
+  logLevel: 4                             # Log level for MySQL
+  slowThreshold: 500                      # Slow query threshold in milliseconds
+
+mongo:
+  uri: "mongodb://openIM:CHANGE_ME@127.0.0.1:37017/openIM_v3?authSource=openIM_v3&maxPoolSize=100"
+  address: [ 127.0.0.1:37017 ]
+  username: openIM
+  password: ""
+  maxPoolSize: 100
+  database: openIM_v3
+
+# Log configuration - defines how logging is handled
+log:
+  storageLocation: ../logs/           # LOG_STORAGE_LOCATION, Directory for storing logs
+  rotationTime: 24                    # Log rotation time in hours
+  remainRotationCount: 2              # Number of log files to retain
+  remainLogLevel: 3                   # Log level (3 = WARN and above, 6 = all levels)
+  isStdout: false                     # Whether to output logs to stdout
+  isJson: false                       # Whether to output logs in JSON format
+  withStack: false                    # Whether to include stack trace in logs
+
+# Secret key for secure communication - 已修改，旧的secret已失效
+secret: ""
+chatSecret: ""
+
+# Token policy configuration
+tokenPolicy:
+  expire: 2592000 # TOKEN_EXPIRE, Token expiration time in seconds (30 days)
+
+# Verification code settings
+verifyCode:
+  validTime: 300 # Verification code valid time in seconds
+  validCount: 5 # Number of times a verification code is valid
+  uintTime: 86400 # Time unit for verification code
+  maxCount: 10 # Maximum number of verification codes in a time unit
+  superCode: "CHANGE_ME" # Super verification code (used only when `use` is empty)
+  len: 6 # Length of the verification code
+  use: "" # Service used for verification code - 可选值: ali(阿里云), smsbao(短信宝), accessyou(易通訊), mail(邮箱), 空字符串(禁用，使用超级验证码)
+  # Aliyun SMS service configuration
+  ali:
+    endpoint: "dysmsapi.aliyuncs.com"
+    accessKeyId: ""
+    accessKeySecret: ""
+    signName: ""
+    verificationCodeTemplateCode: ""
+  # 短信宝 SMS service configuration
+  smsbao:
+    apiUrl: "https://api.smsbao.com/sms" # 短信宝API地址
+    username: "whjk5868" # 短信宝用户名
+    password: ""
+    signName: "北京宇术科技有限公司" # 短信签名
+  # 易通訊 (AccessYou) SMS service configuration
+  accessyou:
+    apiUrl: "https://otp.accessyou-api.com/sendsms-otp.php"
+    accountNo: "11037357"
+    username: "11037357"
+    password: ""
+    templateId: "1"
+  # Email service configuration
+  mail:
+    title: "圈友"
+    senderMail: "746287002@qq.com" # Email address of the sender
+    senderAuthorizationCode: "CHANGE_ME" # Authorization code for the sender's email
+    smtpAddr: "smtp.qq.com" # SMTP server address
+    smtpPort: 465 # SMTP server port for email sending
+
+# Proxy header configuration for IP extraction
+proxyHeader: "X-Forwarded-For" # PROXY_HEADER, Header used for extracting the client IP address
+# 客户端真实 IP 认定（安全相关，见 pkg/common/iptrust）
+ipTrust:
+  # 可信反向代理（nginx）网段。留空 = 回环 + 内网段，nginx 和服务在同一台机器或同一内网时不用填
+  trustedProxies: []
+  # 路由服务（route-service）的出口 IP。只有这些 IP 代报的用户 IP 才会被采信。
+  # 上线前必须填，否则经路由服务登录/注册的所有用户都会记成路由服务的 IP，
+  # 一旦后台开启「每小时登录注册 IP 上限」会把所有人一起限住。例: [ "10.0.0.8" ]
+  trustedForwarders: []
+# 登录失败锁定，填 0 用默认值
+loginLock:
+  maxFailPerAccountIP: 0   # 同账号+同IP 窗口内失败次数，默认 10
+  maxFailPerAccount: 0     # 同账号窗口内累计失败次数，默认 30
+  windowMinutes: 0         # 窗口分钟数，默认 15
+  adminMaxPerAccountIP: 0  # 后台登录 同账号+同IP 尝试次数，默认 10
+  adminMaxPerIP: 0         # 后台登录 同IP 尝试次数，默认 30
+
+# List of admin users
+# 重要：请修改为你自己的管理员账号，不要使用默认值
+adminList:
+  - adminID: admin
+    nickname: 系统管理员
+    imAdmin: admin2024  # 请修改为你的管理员ID
+  - adminID: admin02
+    nickname: 系统管理员
+    imAdmin: admin02  # 请修改为你的管理员ID
+  - adminID: admin03
+    nickname: 系统管理员
+    imAdmin: admin03  # 请修改为你的管理员ID
+# URL for OpenIM server
+openIMUrl: "https://qoet.imtest4.com/api" # OPENIM_SERVER_ADDRESS:API_OPENIM_PORT, URL of the OpenIM server
+
+# 身份证实名认证配置
+idCardVerification:
+  apiUrl: "http://op.juhe.cn/idcard/query"
+  apiKey: ""
+
+# Redis configuration - used for caching and session management
+redis:
+  address: [ 127.0.0.1:16379 ] # REDIS_ADDRESS and REDIS_PORT, Redis server address and port
+  username: # REDIS_USERNAME, Username for Redis authentication
+  password: ""
+
+# 服务器标识配置 - 用于多服务器部署时区分用户
+# 当配置了 serverTag 后，生成的 userID 会自动添加前缀，例如：A5238943740
+# 这样可以确保不同服务器的用户 ID 不会冲突
+serverTag: "A" # 服务器标识，留空则不添加前缀

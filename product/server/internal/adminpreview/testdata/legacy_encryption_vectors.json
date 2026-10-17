@@ -1,0 +1,34 @@
+{
+  "syntheticOnly": true,
+  "plaintextUtf8": "{\"content\":\"Synthetic encryption fixture\"}",
+  "analysis": {
+    "cipherBytes": 48,
+    "decryptMatchesSyntheticJson": true,
+    "derivedIVEqualsFirst16KeyBytes": true,
+    "derivedSyntheticIVHex": "30313233343536373839616263646566",
+    "keyEncoding": "raw32",
+    "keyVersion": 1,
+    "mode": "AES-CBC-PKCS7",
+    "plaintextBytes": 42,
+    "samePlaintextSameCiphertext": true,
+    "synthetic": true
+  },
+  "captures": [
+    {
+      "capturedAt": "2026-10-15T05:47:12Z",
+      "contentBase64": "j5xeigE92OoLZ75P0bHYG/CIeD0SKLxqUguCXQMO7nnoEbv2+MHrxPIq96q9LV74",
+      "contentType": 101,
+      "key": "0123456789abcdef0123456789abcdef",
+      "keyVersion": 1,
+      "synthetic": true
+    },
+    {
+      "capturedAt": "2026-10-15T05:47:12Z",
+      "contentBase64": "j5xeigE92OoLZ75P0bHYG/CIeD0SKLxqUguCXQMO7nnoEbv2+MHrxPIq96q9LV74",
+      "contentType": 101,
+      "key": "0123456789abcdef0123456789abcdef",
+      "keyVersion": 1,
+      "synthetic": true
+    }
+  ]
+}
