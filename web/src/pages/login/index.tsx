@@ -27,7 +27,7 @@ export const Login = () => {
   const retryConfig = useUserStore(state=>state.getAppConfigByReq);
   useEffect(() => {
     if (appConfigStatus !== "error" ||
-      (configFailure?.reason !== "timeout" && configFailure?.reason !== "connection")) return;
+      (configFailure?.reason !== "timeout" && configFailure?.reason !== "connection" && configFailure?.reason !== "gateway")) return;
     const issuer = getRouteUrl(), generation = sessionCoordinator.generation;
     let retired = false, inFlight = false, visibility = document.visibilityState;
     const recover = () => {
@@ -35,7 +35,7 @@ export const Login = () => {
       if (retired || inFlight || document.visibilityState !== "visible" ||
         issuer !== getRouteUrl() || generation !== sessionCoordinator.generation ||
         state.appConfigStatus !== "error" ||
-        (state.appConfigFailure?.reason !== "timeout" && state.appConfigFailure?.reason !== "connection")) return;
+        (state.appConfigFailure?.reason !== "timeout" && state.appConfigFailure?.reason !== "connection" && state.appConfigFailure?.reason !== "gateway")) return;
       inFlight = true;
       const settled = () => { inFlight = false; };
       void state.getAppConfigByReq().then(settled, settled);

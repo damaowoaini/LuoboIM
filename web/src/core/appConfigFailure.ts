@@ -1,8 +1,8 @@
 import { AppConfigResponseError } from "./appConfig";
-import { ApiError, TransportApiError } from "@/utils/request";
+import { ApiError, HttpApiError, TransportApiError } from "@/utils/request";
 
 export interface AppConfigFailure {
-  reason: "timeout" | "connection" | "response" | "rejected" | "unknown";
+  reason: "timeout" | "connection" | "gateway" | "response" | "rejected" | "unknown";
   code?: number;
 }
 
@@ -11,6 +11,8 @@ export interface AppConfigFailure {
 export function appConfigFailure(error: unknown): AppConfigFailure {
   if (error instanceof AppConfigResponseError) return { reason: "response" };
   if (error instanceof TransportApiError) return { reason: error.transportKind, code: 503 };
+  if (error instanceof HttpApiError && (error.httpStatus === 502 || error.httpStatus === 503 || error.httpStatus === 504))
+    return { reason: "gateway", code: error.httpStatus };
   if (error instanceof ApiError) {
     const code = Number.isSafeInteger(error.errCode) && Math.abs(error.errCode) <= 99999999
       ? error.errCode : undefined;
@@ -23,6 +25,7 @@ export function appConfigFailureDescription(value?: AppConfigFailure | null): st
   const descriptions = {
     timeout: "配置请求超时，请稍后重试或检查服务地址。",
     connection: "无法连接配置服务，请检查网络或服务地址。",
+    gateway: "配置服务暂时不可用，请稍后重试。",
     response: "配置服务返回的数据格式异常，请联系管理员检查服务版本。",
     rejected: "配置服务返回错误，请重试或联系管理员。",
     unknown: "配置获取失败，请检查服务地址或稍后重试。",

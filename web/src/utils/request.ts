@@ -11,6 +11,13 @@ export class ApiError extends Error {
   readonly registration:RegistrationFlags;
   constructor(readonly errCode: number, readonly errDlt: string, data?:unknown) { super(errDlt); this.name = "ApiError";this.registration=registrationFlags(data); }
 }
+// Only rejected HTTP responses receive this brand; business envelopes do not.
+// Keep ApiError's public fields, name and filtered registration outcome flags.
+export class HttpApiError extends ApiError {
+  constructor(readonly httpStatus: number, errDlt: string, data?: unknown) {
+    super(httpStatus, errDlt, data);
+  }
+}
 // This brand is created only at the Axios transport boundary. A business
 // envelope with errCode503 remains an ordinary ApiError.
 export class TransportApiError extends ApiError {
@@ -61,7 +68,8 @@ const createAxiosInstance = (base: string | (() => string), tokenMode: TokenMode
       throw new TransportApiError("timeout");
     if (!error.response && error.code === "ERR_NETWORK")
       throw new TransportApiError("connection");
-    throw new ApiError(error.response?.status ?? 503, error.code === "ECONNABORTED" ? "请求超时，请重试" : "网络连接失败，请重试",(error.response?.data as {data?:unknown}|undefined)?.data);
+    if (error.response) throw new HttpApiError(error.response.status, error.code === "ECONNABORTED" ? "请求超时，请重试" : "网络连接失败，请重试", (error.response.data as {data?:unknown}|undefined)?.data);
+    throw new ApiError(503, error.code === "ECONNABORTED" ? "请求超时，请重试" : "网络连接失败，请重试");
   });
   return request;
 };

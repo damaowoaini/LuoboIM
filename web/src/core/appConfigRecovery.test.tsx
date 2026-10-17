@@ -8,7 +8,7 @@ import { SessionCoordinator } from "./session/session";
 import { AppConfigResponseError } from "./appConfig";
 import type { AppConfig } from "@/store/type";
 import type { AppConfigFailure } from "./appConfigFailure";
-import { ApiError, TransportApiError } from "@/utils/request";
+import { ApiError, HttpApiError, TransportApiError } from "@/utils/request";
 
 const f = vi.hoisted(() => ({
   issuer: "https://route-a.example",
@@ -81,10 +81,12 @@ async function stop() {
   if (root) await act(async () => { root!.unmount(); });
   root = undefined; host?.remove();
 }
-async function transient(reason: "timeout" | "connection" = "connection") {
-  f.config.mockRejectedValueOnce(new TransportApiError(reason));
+async function transient(reason: "timeout" | "connection" | 502 | 503 | 504 = "connection") {
+  f.config.mockRejectedValueOnce(typeof reason === "number"
+    ? new HttpApiError(reason, "synthetic gateway detail") : new TransportApiError(reason));
   await useUserStore.getState().getAppConfigByReq();
-  expect(useUserStore.getState().appConfigFailure?.reason).toBe(reason);
+  expect(useUserStore.getState().appConfigFailure).toEqual(typeof reason === "number"
+    ? { reason: "gateway", code: reason } : { reason, code: 503 });
   f.config.mockClear();
 }
 function handlers() {
@@ -147,11 +149,36 @@ describe("real login configuration event recovery", () => {
     expect(f.config).toHaveBeenCalledTimes(1);
     await act(async () => { next.resolve(reply()); await flush(); });
     expect(useUserStore.getState().appConfigStatus).toBe("ready");
+
+    for (const status of [502, 503, 504] as const) {
+      await act(async () => { await transient(status); });
+      expect(host.textContent).toContain(`配置服务暂时不可用，请稍后重试。（错误码 ${status}）`);
+      const gateway = deferred(); f.config.mockReturnValueOnce(gateway.promise);
+      if (status === 502) {
+        await act(async () => { window.dispatchEvent(new Event("online")); window.dispatchEvent(new Event("online")); await flush(); });
+      } else {
+        await act(async () => { visibilityEvent("hidden"); window.dispatchEvent(new Event("online")); await flush(); });
+        expect(f.config).not.toHaveBeenCalled();
+        await act(async () => {
+          visibilityEvent("visible"); window.dispatchEvent(new Event("online"));
+          visibilityEvent("hidden"); visibilityEvent("visible"); await flush();
+        });
+      }
+      expect(f.config).toHaveBeenCalledTimes(1); expect(useUserStore.getState().appConfigStatus).toBe("loading");
+      await act(async () => { gateway.resolve(reply()); await flush(); });
+      expect(useUserStore.getState().appConfigStatus).toBe("ready");
+      expect(host.textContent).not.toContain("暂时无法获取服务配置");
+      await act(async () => { window.dispatchEvent(new Event("online")); visibilityEvent("hidden"); visibilityEvent("visible"); await flush(); });
+      expect(f.config).toHaveBeenCalledTimes(1);
+    }
   });
 
   it("removes recovery listeners after ready or unmount and refuses retired issuer and generation handlers", async () => {
-    for (const boundary of ["issuer", "generation"] as const) {
-      f.issuer = "https://route-a.example"; await transient();
+    for (const { boundary, reason } of [
+      { boundary: "issuer", reason: "connection" }, { boundary: "generation", reason: "connection" },
+      { boundary: "issuer", reason: 503 }, { boundary: "generation", reason: 503 },
+    ] as const) {
+      f.issuer = "https://route-a.example"; await transient(reason);
       windowAdd.mockClear(); documentAdd.mockClear(); await mount(); const original = handlers();
       if (boundary === "issuer") f.issuer = "https://route-b.example";
       else f.session!.invalidate();
@@ -175,6 +202,9 @@ describe("real login configuration event recovery", () => {
     const states: { status: "idle" | "loading" | "ready" | "error"; error?: Error; failure?: AppConfigFailure }[] = [
       { status: "idle" }, { status: "loading" }, { status: "ready" },
       { status: "error", error: new ApiError(503, "请求超时，请重试"), failure: { reason: "rejected", code: 503 } },
+      { status: "error", error: new ApiError(502, "synthetic business rejection"), failure: { reason: "rejected", code: 502 } },
+      { status: "error", error: new HttpApiError(401, "synthetic HTTP rejection"), failure: { reason: "rejected", code: 401 } },
+      { status: "error", error: new HttpApiError(500, "synthetic HTTP rejection"), failure: { reason: "rejected", code: 500 } },
       { status: "error", error: new ApiError(500, "网络连接失败，请重试"), failure: { reason: "rejected", code: 500 } },
       { status: "error", error: new AppConfigResponseError(), failure: { reason: "response" } },
       { status: "error", error: new Error("synthetic unknown"), failure: { reason: "unknown" } },

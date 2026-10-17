@@ -4,7 +4,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SessionCoordinator, type Session } from "./session/session";
 import type { AppConfig } from "@/store/type";
-import { ApiError, TransportApiError } from "@/utils/request";
+import { ApiError, HttpApiError, TransportApiError } from "@/utils/request";
 import { decodeAppConfigData } from "./appConfig";
 import { appConfigFailureDescription } from "./appConfigFailure";
 
@@ -146,6 +146,11 @@ describe("real app-config store request publication", () => {
       { error: new ApiError(503, "请求超时，请重试"), expected: { reason: "rejected", code: 503 } },
       { error: new ApiError(401, privateText), expected: { reason: "rejected", code: 401 } },
       { error: new ApiError(502, privateText), expected: { reason: "rejected", code: 502 } },
+      { error: new HttpApiError(502, privateText), expected: { reason: "gateway", code: 502 } },
+      { error: new HttpApiError(503, privateText), expected: { reason: "gateway", code: 503 } },
+      { error: new HttpApiError(504, privateText), expected: { reason: "gateway", code: 504 } },
+      { error: new HttpApiError(401, privateText), expected: { reason: "rejected", code: 401 } },
+      { error: new HttpApiError(500, privateText), expected: { reason: "rejected", code: 500 } },
       { error: new ApiError(Number.MAX_SAFE_INTEGER, privateText), expected: { reason: "rejected" } },
       { error: new Error(privateText), expected: { reason: "unknown" } },
     ];
@@ -156,6 +161,7 @@ describe("real app-config store request publication", () => {
       expect(state).toEqual({ appConfig: before, appConfigStatus: "error", appConfigFailure: expected });
       expect(JSON.stringify(state.appConfigFailure)).not.toContain(privateText);
       expect(appConfigFailureDescription(state.appConfigFailure)).not.toContain(privateText);
+      if (expected.reason === "gateway") expect(appConfigFailureDescription(state.appConfigFailure)).toContain("配置服务暂时不可用");
       const next = deferred(); f.config.mockReturnValueOnce(next.promise);
       const retry = request();
       expect(snapshot()).toEqual({ appConfig: before, appConfigStatus: "loading", appConfigFailure: null });

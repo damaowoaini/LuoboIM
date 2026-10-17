@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { AxiosAdapter, AxiosHeaders } from "axios";
 import { endpoints, SessionCoordinator, StaleSessionError } from "@/core/session/session";
 vi.mock("@/core/session/browser", () => ({ sessionCoordinator: undefined }));
-import createAxiosInstance, { ApiError, TransportApiError } from "./request";
+import createAxiosInstance, { ApiError, HttpApiError, TransportApiError } from "./request";
 const response = (id = "u", host = "tenant.example") => ({ issuer: "https://route.example", userID: id, imToken: `im-${id}`, chatToken: `chat-${id}`, serverInfo: { serverID: host, serverName: "tenant", domains: [host] } });
 const coordinator = () => new SessionCoordinator({ read: async () => undefined, write: async () => {}, clear: async () => {} });
 const adapter: AxiosAdapter = async config => ({ config, data: { errCode: 0, data: { baseURL: config.baseURL, token: config.headers.token } }, headers: new AxiosHeaders(), status: 200, statusText: "OK" });
@@ -13,6 +13,28 @@ describe("Tenant HTTP boundary", () => {
     try {await request.post("/api/auth/register");throw new Error("expected failure");}catch(error){
       expect(error).toBeInstanceOf(ApiError);expect(error).toMatchObject({errCode:1002,registration:{registrationPending:true}});
       expect(JSON.stringify(error)).not.toContain("must-not-escape");expect(error).not.toHaveProperty("config");expect(error).not.toHaveProperty("data");
+      expect(error).not.toBeInstanceOf(HttpApiError);
+    }
+    const outcomes = [
+      { data: { registrationPending: true, requiresLogin: true }, registration: { registrationPending: true, requiresLogin: true } },
+      { data: { registrationRecovered: true, requiresLogin: true }, registration: { registrationRecovered: true, requiresLogin: true } },
+      { data: { registrationPending: "true", registrationRecovered: 1, requiresLogin: 1 }, registration: {} },
+      { data: { registrationPending: true, registrationRecovered: true, requiresLogin: true }, registration: {} },
+    ];
+    for (const status of [502, 503, 504]) for (const outcome of outcomes) {
+      request.defaults.adapter = async config => { throw Object.assign(new Error("must-not-escape"), {
+        config, code: "ERR_BAD_RESPONSE", response: { status, data: { data: {
+          ...outcome.data, imToken: "must-not-escape", password: "must-not-escape", upstreamURL: "must-not-escape",
+        } } },
+      }); };
+      const error: unknown = await request.post("/api/auth/register").catch(value => value);
+      expect(error).toBeInstanceOf(ApiError); expect(error).toBeInstanceOf(HttpApiError);
+      expect(error).not.toBeInstanceOf(TransportApiError);
+      expect(error).toMatchObject({ name: "ApiError", errCode: status, httpStatus: status,
+        errDlt: "网络连接失败，请重试", message: "网络连接失败，请重试" });
+      expect((error as ApiError).registration).toEqual(outcome.registration);
+      expect(JSON.stringify(error)).not.toContain("must-not-escape");
+      for (const field of ["config", "data", "response", "cause"]) expect(error).not.toHaveProperty(field);
     }
   });
   it("resolves the active tenant and correct token on every request, replacing caller tokens", async () => {
@@ -63,10 +85,33 @@ describe("Tenant HTTP boundary", () => {
     const business: unknown = await network.post("/message/search").catch(value => value);
     expect(business).toBeInstanceOf(ApiError); expect(business).not.toBeInstanceOf(TransportApiError);
     expect(business).toMatchObject({ errCode: 503, message: "请求超时，请重试" });
+    expect(business).not.toBeInstanceOf(HttpApiError);
+    network.defaults.adapter = async config => ({ config, data: { errCode: 502, errMsg: "synthetic business rejection" }, headers: new AxiosHeaders(), status: 200, statusText: "OK" });
+    const business502: unknown = await network.post("/message/search").catch(value => value);
+    expect(business502).toBeInstanceOf(ApiError); expect(business502).not.toBeInstanceOf(HttpApiError);
+    expect(business502).not.toBeInstanceOf(TransportApiError);
+    expect(business502).toMatchObject({ errCode: 502, errDlt: "synthetic business rejection", message: "synthetic business rejection" });
     network.defaults.adapter = async config => { throw Object.assign(new Error("sensitive server detail"), { config, code: "ERR_BAD_RESPONSE", response: { status: 500 } }); };
     const http: unknown = await network.post("/message/search").catch(value => value);
     expect(http).toBeInstanceOf(ApiError); expect(http).not.toBeInstanceOf(TransportApiError);
     expect(http).toMatchObject({ errCode: 500 }); expect(http).not.toHaveProperty("config");
+    expect(http).toBeInstanceOf(HttpApiError); expect(http).toMatchObject({ name: "ApiError", httpStatus: 500 });
+    for (const status of [401, 502, 503, 504]) {
+      network.defaults.adapter = async config => { throw Object.assign(new Error("sensitive server detail"), {
+        config, code: "ERR_BAD_RESPONSE", response: { status },
+      }); };
+      const responseError: unknown = await network.post("/message/search").catch(value => value);
+      expect(responseError).toBeInstanceOf(ApiError); expect(responseError).toBeInstanceOf(HttpApiError);
+      expect(responseError).not.toBeInstanceOf(TransportApiError);
+      expect(responseError).toMatchObject({ name: "ApiError", errCode: status, httpStatus: status,
+        errDlt: "网络连接失败，请重试", message: "网络连接失败，请重试", registration: {} });
+      expect(responseError).not.toHaveProperty("config"); expect(responseError).not.toHaveProperty("response");
+      expect(JSON.stringify(responseError)).not.toContain("sensitive server detail");
+    }
+    network.defaults.adapter = async config => { throw Object.assign(new Error("sensitive server detail"), { config, code: "ERR_BAD_RESPONSE" }); };
+    const noResponse: unknown = await network.post("/message/search").catch(value => value);
+    expect(noResponse).toBeInstanceOf(ApiError); expect(noResponse).not.toBeInstanceOf(HttpApiError);
+    expect(noResponse).not.toBeInstanceOf(TransportApiError); expect(noResponse).toMatchObject({ errCode: 503 });
   });
 });
 
