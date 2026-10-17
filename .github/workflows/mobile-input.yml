@@ -1,0 +1,43 @@
+name: Manual Mobile current363 input unstarted25
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-input363-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  current363-unstarted25:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Set fresh workspace path
+        run: echo "MOBILE_WORK=$RUNNER_TEMP/mobile-current363-input" >> "$GITHUB_ENV"
+      - name: Checkout exact current363 source without stored credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Linux tester runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
+      - name: Prepare actual363 source and same official toolchain178locked dependencies
+        run: bash ci/mobile-input-setup.sh current363 "$MOBILE_WORK"
+      - name: Only unstarted21new plus4direct tests; local9analysis and gateway1 reused
+        run: |
+          set -euo pipefail
+          sudo unshare --net -- python3 "$GITHUB_WORKSPACE/ci/mobile-input.py" netns \
+            --run-as "$(id -un)" --work "$MOBILE_WORK" 2>&1 \
+            | tee "$MOBILE_WORK/evidence/input-controller.log"
+      - name: Preserve compact actual reports and setup failures
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: mobile-current363-input-${{ github.run_id }}
+          path: ${{ env.MOBILE_WORK }}/evidence/
+          if-no-files-found: warn
+          retention-days: 14

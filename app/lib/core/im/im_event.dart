@@ -27,6 +27,7 @@ enum ImEventKind {
   presenceChanged,
   customBusinessReceived,
   signalingChanged,
+  typingChanged,
 }
 
 enum ImSignalAction {
@@ -42,6 +43,14 @@ enum ImSignalAction {
   participantDisconnected,
   meetingStreamChanged,
   customSignal,
+}
+
+/// Only live single-chat typing metadata crosses the gateway. No message is
+/// retained, published to history, or used as an unread/read-receipt event.
+final class ImTypingStatus {
+  const ImTypingStatus(this.senderId, this.recipientId, this.active);
+  final String senderId, recipientId;
+  final bool active;
 }
 
 /// Sanitized call metadata. Credentials and SDK objects never enter events.
@@ -82,6 +91,7 @@ final class ImEvent {
     required this.generation,
     Iterable<String> resourceIds = const [],
     this.count,
+    this.typing,
     this.signalAction,
     this.failure,
     this.call,
@@ -93,6 +103,7 @@ final class ImEvent {
   final int generation;
   final List<String> resourceIds;
   final int? count;
+  final ImTypingStatus? typing;
   final ImSignalAction? signalAction;
   final AppFailure? failure;
   final ImCallInvitation? call;

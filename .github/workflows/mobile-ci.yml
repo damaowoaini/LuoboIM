@@ -36,6 +36,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          ref: dfa0b855c3f90668f36aaa4fab95e32d671fd36e # immutable actual current359/full1308 source, not current363
       - name: Linux tester runtime libraries
         run: |
           sudo apt-get update

@@ -6,6 +6,7 @@ import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 
 import '../../../core/error/app_failure.dart';
 import '../../../core/im/open_im_gateway.dart';
+import '../../../core/im/im_event.dart';
 import '../../../core/network/tenant_api.dart';
 import '../../../core/tenant/session_coordinator.dart';
 import '../../conversation/data/conversation_repository.dart';
@@ -26,9 +27,33 @@ import 'retained_merge_codec.dart';
 enum ChatRevokeKind { acknowledged, notDispatched, unconfirmed, busy }
 
 final class ChatRevokeResult {
-  const ChatRevokeResult(this.kind, [this.failure]);
+  const ChatRevokeResult(this.kind, [this.failure, this.reeditDraft]);
   final ChatRevokeKind kind;
   final AppFailure? failure;
+  final ChatReeditDraft? reeditDraft;
+}
+
+/// A one-use, memory-only draft from a verified original self message. The
+/// original cut and privacy facts survive ACK; an absent message is never ACK.
+final class ChatReeditDraft {
+  ChatReeditDraft._(this.messageId, this._draft, this._check);
+  final String messageId;
+  MentionDraft? _draft;
+  final bool Function() _check;
+  bool get current => _draft != null && _check();
+  MentionDraft? take() {
+    if (!current) {
+      discard();
+      return null;
+    }
+    final value = _draft;
+    _draft = null;
+    return value;
+  }
+
+  void discard() {
+    _draft = null;
+  }
 }
 
 /// Opaque, original-view permission. No message body or credential is retained.
@@ -127,6 +152,7 @@ final class ChatRepository {
   final Map<String, ({String path, String? thumbnail})> _staged = {};
   static int _mediaSerial = 0;
   Conversation? _conversation;
+  String? _typingPeer;
   final Set<String> _groupReadMarked = {};
   Future<void>? _readOperation;
   Future<void>? _visibleReadOperation;
@@ -194,6 +220,31 @@ final class ChatRepository {
     );
   }
 
+  bool acceptsTyping(ImTypingStatus status) =>
+      current &&
+      _typingPeer != null &&
+      status.senderId == _typingPeer &&
+      status.recipientId == _userId;
+
+  Future<void> sendTyping(
+    bool active, {
+    required MessageHistoryAccess access,
+    required bool Function() isCurrent,
+  }) {
+    final peer = _typingPeer;
+    if (peer == null || _conversation?.canSend != true || !isCurrent()) {
+      return Future.value();
+    }
+    return _run((manager, access) async {
+      if (!isCurrent() || _typingPeer != peer) return;
+      access.check();
+      await manager.messageManager.typingStatusUpdate(
+        userID: peer,
+        msgTip: active ? 'yes' : 'no',
+      );
+    }, access: access);
+  }
+
   Future<Conversation> conversation() async {
     late final MessageHistoryAccess lease;
     final item = await _run((manager, access) async {
@@ -206,6 +257,17 @@ final class ChatRepository {
         (item) => item.conversationID == conversationId,
       );
       if (matches.isEmpty) throw const AppFailure(FailureKind.invalidResponse);
+      final exact = matches.length == 1 ? matches.single : null;
+      final peer = exact?.userID ?? '';
+      _typingPeer =
+          exact?.conversationType == ConversationType.single &&
+              (exact?.groupID ?? '').isEmpty &&
+              peer.isNotEmpty &&
+              peer != _userId &&
+              peer.length <= 256 &&
+              !RegExp(r'[\s\x00-\x1f\x7f-\x9f]').hasMatch(peer)
+          ? peer
+          : null;
       return mapConversation(
         matches.first,
         ledger: gateway.privacyLedger,
@@ -234,7 +296,8 @@ final class ChatRepository {
       if (id == null ||
           id.isEmpty ||
           isRemoved(id) ||
-          item.status == MessageStatus.deleted) {
+          item.status == MessageStatus.deleted ||
+          item.contentType == MessageType.typing) {
         continue;
       }
       _raw[id] = item;
@@ -1584,7 +1647,7 @@ final class ChatRepository {
     return message;
   }
 
-  Future<void> _revokeAuthority(
+  Future<Message> _revokeAuthority(
     IMManager manager,
     ChatRevokeIntent intent,
   ) async {
@@ -1611,7 +1674,7 @@ final class ChatRepository {
           target.recvID != intent.peerId) {
         throw const AppFailure(FailureKind.permissionDenied);
       }
-      return;
+      return target;
     }
     // v3 server RevokeMsg accepts SuperGroupChatType. Do not infer that the
     // deprecated type2 supports moderation; its existing self API is retained.
@@ -1667,6 +1730,58 @@ final class ChatRepository {
                 sender.roleLevel == GroupRoleLevel.member)) {
       throw const AppFailure(FailureKind.permissionDenied);
     }
+    return target;
+  }
+
+  ChatReeditDraft? _reeditFrom(Message message, ChatRevokeIntent intent) {
+    final policy = gateway.privacyLedger.lookup(intent.messageId);
+    if (message.sendID != _userId || !policy.canRetainAt(now())) return null;
+    final text = message.contentType == MessageType.text
+        ? message.textElem?.content
+        : message.contentType == MessageType.atText
+        ? message.atTextElem?.text
+        : null;
+    if (text == null || text.trim().isEmpty || text.length > 20000) return null;
+    final spans = mapReceivedMentions(message);
+    if (message.contentType == MessageType.atText) {
+      final ids = message.atTextElem?.atUserList;
+      if (ids == null ||
+          ids.isEmpty ||
+          ids.length > maximumMentionRecipients ||
+          ids.toSet().length != ids.length ||
+          ids.any((id) => !MentionIdentity(id, id).valid) ||
+          spans.map((s) => s.identity.userId).toSet().length != ids.length ||
+          spans.any((s) => !ids.contains(s.identity.userId))) {
+        return null;
+      }
+    }
+    final tokens = <MentionToken>[];
+    final visible = StringBuffer();
+    var cursor = 0;
+    for (final span in spans) {
+      visible.write(text.substring(cursor, span.start));
+      final start = visible.length;
+      visible.write(span.identity.label);
+      tokens.add(MentionToken(start, visible.length, span.identity));
+      cursor = span.end;
+    }
+    visible.write(text.substring(cursor));
+    final draft = MentionDraft(visible.toString(), tokens);
+    if (!draft.valid || draft.text.length > 20000) return null;
+    // Keep exact pre-ACK expiration/inspection as well as sticky private facts;
+    // only this successful self-revoke may remove its own ordinary source.
+    final retained = MessagePrivacy.combined([
+      inspectMessagePrivacy(message.toJson()),
+      gateway.privacyLedger.retentionReference(intent.messageId),
+    ]);
+    return ChatReeditDraft._(intent.messageId, draft, () {
+      try {
+        intent._access.check();
+        return intent.acknowledged && current && retained.canRetainAt(now());
+      } on AppFailure {
+        return false;
+      }
+    });
   }
 
   Future<void> inspectRevoke(ChatRevokeIntent intent) =>
@@ -1695,13 +1810,15 @@ final class ChatRepository {
     if (!receipts.pending.add(key)) {
       return const ChatRevokeResult(ChatRevokeKind.busy);
     }
+    ChatReeditDraft? reedit;
     try {
       await _run((manager, _) async {
         // Gateway readiness, metadata and both role reads cannot renew this
         // original view/cut. This final check is inside the native operation.
         _checkRevoke(intent);
-        await _revokeAuthority(manager, intent);
+        final original = await _revokeAuthority(manager, intent);
         _checkRevoke(intent);
+        reedit = _reeditFrom(original, intent);
         intent._dispatched = true;
         await manager.messageManager.revokeMessage(
           conversationID: conversationId,
@@ -1713,8 +1830,9 @@ final class ChatRepository {
         intent._checkSource();
         forgetMessages([intent.messageId]);
       }, access: intent._access);
-      return const ChatRevokeResult(ChatRevokeKind.acknowledged);
+      return ChatRevokeResult(ChatRevokeKind.acknowledged, null, reedit);
     } catch (error) {
+      reedit?.discard();
       if (intent._acknowledged) {
         // Already-started success is not cancelled by a later view change.
         return const ChatRevokeResult(ChatRevokeKind.acknowledged);

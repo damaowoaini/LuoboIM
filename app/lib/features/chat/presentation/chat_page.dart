@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../design/tokens.dart';
 import '../../../core/error/app_failure.dart';
 import '../../../core/im/open_im_gateway.dart';
+import '../../../core/im/im_event.dart';
 import '../../../core/network/tenant_api.dart';
 import '../../../core/tenant/session_access.dart';
 import '../../../core/tenant/session_coordinator.dart';
@@ -33,6 +34,7 @@ import '../../group/presentation/group_creation_action.dart';
 import '../../contacts/domain/contact.dart';
 import '../../contacts/contacts_providers.dart';
 import 'chat_controller.dart';
+import 'chat_typing_controller.dart';
 import 'mention_text_controller.dart';
 import 'group_mention_picker.dart';
 import 'mentioned_message_text.dart';
@@ -75,6 +77,56 @@ class ChatPage extends ConsumerStatefulWidget {
 class _ChatPageState extends ConsumerState<ChatPage>
     with WidgetsBindingObserver {
   late final ChatController controller;
+  late final ChatTypingController _typing;
+  ChatReeditDraft? _reedit;
+  StreamSubscription<ImEvent>? _inputEvents;
+  String? _pendingReeditId;
+  int _reeditSource = 0;
+  int _inputView = 0, _reeditView = 0;
+  String _typingText = '';
+  ModalRoute<dynamic>? _inputRoute;
+  bool get _inputCurrent =>
+      mounted &&
+      _foreground &&
+      _routeVisible &&
+      _inputRoute?.isActive == true &&
+      _inputRoute?.isCurrent == true &&
+      !_leaving &&
+      controller.usable &&
+      widget.conversationId == controller.repository.conversationId &&
+      widget.sourceCurrent?.call() != false;
+  void _discardReedit() {
+    _reedit?.discard();
+    _reedit = null;
+  }
+
+  void _focusChanged() {
+    if (!focus.hasFocus) _typing.stopInput();
+  }
+
+  void _restoreReedit(int view, ChatReeditDraft source) {
+    if (!_inputCurrent ||
+        view != _inputView ||
+        view != _reeditView ||
+        !identical(source, _reedit)) {
+      return;
+    }
+    if (input.text.isNotEmpty) {
+      _notice('请先发送或清空当前草稿，再恢复这条消息。');
+      return;
+    }
+    final draft = source.take();
+    if (draft == null) {
+      setState(_discardReedit);
+      return;
+    }
+    _reedit = null;
+    input.restoreRecalled(draft);
+    _restoredMentionText = false;
+    focus.requestFocus();
+    setState(() {});
+  }
+
   late final ChatBatchSelection selection;
   late final ChatAudioPlayback playback;
   final input = MentionTextController();
@@ -183,6 +235,23 @@ class _ChatPageState extends ConsumerState<ChatPage>
         now: widget.now,
       ),
     );
+    _typing = ChatTypingController(
+      controller.repository,
+      isCurrent: () => _inputCurrent,
+    )..addListener(_changed);
+    _inputEvents = controller.repository.gateway.events.listen((event) {
+      if (event.generation != controller.repository.generation ||
+          event.kind != ImEventKind.messageDeleted) {
+        return;
+      }
+      if (event.resourceIds.contains(_pendingReeditId) ||
+          event.resourceIds.contains(_reedit?.messageId)) {
+        ++_reeditSource;
+        _discardReedit();
+        if (mounted) setState(() {});
+      }
+    });
+    focus.addListener(_focusChanged);
     _readingPreferences = ChatReadingPreferences(
       ref.read(chatReadingStoreProvider),
       controller.repository.session,
@@ -244,9 +313,20 @@ class _ChatPageState extends ConsumerState<ChatPage>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _inputRoute ??= ModalRoute.of(context);
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
-    if (!_foreground) _retireRevoke();
+    if (!_foreground) {
+      _retireRevoke();
+      ++_inputView;
+      _discardReedit();
+      _typing.setVisible(false);
+    }
     if (!_foreground) ++_cardIntent;
     if (!_foreground && !_locationPickerOpen) {
       ++_locationIntent;
@@ -268,6 +348,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
         _emojiPickerResumed = null;
       }
     }
+    _typing.setVisible(_inputCurrent);
     _readSignature = '';
     if (_foreground) {
       _scheduleVisibleReads();
@@ -385,13 +466,19 @@ class _ChatPageState extends ConsumerState<ChatPage>
   }
 
   void _inputChanged() {
+    final textChanged = _typingText != input.text;
+    _typingText = input.text;
     if (input.text.isEmpty) _restoredMentionText = false;
-    if (_draftLoaded) controller.updateDraft(input.storedDraft);
+    if (_draftLoaded) {
+      controller.updateDraft(input.storedDraft);
+      if (textChanged) _typing.edited(input.text, focused: focus.hasFocus);
+    }
     if (mounted) setState(() {});
   }
 
   void _changed() {
     if (!mounted) return;
+    if (_reedit?.current == false) _discardReedit();
     playback.recheck();
     _audioExpiry?.cancel();
     final playing = controller.messages
@@ -452,6 +539,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
       ++_locationIntent;
       ++_cardIntent;
       _retireRevoke();
+      ++_inputView;
+      _discardReedit();
+      _typing.setVisible(false);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           ++_locationChanges.value;
@@ -468,6 +558,12 @@ class _ChatPageState extends ConsumerState<ChatPage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    ++_inputView;
+    _discardReedit();
+    unawaited(_inputEvents?.cancel());
+    _typing.removeListener(_changed);
+    _typing.dispose();
+    focus.removeListener(_focusChanged);
     ++_locationIntent;
     _locationChanges.dispose();
     ++_cardIntent;
@@ -508,7 +604,11 @@ class _ChatPageState extends ConsumerState<ChatPage>
       return;
     }
     if (_leaving) return;
+    _typing.stopInput();
     _leaving = true;
+    ++_inputView;
+    _discardReedit();
+    _typing.setVisible(false);
     await controller.flushDraft();
     if (!mounted) return;
     if (controller.draftFailure != null) {
@@ -549,7 +649,12 @@ class _ChatPageState extends ConsumerState<ChatPage>
         !(_revokeRoute!.isActive && _revokeRoute!.isCurrent)) {
       _retireRevoke();
     }
-    if (!_routeVisible) _readSignature = '';
+    if (!_routeVisible) {
+      _readSignature = '';
+      ++_inputView;
+      _discardReedit();
+    }
+    _typing.setVisible(_inputCurrent);
     _scheduleVisibleReads();
     return PopScope<Object?>(
       canPop: _allowPop,
@@ -566,7 +671,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
                       ? null
                       : _conversationDetails,
                   child: Text(
-                    controller.conversation?.title ?? '聊天',
+                    _typing.peerTyping
+                        ? '对方正在输入…'
+                        : controller.conversation?.title ?? '聊天',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -628,6 +735,27 @@ class _ChatPageState extends ConsumerState<ChatPage>
                     content: Text(controller.failure!.message),
                     actions: [
                       TextButton(onPressed: _retry, child: const Text('重试')),
+                    ],
+                  ),
+                if (_reedit case final source?)
+                  MaterialBanner(
+                    content: const Text('你已撤回一条消息'),
+                    actions: [
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(44, 44),
+                          visualDensity: VisualDensity.standard,
+                          tapTargetSize: MaterialTapTargetSize.padded,
+                        ),
+                        onPressed: source.current && _inputCurrent
+                            ? () => _restoreReedit(_reeditView, source)
+                            : null,
+                        child: const Text('重新编辑'),
+                      ),
+                      TextButton(
+                        onPressed: () => setState(_discardReedit),
+                        child: const Text('关闭'),
+                      ),
                     ],
                   ),
                 if (controller.draftFailure != null)
@@ -2138,6 +2266,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
     var opened = false;
     late final DialogRoute<bool> route;
     late final ChatRevokeIntent intent;
+    ChatReeditDraft? recalled;
+    final reeditSource = _reeditSource;
+    _pendingReeditId = item.id;
     bool current() {
       if (!mounted ||
           !_foreground ||
@@ -2174,6 +2305,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
         intent: intent,
         isCurrent: current,
         ticketChanges: _revokeChanges,
+        onAcknowledged: (draft) {
+          recalled = draft;
+        },
         onCovered: () {
           if (ticket == _revokeIntent) _retireRevoke();
         },
@@ -2187,13 +2321,29 @@ class _ChatPageState extends ConsumerState<ChatPage>
       );
       _revokeRoute = route;
       opened = true;
-      await navigator.push(route);
+      final acknowledged = await navigator.push(route);
       await route.completed;
+      if (acknowledged == true &&
+          ticket == _revokeIntent &&
+          mounted &&
+          _inputCurrent &&
+          origin?.isCurrent == true &&
+          reeditSource == _reeditSource &&
+          recalled?.current == true) {
+        setState(() {
+          _discardReedit();
+          _reedit = recalled;
+          _reeditView = _inputView;
+          recalled = null;
+        });
+      }
     } on AppFailure catch (error) {
       if (mounted && origin?.isCurrent == true && ticket == _revokeIntent) {
         _notice(error.message);
       }
     } finally {
+      recalled?.discard();
+      if (_pendingReeditId == item.id) _pendingReeditId = null;
       if (identical(_revokeRoute, route)) _revokeRoute = null;
       if (ticket == _revokeIntent) _retireRevoke();
     }
@@ -2613,12 +2763,14 @@ class _GroupRevokeDialog extends StatefulWidget {
     required this.intent,
     required this.isCurrent,
     required this.ticketChanges,
+    required this.onAcknowledged,
     required this.onCovered,
   });
   final ChatController controller;
   final ChatRevokeIntent intent;
   final bool Function() isCurrent;
   final Listenable ticketChanges;
+  final void Function(ChatReeditDraft?) onAcknowledged;
   final VoidCallback onCovered;
   @override
   State<_GroupRevokeDialog> createState() => _GroupRevokeDialogState();
@@ -2718,9 +2870,13 @@ class _GroupRevokeDialogState extends State<_GroupRevokeDialog> {
         widget.intent,
         isCurrent: () => _viewCurrent,
       );
-      if (!_viewCurrent) return;
+      if (!_viewCurrent) {
+        result.reeditDraft?.discard();
+        return;
+      }
       switch (result.kind) {
         case ChatRevokeKind.acknowledged:
+          widget.onAcknowledged(result.reeditDraft);
           _finish(true);
         case ChatRevokeKind.unconfirmed:
           _ready = false;

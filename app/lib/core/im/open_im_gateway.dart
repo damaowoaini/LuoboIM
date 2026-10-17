@@ -630,6 +630,7 @@ final class OpenImGateway implements ImGateway {
     AppFailure? failure,
     ImSignalAction? signal,
     ImCallInvitation? call,
+    ImTypingStatus? typing,
     int? historyRevision,
     bool? historyClearing,
   }) {
@@ -643,6 +644,7 @@ final class OpenImGateway implements ImGateway {
         failure: failure,
         signalAction: signal,
         call: call,
+        typing: typing,
         historyRevision: historyRevision,
         historyClearing: historyClearing,
       ),
@@ -694,6 +696,7 @@ final class OpenImGateway implements ImGateway {
       int? count,
       ImSignalAction? signal,
       ImCallInvitation? call,
+      ImTypingStatus? typing,
     }) => _emit(
       request,
       generation,
@@ -702,6 +705,7 @@ final class OpenImGateway implements ImGateway {
       count: count,
       signal: signal,
       call: call,
+      typing: typing,
     );
     Future<void> register(Future<dynamic> Function() action) async {
       _check(request);
@@ -725,8 +729,34 @@ final class OpenImGateway implements ImGateway {
       return '';
     }
 
+    bool consumeTyping(Message item, {bool offline = false}) {
+      if (item.contentType != MessageType.typing) return false;
+      // Malformed/offline typing is still transient and must never enter the
+      // privacy ledger or ordinary-message refresh path.
+      final sender = item.sendID ?? '', recipient = item.recvID ?? '';
+      bool identity(String value) =>
+          value.isNotEmpty &&
+          value.length <= 256 &&
+          !RegExp(r'[\s\x00-\x1f\x7f-\x9f]').hasMatch(value);
+      final tip = item.typingElem?.msgTips;
+      if (!offline &&
+          active() &&
+          item.sessionType == 1 &&
+          (item.groupID ?? '').isEmpty &&
+          identity(sender) &&
+          identity(recipient) &&
+          sender != recipient &&
+          const {'yes', 'no'}.contains(tip)) {
+        emit(
+          ImEventKind.typingChanged,
+          typing: ImTypingStatus(sender, recipient, tip == 'yes'),
+        );
+      }
+      return true;
+    }
+
     void rememberMessage(Message item, [String conversationId = '']) {
-      if (!active()) return;
+      if (!active() || item.contentType == MessageType.typing) return;
       final id = conversationId.isEmpty
           ? messageConversation(item)
           : conversationId;
@@ -773,17 +803,19 @@ final class OpenImGateway implements ImGateway {
       () => manager.messageManager.setAdvancedMsgListener(
         OnAdvancedMsgListener(
           onRecvNewMessage: (item) {
+            if (consumeTyping(item)) return;
             rememberMessage(item);
             emit(ImEventKind.messageReceived, ids: [item.clientMsgID]);
           },
           onRecvOfflineNewMessage: (item) {
+            if (consumeTyping(item, offline: true)) return;
             rememberMessage(item);
             emit(ImEventKind.offlineMessageReceived, ids: [item.clientMsgID]);
           },
-          onRecvOnlineOnlyMessage: (item) => emit(
-            ImEventKind.transientMessageReceived,
-            ids: [item.clientMsgID],
-          ),
+          onRecvOnlineOnlyMessage: (item) {
+            if (consumeTyping(item)) return;
+            emit(ImEventKind.transientMessageReceived, ids: [item.clientMsgID]);
+          },
           onMsgDeleted: (item) {
             if (active()) privacyLedger.forget([item.clientMsgID ?? '']);
             emit(ImEventKind.messageDeleted, ids: [item.clientMsgID]);

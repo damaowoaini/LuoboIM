@@ -15,6 +15,15 @@ final class MentionTextController extends TextEditingController {
     _install(draft.text, draft.tokens, draft.text.length);
   }
 
+  /// Only a verified self-revoke draft supplies identities. Ordinary stored
+  /// drafts keep restore()'s plain-text-only contract.
+  void restoreRecalled(MentionDraft draft) {
+    if (!draft.valid || draft.text.length > 20000) {
+      throw const FormatException();
+    }
+    _install(draft.text, draft.tokens, draft.text.length);
+  }
+
   @override
   set value(TextEditingValue next) {
     if (!_installing) {
