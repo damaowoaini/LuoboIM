@@ -244,9 +244,9 @@
   ],
   "own_inputs": [
     {
-      "bytes": 5221,
+      "bytes": 6961,
       "path": "ci/apple-current359/README.md",
-      "sha256": "b82f48252be5365231f12a322c5227d5efd22d6e4b104d914356602b490179ec"
+      "sha256": "6724377d0028bc320a16b81f51b111557fe0e52d7909c4fb26f50ea92bcbf9a1"
     },
     {
       "bytes": 9176,
@@ -261,7 +261,7 @@
     {
       "bytes": 32359,
       "path": "ci/apple-current359/run.py",
-      "sha256": "aca224168d27ee436004c0cad268e53bbc1ad3980e34fc0557bc02df6727d752"
+      "sha256": "9d9725f96c1df125c5c7ccab58554c75275ca9c4417189df5e36cfc409d05bdb"
     },
     {
       "bytes": 2662,
@@ -275,13 +275,13 @@
     },
     {
       "path": "ci/apple-current359/gem_audit.py",
-      "bytes": 19246,
-      "sha256": "e0a798becdd08e999b6b6657b8fb37ef1397cf4df20248d2f6a14cb53a470baf"
+      "bytes": 19947,
+      "sha256": "0c916ba5cb31d0ffabc73664f9e3055bd0b0069c3c0ade0c6277248f980f1f57"
     },
     {
       "path": "ci/apple-current359/test_gem_audit.py",
-      "bytes": 15043,
-      "sha256": "0a26773763bac5673f78aacfbc146f0741414ca8da61b2fb79e753cd809026ba"
+      "bytes": 16247,
+      "sha256": "b2eb4b915ef777917be9512700c648026319d6aa561f2e60b846b4a7327f2c68"
     }
   ],
   "packages": 178,
@@ -301,7 +301,7 @@
   "state": "source_only_resolution_pending_not_App_accepted",
   "xcodebuild": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
   "preinstalled_gem_audit": {
-    "schema": 3,
+    "schema": 4,
     "official_ruby_commit": "0581089df9f0af0fe6b64cb8167987c211100947",
     "probe": "ci/apple-current359/gem_probe.rb",
     "scope": "actual loaded files/specs/runtime and regular-gem Ruby source trees; configured libruby first observation, no dyld-map or App claim",
@@ -309,7 +309,7 @@
     "unknown_relative_markers": "refuse",
     "source_provenance_Root_acceptance": false,
     "probe_schema": 2,
-    "path_contract": "lexical/canonical spec-gem-require correspondence; fixed selected-Ruby bundled names only; mappings checked before and after audit",
+    "path_contract": "exact selected bundled spec counterpart plus same-base or explicit system-source hybrid; gem and all require roots remain together; final mappings rechecked",
     "bundled_source": {
       "url": "https://raw.githubusercontent.com/ruby/ruby/0581089df9f0af0fe6b64cb8167987c211100947/gems/bundled_gems",
       "Ruby_commit": "0581089df9f0af0fe6b64cb8167987c211100947",
@@ -317,6 +317,33 @@
       "bytes": 1187,
       "sha256": "9b3f0b8dafa8ffb6b65e5bdd0b4c5e712f90472d6dd84dd1a26bb6071f80e06f",
       "scope": "fixed official bundled names/versions only; actual runner minitest canonical target remains unknown"
-    }
+    },
+    "hybrid_official_rubygems": {
+      "version": "4.0.20",
+      "commit": "7f2502dc32b4e10a099c398ad93d2d2534873205",
+      "documentation_only_not_runtime_input": true,
+      "source_files": [
+        {
+          "url": "https://api.github.com/repos/rubygems/rubygems/git/ref/tags/v4.0.20",
+          "bytes": 333,
+          "sha256": "039718600efd2c31334dd792f2c63373fe8a391a1c1cde70097b2e5780139d40"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/rubygems/rubygems/7f2502dc32b4e10a099c398ad93d2d2534873205/lib/rubygems/specification.rb",
+          "bytes": 69996,
+          "sha256": "47a7d55eb4b5138544f13bcd29a9f05ec43c6135a79d1a55b4a17cdb610d2071"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/rubygems/rubygems/7f2502dc32b4e10a099c398ad93d2d2534873205/lib/rubygems/basic_specification.rb",
+          "bytes": 8555,
+          "sha256": "13c82ee2d949d34c91c11b59aeaa2b69afbef31a61f07ff2d946a3c65a8a8f5b"
+        }
+      ]
+    },
+    "hybrid_actual_observed_fullnames": [
+      "minitest-5.20.0",
+      "rexml-3.4.4"
+    ],
+    "other_bundled_hybrids_actual_observed": false
   }
 }

@@ -184,9 +184,15 @@ def audit(source, selected, home, config_pin):
         require(logical_base == expected_base or (logical_base == gem_root and expected_base == default_base),
                 'loaded_from', name, 'only system-to-selected-Ruby bundled counterpart allowed')
         computed = mapped(gem.get('full_gem_path'), mappings['gem'], 'full_gem_path', name, exists=not default)
+        # RubyGems4.0.20 load/base_dir/gems_dir use lexical loaded_from. An exact
+        # global spec alias may therefore refer to the selected bundled spec
+        # while gem+require sources stay together in the real system gem base.
+        hybrid = (not default and full_name in BUNDLED_FULL_NAMES and logical_base == gem_root and
+                  expected_base == default_base and computed == gem_root/'gems'/full_name)
+        source_base = gem_root if hybrid else expected_base
         require(Path(gem['full_gem_path']) == logical_base/'gems'/full_name and
-                computed == expected_base/'gems'/full_name,
-                'full_gem_path', name, 'spec/gem must map to one exact selected base/fullname')
+                computed == source_base/'gems'/full_name,
+                'full_gem_path', name, 'exact permitted spec/gem counterpart or hybrid layout required')
         require(computed.is_dir() or (default and not computed.exists()),
                 'full_gem_path', name, 'directory or absent default metadata required')
         req = values(gem.get('require_paths'), 'require_paths', name, 16)
@@ -205,13 +211,15 @@ def audit(source, selected, home, config_pin):
             extension = logical.is_relative_to(logical_base/'extensions') and logical.name == full_name and len(logical.relative_to(logical_base/'extensions').parts) == 3
             require(logical.is_relative_to(logical_base/'gems'/full_name) or extension,
                     'full_require_paths', name, 'foreign require path refused')
-            require(p == expected_base/logical.relative_to(logical_base) and
+            require(p == source_base/logical.relative_to(logical_base) and
                     (p.is_dir() or (default and not p.exists())),
                     'full_require_paths', name, 'spec/gem/require counterpart mapping differs')
             canonical_requires.append(str(p))
         row = {**gem, 'spec_body': spec_body, 'computed_directory_exists': computed.is_dir(),
                'computed_directory_is_source_evidence': not default, 'ruby_sources': [], 'loaded_files': [],
-               'canonical_gem_root': str(computed), 'canonical_full_require_paths': canonical_requires}
+               'canonical_gem_root': str(computed), 'canonical_full_require_paths': canonical_requires,
+               'canonical_spec_base': str(expected_base), 'canonical_source_base': str(source_base),
+               'layout': 'selected_bundled_spec_with_system_sources' if hybrid else 'same_canonical_base'}
         if not default:
             require(computed.is_dir(), 'full_gem_path', name, 'real regular gem directory required')
             def walk_error(error):
@@ -295,7 +303,7 @@ def audit(source, selected, home, config_pin):
         g['activation_only_no_individual_loaded_file'] = not g['loaded_files']
     for value, observed, field, subject, exists in checked_mappings:
         mapped(value, observed, field, subject, exists=exists, remember=False)
-    return {'schema': 3, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
+    return {'schema': 4, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
             'ruby_binary': binary, 'configured_shared_libruby': libruby,
             'libruby_scope': 'RbConfig selected library body; not a dyld process-map claim',
             'config': config, 'gems': specs, 'loaded_features': features,

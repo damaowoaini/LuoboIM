@@ -74,3 +74,31 @@ first proves a valid baseline and checks its exact rejection field/subject;
 one subcase changes the alias during the real tree walk to exercise final
 mapping revalidation. No old selector2/packaging6/consumer3/prior7 are repeated.
 R4 has executed no tests, Ruby, parser, native resolution or cloud task.
+
+## R5: observed selected-spec/system-source hybrid
+
+Run38989464572 first proved that minitest5.20.0 and rexml3.4.4 have exact
+selected-Ruby bundled spec targets, while their real gem and require directories
+stay under the system gem base. R4 rejected that shape by design; it was not an
+accepted source observation. R5 explicitly revises just that layout contract.
+
+At fixed RubyGems4.0.20 commit7f2502dc32b4e10a099c398ad93d2d2534873205,
+Specification.load stores File.expand_path of the lexical spec path; base_dir,
+gems_dir and full_require_paths derive from it without making the canonical spec
+file's parent the physical gem-source root. That supports the narrow hybrid
+rule for the existing fixed16 bundled name-version entries. Only two are actual
+runner observations; other entries have not been observed as hybrids.
+
+The spec alias must still target the exact same-fullname spec in this selected
+Ruby. A hybrid's actual gem and every require directory must all remain at the
+exact system/fullname counterpart. Different Ruby roots, arbitrary Cellar or
+Homebrew paths, other fullnames, split gem/require roots, or changed mappings
+remain refused. Actual spec/Ruby-tree/loaded-file bodies and final mapping
+revalidation are mandatory. Both spec-base and source-base are explicit in the
+record; first observation is never official-content or Root acceptance.
+
+Probe schema2 is unchanged; audit evidence schema4 distinguishes the layout.
+Only the two directly affected controls are prepared. The old split-root
+negative is explicitly replaced by a hybrid whose require path escapes its real
+gem base; hybrid positives and every alias negative prove a valid baseline.
+No controls/Ruby/native work or cloud job has been executed for R5.

@@ -1,0 +1,49 @@
+name: Namespace progress R3 strict performance targeted seven
+
+# Independent1201 successor. The old1199 lane remains immutable for its callers.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: namespace-progress-performance-r3-target7-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  target7:
+    name: Private filesystem and BSON / exact seven tops and forty-three subs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+      LUOBO_EMAIL_INTEGRATION: '0'
+      LUOBO_RUN_LEGACY_LOAD_TESTS: '0'
+      LUOBO_RUN_LEGACY_EXAMPLES: '0'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Safety and source-only immutable1199 parent plus formatted R3 overlay3
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/namespace-progress-performance-r3/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Only Progress7top43sub / original10001 and600s / no database fixture
+        run: python3 -B ci/namespace-progress-performance-r3/run.py
+      - name: Preserve compact raw evidence only; task source and journals remain off artifact
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: namespace-progress-performance-r3-target7-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-results/namespace-progress-performance-r3/
+          if-no-files-found: warn
+          retention-days: 14
