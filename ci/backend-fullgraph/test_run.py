@@ -53,6 +53,30 @@ class FullGraphControls(unittest.TestCase):
    bad=dict(valid);bad[key]=value
    with self.subTest(startup=key,value=value),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
 
+  # Last entered Acquire stage is separate from both the overall phase and
+  # legacy's last successful announcement. Only the original call return is
+  # represented; these finite fields never mint canonical or Ready evidence.
+  acquire_base=dict(valid,phase='actual-agent-stop-dual-drain-and-credential-exclusion')
+  acquire_stages=['validate-request', 'check-targets', 'hold', 'services', 'stop-producer', 'drain-consumers-live', 'stop-consumer', 'exclude-credentials', 'drain-consumers-empty', 'held-metadata', 'signed-observe']
+  for stage in acquire_stages:
+   for error_class in ('owned-evidence','deadline','cancelled','other'):
+    value=dict(acquire_base,acquireStage=stage,acquireAttempted=True,acquireReturned=True,acquireErrorClass=error_class)
+    observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+    self.assertEqual((observed['acquireStage'],observed['acquireAttempted'],observed['acquireReturned'],observed['acquireErrorClass']),(stage,True,True,error_class))
+    self.assertEqual((observed['accepted'],observed['failureClass'],observed['failureSHA256']),(value['accepted'],value['failureClass'],value['failureSHA256']))
+    self.assertNotIn('PRIVATE_',json.dumps(observed));self.assertNotIn('rawError',observed)
+  # A later Begin verification/journal failure may follow a SUCCESSFUL Acquire.
+  value=dict(acquire_base,acquireStage='signed-observe',acquireAttempted=True,acquireReturned=True,acquireErrorClass='ok')
+  observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+  self.assertFalse(observed['accepted']);self.assertEqual(observed['acquireErrorClass'],'ok');self.assertEqual(observed['failureClass'],value['failureClass'])
+  not_entered=dict(acquire_base,acquireStage='not-entered',acquireAttempted=False,acquireReturned=False,acquireErrorClass='not-entered')
+  self.assertFalse(collector.public_terminal(json.dumps(not_entered).encode(),not_entered['scenario'])['acquireAttempted'])
+  in_progress=dict(acquire_base,acquireStage='hold',acquireAttempted=True,acquireReturned=False,acquireErrorClass='in-progress')
+  self.assertFalse(collector.public_terminal(json.dumps(in_progress).encode(),in_progress['scenario'])['acquireReturned'])
+  for changed in [dict(acquireStage='PRIVATE_ERROR_USER_GROUP'),dict(acquireErrorClass='provider-raw'),dict(acquireAttempted=1),dict(acquireReturned=1),dict(acquireAttempted=False),dict(acquireReturned=False),dict(acquireStage='not-entered'),dict(acquireErrorClass='in-progress'),dict(acquireStage='hold',acquireErrorClass='ok')]:
+   bad=dict(value,**changed)
+   with self.subTest(acquire=changed),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+
  def test_real_tracked_git_bodies_symlink_bounds_static_elf_and_strict_receipt(self):
   with tempfile.TemporaryDirectory() as directory:
    root=Path(directory);source=root/'source';source.mkdir()

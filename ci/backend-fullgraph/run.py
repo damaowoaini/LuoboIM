@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE={'members': 1575, 'digest': '55636eb7494b1095febac99fd1af5790ab5c3a7a1c31a8d9cdae329e70060280'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
+FINAL_SOURCE={'members': 1575, 'digest': 'e487c9c7d87ad34be44029bc1091bf95a0a1d96775e7dac5c0bcb191535a3191'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -224,8 +224,10 @@ def check_launcher_reuse(value):
  return value
 
 def load_launcher_reuse(out):
- # Only runtimeacceptance/bootstrap changed. Original ownedcontrol test/code,
- # local dependency closure and locks are source-identical; no Go is dispatched.
+ # Source-bound 868e launcher evidence is reused without a new Go dispatch.
+ # Its exact Hold/reopen/reject-Start test path does not call the changed
+ # bootstrap, Merkle proof, Agent.Acquire, flow or acceptance observation code.
+ # Those source changes are not a claim that all dependency bytes are identical.
  receipt=dict(LAUNCHER_PASSED_REUSE)
  write(out/'launcher-passed-reuse.json',check_launcher_reuse(receipt))
  return receipt

@@ -58,6 +58,7 @@ type Session struct {
 	Legacy                        []*ownedcontrol.OwnedService
 	legacyStartupStage            string
 	legacyChildRetained           bool
+	acquireObservation            ownedcontrol.AgentAcquireObservation
 	journal                       namespaceimport.Journal
 	cleanupMu                     sync.Mutex
 	localExited                   map[*ownedcontrol.OwnedService]bool
@@ -152,6 +153,7 @@ func Start(ctx context.Context, in Inputs) (*Session, error) {
 	// principal families, and runs real held metadata bootstrap. No fake hold.
 	out.Phase = "actual-agent-stop-dual-drain-and-credential-exclusion"
 	out.State, e = controller.Begin(ctx)
+	out.acquireObservation = agent.AcquireObservation()
 	if e != nil {
 		return out, e
 	}

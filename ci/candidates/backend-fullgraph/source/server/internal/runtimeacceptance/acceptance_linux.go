@@ -61,6 +61,10 @@ type AcceptanceResult struct {
 	ActualStartedRoles       int                        `json:"actualStartedRoles"`
 	LegacyStartupStage       string                     `json:"legacyStartupStage,omitempty"`
 	LegacyChildRetained      bool                       `json:"legacyChildRetained"`
+	AcquireStage             string                     `json:"acquireStage,omitempty"`
+	AcquireAttempted         bool                       `json:"acquireAttempted"`
+	AcquireReturned          bool                       `json:"acquireReturned"`
+	AcquireErrorClass        string                     `json:"acquireErrorClass,omitempty"`
 	LocalCleanupObserved     bool                       `json:"localCleanupObserved"`
 	LocalCleanupState        string                     `json:"localCleanupState,omitempty"`
 	LocalCleanupFailureClass string                     `json:"localCleanupFailureClass,omitempty"`
@@ -225,6 +229,10 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	if session != nil {
 		result.LegacyStartupStage = session.legacyStartupStage
 		result.LegacyChildRetained = session.legacyChildRetained
+		result.AcquireStage = session.acquireObservation.Stage
+		result.AcquireAttempted = session.acquireObservation.Attempted
+		result.AcquireReturned = session.acquireObservation.Returned
+		result.AcquireErrorClass = session.acquireObservation.ErrorClass
 	}
 	if e != nil {
 		if session != nil {

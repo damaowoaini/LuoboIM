@@ -604,53 +604,148 @@ func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedM
 	return value, e
 }
 
-// MerkleProof reads O(log N) actual sibling objects for ONE exact member. It
-// never accepts an arbitrary index or a root supplied by an operator JSON file.
+// MerkleProof reads O(log N) actual sibling objects for ONE exact member.
+// Only this synchronous proof shares its original checkpoint/journal lock. All
+// actual index/value bodies remain fresh private reads; no parsed disk node or
+// context survives the invocation. Generic readers and all write paths stay as is.
 func (w *ImportWorkspace) MerkleProof(ctx context.Context, tree, key string) (root string, proof []DerivedMerkleSibling, resultErr error) {
-	value, _, found, e := w.MerkleState(ctx, tree)
-	if e != nil || !found || value.Phase != "complete" {
+	// Match the original MerkleState boundary and its public proof error class.
+	if w == nil || w.snapshot == nil || !hexText(tree, 64) {
 		return "", nil, ErrChanged
 	}
-	r, n, e := w.DerivedSetIdentity(ctx, value.SetID)
-	if e != nil || r != value.SetRoot || n != value.Count {
-		return "", nil, ErrChanged
-	}
-	entry, exists, e := w.ReadEntry(ctx, DerivedSetID("merkle-positions", tree), key)
-	var pos DerivedMerklePosition
-	if e != nil || !exists || DecodeStrict(entry.Value, &pos) != nil || pos.Index >= n {
-		return "", nil, ErrChanged
-	}
-	index, width, level := pos.Index, n, uint64(0)
-	leafDomain, nodeDomain, ok := merkleDomains(value.Domain)
-	if !ok {
-		return "", nil, ErrChanged
-	}
-	sum := jsonSHA([]string{leafDomain, key})
-	for width > 1 {
-		if level >= 64 {
-			return "", nil, ErrLimit
+	levelLimit := false
+	read := func(readCtx context.Context) (readErr error) {
+		lock, e := lockJournal(w.dir)
+		if e != nil {
+			return ErrChanged
 		}
-		sibling := index ^ 1
-		if sibling < width {
-			var node DerivedMerkleNode
-			entry, exists, e = w.ReadEntry(ctx, merkleNodeSet(tree, level), merkleNodeKey(sibling))
-			if e != nil || !exists || DecodeStrict(entry.Value, &node) != nil || node.Index != sibling || !hexText(node.NodeSHA256, 64) {
-				return "", nil, ErrChanged
+		defer func() {
+			if lock.Close() != nil {
+				levelLimit = false
+				root, proof, readErr = "", nil, ErrChanged
 			}
-			left := sibling < index
-			proof = append(proof, DerivedMerkleSibling{node.NodeSHA256, left})
-			if left {
-				sum = jsonSHA([]string{nodeDomain, node.NodeSHA256, sum})
-			} else {
-				sum = jsonSHA([]string{nodeDomain, sum, node.NodeSHA256})
-			}
+		}()
+		state, expected, e := w.load()
+		if e != nil {
+			return ErrChanged
 		}
-		index /= 2
-		width = width/2 + width%2
-		level++
+		store := progressStore{w.dir}
+		// This is the original ReadEntry object boundary against the SAME head.
+		// Each call still rereads/hash/strict-checks its actual radix path/ref and
+		// private value. There is no per-path or per-object decode cache.
+		entryAt := func(setID, member string) (DerivedEntry, bool, error) {
+			if e := w.check(readCtx); e != nil || !hexText(setID, 64) || !hexText(member, 64) {
+				return DerivedEntry{}, false, ErrChanged
+			}
+			var set derivedSet
+			found, e := store.get(readCtx, state.SetsRoot, setID, &set)
+			if e != nil || !found {
+				return DerivedEntry{}, false, e
+			}
+			var ref derivedValue
+			found, e = store.get(readCtx, set.Root, member, &ref)
+			if e != nil || !found {
+				return DerivedEntry{}, false, e
+			}
+			body, e := ReadPrivateDocument(store.objectPath("derived-value", ref.SHA256), (64<<10)+1)
+			if e != nil || digest(body) != ref.SHA256 || !json.Valid(body) {
+				return DerivedEntry{}, false, ErrChanged
+			}
+			return DerivedEntry{member, ref.SHA256, append(json.RawMessage(nil), body...)}, true, nil
+		}
+		entry, found, e := entryAt(DerivedSetID("merkle-jobs", w.snapshot.Fingerprint()), tree)
+		var value DerivedMerkleState
+		if e != nil || !found || DecodeStrict(entry.Value, &value) != nil || value.TreeID != tree || !hexText(value.SetID, 64) || value.Level > 64 || value.Phase != "complete" {
+			return ErrChanged
+		}
+		if e := w.check(readCtx); e != nil {
+			return ErrChanged
+		}
+		var set derivedSet
+		present, e := store.get(readCtx, state.SetsRoot, value.SetID, &set)
+		if e != nil || present && (set.Count == 0 || !hexText(set.Root, 64)) {
+			return ErrChanged
+		}
+		if !present {
+			set = derivedSet{}
+		}
+		if set.Root != value.SetRoot || set.Count != value.Count {
+			return ErrChanged
+		}
+		n := set.Count
+		entry, exists, e := entryAt(DerivedSetID("merkle-positions", tree), key)
+		var pos DerivedMerklePosition
+		if e != nil || !exists || DecodeStrict(entry.Value, &pos) != nil || pos.Index >= n {
+			return ErrChanged
+		}
+		index, width, level := pos.Index, n, uint64(0)
+		leafDomain, nodeDomain, ok := merkleDomains(value.Domain)
+		if !ok {
+			return ErrChanged
+		}
+		sum := jsonSHA([]string{leafDomain, key})
+		for width > 1 {
+			if level >= 64 {
+				levelLimit = true
+				return ErrLimit
+			}
+			sibling := index ^ 1
+			if sibling < width {
+				var node DerivedMerkleNode
+				entry, exists, e = entryAt(merkleNodeSet(tree, level), merkleNodeKey(sibling))
+				if e != nil || !exists || DecodeStrict(entry.Value, &node) != nil || node.Index != sibling || !hexText(node.NodeSHA256, 64) {
+					return ErrChanged
+				}
+				left := sibling < index
+				proof = append(proof, DerivedMerkleSibling{node.NodeSHA256, left})
+				if left {
+					sum = jsonSHA([]string{nodeDomain, node.NodeSHA256, sum})
+				} else {
+					sum = jsonSHA([]string{nodeDomain, sum, node.NodeSHA256})
+				}
+			}
+			index /= 2
+			width = width/2 + width%2
+			level++
+		}
+		if sum != value.RootSHA256 {
+			return ErrChanged
+		}
+		// Even an out-of-contract edit which ignores the original lock cannot
+		// substitute a different checkpoint during this successful proof.
+		_, after, e := w.load()
+		if e != nil || after != expected {
+			return ErrChanged
+		}
+		root = sum
+		return nil
 	}
-	if sum != value.RootSHA256 {
-		return "", nil, ErrChanged
+	if scoped, e := checkWorkspaceReadScope(ctx, w); scoped {
+		if e != nil {
+			return "", nil, ErrChanged
+		}
+		resultErr = read(ctx)
+	} else if !sameReadScopeSource(w.live, w.live) {
+		// Ordinary PageSource also permits value receivers. Keep its original
+		// first fresh boundary BEFORE lock/load; each entry's w.check below
+		// still delegates to checkFresh because this context has no scope.
+		if e := w.checkFresh(ctx); e != nil {
+			return "", nil, ErrChanged
+		}
+		resultErr = read(ctx)
+	} else {
+		// The same existing capability gives unscoped callers the two fresh
+		// snapshot checks; Capture's current scope is never nested or escaped.
+		resultErr = w.WithSnapshotReadScope(ctx, read)
 	}
-	return sum, proof, nil
+	if resultErr != nil {
+		root, proof = "", nil
+		// Preserve the original proof's ErrChanged/64-level ErrLimit contract.
+		if levelLimit {
+			resultErr = ErrLimit
+		} else {
+			resultErr = ErrChanged
+		}
+	}
+	return
 }

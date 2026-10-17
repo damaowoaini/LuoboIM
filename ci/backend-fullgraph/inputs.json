@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_and_four_planes_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1575,
-    "digest": "55636eb7494b1095febac99fd1af5790ab5c3a7a1c31a8d9cdae329e70060280"
+    "digest": "e487c9c7d87ad34be44029bc1091bf95a0a1d96775e7dac5c0bcb191535a3191"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 53824,
-      "sha256": "dc912092354f431ff31096b72def4c458f63fbc1eae86213ec382a6b4fdb8a5b"
+      "bytes": 53976,
+      "sha256": "d0297df4d215b9aeee566b0ad37f7435abf4a1e94e3c02d8082beb6232b94da4"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 31680,
-      "sha256": "9a455fdff48529afb0dc93edf7ebbe779d4a79adf236067dfb4998d55fc7e714"
+      "bytes": 33035,
+      "sha256": "dd48b1ca35a93e732d995236f32af060324bb2f36acbd2838b85c1ae215651c1"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 49394,
-      "sha256": "23cf6abba9ff234f7a80ca984d29600deab639643b65c4cf0f83e262c24b8940"
+      "bytes": 52111,
+      "sha256": "41a38cbe67447ff30089652d5078549c2be2c8b6a5c47ffb4b8b361eff0d9829"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -722,6 +722,13 @@
       "beforeSHA256": null
     },
     {
+      "target": "server/internal/namespaceimport/ownedcontrol/agent_linux.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/agent_linux.go",
+      "bytes": 14597,
+      "sha256": "86c54ca5e19a1682ff5efda9612e2c8b3a68203bdb965736807717845876cb8b",
+      "beforeSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab"
+    },
+    {
       "target": "server/internal/namespaceimport/ownedcontrol/export_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/export_test.go",
       "bytes": 10983,
@@ -1200,8 +1207,8 @@
     {
       "target": "server/internal/namespaceinventory/import_merkle.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceinventory/import_merkle.go",
-      "bytes": 13768,
-      "sha256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
+      "bytes": 17108,
+      "sha256": "0f9234b579ac5dba31df5a6019025541675573a1e47d360f3d39aa94f50730a2",
       "beforeSHA256": null
     },
     {
@@ -1354,8 +1361,8 @@
     {
       "target": "server/internal/runtimeacceptance/acceptance_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/acceptance_linux.go",
-      "bytes": 19643,
-      "sha256": "a4960852d2f94537f71e1215d65d41678075f1cc0aba3c5e623407c89f4ba7f9",
+      "bytes": 20227,
+      "sha256": "759db1f8347a4151ddf8ff7f2a1dea9b08365b211e463221e4d6f783f9a5054c",
       "beforeSHA256": null
     },
     {
@@ -1382,8 +1389,8 @@
     {
       "target": "server/internal/runtimeacceptance/flow_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/flow_linux.go",
-      "bytes": 12110,
-      "sha256": "adca411f4ea6481f66eda4eb2b716775cf3c41ad9179c7b3043bc7006e3621d4",
+      "bytes": 12231,
+      "sha256": "06151ae4c038ee98dffea7898c725efd5984216f764c7b39d9d852f875d6713a",
       "beforeSHA256": null
     },
     {
@@ -1746,6 +1753,7 @@
     "server/internal/namespaceimport/evidence.go",
     "server/internal/namespaceimport/legacy_head.go",
     "server/internal/namespaceimport/legacy_head_test.go",
+    "server/internal/namespaceimport/ownedcontrol/agent_linux.go",
     "server/internal/namespaceimport/ownedcontrol/export_test.go",
     "server/internal/namespaceimport/ownedcontrol/historical_capture_bodies_linux.go",
     "server/internal/namespaceimport/ownedcontrol/historical_capture_dispositions_linux.go",

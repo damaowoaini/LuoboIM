@@ -1,4 +1,4 @@
-name: Backend Merkle parent repair5 / original-source84 retained
+name: Backend Merkle proof repair4top22sub / original-source85 retained
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   targeted:
-    name: Controller1 CPU + direct owned3/inventory1 / original84 and old14 retained / graph pending
+    name: Controller1 CPU + direct owned2/inventory1 / source-bound78plus7 retained / graph pending
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -56,7 +56,7 @@ jobs:
             --record "$GITHUB_WORKSPACE/ci-results/backend-runtime-join-r8-prepare.resource.json" \
             --min-free-mib 1024 --timeout 600 --poll-interval .2 \
             -- bash ci/backend-integration.sh prepare
-      - name: Only Merkle repair5; original controller CPU only; no main rebuild or raw profile upload
+      - name: Only proof repair4top22sub; original controller CPU only; no main rebuild or raw profile upload
         run: python3 -B ci/backend-runtime-join-r8/run.py
       - name: Always collect owned fixture residuals
         if: always()

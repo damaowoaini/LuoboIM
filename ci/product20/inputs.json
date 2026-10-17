@@ -7,9 +7,9 @@
     "path": "ci/backend-fullgraph/run.py",
     "source": {
       "members": 1575,
-      "digest": "55636eb7494b1095febac99fd1af5790ab5c3a7a1c31a8d9cdae329e70060280"
+      "digest": "e487c9c7d87ad34be44029bc1091bf95a0a1d96775e7dac5c0bcb191535a3191"
     },
-    "status": "formatted-disabled-metrics-contract-source-only-locked-no-accepted-core14-artifact"
+    "status": "formatted-proof-and-acquire-observation-source-only-locked-no-accepted-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "dc912092354f431ff31096b72def4c458f63fbc1eae86213ec382a6b4fdb8a5b",
-    "ci/backend-fullgraph/inputs.json": "a82dff22c4b1f5d093c137f15257bd9ceb6b53572f5c2ef18dfa3cc2812c2ab4",
+    "ci/backend-fullgraph/run.py": "d0297df4d215b9aeee566b0ad37f7435abf4a1e94e3c02d8082beb6232b94da4",
+    "ci/backend-fullgraph/inputs.json": "cd8a341bce1b01222b9195920627d3d14a1bbcd24fca0143dcb7b7f14f029ada",
     "ci/backend-fullgraph/resources.py": "a9ac98690c116869099af8fb54f8d5b46c3c7da5d1280798c2c2a4ba067a4be2",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "bb0b833b952529603c5c78e457b0434f0e258ca00a5bd190d755ca33ac1adc4e",
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1577,
-    "digest": "34ef7223a5e2508df1357e39ac99b84cbeee3259672c577f50ef35c5b56de339"
+    "digest": "36f5dc1400934048b0a9f7c4c982e39c1d4f072748b0e1c986b447aaca35345e"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [
