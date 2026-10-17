@@ -40,6 +40,8 @@ const (
 	bootstrapLauncherProbe BootstrapStage = "launcher-probe"
 )
 
+const bootstrapKafkaCoordinator BootstrapStage = "kafka-coordinator"
+
 type PrivatePlan struct {
 	Version           string `json:"version"`
 	Scenario          string `json:"scenario"`
@@ -182,6 +184,36 @@ func waitFreshKafkaClient(ctx context.Context, user, password string) (sarama.Cl
 		}
 		// Each protocol attempt retains the original three-second I/O bounds.
 		// Only this interval is immediately cancellable; no deadline is renewed.
+		timer := time.NewTimer(200 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return nil, ctx.Err()
+		case <-timer.C:
+			timer.Stop()
+		}
+	}
+}
+
+// The original client owns every returned Broker. Only the read-only lookup
+// for the two nonce-bound fresh groups below may wait for coordinator startup.
+func waitFreshKafkaCoordinator(ctx context.Context, client sarama.Client, group string) (*sarama.Broker, error) {
+	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		broker, err := client.Coordinator(group)
+		if err == nil {
+			if err = ctx.Err(); err != nil {
+				return nil, err
+			}
+			return broker, nil
+		}
+		if !errors.Is(err, sarama.ErrConsumerCoordinatorNotAvailable) {
+			return nil, err
+		}
+		// Preserve the original three-second I/O and caller deadline. The
+		// borrowed broker/client is never closed or replaced by this wait.
 		timer := time.NewTimer(200 * time.Millisecond)
 		select {
 		case <-ctx.Done():
@@ -415,10 +447,12 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 		if e != nil || end != 0 {
 			return out, ownedcontrol.ErrOwnedEvidence
 		}
-		broker, e := client.Coordinator(group)
+		p.observeBootstrapStage(bootstrapKafkaCoordinator)
+		broker, e := waitFreshKafkaCoordinator(ctx, client, group)
 		if e != nil {
 			return out, e
 		}
+		p.observeBootstrapStage(bootstrapKafka)
 		fetch := &sarama.OffsetFetchRequest{Version: 7, ConsumerGroup: group, RequireStable: true}
 		fetch.AddPartition(topic, 0)
 		old, e := broker.FetchOffset(fetch)

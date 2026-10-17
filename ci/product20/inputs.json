@@ -7,9 +7,9 @@
     "path": "ci/backend-fullgraph/run.py",
     "source": {
       "members": 1575,
-      "digest": "a8c2a6c5c14c4f7e927448d54a983888c543cf4e70b6367540eda7f921326665"
+      "digest": "854097abc5dbc2fe549bb845c232083c625488112f879cc11ad3ce67cbf87d2d"
     },
-    "status": "Root-exact-core4-safety-subset-approved-plus-Kafka-wait-whole-R8-controller-still-failed-no-accepted-core14-artifact"
+    "status": "formatted-coordinator-wait-source-only-locked-no-accepted-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "f2c272778cfa31326f864dadcc1bdd7302f41166eddeb371854ebe5065eddbd2",
-    "ci/backend-fullgraph/inputs.json": "68887700dbd0de3a81f1d5a5628cf7db3e4bc6149dca0cef91e0def1f9f42f7d",
+    "ci/backend-fullgraph/run.py": "a47052f672ac6b5a20a7d07f2d0350fb0838cbc6480eb42198e67a2504e1e8d0",
+    "ci/backend-fullgraph/inputs.json": "83d5f7bb786e12498f095e7c8557abd630375cecf1d62a9e1efb30ba098937b6",
     "ci/backend-fullgraph/resources.py": "a9ac98690c116869099af8fb54f8d5b46c3c7da5d1280798c2c2a4ba067a4be2",
     "ci/backend-fullgraph/minio_build.py": "a4f062e946aa93dee82e5fd46977dec087c807660bfd3ff8c36cddf295ab3b08",
     "ci/backend-fullgraph/service_selectors.py": "bb0b833b952529603c5c78e457b0434f0e258ca00a5bd190d755ca33ac1adc4e",
@@ -85,8 +85,8 @@
   },
   "fixtureConfiguration": {
     "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
-    "beforeSHA256": "28974447ad79c88bade77c3d55142909f7bd20510f169e687cc6768feef3807a",
-    "afterSHA256": "2b58ec0b2fa580f20d7dcd657b78bdebe57e249a37b40c12fc3844f57b4fddd2",
+    "beforeSHA256": "49ef15327e70e375bfb73bae55eff32f22057f2f7e3fcb7230feee3250586b88",
+    "afterSHA256": "8b41f919940dcbe84a178a1df87877c28e8a0e5aef7f97c5c5c246c38e031635",
     "exactSingleAnchor": "\"secret\": c[\"serviceSecret\"], \"multiLoginPolicy\": 1",
     "replacement": "\"secret\": c[\"serviceSecret\"], \"adminDelegation\": map[string]any{\"issuer\": b.Header.Tenant}, \"mysql\": fixtureSQL, \"messageVerify\": map[string]bool{\"friendVerify\": false}, \"multiLoginPolicy\": 1",
     "purpose": "Task real tenant issuer, actual schema-only SQL policy DB, explicit friendVerify=false before every role config/bootstrap generation; auxiliary-only derivative, product14 and old four scenarios untouched",
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1577,
-    "digest": "9dc6c261238fe3bb2c06f9b914f3fc0e88bd92d68753ea817f168214e8b3e0ed"
+    "digest": "b626700f9ee5de0f530156f36f6d08cd84a7fa5770cd1c516b974970f98758ce"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

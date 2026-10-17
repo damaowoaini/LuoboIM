@@ -26,6 +26,16 @@ class FullGraphControls(unittest.TestCase):
   with self.assertRaises(ValueError):run.public_cleanup(cleanup)
   with self.assertRaises(ValueError):run.check_result({'version':'owned-fullgraph-token-v2-result-v1','scenario':'ack','accepted':False},'ack','1'*64,{},'2'*64)
 
+  # The actual collector keeps only the new finite coordinator observation.
+  collector=load('collect')
+  terminal={'version':'owned-fullgraph-token-v2-result-v1','scenario':'reader-registered-cancel','accepted':False,'phase':'actual-resource-bootstrap','bootstrapStage':'kafka-coordinator','bootstrapFailureTag':'kafka-coordinator-unavailable','failureClass':'source-error-private','failureSHA256':'a'*64,'sourceSHA256':'','resourcePlaneSHA256':'b'*64,'actualStartedRoles':0,'rawError':'PRIVATE_ERROR_USER_GROUP'}
+  observed=collector.public_terminal(json.dumps(terminal).encode(),terminal['scenario'])
+  self.assertEqual((observed['bootstrapStage'],observed['bootstrapFailureTag']),('kafka-coordinator','kafka-coordinator-unavailable'))
+  self.assertFalse(observed['rawErrorText']);self.assertNotIn('PRIVATE_',json.dumps(observed))
+  for key,value in [('bootstrapStage','kafka-anything'),('bootstrapFailureTag','kafka-anything'),('phase','running')]:
+   bad=copy.deepcopy(terminal);bad[key]=value
+   with self.subTest(coordinator=key),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+
  def test_real_tracked_git_bodies_symlink_bounds_static_elf_and_strict_receipt(self):
   with tempfile.TemporaryDirectory() as directory:
    root=Path(directory);source=root/'source';source.mkdir()

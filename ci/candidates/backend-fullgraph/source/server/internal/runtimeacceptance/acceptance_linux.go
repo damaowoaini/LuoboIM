@@ -114,6 +114,8 @@ func observeBootstrapFailure(err error) string {
 	var broker sarama.KError
 	if errors.As(err, &broker) {
 		switch broker {
+		case sarama.ErrConsumerCoordinatorNotAvailable:
+			return "kafka-coordinator-unavailable"
 		case sarama.ErrSASLAuthenticationFailed:
 			return "kafka-auth"
 		case sarama.ErrTopicAuthorizationFailed, sarama.ErrClusterAuthorizationFailed:
