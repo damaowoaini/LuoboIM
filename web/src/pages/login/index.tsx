@@ -1,3 +1,4 @@
+import { readSdkLoginFailure } from "@/core/session/loginFailure";
 import { useUserStore } from "@/store";
 import { SettingOutlined } from "@ant-design/icons";
 import { Alert, Button } from "antd";
@@ -15,7 +16,7 @@ import { useSearchParams } from "react-router-dom";
 export type FormType = 0 | 1 | 2;
 export const Login = () => {
   const [search] = useSearchParams();
-  const imError = search.get("imError");
+  const imError = search.get("imError") ?? readSdkLoginFailure();
   const logout = search.get("logout");
   const safeImCode = imError && /^-?\d{1,8}$/.test(imError) ? imError : "unknown";
   const appConfigStatus = useUserStore(state=>state.appConfigStatus);

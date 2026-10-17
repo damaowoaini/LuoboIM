@@ -2,7 +2,7 @@ import { CbEvents, SessionType } from "open-im-sdk-wasm";
 import { GroupMessageReceiptInfo, WSEvent } from "open-im-sdk-wasm/lib/types/entity";
 import { useEffect, useRef } from "react";
 
-import { applySingleReadReceipts, captureMessageReadScope, type MessageReadScope } from "@/core/messageReadReceipt";
+import { applySingleReadReceipts, applyOwnReadTimeConfirmed, OWN_READ_TIME_EVENT, captureMessageReadScope, type MessageReadScope } from "@/core/messageReadReceipt";
 import { IMSDK } from "@/layout/MainContentWrap";
 import { ExMessageItem, useConversationStore, useMessageStore, useUserStore } from "@/store";
 
@@ -17,6 +17,9 @@ export function useMessageReceipt() {
     let active = true;
     const single = ({ data }: WSEvent<unknown>) => {
       if (active) applySingleReadReceipts(scope, data);
+    };
+    const own = ({ data }: WSEvent<unknown>) => {
+      if (active) applyOwnReadTimeConfirmed(scope, data);
     };
     const group = ({ data }: WSEvent<GroupMessageReceiptInfo>) => {
       if (!active || scope.single || !scope.current() ||
@@ -35,6 +38,8 @@ export function useMessageReceipt() {
     };
     IMSDK.on(CbEvents.OnRecvC2CReadReceipt, single);
     IMSDK.on(CbEvents.OnRecvGroupReadReceipt, group);
-    return () => { active = false; IMSDK.off(CbEvents.OnRecvC2CReadReceipt, single); IMSDK.off(CbEvents.OnRecvGroupReadReceipt, group); };
+    // A versioned controlled-WASM extension; keep peer/group semantics separate.
+    IMSDK.on(OWN_READ_TIME_EVENT as CbEvents, own);
+    return () => { active = false; IMSDK.off(CbEvents.OnRecvC2CReadReceipt, single); IMSDK.off(CbEvents.OnRecvGroupReadReceipt, group); IMSDK.off(OWN_READ_TIME_EVENT as CbEvents, own); };
   }, [scope, selfUserID]);
 }

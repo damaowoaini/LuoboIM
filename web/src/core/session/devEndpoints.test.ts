@@ -9,7 +9,7 @@ import createAxiosInstance from "@/utils/request";
 import { revokeCurrentSession } from "./logout";
 import {
   browserEndpoints, decodeDevEndpointMapping, DEV_ENDPOINT_BOOTSTRAP_PATH,
-  initializeDevEndpoints, resolveDevEndpoints,
+  initializeDevEndpoints, resolveDevEndpoints, browserSdkLoopbackOptIn, resolveDevSdkLoopbackOptIn,
 } from "./devEndpoints";
 
 const origin = "http://127.0.0.1:7778";
@@ -143,5 +143,41 @@ describe("explicit loopback tenant transport", () => {
       body: JSON.stringify({ imToken: "synthetic-im-synthetic-user" }), credentials: "omit", redirect: "error",
     }) }]);
     expect(f.session!.current!.userID).toBe("second");
+  });
+});
+
+
+describe("controlled SDK initialization transport", () => {
+  it("opts in only for an exact validated HTTP loopback issuer tenant and active domain", async () => {
+    await install();
+    await f.session!.commit(auth());
+    const session = f.session!.current!;
+    expect(browserSdkLoopbackOptIn(session)).toBe(true);
+    const selected = decodeDevEndpointMapping(bootstrap, { origin, issuer: origin })!;
+    for (const changed of [
+      { ...session, issuer: "http://localhost:7778" },
+      { ...session, tenant: { ...session.tenant, serverID: "foreign-tenant" } },
+      { ...session, tenant: { ...session.tenant, domains: ["foreign.example"] } },
+      { ...session, tenant: { ...session.tenant, domains: [...session.tenant.domains, "backup.example"], activeLine: 1 } },
+    ]) expect(resolveDevSdkLoopbackOptIn(changed, { origin, issuer: origin }, selected)).toBe(false);
+    expect(resolveDevSdkLoopbackOptIn(session, { origin, issuer: "https://route.example" }, selected)).toBe(false);
+    expect(resolveDevSdkLoopbackOptIn(session, { origin, issuer: origin })).toBe(false);
+    for (const alternate of ["http://localhost:7781", "https://localhost:7781", "http://[::1]:7781", "http://remote.example"]) {
+      const context = { origin: alternate, issuer: alternate };
+      const mapping = decodeDevEndpointMapping({ ...bootstrap, issuer: alternate }, context);
+      expect(resolveDevSdkLoopbackOptIn({ ...session, issuer: alternate }, context, mapping)).toBe(alternate === "http://localhost:7781");
+    }
+  });
+
+  it("does not grant SDK opt-in from an absent bootstrap or a changed current issuer", async () => {
+    await f.session!.commit(auth());
+    expect(browserSdkLoopbackOptIn(f.session!.current!)).toBe(false);
+    await install();
+    expect(browserSdkLoopbackOptIn(f.session!.current!)).toBe(true);
+    f.issuer = "https://route.example";
+    expect(browserSdkLoopbackOptIn(f.session!.current!)).toBe(false);
+    f.issuer = origin;
+    vi.stubGlobal("window", { location: { origin: "http://localhost:7778" } });
+    expect(browserSdkLoopbackOptIn(f.session!.current!)).toBe(false);
   });
 });

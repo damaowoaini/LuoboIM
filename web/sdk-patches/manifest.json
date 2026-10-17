@@ -1,37 +1,53 @@
 {
   "package": "open-im-sdk-wasm",
   "version": "3.5.1-alpha.3",
-  "scope": "Reviewed JavaScript/typing patch only; original WASM untouched",
+  "scope": "Successor to isolated paired SDK8; unchanged controlled WASM/glue and worker/database protocol",
   "files": [
     {
-      "path": "lib/index.js",
-      "original_sha256": "985d5ea6e839c72cc310b6362045bc86dde43716286a97c9f36b31eba53dbc88",
-      "patched_sha256": "b3f5d89077154bf5b8bc60339167ea0420f8de92234bfd3a211e79a095673202"
+      "path": "lib/constant/index.d.ts",
+      "original_sha256": "7878154a79e99fdfdfc15df330e0252e319464c9eaf934baac13fe533802b661",
+      "patched_sha256": "8236ed18979e695b85fa856e4879c3b4da2f7b90133bb5616a098f9bb57707ca"
     },
     {
       "path": "lib/index.es.js",
       "original_sha256": "bbcadba97c638bc9d42a8adf66416177d0446efa21ae25971d73f7779cae66df",
-      "patched_sha256": "9fb7af957d270df23c3bb9ff0fa285b498aabd0f5b63a76427e1378871fe4a76"
+      "patched_sha256": "75e3038435ad33ff9698636615c51eb8dc0479cd85c5c1465d0eaf07978b2b25",
+      "previous_patched_sha256": "2d7b219249bd3d0d8c730d368ede97ddc4dad40bacafd4db529c69ce160c17e2"
+    },
+    {
+      "path": "lib/index.js",
+      "original_sha256": "985d5ea6e839c72cc310b6362045bc86dde43716286a97c9f36b31eba53dbc88",
+      "patched_sha256": "de530888dedc4c75f5a29709af384270e94229ffdac6c76cd0a625ec6428d739",
+      "previous_patched_sha256": "f390481393be616fb14928e346b28742d9a6bfdcbf0f72e812db07b76473f1a7"
     },
     {
       "path": "lib/index.umd.js",
       "original_sha256": "7048acca4112dc8058419f88cffdd311f4daeff46fc2cd52500a940a5320fd9b",
-      "patched_sha256": "e5b9a6e36170092704d79cfdc86137b130b178f333e1f8f66365267a90f815b2"
+      "patched_sha256": "400901493266f07e2ba233b31f51bc3ccd838105c71de95c4a44584e89d19045",
+      "previous_patched_sha256": "5bcbf2f346219466185fa52cfc2d71c473fef0a7737fe5bd93b60301c0b4b41c"
+    },
+    {
+      "path": "lib/types/entity.d.ts",
+      "original_sha256": "e24c7b01001c7f2ee0aa9f1af0c17678746189a7498570955608692301f8b8dd",
+      "patched_sha256": "ece6192a1cf24250c6f29474ff18a4df8e905c8d4ffac0fbe931abebd344c5d4"
     },
     {
       "path": "lib/types/params.d.ts",
       "original_sha256": "cba902a62f809c69809962dcdfc054b9800f6561ae276be01889c93c6deee0df",
-      "patched_sha256": "a825fc6581b5ca0a96d299d8fc82a8f0e4c45ac50653f3b68d980a3d3d98f5f4"
-    },
-    {
-      "path": "lib/worker.js",
-      "original_sha256": "630b5c53481103878189264de31a402f76285eefdf9ccc663a44a881e3319db1",
-      "patched_sha256": "d70480aea32ac41e06aa60245198987d083cf275c75a8e419868b6ef3f85bff8"
+      "patched_sha256": "8232d856d5396493880db7a18b410b355b6af866afbba9a897529e8148093119",
+      "previous_patched_sha256": "a825fc6581b5ca0a96d299d8fc82a8f0e4c45ac50653f3b68d980a3d3d98f5f4"
     },
     {
       "path": "lib/worker-legacy.js",
       "original_sha256": "3f59aae28b3b150258a0c37ccf3a30f328b01b02b6d63a7e14feffff36cd4822",
-      "patched_sha256": "46b21be9c784bf9281705342f738542c6fc2d3cef4f31c68a346a65a4bf1452f"
+      "patched_sha256": "ecdb844877b03ca4a7a753773da50fbf49ebd69c4a675a67219a05a94f3ccc0a",
+      "previous_patched_sha256": "46b21be9c784bf9281705342f738542c6fc2d3cef4f31c68a346a65a4bf1452f"
+    },
+    {
+      "path": "lib/worker.js",
+      "original_sha256": "630b5c53481103878189264de31a402f76285eefdf9ccc663a44a881e3319db1",
+      "patched_sha256": "457583dfbb0b0593d9ba3c7e86b90bd4f11fa1af3ab8c8bf383e7a49bb234efc",
+      "previous_patched_sha256": "d70480aea32ac41e06aa60245198987d083cf275c75a8e419868b6ef3f85bff8"
     }
   ],
   "license": {
@@ -42,8 +58,36 @@
     "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1"
   },
   "modifications": [
-    "Allow per-session dataDir in wrapper without changing wire protocol",
-    "Default SDK stdout and method logging off; remove raw event/DB/SQL console output",
-    "Preserve original WASM, database tables and codecs"
-  ]
+    "Keep the existing per-session dataDir and quiet SDK logging",
+    "Bind buffer sends to one original session, acknowledge real upload registrations before dispatch, and release only the original lease",
+    "Persist authoritative own read times atomically with earliest-time preservation and owner/database/history scope checks",
+    "Project the distinct durable own-read event without a second mark or history query",
+    "Require the exact controlled WASM and matching Go glue before installing JS patches",
+    "Forward only an explicit boolean loopback opt-in; preserve strict remote HTTPS/WSS defaults",
+    "Require the controlled InitSDK SyncCall result to be exactly [true] before any Login call"
+  ],
+  "coreFiles": [
+    {
+      "path": "public/openIM.wasm",
+      "bytes": 35566446,
+      "sha256": "43a4a8929e01415ec9c03b6297137878c7ddab0fe03da31a90d686016396cea7"
+    },
+    {
+      "path": "public/wasm_exec.js",
+      "bytes": 16992,
+      "sha256": "0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14"
+    }
+  ],
+  "controlledCore": {
+    "baseCommit": "7b156fc5557878ad6e6a07e572694af5699c6624",
+    "sourceManifest": "ci/web-controlled-wasm/final-source.json",
+    "sourceManifestSHA256AtBuild": "d897d7945cb351c9afaf6ec187a31ae51cf2872f41af011ac00f269e014034e6",
+    "buildRun": 39004401325,
+    "buildHead": "0fcf06a8cc38b8e1087aa8ae95dfce33f04cd709",
+    "artifactID": 12090361429,
+    "artifactZIP_SHA256": "74498331bceea76d01a19665e8e680bc284c3931c37edb701ebf2c091c3fd5cd",
+    "GoVersion": "1.27.2",
+    "startupABIRegistered": 145,
+    "SDKInitializationAndBusinessAcceptance": "prior paired SDK8 UI login failed10005; this JS/App initialization successor is source-only/unrun"
+  }
 }

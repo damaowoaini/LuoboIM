@@ -8,6 +8,7 @@ import { bindSessionView } from "@/core/session/view";
 import { createChildSdk, isDesktopChild } from "@/core/session/childSdk";
 import { sessionCoordinator } from "@/core/session/browser";
 import { bindSessionSdk } from "@/core/session/sdk";
+import { browserSdkLoopbackOptIn } from "@/core/session/devEndpoints";
 import { getSDK } from "open-im-sdk-wasm";
 import { AllowType } from "open-im-sdk-wasm";
 import { useEffect, useState } from "react";
@@ -51,7 +52,11 @@ export const IMSDK = bindMessageHistory(bindSessionSdk(
             throw new Error("SDK登录账号与当前会话不一致");
           const dataDir = await sdkDataDirectory(sessionCoordinator.namespace);
           runtimeBoundary?.beforeLogin();
-          return [{ ...params, dataDir, isLogStandardOutput: false }, ...args.slice(1)];
+          const prepared: Record<string, unknown> = { ...params, dataDir, isLogStandardOutput: false };
+          // A caller cannot opt in independently of the validated deployment.
+          delete prepared.allowInsecureLoopbackForTesting;
+          if (browserSdkLoopbackOptIn(session)) prepared.allowInsecureLoopbackForTesting = true;
+          return [prepared, ...args.slice(1)];
         },
         afterLogout: async () => {
           if (closeSdkDatabase) await closeSdkWorker(closeSdkDatabase);

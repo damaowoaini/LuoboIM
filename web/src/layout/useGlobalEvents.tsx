@@ -1,3 +1,4 @@
+import { rememberSdkLoginFailure, clearSdkLoginFailure } from "@/core/session/loginFailure";
 import { sessionCoordinator } from "@/core/session/browser";
 import { createApplicationEventHandlers } from "@/core/applicationEventHandlers";
 import { subscribeSessionEvent } from "@/core/session/desktop";
@@ -254,6 +255,7 @@ export function useGlobalEvent() {
         wsAddr: getWsUrl(),
         logLevel: LogLevel.Error,
       });
+      clearSdkLoginFailure();
       await useUserStore.getState().getAppConfigByReq();
       await initStore();
     } catch (error) {
@@ -262,6 +264,7 @@ export function useGlobalEvent() {
       const safeFailureCode = Number.isSafeInteger(failureCode) ? String(failureCode) : "unknown";
       console.error("SDK登录失败", safeFailureCode);
       if ((error as WsResponse).errCode !== 10102) {
+        rememberSdkLoginFailure(safeFailureCode);
         await clearIMProfile();
         navigate(`/login?imError=${safeFailureCode}`, { replace: true });
       } else {

@@ -49,15 +49,32 @@ export function decodeDevEndpointMapping(value: unknown, current: Context): DevE
   return Object.freeze({ version: 1, issuer: current.origin, serverID: data.serverID, domain: data.domain });
 }
 
+function matchesDevEndpointMapping(session: Session, current: Context, selected?: DevEndpointMapping): boolean {
+  const domain = session.tenant.domains[session.tenant.activeLine];
+  return !!selected && loopbackOrigin(current.origin) && current.origin === selected.issuer &&
+    current.issuer === selected.issuer && session.issuer === selected.issuer &&
+    session.tenant.serverID === selected.serverID && domain === selected.domain;
+}
+
 export function resolveDevEndpoints(session: Session, current: Context, selected?: DevEndpointMapping) {
   const original = endpoints(session);
-  const domain = session.tenant.domains[session.tenant.activeLine];
-  if (!selected || !loopbackOrigin(current.origin) || current.origin !== selected.issuer ||
-      current.issuer !== selected.issuer || session.issuer !== selected.issuer ||
-      session.tenant.serverID !== selected.serverID || domain !== selected.domain) return original;
+  if (!matchesDevEndpointMapping(session, current, selected)) return original;
   const origin = new URL(current.origin);
   const socketOrigin = `${origin.protocol === "https:" ? "wss:" : "ws:"}//${origin.host}`;
   return { chat: `${origin.origin}/chat`, im: `${origin.origin}/im`, ws: `${socketOrigin}/msg_gateway` };
+}
+
+// This is an opt-in for the same validated deployment mapping, not a URL
+// prefix exception. The Go core still independently restricts insecure hosts.
+export function resolveDevSdkLoopbackOptIn(session: Session, current: Context, selected?: DevEndpointMapping): boolean {
+  if (!matchesDevEndpointMapping(session, current, selected)) return false;
+  const origin = new URL(current.origin);
+  return origin.protocol === "http:" && ["127.0.0.1", "localhost"].includes(origin.hostname);
+}
+
+export function browserSdkLoopbackOptIn(session: Session): boolean {
+  const current = context();
+  return !!current && resolveDevSdkLoopbackOptIn(session, current, mapping);
 }
 
 export function browserEndpoints(session: Session) {

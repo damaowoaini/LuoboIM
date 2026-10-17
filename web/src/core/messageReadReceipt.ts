@@ -191,3 +191,38 @@ export async function markReadAndHydrate(scope: MessageReadScope, sdk: ReadSDK,
     return { state: !scope.current() ? "stale" : acknowledged ? "unconfirmed" : "failed", acknowledged, projected: 0 };
   }
 }
+
+/** Emitted only by the controlled WASM own-receipt producer after the exact
+ * SQLite/IndexedDB commit. Subscribe through IMSDK, never a DOM/custom event.
+ * The old opaque WASM has no such producer and cannot establish this contract. */
+export const OWN_READ_TIME_EVENT = "OnOwnC2CReadTimeConfirmed";
+export function applyOwnReadTimeConfirmed(scope: MessageReadScope, event: unknown): number {
+  if (!scope.current() || !scope.single || !scope.peer || scope.peer === scope.actor || !record(event) ||
+      event.schemaVersion !== 1 || event.ownerID !== scope.actor || event.peerID !== scope.peer ||
+      event.conversationID !== scope.conversationID || event.sessionType !== 1 ||
+      typeof event.receiptID !== "string" || !event.receiptID || !Array.isArray(event.committedRows) ||
+      !event.committedRows.length) return 0;
+  const loaded = new Map(useMessageStore.getState().historyMessageList.map(message => [message.clientMsgID, message]));
+  const ids = new Set<string>(), seqs = new Set<number>();
+  const originals: { message: ExMessageItem; readTime: number }[] = [];
+  // Check the entire batch before projecting anything. Unknown loaded rows are
+  // not looked up or acknowledged; their persisted SDK snapshot can load later.
+  for (const raw of event.committedRows) {
+    if (!record(raw) || typeof raw.clientMsgID !== "string" || !raw.clientMsgID ||
+        !Number.isSafeInteger(raw.seq) || (raw.seq as number) <= 0 || raw.sendID !== scope.peer ||
+        raw.recvID !== scope.actor || !Number.isSafeInteger(raw.readTime) ||
+        readMillis(raw.readTime) !== raw.readTime || ids.has(raw.clientMsgID) || seqs.has(raw.seq as number)) return 0;
+    ids.add(raw.clientMsgID); seqs.add(raw.seq as number);
+    const message = loaded.get(raw.clientMsgID);
+    if (!message) continue;
+    if (!belongs(message, scope) || message.sendID !== raw.sendID || message.recvID !== raw.recvID || message.seq !== raw.seq) return 0;
+    originals.push({ message, readTime: raw.readTime as number });
+  }
+  if (!scope.current()) return 0;
+  const identities = originals.map(({ message }) => readIdentity(scope.owner, scope.conversationID, message));
+  if (identities.some(value => !value)) return 0;
+  readBarrier.acknowledge(identities.filter((value): value is NonNullable<typeof value> => !!value));
+  let projected = 0;
+  for (const { message, readTime } of originals) if (updateReadTime(message, scope, readTime)) projected++;
+  return projected;
+}

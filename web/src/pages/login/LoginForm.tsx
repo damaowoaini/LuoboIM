@@ -1,8 +1,9 @@
+import { clearSdkLoginFailure } from "@/core/session/loginFailure";
 import { Button, Form, Input, QRCode, Select, Space, Tabs, message } from "antd";
 import { t } from "i18next";
 import md5 from "md5";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useLogin, useSendSms } from "@/api/login";
 import login_pc from "@/assets/images/login/login_pc.png";
@@ -34,6 +35,7 @@ type LoginFormProps = {
 
 const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormProps) => {
   const navigate = useNavigate();
+  const [search, setSearch] = useSearchParams();
   const [form] = Form.useForm();
   const [loginType, setLoginType] = useState<LoginType>(LoginType.Password);
   const { mutate: login, isPending: loginLoading } = useLogin();
@@ -55,6 +57,12 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
   }, [countdown]);
 
   const onFinish = (params: API.Login.LoginParams) => {
+    clearSdkLoginFailure();
+    if (search.has("imError")) {
+      const next = new URLSearchParams(search);
+      next.delete("imError");
+      setSearch(next, { replace: true });
+    }
     if (loginType === 0) {
       params.password = md5(params.password ?? "");
       delete params.verifyCode;

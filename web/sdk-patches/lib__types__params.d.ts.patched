@@ -11,6 +11,8 @@ export declare type InitAndLoginConfig = {
     platformID: number;
     apiAddr: string;
     wsAddr: string;
+    /** Explicit reviewed loopback test transport only; false by default. */
+    allowInsecureLoopbackForTesting?: boolean;
     dataDir?: string;
     logLevel?: LogLevel;
     isLogStandardOutput?: boolean;
