@@ -15,14 +15,25 @@ lane = importlib.util.module_from_spec(spec); spec.loader.exec_module(lane)
 
 class LogCLIContract(unittest.TestCase):
     def test_fixed_help_real_pipes_are_bounded_private_and_all_post_checks_are_independent(self):
-        help_text = '--[no-]pager --style ndjson --color --start --end --predicate --[no-]info --[no-]debug'
+        help_text = 'usage: log show [options]\n--[no-]pager --style ndjson --color --start --end --predicate --[no-]info --[no-]debug'
         secret = 'PRIVATE-NONHELP-TEXT-NOT-RETAINED'
         real_popen = subprocess.Popen
         cases = [('complete', 'print('+repr(help_text+' '+secret)+')', 'none'),
-                 ('missing', 'print("--style")', 'missing_help_tokens'),
-                 ('nonzero', 'import sys;sys.stderr.write('+repr(secret)+');sys.exit(64)', 'cli_nonzero'),
+                 ('complete64', 'import sys;sys.stderr.write('+repr(help_text+'\n'+secret)+');sys.exit(64)', 'none'),
+                 ('missing', 'print("usage: log show [options]\\n--style")', 'missing_help_tokens'),
+                 ('nonzero', 'import sys;sys.stderr.write('+repr(secret)+');sys.exit(64)', 'missing_show_usage_header'),
+                 ('other-nonzero', 'import sys;sys.stderr.write('+repr(help_text)+');sys.exit(2)', 'cli_nonzero'),
+                 ('no-show-header0', 'print('+repr(help_text.replace('usage: log show [options]','usage: log'))+')', 'missing_show_usage_header'),
+                 ('wrong-command64', 'import sys;sys.stderr.write('+repr(help_text.replace('usage: log show [options]','usage: log stream [options]'))+');sys.exit(64)', 'missing_show_usage_header'),
+                 ('missing-token64', 'import sys;sys.stderr.write('+repr(help_text.replace('--color',''))+');sys.exit(64)', 'missing_help_tokens'),
+                 ('mixed-eperm64', 'import sys;sys.stderr.write('+repr(help_text+'\nlog: operation not permitted\n')+');sys.exit(64)', 'help_permission_refusal'),
+                 ('mixed-sandbox64', 'import sys;sys.stderr.write('+repr(help_text+'\nlog: not permitted in sandbox\n')+');sys.exit(64)', 'help_permission_refusal'),
+                 ('mixed-eperm0', 'print('+repr(help_text+'\nlog: operation not permitted\n')+')', 'help_permission_refusal'),
+                 ('stdout-only64', 'import sys;print('+repr(help_text)+');sys.exit(64)', 'usage64_not_static_help'),
+                 ('invalid-utf8', 'import os;os.write(1,b"\\xff")', 'invalid_utf8'),
                  ('overflow', 'print("x"*10000)', 'output_limit'),
-                 ('timeout', 'import time;time.sleep(4)', 'timeout')]
+                 ('timeout', 'import time;time.sleep(4)', 'timeout'),
+                 ('partial-then-timeout', 'import sys,time;sys.stdout.write('+repr(help_text)+');sys.stdout.flush();time.sleep(4)', 'timeout')]
         for label, script, reason in cases:
             with self.subTest(label=label), tempfile.TemporaryDirectory() as folder:
                 work = Path(folder); (work/'evidence').mkdir(); commands = []; children = []
@@ -42,15 +53,20 @@ class LogCLIContract(unittest.TestCase):
                 self.assertNotIn(secret, json.dumps(result)); self.assertFalse(result['raw_help_or_system_log_retained'])
                 self.assertLessEqual(result['combined_observed_bytes'], 8193)
                 self.assertEqual(list(work.iterdir()), [work/'evidence'])
-                if label == 'complete':
-                    self.assertTrue(all(result['supports'].values())); self.assertEqual(result['exit_code'], 0)
-                    self.assertTrue(result['streams_complete'])
+                if label in ('complete','complete64'):
+                    self.assertTrue(all(result['supports'].values())); self.assertEqual(result['exit_code'], 64 if label=='complete64' else 0)
+                    self.assertTrue(result['streams_complete']);self.assertTrue(result['show_usage_header'])
+                    self.assertTrue(result['static_help_exit_contract_accepted'])
                 elif label == 'missing':
                     self.assertEqual(result['status'], 'inconclusive')
                     self.assertFalse(result['supports']['no_pager'])
                     self.assertTrue(result['support_false_means_unobserved_not_unsupported'])
-                else:
+                elif reason in ('timeout','output_limit','invalid_utf8'):
                     self.assertEqual(result['supports'], {})
+                else:
+                    self.assertEqual(result['status'],'inconclusive')
+                if reason != 'none':self.assertFalse(result['static_help_exit_contract_accepted'])
+                if reason in ('timeout','output_limit'):self.assertFalse(result['streams_complete'])
                 seen = []
                 def tool(name):
                     seen.append(name)
@@ -144,7 +160,11 @@ class LogCLIContract(unittest.TestCase):
                 with mock.patch.object(lane,'home_configuration_present',return_value=False), mock.patch.object(lane.subprocess,'Popen',side_effect=launch):
                     observed=lane.help_observation(work,dict(os.environ))
                 self.assertEqual(commands,[lane.COMMAND]);self.assertEqual(observed['stderr_class'],expected)
-                self.assertEqual(observed['reason'],'cli_nonzero');self.assertFalse(observed['cause_inferred_from_exit_code'])
+                reason = ('help_permission_refusal' if expected in ('eperm','sandbox_refusal') or stderr.startswith(b'log: operation not permitted\nusage:')
+                          else 'missing_help_tokens' if expected=='usage'
+                          else 'invalid_utf8' if stderr==b'\xff' else 'missing_show_usage_header')
+                self.assertEqual(observed['reason'],reason);self.assertFalse(observed['cause_inferred_from_exit_code'])
+                self.assertFalse(observed['static_help_exit_contract_accepted'])
                 self.assertNotIn('PRIVATE',json.dumps(observed));self.assertNotIn('private.invalid',json.dumps(observed))
                 self.assertFalse(observed['execution_surface']['worker_sandbox_applied'])
         self.assertEqual(lane.classify_static_help_stderr(b'x'*(lane.CAP+1)),'unknown')
@@ -157,7 +177,7 @@ class LogCLIContract(unittest.TestCase):
             before={'log':{'actual':'log'},'python':{'actual':'python'}};controllers=[{'actual':'source'}]
             lane.put(work/'activation.json',{'identity':lane.IDENTITY,'controllers':controllers,'before':before})
             allowed={'HOME':os.environ['HOME'],'PATH':'/usr/bin:/bin','TMPDIR':str(work)};commands=[]
-            help_text='--[no-]pager --style ndjson --color --start --end --predicate --[no-]info --[no-]debug'
+            help_text='usage: log show [options]\n--[no-]pager --style ndjson --color --start --end --predicate --[no-]info --[no-]debug'
             def launch(command,**kwargs):
                 self.assertEqual(command,lane.COMMAND);commands.append(command);self.assertEqual(kwargs['env'],allowed)
                 return real_popen([sys.executable,'-B','-c','print('+repr(help_text)+')'],**kwargs)

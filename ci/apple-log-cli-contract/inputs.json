@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "identity": "apple-macos15-log-help-show-supervisor-v2",
+  "identity": "apple-macos15-log-help-show-supervisor-v3",
   "command": [
     "/usr/bin/log",
     "help",
@@ -17,18 +17,18 @@
   "owned": [
     {
       "path": "ci/apple-log-cli-contract/run.py",
-      "bytes": 19548,
-      "sha256": "5a3c057b2ac3ddbaf47eb4c003b2687fbfd526536d2a76f7c3096876ad122efd"
+      "bytes": 21191,
+      "sha256": "948544900042525be1a9da8099e52af237d2985086dbf27919fa407f178a0a3f"
     },
     {
       "path": "ci/apple-log-cli-contract/test_log_cli.py",
-      "bytes": 12285,
-      "sha256": "8c047c84f42366e43dbda2617b9258fd716bded2c460b96714f4b06c355a8834"
+      "bytes": 14831,
+      "sha256": "ac29eed4b6becaa203d914c6eaee9abc547625deacd39deef67922c4d17d3f35"
     },
     {
       "path": ".github/workflows/apple-log-cli-contract.yml",
-      "bytes": 1294,
-      "sha256": "bcf1e11f06bf931d05a785dc9ef632a35ae302b00fe941af69532b7aef7352e2"
+      "bytes": 1310,
+      "sha256": "6caa117b8ddb512fb8a16717d1b94fa962e9d4598f478a989009b38992a7a5d1"
     }
   ],
   "borrowed": [
@@ -110,5 +110,42 @@
     "reasonUnproved": true,
     "oldRawRecovered": false,
     "repeatInsideForComparison": false
+  },
+  "helpExitContract": {
+    "allowedExitCodes": [
+      0,
+      64
+    ],
+    "showUsageHeaders": [
+      "usage: log show [options]",
+      "usage: log show [options] <archive>",
+      "usage: log show [options] [<archive>]",
+      "usage: log show [options] --archive <archive>",
+      "usage: log show [options] [--archive <archive>|--file <file>]"
+    ],
+    "allNineTokensRequired": true,
+    "usage64RequiresClosedUsageClass": true,
+    "permissionRefusalAlwaysRejected": true,
+    "exitCodeAloneGrantsNothing": true,
+    "historicalObservationReclassified": false
+  },
+  "priorSupervisorObservation": {
+    "run": 39048623934,
+    "job": 117442348471,
+    "artifact": 12107155253,
+    "observation": {
+      "bytes": 1139,
+      "sha256": "a10fc3db3f9eca03bff6dcb010cf7cea5e9136581492534c4fead04c2940ec5e"
+    },
+    "nativeExitCode": 64,
+    "stderrBytes": 1957,
+    "stderrSHA256": "2655f83a2b65ecada4cb0ae94d6b047882b2be1ed3686bbedfad5b965e5bfb83",
+    "complete": true,
+    "withinCap": true,
+    "closedClass": "usage",
+    "requiredHeaderAndAllTokensNotPreviouslyObserved": true,
+    "retrospectivePASS": false,
+    "oldInsideCauseStillUnproved": true,
+    "repeatPriorInsideForComparison": false
   }
 }

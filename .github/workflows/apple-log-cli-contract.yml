@@ -1,4 +1,4 @@
-name: macOS15 fixed log help show outside worker sandbox
+name: macOS15 fixed log show help contract with bounded usage64 evidence
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       observation:
         type: choice
         required: true
-        options: [apple-macos15-log-help-show-supervisor-v2]
+        options: [apple-macos15-log-help-show-supervisor-v3]
 
 permissions:
   contents: read
@@ -28,13 +28,13 @@ jobs:
           umask 077
           python="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
           test -x "$python"
-          "$python" -B ci/apple-log-cli-contract/run.py --identity apple-macos15-log-help-show-supervisor-v2
+          "$python" -B ci/apple-log-cli-contract/run.py --identity apple-macos15-log-help-show-supervisor-v3
       - name: Fixed projected observations only
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: apple-log-cli-contract-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/luobo-apple-log-cli-supervisor-v2/evidence/*.json
+          path: ${{ runner.temp }}/luobo-apple-log-cli-supervisor-v3/evidence/*.json
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn

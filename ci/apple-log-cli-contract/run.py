@@ -18,13 +18,14 @@ from types import SimpleNamespace
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-IDENTITY = 'apple-macos15-log-help-show-supervisor-v2'
-WORK_NAME = 'luobo-apple-log-cli-supervisor-v2'
+IDENTITY = 'apple-macos15-log-help-show-supervisor-v3'
+WORK_NAME = 'luobo-apple-log-cli-supervisor-v3'
 EXECUTION_SURFACE = {'help_process': 'resource-supervisor-without-worker-sandbox',
     'worker_sandbox_applied': False, 'same_original_diagnostic_rules': False,
     'file_write_network_sandbox_enforced_for_help': False,
     'fixed_static_help_only': True, 'system_log_query_executed': False}
 COMMAND = ['/usr/bin/log', 'help', 'show']
+HELP_EXIT_CONTRACT = {'allowedExitCodes': [0, 64], 'showUsageHeaders': ['usage: log show [options]', 'usage: log show [options] <archive>', 'usage: log show [options] [<archive>]', 'usage: log show [options] --archive <archive>', 'usage: log show [options] [--archive <archive>|--file <file>]'], 'allNineTokensRequired': True, 'usage64RequiresClosedUsageClass': True, 'permissionRefusalAlwaysRejected': True, 'exitCodeAloneGrantsNothing': True, 'historicalObservationReclassified': False}
 CAP = 8192
 SECONDS = 2
 ORIGINAL_PATHS = {'gem_root': '/opt/homebrew/lib/ruby/gems/3.3.0',
@@ -76,6 +77,7 @@ def metadata():
     if (value.get('schema') != 1 or value.get('identity') != IDENTITY
             or value.get('executionSurface') != EXECUTION_SURFACE
             or value.get('command') != COMMAND or value.get('originalEnvironmentPaths') != ORIGINAL_PATHS
+            or value.get('helpExitContract') != HELP_EXIT_CONTRACT
             or value.get('limits') != {'seconds': 2, 'outputBytes': 8192, 'floorBytes': 1 << 30,
                 'allocatedBytes': 64 << 20, 'pollSeconds': .2, 'guardSeconds': 30}):
         raise ValueError('fixed-contract')
@@ -158,7 +160,8 @@ def help_observation(work, environment):
         'support_false_means_unobserved_not_unsupported': True,
         'raw_help_or_system_log_retained': False, 'execution_surface': dict(EXECUTION_SURFACE),
         'stderr_class': 'unknown', 'stderr_class_is_literal_observation_only': True,
-        'cause_inferred_from_exit_code': False}
+        'cause_inferred_from_exit_code': False, 'show_usage_header': False,
+        'permission_refusal_observed': False, 'static_help_exit_contract_accepted': False}
     if home_configuration_present(environment):
         result.update(reason='user_log_configuration_present')
         return result
@@ -188,18 +191,31 @@ def help_observation(work, environment):
                     raise OverflowError()
         result['exit_code'] = child.wait(timeout=max(.001, deadline-time.monotonic()))
         result['streams_complete'] = True
-        if result['exit_code'] != 0:
-            result['reason'] = 'cli_nonzero'
-            return result
-        # The two complete bounded help streams remain memory-only. Some
-        # versions print static help to stderr even when help exits zero.
+        # Both complete bounded streams remain memory-only. The fixed help
+        # command may return EX_USAGE64; neither that code nor generic usage
+        # text proves the exact show help contract without its full evidence.
         body = bytes(streams['stdout']['body'])+b'\n'+bytes(streams['stderr']['body'])
         body.decode('utf-8', 'strict')
         result['supports'] = {name: bool(re.search(token, body)) for name, token in SUPPORT_TOKENS.items()}
-        if all(result['supports'].values()):
-            result.update(status='observed_complete_cli_help', reason='none')
-        else:
+        result['show_usage_header'] = any(line.strip() in {
+            header.encode('ascii') for header in HELP_EXIT_CONTRACT['showUsageHeaders']}
+            for line in body.splitlines())
+        result['stderr_class'] = classify_static_help_stderr(bytes(streams['stderr']['body']))
+        result['permission_refusal_observed'] = any(classify_static_help_stderr(line) in {
+            'eperm','sandbox_refusal'} for line in body.splitlines())
+        if result['exit_code'] not in HELP_EXIT_CONTRACT['allowedExitCodes']:
+            result['reason'] = 'cli_nonzero'
+        elif result['permission_refusal_observed']:
+            result['reason'] = 'help_permission_refusal'
+        elif not result['show_usage_header']:
+            result['reason'] = 'missing_show_usage_header'
+        elif not all(result['supports'].values()):
             result['reason'] = 'missing_help_tokens'
+        elif result['exit_code'] == 64 and result['stderr_class'] != 'usage':
+            result['reason'] = 'usage64_not_static_help'
+        else:
+            result.update(status='observed_complete_cli_help', reason='none',
+                          static_help_exit_contract_accepted=True)
     except (TimeoutError, subprocess.TimeoutExpired):
         result['reason'] = 'timeout'
     except OverflowError:
