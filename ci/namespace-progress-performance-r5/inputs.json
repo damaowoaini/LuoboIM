@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "namespace_progress_performance_r7_1205_oracle1_15_publication1_4_then_large1_privateFS_BSON_noDB_no_runtime",
+  "scope": "namespace_progress_performance_r8_1205_original_large1_CPU_alloc_diagnostic_privateFS_BSON_noDB_no_runtime",
   "parentRunner": {
     "path": "ci/namespace-progress-performance-r4/run.py",
     "bytes": 17775,
@@ -80,8 +80,8 @@
   "dependencies": [
     {
       "path": ".github/workflows/namespace-progress-performance-r5-targeted.yml",
-      "bytes": 1723,
-      "sha256": "ea2dc7771b7e7a70f30a0fdfe6d7b59e849f36c8e3e0e3a341537c8a81f9f8e9",
+      "bytes": 1703,
+      "sha256": "ef9a35785a3efbbcfe7b59c78b42be988098529a8b56b4f5b21615162f4ff90b",
       "mode": 420
     },
     {
@@ -98,45 +98,18 @@
     },
     {
       "path": "ci/namespace-progress-performance-r5/run.py",
-      "bytes": 24265,
-      "sha256": "946e6206c2fcec0660bcf30cfeb16026710a742bd681938bcd464a33938aa8fa",
+      "bytes": 31368,
+      "sha256": "1288f434701c77cbd9ce5b1751814c6512cba94d439123e612019294c168f429",
       "mode": 420
     },
     {
       "path": "ci/namespace-progress-performance-r5/test_run.py",
-      "bytes": 10268,
-      "sha256": "df512e209b7efb3ae73885f706e1772317a56a858f58272ef60a0e9dfdd57108",
+      "bytes": 15496,
+      "sha256": "2ef7a7d4434d590142d8effcf1d3e1defb28c7c3a0e28412503e08f79f1c2c88",
       "mode": 420
     }
   ],
   "phases": {
-    "short": {
-      "tops": [
-        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle"
-      ],
-      "subs": [
-        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/CID-origin-closure",
-        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/blocked-private-object",
-        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/bounded-spill",
-        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/discard",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/escaped-case-alias",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-depth-accepted",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-depth-overflow",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-float64-overflow",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-float64-underflow",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-largest-finite-float64",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-nested-duplicate",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-unicode-fold-alias",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/trailing-second-value",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-fraction",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-range",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-shape",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-items-shape",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/unknown-top-field",
-        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/valid-raw-value"
-      ]
-    },
     "large": {
       "tops": [
         "TestNamespaceProgressLargeHistoryHasNoFinalFullSweep"
@@ -211,10 +184,6 @@
     ]
   },
   "expected": {
-    "short": {
-      "topPASS": 2,
-      "subPASS": 19
-    },
     "large": {
       "topPASS": 1,
       "subPASS": 0
@@ -276,7 +245,47 @@
       "fixtureR1GoTestsAtPreparation": 0
     },
     "unselectedOriginal": "No full11/49, strictJSON26, classifier3 or current short3/13 rerun",
-    "R7GoAtPreparation": 0
+    "R7GoAtPreparation": 0,
+    "R7Actual": {
+      "run": 39004002126,
+      "job": 117312617652,
+      "head": "d1403c6864eb185afe9bdec522f30a6bb68da93b",
+      "source1205Digest": "75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779",
+      "short2top19sub": "actual PASS; exact successful names retained below, historical only, not selected again",
+      "successfulNames": {
+        "tops": [
+          "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle"
+        ],
+        "subs": [
+          "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/CID-origin-closure",
+          "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/blocked-private-object",
+          "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/bounded-spill",
+          "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/discard",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/escaped-case-alias",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-depth-accepted",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-depth-overflow",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-float64-overflow",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-float64-underflow",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-largest-finite-float64",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-nested-duplicate",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-unicode-fold-alias",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/trailing-second-value",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-fraction",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-range",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-shape",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-items-shape",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/unknown-top-field",
+          "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/valid-raw-value"
+        ]
+      },
+      "Large10001": "actually started; original600s timeout/packageFAIL in summary-rows, no named completion",
+      "receipt": {
+        "path": "references/integration/namespace-progress-r7-d140-observer-20261017/independent-terminal-receipt.json",
+        "bytes": 13913,
+        "sha256": "f2409335251c610c01f3ce1abd8a6cb5fa81fdedcd09022718eea42f8881d5ad"
+      }
+    }
   },
   "origin": {
     "R7SourceCandidateSHA256": "a1a9b71a5e521a9a551a2191e39f83cc4f5ed2a9f4763ea6c1750c1a7728e1f8",
@@ -340,5 +349,16 @@
       "server/internal/namespaceinventory/progress_metadata_test.go",
       "server/internal/namespaceinventory/progress_page_memo_test.go"
     ]
+  },
+  "profileContract": {
+    "profileMaxBytes": 8388608,
+    "reportMaxBytes": 131072,
+    "binaryMaxBytes": 268435456,
+    "topNodes": 30,
+    "toolTimeoutSeconds": 60,
+    "memProfileRate": "Go default sampled; no override",
+    "uploadTestBinary": false,
+    "primaryExitPreserved": true,
+    "freshSourceBeforeAndAfterDiagnostics": true
   }
 }

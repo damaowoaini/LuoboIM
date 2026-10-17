@@ -220,6 +220,19 @@ def flutter_bootstrap_architecture(work, environment):
            'not_a_cross_runner_release_pin': True, 'kernel_state_written': False})
 
 
+def flutter_bootstrap_version(work, lane, e, flutter):
+    # A first official invocation can write curl progress to stdout. Complete
+    # that acquisition once, then require a separate clean machine response.
+    command(work, 'flutter-bootstrap', [flutter/'bin/flutter', '--version'], work, e)
+    version = json.loads(command(work, 'flutter-version', [flutter/'bin/flutter', '--version', '--machine'], work, e))
+    if not isinstance(version, dict):
+        raise ValueError('Flutter machine metadata object required')
+    for key, wanted in [('frameworkVersion', '3.47.7'), ('frameworkRevision', lane['flutter']['commit']),
+                        ('engineRevision', lane['flutter']['engine']), ('dartSdkVersion', '3.13.5')]:
+        if version.get(key) != wanted: raise ValueError('exact Flutter/Dart release required')
+    return version
+
+
 def flutter_setup(work, lane, e):
     flutter = work/'flutter'
     command(work, 'flutter-init', ['/usr/bin/git', 'init', '--quiet', flutter], work, e)
@@ -234,11 +247,8 @@ def flutter_setup(work, lane, e):
     if (flutter/'bin/internal/engine.version').read_text().strip() != lane['flutter']['engine']:
         raise ValueError('fixed engine revision required')
     flutter_bootstrap_architecture(work, e)
-    # Fresh official bootstrap acquisition; no local cache/snapshots copied.
-    version = json.loads(command(work, 'flutter-version', [flutter/'bin/flutter', '--version', '--machine'], work, e))
-    for key, wanted in [('frameworkVersion', '3.47.7'), ('frameworkRevision', lane['flutter']['commit']),
-                        ('engineRevision', lane['flutter']['engine']), ('dartSdkVersion', '3.13.5')]:
-        if version.get(key) != wanted: raise ValueError('exact Flutter/Dart release required')
+    # Bootstrap output is kept as evidence, never parsed as machine metadata.
+    flutter_bootstrap_version(work, lane, e, flutter)
     # Preserve engine cache stamp contract from official Flutter; pre-cache is source acquisition,
     # not App compilation. The independently audited debug iOS engine must match R7 engine50.
     command(work, 'flutter-precache', [flutter/'bin/flutter', 'precache', '--ios'], work, e)

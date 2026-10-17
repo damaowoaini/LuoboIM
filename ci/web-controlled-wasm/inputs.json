@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "scope": "controlled_web_wasm_continuation8top20sub_no_rebuild_no_ABI_replay",
+  "scope": "controlled_web_ownread2top17sub_test_only_source_derivation_no_rebuild",
   "baseInputsSHA256": "7a8e8355c28421907f80f0bbc2e5231935396b0372d6bebc6d9127cf34b750c9",
   "requiredABISHA256": "3443b5eaab7e08b96829fa839ac3774f03e4df82e3c9c2dfa67dc882bfee772a",
   "resourceGuard": {
@@ -17,11 +17,6 @@
   },
   "finalManifest": "provided as explicit repo-relative CLI/workflow path plus exact SHA256; Root has not sealed final composite yet",
   "expected": {
-    "wasmwrapper": {
-      "top": 6,
-      "sub": 3,
-      "race": false
-    },
     "ownread": {
       "top": 2,
       "sub": 17,
@@ -30,7 +25,7 @@
   },
   "wasmRace": "Go js/wasm does not support race; Node wasm targeted tests are not claimed race-tested",
   "fullRegression": false,
-  "controllerPinsSHA256": "59db6b67285e98ff94c537cee07ec0dccc381351cb3dcac5b7902abaaed06eaf",
+  "controllerPinsSHA256": "fe9357989713d18634e7403407cfaaa040f45fb465cbbab8d3672870fd182687",
   "reusedValidation": {
     "run": 39004401325,
     "head": "0fcf06a8cc38b8e1087aa8ae95dfce33f04cd709",
@@ -50,8 +45,8 @@
     }
   },
   "expectedExecuted": {
-    "top": 8,
-    "sub": 20
+    "top": 2,
+    "sub": 17
   },
   "expectedReused": {
     "hostBufferplan": {
@@ -60,6 +55,17 @@
       "race": true
     },
     "WASMBuild": 1,
-    "ABI145": 1
+    "ABI145": 1,
+    "wasmwrapper": {
+      "top": 6,
+      "sub": 3,
+      "race": false
+    }
+  },
+  "testOnlyDerivation": {
+    "path": "ci/web-controlled-wasm/test-only-reused-r3-validation.json",
+    "bytes": 1742,
+    "sha256": "8c4968802ca35546ad92876910e8107e67c171abd88359243f724d3c53d81f9c",
+    "mode": "0o644"
   }
 }

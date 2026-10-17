@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R7 typed index oracle1/15 + publication1/4; then original Large10001/600s."""
+"""R8 unchanged Large10001/600s once; owned CPU/alloc profiles, no short rerun."""
 import argparse
 from collections import Counter
 import hashlib
@@ -15,7 +15,7 @@ import time
 
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
-SCOPE = 'namespace_progress_performance_r7_1205_oracle1_15_publication1_4_then_large1_privateFS_BSON_noDB_no_runtime'
+SCOPE = 'namespace_progress_performance_r8_1205_original_large1_CPU_alloc_diagnostic_privateFS_BSON_noDB_no_runtime'
 PREFIX = 'github.com/openimsdk/open-im-server/v3/'
 PACKAGE = 'internal/namespaceinventory'
 PARENT_PATH = 'ci/namespace-progress-performance-r4/run.py'
@@ -52,6 +52,21 @@ LARGE = 'TestNamespaceProgressLargeHistoryHasNoFinalFullSweep'
 FIXTURE_TARGET = 'server/internal/namespaceinventory/progress_page_memo_test.go'
 FIXTURE_OLD = b'if _, e := BeginResumableCapture(context.Background(), s, s.id.Binding, dir, l, ProgressBudget{Steps: 1, SourcePages: 1}); e != nil {'
 FIXTURE_NEW = FIXTURE_OLD.replace(b'Steps: 1,', b'Steps: 2,')
+HISTORY['R7Actual'] = {
+    'run': 39004002126, 'job': 117312617652,
+    'head': 'd1403c6864eb185afe9bdec522f30a6bb68da93b',
+    'source1205Digest': FINAL_DIGEST,
+    'short2top19sub': 'actual PASS; exact successful names retained below, historical only, not selected again',
+    'successfulNames': {'tops': sorted([INDEX_TOP, PUBLICATION_TOP]),
+        'subs': sorted([INDEX_TOP + '/' + s for s in INDEX_SUBS]
+                       + [PUBLICATION_TOP + '/' + s for s in ['discard', 'bounded-spill', 'blocked-private-object', 'CID-origin-closure']])},
+    'Large10001': 'actually started; original600s timeout/packageFAIL in summary-rows, no named completion',
+    'receipt': {'path': 'references/integration/namespace-progress-r7-d140-observer-20261017/independent-terminal-receipt.json',
+        'bytes': 13913, 'sha256': 'f2409335251c610c01f3ce1abd8a6cb5fa81fdedcd09022718eea42f8881d5ad'}}
+PROFILE_CONTRACT = {'profileMaxBytes': 8 << 20, 'reportMaxBytes': 128 << 10,
+    'binaryMaxBytes': 256 << 20, 'topNodes': 30, 'toolTimeoutSeconds': 60,
+    'memProfileRate': 'Go default sampled; no override', 'uploadTestBinary': False,
+    'primaryExitPreserved': True, 'freshSourceBeforeAndAfterDiagnostics': True}
 _PARENT = None
 
 
@@ -78,19 +93,12 @@ def core():
 
 
 def expected():
-    old = parent().expected()
-    short = {'tops': sorted([INDEX_TOP, PUBLICATION_TOP]),
-             'subs': sorted([s for s in old['subs'] if s.split('/')[0] == PUBLICATION_TOP]
-                            + [INDEX_TOP + '/' + sub for sub in INDEX_SUBS])}
-    return {'short': short, 'large': {'tops': [LARGE], 'subs': []}}
+    return {'large': {'tops': [LARGE], 'subs': []}}
 
 
 def run_expression(label):
     selected = expected()[label]
     expression = '^(' + '|'.join(selected['tops']) + ')$'
-    if label == 'short':
-        subs = sorted(s.split('/', 1)[1] for s in selected['subs'])
-        expression += '/^(' + '|'.join(subs) + ')$'
     return expression
 
 
@@ -151,11 +159,12 @@ def verify():
             or c['parentInputs']['path'] != PARENT_INPUTS or c['parentInputs']['sha256'] != PARENT_INPUTS_SHA
             or c['phases'] != expected() or c['preservedOriginalTargets'] != parent().expected()
             or c['history'] != HISTORY or c['origin'] != ORIGIN or c['sourceParent'] != SOURCE_PARENT
-            or c['expected'] != {'short': {'topPASS': 2, 'subPASS': 19}, 'large': {'topPASS': 1, 'subPASS': 0},
+            or c['profileContract'] != PROFILE_CONTRACT
+            or c['expected'] != {'large': {'topPASS': 1, 'subPASS': 0},
                                  'skip': 0, 'fail': 0, 'vet': False, 'fullRegression': False, 'databaseFixture': False}
             or len(c['dependencies']) != len(DEPENDENCY_PATHS)
             or {r['path'] for r in c['dependencies']} != DEPENDENCY_PATHS):
-        raise ValueError('exact R7 oracle1/15 publication1/4 then Large1 source1205 contract required')
+        raise ValueError('exact R8 unchanged Large1 profile-only source1205 contract required')
     for row in c['dependencies'] + [c['parentRunner'], c['parentInputs']]:
         core().pinned(row, REPO)
     prior, before = parent().verify()  # Source only; no parent run/CLI/Go.
@@ -191,7 +200,7 @@ def verify():
 
 def audit(events, code, label):
     if label not in expected():
-        raise ValueError('only fixed short or Large phase allowed')
+        raise ValueError('only unchanged original Large phase allowed')
     return core().audit(events, code, PACKAGE, expected()[label])
 
 
@@ -207,26 +216,136 @@ def check_materialized(c, bodies, work, template):
     return post
 
 
-def execute_phases(command, isolation, post):
-    outcomes = {}
-    for label, selected in expected().items():
-        expression = run_expression(label)
-        argv = isolation + ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1',
-                            '-vet=off', '-timeout=600s', '-run', expression, './' + PACKAGE]
+def owned_profile_file(path, root, limit, load=True):
+    """Fixed owned leaf only; stable body snapshots, not a native/source trust grant."""
+    if (root.resolve(strict=True) != root or not root.is_dir()
+            or path.parent != root or path.resolve(strict=True) != path):
+        raise ValueError('canonical owned profile leaf required')
+    before = path.lstat()
+    if (not stat.S_ISREG(before.st_mode) or before.st_uid != os.getuid()
+            or before.st_nlink != 1 or before.st_mode & 0o022 or before.st_size < 1
+            or before.st_size > limit):
+        raise ValueError('bounded owned profile body required')
+    digestor, parts, total = hashlib.sha256(), [], 0
+    with path.open('rb') as handle:
+        opened = os.fstat(handle.fileno())
+        if (opened.st_dev, opened.st_ino) != (before.st_dev, before.st_ino):
+            raise ValueError('profile leaf replaced before read')
+        while True:
+            block = handle.read(min(1 << 20, limit + 1 - total))
+            if not block:
+                break
+            total += len(block)
+            if total > limit:
+                raise ValueError('profile body grew beyond cap')
+            digestor.update(block)
+            if load:
+                parts.append(block)
+        after = os.fstat(handle.fileno())
+    final = path.lstat()
+    identity = lambda value: (value.st_dev, value.st_ino, value.st_mode, value.st_uid,
+        value.st_gid, value.st_nlink, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
+    if identity(before) != identity(after) or identity(before) != identity(final) or total != before.st_size:
+        raise ValueError('profile body changed during read')
+    return {'bytes': total, 'sha256': digestor.hexdigest(), 'mode': stat.S_IMODE(before.st_mode)}, b''.join(parts)
+
+
+def profile_diagnostics(command, isolation, profile_dir, output):
+    """Local pprof only after test exit, including nonzero exit. Binary stays in work."""
+    output.mkdir(mode=0o700)
+    result = {'accepted': False, 'profiles': {}, 'reports': {}, 'testBinaryUploaded': False}
+    binary = profile_dir / 'large.test'
+    try:
+        binary_row, _ = owned_profile_file(binary, profile_dir, PROFILE_CONTRACT['binaryMaxBytes'], False)
+    except (FileNotFoundError, ValueError):
+        result['binaryState'] = 'missing_or_rejected'
+        write(output / 'summary.json', result)
+        return result
+    result['binaryBody'] = binary_row
+    profiles = {}
+    for name in ['cpu', 'alloc']:
+        path = profile_dir / (name + '.pprof')
         try:
-            folder, code = command(label, argv, 900)
+            body, raw = owned_profile_file(path, profile_dir, PROFILE_CONTRACT['profileMaxBytes'])
+            if raw[:2] != b'\x1f\x8b':
+                raise ValueError('gzip profile header required')
+            profiles[name] = (path, body, raw)
+            result['profiles'][name] = dict(body, state='bounded_gzip_pending_pprof_validation')
+        except (FileNotFoundError, ValueError):
+            result['profiles'][name] = {'state': 'missing_or_rejected'}
+    views = [('cpu-top', 'cpu', []), ('alloc-objects-top', 'alloc', ['-sample_index=alloc_objects']),
+             ('alloc-space-top', 'alloc', ['-sample_index=alloc_space'])]
+    for label, name, flags in views:
+        if name not in profiles:
+            continue
+        path, before, raw = profiles[name]
+        argv = isolation + ['go', 'tool', 'pprof', '-top', '-cum', '-nodecount=30', '-symbolize=none']
+        argv += flags + [str(binary), str(path)]
+        # The regular command wrapper still enforces original resource/timeout/netns.
+        # A pprof parse error is evidence, not a successful test result.
+        folder, code = command('pprof-' + label, argv, PROFILE_CONTRACT['toolTimeoutSeconds'])
+        binary_after, _ = owned_profile_file(binary, profile_dir, PROFILE_CONTRACT['binaryMaxBytes'], False)
+        after, _ = owned_profile_file(path, profile_dir, PROFILE_CONTRACT['profileMaxBytes'])
+        if after != before or binary_after != binary_row:
+            raise ValueError('pprof changed its selected input body')
+        report = {'exit': code, 'accepted': False}
+        for filename in ['stdout.jsonl', 'stderr.log', 'resource.json', 'guard.log']:
+            source = folder / filename
+            if source.exists() and source.stat().st_size == 0:
+                continue
             try:
-                events = [json.loads(x) for x in regular(folder / 'stdout.jsonl').decode().splitlines() if x.strip()]
-                outcome = {'accepted': True, **audit(events, code, label)}
-            except (ValueError, UnicodeError, TypeError, KeyError):
-                outcome = {'accepted': False, 'exit': code, 'rawRetained': True}
-            parent().write(folder / 'summary.json', outcome)
-            outcomes[label] = outcome
-        finally:
-            post(label)  # Also recheck source after failure/timeout; never enter Large on failure.
-        if not outcome['accepted']:
-            break
-    return outcomes
+                body, content = owned_profile_file(source, folder, PROFILE_CONTRACT['reportMaxBytes'])
+            except (FileNotFoundError, ValueError):
+                report[filename] = {'state': 'missing_or_rejected'}
+                continue
+            destination = output / (label + '-' + filename)
+            with destination.open('xb') as handle:
+                handle.write(content)
+            destination.chmod(0o600)
+            report[filename] = body
+        report['accepted'] = code == 0 and 'sha256' in report.get('stdout.jsonl', {})
+        result['reports'][label] = report
+        if report['accepted'] and not (output / path.name).exists():
+            with (output / path.name).open('xb') as handle:
+                handle.write(raw)
+            (output / path.name).chmod(0o600)
+            result['profiles'][name]['state'] = 'pprof_accepted_and_body_copied_under_cap'
+    for path, before, _ in profiles.values():
+        after, _ = owned_profile_file(path, profile_dir, PROFILE_CONTRACT['profileMaxBytes'])
+        if after != before:
+            raise ValueError('pprof changed an earlier selected profile body')
+    result['accepted'] = (set(result['reports']) == {v[0] for v in views}
+                          and all(v['accepted'] for v in result['reports'].values()))
+    write(output / 'summary.json', result)
+    return result
+
+
+def execute_phases(command, isolation, post, profile_dir, diagnose):
+    argv = isolation + ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1',
+        '-vet=off', '-timeout=600s', '-run', run_expression('large'),
+        '-cpuprofile', str(profile_dir / 'cpu.pprof'), '-memprofile', str(profile_dir / 'alloc.pprof'),
+        '-o', str(profile_dir / 'large.test'), './' + PACKAGE]
+    try:
+        folder, code = command('large', argv, 900)
+        try:
+            events = [json.loads(x) for x in regular(folder / 'stdout.jsonl').decode().splitlines() if x.strip()]
+            outcome = {'accepted': True, 'exit': code, **audit(events, code, 'large')}
+        except (ValueError, UnicodeError, TypeError, KeyError):
+            outcome = {'accepted': False, 'exit': code, 'rawRetained': True}
+        # Freeze the main test outcome BEFORE any successful diagnostic command.
+        write(folder / 'summary.json', outcome)
+    finally:
+        post('large')
+    try:
+        diagnostics = diagnose()  # Natural failed test still reaches read-only diagnostics.
+    finally:
+        post('diagnostics')
+    return {'large': outcome, 'diagnostics': diagnostics}
+
+
+def final_exit(outcomes):
+    accepted = outcomes['large']['accepted'] and outcomes['diagnostics']['accepted']
+    return 0 if accepted else (outcomes['large']['exit'] or 1)
 
 
 def require_guard(record, code):
@@ -257,14 +376,14 @@ def run():
     c, bodies = verify()
     selected = expected()
     temporary = Path(os.environ['RUNNER_TEMP'])
-    work = temporary / ('namespace-progress-performance-r7-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'])
+    work = temporary / ('namespace-progress-performance-r8-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'])
     if not temporary.is_absolute() or temporary.resolve() != temporary or work.exists():
         raise ValueError('fresh canonical work required')
     fs = os.statvfs(temporary)
     if fs.f_bavail * fs.f_frsize < 4 * 1024**3:
         raise ValueError('4GiB bootstrap floor; no Go child started')
     work.mkdir(mode=0o700)
-    output = REPO / 'ci-results/namespace-progress-performance-r7'
+    output = REPO / 'ci-results/namespace-progress-performance-r8'
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     version = subprocess.check_output(['go', 'version'], text=True, timeout=15).strip()
     if version != 'go version go1.27.2 linux/amd64':
@@ -279,7 +398,7 @@ def run():
     template = bodies['server/config/config.example.yaml']
     with (work / 'server/config/config.yaml').open('xb') as handle:
         handle.write(template)
-    for folder in ['modcache', 'buildcache', 'gopath', 'tmp']:
+    for folder in ['modcache', 'buildcache', 'gopath', 'tmp', 'profiles', 'profile-reports']:
         (work / folder).mkdir(mode=0o700)
     env = test_environment(os.environ, work, goroot)
     locks = {path: bodies[path] for path in ['server/go.mod', 'server/go.sum']}
@@ -287,7 +406,8 @@ def run():
           'parent1203Digest': PARENT_DIGEST, 'parent1201Digest': parent().PARENT_DIGEST,
           'effectiveCount': 1205, 'effectiveDigest': FINAL_DIGEST, 'goVersion': version,
           'phases': selected, 'locksBefore': rows(locks), 'generatedPublicConfigSHA256': sha(template),
-          'noRuntimeAdoption': True, 'DBFixtureSelected': False, 'currentShortTop': 2, 'currentShortSub': 19,
+          'noRuntimeAdoption': True, 'DBFixtureSelected': False, 'currentLargeTop': 1, 'currentLargeSub': 0,
+          'profileContract': PROFILE_CONTRACT,
           'sourceParent1204': SOURCE_PARENT,
           'originalLarge10001_600s': True, 'history': c['history']})
 
@@ -296,7 +416,7 @@ def run():
         if remaining < 1:
             raise ValueError('whole controller budget exhausted')
         timeout = max(1, int(min(remaining, timeout)))
-        folder = output / label
+        folder = (work / 'profile-reports' if label.startswith('pprof-') else output) / label
         folder.mkdir()
         capture = [sys.executable, '-B', str(REPO / 'ci/group-effects/capture.py'), '--stdout', str(folder / 'stdout.jsonl'),
                    '--stderr', str(folder / 'stderr.log'), '--'] + argv
@@ -335,9 +455,10 @@ def run():
               'locksAfter': rows({p: post_bodies[p] for p in locks}),
               'generatedPublicConfigSHA256': sha(template)})
 
-    outcomes = execute_phases(command, isolation, post)
-    accepted = list(outcomes) == ['short', 'large'] and all(x['accepted'] for x in outcomes.values())
-    write(output / 'summary.json', {'state': 'r7_index_oracle1_15_publication1_4_and_original_large_passed' if accepted else 'failed_or_incomplete',
+    outcomes = execute_phases(command, isolation, post, work / 'profiles',
+        lambda: profile_diagnostics(command, isolation, work / 'profiles', output / 'diagnostics'))
+    accepted = outcomes['large']['accepted'] and outcomes['diagnostics']['accepted']
+    write(output / 'summary.json', {'state': 'r8_original_large_and_bounded_profiles_complete' if accepted else 'failed_or_incomplete',
           'scope': SCOPE, 'phases': outcomes, 'effectiveCount': 1205, 'sourceDigest': FINAL_DIGEST,
           'currentExecutionExpected': c['expected'], 'historicalResultsOnly': c['history'],
           'fullOriginal11_49Rerun': False, 'wholeRegression': False, 'vetRun': False,
@@ -346,7 +467,8 @@ def run():
           'workRetainedForEphemeralRunnerCleanup': True,
           'fixtureCleanup': 'not applicable; no service or container started',
           'inventoryStateAlwaysUntrustedIncomplete': True})
-    return 0 if accepted else 1
+    # Diagnostic success can never replace the exact failed main test exit.
+    return final_exit(outcomes)
 
 
 if __name__ == '__main__':
@@ -356,9 +478,9 @@ if __name__ == '__main__':
     try:
         if args.verify:
             verify()
-            print('Exact R4 helper1203 + borrowed R6 overlay4 =same1204 + formatted R7 overlay3 =1205; oracle15/publication4 then Large1; no Go/DB execution.')
+            print('Exact unchanged R7 source1205; original Large1 CPU/alloc diagnostic only, old oracle2/19 historical; no Go/DB execution.')
         else:
             raise SystemExit(run())
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError, json.JSONDecodeError):
-        print('R7 index validation incomplete; original raw retained.', file=sys.stderr)
+        print('R8 Large profiling validation incomplete; original raw retained.', file=sys.stderr)
         raise SystemExit(2)

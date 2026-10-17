@@ -19,6 +19,7 @@ import current_reuse as recovery
 import support as s
 import verify_inputs
 import rich_current
+import maven_file_origins
 import plugin_scope
 import plugin_scope_fixture
 import classpaths_current as classpaths
@@ -408,7 +409,22 @@ class Job(generic.Job):
         check_catalogue(self.context)
         self._typed_resolver_dispatch=False
         try:
-            result=parent.Job.gradle_prepare(self)
+            # Preserve the original phase dispatch/XML/lock checks. Only the
+            # origin proof uses current359's strict published-file relation.
+            self.verify()
+            e=parent.environment(self.w,False)
+            command=self.gradle('dependencies',offline=False)+['--info','-I',parent.HERE/'resolve.gradle','--write-verification-metadata','sha256']
+            log=self.cmd(command,self.w/'source/app/android',e,'gradle-dependency-setup',1800)
+            proof=maven_file_origins.audit(self.w,log.read_text(errors='replace'))
+            xml=self.w/'source/app/android/gradle/verification-metadata.xml'
+            if not xml.is_file() or '<sha256 ' not in xml.read_text():
+                raise ValueError('new actual dependency verification metadata required')
+            s.put(self.w/'evidence/gradle-verification-metadata.xml',xml.read_bytes())
+            proof['verification_metadata_sha256']=s.sha(xml)
+            proof['preexisting_hermetic_lock']=False
+            s.write_json(self.w/'evidence/dependency-origin-audit.json',proof)
+            self.verify()
+            result=None
             if self._typed_resolver_dispatch is not True:raise ValueError('production resolver not dispatched')
             rich_current.bind_origins(self.w,HERE,s.write_json)
             plugin_scope.bind_origins(self.w,HERE,self.inputs)

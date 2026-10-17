@@ -36,8 +36,8 @@ SPECS = {
   'TestOwnReadTimeEnvelopeAndIncomingIdentity','TestOwnReadTimeCoreDurablePortAndDistinctEvent'], 'subs':[
   'TestOwnReadTimeEnvelopeAndIncomingIdentity/'+s for s in ['foreign_actor','foreign_CID','foreign_peer','ordinary_message_envelope','missing_authoritative_time','duplicate_seq','outgoing_row','real_envelope_time_ignores_original_send_time','mixed_directions_keep_only_exact_incoming_rows','mixed_directions_reject_forged_outgoing_identity','mixed_directions_reject_duplicate_ID_and_seq_before_skipping']] + [
   'TestOwnReadTimeCoreDurablePortAndDistinctEvent/'+s for s in ['committed','unconfirmed','wrong_stored_identity','foreign_preflight','scope_is_captured_before_delayed_conversation_lookup','delayed_conversation_cannot_renew_history_or_owner_scope']]}}
-ACTIVE_TESTS = ['wasmwrapper','ownread']
-PHASES = ['fetch','metadata','download','module-verify','wasmwrapper','ownread']
+ACTIVE_TESTS = ['ownread']
+PHASES = ['fetch','metadata','download','module-verify','ownread']
 
 
 def sha(raw):
@@ -206,12 +206,53 @@ def remove_owned_module_cache(owned):
     return {'removed': not cache.exists(), 'directoriesOwnerWriteRestored': changed}
 
 
+def validate_test_only_derivation(contract, derivation, old_digest):
+    target = 'internal/conversation_msg/enterprise_group_read_test.go'
+    base = json.loads(regular(HERE/'base-inputs.json'))['core']
+    before = next(row for row in base if row['path'] == target)
+    if (derivation.get('target') != target or derivation.get('before') != before
+            or derivation.get('count') != 319 or len(contract['core']) != 319
+            or derivation.get('oldCoreDigest') != old_digest
+            or derivation.get('newCoreDigest') != contract['coreDigest']):
+        raise ValueError('exact declared test-only source derivation required')
+    after = next(row for row in contract['core'] if row['path'] == target)
+    if derivation.get('after') != after:
+        raise ValueError('declared test source result differs')
+    overlay = next(row for row in contract['overlay'] if row['target'] == target)
+    if overlay['path'] != 'ci/web-controlled-wasm/source/core/'+target:
+        raise ValueError('exact test-only overlay path required')
+    body = pinned(overlay, REPO)
+    added = b'\t"github.com/openimsdk/openim-sdk-core/v3/pkg/db/db_interface"\n'
+    old_type = b'func groupTestDB(t *testing.T, base string) (context.Context, *db.DataBase) {'
+    new_type = b'func groupTestDB(t *testing.T, base string) (context.Context, db_interface.DataBase) {'
+    if body.count(added) != 1 or body.count(new_type) != 1:
+        raise ValueError('exact test type/import delta required')
+    restored_body = body.replace(added,b'',1).replace(new_type,old_type,1)
+    if sha(restored_body) != before['sha256'] or len(restored_body) != before['bytes']:
+        raise ValueError('other test source or assertions changed')
+    restored = [before if row['path'] == target else row for row in contract['core']]
+    if digest(restored) != old_digest or contract['coreDigest'] == old_digest:
+        raise ValueError('other source changed or old digest aliased')
+    wrapper = derivation.get('wrapperReuse', {})
+    if (wrapper.get('run') != 39005633844
+            or wrapper.get('head') != '447193134ee076a464ea1ac75ed967d341a9b7de'
+            or wrapper.get('sourceManifestSHA256') != 'a1403514f9b961a9bc9c25f602140bb074d39951c1f16f226eae47e92d5f97d7'
+            or wrapper.get('rawArtifactID') != 12090389444
+            or wrapper.get('rawArtifactSHA256') != '89fb8ae594d70da3953d0abcd253963d13037472abd06a70bbdedb42fe327f99'
+            or wrapper.get('summary') != {'topPASS':6,'subPASS':3,'skip':0,'fail':0,'race':False}
+            or wrapper.get('sourcePostExact') is not True or wrapper.get('ownedCacheCleanup') is not True
+            or derivation.get('productionInputChanged') is not False
+            or derivation.get('goEmbedDirectivesInFixedCore') != 0):
+        raise ValueError('exact R3 wrapper reuse and unchanged production scope required')
+    return derivation
+
+
 def require_reused_validation(contract, inputs):
     reused = inputs.get('reusedValidation', {})
     if (reused.get('run') != 39004401325
             or reused.get('head') != '0fcf06a8cc38b8e1087aa8ae95dfce33f04cd709'
             or reused.get('finalManifestSHA256') != 'd897d7945cb351c9afaf6ec187a31ae51cf2872f41af011ac00f269e014034e6'
-            or reused.get('coreDigest') != contract['coreDigest']
+            or reused.get('coreDigest') != '660544b307ddb9fbaa3cb37e77184f60f4b63ae99cb62cc4fa7d16b28ffea894'
             or reused.get('buildExit') != 0
             or reused.get('hostBufferplan') != {'topPASS': 3, 'subPASS': 4, 'race': True}):
         raise ValueError('exact unchanged R2 build and host target proof required')
@@ -231,7 +272,9 @@ def require_reused_validation(contract, inputs):
             or proof.get('functionCount') != 145
             or proof.get('functionSetSHA256') != sha(('\n'.join(sorted(json.loads(regular(HERE/'required-abi.json'))['functions']))+'\n').encode())):
         raise ValueError('independently accepted R2 WASM startup proof required')
-    return reused
+    derivation_row = inputs['testOnlyDerivation']
+    validate_test_only_derivation(contract,json.loads(pinned(derivation_row,REPO)),reused['coreDigest'])
+    return {**reused,'testOnlyDerivation':derivation_row}
 
 
 def phase_allowed(label, completed):
@@ -368,7 +411,7 @@ def main():
         if sha(regular(HERE/'inputs.json'))!=inputsBefore:raise ValueError('harness inputs changed')
         write(owned/'raw/source-post.json',{'core':vector(core),'protocol':vector(owned/'source/protocol'),'supportExact':True})
         shutil.copyfile(owned/'raw/source-manifest.json',owned/'products/source-manifest.json')
-        write(owned/'products/continuation-manifest.json',{'files':vector(owned/'products'),'manifestSHA256':args.manifest_sha256,'Go':metadata,'executedTargetScope':{'top':8,'sub':20},'reusedValidation':reused,'runtimeReplacement':False,'WASMBuild':0,'ABIProbe':0})
+        write(owned/'products/continuation-manifest.json',{'files':vector(owned/'products'),'manifestSHA256':args.manifest_sha256,'Go':metadata,'executedTargetScope':{'top':2,'sub':17},'reusedValidation':reused,'runtimeReplacement':False,'WASMBuild':0,'ABIProbe':0})
         accepted=True
     finally:
         sourcePost=False;cleanup=False;postError=None;moduleCleanup=None
@@ -391,7 +434,7 @@ def main():
                 cleanup=all(not r.exists() for r in [owned/'cache',owned/'tmp',owned/'download',owned/'source'])
             finally:
                 accepted=accepted and sourcePost and cleanup and postError is None
-                write(owned/'raw/controller.json',{'accepted':accepted,'completedPhases':completed,'runtimeReplacement':False,'nativeBind':False,'SDKInit':0,'login':0,'send':0,'fullRegression':False,'ownedCacheSourceRemoved':cleanup,'sourcePostExact':sourcePost,'postErrorType':postError,'moduleCacheCleanup':moduleCleanup,'executedTargetScope':{'top':8,'sub':20},'reusedValidation':reused})
+                write(owned/'raw/controller.json',{'accepted':accepted,'completedPhases':completed,'runtimeReplacement':False,'nativeBind':False,'SDKInit':0,'login':0,'send':0,'fullRegression':False,'ownedCacheSourceRemoved':cleanup,'sourcePostExact':sourcePost,'postErrorType':postError,'moduleCacheCleanup':moduleCleanup,'plannedTargetScope':{'top':2,'sub':17},'reusedValidation':reused})
     if not accepted:raise ValueError('source or phase acceptance incomplete')
     return 0
 

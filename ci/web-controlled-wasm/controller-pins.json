@@ -3,14 +3,14 @@
   "files": [
     {
       "path": ".github/workflows/web-controlled-wasm-targeted.yml",
-      "bytes": 3197,
-      "sha256": "53aba37bf9d0254c14d6319be5795372a463ee546df8d3003a31fc662ce35811",
+      "bytes": 3187,
+      "sha256": "7b8742f9b0bf6095ec4ecc30e5a2c979856419a685d032c4f7374c0203d07e6a",
       "mode": "0o644"
     },
     {
       "path": "ci/web-controlled-wasm/README.md",
-      "bytes": 2219,
-      "sha256": "40bc89f8241cc2d2abe25608a92145f19b5d958ebed6d0f2d13b575df9643951",
+      "bytes": 1985,
+      "sha256": "bdf7ea3075a30ecee708e0ecb95a1cae70f336d199e298005bb99f44ff7d30ad",
       "mode": "0o644"
     },
     {
@@ -57,14 +57,20 @@
     },
     {
       "path": "ci/web-controlled-wasm/run.py",
-      "bytes": 25256,
-      "sha256": "e01d29b18b3defd61c0d77e6ad58adbcc5f4877a8d564e70f4cd53b21d51403c",
+      "bytes": 28344,
+      "sha256": "83863b326e1a1332fbe8904084eeb22061b0e48d8be202ab3422428c15834bf7",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/test-only-reused-r3-validation.json",
+      "bytes": 1742,
+      "sha256": "8c4968802ca35546ad92876910e8107e67c171abd88359243f724d3c53d81f9c",
       "mode": "0o644"
     },
     {
       "path": "ci/web-controlled-wasm/test_run.py",
-      "bytes": 9785,
-      "sha256": "329934b35dd6c6aa2f555836c45ae25fc2b9f3c20f1d315aa12694c419d17285",
+      "bytes": 11284,
+      "sha256": "b0291b7758215afde94007595a57be63bdab45512dda0e99d49dc713fa09e46a",
       "mode": "0o644"
     }
   ]

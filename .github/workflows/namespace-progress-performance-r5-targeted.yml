@@ -1,4 +1,4 @@
-name: Namespace progress R7 typed index oracle and publication then original Large
+name: Namespace progress R8 original Large CPU and allocation diagnostic
 
 on:
   workflow_dispatch:
@@ -7,12 +7,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: namespace-progress-performance-r7-${{ github.ref }}
+  group: namespace-progress-performance-r8-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  short-then-large:
-    name: Exact oracle1top15sub plus publication1top4sub; original10001 after sourcepost
+  original-large-profile:
+    name: Only original10001 and600s with bounded CPU and alloc evidence
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
@@ -36,13 +36,13 @@ jobs:
           go-version: '1.27.2'
           check-latest: false
           cache: false
-      - name: Only new oracle15 plus direct publication4, then unchanged Large10001/600s
+      - name: Only unchanged Large10001/600s then local pprof even after natural failure
         run: python3 -B ci/namespace-progress-performance-r5/run.py
       - name: Retain compact raw evidence on success or failure
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
-          name: namespace-progress-performance-r7-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ci-results/namespace-progress-performance-r7/
+          name: namespace-progress-performance-r8-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-results/namespace-progress-performance-r8/
           if-no-files-found: warn
           retention-days: 14

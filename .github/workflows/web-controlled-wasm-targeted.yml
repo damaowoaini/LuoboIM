@@ -1,4 +1,4 @@
-name: Controlled Web WASM continuation8top20sub (never deploy)
+name: Controlled Web WASM ownread2top17sub (never deploy)
 
 on:
   workflow_dispatch:
@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: '24.21.0'
           package-manager-cache: false
-      - name: Only WASM continuation8top20sub (no build or ABI replay)
+      - name: Only WASM ownread2top17sub (no build or ABI replay)
         run: |
           mkdir -m 700 .ci-owned
           python3 -B ci/group-effects/resource_guard.py --cwd "$GITHUB_WORKSPACE" --log "$GITHUB_WORKSPACE/controlled-wasm-outer.log" --record "$GITHUB_WORKSPACE/controlled-wasm-outer-resource.json" --min-free-mib 1024 --poll-interval .2 --allocated-root "$GITHUB_WORKSPACE/.ci-owned" --max-allocated-mib 8192 --timeout 2700 -- python3 -B ci/web-controlled-wasm/run.py --manifest "$WASM_MANIFEST" --manifest-sha256 "$WASM_MANIFEST_SHA256"

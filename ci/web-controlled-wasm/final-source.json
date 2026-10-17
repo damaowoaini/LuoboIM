@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "baseCommit": "7b156fc5557878ad6e6a07e572694af5699c6624",
   "baseInputsSHA256": "7a8e8355c28421907f80f0bbc2e5231935396b0372d6bebc6d9127cf34b750c9",
-  "harnessInputsSHA256": "6c222e887c60153276baa2980bcb85f7cc7a7c28d949fd394a2c2ab2dc0b4a76",
+  "harnessInputsSHA256": "80a58008b7f29c3f0e998274c453bd49f82fc685d79610a4e47a3237d32aec88",
   "goSumSHA256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f",
   "requiredABI": 145,
   "core": [
@@ -392,8 +392,8 @@
     },
     {
       "path": "internal/conversation_msg/enterprise_group_read_test.go",
-      "bytes": 5438,
-      "sha256": "a041b6924a820e5d2ea23f9c055b96623d1fb20986b15c63710300791b08e75b",
+      "bytes": 5510,
+      "sha256": "e26ad7108641610dc574c9479c7fc8c63e856262f09589dbfed62bcffd949e75",
       "mode": "0o644"
     },
     {
@@ -1921,8 +1921,16 @@
       "mode": "0o644"
     }
   ],
-  "coreDigest": "660544b307ddb9fbaa3cb37e77184f60f4b63ae99cb62cc4fa7d16b28ffea894",
+  "coreDigest": "1d58f4d57184511d7febfc2c0fbab5bac381d0088f634b7ffb22dd0a61e3b914",
   "overlay": [
+    {
+      "path": "ci/web-controlled-wasm/source/core/internal/conversation_msg/enterprise_group_read_test.go",
+      "bytes": 5510,
+      "sha256": "e26ad7108641610dc574c9479c7fc8c63e856262f09589dbfed62bcffd949e75",
+      "mode": "0o644",
+      "target": "internal/conversation_msg/enterprise_group_read_test.go",
+      "beforeSHA256": "a041b6924a820e5d2ea23f9c055b96623d1fb20986b15c63710300791b08e75b"
+    },
     {
       "path": "ci/web-controlled-wasm/source/core/internal/conversation_msg/own_read_time.go",
       "bytes": 9840,
@@ -2502,17 +2510,13 @@
   ],
   "protocolDigest": "e9117374cf571ae29529e19228a9fea2bcf556e919caa3b175810b5b72a74f19",
   "expectedTargetScope": {
-    "wasmwrapper": {
-      "top": 6,
-      "sub": 3
-    },
     "ownread": {
       "top": 2,
       "sub": 17
     },
     "total": {
-      "top": 8,
-      "sub": 20
+      "top": 2,
+      "sub": 17
     }
   },
   "usage": {
@@ -2538,6 +2542,23 @@
       "bytes": 1433,
       "sha256": "8b795b9f477838f61ffc5186bf193fae114ee877861c49209e81c19f313bcf8b",
       "mode": "0o644"
+    },
+    "wasmwrapper": {
+      "run": 39005633844,
+      "top": 6,
+      "sub": 3
+    },
+    "exactTestOnlyDerivation": {
+      "path": "ci/web-controlled-wasm/test-only-reused-r3-validation.json",
+      "bytes": 1742,
+      "sha256": "8c4968802ca35546ad92876910e8107e67c171abd88359243f724d3c53d81f9c",
+      "mode": "0o644"
     }
+  },
+  "testOnlyDerivation": {
+    "path": "ci/web-controlled-wasm/test-only-reused-r3-validation.json",
+    "bytes": 1742,
+    "sha256": "8c4968802ca35546ad92876910e8107e67c171abd88359243f724d3c53d81f9c",
+    "mode": "0o644"
   }
 }

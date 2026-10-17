@@ -31,14 +31,14 @@
       "sha256": "088468334147bbf6d778a041eb352972c890b66155ad1fd4f1e035e31b9a60cf"
     },
     {
-      "bytes": 16275,
+      "bytes": 16454,
       "path": "ci/apple-current359/lane.json",
-      "sha256": "7738a419345ef5749738328792d29e76483687f49edfb73cf1452b86433fcedc"
+      "sha256": "5cf8d049b230ef7de63ce95861497c50983338176d991fe3045385e65832d341"
     },
     {
-      "bytes": 33977,
+      "bytes": 34456,
       "path": "ci/apple-current359/run.py",
-      "sha256": "119539fc50b56ece8268926c33afba27193b4374fc9dc0978351e91200fa657c"
+      "sha256": "a741109dcd7355cedec093685058c28bdea91fbaf4eee7ea8020dd90fa93b197"
     },
     {
       "bytes": 3474,
@@ -59,6 +59,11 @@
       "path": "ci/apple-current359/test_tool_environment.py",
       "bytes": 5555,
       "sha256": "b8f16c4cb2da7fde53df83351ae2492f0342d8517a64240a08dd57b1b83e78cf"
+    },
+    {
+      "path": "ci/apple-current359/test_bootstrap_output.py",
+      "bytes": 2749,
+      "sha256": "91064bf4945a0473188b8cf1df680c3189d7674617a113767bed0d096b179ac5"
     }
   ],
   "identity": "current359-null2-apple-native-resolution-v2",

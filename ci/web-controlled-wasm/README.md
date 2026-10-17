@@ -1,39 +1,32 @@
-# Controlled Web WASM continuation (8 tops / 20 subs)
+# Controlled Web ownread continuation (2 tops / 17 subs)
 
-This manual lane runs only the previously failed wasmwrapper (6 tops/3 subs)
-and not-yet-started ownread (2 tops/17 subs), with exact run/pass/footer audit.
-It fetches the fixed source, verifies tools, acquires and verifies the locked
-modules, and checks source/modes before and after. It does not rebuild a product
-WASM, run host bufferplan again, or replay the standalone ABI probe.
+This manual lane runs only ownread, whose R3 package failed compilation before
+any selected case started. R3 wasmwrapper6/3 already passed. R2 product build,
+host bufferplan3/4 (race), and Root ABI145 registration are retained as separate
+source-bound evidence and are not replayed. No new product WASM is built or
+downloaded into this CI. The exact targeted result is only2/17.
 
-`reused-r2-validation.json` binds R2 run39004401325/head0fcf06a, source manifest
-`d897d794...`, actual WASM/shim hashes, the successful build and host bufferplan
-3 tops/4 subs (race), and Root's separate exact ABI145 startup observation.
-That proves registration only: init/login/database/network all remain zero.
-No R2 product artifact is downloaded into this CI. Executed8/20 and reused
-3/4 plus ABI evidence remain distinct; this is not a newly executed11/24 suite.
+The shared legacy test helper now returns db_interface.DataBase. All its old
+test bodies/HTTP fixture/assertions remain exact. The complete319-source vector
+has a new digest and20 overlays. The reuse gate verifies both source rows,
+reverses only the exact import/type edits, and reconstructs the old full319
+digest. All production source/SDK support/protocol52 and locks remain identical;
+the fixed production tree has no go:embed directives that could include the
+changed _test.go. Old and new core digests are never aliases.
 
-Only js/wasm test execution sets GOMAXPROCS=1. Other host phase limits remain
-unchanged. All source319/overlay19/protocol52/SDK review snapshots and locks
-are unchanged. SDK/consumer snapshots stay under `ci/.../source`, not production.
+`reused-r2-validation.json` and `test-only-reused-r3-validation.json` bind prior
+run/head/source/artifact hashes, actual passed counts, sourcepost and cleanup.
+They do not claim full API semantics, SDK initialization or current business
+validation. Only current ownread uses GOMAXPROCS1. Host phases retain their
+original bounds and fresh owned cache. R3's checked module-cache cleanup is
+unchanged; no source/shared/external mode is modified.
 
-Cleanup restores owner-write only on checked, canonical, this-UID directories
-inside the task's own `cache/mod`, through stable no-follow descriptors. It
-then removes that cache and the original exact owned trees. It never chmods
-source trees, source files or external/shared caches.
+Cold4GiB/floor1GiB/.2s/owned8GiB and original timeouts remain. Source/locks are
+readonly by contract; only fixed public acquisition is online, execution uses
+a real nonroot empty network namespace, and HOME remains actual. Artifacts
+contain continuation receipts, no new WASM. Nothing is deployed.
 
-Cold admission stays4GiB; continuous floor1GiB/.2s; owned8GiB; original phase
-timeouts and outer2700s remain. Actual HOME is retained, Go locks are readonly,
-only public fetch/acquisition is online, and execution remains in a real
-nonroot empty network namespace. Output artifacts are continuation receipts,
-not a new WASM. No SDK init, login, sends, deployment or full regression.
-
-Root supplies the exact final manifest SHA:
-
-```sh
-python3 -B ci/web-controlled-wasm/run.py --manifest ci/web-controlled-wasm/final-source.json --manifest-sha256 FINAL_SHA --verify
-```
-
-New runtime/cache controls2 and directly affected old phase-order control1
-are prepared for Root's one local targeted run. Original other3 controls and
-prior successful Go/build/ABI results are reused, not repeated.
+Root provides the final manifest SHA to `run.py --manifest
+ci/web-controlled-wasm/final-source.json --manifest-sha256 SHA --verify`.
+Only directly affected runtime/phase-order controls and the new test-only
+reuse control are planned locally. Other valid controls are reused.

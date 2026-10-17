@@ -1,4 +1,4 @@
-"""R7: only two directly affected controller controls; unchanged postcheck reused."""
+"""R8: one directly affected dispatch control and one bounded-profile control; no Go invocation."""
 import copy
 import hashlib
 import importlib.util
@@ -28,74 +28,145 @@ def events(label):
 
 
 class R5ControllerTests(unittest.TestCase):
-    def test_short_oracle15_publication4_and_postcheck_prevent_any_large_after_failure(self):
-        expected = SUBJECT.expected()
-        self.assertEqual((len(expected['short']['tops']), len(expected['short']['subs'])), (2, 19))
-        self.assertEqual(expected['large'], {'tops': [SUBJECT.LARGE], 'subs': []})
-        for change in ['good', 'missing-new', 'missing-old-sub', 'duplicate-pass', 'skip', 'nonzero',
-                       'race', 'missing-footer', 'foreign', 'post-failure', 'large-nonzero']:
+    def test_original_large_profiles_owned_outputs_then_diagnostics_without_overwriting_main_failure(self):
+        self.assertEqual(SUBJECT.expected(), {'large': {'tops': [SUBJECT.LARGE], 'subs': []}})
+        for change in ['good', 'missing-done', 'skip', 'nonzero', 'race', 'missing-footer',
+                       'foreign', 'post-failure', 'diagnostic-failure']:
             with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder).resolve()
-                calls, posts = [], []
+                profiles = root / 'profiles'
+                profiles.mkdir(mode=0o700)
+                calls, order = [], []
 
                 def command(label, argv, timeout):
-                    calls.append(label)
+                    calls.append(label); order.append(label)
+                    self.assertEqual(label, 'large')
                     self.assertEqual(timeout, 900)
-                    expression = '^(' + '|'.join(expected[label]['tops']) + ')$'
-                    if label == 'short':
-                        names = sorted(s.split('/', 1)[1] for s in expected[label]['subs'])
-                        expression += '/^(' + '|'.join(names) + ')$'
-                        self.assertNotIn('legacy-checkpoint', expression)
-                        for old_top in ['TestNamespaceProgressMemoKeepsCustody',
-                                'TestNamespaceProgressMetadataLookupOncePerReference',
-                                'TestNamespaceProgressResolvedMetadataRetainsBindings']:
-                            self.assertNotIn(old_top, expression)
-                        self.assertNotIn('TestNamespaceProgressContinuesAcrossEveryStage', expression)
                     self.assertEqual(argv, ['fixed-isolation', 'go', 'test', '-mod=readonly', '-p=1',
                         '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=600s',
-                        '-run', expression, './internal/namespaceinventory'])
-                    raw, code = events(label), 0
-                    if label == 'short':
-                        if change in ('missing-new', 'missing-old-sub'):
-                            name = SUBJECT.INDEX_TOP if change == 'missing-new' else SUBJECT.PUBLICATION_TOP + '/discard'
-                            raw = [e for e in raw if e.get('Test') != name]
-                        elif change == 'duplicate-pass':
-                            raw.insert(2, dict(next(e for e in raw if e.get('Test') and e['Action'] == 'pass')))
-                        elif change == 'skip':
-                            next(e for e in raw if e.get('Test') and e['Action'] == 'pass')['Action'] = 'skip'
-                        elif change == 'nonzero':
-                            code = 1
-                        elif change == 'race':
-                            raw.insert(1, {'Package': raw[0]['Package'], 'Action': 'output', 'Output': 'WARNING: DATA RACE'})
-                        elif change == 'missing-footer':
-                            raw.pop()
-                        elif change == 'foreign':
-                            raw[1]['Test'] = SUBJECT.LARGE
-                    elif change == 'large-nonzero':
-                        code = 1
+                        '-run', '^(' + SUBJECT.LARGE + ')$',
+                        '-cpuprofile', str(profiles / 'cpu.pprof'), '-memprofile', str(profiles / 'alloc.pprof'),
+                        '-o', str(profiles / 'large.test'), './internal/namespaceinventory'])
+                    raw, code = events('large'), 0
+                    if change == 'missing-done':
+                        raw = [e for e in raw if not (e.get('Test') == SUBJECT.LARGE and e['Action'] == 'pass')]
+                    elif change == 'skip':
+                        next(e for e in raw if e.get('Test') and e['Action'] == 'pass')['Action'] = 'skip'
+                    elif change == 'nonzero':
+                        code = 4
+                    elif change == 'race':
+                        raw.insert(1, {'Package': raw[0]['Package'], 'Action': 'output', 'Output': 'WARNING: DATA RACE'})
+                    elif change == 'missing-footer':
+                        raw.pop()
+                    elif change == 'foreign':
+                        raw[1]['Test'] = SUBJECT.INDEX_TOP
                     output = root / label
                     output.mkdir()
                     (output / 'stdout.jsonl').write_text(''.join(json.dumps(e) + '\n' for e in raw))
                     return output, code
 
                 def post(label):
-                    posts.append(label)
+                    order.append('post-' + label)
                     if change == 'post-failure':
                         raise ValueError('synthetic source changed')
 
+                def diagnose():
+                    order.append('diagnostics')
+                    # Main result must already be frozen, including failed exit.
+                    observed = json.loads((root / 'large/summary.json').read_text())
+                    self.assertEqual(observed['exit'], 4 if change == 'nonzero' else 0)
+                    return {'accepted': change != 'diagnostic-failure'}
+
                 if change == 'post-failure':
                     with self.assertRaisesRegex(ValueError, 'synthetic source changed'):
-                        SUBJECT.execute_phases(command, ['fixed-isolation'], post)
-                    self.assertEqual(calls, ['short'])
+                        SUBJECT.execute_phases(command, ['fixed-isolation'], post, profiles, diagnose)
+                    self.assertEqual(order, ['large', 'post-large'])
                 else:
-                    result = SUBJECT.execute_phases(command, ['fixed-isolation'], post)
-                    self.assertEqual(calls, ['short', 'large'] if change in ('good', 'large-nonzero') else ['short'])
-                    self.assertEqual(list(result), calls)
-                    self.assertEqual(all(v['accepted'] for v in result.values()), change == 'good')
-                self.assertEqual(posts, calls)
-                self.assertTrue((root / 'short/summary.json').is_file())
+                    result = SUBJECT.execute_phases(command, ['fixed-isolation'], post, profiles, diagnose)
+                    self.assertEqual(order, ['large', 'post-large', 'diagnostics', 'post-diagnostics'])
+                    self.assertEqual(result['large']['accepted'], change in ('good', 'diagnostic-failure'))
+                    self.assertEqual(SUBJECT.final_exit(result), 0 if change == 'good' else 4 if change == 'nonzero' else 1)
+                self.assertEqual(calls, ['large'])
         with self.assertRaises(ValueError):
-            SUBJECT.audit(events('short'), 0, 'large')
+            SUBJECT.audit(events('large'), 0, 'short')
+
+    def test_profile_reports_are_bounded_local_stable_and_never_publish_test_binary(self):
+        for change in ['good', 'missing-cpu', 'invalid-cpu', 'oversized-cpu', 'symlink-cpu',
+                       'oversized-report', 'tool-error', 'changed-profile', 'cross-profile-change', 'resource-stop']:
+            with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder).resolve()
+                profiles, reports = root / 'profiles', root / 'reports'
+                profiles.mkdir(mode=0o700); reports.mkdir(mode=0o700)
+                binary = profiles / 'large.test'
+                binary.write_bytes(b'controlled test binary'); binary.chmod(0o755)
+                for name in ['cpu', 'alloc']:
+                    path = profiles / (name + '.pprof')
+                    path.write_bytes(b'\x1f\x8b' + b'OS boundary profile fixture'); path.chmod(0o600)
+                cpu = profiles / 'cpu.pprof'
+                if change == 'missing-cpu':
+                    cpu.unlink()
+                elif change == 'invalid-cpu':
+                    cpu.write_bytes(b'not gzip')
+                elif change == 'oversized-cpu':
+                    cpu.write_bytes(b'\x1f\x8b' + b'x' * SUBJECT.PROFILE_CONTRACT['profileMaxBytes'])
+                elif change == 'symlink-cpu':
+                    outside = root / 'outside.pprof'; outside.write_bytes(cpu.read_bytes())
+                    cpu.unlink(); cpu.symlink_to(outside)
+                calls = []
+
+                def command(label, argv, timeout):
+                    calls.append(label)
+                    self.assertEqual(timeout, 60)
+                    name = 'cpu' if label == 'pprof-cpu-top' else 'alloc'
+                    flags = [] if name == 'cpu' else ['-sample_index=alloc_objects' if label == 'pprof-alloc-objects-top'
+                                                     else '-sample_index=alloc_space']
+                    self.assertEqual(argv, ['fixed-isolation', 'go', 'tool', 'pprof', '-top', '-cum',
+                        '-nodecount=30', '-symbolize=none'] + flags + [str(binary), str(profiles / (name + '.pprof'))])
+                    if change == 'resource-stop':
+                        raise ValueError('synthetic guard stopped')
+                    out = reports / label; out.mkdir()
+                    (out / 'stdout.jsonl').write_bytes(b'x' * (SUBJECT.PROFILE_CONTRACT['reportMaxBytes'] + 1)
+                        if change == 'oversized-report' else b'Type: cpu or allocs\nShowing controlled top view\n')
+                    (out / 'stderr.log').write_bytes(b'')
+                    (out / 'resource.json').write_text('{"status":"passed","exit_code":0}\n')
+                    (out / 'guard.log').write_text('controlled guard\n')
+                    if change == 'changed-profile':
+                        (profiles / (name + '.pprof')).write_bytes(b'\x1f\x8bchanged')
+                    elif change == 'cross-profile-change' and label == 'pprof-alloc-objects-top':
+                        cpu.write_bytes(b'\x1f\x8bchanged after CPU view')
+                    return out, 1 if change == 'tool-error' else 0
+
+                destination = root / 'artifact-diagnostics'
+                if change in ('changed-profile', 'cross-profile-change', 'resource-stop'):
+                    message = ('changed its selected input body' if change == 'changed-profile' else
+                               'changed an earlier selected profile body' if change == 'cross-profile-change' else
+                               'synthetic guard stopped')
+                    with self.assertRaisesRegex(ValueError, message):
+                        SUBJECT.profile_diagnostics(command, ['fixed-isolation'], profiles, destination)
+                    self.assertEqual(len(calls), 3 if change == 'cross-profile-change' else 1)
+                else:
+                    result = SUBJECT.profile_diagnostics(command, ['fixed-isolation'], profiles, destination)
+                    self.assertEqual(result['accepted'], change == 'good')
+                    self.assertFalse(result['testBinaryUploaded'])
+                    self.assertEqual(len(calls), 2 if change in ('missing-cpu', 'invalid-cpu', 'oversized-cpu', 'symlink-cpu') else 3)
+                    if change in ('missing-cpu', 'invalid-cpu', 'oversized-cpu', 'symlink-cpu'):
+                        self.assertEqual(result['profiles']['cpu']['state'], 'missing_or_rejected')
+                        self.assertNotIn('cpu-top', result['reports'])
+                    elif change == 'oversized-report':
+                        self.assertEqual(result['reports']['cpu-top']['stdout.jsonl']['state'], 'missing_or_rejected')
+                    elif change == 'tool-error':
+                        self.assertEqual(result['reports']['cpu-top']['exit'], 1)
+                    if change == 'good':
+                        self.assertEqual(set(result['reports']), {'cpu-top', 'alloc-objects-top', 'alloc-space-top'})
+                        self.assertTrue(all(v['accepted'] for v in result['reports'].values()))
+                        self.assertEqual((destination / 'cpu.pprof').read_bytes(), cpu.read_bytes())
+                        self.assertEqual((destination / 'alloc.pprof').read_bytes(), (profiles / 'alloc.pprof').read_bytes())
+                    else:
+                        self.assertFalse((destination / 'cpu.pprof').exists())
+                    for path in destination.iterdir():
+                        self.assertLessEqual(path.stat().st_size, SUBJECT.PROFILE_CONTRACT['profileMaxBytes'])
+                self.assertEqual(binary.read_bytes(), b'controlled test binary')
+                self.assertFalse(any(p.name.endswith('.test') for p in destination.rglob('*')))
 
     def test_overlay_is_borrowed_R6_four_plus_formatted_R7_three_and_rejects_collisions_or_drift(self):
         old = b'// exact fixture prefix\n' + SUBJECT.FIXTURE_OLD + b'\n// original assertions unchanged\n'

@@ -248,9 +248,9 @@
       "sha256": "6a17588836b2db887340c252cb0ed0179974dad3a8abf8bb78310f060b6e45c5"
     },
     {
-      "bytes": 30756,
+      "bytes": 31851,
       "path": "ci/android-current359/run.py",
-      "sha256": "1891d2bd53015f387bb08d6ae244d63c56dba31a8f6804b1058e14dd581ec851"
+      "sha256": "10699e54a674d2565b4ca50cd9cdc243effbe7a1e5d4488103ff7b56fa1b15be"
     },
     {
       "bytes": 19978,
@@ -261,6 +261,16 @@
       "bytes": 6706,
       "path": "ci/android-current359/test_plugin_scope.py",
       "sha256": "a13fb415c15df6939c521de76486edf3eaccdd41896a394ec8391ec21cd9ca41"
+    },
+    {
+      "path": "ci/android-current359/maven_file_origins.py",
+      "bytes": 13791,
+      "sha256": "561f52b35c2fe2b8fb2745fb39d89e510aefd5e2354329fab1d3f8823091b073"
+    },
+    {
+      "path": "ci/android-current359/test_maven_file_origins.py",
+      "bytes": 8070,
+      "sha256": "a108751c0631ab80deac0b0b132149d0fa84d283aa88cce236a6c3f8ebe09d42"
     }
   ],
   "controller_revision": "null2-plugin-scope-v2-init-shadow-stacktrace-exact-configuration-root",

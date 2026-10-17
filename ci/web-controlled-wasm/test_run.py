@@ -94,22 +94,22 @@ class ControllerContract(unittest.TestCase):
             self.assertFalse((root/'outside').exists())
 
 
-    def test_wasm_runtime_uses_one_processor_only_for_the_two_continuation_targets(self):
+    def test_wasm_runtime_uses_one_processor_only_for_current_continuation_target(self):
         base=lane.clean_environment({'HOME':os.environ['HOME'],'PATH':'/synthetic/bin'},Path('/synthetic/owned'),'/synthetic/go')
         self.assertEqual(base['GOMAXPROCS'],'2')
-        for label in ['wasmwrapper','ownread']:
+        for label in ['ownread']:
             current=lane.runtime_environment(base,label,{'GOOS':'js','GOARCH':'wasm','GOMAXPROCS':'8'})
             self.assertEqual(current['GOMAXPROCS'],'1')
             self.assertEqual(current['HOME'],os.environ['HOME'])
             self.assertEqual(current['GOPROXY'],'off')
         for label in ['fetch','metadata','download','module-verify']:
             self.assertEqual(lane.runtime_environment(base,label)['GOMAXPROCS'],'2')
-        for label in ['build','bufferplan','abi','unselected']:
+        for label in ['build','bufferplan','wasmwrapper','abi','unselected']:
             with self.assertRaises(ValueError):lane.runtime_environment(base,label)
         self.assertEqual(base['GOMAXPROCS'],'2')
-        self.assertEqual(lane.ACTIVE_TESTS,['wasmwrapper','ownread'])
-        self.assertEqual(sum(len(lane.SPECS[x]['tops']) for x in lane.ACTIVE_TESTS),8)
-        self.assertEqual(sum(len(lane.SPECS[x]['subs']) for x in lane.ACTIVE_TESTS),20)
+        self.assertEqual(lane.ACTIVE_TESTS,['ownread'])
+        self.assertEqual(sum(len(lane.SPECS[x]['tops']) for x in lane.ACTIVE_TESTS),2)
+        self.assertEqual(sum(len(lane.SPECS[x]['subs']) for x in lane.ACTIVE_TESTS),17)
 
     def test_real_readonly_owned_module_cache_cleanup_never_chmods_source_or_external_tree(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -133,6 +133,29 @@ class ControllerContract(unittest.TestCase):
                 (owned/'cache/mod').unlink()
             finally:
                 source.chmod(0o755);outside.chmod(0o755)
+
+
+    def test_only_declared_test_type_delta_can_reuse_R2_and_R3_results(self):
+        contract=json.loads(lane.regular(lane.HERE/'final-source.json'))
+        inputs=json.loads(lane.regular(lane.HERE/'inputs.json'))
+        derivation=json.loads(lane.pinned(inputs['testOnlyDerivation'],lane.REPO))
+        old=inputs['reusedValidation']['coreDigest']
+        self.assertEqual(lane.validate_test_only_derivation(contract,derivation,old),derivation)
+        self.assertNotEqual(contract['coreDigest'],old)
+        self.assertEqual(len(contract['core']),319)
+        self.assertEqual(len(contract['overlay']),20)
+        mutations=[lambda c,d:d.update(target='production.go'),
+                   lambda c,d:d['before'].update(sha256='0'*64),
+                   lambda c,d:d['after'].update(sha256='0'*64),
+                   lambda c,d:c.update(coreDigest=old),
+                   lambda c,d:d['wrapperReuse']['summary'].update(topPASS=5)]
+        for mutate in mutations:
+            c,d=copy.deepcopy(contract),copy.deepcopy(derivation);mutate(c,d)
+            with self.subTest(mutation=mutate),self.assertRaises(ValueError):lane.validate_test_only_derivation(c,d,old)
+        c,d=copy.deepcopy(contract),copy.deepcopy(derivation)
+        unrelated=next(row for row in c['core'] if row['path']=='wasm/cmd/main.go')
+        unrelated['sha256']='f'*64;c['coreDigest']=lane.digest(c['core']);d['newCoreDigest']=c['coreDigest']
+        with self.assertRaises(ValueError):lane.validate_test_only_derivation(c,d,old)
 
 
 if __name__=='__main__':unittest.main(verbosity=2)
