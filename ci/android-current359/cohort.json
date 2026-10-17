@@ -215,7 +215,7 @@
     {
       "bytes": 11062,
       "path": "ci/android-current359/plugin_scope_fixture.py",
-      "sha256": "efaa8c14fc17e58490d94f0f03e158704d86e0e81d7c4a30630d21bbc867ca19"
+      "sha256": "8c0589089e415707ce7615e3f89f88412ce5b0be6f0cf9098d0327cda3337d54"
     },
     {
       "bytes": 1384,
@@ -228,9 +228,9 @@
       "sha256": "25699bc89f48b00bbe58e40d7bbe8a103358015e60b0c874ca0a5ee0eebe290b"
     },
     {
-      "bytes": 44288,
+      "bytes": 45240,
       "path": "ci/android-current359/resolve.gradle",
-      "sha256": "b0a4a11f2e4a1b49d4a2e84aabfb0daa9ba1f34929a6d0ffa372139978ea0cbb"
+      "sha256": "f4b8f4f61ebe40859ef487f5e3fd402395c8b37af13b606926cf1437dc9536f0"
     },
     {
       "bytes": 71217,
@@ -253,9 +253,9 @@
       "sha256": "1891d2bd53015f387bb08d6ae244d63c56dba31a8f6804b1058e14dd581ec851"
     },
     {
-      "bytes": 17575,
+      "bytes": 19978,
       "path": "ci/android-current359/test_identity.py",
-      "sha256": "fed1e271bf43c362801cc1acbb5990e8544b8525f99b235b10c201ffccdc4deb"
+      "sha256": "7ee7a825e9398f54fe09c4a50a361dd50726050e2b6f0e8b119e00223638a10e"
     },
     {
       "bytes": 6706,
@@ -263,7 +263,7 @@
       "sha256": "a13fb415c15df6939c521de76486edf3eaccdd41896a394ec8391ec21cd9ca41"
     }
   ],
-  "controller_revision": "null2-plugin-scope-v2-init-shadow-stacktrace-component-refusal-diagnostic",
+  "controller_revision": "null2-plugin-scope-v2-init-shadow-stacktrace-exact-configuration-root",
   "core_compatibility": {
     "Go_protocol_SDK_native_source_subset_exact": true,
     "new_App_Go_build_or_current_Go_version_claim": false,
@@ -363,7 +363,7 @@
     "fixture": {
       "bytes": 11062,
       "path": "ci/android-current359/plugin_scope_fixture.py",
-      "sha256": "efaa8c14fc17e58490d94f0f03e158704d86e0e81d7c4a30630d21bbc867ca19"
+      "sha256": "8c0589089e415707ce7615e3f89f88412ce5b0be6f0cf9098d0327cda3337d54"
     },
     "mandatory_preseal_after_builtin_before_production_models": true,
     "owned_outputs_policy_unchanged": true,

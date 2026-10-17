@@ -195,14 +195,14 @@ class Current359(unittest.TestCase):
         text=(HERE/'resolve.gradle').read_text()
         prefix=text[:text.index('def selectorIdentity = ')]
         self.assertEqual(hashlib.sha256(prefix.encode()).hexdigest(),'4cfbb4c5ccc8da2b68c1eae45de77d31ae575b8c7bf3d7943760fc99f60bd484')
-        body=text.split('def componentIdentity = { component,p,c,String role ->\n',1)[1].split('\ngradle.beforeSettings',1)[0]
+        body=text.split('def componentIdentity = { component,p,c,String role,sourceResult,resolutionRoot ->\n',1)[1].split('\ngradle.beforeSettings',1)[0]
         accepted=body.split('    // Diagnostic-only;',1)[0]
-        self.assertEqual(hashlib.sha256(accepted.encode()).hexdigest(),'782366408a433075377b35ec0b2e9fe9acd40eac487a04fa7981a187f796325e')
+        self.assertEqual(hashlib.sha256(accepted.encode()).hexdigest(),'aae2c9823cf3b4d56dc8bcab7aa727761180722dc228e645ebb504cdf9d4359b')
         self.assertTrue(body.endswith("    componentRefusalDiagnostic(component,p,c,role)\n    throw new GradleException('unknown selected component identifier refused')\n}"))
-        self.assertEqual(body.count('return '),2)
-        for expression in ["componentIdentity(edge.selected.id,p,c,'edge.selected')",
-                "componentIdentity(edge.from.id,p,c,'edge.from')",
-                "componentIdentity(component,p,c,'artifact')"]:
+        self.assertEqual(body.count('return '),3)
+        for expression in ["componentIdentity(edge.selected.id,p,c,'edge.selected',edge.selected,resolutionRoot)",
+                "componentIdentity(edge.from.id,p,c,'edge.from',edge.from,resolutionRoot)",
+                "componentIdentity(component,p,c,'artifact',null,resolutionRoot)"]:
             with self.subTest(call=expression):self.assertEqual(text.count(expression),1)
         self.assertEqual(text.count('componentIdentity('),3)
         diagnostic=text.split('// Refusal diagnostics only:',1)[1].split('def componentIdentity = ',1)[0]
@@ -221,6 +221,34 @@ class Current359(unittest.TestCase):
         self.assertIn(r'/[\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u2028-\u202e\u2066-\u2069]/',diagnostic)
         self.assertNotIn('.message',diagnostic)
         self.assertEqual(hashlib.sha256(r.plugin_scope_fixture.writer_bytes(HERE)).hexdigest(),'edb7753928b27ef2d6dd8a51fb0822554563f9bcdf3a8b63cd98fbe85786008e')
+
+
+    def test_configuration_root_requires_exact_original_from_object_and_never_admits_selected_or_artifact(self):
+        # Guard the actual Groovy admission block; no mirror Python evaluator.
+        text=(HERE/'resolve.gradle').read_text()
+        branch=text.split('    // Gradle9.3.1 graph metadata only.',1)[1].split('    // Diagnostic-only;',1)[0]
+        self.assertEqual(hashlib.sha256(('    // Gradle9.3.1 graph metadata only.'+branch).encode()).hexdigest(),'8379d80c4cfd2470c229c72fb363de281cda9c560e4e18136c72d3a3ba6054f3')
+        for required in ["role == 'edge.from'",
+                'component.getClass() == org.gradle.api.internal.artifacts.DefaultRootComponentIdentifier',
+                "component.displayName == 'root'", 'sourceResult != null && resolutionRoot != null',
+                'sourceResult.is(resolutionRoot)', 'component.is(sourceResult.id)',
+                'component.is(resolutionRoot.id) && component == resolutionRoot.id',
+                'def projectProof = checkedProject(p)', "return [kind:'configuration-root'",
+                'checked_project:projectProof']:
+            with self.subTest(required=required):self.assertIn(required,branch)
+        self.assertLess(branch.index('checkedProject(p)'),branch.index('return ['))
+        self.assertEqual(branch.count('return '),1)
+        self.assertNotIn('localIdentity(',branch)
+        self.assertNotIn('approvedLocal(',branch)
+        self.assertNotIn("role == 'edge.selected'",branch)
+        self.assertNotIn("role == 'artifact'",branch)
+        capture='def resolution = c.incoming.resolutionResult\n                        def resolutionRoot = resolution.rootComponent.get()\n                        resolution.allDependencies.each'
+        self.assertIn(capture,text)
+        self.assertEqual(text.count('componentIdentity('),3)
+        self.assertIn("from:componentIdentity(edge.from.id,p,c,'edge.from',edge.from,resolutionRoot)",text)
+        self.assertIn("componentIdentity(edge.selected.id,p,c,'edge.selected',edge.selected,resolutionRoot)",text)
+        self.assertIn("componentIdentity(component,p,c,'artifact',null,resolutionRoot)",text)
+        self.assertIn("componentRefusalDiagnostic(component,p,c,role)\n    throw new GradleException('unknown selected component identifier refused')",text)
 
 
 

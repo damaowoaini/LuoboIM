@@ -470,7 +470,7 @@ def componentRefusalDiagnostic = { component,p,c,String role ->
         catch (Throwable unavailableLogger) { /* original refusal still follows */ }
     }
 }
-def componentIdentity = { component,p,c,String role ->
+def componentIdentity = { component,p,c,String role,sourceResult,resolutionRoot ->
     if (component instanceof ProjectComponentIdentifier) {
         return [kind:'project', identity:component.displayName, buildTreePath:component.buildTreePath,
                 projectPath:component.projectPath]
@@ -479,6 +479,17 @@ def componentIdentity = { component,p,c,String role ->
         checkModule(component.group, component.module, component.version)
         return [kind:'module', identity:component.displayName, group:component.group,
                 module:component.module, version:component.version]
+    }
+    // Gradle9.3.1 graph metadata only. Never admit a selected component/artifact.
+    if (role == 'edge.from' &&
+            component.getClass() == org.gradle.api.internal.artifacts.DefaultRootComponentIdentifier &&
+            component.displayName == 'root' && sourceResult != null && resolutionRoot != null &&
+            sourceResult.is(resolutionRoot) && component.is(sourceResult.id) &&
+            component.is(resolutionRoot.id) && component == resolutionRoot.id) {
+        def projectProof = checkedProject(p)
+        return [kind:'configuration-root', identity:'root',
+            component_class:component.getClass().name, project:p.path, configuration:c.name,
+            checked_project:projectProof]
     }
     // Diagnostic-only; known component branches and original refusal stay intact.
     componentRefusalDiagnostic(component,p,c,role)
@@ -545,7 +556,9 @@ gradle.projectsEvaluated {
                     configs.findAll { it.canBeResolved && !(it.name.toLowerCase() =~ /release|profile|test|lint/) }.each { c ->
                         // Inspect the complete graph, including dependencies
                         // below local projects, before filtering any artifacts.
-                        c.incoming.resolutionResult.allDependencies.each { edge ->
+                        def resolution = c.incoming.resolutionResult
+                        def resolutionRoot = resolution.rootComponent.get()
+                        resolution.allDependencies.each { edge ->
                             def requested = selectorIdentity(edge.requested)
                             if (edge instanceof UnresolvedDependencyResult) {
                                 throw new GradleException('unresolved dependency result refused: ' + requested.identity,
@@ -554,9 +567,9 @@ gradle.projectsEvaluated {
                             if (!(edge instanceof ResolvedDependencyResult)) {
                                 throw new GradleException('unknown dependency result refused: ' + requested.identity)
                             }
-                            def selected = componentIdentity(edge.selected.id,p,c,'edge.selected')
+                            def selected = componentIdentity(edge.selected.id,p,c,'edge.selected',edge.selected,resolutionRoot)
                             selections.add([project:p.path, configuration:c.name,
-                                    from:componentIdentity(edge.from.id,p,c,'edge.from'), requested:requested,
+                                    from:componentIdentity(edge.from.id,p,c,'edge.from',edge.from,resolutionRoot), requested:requested,
                                     selected:selected])
                             if (edge.selected.id instanceof ProjectComponentIdentifier) {
                                 rows.add([project:p.path, configuration:c.name,
@@ -596,7 +609,7 @@ gradle.projectsEvaluated {
                                     path:file.path, bytes:file.bytes, sha256:file.sha256])
                                 return
                             }
-                            def selected = componentIdentity(component,p,c,'artifact')
+                            def selected = componentIdentity(component,p,c,'artifact',null,resolutionRoot)
                             if (!f.isFile()) throw new GradleException('resolved external artifact missing')
                             def h = MessageDigest.getInstance('SHA-256')
                             f.withInputStream { stream ->

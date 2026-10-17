@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": ".github/workflows/web-controlled-wasm-targeted.yml",
+      "bytes": 3166,
+      "sha256": "62bc27fa2d1df45ea41c190e9f740730ae2b24f37e25691966d7cc00ad91d1a0",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/README.md",
+      "bytes": 4367,
+      "sha256": "17984a3f5fc46c9ba6f3a733e76ecc15cf2faeb58a5537b0d6bfaa86d1a34257",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/base-inputs.json",
+      "bytes": 67636,
+      "sha256": "7a8e8355c28421907f80f0bbc2e5231935396b0372d6bebc6d9127cf34b750c9",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/fetch.py",
+      "bytes": 981,
+      "sha256": "ff52b0b597dc4bf142cb86be0ac1c792d2bb8a782d2dbfb2dbc873b355cd241b",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/metadata.py",
+      "bytes": 533,
+      "sha256": "d988e98bd7597599bc8916d18807ee56eca2a86b33a8080b6448a91187dcf15f",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/observe.mjs",
+      "bytes": 1759,
+      "sha256": "a60b807d39ca8e4bc5c40803df7f6b921e27b27b8e82e8d05fef73ea910b609a",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/phase.py",
+      "bytes": 1675,
+      "sha256": "3d680bdcf863cf5f7ae63488163508a6050f26b642c811506dfac331e1a00bc0",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/required-abi.json",
+      "bytes": 4280,
+      "sha256": "3443b5eaab7e08b96829fa839ac3774f03e4df82e3c9c2dfa67dc882bfee772a",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/run.py",
+      "bytes": 20524,
+      "sha256": "9faad08cf692f05a20f6335b20422a2d97619aa6b4444b2a591e63c0fc5d97d4",
+      "mode": "0o644"
+    },
+    {
+      "path": "ci/web-controlled-wasm/test_run.py",
+      "bytes": 4698,
+      "sha256": "2593f2c44513cf2ffc26f6ba4876c9e5d08da422dc491a2b64b53e4ef2dd3479",
+      "mode": "0o644"
+    }
+  ]
+}

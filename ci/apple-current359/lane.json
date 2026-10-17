@@ -269,9 +269,9 @@
       "sha256": "088468334147bbf6d778a041eb352972c890b66155ad1fd4f1e035e31b9a60cf"
     },
     {
-      "bytes": 32365,
+      "bytes": 33977,
       "path": "ci/apple-current359/run.py",
-      "sha256": "3d9ccefcc5c085f1c06c3fd5201a40f86ad929caa3af78029b801db7bc21cd20"
+      "sha256": "119539fc50b56ece8268926c33afba27193b4374fc9dc0978351e91200fa657c"
     },
     {
       "bytes": 3474,
@@ -287,6 +287,11 @@
       "bytes": 6834,
       "path": "ci/apple-current359/test_ruby_bootstrap.py",
       "sha256": "1bc3e0a6e67e86797dc6f74c1caa0526fc366c5ac41fa9f6e2c05bd9c154b3ea"
+    },
+    {
+      "path": "ci/apple-current359/test_tool_environment.py",
+      "bytes": 5555,
+      "sha256": "b8f16c4cb2da7fde53df83351ae2492f0342d8517a64240a08dd57b1b83e78cf"
     }
   ],
   "packages": 178,

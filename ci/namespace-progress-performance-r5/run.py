@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R6 shared fixture: retry only failed3/13, then unchanged Large10001/600s."""
+"""R7 typed index oracle1/15 + publication1/4; then original Large10001/600s."""
 import argparse
 from collections import Counter
 import hashlib
@@ -15,7 +15,7 @@ import time
 
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
-SCOPE = 'namespace_progress_performance_r6_1204_failed3_13_then_large1_privateFS_BSON_noDB_no_runtime'
+SCOPE = 'namespace_progress_performance_r7_1205_oracle1_15_publication1_4_then_large1_privateFS_BSON_noDB_no_runtime'
 PREFIX = 'github.com/openimsdk/open-im-server/v3/'
 PACKAGE = 'internal/namespaceinventory'
 PARENT_PATH = 'ci/namespace-progress-performance-r4/run.py'
@@ -23,28 +23,23 @@ PARENT_INPUTS = 'ci/namespace-progress-performance-r4/inputs.json'
 PARENT_RUNNER_SHA = '0e740711a364b5ff14f52c815e966df4d3d1320f9cb48f19b69380f51f8c8275'
 PARENT_INPUTS_SHA = '50ec67c768015dd9754088bd0418cd649108f6a118375eddae3452dbc7e06d28'
 PARENT_DIGEST = '2134b7ddbb9202f85878d665ac4f44ca3566d757fe51b2941d9f48796af42465'
-FINAL_DIGEST = '3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e'
+FINAL_DIGEST = '75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779'
 DIGEST_ALGORITHM = 'ascending UTF8(path)+NUL+ASCII SHA256+LF then SHA256'
 SOURCE_MANIFEST = '061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40'
-HISTORY = {'parent1203SourceOnly': True, 'oldRun': 39000056079,
-           'oldActual': 'short original3top6sub and new legacy-checkpoint1sub passed; failed13sub stopped in shared fixture; Large unstarted',
-           'reusedOriginalPassedTops': ['TestNamespaceProgressContinuesAcrossEveryStage',
-                                      'TestNamespaceProgressImportsOldPrefixWithoutRescanning',
-                                      'TestNamespaceProgressRejectsUnboundDerivedState'],
-           'reusedPassedSub': 'TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint',
-           'oldCheckpoint4_6': 'historical R4 evidence only; unchanged checkpoint logic, not a fixture-R1 run',
-           'unselectedOriginal': 'strictJSON26 and classifier3 are not fresh passes here',
-           'fixtureR1GoTestsAtPreparation': 0}
-ORIGIN = {'originalR5SourceManifestSHA256': SOURCE_MANIFEST, 'GoFormatAtPreparation': 0,
-          'rootGofmtBeforeAdoptionRequired': True, 'GoTestsAtPreparation': 0,
-          'lineage': 'immutable R4.verify source1203 -> R5 product2/test1 unchanged plus exact shared-fixture one-byte fix -> source1204',
-          'original11top49subNamesAssertionsPreserved': True, 'onlySharedFixtureSteps1to2': True,
-          'original10001_and_600s_preserved': True}
+HISTORY = {'R6Actual': {'run': 39001760279, 'job': 117305993492, 'head': '8608b7f313a58aaef46ecaaacb1806baae1c754a', 'source1204Digest': '3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e', 'short3top13sub': 'actual PASS; reused historical only, not selected again', 'successfulNames': {'tops': ['TestNamespaceProgressMemoKeepsCustody', 'TestNamespaceProgressMetadataLookupOncePerReference', 'TestNamespaceProgressResolvedMetadataRetainsBindings'], 'subs': ['TestNamespaceProgressMemoKeepsCustody/bounded-eviction', 'TestNamespaceProgressMemoKeepsCustody/copy-isolation', 'TestNamespaceProgressMemoKeepsCustody/foreign-reference', 'TestNamespaceProgressMemoKeepsCustody/invocation-local', 'TestNamespaceProgressMemoKeepsCustody/limits', 'TestNamespaceProgressMemoKeepsCustody/private-mode', 'TestNamespaceProgressMemoKeepsCustody/raw-tamper', 'TestNamespaceProgressMemoKeepsCustody/strict-redecode', 'TestNamespaceProgressMetadataLookupOncePerReference/checked-row', 'TestNamespaceProgressMetadataLookupOncePerReference/summary-seen', 'TestNamespaceProgressResolvedMetadataRetainsBindings/number-and-row', 'TestNamespaceProgressResolvedMetadataRetainsBindings/pass-and-metaSHA', 'TestNamespaceProgressResolvedMetadataRetainsBindings/private-page-and-row']}, 'Large10001': 'actually started, Go600s timeout/packageFAIL; no completed top result', 'receipt': {'path': 'references/integration/native-r8-diag-perf-r6-observer-20261017/custody-perf-39001760279/independent-terminal-receipt.json', 'bytes': 8954, 'sha256': 'af73ee46c77d1dafe071394f7eec3ee8838543ce999db8972f6fb701506e515c'}}, 'earlierHistoryUnchanged': {'parent1203SourceOnly': True, 'oldRun': 39000056079, 'oldActual': 'short original3top6sub and new legacy-checkpoint1sub passed; failed13sub stopped in shared fixture; Large unstarted', 'reusedOriginalPassedTops': ['TestNamespaceProgressContinuesAcrossEveryStage', 'TestNamespaceProgressImportsOldPrefixWithoutRescanning', 'TestNamespaceProgressRejectsUnboundDerivedState'], 'reusedPassedSub': 'TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint', 'oldCheckpoint4_6': 'historical R4 evidence only; unchanged checkpoint logic, not a fixture-R1 run', 'unselectedOriginal': 'strictJSON26 and classifier3 are not fresh passes here', 'fixtureR1GoTestsAtPreparation': 0}, 'unselectedOriginal': 'No full11/49, strictJSON26, classifier3 or current short3/13 rerun', 'R7GoAtPreparation': 0}
+ORIGIN = {'R7SourceCandidateSHA256': 'a1a9b71a5e521a9a551a2191e39f83cc4f5ed2a9f4763ea6c1750c1a7728e1f8', 'RootActualFormat3': {'path': '.qa/namespace-progress-r7-source-format3-1/root-acceptance.json', 'bytes': 1283, 'sha256': '2d7b014cfb1356910439c2823bfd614ec434cd350668fe8b8309f8bf172e5bad'}, 'actualFormattedSources': [{'target': 'server/internal/namespaceinventory/progress_batch.go', 'formattedSource': {'path': '.qa/namespace-progress-r7-source-format3-1/source/server/internal/namespaceinventory/progress_batch.go', 'bytes': 5549, 'sha256': '275768fedbe6c8fd078f398c7a5f3f8351695a4f982db6cb18dfadd5189927cf'}, 'CI': 'ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_batch.go'}, {'target': 'server/internal/namespaceinventory/progress_index.go', 'formattedSource': {'path': '.qa/namespace-progress-r7-source-format3-1/source/server/internal/namespaceinventory/progress_index.go', 'bytes': 7522, 'sha256': '0f46357ed071b3c7f89fdb5b7a361d73bb690ae8f60ec589598acdb8331a2fb5'}, 'CI': 'ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_index.go'}, {'target': 'server/internal/namespaceinventory/progress_index_decode_test.go', 'formattedSource': {'path': '.qa/namespace-progress-r7-source-format3-1/source/server/internal/namespaceinventory/progress_index_decode_test.go', 'bytes': 2815, 'sha256': 'ce7ee655eb3c4fc2a36c242b3c8d7320b955c65b30bcdac3639043a7531a3500'}, 'CI': 'ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_index_decode_test.go'}], 'R6OriginUnchanged': {'originalR5SourceManifestSHA256': '061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40', 'GoFormatAtPreparation': 0, 'rootGofmtBeforeAdoptionRequired': True, 'GoTestsAtPreparation': 0, 'lineage': 'immutable R4.verify source1203 -> R5 product2/test1 unchanged plus exact shared-fixture one-byte fix -> source1204', 'original11top49subNamesAssertionsPreserved': True, 'onlySharedFixtureSteps1to2': True, 'original10001_and_600s_preserved': True}, 'lineage': 'verified immutable R4 source1203 + exact borrowed R6 overlay4 -> same1204 digest + Root actual formatted R7 overlay3 ->1205', 'original10001_and_600s_preserved': True, 'genericDecodeStrictAndUniqueProgressJSONUnchanged': True, 'GoTestsAtPreparation': 0}
+SOURCE_PARENT = {'count': 1204, 'digest': '3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e', 'originalR6InputsSHA256': 'aec9a0835f1f4a588f4bc6fe358e454966a23f81171cf8bbc1cdc2cdb1d0f812', 'borrowedOverlayTargets': ['server/internal/namespaceinventory/progress_capture.go', 'server/internal/namespaceinventory/progress_journal.go', 'server/internal/namespaceinventory/progress_metadata_test.go', 'server/internal/namespaceinventory/progress_page_memo_test.go']}
 SOURCE_ROOT = 'ci/namespace-progress-performance-r5/source/'
 MODIFIED = frozenset('server/internal/namespaceinventory/' + n for n in
-                     ['progress_capture.go', 'progress_journal.go', 'progress_page_memo_test.go'])
-NEW = frozenset(['server/internal/namespaceinventory/progress_metadata_test.go'])
+                     ['progress_capture.go', 'progress_journal.go', 'progress_page_memo_test.go',
+                      'progress_batch.go', 'progress_index.go'])
+NEW = frozenset(['server/internal/namespaceinventory/progress_metadata_test.go',
+                 'server/internal/namespaceinventory/progress_index_decode_test.go'])
 OVERLAY_TARGETS = MODIFIED | NEW
+R6_OVERLAY_TARGETS = frozenset(SOURCE_PARENT['borrowedOverlayTargets'])
+INDEX_TOP = 'TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle'
+PUBLICATION_TOP = 'TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted'
+INDEX_SUBS = ['valid-raw-value', 'unknown-top-field', 'escaped-case-alias', 'raw-nested-duplicate', 'raw-unicode-fold-alias', 'raw-depth-accepted', 'raw-depth-overflow', 'raw-float64-overflow', 'raw-float64-underflow', 'raw-largest-finite-float64', 'typed-depth-range', 'typed-depth-fraction', 'typed-depth-shape', 'typed-items-shape', 'trailing-second-value']
 DEPENDENCY_PATHS = frozenset([PARENT_PATH, PARENT_INPUTS,
     'ci/namespace-progress-performance-r5/run.py', 'ci/namespace-progress-performance-r5/test_run.py',
     '.github/workflows/namespace-progress-performance-r5-targeted.yml'])
@@ -84,10 +79,9 @@ def core():
 
 def expected():
     old = parent().expected()
-    short = {'tops': sorted(OLD_SHORT + NEW_TOPS),
-             'subs': sorted([s for s in old['subs'] if s.split('/')[0] in OLD_SHORT]
-                            + [top + '/' + s for top, subs in NEW_CASES.items() for s in subs
-                               if s != 'legacy-checkpoint'])}
+    short = {'tops': sorted([INDEX_TOP, PUBLICATION_TOP]),
+             'subs': sorted([s for s in old['subs'] if s.split('/')[0] == PUBLICATION_TOP]
+                            + [INDEX_TOP + '/' + sub for sub in INDEX_SUBS])}
     return {'short': short, 'large': {'tops': [LARGE], 'subs': []}}
 
 
@@ -114,8 +108,8 @@ def digest(items):
 
 def apply_overlay(c, previous, root):
     result, seen = dict(previous), set()
-    if len(c['overlay']) != 4:
-        raise ValueError('exact three-modified/one-new fixture-R1 overlay required')
+    if len(c['overlay']) != 7:
+        raise ValueError('exact borrowed R6 four plus formatted R7 three overlay required')
     for row in c['overlay']:
         target = core().name(row['target'])
         before = previous.get(target)
@@ -123,14 +117,23 @@ def apply_overlay(c, previous, root):
                 or (before is not None) != (target in MODIFIED)
                 or row['beforeSHA256'] != (sha(before) if before is not None else None)
                 or row['path'] != SOURCE_ROOT + target or row['mode'] != '0o644'):
-            raise ValueError('exact1203-before R5 sources required')
+            raise ValueError('exact1203-before borrowed R6 and formatted R7 sources required')
         seen.add(target)
         result[target] = core().pinned(row, root)
     source = root / SOURCE_ROOT
     actual = {str(p.relative_to(root)) for p in source.rglob('*') if p.is_file() or p.is_symlink()}
     if seen != OVERLAY_TARGETS or actual != {r['path'] for r in c['overlay']}:
-        raise ValueError('extra or missing R5 source')
+        raise ValueError('extra or missing R6/R7 source')
     return result
+
+
+def check_r6_source_parent(before, bodies):
+    inherited = dict(before)
+    for target in R6_OVERLAY_TARGETS:
+        inherited[target] = bodies[target]
+    if len(inherited) != SOURCE_PARENT['count'] or digest(rows(inherited)) != SOURCE_PARENT['digest']:
+        raise ValueError('exact inherited R6 source1204 digest required before R7')
+    return inherited
 
 
 def check_fixture_change(before, after):
@@ -141,28 +144,29 @@ def check_fixture_change(before, after):
 def verify():
     c = json.loads(regular(INPUTS))
     if (c['schema'] != 1 or c['scope'] != SCOPE or c['parentCount'] != 1203
-            or c['parentDigest'] != PARENT_DIGEST or c['effectiveCount'] != 1204
+            or c['parentDigest'] != PARENT_DIGEST or c['effectiveCount'] != 1205
             or c['effectiveDigest'] != FINAL_DIGEST or c['effectiveDigestAlgorithm'] != DIGEST_ALGORITHM
-            or c['sourceModeSource'] != 'verified parent1203 modes plus exact overlay4 mode0644'
+            or c['sourceModeSource'] != 'verified R4 modes plus borrowed R6 overlay4 and formatted R7 overlay3 mode0644'
             or c['parentRunner']['path'] != PARENT_PATH or c['parentRunner']['sha256'] != PARENT_RUNNER_SHA
             or c['parentInputs']['path'] != PARENT_INPUTS or c['parentInputs']['sha256'] != PARENT_INPUTS_SHA
             or c['phases'] != expected() or c['preservedOriginalTargets'] != parent().expected()
-            or c['history'] != HISTORY or c['origin'] != ORIGIN
-            or c['expected'] != {'short': {'topPASS': 3, 'subPASS': 13}, 'large': {'topPASS': 1, 'subPASS': 0},
+            or c['history'] != HISTORY or c['origin'] != ORIGIN or c['sourceParent'] != SOURCE_PARENT
+            or c['expected'] != {'short': {'topPASS': 2, 'subPASS': 19}, 'large': {'topPASS': 1, 'subPASS': 0},
                                  'skip': 0, 'fail': 0, 'vet': False, 'fullRegression': False, 'databaseFixture': False}
             or len(c['dependencies']) != len(DEPENDENCY_PATHS)
             or {r['path'] for r in c['dependencies']} != DEPENDENCY_PATHS):
-        raise ValueError('exact fixture-R1 failed3/13 then Large1 source1204 contract required')
+        raise ValueError('exact R7 oracle1/15 publication1/4 then Large1 source1205 contract required')
     for row in c['dependencies'] + [c['parentRunner'], c['parentInputs']]:
         core().pinned(row, REPO)
     prior, before = parent().verify()  # Source only; no parent run/CLI/Go.
     if len(before) != 1203 or prior['effectiveDigest'] != PARENT_DIGEST:
         raise ValueError('frozen1203 parent differs')
     bodies = apply_overlay(c, before, REPO)
+    check_r6_source_parent(before, bodies)
     modes = dict(prior['sourceModes'])
     modes.update({r['target']: 0o644 for r in c['overlay']})
-    if len(bodies) != 1204 or digest(rows(bodies)) != FINAL_DIGEST or set(modes) != set(bodies):
-        raise ValueError('source1204 bodies/modes/digest differ')
+    if len(bodies) != 1205 or digest(rows(bodies)) != FINAL_DIGEST or set(modes) != set(bodies):
+        raise ValueError('source1205 bodies/modes/digest differ')
     for p, raw in before.items():
         if p == FIXTURE_TARGET:
             check_fixture_change(raw, bodies[p])
@@ -177,6 +181,11 @@ def verify():
     loops = re.findall(rb'for _, kind := range \[\]string\{([^}]+)\}', test)
     if [re.findall(rb'"([^"\n]+)"', x) for x in loops] != [[s.encode() for s in v] for v in NEW_CASES.values()]:
         raise ValueError('exact six R5 metadata subcases required')
+    index = bodies['server/internal/namespaceinventory/progress_index_decode_test.go']
+    if Counter(x.decode() for x in re.findall(rb'^func (Test\w+)\(', index, re.M)) != Counter([INDEX_TOP]):
+        raise ValueError('only the new original-strict-index oracle top required')
+    if re.findall(rb'^\s*\{"([^"\n]+)",', index, re.M) != [name.encode() for name in INDEX_SUBS]:
+        raise ValueError('exact fifteen index oracle subcases required')
     return dict(c, sourceModes=modes), bodies
 
 
@@ -248,14 +257,14 @@ def run():
     c, bodies = verify()
     selected = expected()
     temporary = Path(os.environ['RUNNER_TEMP'])
-    work = temporary / ('namespace-progress-performance-r6-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'])
+    work = temporary / ('namespace-progress-performance-r7-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'])
     if not temporary.is_absolute() or temporary.resolve() != temporary or work.exists():
         raise ValueError('fresh canonical work required')
     fs = os.statvfs(temporary)
     if fs.f_bavail * fs.f_frsize < 4 * 1024**3:
         raise ValueError('4GiB bootstrap floor; no Go child started')
     work.mkdir(mode=0o700)
-    output = REPO / 'ci-results/namespace-progress-performance-r6'
+    output = REPO / 'ci-results/namespace-progress-performance-r7'
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     version = subprocess.check_output(['go', 'version'], text=True, timeout=15).strip()
     if version != 'go version go1.27.2 linux/amd64':
@@ -276,9 +285,10 @@ def run():
     locks = {path: bodies[path] for path in ['server/go.mod', 'server/go.sum']}
     write(output / 'source.json', {'scope': SCOPE, 'commit': os.environ['GITHUB_SHA'], 'inputsSHA256': sha(regular(INPUTS)),
           'parent1203Digest': PARENT_DIGEST, 'parent1201Digest': parent().PARENT_DIGEST,
-          'effectiveCount': 1204, 'effectiveDigest': FINAL_DIGEST, 'goVersion': version,
+          'effectiveCount': 1205, 'effectiveDigest': FINAL_DIGEST, 'goVersion': version,
           'phases': selected, 'locksBefore': rows(locks), 'generatedPublicConfigSHA256': sha(template),
-          'noRuntimeAdoption': True, 'DBFixtureSelected': False, 'retryTop': 3, 'retrySub': 13,
+          'noRuntimeAdoption': True, 'DBFixtureSelected': False, 'currentShortTop': 2, 'currentShortSub': 19,
+          'sourceParent1204': SOURCE_PARENT,
           'originalLarge10001_600s': True, 'history': c['history']})
 
     def command(label, argv, timeout):
@@ -327,8 +337,8 @@ def run():
 
     outcomes = execute_phases(command, isolation, post)
     accepted = list(outcomes) == ['short', 'large'] and all(x['accepted'] for x in outcomes.values())
-    write(output / 'summary.json', {'state': 'r6_fixture_retry3_13_and_original_large_passed' if accepted else 'failed_or_incomplete',
-          'scope': SCOPE, 'phases': outcomes, 'effectiveCount': 1204, 'sourceDigest': FINAL_DIGEST,
+    write(output / 'summary.json', {'state': 'r7_index_oracle1_15_publication1_4_and_original_large_passed' if accepted else 'failed_or_incomplete',
+          'scope': SCOPE, 'phases': outcomes, 'effectiveCount': 1205, 'sourceDigest': FINAL_DIGEST,
           'currentExecutionExpected': c['expected'], 'historicalResultsOnly': c['history'],
           'fullOriginal11_49Rerun': False, 'wholeRegression': False, 'vetRun': False,
           'runtimeSwitch': False, 'notDeployable': True, 'databaseVendorCallbackFixture': False,
@@ -346,9 +356,9 @@ if __name__ == '__main__':
     try:
         if args.verify:
             verify()
-            print('Exact immutable1203 + fixture-R1 overlay4 =1204; failed3/13 then Large1; no Go/DB execution.')
+            print('Exact R4 helper1203 + borrowed R6 overlay4 =same1204 + formatted R7 overlay3 =1205; oracle15/publication4 then Large1; no Go/DB execution.')
         else:
             raise SystemExit(run())
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError, json.JSONDecodeError):
-        print('R6 fixture validation incomplete; original raw retained.', file=sys.stderr)
+        print('R7 index validation incomplete; original raw retained.', file=sys.stderr)
         raise SystemExit(2)

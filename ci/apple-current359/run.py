@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import platform
 import signal
+import shutil
 import stat
 import subprocess
 import sys
@@ -75,7 +76,7 @@ def env(work, selected):
     ruby = Path(selected['ruby']['path'])
     # No inherited credentials/proxies/Java/Ruby options, no HOME reassignment.
     e = {k: os.environ[k] for k in ['HOME', 'USER', 'LOGNAME'] if k in os.environ}
-    e.update(PATH=str(work/'flutter/bin')+':'+str(pod.parent)+':'+str(ruby.parent)+':/usr/bin:/bin',
+    e.update(PATH=str(work/'flutter/bin')+':'+str(pod.parent)+':'+str(ruby.parent)+':/usr/bin:/bin:/usr/sbin',
              GEM_HOME=selected['gem_root'], GEM_PATH=selected['gem_root'],
              LANG='en_US.UTF-8', CI='true', TMPDIR=str(work/'tmp'),
              DEVELOPER_DIR='/Applications/Xcode_16.4.app/Contents/Developer',
@@ -195,6 +196,30 @@ def reuse_core(work, lane, spec):
            'R10_root_acceptance': lane['R10_root_acceptance'], 'new_Go_or_bind_executions': 0})
 
 
+def flutter_bootstrap_architecture(work, environment):
+    # Flutter's fixed shell bootstrap invokes this unqualified name. Resolve
+    # the real OS utility, never synthesize a machine result or copy a tool.
+    tool = '/usr/sbin/sysctl'
+    if shutil.which('sysctl', path=environment['PATH']) != tool:
+        raise ValueError('fixed system sysctl resolution required')
+    host = load(REPO/'ci/apple-host-tool/run.py', 'app359_system_sysctl')
+    before = host.fingerprint(Path(tool), 1024**2, True)
+    mode, uid = before['identity'][2], before['identity'][3]
+    if uid != 0 or not mode & 0o111 or mode & 0o022:
+        raise ValueError('nonwritable root-owned system sysctl required')
+    command(work, 'sysctl-signature', host.apple_signature_argv(tool), work, environment)
+    value = command(work, 'sysctl-arm64', [tool, '-n', 'hw.optional.arm64'], work, environment)
+    if (value != b'1\n' or packaging.regular(work/'evidence/sysctl-arm64.stderr.log', 64*1024)):
+        raise ValueError('exact real ARM64 sysctl result required')
+    after = host.fingerprint(Path(tool), 1024**2, True)
+    if after != before:
+        raise ValueError('system sysctl changed during bootstrap query')
+    record(work/'evidence/system-sysctl.json', {'before': before, 'after': after,
+           'query': [tool, '-n', 'hw.optional.arm64'], 'Apple_signature_verified': True,
+           'origin': 'selected macOS installed Apple utility; first cloud body observation',
+           'not_a_cross_runner_release_pin': True, 'kernel_state_written': False})
+
+
 def flutter_setup(work, lane, e):
     flutter = work/'flutter'
     command(work, 'flutter-init', ['/usr/bin/git', 'init', '--quiet', flutter], work, e)
@@ -208,6 +233,7 @@ def flutter_setup(work, lane, e):
         consume.read_file(flutter, row)
     if (flutter/'bin/internal/engine.version').read_text().strip() != lane['flutter']['engine']:
         raise ValueError('fixed engine revision required')
+    flutter_bootstrap_architecture(work, e)
     # Fresh official bootstrap acquisition; no local cache/snapshots copied.
     version = json.loads(command(work, 'flutter-version', [flutter/'bin/flutter', '--version', '--machine'], work, e))
     for key, wanted in [('frameworkVersion', '3.47.7'), ('frameworkRevision', lane['flutter']['commit']),

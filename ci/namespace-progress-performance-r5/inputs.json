@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "namespace_progress_performance_r6_1204_failed3_13_then_large1_privateFS_BSON_noDB_no_runtime",
+  "scope": "namespace_progress_performance_r7_1205_oracle1_15_publication1_4_then_large1_privateFS_BSON_noDB_no_runtime",
   "parentRunner": {
     "path": "ci/namespace-progress-performance-r4/run.py",
     "bytes": 17775,
@@ -15,10 +15,10 @@
   },
   "parentCount": 1203,
   "parentDigest": "2134b7ddbb9202f85878d665ac4f44ca3566d757fe51b2941d9f48796af42465",
-  "effectiveCount": 1204,
-  "effectiveDigest": "3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e",
+  "effectiveCount": 1205,
+  "effectiveDigest": "75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779",
   "effectiveDigestAlgorithm": "ascending UTF8(path)+NUL+ASCII SHA256+LF then SHA256",
-  "sourceModeSource": "verified parent1203 modes plus exact overlay4 mode0644",
+  "sourceModeSource": "verified R4 modes plus borrowed R6 overlay4 and formatted R7 overlay3 mode0644",
   "overlay": [
     {
       "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_capture.go",
@@ -51,13 +51,37 @@
       "mode": "0o644",
       "target": "server/internal/namespaceinventory/progress_page_memo_test.go",
       "beforeSHA256": "0632abe9506c1cb1beac83dceff7a9d7ca0605ba4e249a3c267a3657ec75afd2"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_batch.go",
+      "bytes": 5549,
+      "sha256": "275768fedbe6c8fd078f398c7a5f3f8351695a4f982db6cb18dfadd5189927cf",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_batch.go",
+      "beforeSHA256": "93a387fc4328a099b615822c552687f5273d987dc1041512e9e7e72222ebff34"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_index.go",
+      "bytes": 7522,
+      "sha256": "0f46357ed071b3c7f89fdb5b7a361d73bb690ae8f60ec589598acdb8331a2fb5",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_index.go",
+      "beforeSHA256": "0512e9096c1143ccb42770293f31aab50a1605be993465ea71d5a3a3382c4500"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_index_decode_test.go",
+      "bytes": 2815,
+      "sha256": "ce7ee655eb3c4fc2a36c242b3c8d7320b955c65b30bcdac3639043a7531a3500",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_index_decode_test.go",
+      "beforeSHA256": null
     }
   ],
   "dependencies": [
     {
       "path": ".github/workflows/namespace-progress-performance-r5-targeted.yml",
-      "bytes": 1678,
-      "sha256": "7a95fdbcda9cfa8d7aed2e4033800978d393627672edc2964b71405d67bec287",
+      "bytes": 1723,
+      "sha256": "ea2dc7771b7e7a70f30a0fdfe6d7b59e849f36c8e3e0e3a341537c8a81f9f8e9",
       "mode": 420
     },
     {
@@ -74,38 +98,43 @@
     },
     {
       "path": "ci/namespace-progress-performance-r5/run.py",
-      "bytes": 18574,
-      "sha256": "88e8a530053b8e89d132536d664e665e8d4839bfe12a2413369e2f19532c9ca8",
+      "bytes": 24265,
+      "sha256": "946e6206c2fcec0660bcf30cfeb16026710a742bd681938bcd464a33938aa8fa",
       "mode": 420
     },
     {
       "path": "ci/namespace-progress-performance-r5/test_run.py",
-      "bytes": 9937,
-      "sha256": "c309ae93d67dd57be07ee7749a7011217c850168339c1d79aeb18d676e166df1",
+      "bytes": 10268,
+      "sha256": "df512e209b7efb3ae73885f706e1772317a56a858f58272ef60a0e9dfdd57108",
       "mode": 420
     }
   ],
   "phases": {
     "short": {
       "tops": [
-        "TestNamespaceProgressMemoKeepsCustody",
-        "TestNamespaceProgressMetadataLookupOncePerReference",
-        "TestNamespaceProgressResolvedMetadataRetainsBindings"
+        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle"
       ],
       "subs": [
-        "TestNamespaceProgressMemoKeepsCustody/bounded-eviction",
-        "TestNamespaceProgressMemoKeepsCustody/copy-isolation",
-        "TestNamespaceProgressMemoKeepsCustody/foreign-reference",
-        "TestNamespaceProgressMemoKeepsCustody/invocation-local",
-        "TestNamespaceProgressMemoKeepsCustody/limits",
-        "TestNamespaceProgressMemoKeepsCustody/private-mode",
-        "TestNamespaceProgressMemoKeepsCustody/raw-tamper",
-        "TestNamespaceProgressMemoKeepsCustody/strict-redecode",
-        "TestNamespaceProgressMetadataLookupOncePerReference/checked-row",
-        "TestNamespaceProgressMetadataLookupOncePerReference/summary-seen",
-        "TestNamespaceProgressResolvedMetadataRetainsBindings/number-and-row",
-        "TestNamespaceProgressResolvedMetadataRetainsBindings/pass-and-metaSHA",
-        "TestNamespaceProgressResolvedMetadataRetainsBindings/private-page-and-row"
+        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/CID-origin-closure",
+        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/blocked-private-object",
+        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/bounded-spill",
+        "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/discard",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/escaped-case-alias",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-depth-accepted",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-depth-overflow",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-float64-overflow",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-float64-underflow",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-largest-finite-float64",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-nested-duplicate",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/raw-unicode-fold-alias",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/trailing-second-value",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-fraction",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-range",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-depth-shape",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/typed-items-shape",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/unknown-top-field",
+        "TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle/valid-raw-value"
       ]
     },
     "large": {
@@ -183,8 +212,8 @@
   },
   "expected": {
     "short": {
-      "topPASS": 3,
-      "subPASS": 13
+      "topPASS": 2,
+      "subPASS": 19
     },
     "large": {
       "topPASS": 1,
@@ -197,28 +226,119 @@
     "databaseFixture": false
   },
   "history": {
-    "parent1203SourceOnly": true,
-    "oldRun": 39000056079,
-    "oldActual": "short original3top6sub and new legacy-checkpoint1sub passed; failed13sub stopped in shared fixture; Large unstarted",
-    "reusedOriginalPassedTops": [
-      "TestNamespaceProgressContinuesAcrossEveryStage",
-      "TestNamespaceProgressImportsOldPrefixWithoutRescanning",
-      "TestNamespaceProgressRejectsUnboundDerivedState"
-    ],
-    "reusedPassedSub": "TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint",
-    "oldCheckpoint4_6": "historical R4 evidence only; unchanged checkpoint logic, not a fixture-R1 run",
-    "unselectedOriginal": "strictJSON26 and classifier3 are not fresh passes here",
-    "fixtureR1GoTestsAtPreparation": 0
+    "R6Actual": {
+      "run": 39001760279,
+      "job": 117305993492,
+      "head": "8608b7f313a58aaef46ecaaacb1806baae1c754a",
+      "source1204Digest": "3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e",
+      "short3top13sub": "actual PASS; reused historical only, not selected again",
+      "successfulNames": {
+        "tops": [
+          "TestNamespaceProgressMemoKeepsCustody",
+          "TestNamespaceProgressMetadataLookupOncePerReference",
+          "TestNamespaceProgressResolvedMetadataRetainsBindings"
+        ],
+        "subs": [
+          "TestNamespaceProgressMemoKeepsCustody/bounded-eviction",
+          "TestNamespaceProgressMemoKeepsCustody/copy-isolation",
+          "TestNamespaceProgressMemoKeepsCustody/foreign-reference",
+          "TestNamespaceProgressMemoKeepsCustody/invocation-local",
+          "TestNamespaceProgressMemoKeepsCustody/limits",
+          "TestNamespaceProgressMemoKeepsCustody/private-mode",
+          "TestNamespaceProgressMemoKeepsCustody/raw-tamper",
+          "TestNamespaceProgressMemoKeepsCustody/strict-redecode",
+          "TestNamespaceProgressMetadataLookupOncePerReference/checked-row",
+          "TestNamespaceProgressMetadataLookupOncePerReference/summary-seen",
+          "TestNamespaceProgressResolvedMetadataRetainsBindings/number-and-row",
+          "TestNamespaceProgressResolvedMetadataRetainsBindings/pass-and-metaSHA",
+          "TestNamespaceProgressResolvedMetadataRetainsBindings/private-page-and-row"
+        ]
+      },
+      "Large10001": "actually started, Go600s timeout/packageFAIL; no completed top result",
+      "receipt": {
+        "path": "references/integration/native-r8-diag-perf-r6-observer-20261017/custody-perf-39001760279/independent-terminal-receipt.json",
+        "bytes": 8954,
+        "sha256": "af73ee46c77d1dafe071394f7eec3ee8838543ce999db8972f6fb701506e515c"
+      }
+    },
+    "earlierHistoryUnchanged": {
+      "parent1203SourceOnly": true,
+      "oldRun": 39000056079,
+      "oldActual": "short original3top6sub and new legacy-checkpoint1sub passed; failed13sub stopped in shared fixture; Large unstarted",
+      "reusedOriginalPassedTops": [
+        "TestNamespaceProgressContinuesAcrossEveryStage",
+        "TestNamespaceProgressImportsOldPrefixWithoutRescanning",
+        "TestNamespaceProgressRejectsUnboundDerivedState"
+      ],
+      "reusedPassedSub": "TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint",
+      "oldCheckpoint4_6": "historical R4 evidence only; unchanged checkpoint logic, not a fixture-R1 run",
+      "unselectedOriginal": "strictJSON26 and classifier3 are not fresh passes here",
+      "fixtureR1GoTestsAtPreparation": 0
+    },
+    "unselectedOriginal": "No full11/49, strictJSON26, classifier3 or current short3/13 rerun",
+    "R7GoAtPreparation": 0
   },
   "origin": {
-    "originalR5SourceManifestSHA256": "061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40",
-    "GoFormatAtPreparation": 0,
-    "rootGofmtBeforeAdoptionRequired": true,
-    "GoTestsAtPreparation": 0,
-    "lineage": "immutable R4.verify source1203 -> R5 product2/test1 unchanged plus exact shared-fixture one-byte fix -> source1204",
-    "original11top49subNamesAssertionsPreserved": true,
-    "onlySharedFixtureSteps1to2": true,
-    "original10001_and_600s_preserved": true
+    "R7SourceCandidateSHA256": "a1a9b71a5e521a9a551a2191e39f83cc4f5ed2a9f4763ea6c1750c1a7728e1f8",
+    "RootActualFormat3": {
+      "path": ".qa/namespace-progress-r7-source-format3-1/root-acceptance.json",
+      "bytes": 1283,
+      "sha256": "2d7b014cfb1356910439c2823bfd614ec434cd350668fe8b8309f8bf172e5bad"
+    },
+    "actualFormattedSources": [
+      {
+        "target": "server/internal/namespaceinventory/progress_batch.go",
+        "formattedSource": {
+          "path": ".qa/namespace-progress-r7-source-format3-1/source/server/internal/namespaceinventory/progress_batch.go",
+          "bytes": 5549,
+          "sha256": "275768fedbe6c8fd078f398c7a5f3f8351695a4f982db6cb18dfadd5189927cf"
+        },
+        "CI": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_batch.go"
+      },
+      {
+        "target": "server/internal/namespaceinventory/progress_index.go",
+        "formattedSource": {
+          "path": ".qa/namespace-progress-r7-source-format3-1/source/server/internal/namespaceinventory/progress_index.go",
+          "bytes": 7522,
+          "sha256": "0f46357ed071b3c7f89fdb5b7a361d73bb690ae8f60ec589598acdb8331a2fb5"
+        },
+        "CI": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_index.go"
+      },
+      {
+        "target": "server/internal/namespaceinventory/progress_index_decode_test.go",
+        "formattedSource": {
+          "path": ".qa/namespace-progress-r7-source-format3-1/source/server/internal/namespaceinventory/progress_index_decode_test.go",
+          "bytes": 2815,
+          "sha256": "ce7ee655eb3c4fc2a36c242b3c8d7320b955c65b30bcdac3639043a7531a3500"
+        },
+        "CI": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_index_decode_test.go"
+      }
+    ],
+    "R6OriginUnchanged": {
+      "originalR5SourceManifestSHA256": "061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40",
+      "GoFormatAtPreparation": 0,
+      "rootGofmtBeforeAdoptionRequired": true,
+      "GoTestsAtPreparation": 0,
+      "lineage": "immutable R4.verify source1203 -> R5 product2/test1 unchanged plus exact shared-fixture one-byte fix -> source1204",
+      "original11top49subNamesAssertionsPreserved": true,
+      "onlySharedFixtureSteps1to2": true,
+      "original10001_and_600s_preserved": true
+    },
+    "lineage": "verified immutable R4 source1203 + exact borrowed R6 overlay4 -> same1204 digest + Root actual formatted R7 overlay3 ->1205",
+    "original10001_and_600s_preserved": true,
+    "genericDecodeStrictAndUniqueProgressJSONUnchanged": true,
+    "GoTestsAtPreparation": 0
   },
-  "notDeployable": true
+  "notDeployable": true,
+  "sourceParent": {
+    "count": 1204,
+    "digest": "3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e",
+    "originalR6InputsSHA256": "aec9a0835f1f4a588f4bc6fe358e454966a23f81171cf8bbc1cdc2cdb1d0f812",
+    "borrowedOverlayTargets": [
+      "server/internal/namespaceinventory/progress_capture.go",
+      "server/internal/namespaceinventory/progress_journal.go",
+      "server/internal/namespaceinventory/progress_metadata_test.go",
+      "server/internal/namespaceinventory/progress_page_memo_test.go"
+    ]
+  }
 }

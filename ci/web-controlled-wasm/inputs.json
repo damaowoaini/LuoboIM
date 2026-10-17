@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "scope": "controlled_web_wasm_build_targeted_no_runtime_no_native_no_send",
+  "baseInputsSHA256": "7a8e8355c28421907f80f0bbc2e5231935396b0372d6bebc6d9127cf34b750c9",
+  "requiredABISHA256": "3443b5eaab7e08b96829fa839ac3774f03e4df82e3c9c2dfa67dc882bfee772a",
+  "resourceGuard": {
+    "path": "ci/group-effects/resource_guard.py",
+    "sha256": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c"
+  },
+  "go": "go1.27.2",
+  "node": "v24.21.0",
+  "resources": {
+    "coldFreeBytes": 4294967296,
+    "continuousFreeMiB": 1024,
+    "allocatedMiB": 8192,
+    "pollSeconds": 0.2
+  },
+  "finalManifest": "provided as explicit repo-relative CLI/workflow path plus exact SHA256; Root has not sealed final composite yet",
+  "expected": {
+    "bufferplan": {
+      "top": 3,
+      "sub": 4,
+      "race": true
+    },
+    "wasmwrapper": {
+      "top": 6,
+      "sub": 3,
+      "race": false
+    },
+    "ownread": {
+      "top": 2,
+      "sub": 17,
+      "race": false
+    },
+    "ABI": 145
+  },
+  "wasmRace": "Go js/wasm does not support race; Node wasm targeted tests are not claimed race-tested",
+  "fullRegression": false,
+  "controllerPinsSHA256": "ce2a442b5fe9996cba3caa2ef864546751442b65d0c7f06202b8b6f16ca6647f"
+}

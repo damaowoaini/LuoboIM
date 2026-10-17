@@ -1,0 +1,77 @@
+name: Controlled Web WASM targeted build (never deploy)
+
+on:
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: 'Exact committed final core/support composition manifest'
+        required: true
+        default: 'ci/web-controlled-wasm/final-source.json'
+        type: string
+      manifest_sha256:
+        description: 'Root reviewed final composition manifest SHA256'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-controlled-wasm-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  source-target-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      GOTOOLCHAIN: local
+      GOENV: 'off'
+      GOWORK: 'off'
+      GOAUTH: 'off'
+      WASM_MANIFEST: ${{ inputs.manifest }}
+      WASM_MANIFEST_SHA256: ${{ inputs.manifest_sha256 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Public source and final composition metadata only
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/web-controlled-wasm/run.py --manifest "$WASM_MANIFEST" --manifest-sha256 "$WASM_MANIFEST_SHA256" --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Fixed-source build and only targeted11 plus startup ABI145
+        run: |
+          mkdir -m 700 .ci-owned
+          python3 -B ci/group-effects/resource_guard.py --cwd "$GITHUB_WORKSPACE" --log "$GITHUB_WORKSPACE/controlled-wasm-outer.log" --record "$GITHUB_WORKSPACE/controlled-wasm-outer-resource.json" --min-free-mib 1024 --poll-interval .2 --allocated-root "$GITHUB_WORKSPACE/.ci-owned" --max-allocated-mib 8192 --timeout 2700 -- python3 -B ci/web-controlled-wasm/run.py --manifest "$WASM_MANIFEST" --manifest-sha256 "$WASM_MANIFEST_SHA256"
+      - name: Always retain compact source/lock/phase/process evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: web-controlled-wasm-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .ci-owned/web-controlled-wasm/raw/
+            .ci-owned/web-controlled-wasm/ownership.json
+            controlled-wasm-outer.log
+            controlled-wasm-outer-resource.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Separate rebuilt WASM and matching glue (review only)
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: web-controlled-wasm-products-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci-owned/web-controlled-wasm/products/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14

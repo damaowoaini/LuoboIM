@@ -1,4 +1,4 @@
-"""R6: two directly affected pure controls; third unchanged R5 control is reused."""
+"""R7: only two directly affected controller controls; unchanged postcheck reused."""
 import copy
 import hashlib
 import importlib.util
@@ -28,9 +28,9 @@ def events(label):
 
 
 class R5ControllerTests(unittest.TestCase):
-    def test_short_exact_gate_and_postcheck_prevent_any_large_after_failure(self):
+    def test_short_oracle15_publication4_and_postcheck_prevent_any_large_after_failure(self):
         expected = SUBJECT.expected()
-        self.assertEqual((len(expected['short']['tops']), len(expected['short']['subs'])), (3, 13))
+        self.assertEqual((len(expected['short']['tops']), len(expected['short']['subs'])), (2, 19))
         self.assertEqual(expected['large'], {'tops': [SUBJECT.LARGE], 'subs': []})
         for change in ['good', 'missing-new', 'missing-old-sub', 'duplicate-pass', 'skip', 'nonzero',
                        'race', 'missing-footer', 'foreign', 'post-failure', 'large-nonzero']:
@@ -46,6 +46,10 @@ class R5ControllerTests(unittest.TestCase):
                         names = sorted(s.split('/', 1)[1] for s in expected[label]['subs'])
                         expression += '/^(' + '|'.join(names) + ')$'
                         self.assertNotIn('legacy-checkpoint', expression)
+                        for old_top in ['TestNamespaceProgressMemoKeepsCustody',
+                                'TestNamespaceProgressMetadataLookupOncePerReference',
+                                'TestNamespaceProgressResolvedMetadataRetainsBindings']:
+                            self.assertNotIn(old_top, expression)
                         self.assertNotIn('TestNamespaceProgressContinuesAcrossEveryStage', expression)
                     self.assertEqual(argv, ['fixed-isolation', 'go', 'test', '-mod=readonly', '-p=1',
                         '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=600s',
@@ -53,7 +57,7 @@ class R5ControllerTests(unittest.TestCase):
                     raw, code = events(label), 0
                     if label == 'short':
                         if change in ('missing-new', 'missing-old-sub'):
-                            name = SUBJECT.NEW_TOPS[0] if change == 'missing-new' else 'TestNamespaceProgressMemoKeepsCustody/raw-tamper'
+                            name = SUBJECT.INDEX_TOP if change == 'missing-new' else SUBJECT.PUBLICATION_TOP + '/discard'
                             raw = [e for e in raw if e.get('Test') != name]
                         elif change == 'duplicate-pass':
                             raw.insert(2, dict(next(e for e in raw if e.get('Test') and e['Action'] == 'pass')))
@@ -93,7 +97,7 @@ class R5ControllerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             SUBJECT.audit(events('short'), 0, 'large')
 
-    def test_overlay_is_exact_three_modified_one_new_and_rejects_collisions_or_drift(self):
+    def test_overlay_is_borrowed_R6_four_plus_formatted_R7_three_and_rejects_collisions_or_drift(self):
         old = b'// exact fixture prefix\n' + SUBJECT.FIXTURE_OLD + b'\n// original assertions unchanged\n'
         new = old.replace(SUBJECT.FIXTURE_OLD, SUBJECT.FIXTURE_NEW, 1)
         SUBJECT.check_fixture_change(old, new)
@@ -112,7 +116,7 @@ class R5ControllerTests(unittest.TestCase):
                 overlay.append({'path': str(path.relative_to(root)), 'target': target, 'bytes': path.stat().st_size,
                     'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'mode': '0o644',
                     'beforeSHA256': hashlib.sha256(previous[target]).hexdigest() if target in previous else None})
-            self.assertEqual(len(SUBJECT.apply_overlay({'overlay': overlay}, previous, root)), 4)
+            self.assertEqual(len(SUBJECT.apply_overlay({'overlay': overlay}, previous, root)), 7)
             for change in ['missing-modified', 'before-drift', 'new-collision', 'duplicate', 'extra', 'mode', 'wrong-lane', 'body']:
                 bad, before = copy.deepcopy(overlay), dict(previous)
                 n = next(i for i, r in enumerate(bad) if r['target'] in SUBJECT.NEW)

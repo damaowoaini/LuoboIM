@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "scope": "review_only_sdk_and_Web_consumer_source_no_runtime_replacement",
+  "finalSDKPatchCount": 12,
+  "existingContext": 2,
+  "consumerSources": 3,
+  "files": [
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/buffer-source/window-buffer.js",
+      "bytes": 5390,
+      "sha256": "658df3f590e051fe579f6c299b81b09374cc1d89d87fc6f48905a5b03b2fc789",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/buffer-source/worker-buffer.js",
+      "bytes": 3397,
+      "sha256": "ac61402849c86f979c3c7af2167eda172ab07b407a1218c414193868688ef4b3",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__constant__index.d.ts.patched",
+      "bytes": 3031,
+      "sha256": "8236ed18979e695b85fa856e4879c3b4da2f7b90133bb5616a098f9bb57707ca",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__index.es.js.patched",
+      "bytes": 114860,
+      "sha256": "2d7b219249bd3d0d8c730d368ede97ddc4dad40bacafd4db529c69ce160c17e2",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__index.js.patched",
+      "bytes": 115756,
+      "sha256": "f390481393be616fb14928e346b28742d9a6bfdcbf0f72e812db07b76473f1a7",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__index.umd.js.patched",
+      "bytes": 120206,
+      "sha256": "5bcbf2f346219466185fa52cfc2d71c473fef0a7737fe5bd93b60301c0b4b41c",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__types__entity.d.ts.patched",
+      "bytes": 11816,
+      "sha256": "ece6192a1cf24250c6f29474ff18a4df8e905c8d4ffac0fbe931abebd344c5d4",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__worker-legacy.js.patched",
+      "bytes": 250451,
+      "sha256": "ecdb844877b03ca4a7a753773da50fbf49ebd69c4a675a67219a05a94f3ccc0a",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__worker.js.patched",
+      "bytes": 250420,
+      "sha256": "457583dfbb0b0593d9ba3c7e86b90bd4f11fa1af3ab8c8bf383e7a49bb234efc",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/own-readtime-source/metadata-lifecycle.js",
+      "bytes": 3217,
+      "sha256": "3f130cc56d6ea9c0765a1be94ef6e6dd7b8735ddb33d368359b0343dddbf8a63",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/own-readtime-source/own-read-time-window.js",
+      "bytes": 1733,
+      "sha256": "6edd89b9d4840137ad507adb5bef671af51dc8367cb72b90848640b0bc290466",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/own-readtime-source/own-read-time-worker.js",
+      "bytes": 8078,
+      "sha256": "66973f46ce54fa7a8b152485782a66422216a92d92711380d606947c601bf02e",
+      "mode": "0o644",
+      "role": "final_composed_sdk_source_snapshot_not_installed"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/lib__types__params.d.ts.patched",
+      "bytes": 10966,
+      "sha256": "a825fc6581b5ca0a96d299d8fc82a8f0e4c45ac50653f3b68d980a3d3d98f5f4",
+      "mode": "0o644",
+      "role": "existing_params_context_unchanged"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/sdk-patches/LICENSE.vendor",
+      "bytes": 11356,
+      "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+      "mode": "0o755",
+      "role": "original_vendor_license"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/web-consumer/web/src/core/messageReadReceipt.ts",
+      "bytes": 15530,
+      "sha256": "01bdb16ec2cc4e60986ed71f898306eadcbcade79470a696a5fe02fca77b646a",
+      "mode": "0o644",
+      "role": "Web_consumer_review_snapshot_not_adopted"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/web-consumer/web/src/pages/chat/queryChat/useMessageReceipt.ts",
+      "bytes": 2523,
+      "sha256": "6f5db6fc2a286b2cd42b2a8a22f56a0f7c7090cd64e3dd217fc4d09cf1bdf33a",
+      "mode": "0o644",
+      "role": "Web_consumer_review_snapshot_not_adopted"
+    },
+    {
+      "path": "ci/web-controlled-wasm/source/web-consumer/web/src/core/messageReadReceipt/own-readtime-event.test.tsx",
+      "bytes": 6016,
+      "sha256": "e72685f3fc4ca6dc028285301c8c59b3049c26e190832110a16801acc7832135",
+      "mode": "0o644",
+      "role": "Web_consumer_review_snapshot_not_adopted"
+    }
+  ],
+  "productionDestinations": [],
+  "SDKInit": 0,
+  "login": 0,
+  "businessSend": 0
+}
