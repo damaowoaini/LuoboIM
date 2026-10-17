@@ -91,4 +91,43 @@ class VMWaitControls(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'tester-incarnation'):v.collect('http://127.0.0.1:40123/opaqueAuthCode=/',types.SimpleNamespace(pid=123,poll=lambda:None),work,private,threading.Event())
             self.assertFalse((work/'evidence/input-vm-wait-sample1.json').exists())
 
+
+    def test_sampler_failure_stage_and_closed_reason_never_export_exception_text_or_rpc_payload(self):
+        secret='http://127.0.0.1:40123/PRIVATE-AUTH/ LOCAL-SECRET'
+        original={'pid':123,'start':20,'uid':os.getuid(),'pgrp':55,'session':55,'exe':'/owned/flutter_tester','ticks':100}
+        class UnprintableError(ValueError):
+            def __str__(self):raise AssertionError('exception text must not be read')
+        scenarios=[('get-isolate',ValueError('service-response-limit'),'service-response-limit'),
+                   ('get-stack',ValueError('service-rpc-refused'),'service-rpc-refused'),
+                   ('project-stack',None,'frame-shape'),
+                   ('get-isolate',ValueError(secret),'other'),
+                   ('get-isolate',ValueError('service-response-limit',secret),'other'),
+                   ('get-stack',UnprintableError(secret),'other')]
+        for failure_stage,error,reason in scenarios:
+            with self.subTest(stage=failure_stage,reason=reason),tempfile.TemporaryDirectory() as folder:
+                work=Path(folder).resolve();private=work/'private';private.mkdir(mode=0o700);(work/'evidence').mkdir();v.write_private(private/'original-child.json',original)
+                seen=[]
+                class Client:
+                    def __init__(self,port,path,check,deadline):check();self.check=check
+                    def rpc(self,method,params):
+                        self.check();seen.append(method)
+                        if method=='getVM':return {'type':'VM','pid':123,'isolates':[{'name':'main','id':'isolates/1'}]}
+                        if method=={'get-isolate':'getIsolate','get-stack':'getStack'}.get(failure_stage):raise error
+                        if method=='getIsolate':return {'type':'Isolate','runnable':True,'pauseEvent':{'kind':'Resume'}}
+                        return {'type':'Stack','frames':[None],'vars':[secret],'objects':secret}
+                    def close(self):pass
+                stop=types.SimpleNamespace(is_set=lambda:False,wait=lambda seconds:False)
+                child=types.SimpleNamespace(pid=123,poll=lambda:None)
+                with mock.patch.object(v,'socket_owner',return_value=dict(original)),mock.patch.object(v,'ReadOnlyVM',Client):
+                    result=v.collect('http://127.0.0.1:40123/opaqueAuthCode=/',child,work,private,stop)
+                self.assertEqual(result['attemptedSamples'],2);self.assertEqual(result['acceptedSamples'],0);self.assertFalse(result['defaultNoVMServiceAccepted'])
+                expected=['getVM']+(['getIsolate'] if failure_stage=='get-isolate' else ['getIsolate','getStack'])*2
+                self.assertEqual(seen,expected)
+                for index in (1,2):
+                    raw=(work/'evidence'/f'input-vm-wait-sample{index}.json').read_bytes();row=json.loads(raw)
+                    self.assertFalse(row['accepted']);self.assertEqual(row['failureStage'],failure_stage);self.assertEqual(row['failureReason'],reason)
+                    self.assertNotIn(b'PRIVATE-AUTH',raw);self.assertNotIn(b'LOCAL-SECRET',raw);self.assertNotIn(b'opaqueAuthCode',raw)
+                    self.assertNotIn('frames',row);self.assertNotIn('objects',row);self.assertNotIn('vars',row)
+        self.assertEqual(v.sample_failure(secret,ValueError(secret)),{'failureStage':'other','failureReason':'other'})
+
 if __name__=='__main__':unittest.main(verbosity=2)

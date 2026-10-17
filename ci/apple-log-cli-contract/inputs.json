@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "identity": "apple-macos15-log-help-show-contract-v1",
+  "command": [
+    "/usr/bin/log",
+    "help",
+    "show"
+  ],
+  "limits": {
+    "seconds": 2,
+    "outputBytes": 8192,
+    "floorBytes": 1073741824,
+    "allocatedBytes": 67108864,
+    "pollSeconds": 0.2,
+    "guardSeconds": 30
+  },
+  "owned": [
+    {
+      "path": "ci/apple-log-cli-contract/run.py",
+      "bytes": 18001,
+      "sha256": "abf70a2a5ad9c9954444db63c1e8e21a29a1050443c7a4151ee56262141399b3"
+    },
+    {
+      "path": "ci/apple-log-cli-contract/test_log_cli.py",
+      "bytes": 4792,
+      "sha256": "04bb5b27f2d2d90439d192c879a5ebcbd5d360b4a50e6d851ba7a0706dcf15d5"
+    },
+    {
+      "path": ".github/workflows/apple-log-cli-contract.yml",
+      "bytes": 1273,
+      "sha256": "0b9b7fb7b1021c2cff44c26b1a0a225395a39480b470970cd3b8ff6806e849af"
+    }
+  ],
+  "borrowed": [
+    {
+      "path": "ci/apple-host-tool/run.py",
+      "bytes": 11626,
+      "sha256": "ef4fef688a380c0d7c39c078e812e91f89adee77b8fda1d0203cef2128cfca94"
+    },
+    {
+      "path": "ci/apple-sdk/resource_dual.py",
+      "bytes": 7394,
+      "sha256": "d1d872e0c2b394d73549f0ed071c457ee5019c41b90277c748c328b0219e7718"
+    },
+    {
+      "path": "ci/apple-current359/cache_resource.py",
+      "bytes": 4639,
+      "sha256": "c10e12df95014cb3107fca9974bd955ac88b0b1248e7bf211471208d77867996"
+    },
+    {
+      "path": "ci/apple-resolution-temp-diagnostic/xcrun_adapter.py",
+      "bytes": 21452,
+      "sha256": "f188fb6e2765d3de3546faf4071350e0098c515604aae51ed751906e0f43dc70"
+    },
+    {
+      "path": "ci/apple-current359/run.py",
+      "bytes": 42809,
+      "sha256": "f64756379696d7e2dcaf914dbb8a7933dcf051e7c1f5612f5b8bcd35775d2fbc"
+    }
+  ],
+  "originalEnvironmentPaths": {
+    "gem_root": "/opt/homebrew/lib/ruby/gems/3.3.0",
+    "ruby": {
+      "path": "/opt/homebrew/Cellar/ruby@3.3/3.3.12/bin/ruby"
+    },
+    "script": {
+      "path": "/opt/homebrew/lib/ruby/gems/3.3.0/bin/pod"
+    }
+  },
+  "priorLogBody": {
+    "path": "/usr/bin/log",
+    "bytes": 617328,
+    "sha256": "b4d2481e4fda1c2cf3c3301312deffe0785e013bbc5b7e693950fb92ddc43c3c"
+  },
+  "priorLogProvenance": {
+    "artifact": 12104534986,
+    "file": {
+      "path": ".qa/backend1555-repair21-owned-denial-batch17-1/apple-artifact/spm/luobo-apple-current359/evidence/denial-log-tool-before.json",
+      "bytes": 332,
+      "sha256": "66d15d57708352a551fd57cd0e26d78e3338e564f2d5650a0efa1a78b9f0d8d1"
+    }
+  },
+  "scope": {
+    "systemLogQuery": false,
+    "SPM": false,
+    "Swift": false,
+    "App": false,
+    "acquire": false,
+    "old20ToolsSDK": false,
+    "PodRubyCommandsOrBodyObservation": false,
+    "supportsFalseMeansUnobserved": true
+  }
+}

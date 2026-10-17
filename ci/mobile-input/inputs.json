@@ -2154,8 +2154,8 @@
     },
     {
       "path": "ci/mobile-input-vm.py",
-      "bytes": 19339,
-      "sha256": "6b409db15f220af741db6159c380eeba1d6cde91adca0bd482f68c109c83f4dd"
+      "bytes": 20938,
+      "sha256": "2925238c5d7249b07b4056be359c80c74a486a6aea2d0376560dc2767a0e0974"
     },
     {
       "path": ".github/workflows/mobile-input-vm-diagnostic.yml",

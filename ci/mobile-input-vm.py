@@ -11,6 +11,40 @@ MARKER = 'chat_input_unmount pumpWidget.before'
 RULE_SHA = 'bef5fd760ded7beab99f71cd007ace681f001ed6d28bb58ad3dd014e20ba859d'
 MAX_LINE = 262144
 URI_PATTERN = re.compile(r'(?:https?|wss?)://[^\s<>"\x27\\]+', re.IGNORECASE)
+SAMPLE_FAILURE_STAGES = frozenset(('get-isolate','get-stack','project-stack'))
+SAMPLE_FAILURE_REASONS = frozenset((
+    'control-frame-shape',
+    'duplicate-upgrade-header',
+    'fd-limit',
+    'foreign-parent',
+    'frame-shape',
+    'non-readonly-method',
+    'original-child-ended',
+    'original-child-owner',
+    'original-launcher-incarnation',
+    'parent-chain-limit',
+    'parent-incarnation',
+    'proc-stat-shape',
+    'proc-stat-short',
+    'process-inventory-limit',
+    'request-limit',
+    'rpc-parameter-scope',
+    'service-closed',
+    'service-frame-count-limit',
+    'service-frame-flags',
+    'service-frame-type',
+    'service-response-limit',
+    'service-result-type',
+    'service-rpc-refused',
+    'socket-inventory-limit',
+    'socket-owner-ambiguous',
+    'stack-frame-limit',
+    'tester-incarnation-changed',
+    'tester-listener-unavailable',
+    'tester-socket-not-unique',
+    'upgrade-limit',
+    'upgrade-refused',
+))
 
 
 def canonical(value):
@@ -203,6 +237,14 @@ def safe_sample(isolate,stack):
     return out
 
 
+def sample_failure(stage,error):
+    # Only code-declared closed slugs may leave the private sampling boundary.
+    # Never stringify exceptions or project the RPC/error response itself.
+    value=error.args[0] if type(error) is ValueError and len(error.args)==1 else None
+    return {'failureStage':stage if type(stage) is str and stage in SAMPLE_FAILURE_STAGES else 'other',
+            'failureReason':value if type(value) is str and value in SAMPLE_FAILURE_REASONS else 'other'}
+
+
 def collect(uri,child,work,private,stop):
     started=time.monotonic();deadline=started+20;port,path=endpoint(uri);original=json.loads((private/'original-child.json').read_bytes());owner=socket_owner(port,child,work,original=original,deadline=deadline)
     def checked():
@@ -222,12 +264,16 @@ def collect(uri,child,work,private,stop):
         for index in range(2):
             if index and stop.wait(1):raise ValueError('original-owner-stopped')
             before=checked();row={'sample':index+1,'ownerPID':owner['pid'],'ownerStart':owner['start'],'accepted':False}
+            stage='get-isolate'
             try:
                 iso=client.rpc('getIsolate',{'isolateId':isolateID})
+                stage='get-stack'
                 stack=client.rpc('getStack',{'isolateId':isolateID,'limit':32})
+                stage='project-stack'
                 row.update(safe_sample(iso,stack));row['accepted']=True
             except Exception as error:
                 row['exceptionType']=type(error).__name__
+                row.update(sample_failure(stage,error))
             after=checked();delta=after['ticks']-before['ticks']
             if delta<0:raise ValueError('cpu-counter-incarnation')
             row['cpuTicksDelta']=delta;row['ticksPerSecond']=os.sysconf('SC_CLK_TCK');records.append(row)
