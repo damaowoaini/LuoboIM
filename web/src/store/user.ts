@@ -2,6 +2,7 @@ import { StaleSessionError } from "@/core/session/session";
 import { sessionCoordinator } from "@/core/session/browser";
 import { getRouteUrl } from "@/core/session/route";
 import { createSessionLogout, revokeCurrentSession } from "@/core/session/logout";
+import { appConfigFailure } from "@/core/appConfigFailure";
 import { t } from "i18next";
 import { create } from "zustand";
 
@@ -28,6 +29,7 @@ export const useUserStore = create<UserStore>()((set, get) => ({
   selfInfo: {} as BusinessUserInfo,
   appConfig: {} as AppConfig,
   appConfigStatus: "idle",
+  appConfigFailure: null,
   appSettings: {
     locale: getLocale(),
     closeAction: "miniSize",
@@ -56,14 +58,14 @@ export const useUserStore = create<UserStore>()((set, get) => ({
     const issuer = getRouteUrl(), generation = sessionCoordinator.generation;
     const current = () => ticket === appConfigRequestTicket &&
       issuer === getRouteUrl() && generation === sessionCoordinator.generation;
-    set({appConfigStatus:"loading"});
+    set({appConfigStatus:"loading",appConfigFailure:null});
     try {
       const { data } = await getAppConfig();
       if (!current()) return;
-      set({appConfig:data.config ?? {} as AppConfig,appConfigStatus:"ready"});
+      set({appConfig:data.config ?? {} as AppConfig,appConfigStatus:"ready",appConfigFailure:null});
     } catch (error) {
       if (!current() || error instanceof StaleSessionError) return;
-      set({appConfigStatus:"error"});
+      set({appConfigStatus:"error",appConfigFailure:appConfigFailure(error)});
     }
   },
   updateAppSettings: (settings: Partial<AppSettings>) => {
@@ -104,7 +106,7 @@ const logoutCurrentSession = createSessionLogout(sessionCoordinator, revokeCurre
   // lifecycle closes the worker and restarts the document after persistence.
   const clearing = clearIMProfile().catch(() => undefined);
   useUserStore.setState({ selfInfo: {} as BusinessUserInfo, appConfig: {} as AppConfig,
-    appConfigStatus: "idle", workMomentsUnreadCount: 0, imageCache: {} });
+    appConfigStatus: "idle", appConfigFailure: null, workMomentsUnreadCount: 0, imageCache: {} });
   useContactStore.getState().clearContactStore();
   useConversationStore.getState().clearConversationStore();
   window.electronAPI?.ipcInvoke("updateUnreadCount", 0);

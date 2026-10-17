@@ -55,7 +55,7 @@ export function applyDesktopSnapshot(input: unknown): void {
     !Array.isArray(value.contacts.blackList)
   )
     throw new Error("窗口数据归属无效");
-  useUserStore.setState({ ...value.user, appConfigStatus: "ready" });
+  useUserStore.setState({ ...value.user, appConfigStatus: "ready", appConfigFailure: null });
   useContactStore.setState(value.contacts);
 }
 export function bindDesktopMainSdk(sdk: object): () => void {

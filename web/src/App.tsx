@@ -42,6 +42,7 @@ function App() {
         selfInfo: {} as BusinessUserInfo,
         appConfig: {} as import("./store/type").AppConfig,
         appConfigStatus: "idle",
+        appConfigFailure: null,
         imageCache: {},
         workMomentsUnreadCount: 0,
       });

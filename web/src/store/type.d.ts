@@ -12,6 +12,7 @@ import {
 
 import { BusinessUserInfo } from "@/api/login";
 import type { Session } from "@/core/session/session";
+import type { AppConfigFailure } from "@/core/appConfigFailure";
 
 import { ExMessageItem } from "./message";
 
@@ -19,6 +20,7 @@ export interface UserStore {
   selfInfo: BusinessUserInfo;
   appConfig: AppConfig;
   appConfigStatus: "idle" | "loading" | "ready" | "error";
+  appConfigFailure: AppConfigFailure | null;
   appSettings: AppSettings;
   imageCache: Record<string, string>;
   workMomentsUnreadCount: number;

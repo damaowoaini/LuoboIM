@@ -86,28 +86,32 @@ class CacheResourceControls(unittest.TestCase):
                 self.assertFalse(scope['process_exclusive_cache_ownership_claimed'])
 
     def test_exact_leaf_measurement_rejects_aliases_and_identity_changes_without_reading_bodies(self):
-        for variant in ['valid', 'symlink', 'hardlink', 'directory', 'identity']:
-            with self.subTest(variant=variant), tempfile.TemporaryDirectory() as tmp:
-                root = Path(tmp).resolve()/'T'; root.mkdir(mode=0o700)
-                uid = os.getuid()
-                row = {'canonical': str(root), 'uid': uid,
-                       'directory_identity': xcrun_adapter.cache_directory_identity(root, uid),
-                       'protected_preexisting': []}
-                leaf = root/'xcrun_db-Ab12Cd34'
-                if variant in ['valid', 'identity']:
-                    leaf.write_bytes(b'small actual allocated cache')
-                elif variant in ['symlink', 'hardlink']:
-                    outside = root.parent/'foreign'; outside.write_bytes(b'not cache')
-                    if variant == 'symlink': leaf.symlink_to(outside)
-                    else: os.link(outside, leaf)
-                else: leaf.mkdir()
-                if variant == 'identity': row['directory_identity'][1] += 1
-                with patch.object(Path, 'read_bytes', side_effect=AssertionError('measurement read a body')):
-                    if variant == 'valid':
-                        self.assertEqual(cache_resource.allocated_cache_leaves(row, xcrun_adapter.cache_directory_identity), leaf.stat().st_blocks*512)
-                    else:
-                        with self.assertRaises(ValueError):
-                            cache_resource.allocated_cache_leaves(row, xcrun_adapter.cache_directory_identity)
+        for filename in ['xcrun_db-Ab12Cd34', 'xcrun_db']:
+            for variant in ['valid', 'symlink', 'hardlink', 'directory', 'identity', 'protected']:
+                with self.subTest(filename=filename, variant=variant), tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp).resolve()/'T'; root.mkdir(mode=0o700)
+                    uid = os.getuid()
+                    row = {'canonical': str(root), 'uid': uid,
+                           'directory_identity': xcrun_adapter.cache_directory_identity(root, uid),
+                           'protected_preexisting': []}
+                    leaf = root/filename
+                    if variant in ['valid', 'identity', 'protected']:
+                        leaf.write_bytes(b'small actual allocated cache')
+                    elif variant in ['symlink', 'hardlink']:
+                        outside = root.parent/'foreign'; outside.write_bytes(b'not cache')
+                        if variant == 'symlink': leaf.symlink_to(outside)
+                        else: os.link(outside, leaf)
+                    else: leaf.mkdir()
+                    if variant == 'identity': row['directory_identity'][1] += 1
+                    if variant == 'protected': row['protected_preexisting'] = [leaf.name]
+                    with patch.object(Path, 'read_bytes', side_effect=AssertionError('measurement read a body')):
+                        if variant == 'protected':
+                            self.assertEqual(cache_resource.allocated_cache_leaves(row, xcrun_adapter.cache_directory_identity), 0)
+                        elif variant == 'valid':
+                            self.assertEqual(cache_resource.allocated_cache_leaves(row, xcrun_adapter.cache_directory_identity), leaf.stat().st_blocks*512)
+                        else:
+                            with self.assertRaises(ValueError):
+                                cache_resource.allocated_cache_leaves(row, xcrun_adapter.cache_directory_identity)
 
 
 if __name__ == '__main__':

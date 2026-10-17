@@ -227,12 +227,12 @@ def seal_cache_boundary(work):
     protected = []
     for number, child in enumerate(root.iterdir()):
         if number >= 4096: raise ValueError('bounded Darwin temporary directory inventory required')
-        if child.name.startswith('xcrun_db-'):
+        if child.name == 'xcrun_db' or child.name.startswith('xcrun_db-'):
             if len(protected) >= 256 or len(child.name) > 128:
                 raise ValueError('bounded preexisting cache protection required')
             # Only public tool cache names; no body, environment or private path
             # outside this fixed current-user directory is inventoried.
-            if not re.fullmatch(r'xcrun_db-[A-Za-z0-9_-]{1,96}', child.name):
+            if not re.fullmatch(r'xcrun_db(?:-[A-Za-z0-9_-]{1,96})?', child.name):
                 raise ValueError('unexpected preexisting xcrun cache name')
             protected.append(child.name)
     row['protected_preexisting'] = sorted(protected)
@@ -257,7 +257,7 @@ def cache_boundary(work):
         raise ValueError('Darwin cache boundary changed')
     names = row.get('protected_preexisting')
     if (not isinstance(names, list) or len(names) > 256 or names != sorted(set(names))
-            or any(not isinstance(n, str) or not re.fullmatch(r'xcrun_db-[A-Za-z0-9_-]{1,96}', n) for n in names)):
+            or any(not isinstance(n, str) or not re.fullmatch(r'xcrun_db(?:-[A-Za-z0-9_-]{1,96})?', n) for n in names)):
         raise ValueError('preexisting cache protection differs')
     return row
 
@@ -269,6 +269,13 @@ def cache_profile(work):
     directories = list(dict.fromkeys([row['canonical'], row['lexical']]))
     text = ''.join('(allow file-write* (regex #'+json.dumps(cache_leaf_pattern(p))+'))'
                    for p in directories)
+    # The actual R18 tools created the bounded temporary leaves, then failed
+    # to rename them to this one final leaf. Admit that exact destination only
+    # when it was absent from the sealed inventory; an existing cache stays
+    # protected. This is not a subtree grant or a claim of exclusive ownership.
+    if 'xcrun_db' not in row['protected_preexisting']:
+        text += ''.join('(allow file-write* (literal '+json.dumps(p+'/xcrun_db')+'))'
+                        for p in directories)
     for directory in directories:
         for name in row['protected_preexisting']:
             text += '(deny file-write* (literal '+json.dumps(directory+'/'+name)+'))'

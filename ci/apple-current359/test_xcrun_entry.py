@@ -70,6 +70,7 @@ class ActualEntryBoundary(unittest.TestCase):
                 self.assertEqual(a.cache_boundary(work), sealed)
                 profile = a.cache_profile(work)
                 self.assertIn('(regex #'+json.dumps(a.cache_leaf_pattern(root))+')', profile)
+                self.assertIn('(allow file-write* (literal '+json.dumps(str(root/'xcrun_db'))+'))', profile)
                 self.assertIn('(deny file-write* (literal '+json.dumps(str(old))+'))', profile)
                 self.assertNotIn('(subpath ', profile)
                 pattern = a.cache_leaf_pattern(root)
@@ -89,6 +90,7 @@ class ActualEntryBoundary(unittest.TestCase):
                         actual_pattern = a.cache_leaf_pattern(directory)
                         self.assertNotIn('{', actual_pattern)
                         self.assertIn('(regex #'+json.dumps(actual_pattern)+')', alias_profile)
+                        self.assertIn('(allow file-write* (literal '+json.dumps(directory+'/xcrun_db')+'))', alias_profile)
                         self.assertIn('(deny file-write* (literal '+json.dumps(directory+'/'+old.name)+'))', alias_profile)
                         self.assertIsNotNone(re.fullmatch(actual_pattern,directory+'/xcrun_db-vNT62YK1'))
                         for suffix in ['vNT62YK', 'vNT62YK11', 'vNT6_YK1', 'vNT62YK1/nested']:
@@ -96,6 +98,19 @@ class ActualEntryBoundary(unittest.TestCase):
                 changed = copy.deepcopy(row); changed['directory_identity'][1] += 1
                 with mock.patch.object(a, 'discover_cache_directory', return_value=changed):
                     with self.assertRaisesRegex(ValueError, 'boundary changed'): a.cache_profile(work)
+                # Re-sealing another command after a final cache exists must
+                # protect it, without reading or overwriting its body.
+                final = root/'xcrun_db'; final.write_bytes(b'preexisting final cache')
+                other = work.parent/'second-owned'; (other/'tool-adapters').mkdir(parents=True)
+                protected = a.seal_cache_boundary(other)
+                self.assertEqual(protected['protected_preexisting'], ['xcrun_db', old.name])
+                for directory in aliases:
+                    with mock.patch.object(a, 'cache_boundary', return_value=dict(protected, canonical=directory, lexical=directory)):
+                        guarded = a.cache_profile(other)
+                    self.assertNotIn('(allow file-write* (literal '+json.dumps(directory+'/xcrun_db')+'))', guarded)
+                    self.assertIn('(deny file-write* (literal '+json.dumps(directory+'/xcrun_db')+'))', guarded)
+                    self.assertNotIn('(subpath ', guarded)
+                self.assertEqual(final.read_bytes(), b'preexisting final cache')
             with self.assertRaises(ValueError): a.cache_directory_identity(root, uid+1)
             root.chmod(0o755)
             with self.assertRaises(ValueError): a.cache_directory_identity(root, uid)

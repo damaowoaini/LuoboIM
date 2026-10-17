@@ -21,7 +21,7 @@ def allocated_cache_leaves(row, check_directory):
         for number, entry in enumerate(entries):
             if number >= 4096:
                 raise ValueError('bounded cache directory inventory required')
-            if entry.name in protected or not re.fullmatch(r'xcrun_db-[A-Za-z0-9]{8}', entry.name):
+            if entry.name in protected or not (entry.name == 'xcrun_db' or re.fullmatch(r'xcrun_db-[A-Za-z0-9]{8}', entry.name)):
                 continue
             matched += 1
             if matched > 256:

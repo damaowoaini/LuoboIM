@@ -16,14 +16,15 @@
     "latest_observed": {
       "actualVersionCommands": 4,
       "allCommandExitCodes": 0,
-      "artifactSHA256": "200405cf3ac149f9431e6e8503ffef6310e6a0f7fb74362c3e0024ee8fce9c9b",
+      "artifactSHA256": "b7df22c850aef21a6dfa665b4b49b41776e331e30ab5dcc8762e0396683e16e3",
       "attempt": 1,
-      "cacheWriteStderrRefused": true,
+      "finalCacheRenameStderrRefused": true,
       "fullBuildStarted": false,
-      "head": "6350237f58b87e3a3d7aaed9a4b0df9d41c45148",
-      "permissionFailureCauseProven": false,
+      "head": "e9933f83c62767ab3a120523fec0b3cdbd11e7ec",
+      "observedDeniedDestination": "same original Darwin UID T directory / exact xcrun_db",
       "preflightPassed": false,
-      "run": 39025436412
+      "run": 39027598213,
+      "temporaryLeafCreationReachedRename": true
     },
     "network": "deny",
     "original_ARM_probe_unchanged": true,
@@ -301,7 +302,7 @@
     {
       "bytes": 42734,
       "path": "ci/apple-current359/run.py",
-      "sha256": "cbf3d9967608e0fbd40b60e90b2ad656d9495637226ebe990146fb8e6cdfa6f4"
+      "sha256": "ff04c0ec12a667a8b988ffe28e1d19205633f0a7524cb698eb68bc217072e421"
     },
     {
       "bytes": 3474,
@@ -339,9 +340,9 @@
       "sha256": "7e4087dee844f76ced62815772322be4f9b8d28cdd69fee234c7abb71513ada7"
     },
     {
-      "bytes": 18827,
+      "bytes": 19364,
       "path": "ci/apple-current359/xcrun_adapter.py",
-      "sha256": "9135a96cf373e3a393ec68dfad56638c49cb49499a4152de9b8f41128a6deeec"
+      "sha256": "74d676cead63125c624281fbaced5abb3c7f15b56db647e46eb7aa9e90d2e0ed"
     },
     {
       "bytes": 5245,
@@ -359,26 +360,26 @@
       "sha256": "78e27384295c35244887317e2ecfd3057dc3d83bec9946e9f66ed4b4063ccbc6"
     },
     {
-      "bytes": 7144,
+      "bytes": 8462,
       "path": "ci/apple-current359/test_xcrun_entry.py",
-      "sha256": "80f2bff313df603d1348b30292efc6b464d771ed4c0fcf280d27585a88e70e1d"
+      "sha256": "aa83b87c9759094b53eb94f30910d56413f02423ab66b6bcf69700889e1105e1"
     },
     {
-      "bytes": 3700,
+      "bytes": 3730,
       "path": "ci/apple-current359/cache_resource.py",
-      "sha256": "757c95baac62e3ff114af25665db07d7315a535bdbb31a09ce78854cd029d541"
+      "sha256": "bf7f181cb8e474d06bdfe34c07818e2ac497fd0453d85a97e502a2c3c44c292d"
     },
     {
-      "bytes": 6594,
+      "bytes": 7050,
       "path": "ci/apple-current359/test_cache_resource.py",
-      "sha256": "16d1d83c6fe7efddd45cf362bc8988e4677ca6b4e30f28bc68243c19673bb1ff"
+      "sha256": "8bbbcb98fcdef54d8e3dcc01b3a40edee642c15f044a76ec1bf4226b4847bf17"
     }
   ],
   "owned_xcrun_adapter": {
     "CFFIXED_USER_HOME": "work/cf-home",
     "HOME_reassigned": false,
     "PATH_prepend": "work/tool-adapters only",
-    "actual_xcode_flag_CF_cache_and_internal_xcrun_consumption": "R17 actual ARM version argv returned0; cache stderr refused; native dependency resolution remains unverified",
+    "actual_xcode_flag_CF_cache_and_internal_xcrun_consumption": "R18 actual ARM/version commands exit0; bounded temporary leaf creation succeeds, final rename refused; dependency resolution remains unverified",
     "admitted_project_operations": [
       "-resolvePackageDependencies",
       "-list",
@@ -402,8 +403,8 @@
     "sandbox_additional_external_write_grants": {
       "HOME_reassigned": false,
       "SBPL_exact_leaf_syntax": "eight explicit alphanumeric character classes; both verified aliases of same original UID directory; existing paths denied in both spellings",
-      "leaf": "xcrun_db-[A-Za-z0-9]{8}",
-      "preexisting_cache_paths": "deny writes individually; no cache bodies read",
+      "leaf": "xcrun_db-[A-Za-z0-9]{8} temporary leaves; exact xcrun_db final destination only if absent in original sealed inventory",
+      "preexisting_cache_paths": "deny temporary and final cache paths individually in both validated aliases; no cache bodies read",
       "scope": "current UID confstr(65537) canonical private /var/folders/*/*/T only",
       "secondary_allocation_cap_bytes": 67108864,
       "unknown_path_or_shape": "refuse"
