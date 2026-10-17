@@ -41,7 +41,7 @@ packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes'
 pod_selector = borrowed_helper({'path': 'ci/apple-current354/pod_selector.py', 'bytes': 5603, 'sha256': '820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769'}, 'apple359_reviewed117_selector')
 
 
-gem_audit = borrowed_helper({'path': 'ci/apple-current359/gem_audit.py', 'bytes': 15989, 'sha256': '1ea544a0ddeb5868f1f9f5c3bae6630bb9f6baef0374d89db1fc939c21010515'}, 'apple359_fixed_gem_audit')
+gem_audit = borrowed_helper({'path': 'ci/apple-current359/gem_audit.py', 'bytes': 19246, 'sha256': 'e0a798becdd08e999b6b6657b8fb37ef1397cf4df20248d2f6a14cb53a470baf'}, 'apple359_fixed_gem_audit')
 
 custody = load(REPO/'ci/apple-sdk-link/custody.py', 'current359_custody')
 put, record, mkdir, sha = (getattr(custody, n) for n in ['put', 'record', 'mkdir', 'sha'])

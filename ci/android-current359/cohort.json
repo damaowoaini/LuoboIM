@@ -203,9 +203,14 @@
       "sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
     },
     {
-      "bytes": 34084,
+      "bytes": 9531,
+      "path": "ci/android-current359/repository_lifecycle_fixture.py",
+      "sha256": "25699bc89f48b00bbe58e40d7bbe8a103358015e60b0c874ca0a5ee0eebe290b"
+    },
+    {
+      "bytes": 36364,
       "path": "ci/android-current359/resolve.gradle",
-      "sha256": "4cc9d30da523c26ae7fed1a8dc99a865d4f2c8c0e9baf17aaa674835bcfa8dd9"
+      "sha256": "00e49cc73c2831c825a43f392145ec7b974518414e2f7adb759324e17b3519cd"
     },
     {
       "bytes": 71217,
@@ -233,6 +238,7 @@
       "sha256": "f576115d09037d3e7d35feb173a06f8cf656992297d8b90c3c3ed2b05219172b"
     }
   ],
+  "controller_revision": "repository-lifecycle-r1-early-fixed-content-then-readonly",
   "core_compatibility": {
     "Go_protocol_SDK_native_source_subset_exact": true,
     "new_App_Go_build_or_current_Go_version_claim": false,
@@ -330,6 +336,18 @@
     "bytes": 40663,
     "path": "app/pubspec.lock",
     "sha256": "dd9f75df4899be9c6aaca509d39e259a14164ce8be7b8ed693860bce7df4b648"
+  },
+  "repository_lifecycle": {
+    "JitPack": [
+      "com.github.davidliu",
+      "audioswitch",
+      "039a35aefab7747c557242fa216c9ea11743b604"
+    ],
+    "after_use": "read-only URL/object/filter/scope validation",
+    "early_once": "beforeSettings/beforeProject existing+whenObjectAdded;fixedfilter freeze",
+    "fixed_Gradle": "9.3.1",
+    "new_actual_Gradle1": "prepared_UNRUN;Root authorization required",
+    "source535_and_AAR_unchanged": true
   },
   "schema": "luobo.android.current359-context.v1",
   "shared_source_identity": "Historical354/530 and257/428 libraries remain separate; no old App/native acceptance alias",

@@ -12,6 +12,12 @@ import stat
 
 
 RUBY_COMMIT = '0581089df9f0af0fe6b64cb8167987c211100947'
+# gems/bundled_gems at that exact Ruby commit. This is not an arbitrary Cellar
+# exemption: even another gem/version in this Ruby tree remains unapproved.
+BUNDLED_FULL_NAMES = frozenset('''minitest-5.20.0 power_assert-2.0.3 rake-13.1.0
+test-unit-3.6.1 rexml-3.4.4 rss-0.3.1 net-ftp-0.3.4 net-imap-0.4.25
+net-pop-0.1.2 net-smtp-0.5.1 matrix-0.4.2 prime-0.1.2 rbs-3.4.0
+typeprof-0.21.9 debug-1.9.2 racc-1.7.3'''.split())
 BUILTINS = {
     'enumerator.so': ('enumerator.c', 4652),
     'thread.rb': ('thread_sync.c', 1720),
@@ -50,7 +56,7 @@ def audit(source, selected, home, config_pin):
     ruby_root = ruby.parent.parent
     gem_root = Path(selected['gem_root']).resolve(strict=True)
     roots = (ruby_root, gem_root)
-    require(source.get('schema') == 1 and source.get('ruby') == '3.3.12', 'ruby', 'runtime', 'fixed 3.3.12 required')
+    require(source.get('schema') == 2 and source.get('ruby') == '3.3.12', 'ruby', 'runtime', 'fixed 3.3.12 mapped probe required')
     text(source.get('rubygems'), 'rubygems', 'runtime', 64)  # observed, not inferred from bundled source
 
     def path(value, field, subject, exists=True):
@@ -67,6 +73,17 @@ def audit(source, selected, home, config_pin):
 
     bodies = {}
     total = 0
+    checked_mappings = []
+
+    def mapped(value, proof, field, subject, exists=True, remember=True):
+        p = path(value, field, subject, exists=exists)
+        kind = 'file' if p.is_file() else 'directory' if p.is_dir() else 'other' if p.exists() else 'missing'
+        observed = {'lexical': value, 'canonical': str(p) if kind != 'missing' else None, 'kind': kind}
+        require(isinstance(proof, dict) and proof == observed,
+                field+'.mapping', subject, 'probe/path mapping changed or incomplete')
+        if remember:
+            checked_mappings.append((value, dict(observed), field, subject, exists))
+        return p
 
     def body(p, field, subject, limit=4*1024**2):
         nonlocal total
@@ -147,30 +164,54 @@ def audit(source, selected, home, config_pin):
         full_name = text(gem.get('full_name'), 'full_name', name, 256)
         require(re.fullmatch(re.escape(name+'-'+version)+r'(?:-[A-Za-z0-9_.-]+)?', full_name) is not None,
                 'full_name', name, 'exact gem/version/platform name required')
-        spec = path(gem.get('loaded_from'), 'loaded_from', name)
+        mappings = gem.get('path_mappings')
+        require(isinstance(mappings, dict) and set(mappings) == {'spec', 'gem', 'requires'},
+                'path_mappings', name, 'explicit spec/gem/require mappings required')
+        spec = mapped(gem.get('loaded_from'), mappings['spec'], 'loaded_from', name)
         spec_body = body(spec, 'loaded_from', name)
         default = gem.get('default')
         require(type(default) is bool and default == (spec.parent == default_specs),
                 'default', name, 'default flag/spec location mismatch')
         require(spec.name == full_name+'.gemspec', 'loaded_from', name, 'exact spec filename required')
-        expected_base = default_base if default else gem_root
-        require(spec.parent == expected_base/('specifications/default' if default else 'specifications'),
-                'loaded_from', name, 'foreign spec root refused')
-        computed = path(gem.get('full_gem_path'), 'full_gem_path', name, exists=not default)
-        require(computed == expected_base/'gems'/full_name,
-                'full_gem_path', name, 'unexpected computed layout')
+        logical_spec = Path(gem['loaded_from'])
+        spec_dir = 'specifications/default' if default else 'specifications'
+        allowed_bases = (default_base,) if default else ((gem_root, default_base) if full_name in BUNDLED_FULL_NAMES else (gem_root,))
+        logical_bases = [base for base in allowed_bases if logical_spec == base/spec_dir/(full_name+'.gemspec')]
+        canonical_bases = [base for base in allowed_bases if spec == base/spec_dir/(full_name+'.gemspec')]
+        require(len(logical_bases) == len(canonical_bases) == 1,
+                'loaded_from', name, 'exact same-fullname selected spec layout required')
+        logical_base, expected_base = logical_bases[0], canonical_bases[0]
+        require(logical_base == expected_base or (logical_base == gem_root and expected_base == default_base),
+                'loaded_from', name, 'only system-to-selected-Ruby bundled counterpart allowed')
+        computed = mapped(gem.get('full_gem_path'), mappings['gem'], 'full_gem_path', name, exists=not default)
+        require(Path(gem['full_gem_path']) == logical_base/'gems'/full_name and
+                computed == expected_base/'gems'/full_name,
+                'full_gem_path', name, 'spec/gem must map to one exact selected base/fullname')
+        require(computed.is_dir() or (default and not computed.exists()),
+                'full_gem_path', name, 'directory or absent default metadata required')
         req = values(gem.get('require_paths'), 'require_paths', name, 16)
         files = values(gem.get('files'), 'files', name, 20000)
         for value in req+files:
             value = text(value, 'spec paths', name)
             p = PurePosixPath(value)
             require(not p.is_absolute() and '..' not in p.parts, 'spec paths', name, 'relative safe spec paths required')
-        for value in values(gem.get('full_require_paths'), 'full_require_paths', name, 16):
-            p = path(value, 'full_require_paths', name, exists=not default)
-            extension = p.is_relative_to(expected_base/'extensions') and p.name == full_name and len(p.relative_to(expected_base/'extensions').parts) == 3
-            require(p.is_relative_to(computed) or extension, 'full_require_paths', name, 'foreign require path refused')
+        required = values(gem.get('full_require_paths'), 'full_require_paths', name, 16)
+        required_maps = values(mappings['requires'], 'full_require_paths.mapping', name, 16)
+        require(len(required) == len(required_maps), 'full_require_paths.mapping', name, 'complete mapping list required')
+        canonical_requires = []
+        for value, observed in zip(required, required_maps):
+            p = mapped(value, observed, 'full_require_paths', name, exists=not default)
+            logical = Path(value)
+            extension = logical.is_relative_to(logical_base/'extensions') and logical.name == full_name and len(logical.relative_to(logical_base/'extensions').parts) == 3
+            require(logical.is_relative_to(logical_base/'gems'/full_name) or extension,
+                    'full_require_paths', name, 'foreign require path refused')
+            require(p == expected_base/logical.relative_to(logical_base) and
+                    (p.is_dir() or (default and not p.exists())),
+                    'full_require_paths', name, 'spec/gem/require counterpart mapping differs')
+            canonical_requires.append(str(p))
         row = {**gem, 'spec_body': spec_body, 'computed_directory_exists': computed.is_dir(),
-               'computed_directory_is_source_evidence': not default, 'ruby_sources': [], 'loaded_files': []}
+               'computed_directory_is_source_evidence': not default, 'ruby_sources': [], 'loaded_files': [],
+               'canonical_gem_root': str(computed), 'canonical_full_require_paths': canonical_requires}
         if not default:
             require(computed.is_dir(), 'full_gem_path', name, 'real regular gem directory required')
             def walk_error(error):
@@ -215,8 +256,8 @@ def audit(source, selected, home, config_pin):
                     'feature', label, 'relative feature not mapped to approved load path')
         loaded = body(p, 'feature', label, 32*1024**2)
         owners = [g for g in specs if not g['default'] and
-                  (p.is_relative_to(Path(g['full_gem_path'])) or
-                   any(p.is_relative_to(Path(root)) for root in g['full_require_paths']))]
+                  (p.is_relative_to(Path(g['canonical_gem_root'])) or
+                   any(p.is_relative_to(Path(root)) for root in g['canonical_full_require_paths']))]
         require(len(owners) <= 1, 'feature.owner', label, 'ambiguous gem ownership')
         if owners:
             owner = owners[0]
@@ -252,7 +293,9 @@ def audit(source, selected, home, config_pin):
     for g in specs:
         g['loaded_files'] = sorted(set(g['loaded_files']))
         g['activation_only_no_individual_loaded_file'] = not g['loaded_files']
-    return {'schema': 2, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
+    for value, observed, field, subject, exists in checked_mappings:
+        mapped(value, observed, field, subject, exists=exists, remember=False)
+    return {'schema': 3, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
             'ruby_binary': binary, 'configured_shared_libruby': libruby,
             'libruby_scope': 'RbConfig selected library body; not a dyld process-map claim',
             'config': config, 'gems': specs, 'loaded_features': features,

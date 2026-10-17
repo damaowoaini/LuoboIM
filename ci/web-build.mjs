@@ -9,8 +9,8 @@ import { verifyFile, verifyLinuxBindings } from "./web-ci.mjs";
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const web = path.join(repo, "web"), output = path.join(repo, "ci-output/web-build");
 const descriptorPath = path.join(repo, "ci/web-build.inputs.json");
-const cohort = "web4301-build-only-v1";
-const sourceDigest = "dcbebe0d5d014533a25b7d4d1d0cfae603a1467d5fd924cb06aa6ce6f81270e6";
+const cohort = "web4304-build-only-v1";
+const sourceDigest = "0caf95814993ac8936c1de386b2259d1f2bab5adda217436fc411af45907aa90";
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 const hash = (body) => createHash("sha256").update(body).digest("hex");
 const json = (file) => JSON.parse(readFileSync(file, "utf8"));
@@ -27,9 +27,9 @@ const writeJSON = (file, value) => writeNew(file, JSON.stringify(value, null, 2)
 
 export function validateDescriptor(input) {
   assert(input.schema === "luobo.web.build-only.v1" && input.cohort === cohort && input.node === "24.21.0", "Explicit build-only identity required");
-  assert(input.sourceFiles === 4301 && input.files.length === 4301 && new Set(input.files.map((r) => r.path)).size === 4301, "Exact4301 source set required");
+  assert(input.sourceFiles === 4304 && input.files.length === 4304 && new Set(input.files.map((r) => r.path)).size === 4304, "Exact4304 source set required");
   for (const row of input.files) assert(typeof row.path === "string" && !path.isAbsolute(row.path) && !row.path.split(/[\\/]/).some((p) => !p || p === "." || p === "..") && /^[0-9a-f]{64}$/.test(row.sha256) && Number.isSafeInteger(row.bytes) && row.bytes >= 0, "Bounded relative source row required");
-  assert(input.sourceDigest === sourceDigest && rowsDigest(input.files) === sourceDigest, "Reviewed4301 source digest differs");
+  assert(input.sourceDigest === sourceDigest && rowsDigest(input.files) === sourceDigest, "Reviewed4304 source digest differs");
   assert(input.files.filter((r) => r.path.startsWith("public/")).length === 13, "Exact public13 inventory required");
   return input;
 }
@@ -206,11 +206,11 @@ function bundleWorker() {
   execute(buildPlan(process.execPath, "unused-in-worker", path.join(output, "dist"))[2]);
   verifySourceTree(web, input.files, true); verifySDK(); checkedInputs();
   const candidate = retainBuildCandidate(output, path.join(output, "dist"), input.files.filter((r) => r.path.startsWith("public/")), input.csp,
-    { cohort, commit: prepared.commit, sourceFiles: 4301, sourceDigest });
+    { cohort, commit: prepared.commit, sourceFiles: 4304, sourceDigest });
   assert(candidate.proof.passed, "Pinned production CSP semantic mismatch; bounded actual index/proof and candidate retained");
   const files = candidate.files;
   writeJSON(path.join(output, "dist-manifest.json"), files);
-  writeJSON(path.join(output, "dist-proof.json"), { cohort, commit: prepared.commit, sourceFiles: 4301, sourceDigest, files: files.length, bytes: files.reduce((n, r) => n + r.bytes, 0), filesDigest: rowsDigest(files), manifestSHA256: hash(readFileSync(path.join(output, "dist-manifest.json"))), opaqueWASMSameAsReviewedPublicSource: true, SDKSourceRebuilt: false, runtimeOrPreviewAcceptance: false, deployment: false, resourceGuardPassStillRequired: true });
+  writeJSON(path.join(output, "dist-proof.json"), { cohort, commit: prepared.commit, sourceFiles: 4304, sourceDigest, files: files.length, bytes: files.reduce((n, r) => n + r.bytes, 0), filesDigest: rowsDigest(files), manifestSHA256: hash(readFileSync(path.join(output, "dist-manifest.json"))), opaqueWASMSameAsReviewedPublicSource: true, SDKSourceRebuilt: false, runtimeOrPreviewAcceptance: false, deployment: false, resourceGuardPassStillRequired: true });
   console.log("BUILD_CANDIDATE_READY; outer resource exit/status must also pass");
 }
 
@@ -233,7 +233,7 @@ function main() {
     const npmVersion = execute({ name: "npm-version", command: node, args: [npm, "--version"], timeout: 10000 }, repo).trim();
     assert(/^\d+\.\d+\.\d+$/.test(npmVersion), "Exact bundled npm version query required");
     writeNew(path.join(output, "inputs.json"), readFileSync(descriptorPath));
-    writeJSON(path.join(output, "source.json"), { cohort, commit: actualHead, sourceFiles: 4301, sourceDigest, sourceDeclarationSHA256: hash(readFileSync(descriptorPath)), npmVersion,
+    writeJSON(path.join(output, "source.json"), { cohort, commit: actualHead, sourceFiles: 4304, sourceDigest, sourceDeclarationSHA256: hash(readFileSync(descriptorPath)), npmVersion,
       node: { version: process.version, bytes: lstatSync(node).size, sha256: hash(readFileSync(node)), bundledNpmCLI_SHA256: hash(readFileSync(npm)), officialActionVersionPin: input.node }, testsRun: 0, typeChecksRun: 0, businessActions: 0, nativeOrSDKBind: 0, HOMEUnchanged: true, sourceIncludesPrivateConfiguration: false });
     execute(plan[0]); execute(plan[1]); verifySDK(); verifySourceTree(web, input.files, true);
     checkedInputs();

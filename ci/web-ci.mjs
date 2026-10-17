@@ -61,8 +61,20 @@ export function validateReport(report, audit, exit, { minimum, exact, before = f
 }
 
 export function webCohort(value = "full-regression") {
-  assert(["chat-card-42", "individual-forward-32", "full-regression"].includes(value), "Explicit chat-card-42, individual-forward-32 or full-regression cohort required");
+  assert(["chat-card-42", "individual-forward-32", "announcement-read-21", "full-regression"].includes(value), "Explicit chat-card-42, individual-forward-32, announcement-read-21 or full-regression cohort required");
   return value;
+}
+
+export function announcementReadCohort(announcement) {
+  assert(announcement?.originManifestSHA256 === "012853b3d517e34c97db227b932e91afcff2895783df16e5bfc71effcbd6cd3c", "Reviewed announcement-read lineage required");
+  const before = [{"bytes":2721,"path":"web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx","sha256":"98c055ade4188e56fe51775dd08cbd4449fef3d7c942b658cfe605c594702ed0"}];
+  const current = [{"bytes":11272,"path":"web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx","sha256":"57d1849f58f95f43d3e2935082392cb1d064c8208ef83c3836b2f010aee26eb7"},{"bytes":5142,"path":"web/src/core/groupAnnouncementAck.ts","sha256":"2e1bb5b626b239a97ec95220c8bc56872d4ce23149371ef8f48bc1492ffd582f"}];
+  const adopted = [{"bytes":4316,"path":"web/src/core/groupAnnouncementAck.test.ts","sha256":"c1ab5310630769983491b8f6c7bb74b4da1dcdc4dfd7f302c46af918b661c917"},{"bytes":12381,"path":"web/src/core/groupAnnouncementScope/announcement-read.test.tsx","sha256":"2f222fa1fae29bf23ba06ab375f677ff0252ae39ff7ab814b91b8daa88197ce3"}];
+  assert(JSON.stringify(announcement.before) === JSON.stringify(before) && JSON.stringify(announcement.currentAfter) === JSON.stringify(current) && JSON.stringify(announcement.adoptedTests) === JSON.stringify(adopted), "Exact announcement source/test lineage required");
+  assert(JSON.stringify(announcement.testPaths) === JSON.stringify(["src/core/groupAnnouncementAck.test.ts","src/core/groupAnnouncementScope/announcement-read.test.tsx"]), "Exact normal announcement test paths required");
+  assert(announcement.tests === 21 && announcement.requiredNames?.length === 21 && new Set(announcement.requiredNames).size === 21 && hash(Buffer.from(JSON.stringify(announcement.requiredNames))) === "1a16d714b2cd262bc49767b8d20c7d9552aad3a064afcaf08bbbc01c83c63cb6", "Exact21 announcement names required");
+  assert(announcement.previousExpectedFullTests === 763 && announcement.expectedFullTests === 784, "Explicit763+21 announcement regression lineage required");
+  return { exact: announcement.tests, requiredNames: announcement.requiredNames };
 }
 
 export function individualForwardCohort(individual) {
@@ -165,9 +177,12 @@ export function verifyInputs() {
   const card = inputs.chatCardAdoption;
   const copy = card?.copyRetention;
   const individual = inputs.individualForwardAdoption;
+  const announcement = inputs.announcementReadAdoption;
   individualForwardCohort(individual);
+  announcementReadCohort(announcement);
+  for (const entry of [...announcement.currentAfter, ...announcement.adoptedTests]) verifyFile(repo, entry);
   assert(card?.originManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a" && card.before.length === 13 && card.currentAfter.length === 15 && card.adoptedTests.length === 4, "Complete chat-card source/test lineage required");
-  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === individual.expectedFullTests, "Explicit pending 689+37+5+32 regression cohort required");
+  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === announcement.expectedFullTests && announcement.previousExpectedFullTests === individual.expectedFullTests, "Explicit pending689+37+5+32+21 regression cohort required");
   assert(card.requiredNames.length === 37 && new Set(card.requiredNames).size === 37, "Complete unique chat-card names required");
   assert(copy.requiredNames.length === 5 && new Set([...card.requiredNames, ...copy.requiredNames]).size === 42, "Complete unique copy-retention names required");
   assert(new Set([...card.requiredNames, ...copy.requiredNames, ...individual.requiredNames]).size === 74, "Complete unique 42+32 current names required");
@@ -284,7 +299,9 @@ async function main() {
       { exact: card.tests + copy.newTests, requiredNames: cardNames }, [...card.testPaths, ...copy.testPaths]));
     else if (cohort === "individual-forward-32") await phase("individual-forward-32", () => runTests("individual-forward-32",
       individualForwardCohort(individual), individual.testPaths));
-    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames] }));
+    else if (cohort === "announcement-read-21") await phase("announcement-read-21", () => runTests("announcement-read-21",
+      announcementReadCohort(inputs.announcementReadAdoption), inputs.announcementReadAdoption.testPaths));
+    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames, ...inputs.announcementReadAdoption.requiredNames] }));
     await phase("types-web-strict", async () => checkedProcess(await execute("types-web-strict", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"])));
     await phase("types-desktop-original", async () => checkedProcess(await execute("types-desktop-original", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.desktop.json"])));
     if (cohort === "full-regression") {

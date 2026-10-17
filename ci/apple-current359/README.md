@@ -51,3 +51,26 @@ Homebrew 的 system gem 根与 Cellar default spec 根分别核验；site/vendor
 
 仅新增 `GemSourceAudit` 的两项 filesystem 控制；原 selector2、packaging6、consumer3及本批已绿7不重跑。
 本 R3 只封源码，尚未执行控制、Ruby probe、解析或原生构建，也未派云任务。
+
+## R4: exact selected-Ruby bundled counterparts
+
+Run38987540599 rejected minitest's canonical spec parent. Its probe recorded
+only lexical spec/gem/require paths: the actual canonical target remains UNKNOWN.
+Schema2 now records lexical/canonical/kind for each, and the auditor checks those
+observations both before reads and before returning its evidence.
+
+Regular system gems retain their existing source rules. The only additional
+layout is an exact name-version from the16 entries in the fixed Ruby3.3.12
+`gems/bundled_gems`, under this selected Ruby's
+`lib/ruby/gems/3.3.0/{specifications,gems,extensions}`. Spec, gem and require
+counterparts must share one fullname and canonical base. Other Ruby versions,
+arbitrary Cellar paths, different fullnames, wrong layouts, split bases and changed
+mappings remain refused. Actual specs, regular-gem Ruby trees and loaded
+extensions are still hashed. Layout does not prove official gem content;
+first observations still need Root review and approval remains null.
+
+Only the two directly affected filesystem controls are prepared. Every negative
+first proves a valid baseline and checks its exact rejection field/subject;
+one subcase changes the alias during the real tree walk to exercise final
+mapping revalidation. No old selector2/packaging6/consumer3/prior7 are repeated.
+R4 has executed no tests, Ruby, parser, native resolution or cloud task.

@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput } from "./web-ci.mjs";
+import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput, announcementReadCohort } from "./web-ci.mjs";
 
 function runFixture(callback) {
   const root = mkdtempSync(path.join(os.tmpdir(), "luobo-web-ci-"));
@@ -136,4 +136,32 @@ test("individual-forward successor preserves card history and rejects changed li
   assert.throws(() => currentIndividualForwardInput(picker, { ...individual, originManifestSHA256: "0".repeat(64) }), /Reviewed/);
   assert.throws(() => currentIndividualForwardInput(picker, { ...individual, before: individual.before.filter((entry) => entry.path !== picker.path) }), /predecessor paths/);
   assert.throws(() => currentIndividualForwardInput(picker, { ...individual, currentAfter: individual.currentAfter.slice(1) }), /source and fixture paths/);
+});
+
+const announcement = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8")).announcementReadAdoption;
+test("announcement-read cohort requires all21 names and normal source paths", () => {
+  assert.equal(webCohort("announcement-read-21"), "announcement-read-21");
+  const options = announcementReadCohort(announcement);
+  assert.equal(options.exact, 21);
+  const data = reports(Array(21).fill("passed"));
+  data.audit.tests.forEach((entry, index) => { entry.name = announcement.requiredNames[index]; });
+  assert.equal(checked(data, 0, options).passed, 21);
+  data.audit.tests[0].name = "unreviewed announcement name";
+  assert.throws(() => checked(data, 0, options), /Required test/);
+  assert.throws(() => announcementReadCohort({ ...announcement, requiredNames: announcement.requiredNames.slice(1) }), /Exact21/);
+  assert.throws(() => announcementReadCohort({ ...announcement, requiredNames: ["wrong", ...announcement.requiredNames.slice(1)] }), /Exact21/);
+  assert.throws(() => announcementReadCohort({ ...announcement, testPaths: [...announcement.testPaths, "src/unrelated.test.ts"] }), /normal announcement/);
+  assert.throws(() => announcementReadCohort({ ...announcement, expectedFullTests: 763 }), /regression lineage/);
+});
+test("announcement successor rejects wrong source and keeps card individual history exact", () => {
+  assert.deepEqual(announcementReadCohort(announcement).requiredNames, announcement.requiredNames);
+  assert.throws(() => announcementReadCohort({ ...announcement, originManifestSHA256: "0".repeat(64) }), /Reviewed/);
+  const currentAfter = structuredClone(announcement.currentAfter); currentAfter[0].sha256 = "0".repeat(64);
+  assert.throws(() => announcementReadCohort({ ...announcement, currentAfter }), /source\/test lineage/);
+  const before = structuredClone(announcement.before); before[0].bytes++;
+  assert.throws(() => announcementReadCohort({ ...announcement, before }), /source\/test lineage/);
+  const input = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8"));
+  assert.equal(input.fullMinimumTests, 784);
+  assert.equal(input.announcementReadAdoption.previousExpectedFullTests, input.individualForwardAdoption.expectedFullTests);
+  assert.equal(new Set([...input.chatCardAdoption.requiredNames, ...input.chatCardAdoption.copyRetention.requiredNames, ...input.individualForwardAdoption.requiredNames, ...announcement.requiredNames]).size, 95);
 });

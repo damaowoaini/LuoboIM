@@ -1,7 +1,7 @@
 {
   "version": 3,
   "node": "24.21.0",
-  "fullMinimumTests": 763,
+  "fullMinimumTests": 784,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -1108,5 +1108,101 @@
       "affectedReceiptSHA256": "2700bede7fc5f6d9a085e13f246ecf1b7598220811f622709715db0bab45e149"
     },
     "sourceMeaning": "Explicit successor of reviewed R5 5product+3test/fixture; overlap before ChooseModal equals original d640 currentAfter. Old card15/copy lineage unchanged; known32 exact normal-source test names. Source/body privacy and ACK receipts do not prove actual business sending."
+  },
+  "announcementReadAdoption": {
+    "originManifestSHA256": "012853b3d517e34c97db227b932e91afcff2895783df16e5bfc71effcbd6cd3c",
+    "before": [
+      {
+        "bytes": 2721,
+        "path": "web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx",
+        "sha256": "98c055ade4188e56fe51775dd08cbd4449fef3d7c942b658cfe605c594702ed0"
+      }
+    ],
+    "currentAfter": [
+      {
+        "bytes": 11272,
+        "path": "web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx",
+        "sha256": "57d1849f58f95f43d3e2935082392cb1d064c8208ef83c3836b2f010aee26eb7"
+      },
+      {
+        "bytes": 5142,
+        "path": "web/src/core/groupAnnouncementAck.ts",
+        "sha256": "2e1bb5b626b239a97ec95220c8bc56872d4ce23149371ef8f48bc1492ffd582f"
+      }
+    ],
+    "adoptedTests": [
+      {
+        "bytes": 4316,
+        "path": "web/src/core/groupAnnouncementAck.test.ts",
+        "sha256": "c1ab5310630769983491b8f6c7bb74b4da1dcdc4dfd7f302c46af918b661c917"
+      },
+      {
+        "bytes": 12381,
+        "path": "web/src/core/groupAnnouncementScope/announcement-read.test.tsx",
+        "sha256": "2f222fa1fae29bf23ba06ab375f677ff0252ae39ff7ab814b91b8daa88197ce3"
+      }
+    ],
+    "testPaths": [
+      "src/core/groupAnnouncementAck.test.ts",
+      "src/core/groupAnnouncementScope/announcement-read.test.tsx"
+    ],
+    "tests": 21,
+    "requiredNames": [
+      "stores only boolean true under realm account group and full-version hashes",
+      "separates every realm account group and version dimension without deleting other versions",
+      "refuses wrong group actor status or malformed snapshot instead of acknowledging unverified metadata",
+      "does not report a failed or obsolete local write as a successful acknowledgement",
+      "opening or double-clicking reads without acknowledging and keeps the existing editor opener",
+      "hides only after successful exact boolean persistence and keeps a 44px keyboard confirmation",
+      "keeps the prompt and an explicit retry after storage failure without automatic repeat",
+      "does not turn a failed local acknowledgement read into a hidden prompt",
+      "shows a new version again while ordinary same-CID unread updates preserve valid reading",
+      "a fresh changed version cannot be confirmed under the old visible version",
+      "wrong group or current actor and empty membership reject confirmation before storage",
+      "A to B to A cannot revive a pending original confirmation",
+      "owner issuer and tenant changes never let a pending confirmation write a replacement owner's record",
+      "blur and refocus retire the old confirmation rather than resuming its action",
+      "an intervening modal retires pending confirmation even when the same view returns",
+      "a hidden document retires pending confirmation and never resumes its write",
+      "an expired confirmation result cannot write or relabel the current prompt",
+      "a late publisher from A or a wrong identity cannot label B's current announcement",
+      "a mismatched current publisher remains generic and never changes the verified announcement",
+      "a newer personal or all-members mention is never reset by this version's local acknowledgement",
+      "a same-view group mute does not remove a normal member's local read acknowledgement"
+    ],
+    "acceptedFullNames": [
+      "exact-version local announcement acknowledgement > stores only boolean true under realm account group and full-version hashes",
+      "exact-version local announcement acknowledgement > separates every realm account group and version dimension without deleting other versions",
+      "exact-version local announcement acknowledgement > refuses wrong group actor status or malformed snapshot instead of acknowledging unverified metadata",
+      "exact-version local announcement acknowledgement > does not report a failed or obsolete local write as a successful acknowledgement",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > opening or double-clicking reads without acknowledging and keeps the existing editor opener",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > hides only after successful exact boolean persistence and keeps a 44px keyboard confirmation",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > keeps the prompt and an explicit retry after storage failure without automatic repeat",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > does not turn a failed local acknowledgement read into a hidden prompt",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > shows a new version again while ordinary same-CID unread updates preserve valid reading",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > a fresh changed version cannot be confirmed under the old visible version",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > wrong group or current actor and empty membership reject confirmation before storage",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > A to B to A cannot revive a pending original confirmation",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > owner issuer and tenant changes never let a pending confirmation write a replacement owner's record",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > blur and refocus retire the old confirmation rather than resuming its action",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > an intervening modal retires pending confirmation even when the same view returns",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > a hidden document retires pending confirmation and never resumes its write",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > an expired confirmation result cannot write or relabel the current prompt",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > a late publisher from A or a wrong identity cannot label B's current announcement",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > a mismatched current publisher remains generic and never changes the verified announcement",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > a newer personal or all-members mention is never reset by this version's local acknowledgement",
+      "real announcement card uses local exact-version acknowledgement without SDK @ reset > a same-view group mute does not remove a normal member's local read acknowledgement"
+    ],
+    "previousExpectedFullTests": 763,
+    "expectedFullTests": 784,
+    "fullState": "pending_final_regression_only_not_executed",
+    "localAccepted": {
+      "source": "Root candidate/root-acceptance.json",
+      "testsPASS": 21,
+      "WebStrictNoEmit": "PASS_R1",
+      "originalTypesFailureRetained": true,
+      "behaviorNotRerunAfterErasedReferenceCorrection": true
+    },
+    "sourceMeaning": "Only these4 rows succeed exact4301. Pure local announcement acknowledgement never clears native personal/all-member mentions. No prior4301 build47 or full763 reused as a new4304 execution."
   }
 }

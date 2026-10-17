@@ -1,38 +1,38 @@
 {
   "schema": "luobo.web.build-only.v1",
-  "cohort": "web4301-build-only-v1",
+  "cohort": "web4304-build-only-v1",
   "node": "24.21.0",
-  "sourceFiles": 4301,
-  "sourceDigest": "dcbebe0d5d014533a25b7d4d1d0cfae603a1467d5fd924cb06aa6ce6f81270e6",
+  "sourceFiles": 4304,
+  "sourceDigest": "0caf95814993ac8936c1de386b2259d1f2bab5adda217436fc411af45907aa90",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
   "sourceDeclaration": {
-    "path": "references/integration/forward-seed-host-batch-20261017/final-web-source-vector.json",
-    "bytes": 828123,
-    "sha256": "5dd0471a2cd73c1c193ac008c7c3d593ed589d39cba45c6fceab75de982de6f0"
+    "path": "references/integration/web-announcement-formal-ci-candidate-20261017/final-web-source-vector.json",
+    "bytes": 806659,
+    "sha256": "057ce2fea53b4bcaeb70e456c9337e2b0fbaf8576f788deb998a3be89de46f0c"
   },
-  "sourceOriginRef": "87a4f0b979cab6cde4518fb50e58379bff92bf60",
-  "sourceObservedAtPublicRef": "f348ae881a7462d0f53643c1c05a6d8d222c7a1c",
-  "checkoutRule": "actual GITHUB_SHA must equal git HEAD; all4301 source rows exact; CI controller commit may be later without changing Web source identity",
+  "sourceOriginRef": null,
+  "sourceObservedAtPublicRef": null,
+  "checkoutRule": "actual GITHUB_SHA must equal git HEAD; all4304 source rows exact; CI controller commit may be later without changing source identity",
   "controllerInputs": [
     {
       "path": ".github/workflows/web-build-only.yml",
       "bytes": 4114,
-      "sha256": "ffc230c420f994850c889de56f5a724da5dbbbf2ef68bef0926eeb110957a4fe"
+      "sha256": "be57de542654afc8535378150017d512471bf78e67edf71646b101e72460ee29"
     },
     {
       "path": "ci/README.web-build.md",
-      "bytes": 4928,
-      "sha256": "f8dc2a1995e6ffac3134d0f7f515954fba5543af65d12b29a80bbb9377cbbb98"
+      "bytes": 5930,
+      "sha256": "3c6add6bee697e5409a71704881f2363558def33b7b902575585b641c07cb854"
     },
     {
       "path": "ci/web-build.mjs",
       "bytes": 18145,
-      "sha256": "6d2e4b9abf1db8c15f19d514bb7fb5331473d90584d5616e1eb2595b2fa5edcf"
+      "sha256": "4269afc5535e2e336424422b3032f53f925a96dfe0efb4644b1c89dbaac2a78d"
     },
     {
       "path": "ci/web-build.test.mjs",
-      "bytes": 3773,
-      "sha256": "c4c9525f0ce2ae5bc207fdb27448b65c9b1d3ac54bb57ad5ecdfa98d27d43182"
+      "bytes": 3825,
+      "sha256": "48e3cf7c3b42cc896a5e107e3ae13d64afddccd981842a434ade41ada451c599"
     },
     {
       "path": "ci/web-build.csp.test.mjs",
@@ -43,13 +43,13 @@
   "borrowedInputs": [
     {
       "path": "ci/web-ci.mjs",
-      "bytes": 28424,
-      "sha256": "3bc0314d205caddd3c2f8068b617b11468054a20a229af2a2e36f6b6987551f6"
+      "bytes": 31138,
+      "sha256": "3367c96c42cf218fec624a74282679e1838e18971976e4b2cb700ce918e5dddd"
     },
     {
       "path": "ci/web-ci.inputs.json",
-      "bytes": 54541,
-      "sha256": "edd67b7d937672c94b09e2275fb129f5e94cc82684aa324bf55d20eeec80fabb"
+      "bytes": 62109,
+      "sha256": "040c42f75750f922d38e65f2f76ab35d3172eec357f1e022bef4c6ff1339cd23"
     },
     {
       "path": "ci/group-effects/resource_guard.py",
@@ -20025,6 +20025,21 @@
       "sha256": "7c61dd9f02f34f55eb52f876975fd586e8ce653f0342c74b7cdc792cae175914"
     },
     {
+      "path": "src/core/groupAnnouncementAck.test.ts",
+      "bytes": 4316,
+      "sha256": "c1ab5310630769983491b8f6c7bb74b4da1dcdc4dfd7f302c46af918b661c917"
+    },
+    {
+      "path": "src/core/groupAnnouncementAck.ts",
+      "bytes": 5142,
+      "sha256": "2e1bb5b626b239a97ec95220c8bc56872d4ce23149371ef8f48bc1492ffd582f"
+    },
+    {
+      "path": "src/core/groupAnnouncementScope/announcement-read.test.tsx",
+      "bytes": 12381,
+      "sha256": "2f222fa1fae29bf23ba06ab375f677ff0252ae39ff7ab814b91b8daa88197ce3"
+    },
+    {
       "path": "src/core/groupAnnouncementScope/announcement-scope.test.tsx",
       "bytes": 12638,
       "sha256": "ad7331a06d8ad70e0f92b22a0d14b9f2377a3e4a84753a908dbd2e7e4026da29"
@@ -20656,8 +20671,8 @@
     },
     {
       "path": "src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx",
-      "bytes": 2721,
-      "sha256": "98c055ade4188e56fe51775dd08cbd4449fef3d7c942b658cfe605c594702ed0"
+      "bytes": 11272,
+      "sha256": "57d1849f58f95f43d3e2935082392cb1d064c8208ef83c3836b2f010aee26eb7"
     },
     {
       "path": "src/pages/chat/queryChat/ChatHeader/GroupCallingCard.tsx",
@@ -21583,5 +21598,50 @@
         "sha256": "b825162aced2e79be8d68d45efb1f89ec34ed4189467195a071a0d7b694a19d4"
       }
     ]
+  },
+  "predecessorSource": {
+    "cohort": "web4301-build-only-v1",
+    "sourceFiles": 4301,
+    "sourceDigest": "dcbebe0d5d014533a25b7d4d1d0cfae603a1467d5fd924cb06aa6ce6f81270e6",
+    "sourceDeclaration": {
+      "path": "references/integration/forward-seed-host-batch-20261017/final-web-source-vector.json",
+      "bytes": 828123,
+      "sha256": "5dd0471a2cd73c1c193ac008c7c3d593ed589d39cba45c6fceab75de982de6f0"
+    },
+    "sourceOriginRef": "87a4f0b979cab6cde4518fb50e58379bff92bf60",
+    "sourceObservedAtPublicRef": "f348ae881a7462d0f53643c1c05a6d8d222c7a1c"
+  },
+  "sourceOverlay": {
+    "candidateManifestSHA256": "012853b3d517e34c97db227b932e91afcff2895783df16e5bfc71effcbd6cd3c",
+    "before": [
+      {
+        "bytes": 2721,
+        "path": "web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx",
+        "sha256": "98c055ade4188e56fe51775dd08cbd4449fef3d7c942b658cfe605c594702ed0"
+      }
+    ],
+    "after": [
+      {
+        "bytes": 4316,
+        "path": "web/src/core/groupAnnouncementAck.test.ts",
+        "sha256": "c1ab5310630769983491b8f6c7bb74b4da1dcdc4dfd7f302c46af918b661c917"
+      },
+      {
+        "bytes": 5142,
+        "path": "web/src/core/groupAnnouncementAck.ts",
+        "sha256": "2e1bb5b626b239a97ec95220c8bc56872d4ce23149371ef8f48bc1492ffd582f"
+      },
+      {
+        "bytes": 12381,
+        "path": "web/src/core/groupAnnouncementScope/announcement-read.test.tsx",
+        "sha256": "2f222fa1fae29bf23ba06ab375f677ff0252ae39ff7ab814b91b8daa88197ce3"
+      },
+      {
+        "bytes": 11272,
+        "path": "web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx",
+        "sha256": "57d1849f58f95f43d3e2935082392cb1d064c8208ef83c3836b2f010aee26eb7"
+      }
+    ],
+    "state": "not adopted or built by this preparation; Root targeted21/types result only"
   }
 }

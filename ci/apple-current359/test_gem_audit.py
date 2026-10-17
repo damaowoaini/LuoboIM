@@ -5,11 +5,46 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 import gem_audit
 
 
 class GemSourceAudit(unittest.TestCase):
+    def observed_path(self, value):
+        p = Path(value)
+        kind = 'file' if p.is_file() else 'directory' if p.is_dir() else 'other' if p.exists() else 'missing'
+        return {'lexical': str(value), 'canonical': str(p.resolve(strict=True)) if p.exists() else None, 'kind': kind}
+
+    def refresh_maps(self, source):
+        for gem in source['gems']:
+            gem['path_mappings'] = {'spec': self.observed_path(gem['loaded_from']),
+                                    'gem': self.observed_path(gem['full_gem_path']),
+                                    'requires': [self.observed_path(p) for p in gem['full_require_paths']]}
+
+    def bundled_alias(self, source, selected, name='minitest', version='5.20.0'):
+        full_name = name+'-'+version
+        base = Path(selected['ruby']['path']).parent.parent/'lib/ruby/gems/3.3.0'
+        target_spec = base/'specifications'/(full_name+'.gemspec')
+        target_spec.parent.mkdir(parents=True, exist_ok=True)
+        target_spec.write_bytes(b'# selected Ruby bundled spec\n'); target_spec.chmod(0o644)
+        target_gem = base/'gems'/full_name
+        (target_gem/'lib').mkdir(parents=True)
+        (target_gem/'lib'/('minitest.rb')).write_bytes(b'# selected bundled source\n')
+        system = Path(selected['gem_root'])
+        logical_spec = system/'specifications'/target_spec.name
+        logical_spec.symlink_to(target_spec)
+        logical_gem = system/'gems'/full_name
+        logical_gem.symlink_to(target_gem, target_is_directory=True)
+        source['gems'].append({'name': name, 'version': version, 'full_name': full_name,
+                               'default': False, 'loaded_from': str(logical_spec),
+                               'full_gem_path': str(logical_gem), 'require_paths': ['lib'],
+                               'full_require_paths': [str(logical_gem/'lib')], 'files': ['lib/minitest.rb']})
+        source['load_path'].append(str(logical_gem/'lib'))
+        self.refresh_maps(source)
+        return {'spec': logical_spec, 'gem': logical_gem, 'target_spec': target_spec,
+                'target_gem': target_gem, 'base': base}
+
     def fixture(self, root):
         ruby_root, gem_root, home = root/'ruby', root/'system-gems', root/'real-home'
         home.mkdir()
@@ -51,7 +86,7 @@ class GemSourceAudit(unittest.TestCase):
         selected = {'ruby': {'path': str(ruby), 'bytes': ruby.stat().st_size,
                             'sha256': hashlib.sha256(ruby.read_bytes()).hexdigest(), 'mode': 0o644},
                     'gem_root': str(gem_root)}
-        source = {'schema': 1, 'ruby': '3.3.12', 'rubygems': '3.5.22', 'ruby_binary': str(ruby),
+        source = {'schema': 2, 'ruby': '3.3.12', 'rubygems': '3.5.22', 'ruby_binary': str(ruby),
                   'config': {'prefix': str(ruby_root), 'bindir': str(ruby.parent), 'libdir': str(lib),
                              'rubylibdir': str(stdlib), 'rubyarchdir': str(arch), 'ruby_version': '3.3.0',
                              'arch': 'arm64-darwin', 'DLEXT': 'bundle', 'ENABLE_SHARED': 'yes',
@@ -61,6 +96,7 @@ class GemSourceAudit(unittest.TestCase):
                   'load_path': [str(stdlib), str(arch)]+[g['full_require_paths'][0] for g in gems if not g['default']],
                   'gems': gems, 'features': features}
         pin = {'bytes': config.stat().st_size, 'sha256': hashlib.sha256(config.read_bytes()).hexdigest()}
+        self.refresh_maps(source)
         return source, selected, home, pin
 
     def test_real_specs_stdlib_and_compiled_markers_replace_synthetic_default_roots(self):
@@ -85,11 +121,25 @@ class GemSourceAudit(unittest.TestCase):
             extension.mkdir(parents=True)
             native = extension/'core.bundle'; native.write_bytes(b'extension bytes')
             source['gems'][-1]['full_require_paths'].append(str(extension))
+            self.refresh_maps(source)
             source['features'].append({'feature': str(native), 'bootstrap': False, 'paths': [str(native)]})
             changed = gem_audit.audit(source, selected, home, pin)
             self.assertIn(str(native), changed['gems'][-1]['loaded_files'])
             self.assertEqual(changed['configured_shared_libruby'], proof['configured_shared_libruby'])
             json.dumps(changed)  # evidence must remain serializable
+            aliases = self.bundled_alias(source, selected)
+            mapped = gem_audit.audit(source, selected, home, pin)
+            bundled = mapped['gems'][-1]
+            self.assertEqual(bundled['name'], 'minitest')
+            self.assertEqual(bundled['canonical_gem_root'], str(aliases['target_gem']))
+            self.assertEqual(bundled['path_mappings']['spec']['canonical'], str(aliases['target_spec']))
+            self.assertTrue(bundled['activation_only_no_individual_loaded_file'])
+            feature = aliases['gem']/'lib/minitest.rb'
+            source['features'].append({'feature': str(feature), 'bootstrap': False,
+                                       'paths': [str(feature.resolve(strict=True))]})
+            loaded = gem_audit.audit(source, selected, home, pin)
+            self.assertEqual(loaded['gems'][-1]['loaded_files'], [str(feature.resolve(strict=True))])
+            self.assertEqual(loaded['loaded_features'][-1]['owner'], 'minitest')
 
     def test_unknown_or_missing_sources_cannot_hide_behind_default_or_builtin_flags(self):
         def missing_spec(s, _):
@@ -115,6 +165,7 @@ class GemSourceAudit(unittest.TestCase):
             s['gem_path'].append(str(home))
         def require_other_gem(s, _):
             s['gems'][2]['full_require_paths'] = s['gems'][3]['full_require_paths']
+            s['gems'][2]['path_mappings']['requires'] = copy.deepcopy(s['gems'][3]['path_mappings']['requires'])
         for change, expected_field in [(missing_spec, 'loaded_from'), (missing_feature, 'feature.paths'),
                                        (unknown_marker, 'feature.paths'), (late_marker, 'feature.paths'),
                                        (user_source, 'feature.paths'), (wrong_flag, 'default'),
@@ -130,6 +181,50 @@ class GemSourceAudit(unittest.TestCase):
                     gem_audit.audit(copy.deepcopy(source), selected, home, pin)
                 self.assertEqual(rejected.exception.proof['field'], expected_field)
                 self.assertTrue(rejected.exception.proof['subject'])
+        # Each alias denial starts with the very same valid selected-Ruby alias.
+        for change, field in [('other-ruby', 'loaded_from'), ('other-fullname', 'loaded_from'),
+                              ('wrong-layout', 'loaded_from'), ('unlisted-bundle', 'loaded_from'),
+                              ('split-root', 'full_gem_path'), ('require-remap', 'full_require_paths'),
+                              ('stale-probe', 'loaded_from.mapping'), ('late-remap', 'loaded_from.mapping')]:
+            with self.subTest(alias=change), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                source, selected, home, pin = self.fixture(root)
+                aliases = self.bundled_alias(source, selected)
+                baseline = gem_audit.audit(copy.deepcopy(source), selected, home, pin)
+                self.assertEqual(baseline['gems'][-1]['canonical_gem_root'], str(aliases['target_gem']))
+                def retarget_spec(target):
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes(b'# replacement spec\n')
+                    aliases['spec'].unlink(); aliases['spec'].symlink_to(target)
+                if change == 'other-ruby':
+                    retarget_spec(root/'other-ruby/lib/ruby/gems/3.3.0/specifications/minitest-5.20.0.gemspec')
+                elif change == 'other-fullname':
+                    retarget_spec(aliases['base']/'specifications/minitest-5.19.0.gemspec')
+                elif change == 'wrong-layout':
+                    retarget_spec(aliases['base']/'misc/minitest-5.20.0.gemspec')
+                elif change == 'unlisted-bundle':
+                    self.bundled_alias(source, selected, name='unreviewed')
+                elif change == 'split-root':
+                    aliases['gem'].unlink(); (aliases['gem']/'lib').mkdir(parents=True)
+                    (aliases['gem']/'lib/minitest.rb').write_bytes(b'# different source\n')
+                elif change == 'require-remap':
+                    (aliases['target_gem']/'lib/minitest.rb').unlink(); (aliases['target_gem']/'lib').rmdir()
+                    other = aliases['base']/'other-lib'; other.mkdir()
+                    (aliases['target_gem']/'lib').symlink_to(other, target_is_directory=True)
+                elif change == 'stale-probe':
+                    retarget_spec(aliases['base']/'misc/minitest-5.20.0.gemspec')
+                if change != 'stale-probe':
+                    self.refresh_maps(source)
+                real_walk = gem_audit.os.walk
+                def walking(path, *args, **kwargs):
+                    yield from real_walk(path, *args, **kwargs)
+                    if change == 'late-remap' and Path(path) == aliases['target_gem']:
+                        retarget_spec(aliases['base']/'misc/minitest-5.20.0.gemspec')
+                with mock.patch.object(gem_audit.os, 'walk', side_effect=walking):
+                    with self.assertRaises(gem_audit.AuditFailure) as rejected:
+                        gem_audit.audit(source, selected, home, pin)
+                self.assertEqual(rejected.exception.proof['field'], field)
+                self.assertEqual(rejected.exception.proof['subject'], 'unreviewed' if change == 'unlisted-bundle' else 'minitest')
 
 
 if __name__ == '__main__':

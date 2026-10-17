@@ -7,17 +7,35 @@ abort 'fixed Ruby/CocoaPods identity' unless RUBY_VERSION == '3.3.12' &&
   Gem.loaded_specs.fetch('cocoapods').version.to_s == '1.17.0' &&
   Gem.loaded_specs.fetch('cocoapods-core').version.to_s == '1.17.0'
 
+def observed_path(path)
+  kind = if File.file?(path)
+    'file'
+  elsif File.directory?(path)
+    'directory'
+  elsif File.exist?(path)
+    'other'
+  else
+    'missing'
+  end
+  { 'lexical' => path, 'canonical' => kind == 'missing' ? nil : File.realpath(path), 'kind' => kind }
+end
+
 specs = Gem.loaded_specs.values.map do |spec|
+  required = spec.full_require_paths
   {
     'name' => spec.name, 'version' => spec.version.to_s, 'full_name' => spec.full_name,
     'default' => spec.default_gem?, 'loaded_from' => spec.loaded_from,
     'full_gem_path' => spec.full_gem_path, 'require_paths' => spec.raw_require_paths,
-    'full_require_paths' => spec.full_require_paths, 'files' => spec.files
+    'full_require_paths' => required, 'files' => spec.files,
+    'path_mappings' => {
+      'spec' => observed_path(spec.loaded_from), 'gem' => observed_path(spec.full_gem_path),
+      'requires' => required.map { |path| observed_path(path) }
+    }
   }
 end
 config_keys = %w[prefix bindir libdir rubylibdir rubyarchdir ruby_version arch DLEXT ENABLE_SHARED LIBRUBY_SO]
 observation = {
-  'schema' => 1, 'ruby' => RUBY_VERSION, 'rubygems' => Gem::VERSION,
+  'schema' => 2, 'ruby' => RUBY_VERSION, 'rubygems' => Gem::VERSION,
   'ruby_binary' => RbConfig.ruby,
   'config' => config_keys.to_h { |key| [key, RbConfig::CONFIG.fetch(key)] },
   'gem_dir' => Gem.dir, 'gem_path' => Gem.path, 'default_dir' => Gem.default_dir,

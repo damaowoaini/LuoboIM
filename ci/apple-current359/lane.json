@@ -244,9 +244,9 @@
   ],
   "own_inputs": [
     {
-      "bytes": 3824,
+      "bytes": 5221,
       "path": "ci/apple-current359/README.md",
-      "sha256": "08f3535f844552157ab949b8307ebc83d8ec57cd4483c87d48312f8606730e67"
+      "sha256": "b82f48252be5365231f12a322c5227d5efd22d6e4b104d914356602b490179ec"
     },
     {
       "bytes": 9176,
@@ -261,7 +261,7 @@
     {
       "bytes": 32359,
       "path": "ci/apple-current359/run.py",
-      "sha256": "f78b1d5151d9a22f9ff31263239da08dd1b87b8e3952d4d22512471480cf09ae"
+      "sha256": "aca224168d27ee436004c0cad268e53bbc1ad3980e34fc0557bc02df6727d752"
     },
     {
       "bytes": 2662,
@@ -270,18 +270,18 @@
     },
     {
       "path": "ci/apple-current359/gem_probe.rb",
-      "bytes": 1965,
-      "sha256": "92e243aac67cf1a77574329dfd11a68634750a5b756d1422ea0cfdaab6838419"
+      "bytes": 2458,
+      "sha256": "94994f0277a1385d5e748ea56c66fff32afb780389c90536f1bdf48d9d1d81e0"
     },
     {
       "path": "ci/apple-current359/gem_audit.py",
-      "bytes": 15989,
-      "sha256": "1ea544a0ddeb5868f1f9f5c3bae6630bb9f6baef0374d89db1fc939c21010515"
+      "bytes": 19246,
+      "sha256": "e0a798becdd08e999b6b6657b8fb37ef1397cf4df20248d2f6a14cb53a470baf"
     },
     {
       "path": "ci/apple-current359/test_gem_audit.py",
-      "bytes": 8457,
-      "sha256": "ec4631f2d62790d05afb39fa2ed075b5c6ea372c0c7589aa60657c182dfcad36"
+      "bytes": 15043,
+      "sha256": "0a26773763bac5673f78aacfbc146f0741414ca8da61b2fb79e753cd809026ba"
     }
   ],
   "packages": 178,
@@ -301,12 +301,22 @@
   "state": "source_only_resolution_pending_not_App_accepted",
   "xcodebuild": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
   "preinstalled_gem_audit": {
-    "schema": 2,
+    "schema": 3,
     "official_ruby_commit": "0581089df9f0af0fe6b64cb8167987c211100947",
     "probe": "ci/apple-current359/gem_probe.rb",
     "scope": "actual loaded files/specs/runtime and regular-gem Ruby source trees; configured libruby first observation, no dyld-map or App claim",
     "default_computed_directory_is_source_proof": false,
     "unknown_relative_markers": "refuse",
-    "source_provenance_Root_acceptance": false
+    "source_provenance_Root_acceptance": false,
+    "probe_schema": 2,
+    "path_contract": "lexical/canonical spec-gem-require correspondence; fixed selected-Ruby bundled names only; mappings checked before and after audit",
+    "bundled_source": {
+      "url": "https://raw.githubusercontent.com/ruby/ruby/0581089df9f0af0fe6b64cb8167987c211100947/gems/bundled_gems",
+      "Ruby_commit": "0581089df9f0af0fe6b64cb8167987c211100947",
+      "path": "evidence/ruby3312-bundled_gems",
+      "bytes": 1187,
+      "sha256": "9b3f0b8dafa8ffb6b65e5bdd0b4c5e712f90472d6dd84dd1a26bb6071f80e06f",
+      "scope": "fixed official bundled names/versions only; actual runner minitest canonical target remains unknown"
+    }
   }
 }

@@ -244,23 +244,67 @@ def checkedProject = { p ->
             buildFileExists:exists, defaultBuildScriptMissing:defaultMissing,
             buildFileSha256:hash, canonicalOwned:true]
 }
+// BEGIN strict repository lifecycle.
 def hosts = ['dl.google.com','maven.google.com','repo.maven.apache.org','repo1.maven.org',
              'plugins.gradle.org','plugins-artifacts.gradle.org','storage.googleapis.com','jitpack.io'] as Set
+def sealedJitPack = new java.util.IdentityHashMap()
+def repositoryURI = { repo ->
+    if (!repo.hasProperty('url')) return null
+    def u = repo.url as URI
+    if (u.scheme == 'file') {
+        def f = new File(u).canonicalFile
+        if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('repository outside owned root')
+    } else if (u.scheme != 'https' || u.userInfo != null || u.query != null || u.fragment != null || !hosts.contains(u.host)) {
+        throw new GradleException('unexpected dependency repository')
+    }
+    if (u.host == 'jitpack.io' && u.path != '' && u.path != '/')
+        throw new GradleException('unexpected JitPack repository path')
+    u
+}
+def repositoryFilterScope = { repo ->
+    [included:new HashSet(repo.getIncludedConfigurations() ?: []),
+     excluded:new HashSet(repo.getExcludedConfigurations() ?: []),
+     attributes:(repo.getRequiredAttributes() ?: [:]).collectEntries { attribute,values ->
+         [(attribute):new HashSet(values)] }]
+}
+// Read-only after registration. getContentFilter returns the same frozen Action
+// in fixed Gradle9.3.1; it does not acquire dependencies or mutate content.
 def checkRepo = { repo ->
-    if (repo.hasProperty('url')) {
-        def u = repo.url as URI
-        if (u.scheme == 'file') {
-            def f = new File(u).canonicalFile
-            if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('repository outside owned root')
-        } else if (u.scheme != 'https' || u.userInfo != null || u.query != null || u.fragment != null || !hosts.contains(u.host)) {
-            throw new GradleException('unexpected dependency repository')
-        }
-        if (u.host == 'jitpack.io') {
-            if (u.path != '' && u.path != '/') throw new GradleException('unexpected JitPack repository path')
-            repo.content { includeModule('com.github.davidliu','audioswitch') }
-        }
+    def u = repositoryURI(repo)
+    def seal = sealedJitPack.get(repo)
+    if (u?.host == 'jitpack.io' || seal != null) {
+        if (!(repo instanceof org.gradle.api.internal.artifacts.repositories.ContentFilteringRepository) ||
+                seal == null || seal.uri != u || !seal.filter.is(repo.getContentFilter()) ||
+                seal.scope != repositoryFilterScope(repo))
+            throw new GradleException('JitPack repository differs from its early fixed seal')
     }
 }
+def configureRepo = { repo ->
+    def u = repositoryURI(repo)
+    if (sealedJitPack.containsKey(repo)) { checkRepo(repo); return }
+    if (u?.host != 'jitpack.io') return
+    if (!(repo instanceof org.gradle.api.internal.artifacts.repositories.ContentFilteringRepository))
+        throw new GradleException('fixed Gradle content filtering repository required')
+    def group = 'com.github.davidliu', module = 'audioswitch'
+    def version = '039a35aefab7747c557242fa216c9ea11743b604'
+    def outside = { exact -> '(?!' + java.util.regex.Pattern.quote(exact) + '\\z)[\\s\\S]*' }
+    repo.content {
+        includeVersion(group,module,version)
+        // Exclusions win over any pre-existing broader include. Only this
+        // literal tuple may reach JitPack; checkModule also keeps its commit gate.
+        excludeGroupByRegex(outside(group))
+        excludeModuleByRegex('.*',outside(module))
+        excludeVersionByRegex('.*','.*',outside(version))
+    }
+    def filter = repo.getContentFilter() // Freeze before any model resolution.
+    sealedJitPack.put(repo,[uri:u,filter:filter,scope:repositoryFilterScope(repo)])
+    checkRepo(repo)
+}
+def observeRepositories = { repositories ->
+    repositories.each(configureRepo)
+    repositories.whenObjectAdded(configureRepo)
+}
+// END strict repository lifecycle.
 def checkModule = { group, module, v ->
     if (group == 'com.github.davidliu' && module == 'audioswitch' &&
             v != '039a35aefab7747c557242fa216c9ea11743b604') throw new GradleException('JitPack source commit differs')
@@ -337,14 +381,16 @@ def componentIdentity = { component ->
     }
     throw new GradleException('unknown selected component identifier refused')
 }
+gradle.beforeSettings { s ->
+    observeRepositories(s.pluginManagement.repositories)
+}
 gradle.settingsEvaluated { s ->
     s.pluginManagement.repositories.each(checkRepo)
-    s.pluginManagement.repositories.whenObjectAdded(checkRepo)
 }
 gradle.beforeProject { p ->
     checkedProject(p)
-    p.repositories.whenObjectAdded(checkRepo)
-    p.buildscript.repositories.whenObjectAdded(checkRepo)
+    observeRepositories(p.repositories)
+    observeRepositories(p.buildscript.repositories)
     [p.configurations,p.buildscript.configurations].each { configs -> configs.all { c ->
         if (richGate.scoped(p,c)) {
             c.incoming.beforeResolve { richGate.declarations(p,c) }
