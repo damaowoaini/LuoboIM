@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -158,6 +159,38 @@ func freshKafkaConfig(user, password string) *sarama.Config {
 	c.Metadata.Retry.Max = 0
 	c.Admin.Retry.Max = 0
 	return c
+}
+
+// Only the original read-only constructor is retried, and only when its
+// error chain proves ECONNREFUSED. Writes stay outside this loop. In the locked
+// Sarama version that failure returns no live client/socket/metadata updater;
+// vendor asynchronous close checks are not claimed to be fully joined here.
+func waitFreshKafkaClient(ctx context.Context, user, password string) (sarama.Client, error) {
+	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		client, err := sarama.NewClient([]string{"127.0.0.1:9092"}, freshKafkaConfig(user, password))
+		if err == nil {
+			if err = ctx.Err(); err != nil {
+				return nil, errors.Join(err, client.Close())
+			}
+			return client, nil
+		}
+		if !errors.Is(err, syscall.ECONNREFUSED) {
+			return nil, err
+		}
+		// Each protocol attempt retains the original three-second I/O bounds.
+		// Only this interval is immediately cancellable; no deadline is renewed.
+		timer := time.NewTimer(200 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return nil, ctx.Err()
+		case <-timer.C:
+			timer.Stop()
+		}
+	}
 }
 
 // PrepareFresh is an explicit privileged fixture bootstrap, before any owned
@@ -312,7 +345,7 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 	p.observeBootstrapStage(bootstrapKafka)
 	topics := []string{"fullgraph_" + out.Resource.Nonce + "_allocation", "fullgraph_" + out.Resource.Nonce + "_persistence", "fullgraph_" + out.Resource.Nonce + "_push"}
 	groups := []string{"fullgraph_" + out.Resource.Nonce + "_online", "fullgraph_" + out.Resource.Nonce + "_offline", "fullgraph_" + out.Resource.Nonce + "_push"}
-	client, e := sarama.NewClient([]string{"127.0.0.1:9092"}, freshKafkaConfig(c["kafkaAdminUser"], c["kafkaAdminPassword"]))
+	client, e := waitFreshKafkaClient(ctx, c["kafkaAdminUser"], c["kafkaAdminPassword"])
 	if e != nil {
 		return out, e
 	}

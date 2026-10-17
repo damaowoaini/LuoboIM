@@ -4,7 +4,7 @@
   "scope": "fresh_cleanup5top12sub_plus_original_graph2top3sub_and_four_planes_prior_unbound_child1_only_no_deployment",
   "source": {
     "members": 1575,
-    "digest": "7e5c8bbb12a5de0b06a23c2408847c2701dbc84a25631d6876e74dfb16f28d2d"
+    "digest": "a8c2a6c5c14c4f7e927448d54a983888c543cf4e70b6367540eda7f921326665"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,8 +42,8 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 49244,
-      "sha256": "1d0ab601e68dce2363967ab5d747264ef0820aa2f6020913a5ab92ee548645c4"
+      "bytes": 49259,
+      "sha256": "f2c272778cfa31326f864dadcc1bdd7302f41166eddeb371854ebe5065eddbd2"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -1193,15 +1193,15 @@
     {
       "target": "server/internal/namespaceinventory/import_merkle.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceinventory/import_merkle.go",
-      "bytes": 10645,
-      "sha256": "3b3398a881ae5cf4df98e8cfa5b1bd50598c003fb37d189c3fecb1c5859186c5",
+      "bytes": 13768,
+      "sha256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/namespaceinventory/import_merkle_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceinventory/import_merkle_test.go",
-      "bytes": 3188,
-      "sha256": "7f723d5f0b3f2111369de403b6a0291a206780b2ebdd5d6f634f291dee04c637",
+      "bytes": 12011,
+      "sha256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
       "beforeSHA256": null
     },
     {
@@ -1277,8 +1277,8 @@
     {
       "target": "server/internal/namespaceinventory/import_workspace.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceinventory/import_workspace.go",
-      "bytes": 15504,
-      "sha256": "1897772ead76e68c3e3023ace6523d9c998a34c6283325e75a260d22366ceb6f",
+      "bytes": 16097,
+      "sha256": "52b567b233fb3b78b06beb1c2b67eb4045146cb629b0bf38816d082b70c3a88f",
       "beforeSHA256": null
     },
     {
@@ -1291,8 +1291,8 @@
     {
       "target": "server/internal/namespaceinventory/import_workspace_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceinventory/import_workspace_test.go",
-      "bytes": 11176,
-      "sha256": "7783acda4bcfc70362ddbf313caee34f9b7845d2568d3bd3d4bd5e0b741df681",
+      "bytes": 17742,
+      "sha256": "4d4cbf86ee05837c1ab0391668f82d964da0fe8931e21366c78a8a77e00fd394",
       "beforeSHA256": null
     },
     {
@@ -1354,8 +1354,8 @@
     {
       "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/bootstrap_linux.go",
-      "bytes": 29912,
-      "sha256": "a393f8b284c62ec18d61016ae1430c714cdb13faed3d502603fb001fbc6449d3",
+      "bytes": 30970,
+      "sha256": "28974447ad79c88bade77c3d55142909f7bd20510f169e687cc6768feef3807a",
       "beforeSHA256": null
     },
     {

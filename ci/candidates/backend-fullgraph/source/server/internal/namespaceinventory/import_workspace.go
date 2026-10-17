@@ -273,7 +273,12 @@ func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor
 	// registry tree has been persisted by the same O_EXCL+file/directory fsync.
 	ctx, batch := newProgressIndexContext(ctx, w.dir)
 	defer batch.close()
-	setSlots := map[string]int{}
+	// Only descriptors already derived in THIS locked Commit are accumulated.
+	// First reads still authenticate the original registry; each mutation keeps
+	// its exact prior/value CAS and immediate private value write. First-seen
+	// order is deterministic, and at most64 mutations imply at most64 entries.
+	sets := map[string]derivedSet{}
+	setOrder := make([]string, 0, len(changes))
 	finalRoots := make([]string, 0, len(changes)+1)
 	store := progressStore{w.dir}
 	seen := map[string]bool{}
@@ -286,10 +291,13 @@ func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor
 			return st, "", ErrInvalid
 		}
 		seen[k] = true
-		var set derivedSet
-		present, e := store.get(ctx, next.SetsRoot, change.SetID, &set)
-		if e != nil || present && (set.Count == 0 || !hexText(set.Root, 64)) {
-			return st, "", ErrChanged
+		set, loaded := sets[change.SetID]
+		if !loaded {
+			present, readErr := store.get(ctx, old.SetsRoot, change.SetID, &set)
+			if readErr != nil || present && (set.Count == 0 || !hexText(set.Root, 64)) {
+				return st, "", ErrChanged
+			}
+			setOrder = append(setOrder, change.SetID)
 		}
 		var prior derivedValue
 		exists, e := store.get(ctx, set.Root, change.Key, &prior)
@@ -314,16 +322,20 @@ func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor
 			}
 			set.Count++
 		}
-		next.SetsRoot, e = store.put(ctx, next.SetsRoot, change.SetID, set)
+		sets[change.SetID] = set
+	}
+	// Rewriting a descriptor after every leaf only rebuilds our own unpublished
+	// registry. Write each final descriptor once through the original COW path.
+	for _, setID := range setOrder {
+		if e = ctx.Err(); e != nil {
+			return st, "", e
+		}
+		set := sets[setID]
+		next.SetsRoot, e = store.put(ctx, next.SetsRoot, setID, set)
 		if e != nil {
 			return st, "", e
 		}
-		if slot, exists := setSlots[change.SetID]; exists {
-			finalRoots[slot] = set.Root
-		} else {
-			setSlots[change.SetID] = len(finalRoots)
-			finalRoots = append(finalRoots, set.Root)
-		}
+		finalRoots = append(finalRoots, set.Root)
 	}
 	if next.SetsRoot != "" {
 		finalRoots = append(finalRoots, next.SetsRoot)
