@@ -2149,8 +2149,18 @@
     },
     {
       "path": "ci/mobile-input.py",
-      "bytes": 38746,
-      "sha256": "51eb41eafa3890336eb23ac60606e59c746b6005443cec4505ade521aefdba42"
+      "bytes": 39920,
+      "sha256": "ee5e418c6f078ca9bcd24ea40ba4803bef49781d6f6898318b34f51ec4d3ff50"
+    },
+    {
+      "path": "ci/mobile-input-vm.py",
+      "bytes": 19339,
+      "sha256": "6b409db15f220af741db6159c380eeba1d6cde91adca0bd482f68c109c83f4dd"
+    },
+    {
+      "path": ".github/workflows/mobile-input-vm-diagnostic.yml",
+      "bytes": 1726,
+      "sha256": "9a476f746db69f0695cd6fb2acaed2c2e5282958f166a6cdbfc73f2ee163ecbe"
     }
   ],
   "old_test_source_pins": [
@@ -3749,5 +3759,52 @@
     "chat restores a draft and sends through the real method codec without overflow at large text",
     "repeated exit is idempotent and old listener generations cannot enter a new account",
     "actual role read failure stays an error and explicit retry remains read only until confirmation"
-  ]
+  ],
+  "vm_diagnostic": {
+    "version": "owned-flutter-wait-diagnostic-v1",
+    "frameworkRevision": "abaf9c523780a608bd46686fd5e53740a07077f8",
+    "dartSDKRevision": "04bcd1036cdc799ac6564988f159ee454d42c822",
+    "flutterSourcePins": [
+      {
+        "path": "packages/flutter_tools/lib/src/commands/test.dart",
+        "bytes": 34519,
+        "sha256": "0b2956d87e54f51d702e3f316f49187d3c0e69e379657fbccbebc2fe07933dc7"
+      },
+      {
+        "path": "packages/flutter_tools/lib/src/runner/flutter_command.dart",
+        "bytes": 85283,
+        "sha256": "711ffb370b4b1e24ccb288887544ab71609d41ebd79d282a39d239ec0ca05a8f"
+      },
+      {
+        "path": "packages/flutter_tools/lib/src/test/event_printer.dart",
+        "bytes": 1594,
+        "sha256": "6f578a45cc5b3db5cea4f7929b34254f639393abcb0bae78c7bce09f84394aec"
+      },
+      {
+        "path": "packages/flutter_tools/lib/src/test/flutter_tester_device.dart",
+        "bytes": 13491,
+        "sha256": "d4ad82dd17d22b9a9e3c289a545dbf05aa120d38c6f842fdba7c852414973cdb"
+      }
+    ],
+    "machineURIEvent": "test.startedProcess",
+    "URIField": "params.vmServiceUri",
+    "enableVMService": true,
+    "enableDDS": false,
+    "disableAuthentication": false,
+    "target": "wrong-peer wrong-recipient malformed and offline typing never enters history or the active header",
+    "trigger": "chat_input_unmount pumpWidget.before",
+    "samples": 2,
+    "rpcMethods": [
+      "getVM",
+      "getIsolate",
+      "getStack"
+    ],
+    "responseBytes": 262144,
+    "perReadSeconds": 2,
+    "sampleFrameLimit": 32,
+    "diagnosticDeadlineSeconds": 20,
+    "privateRoot": "private-vm-diagnostic",
+    "uploadPrivateURI": false,
+    "defaultNoVMServiceAccepted": false
+  }
 }

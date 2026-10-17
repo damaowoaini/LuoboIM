@@ -1,4 +1,4 @@
-name: Xcode164 owned temporary-path Swift and local SPM diagnostic only
+name: Xcode164 owned-result local SPM only with prior Swift1 reuse
 
 on:
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
           python="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
           test -x "$python"
           echo "APPLE_TEMP_PYTHON=$python" >> "$GITHUB_ENV"
-      - name: Actual small Swift then local-only SPM under original private sandbox
+      - name: Actual local SPM1 with owned result path and prior Swift1 reuse
         run: '"$APPLE_TEMP_PYTHON" -B ci/apple-resolution-temp-diagnostic/run.py --identity apple-xcode164-owned-temp-swift-spm-diagnostic-r23-v1'
       - name: Bounded public logs and identities only, never generated binaries
         if: always()

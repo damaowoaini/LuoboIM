@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import signal
 import subprocess
+import sys
 import threading
 from urllib.parse import unquote, urlparse
 
@@ -31,6 +32,7 @@ FINAL_PORTABLE = '00fb5adacb2cc3e68b6e16059d1de69feaa857ffe33c620c877dad6ccbf210
 LOCAL_REUSE_SHA = 'f8a4f1423ca3635b1469a9526ede3059ffde3e0817af6cb63d43282bd586a75c'
 ORIGINAL_CLOUD15_SHA = 'b2438f78ab68b2e34c111cc8052e85e1563c3fcc0c136a397acb80bcc87387ba'
 CLOUD_REUSE_SHA = '8fe4cd26676632f2dc83032daac6d136b01e33b2d332e6bac5cd8257890c0e28'
+VM_DIAGNOSTIC_SHA = 'bef5fd760ded7beab99f71cd007ace681f001ed6d28bb58ad3dd014e20ba859d'
 SOURCE_POST_SECONDS = 30
 RESOURCE = {'initial_bytes': 4294967296, 'floor_bytes': 1073741824,
             'allocated_cap_bytes': 805306368, 'poll_seconds': .2, 'phase_seconds': 120}
@@ -58,7 +60,7 @@ REUSED_WIDGET21 = [n for n in REUSED22 if n != OLD5[3]]
 REUSED25 = [n for n in UNIVERSE27 if n not in PHASE1+[OLD5[-1]]]
 REUSED_WIDGET24 = [n for n in REUSED25 if n != OLD5[3]]
 PHASE1_PATHS = ['test/features/chat/chat_typing_workflow_test.dart']
-HELPERS = ['ci/mobile-source.py', 'ci/mobile-check.py', 'ci/mobile-announcement.py', 'ci/mobile/inputs.json', 'ci/mobile/required-test-names.json', 'ci/mobile-setup.sh', 'ci/mobile-input-setup.sh', '.github/workflows/mobile-input.yml', '.github/workflows/mobile-ci.yml', 'ci/mobile-input.py']
+HELPERS = ['ci/mobile-source.py', 'ci/mobile-check.py', 'ci/mobile-announcement.py', 'ci/mobile/inputs.json', 'ci/mobile/required-test-names.json', 'ci/mobile-setup.sh', 'ci/mobile-input-setup.sh', '.github/workflows/mobile-input.yml', '.github/workflows/mobile-ci.yml', 'ci/mobile-input.py', 'ci/mobile-input-vm.py', '.github/workflows/mobile-input-vm-diagnostic.yml']
 
 
 def pin(body, row):
@@ -210,6 +212,8 @@ def validate_cloud_reuse(cfg):
 
 def descriptor():
     cfg = json.loads(SOURCE.regular(INPUTS))
+    if SOURCE.sha(json.dumps(cfg['vm_diagnostic'],ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()) != VM_DIAGNOSTIC_SHA:
+        raise ValueError('bounded VM diagnostic contract differs')
     if (cfg['schema'] != 'luobo.mobile.input.current363.diagnostic1.reuse25.v6'
             or cfg['cohort'] != 'current363' or cfg['resource'] != RESOURCE
             or cfg['source_digest'] != FINAL_SOURCE or cfg['portable_digest'] != FINAL_PORTABLE
@@ -351,13 +355,16 @@ def materialize(output):
             'rows': SOURCE.rows(files), 'old_generated_outputs_copied': 0, 'native_acceptance': False}
 
 
-def phase_commands(work, cfg):
+def phase_commands(work, cfg, vm_diagnostic=False):
     validate_local_reuse(cfg)
     validate_cloud_reuse(cfg)
     phases = []
     for label, names, paths in [('input-typing-diagnostic1', PHASE1, PHASE1_PATHS)]:
         command = [str(work/'flutter/bin/flutter'), 'test', '--no-pub', '--machine', '--concurrency=1',
                    '--no-enable-vmservice', '--name', '^(?:'+'|'.join(map(re.escape, names))+')$'] + paths
+        if vm_diagnostic:
+            label = 'input-typing-vm-diagnostic1'
+            command = [sys.executable, str(REPO/'ci/mobile-input-vm.py'), '--work', str(work)]
         phases.append({'label': label, 'names': names, 'expected': len(names),
                        'paths': paths, 'command': command})
     return phases
@@ -545,7 +552,7 @@ def run_phase(work, cfg, old, guard, phase):
     return record, primary
 
 
-def run(work):
+def run(work, vm_diagnostic=False):
     cfg, old = descriptor()
     verify_work(work, cfg, old)
     CHECK.prove_namespace()
@@ -558,7 +565,7 @@ def run(work):
     try:
         CHECK.write_json(work/'evidence/input-local-reuse13-plus1.json', cfg['local_validation_reuse'])
         CHECK.write_json(work/'evidence/input-prior-cloud25.json', cfg['cloud_validation_reuse'])
-        for phase in phase_commands(work, cfg):
+        for phase in phase_commands(work, cfg, vm_diagnostic):
             result, error = run_phase(work, cfg, old, guard, phase)
             phases.append(result)
             if error is not None and primary is None:
@@ -590,6 +597,10 @@ def run(work):
             if primary is not None:
                 raise primary
             raise ValueError('targeted continuation failed')
+    if vm_diagnostic:
+        diagnostic = module('owned_mobile_vm_diagnostic', REPO/'ci/mobile-input-vm.py')
+        diagnostic.write_profiled_pass(work, phases, FINAL_SOURCE, FINAL_PORTABLE)
+        return
     CHECK.write_json(work/'evidence/input-scoped-passed.json',
                      {'state': 'current363_diagnostic1_with_explicit_prior25', 'phases': phases,
                       'cloud_analysis_executed': 0, 'cloud_tests_executed': 1,
@@ -603,7 +614,7 @@ def run(work):
                       'full1329_executed': False, 'native_device_service_acceptance': False})
 
 
-def netns(work, run_as):
+def netns(work, run_as, vm_diagnostic=False):
     if os.geteuid() != 0 or not run_as or run_as == 'root':
         raise ValueError('root netns launcher and nonroot tester required')
     canonical_work(work)
@@ -620,6 +631,8 @@ def netns(work, run_as):
     command = ['/usr/sbin/runuser', '-u', run_as, '--', 'env', '-i']
     command += [k+'='+v for k, v in env.items()]
     command += ['python3', str(Path(__file__).resolve()), 'run', '--work', str(work)]
+    if vm_diagnostic:
+        command.append('--vm-wait-diagnostic')
     os.execv(command[0], command)
 
 
@@ -629,7 +642,10 @@ def main():
     parser.add_argument('--work', type=Path)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--run-as')
+    parser.add_argument('--vm-wait-diagnostic', action='store_true')
     args = parser.parse_args()
+    if args.vm_wait_diagnostic and args.mode not in ('netns','run'):
+        parser.error('VM diagnostic mode only applies to this one guarded run')
     if args.mode == 'materialize':
         if args.output is None:
             parser.error('output required')
@@ -642,9 +658,9 @@ def main():
     elif args.work is None:
         parser.error('work required')
     elif args.mode == 'netns':
-        netns(args.work, args.run_as)
+        netns(args.work, args.run_as, args.vm_wait_diagnostic)
     else:
-        run(args.work)
+        run(args.work, args.vm_wait_diagnostic)
 
 
 if __name__ == '__main__':

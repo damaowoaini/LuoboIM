@@ -24,7 +24,7 @@ SWIFTC = DEVELOPER + '/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc'
 MACOS_SDK = DEVELOPER + '/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk'
 LOG_CAP = 256 * 1024
 CAP = 64 * 1048576
-FRESH_PHASES = ('swift',)
+FRESH_PHASES = ('spm',)
 
 
 def load(path, name):
@@ -57,6 +57,7 @@ def verify():
         raise ValueError('diagnostic identity required')
     for r in spec['owned'] + spec['borrowed']: checked(REPO, r)
     prior_spm_failure(spec)
+    prior_swift_success(spec)
     return spec
 
 
@@ -66,7 +67,10 @@ def driver():
     if prior is not None and Path(prior.__file__).resolve() != parent/'consume.py':
         raise ValueError('foreign source consumer module')
     sys.path.insert(0, str(parent))
-    try: return load(parent/'run.py', 'owned_temp_diagnostic_original_driver')
+    try:
+        result = load(parent/'run.py', 'owned_temp_diagnostic_original_driver')
+        result.xcrun_adapter = load(HERE/'xcrun_adapter.py', 'temp_diagnostic_fixed_result_adapter')
+        return result
     finally: sys.path.pop(0)
 
 
@@ -90,7 +94,8 @@ def native_argv(work, phase):
     if phase != 'spm': raise ValueError('finite phase required')
     return ['/usr/bin/arch', '-arm64e', 'xcrun', 'xcodebuild',
             '-resolvePackageDependencies', '-project', 'Runner.xcodeproj',
-            '-clonedSourcePackagesDirPath', str(work/'source/app/build/ios/SourcePackages')]
+            '-clonedSourcePackagesDirPath', str(work/'source/app/build/ios/SourcePackages'),
+            '-resultBundlePath', str(work/'xcode/Resolve.xcresult')]
 
 
 def native_command(work, phase):
@@ -98,7 +103,7 @@ def native_command(work, phase):
     return {'schema':2, 'phase':phase, 'argv':argv, 'cwd':'work/source/app/ios',
         'outer_exec':argv[0], 'architecture':argv[1][1:],
         'requested_tool':SWIFTC if phase == 'swift' else DEVELOPER+'/usr/bin/xcodebuild',
-        'tool_entry':'direct fixed Swift compiler' if phase == 'swift' else 'unchanged original xcrun adapter',
+        'tool_entry':'direct fixed Swift compiler' if phase == 'swift' else 'diagnostic fixed-result adapter; original ARM/private-cache execution retained',
         'outer_launcher_attempt_recorded':True, 'actual_tool_started':None,
         'actual_tool_start_evidence':'not observed in pre-launch command record',
         'full_environment_recorded':False}
@@ -138,6 +143,19 @@ def prior_spm_failure(spec):
             or prior.get('worker_boundary_post_exact') is not True
             or prior.get('tools_post_exact') is not True):
         raise ValueError('exact prior SPM failure evidence required; never a PASS')
+    return prior
+
+
+def prior_swift_success(spec):
+    prior = spec['priorSwiftSuccessReused']
+    if (prior.get('run') != 39041612104 or prior.get('job') != 117422083283
+            or prior.get('head') != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
+            or prior.get('attempt') != 1 or prior.get('phase') != 'swift'
+            or prior.get('status') != 'passed' or prior.get('exit_code') != 0
+            or prior.get('executed_this_run') is not False
+            or prior.get('actual_tool_started') is not True
+            or prior.get('source_worker_controller_tools_SDK_post_exact') is not True):
+        raise ValueError('exact prior accepted Swift1 success required; no repeat')
     return prior
 
 
@@ -271,13 +289,13 @@ def capture(work, phase, argv, environment):
 
 def worker(work, phase):
     if phase not in FRESH_PHASES:
-        raise ValueError('only corrected Swift phase may execute; original SPM failure is reused')
+        raise ValueError('only owned-result SPM phase may execute; accepted Swift1 is reused')
     spec = verify(); d = driver(); fixtures = load(HERE/'fixtures.py', 'temp_diagnostic_fixtures')
     a = json.loads((work/'activation.json').read_bytes())
     if (a.get('diagnostic_identity') != IDENTITY or a.get('phase') != phase
             or a.get('materialized_App_members') != 0 or a.get('source_ref') is not None):
         raise ValueError('diagnostic-only activation required')
-    d.xcrun_adapter.check(work, REPO/'ci/apple-current359/xcrun_adapter.py', sys.executable)
+    d.xcrun_adapter.check(work, HERE/'xcrun_adapter.py', sys.executable)
     d.xcrun_adapter.cache_boundary(work)
     before = source_snapshot(work, fixtures)
     selected = json.loads((work/'evidence/selected-cocoapods.json').read_bytes())
@@ -329,7 +347,7 @@ def finish_worker_boundary(work, phase, d, fixtures, before, selected, environme
     after = source_snapshot(work, fixtures)
     record(work/'evidence/source-post.json', {'exact': after == before, 'files': after,
         'scope': 'new public diagnostic inputs only; not source359/477 validation'})
-    d.xcrun_adapter.check(work, REPO/'ci/apple-current359/xcrun_adapter.py', sys.executable)
+    d.xcrun_adapter.check(work, HERE/'xcrun_adapter.py', sys.executable)
     d.pod_selector.recheck(selected, Path(environment['HOME']))
     verify()
     # This success receipt is written LAST; an earlier source-post is not a
@@ -406,8 +424,10 @@ def execute():
     if s.f_bavail*s.f_frsize < 1 << 30: raise ValueError('1GiB admission required')
     root.mkdir(mode=0o700)
     (root/'evidence').mkdir(mode=0o700)
-    prior = prior_spm_failure(spec)
-    record(root/'evidence/prior-spm-failure.json', prior)
+    prior_failed_spm = prior_spm_failure(spec)
+    prior = prior_swift_success(spec)
+    record(root/'evidence/prior-spm-failure.json', prior_failed_spm)
+    record(root/'evidence/prior-swift-success.json', prior)
     host = load(REPO/'ci/apple-host-tool/run.py', 'temp_diagnostic_host_fingerprint')
     before_tools = tools_snapshot(spec, host)
     record(root/'evidence/tools-before.json', {'files': before_tools})
@@ -421,7 +441,7 @@ def execute():
         work.mkdir(mode=0o700, parents=True)
         for path in ['evidence','tmp','pub-cache','config','cache/clang','cache/swift-modules','cocoapods/cache','cocoapods/repos']:
             (work/path).mkdir(mode=0o700, parents=True, exist_ok=True)
-        d.xcrun_adapter.install(work, REPO/'ci/apple-current359/xcrun_adapter.py', sys.executable)
+        d.xcrun_adapter.install(work, HERE/'xcrun_adapter.py', sys.executable)
         d.xcrun_adapter.seal_cache_boundary(work)
         # The original adapter identity is ONLY its unchanged entry ABI. This
         # explicit extra scope does not claim that App359/477 was materialized.
@@ -439,7 +459,7 @@ def execute():
         record(work/'evidence/source-pre.json', {'files':source_snapshot(work,fixtures)})
     record(root/'evidence/budget.json', {'primary_plus_secondary_unique_cap_bytes':CAP,
         'all_phase_outputs_share_primary':True,'private_cache_double_counted_in_primary':False,
-        'fresh_phases':list(FRESH_PHASES),'prior_SPM_failure_reused_not_executed':True,
+        'fresh_phases':list(FRESH_PHASES),'prior_Swift_success_reused_not_executed':True,
         'secondary_cap_bytes':CAP,'minimum_free_bytes':1<<30,'poll_seconds':.2,
         'phase_timeout_seconds':120,'original_shared_guard_changed':False,
         'system_T_or_HOME_write_grant_added':False,'cache_bodies_read_or_deleted':False})
@@ -500,13 +520,19 @@ def execute():
                 'fresh_phase_count':len(rows), 'fresh_expected_phases':list(FRESH_PHASES),
                 'fresh_native_commands_passed':all_phases_complete and all(
                     r['exit_code'] == 0 and r['native_command_succeeded'] for r in rows),
-                'prior_phase_results':[prior], 'prior_SPM_failure_reused':True,
-                'SPM_executed_this_run':False, 'SPM_resolution_passed':False,
-                'all_native_commands_passed':False,
+                'prior_phase_results':[prior], 'prior_Swift_success_reused':True,
+                'previous_SPM_failure':prior_failed_spm, 'Swift_executed_this_run':False,
+                'SPM_executed_this_run':bool(rows),
+                'SPM_resolution_passed':all_phases_complete and tools_post_exact and controller_post_exact
+                    and sdk_post_exact and all(r['exit_code'] == 0 and r['native_command_succeeded'] for r in rows),
+                'SPM_resolution_scope':'new local-only fixture; not source477/App resolution',
+                'all_native_commands_passed':all_phases_complete and tools_post_exact and controller_post_exact
+                    and sdk_post_exact and all(r['exit_code'] == 0 and r['native_command_succeeded'] for r in rows),
+                'all_native_commands_passed_scope':'fresh local SPM1 plus exact prior Swift1; not fresh two phases or App build',
                 'all_native_tools_started_proven':all_phases_complete and all(
                     r['actual_tool_started'] is True for r in rows) and prior['actual_tool_started'] is True,
-                'diagnostic_complete_meaning':'fresh Swift observation/post-check complete; prior SPM exit74 retained as failure, not resolution success',
-                'exit_code_scope':'fresh Swift1 and its source/tool/resource boundaries only; prior SPM failure is not re-executed',
+                'diagnostic_complete_meaning':'fresh local SPM1 observation/post-check complete; prior Swift1 reused; no App resolution/compile acceptance',
+                'exit_code_scope':'fresh local SPM1 with owned result path plus current source/tool/SDK/resource boundaries; accepted Swift1 not repeated',
                 'unknown_tool_start_is_not_proof_of_absence':True,
                 'tools_post_exact':tools_post_exact,'controller_post_exact':controller_post_exact,
                 'specific_denied_syscall_proven':False,'old_preflight_repeated':False,

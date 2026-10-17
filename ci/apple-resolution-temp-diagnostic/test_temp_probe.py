@@ -22,7 +22,7 @@ fixtures = load(HERE/'fixtures.py', 'temp_probe_public_inputs')
 
 class TempDiagnostic(unittest.TestCase):
     def test_actual_adapter_accepts_only_the_fixed_local_spm_form_and_swift_command_has_no_App_or_fetch(self):
-        adapter = load(REPO/'ci/apple-current359/xcrun_adapter.py', 'temp_probe_original_adapter')
+        adapter = load(HERE/'xcrun_adapter.py', 'temp_probe_diagnostic_result_adapter')
         with tempfile.TemporaryDirectory() as q:
             work = Path(q).resolve()/'luobo-apple-current359';work.mkdir()
             for name, body in fixtures.sources().items():run.put(work/name,body)
@@ -31,6 +31,7 @@ class TempDiagnostic(unittest.TestCase):
             self.assertEqual(forwarded, ['/usr/bin/xcrun','--no-cache','xcodebuild',
                 '-resolvePackageDependencies','-project','Runner.xcodeproj',
                 '-clonedSourcePackagesDirPath',str(work/'source/app/build/ios/SourcePackages'),
+                '-resultBundlePath',str(work/'xcode/Resolve.xcresult'),
                 '-scheme','Runner','-derivedDataPath',str(work/'xcode/DerivedData'),
                 '-packageCachePath',str(work/'xcode/PackageCache')])
             self.assertEqual(adapter.apple_execution(forwarded)[:4],
@@ -47,15 +48,15 @@ class TempDiagnostic(unittest.TestCase):
             self.assertEqual(swift_command['architecture'],'arm64')
             self.assertEqual(spm_command['architecture'],'arm64e')
             self.assertEqual(spm_command['argv'],argv)
-            self.assertEqual(run.FRESH_PHASES,('swift',))
+            self.assertEqual(run.FRESH_PHASES,('spm',))
             spec = json.loads((HERE/'inputs.json').read_bytes())
-            prior = run.prior_spm_failure(spec)
-            self.assertEqual(prior['phase'],'spm')
-            self.assertEqual(prior['exit_code'],74)
-            self.assertEqual(prior['status'],'failed')
+            prior = run.prior_swift_success(spec)
+            self.assertEqual(prior['phase'],'swift')
+            self.assertEqual(prior['exit_code'],0)
+            self.assertEqual(prior['status'],'passed')
             self.assertFalse(prior['executed_this_run'])
             with self.assertRaises(ValueError):
-                run.prior_spm_failure({**spec,'priorSPMFailureReused':{**prior,'status':'passed'}})
+                run.prior_swift_success({**spec,'priorSwiftSuccessReused':{**prior,'status':'failed'}})
             for phase, command in [('swift',swift_command),('spm',spm_command)]:
                 self.assertEqual(command['phase'],phase)
                 self.assertEqual(command['outer_exec'],'/usr/bin/arch')
@@ -191,3 +192,25 @@ class TempDiagnostic(unittest.TestCase):
             interface.unlink()
             with self.assertRaisesRegex(ValueError,'actual arm64-family Swift interface'):
                 run.macos_sdk_snapshot(developer,host.fingerprint)
+
+
+    def test_actual_diagnostic_adapter_admits_only_owned_resolve_result_bundle_and_rejects_other_operations(self):
+        adapter = load(HERE/'xcrun_adapter.py','temp_probe_result_path_boundary')
+        with tempfile.TemporaryDirectory() as q:
+            work = Path(q).resolve()/'luobo-apple-current359';work.mkdir()
+            for name,body in fixtures.sources().items():run.put(work/name,body)
+            cwd = work/'source/app/ios'
+            argv = run.native_argv(work,'spm')[3:]
+            actual,public = adapter.forwarding(work,argv,cwd)
+            self.assertEqual(actual[actual.index('-resultBundlePath')+1],str(work/'xcode/Resolve.xcresult'))
+            self.assertEqual(public[public.index('-resultBundlePath')+1],'work/xcode/Resolve.xcresult')
+            for target in [str(work/'xcode/Other.xcresult'),str(work.parent/'Resolve.xcresult')]:
+                changed = argv.copy();changed[changed.index('-resultBundlePath')+1] = target
+                with self.assertRaises(ValueError):adapter.forwarding(work,changed,cwd)
+            for operation in ['-list','-showBuildSettings']:
+                changed = ['xcodebuild',operation,'-project','Runner.xcodeproj',
+                           '-resultBundlePath',str(work/'xcode/Resolve.xcresult')]
+                with self.assertRaisesRegex(ValueError,'only for package resolution'):
+                    adapter.forwarding(work,changed,cwd)
+            with self.assertRaisesRegex(ValueError,'duplicate'):
+                adapter.forwarding(work,argv+['-resultBundlePath',str(work/'xcode/Resolve.xcresult')],cwd)

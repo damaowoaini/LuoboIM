@@ -5,8 +5,8 @@
   "owned": [
     {
       "path": "ci/apple-resolution-temp-diagnostic/run.py",
-      "bytes": 29570,
-      "sha256": "db382c54e139184dfbc4015d8b60eae00dbed152054b8c796fc08cf479208f56"
+      "bytes": 31313,
+      "sha256": "16c1f3c3f114ed751411bd7f30390dd0780ee4c376ed528aa5fd01c4cefab650"
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/fixtures.py",
@@ -15,13 +15,18 @@
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/test_temp_probe.py",
-      "bytes": 12648,
-      "sha256": "e18fdc18f3a1dcf4bd6df3d886a31dd72c7ca9ae5b6a797a7ae43306ef8a5165"
+      "bytes": 14303,
+      "sha256": "eda7664bc35787056fd77d6a84d6858c25285a552c5ce4c43ccd314a981102d1"
     },
     {
       "path": ".github/workflows/apple-resolution-temp-diagnostic.yml",
-      "bytes": 1674,
-      "sha256": "bab64cda92575ae80499bb19fadd109f50e34fa55ab9617067318c113160e9a8"
+      "bytes": 1663,
+      "sha256": "fb275de828404319121bd4fad885d534e2652fde94aaac7d31ec6a6309d6256d"
+    },
+    {
+      "path": "ci/apple-resolution-temp-diagnostic/xcrun_adapter.py",
+      "bytes": 21335,
+      "sha256": "bbbb10e07f6e3c702b7ebce0a72c77ffa041d5e20390f12016e0d65dfe3d8d38"
     }
   ],
   "borrowed": [
@@ -219,7 +224,7 @@
   "AppSourceMaterialized": 0,
   "native_package_count": 0,
   "dependency_downloads": 0,
-  "scope": "fresh corrected direct Swift tiny1 only; original local SPM exit74 reused as failure; generated library never run/uploaded; not App/source477 acceptance",
+  "scope": "fresh local SPM1 only with fixed owned resultBundlePath; prior Swift1 accepted result reused, no App/acquisition/old preflight or permission fix proof",
   "limits": {
     "all_owned_plus_exact_new_external_cache_unique_bytes": 67108864,
     "secondary_bytes": 67108864,
@@ -230,10 +235,11 @@
     "stderr_retained_prefix_per_phase": 262144,
     "total_phases": 1,
     "fresh_phases": [
-      "swift"
-    ],
-    "prior_failed_phase_reused_not_run": [
       "spm"
+    ],
+    "prior_failed_phase_reused_not_run": [],
+    "prior_passed_phase_reused_not_run": [
+      "swift"
     ]
   },
   "oldCohortUnchanged": {
@@ -366,6 +372,150 @@
     "sdkAbsenceOrPermissionCauseProven": false
   },
   "preparedNewPureOnly1": [
-    "TempDiagnostic.test_actual_sdk_source_observation_rejects_foreign_alias_and_records_real_arm64_interface_changes"
-  ]
+    "TempDiagnostic.test_actual_diagnostic_adapter_admits_only_owned_resolve_result_bundle_and_rejects_other_operations"
+  ],
+  "priorSwiftSuccessReused": {
+    "phase": "swift",
+    "status": "passed",
+    "exit_code": 0,
+    "executed_this_run": false,
+    "run": 39041612104,
+    "job": 117422083283,
+    "head": "6384db596a54e1d27e3db7369f39fbd55e9b8867",
+    "attempt": 1,
+    "artifact": 12103982260,
+    "artifactSHA256": "103bfe3aec46b127e09f34b89ca5f598228e0e26de9fe051fa499a9fdb7c8439",
+    "actual_tool_started": true,
+    "source_worker_controller_tools_SDK_post_exact": true,
+    "rootAcceptance": {
+      "path": ".qa/backend1555-import-macos-sdk-batch8-1/root-apple-terminal-acceptance.json",
+      "bytes": 5970,
+      "sha256": "574f7e12dc7f71afca5cca413fb805771c5d19c71dcbb83edbade6bc00d0e415"
+    },
+    "rawBodies": [
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/evidence/budget.json",
+        "bytes": 495,
+        "sha256": "df4714ffd4fe4951546d3f191c41175757fed2401cb36dfd4f47d598030111f5"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/evidence/macos-sdk-after.json",
+        "bytes": 5239,
+        "sha256": "618c1e584772b8cf0cb02aba1204fd3b3b6b557586b45a6994fa9bf2b90c44bc"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/evidence/macos-sdk-before.json",
+        "bytes": 4822,
+        "sha256": "4063a20ada557cd20e28538bd15fac292c3116894611bb6fde9e36cabc69f9b7"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/evidence/prior-spm-failure.json",
+        "bytes": 3834,
+        "sha256": "888974f1d39c065d0837690af72066ad23c1f677de8df7ff3c3e53d86b82176e"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/evidence/summary.json",
+        "bytes": 5678,
+        "sha256": "eabef1f88695f21342708e6fd5d87dd77d2ee5b6ee4badb3ef0612a6206cda23"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/evidence/tools-after.json",
+        "bytes": 9502,
+        "sha256": "5127b47aa0cd9fa51e0d7297b9e1ab83c7502e7be3d742ca25ea58de2db7f222"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/evidence/tools-before.json",
+        "bytes": 9485,
+        "sha256": "94402a949829d0d8c78e11ac5daad724fa56e9cf784ae76b584ecf0d45d8973b"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/child-boundary.json",
+        "bytes": 1113,
+        "sha256": "54a11a83a66f0647b6dd14b4fa4ad6e37c6bd499e36b5fba531104dc17e5415c"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/controller-source-post.json",
+        "bytes": 75,
+        "sha256": "7557fdd67e1592921581a309ffe51c71cfde9a05fd1d01977becf6b6a39a508d"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/native-command.json",
+        "bytes": 1256,
+        "sha256": "650ac2c59a3491c0a684663f24b65796282f0c82fe43a57279a1bcab019d9c7b"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/native-result.json",
+        "bytes": 1795,
+        "sha256": "04c536b8ce2e9f92f1f43f5e148f2376d1bce96fff9164caa91a37359fd192cf"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/profile.sb",
+        "bytes": 3021,
+        "sha256": "d5a1da4de18da8ae45b768f9cc64ca022789c6cf8395d8cd697fece7ed354f28"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/resource.json",
+        "bytes": 1453,
+        "sha256": "dd870845f55580502b89de7066bf048d4c834b62177c00fe8de45b8bb29ad5bc"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/selected-cocoapods.json",
+        "bytes": 640,
+        "sha256": "7bed24255154501f87f0430b075c816cfdf54e2d1ee220878f081047ec5c0a9e"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/source-post.json",
+        "bytes": 1014,
+        "sha256": "48d1c36f9fdd36c4e3cebddd9592393ca4ea48936dba22af2c644e2ab62b1b2a"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/source-pre.json",
+        "bytes": 919,
+        "sha256": "3e735f5c25b2c546de426927d2d67b55b44705ae0eb744ac65a01f84b6721ebb"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/stderr.log",
+        "bytes": 97,
+        "sha256": "397d818de37b7a684ba905c1b92230e4534ff4cda0daf8a6eabc2a1fcfd50390"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/stdout.log",
+        "bytes": 2714,
+        "sha256": "9d6ee2c14f8efe5eb9fa22cb6bf2c6932c40f4eb239b7cdc88d719fea5bc3842"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/swift-output.json",
+        "bytes": 213,
+        "sha256": "1969f4a6d8d1236f82d2db1b7b0ace12d3dedc6618c8b6f83612c429e2313461"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/worker-boundary-post.json",
+        "bytes": 126,
+        "sha256": "6ece3f72c99e8cacd67d8aaa1cd129ff82388b7f1e372f3b620f1801ac2fde7b"
+      },
+      {
+        "path": ".qa/backend1555-import-macos-sdk-batch8-1/apple-artifact/swift/luobo-apple-current359/evidence/worker.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "scope": "tiny public Swift library compile/link only, not App; no repeated native command",
+    "notSPMOrAppAcceptance": true
+  },
+  "unchangedSDKSourcePureReuse": {
+    "name": "TempDiagnostic.test_actual_sdk_source_observation_rejects_foreign_alias_and_records_real_arm64_interface_changes",
+    "wholeMethodBodyExact": true,
+    "executedHere": false
+  },
+  "diagnosticResultAdapterProvenance": {
+    "original": {
+      "path": "ci/apple-current359/xcrun_adapter.py",
+      "bytes": 20918,
+      "sha256": "644351abdc5c93da1fee65f30e94d44a9ebe162b404d62a050b9a98dc9e8c2ae"
+    },
+    "derived": "ci/apple-resolution-temp-diagnostic/xcrun_adapter.py",
+    "change": "only resultBundlePath argument path/value/resolve-only gate; cache/profile/ARM/real exec methods exact",
+    "oldApple359LaneSourceAndRegistryUnchanged": true,
+    "oldSPMExit74StillHistoricalFailure": true
+  }
 }
