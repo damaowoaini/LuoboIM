@@ -491,12 +491,12 @@ gradle.beforeProject { p ->
                     [project:p.path, configuration:c.name, requested:requested]))
             if (d.requested instanceof ModuleComponentSelector) {
                 if (richGate.isRich(d.requested.versionConstraint)) {
-                    def selected=richFor(p,c)
-                    if (!selected.gate.scoped(p,c))
+                    def requestedGate=richFor(p,c)
+                    if (!requestedGate.gate.scoped(p,c))
                         logger.lifecycle('LUOBO_PLUGIN_SCOPE_REFUSAL ' + JsonOutput.toJson(
                             [reason:'unregistered-project-or-config',project:p.path.take(256),
                              configuration:c.name.take(256),source_seal_sha256:pluginField.seal_sha256]))
-                    selected.gate.requested(p,c,d.requested)
+                    requestedGate.gate.requested(p,c,d.requested)
                 }
                 else checkModule(d.requested.group, d.requested.module, d.requested.version)
             }

@@ -314,6 +314,7 @@ class Job(generic.Job):
                 raise ValueError('inherited production dependency boundary differs')
             plugin_before=plugin_scope.verified(self.w,HERE,self.inputs,self.b)[1]
             args=list(args);args[args.index('-I')+1]=HERE/'resolve.gradle'
+            args.append('--stacktrace')
             binding=classpaths.verified_catalog(self.w);self._typed_resolver_dispatch=True
         elif label=='assemble-debug':
             if (list(map(str,args))!=list(map(str,self.gradle('assembleDebug')))

@@ -2,9 +2,11 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest import mock
 
@@ -89,7 +91,8 @@ class GemSourceAudit(unittest.TestCase):
         for marker in gem_audit.BUILTINS:
             features.append({'feature': marker, 'bootstrap': True, 'paths': []})
         selected = {'ruby': {'path': str(ruby), 'bytes': ruby.stat().st_size,
-                            'sha256': hashlib.sha256(ruby.read_bytes()).hexdigest(), 'mode': 0o644},
+                            'sha256': hashlib.sha256(ruby.read_bytes()).hexdigest(), 'mode': 0o644,
+                            'uid': ruby.stat().st_uid, 'gid': ruby.stat().st_gid},
                     'gem_root': str(gem_root)}
         source = {'schema': 2, 'ruby': '3.3.12', 'rubygems': '4.0.20', 'ruby_binary': str(ruby),
                   'config': {'prefix': str(ruby_root), 'bindir': str(ruby.parent), 'libdir': str(lib),
@@ -103,6 +106,115 @@ class GemSourceAudit(unittest.TestCase):
         pin = {'bytes': config.stat().st_size, 'sha256': hashlib.sha256(config.read_bytes()).hexdigest()}
         self.refresh_maps(source)
         return source, selected, home, pin
+
+    def leaf_fixture(self, root):
+        source, selected, home, pin = self.fixture(root)
+        aliases = self.bundled_alias(source, selected)
+        self.system_sources(aliases)
+        target = aliases['target_gem']/'History.rdoc'
+        target.write_bytes(b'bundled documentation body\n'); target.chmod(0o644)
+        entry = aliases['gem']/target.name
+        entry.symlink_to(os.path.relpath(target, entry.parent))
+        self.refresh_maps(source)
+        return source, selected, home, pin, aliases, entry, target
+
+    def test_registered_bundled_leaf_aliases_record_real_bodies_and_exact_loaded_owner(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source, selected, home, pin, aliases, entry, target = self.leaf_fixture(Path(directory))
+            ruby_entry = aliases['gem']/'lib/minitest.rb'
+            ruby_entry.unlink()
+            ruby_target = aliases['target_gem']/'lib/minitest.rb'
+            ruby_entry.symlink_to(os.path.relpath(ruby_target, ruby_entry.parent))
+            source['features'].append({'feature': str(ruby_entry), 'bootstrap': False, 'paths': [str(ruby_target)]})
+            proof = gem_audit.audit(source, selected, home, pin)
+            bundled = proof['gems'][-1]
+            self.assertEqual(bundled['name'], 'minitest')
+            self.assertEqual(bundled['layout'], 'selected_bundled_spec_with_system_sources')
+            records = {r['entry_relative']: r for r in bundled['file_leaf_aliases']}
+            self.assertEqual(set(records), {'History.rdoc', 'lib/minitest.rb'})
+            for relative, actual_entry, actual_target in [('History.rdoc', entry, target),
+                                                          ('lib/minitest.rb', ruby_entry, ruby_target)]:
+                record = records[relative]
+                self.assertEqual(record['logical'], str(actual_entry))
+                self.assertEqual(record['symbolic_target'], os.readlink(actual_entry))
+                self.assertEqual(record['canonical_target'], str(actual_target))
+                self.assertEqual(record['full_name'], 'minitest-5.20.0')
+                self.assertEqual(record['body']['sha256'], hashlib.sha256(actual_target.read_bytes()).hexdigest())
+                self.assertEqual(record['body']['bytes'], actual_target.stat().st_size)
+                self.assertEqual(record['target_identity'][5:7], (selected['ruby']['uid'], selected['ruby']['gid']))
+                self.assertEqual(len([r for r in proof['source_bodies'] if r['path'] == str(actual_target)]), 1)
+            self.assertEqual(bundled['ruby_sources'], [records['lib/minitest.rb']['body']])
+            self.assertEqual(bundled['loaded_files'], [str(ruby_target)])
+            self.assertEqual(proof['loaded_features'][-1]['owner'], 'minitest')
+            self.assertFalse(proof['source_provenance_Root_acceptance'])
+            json.dumps(proof)
+
+    def test_registered_bundled_leaf_aliases_refuse_unsafe_or_changed_targets(self):
+        kinds = ['external', 'wrong-fullname', 'wrong-relative', 'directory', 'target-chain',
+                 'parent-link', 'cycle', 'hardlink', 'writable-file', 'writable-parent',
+                 'wrong-owner', 'wrong-gid', 'wrong-alias-owner', 'missing-selected-owner', 'late-remap', 'late-body']
+        for kind in kinds:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                source, selected, home, pin, aliases, entry, target = self.leaf_fixture(root)
+                baseline = gem_audit.audit(source, selected, home, pin)
+                self.assertEqual(baseline['gems'][-1]['file_leaf_aliases'][0]['canonical_target'], str(target))
+                self.assertEqual(baseline['gems'][-1]['file_leaf_aliases'][0]['body']['sha256'],
+                                 hashlib.sha256(target.read_bytes()).hexdigest())
+                if kind in ['external', 'wrong-fullname', 'wrong-relative']:
+                    replacement = (root/'foreign/History.rdoc' if kind == 'external' else
+                                   aliases['base']/'gems/minitest-5.19.0/History.rdoc' if kind == 'wrong-fullname' else
+                                   aliases['target_gem']/'Other.rdoc')
+                    replacement.parent.mkdir(parents=True, exist_ok=True)
+                    replacement.write_bytes(b'foreign counterpart'); replacement.chmod(0o644)
+                    entry.unlink(); entry.symlink_to(replacement)
+                elif kind == 'directory':
+                    target.unlink(); target.mkdir()
+                elif kind == 'target-chain':
+                    alternate = target.with_name('body.rdoc'); alternate.write_bytes(b'chain body')
+                    target.unlink(); target.symlink_to(alternate)
+                elif kind == 'parent-link':
+                    alternate = aliases['target_gem'].with_name('minitest-5.20.0-real')
+                    aliases['target_gem'].rename(alternate)
+                    aliases['target_gem'].symlink_to(alternate, target_is_directory=True)
+                elif kind == 'cycle':
+                    target.unlink(); target.symlink_to(target.name)
+                elif kind == 'hardlink':
+                    os.link(target, target.with_name('duplicate.rdoc'))
+                elif kind == 'writable-file':
+                    target.chmod(0o666)
+                elif kind == 'writable-parent':
+                    target.parent.chmod(0o777)
+                elif kind == 'missing-selected-owner':
+                    selected['ruby'].pop('uid')
+                original_stat, original_walk = gem_audit.os.stat, gem_audit.os.walk
+                checked_parent = original_stat(entry.parent if kind == 'wrong-alias-owner' else target.parent)
+                def observed_stat(path, *args, **kwargs):
+                    observed = original_stat(path, *args, **kwargs)
+                    parent_fd = kwargs.get('dir_fd')
+                    if (kind in ['wrong-owner', 'wrong-gid', 'wrong-alias-owner'] and path == target.name and
+                            parent_fd is not None and os.fstat(parent_fd).st_ino == checked_parent.st_ino):
+                        fields = {name: getattr(observed, name) for name in dir(observed) if name.startswith('st_')}
+                        fields['st_gid' if kind == 'wrong-gid' else 'st_uid'] += 1
+                        return SimpleNamespace(**fields)
+                    return observed
+                def walking(path, *args, **kwargs):
+                    yield from original_walk(path, *args, **kwargs)
+                    if Path(path) == aliases['gem']:
+                        if kind == 'late-remap':
+                            entry.unlink(); entry.symlink_to(aliases['target_gem']/'missing.rdoc')
+                        elif kind == 'late-body':
+                            target.write_bytes(b'body changed after initial observation\n')
+                with mock.patch.object(gem_audit.os, 'stat', side_effect=observed_stat), (
+                        mock.patch.object(gem_audit.os, 'walk', side_effect=walking)):
+                    with self.assertRaises(gem_audit.AuditFailure) as rejected:
+                        gem_audit.audit(source, selected, home, pin)
+                self.assertEqual(rejected.exception.proof['subject'], 'minitest')
+                self.assertEqual(rejected.exception.proof['field'],
+                                 'source_alias.mapping' if kind in ['late-remap', 'late-body'] else 'source_walk')
+                if kind not in ['late-remap', 'late-body']:
+                    self.assertEqual(rejected.exception.proof['reason'], 'gem tree symlink refused')
+                    self.assertFalse(rejected.exception.proof['link']['linked_body_read'])
 
     def test_real_specs_stdlib_and_compiled_markers_replace_synthetic_default_roots(self):
         with tempfile.TemporaryDirectory() as directory:

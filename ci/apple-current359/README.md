@@ -129,3 +129,38 @@ and are not rerun. This R6 has executed no controls/Ruby/native/cloud work.
 Identity `current359-null2-apple-native-resolution-v2` / consumer `current359-null2-apple-source-consumer-v2` fixes published `0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1`. Source477/business359/portable411 replace exactly the same two Dart rows;475 other rows,178 packages, SDK51/native7/core17/engine50/20 implementations stay exact. Former bdffc consumer and all354/359 native reports retain their original identity. New4+direct2 and analysis2 are Dart-only accepted scope; full1308 and this native identity are unexecuted.
 
 Current adopted R6 gem probe/auditor/tests and strict1.17 official/tool pins are borrowed byte-identically. Bounded symlink diagnostics continue refusing links; no Gem root or source grant changes. Null native approval still rejects before any App command. Only the two directly affected consumer controls are proposed; prior selector2/packaging6/consumer3/gem controls are not repeated.
+
+## R7: exact selected-Ruby regular-file leaf aliases
+
+Run38997764742 observed the refused minitest `History.rdoc` alias targeting
+`lib/ruby/gems/3.3.0/gems/minitest-5.20.0/History.rdoc` in the selected Ruby.
+Only that first link/type/mapping was observed; its target body was not read.
+The new rule is not filename-specific: a registered bundled fullname may have
+a leaf alias only to its exact same-relative file counterpart in that selected
+Ruby. Other roots/fullnames/relative names, directory aliases, linked parents,
+chains, loops, special files, hardlinks and unknown classes remain refused.
+
+The original selected Ruby receipt/recheck supplies uid/gid plus its fixed
+executable body. Source and target parents are opened with directory FDs and
+O_NOFOLLOW; they must have that owner/gid and no group/world write. The alias
+must be single-link and retain its identity; its target must be a bounded
+regular single-link nonwritable file, opened with O_NOFOLLOW/O_NONBLOCK and
+hashed under stable FD/path observations. Accepted rows record the logical
+alias, raw symbolic target, exact canonical counterpart, actual body SHA and
+parent/leaf identities. Every admitted alias and body is re-read/rechecked at
+the end. Ruby-file aliases retain their exact activated gem owner. The fixed
+256MiB/20000-body observation budget and final spec/gem/require mapping checks
+stay in force. This does not establish arbitrary host filesystem immutability.
+
+Audit evidence schema5 adds file_leaf_aliases. It observes installed bodies;
+selected ownership/layout does not prove official content of the entire Ruby
+tree. Existing bounded R6 diagnostics remain for links refused before target
+read. A failed admitted read/final recheck records its own bounded failure,
+without falsely claiming that no body had been read. Approval remains null;
+source359/portable411/source477,178 packages,20 implementations,core17,engine50
+and native7 are unchanged. No App/native acceptance follows from this rule.
+
+Prepared only two new real-filesystem controls and two directly affected old
+controls (loaded owner/hybrid positive and the R6 rejection diagnostics).
+No controls, Python imports/parse, Pod/Ruby/native commands, downloads, cloud
+dispatch or adoption have been executed for R7.

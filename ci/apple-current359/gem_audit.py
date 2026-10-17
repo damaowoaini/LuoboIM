@@ -74,6 +74,7 @@ def audit(source, selected, home, config_pin):
     bodies = {}
     total = 0
     checked_mappings = []
+    checked_leaf_aliases = []
 
     def mapped(value, proof, field, subject, exists=True, remember=True):
         p = path(value, field, subject, exists=exists)
@@ -151,6 +152,112 @@ def audit(source, selected, home, config_pin):
                'mode': stat.S_IMODE(before.st_mode)}
         bodies[str(p)] = row
         return row
+
+    def leaf_alias(entry, source_root, full_name, subject, remember=True):
+        # Only a registered bundle's same-relative file counterpart is eligible.
+        # Do not resolve an arbitrary target and then grant the whole Ruby tree.
+        nonlocal total
+        linked_body_read = False
+        def stable(s):
+            return (s.st_dev, s.st_ino, s.st_mode, s.st_nlink, s.st_size,
+                    s.st_uid, s.st_gid, s.st_mtime_ns, s.st_ctime_ns)
+
+        def label(value, maximum):
+            return (isinstance(value, str) and 0 < len(value) <= maximum and
+                    not any(ord(c) < 32 or 127 <= ord(c) <= 159 or 0xd800 <= ord(c) <= 0xdfff or
+                            c in '\u061c\u200e\u200f\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069' for c in value))
+
+        def observe(root, leaf, symbolic=False):
+            nonlocal linked_body_read
+            relative = leaf.relative_to(root)
+            require(relative.parts and '..' not in relative.parts and label(relative.as_posix(), 512),
+                    'source_alias', subject, 'bounded relative leaf required')
+            owner = (selected['ruby'].get('uid'), selected['ruby'].get('gid'))
+            current_ruby = ruby.lstat()
+            require(all(type(v) is int for v in owner) and owner == (current_ruby.st_uid, current_ruby.st_gid),
+                    'source_alias', subject, 'original selected Ruby owner binding required')
+            descriptors, directories = [], []
+            try:
+                descriptor = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+                descriptors.append(descriptor)
+                here = root
+                for part in (None,)+relative.parts[:-1]:
+                    if part is not None:
+                        descriptor = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+                        descriptors.append(descriptor)
+                        here = here/part
+                    s = os.fstat(descriptor)
+                    require(stat.S_ISDIR(s.st_mode) and (s.st_uid, s.st_gid) == owner and not s.st_mode & 0o022,
+                            'source_alias', subject, 'selected-owner nonwritable real parents required')
+                    directories.append((str(here), s.st_dev, s.st_ino, s.st_mode, s.st_uid, s.st_gid))
+                before = os.stat(relative.name, dir_fd=descriptor, follow_symlinks=False)
+                require((before.st_uid, before.st_gid) == owner and before.st_nlink == 1,
+                        'source_alias', subject, 'selected-owner single-link leaf required')
+                if symbolic:
+                    require(stat.S_ISLNK(before.st_mode), 'source_alias', subject, 'original alias required')
+                    target = os.readlink(relative.name, dir_fd=descriptor)
+                    require(label(target, 4096), 'source_alias', subject, 'bounded alias target required')
+                    row = target
+                else:
+                    require(stat.S_ISREG(before.st_mode) and not before.st_mode & 0o022 and 0 < before.st_size <= 4*1024**2,
+                            'source_alias', subject, 'bounded nonwritable regular target required')
+                    opened = os.open(relative.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
+                    descriptors.append(opened)
+                    require(stable(os.fstat(opened)) == stable(before), 'source_alias', subject, 'target changed on open')
+                    digest, count = hashlib.sha256(), 0
+                    linked_body_read = True
+                    while chunk := os.read(opened, 1024**2):
+                        count += len(chunk)
+                        require(count <= before.st_size, 'source_alias', subject, 'target grew while reading')
+                        digest.update(chunk)
+                    require(count == before.st_size and stable(os.fstat(opened)) == stable(before),
+                            'source_alias', subject, 'target changed while reading')
+                    row = {'path': str(leaf), 'bytes': count, 'sha256': digest.hexdigest(),
+                           'mode': stat.S_IMODE(before.st_mode)}
+                require(stable(os.stat(relative.name, dir_fd=descriptor, follow_symlinks=False)) == stable(before),
+                        'source_alias', subject, 'leaf replaced')
+                return row, stable(before), directories
+            finally:
+                for descriptor in reversed(descriptors):
+                    os.close(descriptor)
+
+        try:
+            relative = entry.relative_to(source_root)
+            require(full_name in BUNDLED_FULL_NAMES, 'source_alias', subject, 'registered bundled fullname required')
+            source_boundary = gem_root if source_root.is_relative_to(gem_root) else ruby_root
+            raw, link_state, source_parents = observe(source_boundary, entry, symbolic=True)
+            target = Path(os.path.normpath(str(Path(raw) if Path(raw).is_absolute() else entry.parent/raw)))
+            counterpart = ruby_root/'lib/ruby/gems/3.3.0/gems'/full_name/relative
+            require(target == counterpart, 'source_alias', subject, 'same-fullname same-relative selected counterpart required')
+            actual, target_state, target_parents = observe(ruby_root, target)
+            # These bodies are a first observation, not an official Ruby tree pin.
+            if actual['path'] in bodies:
+                require(bodies[actual['path']] == actual, 'source_alias', subject, 'previously observed body changed')
+            else:
+                total += actual['bytes']
+                require(total <= 256*1024**2 and len(bodies) < 20000, 'source_alias', subject, 'source observation budget')
+                bodies[actual['path']] = actual
+            proof = {'logical': str(entry), 'entry_relative': relative.as_posix(),
+                     'symbolic_target': raw, 'canonical_target': str(target),
+                     'target_relative_to_selected_ruby': target.relative_to(ruby_root).as_posix(),
+                     'full_name': full_name, 'kind': 'same_relative_bundled_regular_file_leaf',
+                     'body': actual, 'link_identity': link_state, 'target_identity': target_state,
+                     'source_parents': source_parents, 'target_parents': target_parents}
+            if remember:
+                checked_leaf_aliases.append((entry, source_root, full_name, subject, proof))
+            return proof
+        except (AuditFailure, OSError, RuntimeError) as error:
+            if not remember or linked_body_read:
+                # A failed recheck/read is not R6's never-read refused link.
+                rejected = AuditFailure('source_alias.mapping' if not remember else 'source_alias',
+                                        subject, 'leaf alias observation changed or failed')
+                rejected.proof['link'] = {'entry_relative': relative.as_posix() if label(relative.as_posix(), 512) else None,
+                                          'linked_body_read': linked_body_read,
+                                          'observation': 'final_recheck' if not remember else 'initial_read',
+                                          'error_class': type(error).__name__}
+                raise rejected from error
+            # Preserve R6's bounded rejection evidence for every other link class.
+            refuse_tree_link(entry, source_root, subject)
 
     require(path(source.get('ruby_binary'), 'ruby_binary', 'runtime') == ruby,
             'ruby_binary', 'runtime', 'selected interpreter differs')
@@ -260,6 +367,7 @@ def audit(source, selected, home, config_pin):
             canonical_requires.append(str(p))
         row = {**gem, 'spec_body': spec_body, 'computed_directory_exists': computed.is_dir(),
                'computed_directory_is_source_evidence': not default, 'ruby_sources': [], 'loaded_files': [],
+               'file_leaf_aliases': [],
                'canonical_gem_root': str(computed), 'canonical_full_require_paths': canonical_requires,
                'canonical_spec_base': str(expected_base), 'canonical_source_base': str(source_base),
                'layout': 'selected_bundled_spec_with_system_sources' if hybrid else 'same_canonical_base'}
@@ -268,12 +376,17 @@ def audit(source, selected, home, config_pin):
             def walk_error(error):
                 raise AuditFailure('source_walk', name, type(error).__name__) from error
             for parent, dirs, paths in os.walk(computed, followlinks=False, onerror=walk_error):
+                aliases = {}
                 for entry in dirs+paths:
                     if (Path(parent)/entry).is_symlink():
-                        refuse_tree_link(Path(parent)/entry, computed, name)
+                        if entry in dirs:
+                            refuse_tree_link(Path(parent)/entry, computed, name)
+                        observed = leaf_alias(Path(parent)/entry, computed, full_name, name)
+                        row['file_leaf_aliases'].append(observed)
+                        aliases[entry] = observed['body']
                 for entry in sorted(paths):
                     if entry.endswith('.rb'):
-                        row['ruby_sources'].append(body(Path(parent)/entry, 'ruby_source', name))
+                        row['ruby_sources'].append(aliases[entry] if entry in aliases else body(Path(parent)/entry, 'ruby_source', name))
             require(row['ruby_sources'], 'ruby_source', name, 'nondefault gem cannot claim zero Ruby sources')
         specs.append(row)
     require({'cocoapods', 'cocoapods-core'} <= names and
@@ -309,7 +422,8 @@ def audit(source, selected, home, config_pin):
         loaded = body(p, 'feature', label, 32*1024**2)
         owners = [g for g in specs if not g['default'] and
                   (p.is_relative_to(Path(g['canonical_gem_root'])) or
-                   any(p.is_relative_to(Path(root)) for root in g['canonical_full_require_paths']))]
+                   any(p.is_relative_to(Path(root)) for root in g['canonical_full_require_paths']) or
+                   any(str(p) == alias['canonical_target'] for alias in g['file_leaf_aliases']))]
         require(len(owners) <= 1, 'feature.owner', label, 'ambiguous gem ownership')
         if owners:
             owner = owners[0]
@@ -347,7 +461,10 @@ def audit(source, selected, home, config_pin):
         g['activation_only_no_individual_loaded_file'] = not g['loaded_files']
     for value, observed, field, subject, exists in checked_mappings:
         mapped(value, observed, field, subject, exists=exists, remember=False)
-    return {'schema': 4, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
+    for entry, source_root, full_name, subject, observed in checked_leaf_aliases:
+        require(leaf_alias(entry, source_root, full_name, subject, remember=False) == observed,
+                'source_alias.mapping', subject, 'leaf alias/body/parent identity changed during audit')
+    return {'schema': 5, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
             'ruby_binary': binary, 'configured_shared_libruby': libruby,
             'libruby_scope': 'RbConfig selected library body; not a dyld process-map claim',
             'config': config, 'gems': specs, 'loaded_features': features,

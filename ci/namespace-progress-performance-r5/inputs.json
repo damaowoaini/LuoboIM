@@ -1,0 +1,219 @@
+{
+  "schema": 1,
+  "scope": "namespace_progress_performance_r5_1204_short6_20_then_large1_privateFS_BSON_noDB_no_runtime",
+  "parentRunner": {
+    "path": "ci/namespace-progress-performance-r4/run.py",
+    "bytes": 17775,
+    "sha256": "0e740711a364b5ff14f52c815e966df4d3d1320f9cb48f19b69380f51f8c8275",
+    "mode": 420
+  },
+  "parentInputs": {
+    "path": "ci/namespace-progress-performance-r4/inputs.json",
+    "bytes": 297300,
+    "sha256": "50ec67c768015dd9754088bd0418cd649108f6a118375eddae3452dbc7e06d28",
+    "mode": 420
+  },
+  "parentCount": 1203,
+  "parentDigest": "2134b7ddbb9202f85878d665ac4f44ca3566d757fe51b2941d9f48796af42465",
+  "effectiveCount": 1204,
+  "effectiveDigest": "5c1e62df1876f797228f36a260fb3e1c09a0c4a073af7b98b1faaa367370ccb8",
+  "effectiveDigestAlgorithm": "ascending UTF8(path)+NUL+ASCII SHA256+LF then SHA256",
+  "sourceModeSource": "verified parent1203 modes plus exact overlay3 mode0644",
+  "overlay": [
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_capture.go",
+      "bytes": 17001,
+      "sha256": "58a40a008806c1d19ff5c8d3d48158eba1f4216067e6604f22f4903bb79e3d3d",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_capture.go",
+      "beforeSHA256": "5190ed26026be7b84604b7e93f4a6c2a3294584292c6c1b946c975b8221d8666"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_journal.go",
+      "bytes": 16089,
+      "sha256": "fd0cf2d226f525fd9ebeceb209a466f0e78450d5ced0dda3b91cb052641429ae",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_journal.go",
+      "beforeSHA256": "bce757691da05f06d9a5ae6fb029807274d4883b53455d4d3dfcc7d73ad4006d"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_metadata_test.go",
+      "bytes": 8106,
+      "sha256": "fd49d5bf0fded7442297c3c5a1143222db8b0563c8e34dcbbb73bb71f76de5f7",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_metadata_test.go",
+      "beforeSHA256": null
+    }
+  ],
+  "dependencies": [
+    {
+      "path": ".github/workflows/namespace-progress-performance-r5-targeted.yml",
+      "bytes": 1669,
+      "sha256": "aebe09cdccf04f52b65ffa4947db592bec99d1da0ccb7667d5bfab025b1a9209",
+      "mode": 420
+    },
+    {
+      "path": "ci/namespace-progress-performance-r4/inputs.json",
+      "bytes": 297300,
+      "sha256": "50ec67c768015dd9754088bd0418cd649108f6a118375eddae3452dbc7e06d28",
+      "mode": 420
+    },
+    {
+      "path": "ci/namespace-progress-performance-r4/run.py",
+      "bytes": 17775,
+      "sha256": "0e740711a364b5ff14f52c815e966df4d3d1320f9cb48f19b69380f51f8c8275",
+      "mode": 420
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/run.py",
+      "bytes": 17246,
+      "sha256": "39d7d6113c0f50a7738049b93f3d80905c5e9eb54cced129144b44c23ec6a736",
+      "mode": 420
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/test_run.py",
+      "bytes": 9044,
+      "sha256": "947e0eca1dc2ca1b9c93bf4cc1e7cd4d9e4005b15a8c1705ca60ed457a2568f7",
+      "mode": 420
+    }
+  ],
+  "phases": {
+    "short": {
+      "tops": [
+        "TestNamespaceProgressContinuesAcrossEveryStage",
+        "TestNamespaceProgressImportsOldPrefixWithoutRescanning",
+        "TestNamespaceProgressMemoKeepsCustody",
+        "TestNamespaceProgressMetadataLookupOncePerReference",
+        "TestNamespaceProgressRejectsUnboundDerivedState",
+        "TestNamespaceProgressResolvedMetadataRetainsBindings"
+      ],
+      "subs": [
+        "TestNamespaceProgressMemoKeepsCustody/bounded-eviction",
+        "TestNamespaceProgressMemoKeepsCustody/copy-isolation",
+        "TestNamespaceProgressMemoKeepsCustody/foreign-reference",
+        "TestNamespaceProgressMemoKeepsCustody/invocation-local",
+        "TestNamespaceProgressMemoKeepsCustody/limits",
+        "TestNamespaceProgressMemoKeepsCustody/private-mode",
+        "TestNamespaceProgressMemoKeepsCustody/raw-tamper",
+        "TestNamespaceProgressMemoKeepsCustody/strict-redecode",
+        "TestNamespaceProgressMetadataLookupOncePerReference/checked-row",
+        "TestNamespaceProgressMetadataLookupOncePerReference/summary-seen",
+        "TestNamespaceProgressRejectsUnboundDerivedState/cancelled",
+        "TestNamespaceProgressRejectsUnboundDerivedState/index-tamper",
+        "TestNamespaceProgressRejectsUnboundDerivedState/partial-head",
+        "TestNamespaceProgressRejectsUnboundDerivedState/raw-tamper",
+        "TestNamespaceProgressRejectsUnboundDerivedState/restart",
+        "TestNamespaceProgressRejectsUnboundDerivedState/valid-hash-foreign-reference",
+        "TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint",
+        "TestNamespaceProgressResolvedMetadataRetainsBindings/number-and-row",
+        "TestNamespaceProgressResolvedMetadataRetainsBindings/pass-and-metaSHA",
+        "TestNamespaceProgressResolvedMetadataRetainsBindings/private-page-and-row"
+      ]
+    },
+    "large": {
+      "tops": [
+        "TestNamespaceProgressLargeHistoryHasNoFinalFullSweep"
+      ],
+      "subs": []
+    }
+  },
+  "preservedOriginalTargets": {
+    "tops": [
+      "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted",
+      "TestNamespaceProgressBatchRechecksIdentityBeforePublishing",
+      "TestNamespaceProgressCheckpointBatchPreservesBudgetAndChain",
+      "TestNamespaceProgressCheckpointReadsLegacyAndRejectsWorkGap",
+      "TestNamespaceProgressContinuesAcrossEveryStage",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness",
+      "TestNamespaceProgressImportsOldPrefixWithoutRescanning",
+      "TestNamespaceProgressLargeHistoryHasNoFinalFullSweep",
+      "TestNamespaceProgressMemoKeepsCustody",
+      "TestNamespaceProgressRejectsUnboundDerivedState",
+      "TestNamespaceProgressRowSelectionPreservesEvidence"
+    ],
+    "subs": [
+      "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/CID-origin-closure",
+      "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/blocked-private-object",
+      "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/bounded-spill",
+      "TestNamespaceProgressBatchKeepsUnpublishedStateUntrusted/discard",
+      "TestNamespaceProgressCheckpointReadsLegacyAndRejectsWorkGap/legacy-V2",
+      "TestNamespaceProgressCheckpointReadsLegacyAndRejectsWorkGap/oversized-logical-gap",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/bad-comma",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/case-fold-root",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/depth64",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/depth65",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/duplicate-root",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/empty",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/escaped-key-alias",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/extra-value",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/invalid-typed-page",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/known-number-noninteger",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/known-number-overflow",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/known-number-wrong-shape",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/known-uint64-overflow",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/nested-object-alias",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/number-max-finite",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/number-min-positive-subnormal",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/number-overflow-negative",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/number-overflow-positive",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/number-underflow-negative",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/number-underflow-positive",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/page",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/same-key-different-objects",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/strings-are-not-objects",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/surrogate-key-alias",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/unicode-key-alias",
+      "TestNamespaceProgressFastJSONPreservesOriginalStrictness/unknown-field",
+      "TestNamespaceProgressMemoKeepsCustody/bounded-eviction",
+      "TestNamespaceProgressMemoKeepsCustody/copy-isolation",
+      "TestNamespaceProgressMemoKeepsCustody/foreign-reference",
+      "TestNamespaceProgressMemoKeepsCustody/invocation-local",
+      "TestNamespaceProgressMemoKeepsCustody/limits",
+      "TestNamespaceProgressMemoKeepsCustody/private-mode",
+      "TestNamespaceProgressMemoKeepsCustody/raw-tamper",
+      "TestNamespaceProgressMemoKeepsCustody/strict-redecode",
+      "TestNamespaceProgressRejectsUnboundDerivedState/cancelled",
+      "TestNamespaceProgressRejectsUnboundDerivedState/index-tamper",
+      "TestNamespaceProgressRejectsUnboundDerivedState/partial-head",
+      "TestNamespaceProgressRejectsUnboundDerivedState/raw-tamper",
+      "TestNamespaceProgressRejectsUnboundDerivedState/restart",
+      "TestNamespaceProgressRejectsUnboundDerivedState/valid-hash-foreign-reference",
+      "TestNamespaceProgressRowSelectionPreservesEvidence/invalid-position",
+      "TestNamespaceProgressRowSelectionPreservesEvidence/mongo-erased-and-ambiguous",
+      "TestNamespaceProgressRowSelectionPreservesEvidence/redis-head-and-reasons"
+    ]
+  },
+  "expected": {
+    "short": {
+      "topPASS": 6,
+      "subPASS": 20
+    },
+    "large": {
+      "topPASS": 1,
+      "subPASS": 0
+    },
+    "skip": 0,
+    "fail": 0,
+    "vet": false,
+    "fullRegression": false,
+    "databaseFixture": false
+  },
+  "history": {
+    "parent1203SourceOnly": true,
+    "oldRun": 38997758491,
+    "oldActual": "new4/6 and affectedold3/6 passed; Large package600.019s timeout; remaining3top37sub not started",
+    "oldCheckpoint4_6": "historical R4 evidence only; unchanged checkpoint logic, not an R5 run",
+    "unselectedOriginal": "strictJSON26 and classifier3 are not fresh passes here",
+    "R5GoTestsAtPreparation": 0
+  },
+  "origin": {
+    "sourceManifestSHA256": "061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40",
+    "GoFormatAtPreparation": 0,
+    "rootGofmtBeforeAdoptionRequired": true,
+    "GoTestsAtPreparation": 0,
+    "lineage": "immutable R4.verify source1203 -> exactly2modified1new -> source1204",
+    "original11top49subBodiesPreserved": true,
+    "original10001_and_600s_preserved": true
+  },
+  "notDeployable": true
+}

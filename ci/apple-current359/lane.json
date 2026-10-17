@@ -244,9 +244,9 @@
   ],
   "own_inputs": [
     {
-      "bytes": 9218,
+      "bytes": 11481,
       "path": "ci/apple-current359/README.md",
-      "sha256": "41b542014471576f33c641b2f4517c098b40745e9a9935d0df7ee810925a8264"
+      "sha256": "c952048ee6a4270733d3e5142c5104fa9f7292573814a30d512d172049b9bb85"
     },
     {
       "bytes": 9182,
@@ -261,7 +261,7 @@
     {
       "bytes": 32365,
       "path": "ci/apple-current359/run.py",
-      "sha256": "4a7229c1e86fb4459a2985fd6b57b96d92dfcc9654a26b3f1a41d8d458cd60da"
+      "sha256": "1bfeaa14459a5b4eb9c13fc8a7e1ce2d6da962d003466808f5e00cd56ca5428a"
     },
     {
       "bytes": 3474,
@@ -274,14 +274,14 @@
       "sha256": "94994f0277a1385d5e748ea56c66fff32afb780389c90536f1bdf48d9d1d81e0"
     },
     {
-      "bytes": 22508,
+      "bytes": 30744,
       "path": "ci/apple-current359/gem_audit.py",
-      "sha256": "06155d52e8c6c57a93719f8077e8e56673238ee41c0d907d92da15e8d1df6de9"
+      "sha256": "0b5ecd6bba6a552149d98fb92f6cd5549a2b17db77df5535cb6c7f5237f0f71f"
     },
     {
-      "bytes": 20164,
+      "bytes": 28051,
       "path": "ci/apple-current359/test_gem_audit.py",
-      "sha256": "06d9581ee626bea121a968f7c6939d161a67bfd25cf0df7d7dadf3c2e7c04b72"
+      "sha256": "46a029118fe4f047d3771cdc721cb0c2863f5cd4c48ef94a7bcea559384fabb7"
     }
   ],
   "packages": 178,
@@ -296,6 +296,17 @@
       "url": "https://raw.githubusercontent.com/ruby/ruby/0581089df9f0af0fe6b64cb8167987c211100947/gems/bundled_gems"
     },
     "default_computed_directory_is_source_proof": false,
+    "file_leaf_aliases": {
+      "actual_runner_target_body_observed": false,
+      "admission": "registered bundled fullname; exact same-relative selected Ruby regular file counterpart only",
+      "evidence": "logical alias/raw symbolic target/canonical counterpart/body SHA and original parent/leaf identities",
+      "final_recheck": "alias target, parent identity, owner/gid/mode/link count/body re-read before proof return",
+      "official_entire_Ruby_content_proven": false,
+      "opening": "directory-fd traversal O_NOFOLLOW; regular target O_NOFOLLOW/O_NONBLOCK; bounded stable bytes",
+      "owner_binding": "original selected Ruby uid/gid rechecked; no group/world writable parents/target",
+      "read_or_final_recheck_failure": "bounded distinct source_alias failure; no false never-read claim",
+      "unknown_directory_chain_loop_external_or_other_counterpart": "refuse with existing bounded R6 diagnostics before read"
+    },
     "hybrid_actual_observed_fullnames": [
       "minitest-5.20.0",
       "rexml-3.4.4"
@@ -341,7 +352,7 @@
         "unresolved"
       ]
     },
-    "schema": 4,
+    "schema": 5,
     "scope": "actual loaded files/specs/runtime and regular-gem Ruby source trees; configured libruby first observation, no dyld-map or App claim",
     "source_provenance_Root_acceptance": false,
     "unknown_relative_markers": "refuse"

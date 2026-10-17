@@ -101,11 +101,13 @@ class Current359(unittest.TestCase):
             self.assertEqual(actual[actual.index('-I')+1],str(HERE/'resolve.gradle'))
             self.assertIn('-DluoboClasspathCatalogSha256='+binding[1],actual)
             self.assertIn(str(r.generic.HERE/'owned-outputs.gradle'),actual)
+            self.assertEqual(actual.count('--stacktrace'),1)
             self.assertEqual(plugin_verified.call_args_list,[call(job.w,HERE,job.inputs,job.b)]*2)
             plugin_origin.assert_not_called();plugin_reports.assert_not_called()
             job.cmd(job.gradle('assembleDebug'),job.w/'source/app/android',
                 r.parent.environment(job.w,True),'assemble-debug',1800)
             self.assertIn(str(HERE/'resolve.gradle'),dispatched[-1])
+            self.assertNotIn('--stacktrace',dispatched[-1])
             plugin_origin.assert_called_once_with(job.w,HERE,job.inputs)
             plugin_reports.assert_called_once_with(job.w,HERE,job.inputs,'apk',False)
             self.assertEqual(plugin_verified.call_args_list,[call(job.w,HERE,job.inputs,job.b)]*4)
@@ -116,6 +118,7 @@ class Current359(unittest.TestCase):
                 'gate-assemblerelease',180,'QA core requires assembleDebug')
             self.assertEqual(dispatched[-1][:len(negative)],list(map(str,negative)))
             self.assertNotIn(str(HERE/'resolve.gradle'),dispatched[-1])
+            self.assertNotIn('--stacktrace',dispatched[-1])
             size=len(dispatched);job._typed_resolver_dispatch=False
             bad=list(args)+['--offline']
             with self.assertRaises(ValueError):job.cmd(bad,job.w/'source/app/android',env,'gradle-dependency-setup',1800)
