@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show debugPrintSynchronously;
 import 'package:flutter/services.dart';
 import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,6 +59,7 @@ final class SdkHarness {
   String userId = 'alice';
   var _messageId = 0;
   bool _closed = false;
+  bool traceDisposal = false;
   final messenger =
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
 
@@ -252,13 +254,26 @@ final class SdkHarness {
     await Future<void>.delayed(Duration.zero);
   }
 
+  void _noteDisposal(String step) {
+    if (traceDisposal) {
+      debugPrintSynchronously('chat_input_sdk_dispose $step');
+    }
+  }
+
   Future<void> dispose() async {
     if (_closed) return;
     _closed = true;
     overrideCall = null;
+    _noteDisposal('session.begin');
     await session.dispose();
+    _noteDisposal('session.end');
+    _noteDisposal('gateway.begin');
     await gateway.dispose();
+    _noteDisposal('gateway.end');
     messenger.setMockMethodCallHandler(channel, null);
+    _noteDisposal('handler.cleared');
+    _noteDisposal('storage.begin');
     await directory.delete(recursive: true);
+    _noteDisposal('storage.end');
   }
 }

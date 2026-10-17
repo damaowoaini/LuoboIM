@@ -1,10 +1,10 @@
 {
-  "schema": "luobo.mobile.input.current363.scoped25.reuse9plus1.v2",
+  "schema": "luobo.mobile.input.current363.failed9.then.diagnostic1.reuse15.v3",
   "cohort": "current363",
   "source_members": 363,
   "portable_members": 415,
-  "source_digest": "a4915d9f88c8f16d694abe0e8fb2cba6a99075c6b869a0ed0527618d2389961e",
-  "portable_digest": "47ed38574138262db0fea7b44c4a0f08c55e88659a5af78152c2c03d4ac51413",
+  "source_digest": "2820dddc3f7213871c9d14a566eb4ca9f267f8010f6d5bd2d9443e0855bac393",
+  "portable_digest": "02b8360346ae1f7bb9cfd2af03dc85d873681507e7a043e3cf60b3961b1f6979",
   "source_rows": [
     {
       "bytes": 111,
@@ -972,9 +972,9 @@
       "sha256": "bf3d30efa310b12c39f37015b5e6dee53e33797ae02ce3ae0e12937d6643b7f9"
     },
     {
-      "bytes": 8228,
+      "bytes": 8712,
       "path": "app/test/core/im/sdk_harness.dart",
-      "sha256": "be8ecae48cdd344757a9b4a9e3805272dbb43e84fa35657ea460bee983ed5b56"
+      "sha256": "0b4b90f7e2b5d0168ccfa85b66abee9c16f28d158ec555566be7441f82b4f7ba"
     },
     {
       "bytes": 7119,
@@ -1153,8 +1153,8 @@
     },
     {
       "path": "app/test/features/chat/chat_input_fixture.dart",
-      "bytes": 6114,
-      "sha256": "15cc4b4f51d2b4a8956583b27c37a5470bc87e97ea6a691aa16ecacf21332286"
+      "bytes": 6374,
+      "sha256": "e3a9f011b0131bcb71cabcca1a7d2839d687a13ffc1ab723e1a2401439c10826"
     },
     {
       "bytes": 7407,
@@ -1203,8 +1203,8 @@
     },
     {
       "path": "app/test/features/chat/chat_typing_workflow_test.dart",
-      "bytes": 9278,
-      "sha256": "2f96fc9066f2c588ed73414210bb3a14461cc77abb85f5a0a7d9d733665c5746"
+      "bytes": 9803,
+      "sha256": "a6f308754964d6539cc8824662619f6c7c0da0013729e00a1cd472ae8a6f78d7"
     },
     {
       "bytes": 5174,
@@ -1822,7 +1822,7 @@
       "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
     }
   ],
-  "delta9": [
+  "delta10": [
     {
       "path": "app/lib/core/im/im_event.dart",
       "before": {
@@ -1898,12 +1898,25 @@
       }
     },
     {
+      "path": "app/test/core/im/sdk_harness.dart",
+      "before": {
+        "bytes": 8228,
+        "path": "app/test/core/im/sdk_harness.dart",
+        "sha256": "be8ecae48cdd344757a9b4a9e3805272dbb43e84fa35657ea460bee983ed5b56"
+      },
+      "after": {
+        "path": "app/test/core/im/sdk_harness.dart",
+        "bytes": 8712,
+        "sha256": "0b4b90f7e2b5d0168ccfa85b66abee9c16f28d158ec555566be7441f82b4f7ba"
+      }
+    },
+    {
       "path": "app/test/features/chat/chat_input_fixture.dart",
       "before": null,
       "after": {
         "path": "app/test/features/chat/chat_input_fixture.dart",
-        "bytes": 6114,
-        "sha256": "15cc4b4f51d2b4a8956583b27c37a5470bc87e97ea6a691aa16ecacf21332286"
+        "bytes": 6374,
+        "sha256": "e3a9f011b0131bcb71cabcca1a7d2839d687a13ffc1ab723e1a2401439c10826"
       }
     },
     {
@@ -1920,8 +1933,8 @@
       "before": null,
       "after": {
         "path": "app/test/features/chat/chat_typing_workflow_test.dart",
-        "bytes": 9278,
-        "sha256": "2f96fc9066f2c588ed73414210bb3a14461cc77abb85f5a0a7d9d733665c5746"
+        "bytes": 9803,
+        "sha256": "a6f308754964d6539cc8824662619f6c7c0da0013729e00a1cd472ae8a6f78d7"
       }
     }
   ],
@@ -1932,6 +1945,7 @@
     "lib/features/chat/presentation/chat_page.dart",
     "lib/features/chat/presentation/chat_typing_controller.dart",
     "lib/features/chat/presentation/mention_text_controller.dart",
+    "test/core/im/sdk_harness.dart",
     "test/features/chat/chat_input_fixture.dart",
     "test/features/chat/chat_reedit_workflow_test.dart",
     "test/features/chat/chat_typing_workflow_test.dart"
@@ -2082,8 +2096,8 @@
     },
     {
       "path": ".github/workflows/mobile-input.yml",
-      "bytes": 1652,
-      "sha256": "8479f67367321f121d1908f783161bd459db3941c2726f57d125e8f4796c1bb9"
+      "bytes": 1686,
+      "sha256": "f3269d99d5930c969381447073709cfcbaec9ab9bb94e7877ffdb73a8a66264a"
     },
     {
       "path": ".github/workflows/mobile-ci.yml",
@@ -2092,8 +2106,8 @@
     },
     {
       "path": "ci/mobile-input.py",
-      "bytes": 20703,
-      "sha256": "2fd70368e73e8a91cfc8a653b569eed1cfedb91030fe73874b4cdfa0aa38af07"
+      "bytes": 33243,
+      "sha256": "b6209ee48073a5d6be34f1aec81cdbba33846be7df7cfa981a10fcab081d16f6"
     }
   ],
   "old_test_source_pins": [
@@ -2138,7 +2152,13 @@
     },
     "full1329ExpectedOnly": true,
     "nativeSourceRefAndInputsUnchanged": true,
-    "historicalFull359WorkflowRef": "dfa0b855c3f90668f36aaa4fab95e32d671fd36e"
+    "historicalFull359WorkflowRef": "dfa0b855c3f90668f36aaa4fab95e32d671fd36e",
+    "fixtureRepairManifest": {
+      "path": "references/integration/mobile363-chat-input-failure-format-r4-candidate-20261017/candidate-manifest.json",
+      "sha256": "9c031a72b9e658cc8df95945fb3dd5d7ccdf18c78a134b5889c92449879b25b8"
+    },
+    "originalCloudBatchPostExactNotRecorded": true,
+    "manualContinuationSelected": "phase9 then isolated phase1; prior15 retained"
   },
   "names25": [
     "self revoke ACK restores text once through the real composer without sending",
@@ -2172,15 +2192,16 @@
   ],
   "cloud_analysis_paths": [],
   "local_validation_reuse": {
-    "state": "Root actual local coverage union: 5 unchanged analyses plus final4; gateway1 PASS; other25 not started at business assertions",
-    "source363": "a4915d9f88c8f16d694abe0e8fb2cba6a99075c6b869a0ed0527618d2389961e",
-    "portable415": "47ed38574138262db0fea7b44c4a0f08c55e88659a5af78152c2c03d4ac51413",
+    "state": "Root actual analysis10 union: unchanged7 reused plus new3; gateway1 reused; no widget execution here",
+    "source363": "2820dddc3f7213871c9d14a566eb4ca9f267f8010f6d5bd2d9443e0855bac393",
+    "portable415": "02b8360346ae1f7bb9cfd2af03dc85d873681507e7a043e3cf60b3961b1f6979",
+    "rootUnionReceiptSHA256": "a504cecb17009833f4e4f71de201f7eff291401dea0d73f6ba4d8c9b2b88df06",
     "productManifest": {
-      "path": "references/integration/mobile-chat-input-reedit-typing-style-r2-candidate-20261017/candidate-manifest.json",
-      "bytes": 6468,
-      "sha256": "1caf2d7f8d778f1eb8e28df48768954adae461ef556b9d4a929631b352dc6fc9"
+      "path": "references/integration/mobile363-chat-input-failure-format-r4-candidate-20261017/candidate-manifest.json",
+      "bytes": 6734,
+      "sha256": "9c031a72b9e658cc8df95945fb3dd5d7ccdf18c78a134b5889c92449879b25b8"
     },
-    "analyses9": [
+    "analyses10": [
       {
         "path": "lib/core/im/im_event.dart",
         "source": {
@@ -2193,17 +2214,15 @@
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-1.json",
+        "resultReceipt": {
           "bytes": 71,
           "sha256": "18033316813064dee6a5f730f82bb7f270204681d4b1b62a213379aff0c6fc74"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-1.log",
+        "raw": {
           "bytes": 44,
           "sha256": "9c14f6f73cf2f269c61d0315cba22ad33daff0f8c11b43a7c65a752feabe290b"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "lib/core/im/open_im_gateway.dart",
@@ -2217,17 +2236,15 @@
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-2.json",
+        "resultReceipt": {
           "bytes": 78,
           "sha256": "10399b2ef70ae05d564431131fb2cd9bb82c94fda9780888278277a75c4174f0"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-2.log",
+        "raw": {
           "bytes": 51,
           "sha256": "a0b1300c2d71e0588aa2f170559617ef3b2fd512fb46ba1f6d72dae47dcb87a6"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "lib/features/chat/data/chat_repository.dart",
@@ -2241,17 +2258,15 @@
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-3-r2.json",
+        "resultReceipt": {
           "bytes": 89,
           "sha256": "5743c27daceec9dc699233ed6b21324e58eed92d187f4d782e892fc85cd1952f"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-3-r2.log",
+        "raw": {
           "bytes": 51,
           "sha256": "c8fa4a17426d25074647fd0ebb014ae85fd318b3c59bf96fd45db484ba979cd6"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "lib/features/chat/presentation/chat_page.dart",
@@ -2265,17 +2280,15 @@
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-4-r2.json",
+        "resultReceipt": {
           "bytes": 91,
           "sha256": "f797a69f0878e3342f675db594df5149d9914a8561c6cac756ad6fabf671446d"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-4-r2.log",
+        "raw": {
           "bytes": 45,
           "sha256": "ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "lib/features/chat/presentation/chat_typing_controller.dart",
@@ -2289,17 +2302,15 @@
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-5-r2.json",
+        "resultReceipt": {
           "bytes": 104,
           "sha256": "1bb1397b23586c6a1da89645b1e4d671c3f869eb71d3bcf2c710902849ca19e5"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-5-r2.log",
+        "raw": {
           "bytes": 58,
           "sha256": "7c67012298ed461cade2f18e8b24fce056b29877b828aba92b6f40981ba2ceca"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "lib/features/chat/presentation/mention_text_controller.dart",
@@ -2313,41 +2324,59 @@
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-6-r2.json",
+        "resultReceipt": {
           "bytes": 105,
           "sha256": "c78e2e1183f97da991750440fd36a15ea326ef7e966f6e49b3871a3cae0a9704"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-6-r2.log",
+        "raw": {
           "bytes": 59,
           "sha256": "fdf715bb704feff4c75c0f209716f85dd9ff1217efb91a41739bd8c450e5fe97"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "exact_unchanged_file_reused"
+      },
+      {
+        "path": "test/core/im/sdk_harness.dart",
+        "source": {
+          "path": "app/test/core/im/sdk_harness.dart",
+          "bytes": 8712,
+          "sha256": "0b4b90f7e2b5d0168ccfa85b66abee9c16f28d158ec555566be7441f82b4f7ba"
+        },
+        "result": {
+          "path": "test/core/im/sdk_harness.dart",
+          "exitCode": 0,
+          "noIssues": true
+        },
+        "resultReceipt": {
+          "bytes": 75,
+          "sha256": "c5716bcebc7c6f20a6776227107a4f928b7b579c1f01fff3a0020e43d3b3c352"
+        },
+        "raw": {
+          "bytes": 47,
+          "sha256": "db0f2e31d5491365c30e0a179318efaa4a428ac9620e86afbab1bb999dfc2a1b"
+        },
+        "execution": "new_analysis3"
       },
       {
         "path": "test/features/chat/chat_input_fixture.dart",
         "source": {
           "path": "app/test/features/chat/chat_input_fixture.dart",
-          "bytes": 6114,
-          "sha256": "15cc4b4f51d2b4a8956583b27c37a5470bc87e97ea6a691aa16ecacf21332286"
+          "bytes": 6374,
+          "sha256": "e3a9f011b0131bcb71cabcca1a7d2839d687a13ffc1ab723e1a2401439c10826"
         },
         "result": {
           "path": "test/features/chat/chat_input_fixture.dart",
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-7.json",
+        "resultReceipt": {
           "bytes": 88,
           "sha256": "0b50f8ba5af4bd1c91f35d7f812762eaf71f3deba27c7d7dd5ec243521c59f0b"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-7.log",
+        "raw": {
           "bytes": 54,
           "sha256": "a508c3f2d32a03c3aa7d7be2947be52b50ae3da10d394a90f6c5a336b8abad87"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "new_analysis3"
       },
       {
         "path": "test/features/chat/chat_reedit_workflow_test.dart",
@@ -2361,71 +2390,52 @@
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-8.json",
+        "resultReceipt": {
           "bytes": 95,
           "sha256": "51596d3315ef71893fd7a25ff1da10e7ac0b1c095afb7dc51aa8a5ba44485958"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-8.log",
+        "raw": {
           "bytes": 61,
           "sha256": "267674432886d9e59755760b0984d4e5346cde0c453995509c7b18c703a18933"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "test/features/chat/chat_typing_workflow_test.dart",
         "source": {
           "path": "app/test/features/chat/chat_typing_workflow_test.dart",
-          "bytes": 9278,
-          "sha256": "2f96fc9066f2c588ed73414210bb3a14461cc77abb85f5a0a7d9d733665c5746"
+          "bytes": 9803,
+          "sha256": "a6f308754964d6539cc8824662619f6c7c0da0013729e00a1cd472ae8a6f78d7"
         },
         "result": {
           "path": "test/features/chat/chat_typing_workflow_test.dart",
           "exitCode": 0,
           "noIssues": true
         },
-        "rawResult": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-9.json",
+        "resultReceipt": {
           "bytes": 95,
           "sha256": "f6fa328ae5c7718c067ed309808fc0395ff8a2baba4db77c1e9bd7a00845b817"
         },
-        "rawLog": {
-          "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-9.log",
+        "raw": {
           "bytes": 61,
           "sha256": "ba6eee91af6034e5f509835101f4944608fa4079d023c0a225a859a2214692ac"
         },
-        "execution": "Root actual targeted Dart analyze --fatal-infos; final exact file body; not a cloud execution"
+        "execution": "new_analysis3"
       }
     ],
-    "analysisBatchResources": [
-      {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/analysis9.resource.json",
-        "bytes": 938,
-        "sha256": "67d074fce2bec78c86e2b842f2e3bfb0fd6e25f7df1f7add06a12d73587ecfd0"
-      },
-      {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/analysis-remaining6.resource.json",
-        "bytes": 950,
-        "sha256": "7ffec85a3e86e4d6d94db4bee8b8cccfd5250763d03526562724e2abc54c43ae"
-      },
-      {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/analysis4-r2.resource.json",
-        "bytes": 946,
-        "sha256": "4b58be34861b03e7fe67a0e8bc626b543bc731dd6bf9ee668a1c5ed898f65164"
-      }
+    "new_analysis_paths3": [
+      "test/core/im/sdk_harness.dart",
+      "test/features/chat/chat_input_fixture.dart",
+      "test/features/chat/chat_typing_workflow_test.dart"
     ],
-    "analysisScripts": [
-      {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/phase.py",
-        "bytes": 2765,
-        "sha256": "df15a81b21357c487759fc547cde9b280803e14db9db75e197e3ec6ebf5d7e51"
-      },
-      {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/phase-r2.py",
-        "bytes": 2804,
-        "sha256": "5565f72b33f4e5a8cb43998ecf53bf53345126402e78b0f30296583465c61622"
-      }
+    "reused_analysis_paths7": [
+      "lib/core/im/im_event.dart",
+      "lib/core/im/open_im_gateway.dart",
+      "lib/features/chat/data/chat_repository.dart",
+      "lib/features/chat/presentation/chat_page.dart",
+      "lib/features/chat/presentation/chat_typing_controller.dart",
+      "lib/features/chat/presentation/mention_text_controller.dart",
+      "test/features/chat/chat_reedit_workflow_test.dart"
     ],
     "gateway1": {
       "name": "repeated exit is idempotent and old listener generations cannot enter a new account",
@@ -2444,41 +2454,263 @@
         "time": 3392
       },
       "raw": {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/selected26.log",
         "bytes": 40974,
         "sha256": "d169220f44e0bf1790beaa7492e7af3d1e32254d2ff434e1260ff36ccaa81d82"
       },
       "command": {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/test-command.json",
         "bytes": 6248,
         "sha256": "39f1511546d7de673a8d92d1c7d60450b2236fa48bccd6330bbb1dd8fa9e1de0"
       },
       "resource": {
-        "path": ".qa/mobile-chat-input-new21-affected5-1/selected26.resource.json",
         "bytes": 939,
         "sha256": "5f69c8a3638868c2bbbfdac3472dcc27df7ee8ee9d4680b538299a3c67620603"
       }
     },
-    "originalInvocation": {
-      "expected": 26,
-      "selectedBusinessStarted": 1,
-      "selectedBusinessPassed": 1,
-      "unstartedBusiness": 25,
-      "loaderErrors": 4,
-      "doneSuccess": false,
-      "missingPackages": [
-        "webview_flutter",
-        "webview_flutter_android",
-        "webview_flutter_platform_interface",
-        "webview_flutter_wkwebview"
-      ],
-      "notAProductFailureProofForUnstarted25": true
+    "resource": {
+      "bytes": 958,
+      "sha256": "ded50426bb843c2f9b2f7029600dd899c07f30be60399c9662097927ce65d78f"
     },
+    "formatResource": {
+      "bytes": 1138,
+      "sha256": "4dd9cbdb9c7a29c359d1fcacc92c57ac5f9dc8ba7d78336a4c835f76dc98ec42"
+    },
+    "script": {
+      "bytes": 1058,
+      "sha256": "9f7db4478dd7aad7b9fa066fb6534036acb84c94bd978ef00c0ee07577211427"
+    },
+    "all415AuthoredSourcesPostExact": true,
+    "cloud15SourcePostExactClaimed": false,
     "cloudReexecution": {
       "analysis": 0,
       "gateway1": false,
-      "test25": true
-    },
-    "full1329Executed": false
+      "tests": 10
+    }
+  },
+  "phase9_names": [
+    "actual self message menu keeps ordinary single chat revoke usable",
+    "actual long press group moderation inspects roles then confirms one standard revoke",
+    "real doubletap dispatches once and native unknown offers only read review even after reopen",
+    "chat restores a draft and sends through the real method codec without overflow at large text",
+    "self at-text ACK restores exact mention identities instead of guessing from draft text",
+    "online-only typing uses the same transient yes-no path while a group composer sends none",
+    "live online-only no clears the header without an ordinary receive refresh",
+    "background and foreign coverage discard typing state until a new foreground event arrives",
+    "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing"
+  ],
+  "phase1_names": [
+    "wrong-peer wrong-recipient malformed and offline typing never enters history or the active header"
+  ],
+  "reused_cloud_names15": [
+    "self revoke ACK restores text once through the real composer without sending",
+    "unknown revoke never offers re-edit even when the native side removed the original",
+    "an acknowledged moderated peer text never becomes the local sender draft",
+    "private self text can be revoked but cannot be retained as a re-edit draft",
+    "incomplete attached privacy metadata cannot be retained by successful self revoke",
+    "explicit re-edit preserves an existing draft until the user clears it",
+    "foreign route coverage permanently retires the old re-edit callback after return",
+    "history clear after ACK immediately blocks a retained re-edit action",
+    "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+    "an explicit delete notice after self revoke cancels its retained re-edit action",
+    "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+    "owner logout while revoke waits keeps the ACK from writing the retired composer",
+    "real focused composer sends bounded yes and throttles further input without sending a message",
+    "input idle and focus loss stop typing through no without replaying a yes",
+    "live exact-peer typing updates the real header and each yes renews only a short TTL"
+  ],
+  "phase9_paths": [
+    "test/features/chat/group_revoke_workflow_test.dart",
+    "test/features/chat/chat_page_test.dart",
+    "test/features/chat/chat_reedit_workflow_test.dart",
+    "test/features/chat/chat_typing_workflow_test.dart"
+  ],
+  "phase1_paths": [
+    "test/features/chat/chat_typing_workflow_test.dart"
+  ],
+  "cloud_validation_reuse": {
+    "run": 39034473775,
+    "job": 117401417624,
+    "head": "6e1449c6027d4d768999a85afd9e9d027697ba22",
+    "attempt": 1,
+    "artifact": 12101941530,
+    "artifactSHA256": "2922e8cc60a79c8452f6ec5d4b4ef601987afc1b6a661b00a25e8d508694601d",
+    "raw_log_sha256": "27527c550d6ac85e14fc014b5e9d5ee5dd3e605be54c1c220a5e30d4ba01e03a",
+    "raw_resource_sha256": "ff804879d28c5f139fbc2ed2b69a6e385a776137a6b75143ee778224d1b5ca8f",
+    "root_partial_receipt_sha256": "e1798d2126f846c56f6e908edabca7bc129880af6f2e59477506a47b79ec5f51",
+    "actual_passed_names15": [
+      "self revoke ACK restores text once through the real composer without sending",
+      "unknown revoke never offers re-edit even when the native side removed the original",
+      "an acknowledged moderated peer text never becomes the local sender draft",
+      "private self text can be revoked but cannot be retained as a re-edit draft",
+      "incomplete attached privacy metadata cannot be retained by successful self revoke",
+      "explicit re-edit preserves an existing draft until the user clears it",
+      "foreign route coverage permanently retires the old re-edit callback after return",
+      "history clear after ACK immediately blocks a retained re-edit action",
+      "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+      "an explicit delete notice after self revoke cancels its retained re-edit action",
+      "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+      "owner logout while revoke waits keeps the ACK from writing the retired composer",
+      "real focused composer sends bounded yes and throttles further input without sending a message",
+      "input idle and focus loss stop typing through no without replaying a yes",
+      "live exact-peer typing updates the real header and each yes renews only a short TTL"
+    ],
+    "actual_cleanup15": [
+      {
+        "name": "self revoke ACK restores text once through the real composer without sending",
+        "test_id": 3,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "unknown revoke never offers re-edit even when the native side removed the original",
+        "test_id": 5,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "an acknowledged moderated peer text never becomes the local sender draft",
+        "test_id": 6,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "private self text can be revoked but cannot be retained as a re-edit draft",
+        "test_id": 7,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "incomplete attached privacy metadata cannot be retained by successful self revoke",
+        "test_id": 8,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "explicit re-edit preserves an existing draft until the user clears it",
+        "test_id": 9,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "foreign route coverage permanently retires the old re-edit callback after return",
+        "test_id": 10,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "history clear after ACK immediately blocks a retained re-edit action",
+        "test_id": 11,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+        "test_id": 12,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "an explicit delete notice after self revoke cancels its retained re-edit action",
+        "test_id": 13,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+        "test_id": 14,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "owner logout while revoke waits keeps the ACK from writing the retired composer",
+        "test_id": 15,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "real focused composer sends bounded yes and throttles further input without sending a message",
+        "test_id": 19,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "input idle and focus loss stop typing through no without replaying a yes",
+        "test_id": 20,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "live exact-peer typing updates the real header and each yes renews only a short TTL",
+        "test_id": 21,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      }
+    ],
+    "accepted_cleanup_fixtures": 15,
+    "accepted_cleanup_markers": 60,
+    "source_digest_at_initial_gate": "a4915d9f88c8f16d694abe0e8fb2cba6a99075c6b869a0ed0527618d2389961e",
+    "portable_digest_at_initial_gate": "47ed38574138262db0fea7b44c4a0f08c55e88659a5af78152c2c03d4ac51413",
+    "prior_source_post_exact_recorded": false,
+    "prior_phase_latched_failure": "phase_timeout",
+    "new_execution_claimed": false
   }
 }

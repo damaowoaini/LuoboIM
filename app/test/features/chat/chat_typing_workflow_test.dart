@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show debugPrintSynchronously;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imapp/core/im/im_event.dart';
@@ -105,10 +106,12 @@ void main() {
     'wrong-peer wrong-recipient malformed and offline typing never enters history or the active header',
     (tester) async {
       final f = ChatInputFixture();
+      f.revoke.sdk.traceDisposal = true;
       StreamSubscription<ImEvent>? events;
       final received = <ImEvent>[];
       try {
         await f.mount(tester);
+        debugPrintSynchronously('chat_input_typing_negative mounted');
         events = f.revoke.sdk.gateway.events.listen(received.add);
         await f.peer(tester, sender: 'mallory');
         await f.peer(tester, recipient: 'another-owner');
@@ -116,6 +119,7 @@ void main() {
         await f.peer(tester, tip: 'not-a-protocol-state');
         await f.peer(tester, session: 3);
         await f.peer(tester, method: 'onRecvOfflineNewMessage');
+        debugPrintSynchronously('chat_input_typing_negative incoming.complete');
         await tester.pump();
         expect(find.text('对方正在输入…'), findsNothing);
         expect(
@@ -134,8 +138,13 @@ void main() {
           isFalse,
         );
         expect(f.controller(tester).messages.length, 1);
+        debugPrintSynchronously('chat_input_typing_negative body.checked');
       } finally {
+        debugPrintSynchronously(
+          'chat_input_typing_negative events.cancel.begin',
+        );
         await events?.cancel();
+        debugPrintSynchronously('chat_input_typing_negative events.cancel.end');
         await f.close(tester);
       }
     },

@@ -21,6 +21,7 @@ final class ChatInputFixture {
   final typing = <Map<String, dynamic>>[];
   late GoRouter router;
   Future<void> Function()? beforeTyping;
+  bool _at = false;
   String rowText = '待核对的原消息';
   Finder get editor => find.byType(TextField);
   Finder get restore => find.widgetWithText(TextButton, '重新编辑');
@@ -49,6 +50,7 @@ final class ChatInputFixture {
       ),
     );
     revoke.metadata['draftText'] = draft;
+    _at = at;
     if (at) {
       rowText = 'Hello @鲍勃 ';
       revoke.raw.remove('textElem');
@@ -130,7 +132,14 @@ final class ChatInputFixture {
   }
 
   Future<void> openRevoke(WidgetTester tester, {bool self = true}) async {
-    final row = find.text(rowText, findRichText: true);
+    final row = _at
+        ? find.byWidgetPredicate(
+            (widget) =>
+                widget is Text &&
+                widget.textSpan?.toPlainText(includeSemanticsLabels: false) ==
+                    rowText,
+          )
+        : find.text(rowText, findRichText: true);
     await revoke.base.ready(tester, row);
     await tester.longPress(row.hitTestable());
     final menu = find.widgetWithText(ListTile, self ? '撤回消息' : '群管理撤回');

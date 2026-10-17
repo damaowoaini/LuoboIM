@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Manual current363/415 incremental25; local9analysis/gateway1 reused. Historical current359 is not an alias."""
+"""Manual current363/415 failed AT + unstarted8, then diagnostic typing1; prior15 reused."""
 import argparse
 import importlib.util
 import json
 import os
 from pathlib import Path
 import re
+import signal
 import subprocess
 import threading
 from urllib.parse import unquote, urlparse
@@ -25,9 +26,11 @@ SOURCE = CHECK.source
 ANALYSIS = module('input_inherited_analysis', REPO/'ci/mobile-announcement.py')
 BASE_SOURCE = '633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199'
 BASE_PORTABLE = '66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb'
-FINAL_SOURCE = 'a4915d9f88c8f16d694abe0e8fb2cba6a99075c6b869a0ed0527618d2389961e'
-FINAL_PORTABLE = '47ed38574138262db0fea7b44c4a0f08c55e88659a5af78152c2c03d4ac51413'
-LOCAL_REUSE_SHA = 'fb1e8615999c4acf4e6319c7c76cbbbba402c66f1d953394df31de970f5b2821'
+FINAL_SOURCE = '2820dddc3f7213871c9d14a566eb4ca9f267f8010f6d5bd2d9443e0855bac393'
+FINAL_PORTABLE = '02b8360346ae1f7bb9cfd2af03dc85d873681507e7a043e3cf60b3961b1f6979'
+LOCAL_REUSE_SHA = '7cd03536735a0431451a93a4e7647746cfd2fda214fcafbf31fffb2eb14a7a6f'
+CLOUD_REUSE_SHA = 'b2438f78ab68b2e34c111cc8052e85e1563c3fcc0c136a397acb80bcc87387ba'
+SOURCE_POST_SECONDS = 30
 RESOURCE = {'initial_bytes': 4294967296, 'floor_bytes': 1073741824,
             'allocated_cap_bytes': 805306368, 'poll_seconds': .2, 'phase_seconds': 120}
 
@@ -37,6 +40,14 @@ NEW21 = ['self revoke ACK restores text once through the real composer without s
 OLD5 = ['actual self message menu keeps ordinary single chat revoke usable', 'actual long press group moderation inspects roles then confirms one standard revoke', 'real doubletap dispatches once and native unknown offers only read review even after reopen', 'chat restores a draft and sends through the real method codec without overflow at large text', 'repeated exit is idempotent and old listener generations cannot enter a new account']
 NAMES26 = NEW21 + OLD5
 NAMES25 = NAMES26[:-1]
+ANALYSIS_PATHS10 = ANALYSIS_PATHS9[:6] + ['test/core/im/sdk_harness.dart'] + ANALYSIS_PATHS9[6:]
+CHANGED_ANALYSIS3 = ['test/core/im/sdk_harness.dart', 'test/features/chat/chat_input_fixture.dart', 'test/features/chat/chat_typing_workflow_test.dart']
+REUSED_ANALYSIS7 = [p for p in ANALYSIS_PATHS9 if p not in CHANGED_ANALYSIS3]
+PHASE9 = [OLD5[0], OLD5[1], OLD5[2], OLD5[3], NEW21[1], *NEW21[17:]]
+PHASE1 = [NEW21[16]]
+REUSED15 = [name for name in NAMES25 if name not in PHASE9 + PHASE1]
+PHASE9_PATHS = ['test/features/chat/group_revoke_workflow_test.dart', 'test/features/chat/chat_page_test.dart', 'test/features/chat/chat_reedit_workflow_test.dart', 'test/features/chat/chat_typing_workflow_test.dart']
+PHASE1_PATHS = ['test/features/chat/chat_typing_workflow_test.dart']
 HELPERS = ['ci/mobile-source.py', 'ci/mobile-check.py', 'ci/mobile-announcement.py', 'ci/mobile/inputs.json', 'ci/mobile/required-test-names.json', 'ci/mobile-setup.sh', 'ci/mobile-input-setup.sh', '.github/workflows/mobile-input.yml', '.github/workflows/mobile-ci.yml', 'ci/mobile-input.py']
 
 
@@ -56,9 +67,9 @@ def validate_inventory(cfg, actual_rows, old_plan):
     if actual_rows != cfg['source_rows'] or len(actual_rows) != 363 or inventory_digest(actual_rows) != FINAL_SOURCE:
         raise ValueError('current363 source inventory differs')
     previous = {r['path']: r for r in actual_rows}
-    selected = cfg['delta9']
-    if len(selected) != 9 or len({r['path'] for r in selected}) != 9:
-        raise ValueError('exact delta9 required')
+    selected = cfg['delta10']
+    if len(selected) != 10 or len({r['path'] for r in selected}) != 10:
+        raise ValueError('exact delta10 required')
     replaced = added = 0
     for row in selected:
         if previous.get(row['path']) != row['after']:
@@ -71,45 +82,74 @@ def validate_inventory(cfg, actual_rows, old_plan):
                 raise ValueError('delta before target differs')
             previous[row['path']] = row['before']
             replaced += 1
-    if (replaced, added) != (5, 4) or list(sorted(previous.values(), key=lambda r: r['path'])) != old_plan['current359']['files']:
-        raise ValueError('historical359 reverse5/remove4 differs')
+    if (replaced, added) != (6, 4) or list(sorted(previous.values(), key=lambda r: r['path'])) != old_plan['current359']['files']:
+        raise ValueError('historical359 reverse6/remove4 differs')
     if inventory_digest(list(previous.values())) != BASE_SOURCE:
         raise ValueError('historical359 digest differs')
 
 
 def validate_local_reuse(cfg):
-    # The reviewed local artifacts are immutable provenance. No cloud-stage
-    # download/read of QA paths, and no fabricated fresh analysis/gateway pass.
+    # Reuse is per exact authored body, not a fresh analysis of the old failed
+    # invocation. Seven unchanged analyses + Root's new three form ten paths.
     proof = cfg['local_validation_reuse']
     canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
     if SOURCE.sha(canonical) != LOCAL_REUSE_SHA:
-        raise ValueError('local analysis9/gateway1 proof differs')
+        raise ValueError('local analysis10/gateway1 proof differs')
     rows = {r['path']: r for r in cfg['source_rows']}
     if (proof['source363'] != FINAL_SOURCE or proof['portable415'] != FINAL_PORTABLE
-            or [r['path'] for r in proof['analyses9']] != ANALYSIS_PATHS9
-            or len(proof['analyses9']) != 9
+            or proof['all415AuthoredSourcesPostExact'] is not True
+            or proof['cloud15SourcePostExactClaimed'] is not False
+            or [r['path'] for r in proof['analyses10']] != ANALYSIS_PATHS10
+            or proof['reused_analysis_paths7'] != REUSED_ANALYSIS7
+            or proof['new_analysis_paths3'] != CHANGED_ANALYSIS3
+            or len(proof['analyses10']) != 10
             or proof['gateway1']['name'] != OLD5[-1]
             or proof['gateway1']['source'] != rows['app/test/core/im/open_im_gateway_test.dart']
-            or proof['cloudReexecution'] != {'analysis': 0, 'gateway1': False, 'test25': True}
-            or proof['originalInvocation']['doneSuccess'] is not False
-            or proof['originalInvocation']['unstartedBusiness'] != 25):
-        raise ValueError('local reuse scope/source differs')
-    for entry in proof['analyses9']:
+            or proof['cloudReexecution'] != {'analysis': 0, 'gateway1': False, 'tests': 10}):
+        raise ValueError('local analysis union scope/source differs')
+    for entry in proof['analyses10']:
         if (entry['source'] != rows['app/'+entry['path']]
                 or entry['result'] != {'path': entry['path'], 'exitCode': 0, 'noIssues': True}):
             raise ValueError('local analysis body/result differs')
 
 
+def validate_cloud_reuse(cfg):
+    proof = cfg['cloud_validation_reuse']
+    canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    if SOURCE.sha(canonical) != CLOUD_REUSE_SHA:
+        raise ValueError('prior cloud15 proof differs')
+    if (proof['run'] != 39034473775 or proof['job'] != 117401417624
+            or proof['head'] != '6e1449c6027d4d768999a85afd9e9d027697ba22'
+            or proof['attempt'] != 1 or proof['actual_passed_names15'] != REUSED15
+            or proof['prior_source_post_exact_recorded'] is not False
+            or proof['prior_phase_latched_failure'] != 'phase_timeout'
+            or proof['new_execution_claimed'] is not False
+            or proof['accepted_cleanup_fixtures'] != 15
+            or proof['accepted_cleanup_markers'] != 60
+            or len(proof['actual_cleanup15']) != 15
+            or proof['source_digest_at_initial_gate'] != 'a4915d9f88c8f16d694abe0e8fb2cba6a99075c6b869a0ed0527618d2389961e'
+            or proof['portable_digest_at_initial_gate'] != '47ed38574138262db0fea7b44c4a0f08c55e88659a5af78152c2c03d4ac51413'):
+        raise ValueError('prior cloud15 scope/failed source-post boundary differs')
+    if [r['name'] for r in proof['actual_cleanup15']] != REUSED15:
+        raise ValueError('prior cloud15 cleanup names differ')
+    for row in proof['actual_cleanup15']:
+        if row['markers'] != cfg['cleanup']['widget_markers']:
+            raise ValueError('prior cloud15 cleanup sequence differs')
+
+
 def descriptor():
     cfg = json.loads(SOURCE.regular(INPUTS))
-    if (cfg['schema'] != 'luobo.mobile.input.current363.scoped25.reuse9plus1.v2'
+    if (cfg['schema'] != 'luobo.mobile.input.current363.failed9.then.diagnostic1.reuse15.v3'
             or cfg['cohort'] != 'current363' or cfg['resource'] != RESOURCE
             or cfg['source_digest'] != FINAL_SOURCE or cfg['portable_digest'] != FINAL_PORTABLE
             or cfg['source_members'] != 363 or cfg['portable_members'] != 415
-            or cfg['analysis_paths'] != ANALYSIS_PATHS9 or cfg['test_paths'] != TEST_PATHS4
+            or cfg['analysis_paths'] != ANALYSIS_PATHS10 or cfg['test_paths'] != TEST_PATHS4
             or cfg['new_names21'] != NEW21 or cfg['old_names5'] != OLD5
             or cfg['names26'] != NAMES26
             or cfg['names25'] != NAMES25 or cfg['reused_names1'] != [OLD5[-1]]
+            or cfg['phase9_names'] != PHASE9 or cfg['phase1_names'] != PHASE1
+            or cfg['reused_cloud_names15'] != REUSED15
+            or cfg['phase9_paths'] != PHASE9_PATHS or cfg['phase1_paths'] != PHASE1_PATHS
             or cfg['cloud_analysis_paths'] != []
             or len(cfg['names25']) != 25 or len(set(cfg['names25'])) != 25
             or [r['path'] for r in cfg['helper_pins']] != HELPERS
@@ -137,6 +177,7 @@ def descriptor():
         raise ValueError('historical1308/new21 expected names differ')
     validate_inventory(cfg, cfg['source_rows'], old)
     validate_local_reuse(cfg)
+    validate_cloud_reuse(cfg)
     return cfg, old
 
 
@@ -166,8 +207,8 @@ def sources(cfg, old):
         files[row['path']] = pin(SOURCE.regular(REPO/SOURCE.safe_name(row['path'])), row)
     if len(files) != 415 or SOURCE.source_digest(files) != FINAL_PORTABLE:
         raise ValueError('current363 portable415 differs')
-    if cfg['analysis_paths'] != [r['path'][4:] for r in cfg['delta9']]:
-        raise ValueError('changed analysis nine differs')
+    if cfg['analysis_paths'] != [r['path'][4:] for r in cfg['delta10']]:
+        raise ValueError('changed analysis ten differs')
     for row in cfg['old_test_source_pins']:
         pin(files[row['path']], row)
     return files
@@ -238,22 +279,198 @@ def materialize(output):
 
 
 def phase_commands(work, cfg):
-    # These nine final files were actually analyzed locally. The one gateway
-    # test passed before four other files failed to load unavailable packages.
-    # Only the 25 unstarted business tests execute on the locked cloud closure.
     validate_local_reuse(cfg)
-    tests = [str(work/'flutter/bin/flutter'), 'test', '--no-pub', '--machine', '--concurrency=1',
-             '--no-enable-vmservice', '--name', '^(?:'+'|'.join(map(re.escape, cfg['names25']))+')$'] + cfg['test_paths']
-    return [], tests
+    validate_cloud_reuse(cfg)
+    phases = []
+    for label, names, paths in [('input-repair9', PHASE9, PHASE9_PATHS),
+                                ('input-typing-diagnostic1', PHASE1, PHASE1_PATHS)]:
+        command = [str(work/'flutter/bin/flutter'), 'test', '--no-pub', '--machine', '--concurrency=1',
+                   '--no-enable-vmservice', '--name', '^(?:'+'|'.join(map(re.escape, names))+')$'] + paths
+        phases.append({'label': label, 'names': names, 'expected': len(names),
+                       'paths': paths, 'command': command})
+    return phases
 
 
-def result_summary(text, cfg):
-    result = {'tests': CHECK.machine_summary(text, 25),
-              'names': CHECK.required_name_summary(text, 25, [{'name': n, 'count': 1} for n in cfg['names25']]),
-              'cleanup': CHECK.group_revoke_cleanup_summary(text, cfg['cleanup'])}
+def phase_cleanup(cfg, phase):
+    cleanup = dict(cfg['cleanup'])
+    cleanup['widget_names'] = [n for n in cleanup['widget_names'] if n in phase['names']]
+    cleanup['repository_names'] = [n for n in cleanup['repository_names'] if n in phase['names']]
+    return cleanup
+
+
+def result_summary(text, cfg, phase):
+    expected = phase['expected']
+    result = {'tests': CHECK.machine_summary(text, expected),
+              'names': CHECK.required_name_summary(text, expected, [{'name': n, 'count': 1} for n in phase['names']]),
+              'cleanup': CHECK.group_revoke_cleanup_summary(text, phase_cleanup(cfg, phase))}
     if ANALYSIS.ui_warnings(text):
-        raise ValueError('tap/overflow warning in incremental25')
+        raise ValueError('tap/overflow warning in targeted continuation')
     return result
+
+
+def failure_observation(text, cfg, phase):
+    # Only a complete selected-test assertion failure may proceed to the final
+    # diagnostic. Loader failures, unknown IDs, missing cleanup, warnings,
+    # skips and guard failures are not an excuse to continue.
+    starts, finished, errors, footers, assertions = {}, {}, [], [], set()
+    malformed = False
+    assertion_headers = ('The following TestFailure was thrown',
+                         'The following AssertionError was thrown',
+                         'The following _AssertionError was thrown')
+    for line in text.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        kind = event.get('type')
+        if footers and kind is not None:
+            malformed = True
+        if kind == 'testStart':
+            item = event.get('test', {})
+            if not isinstance(item, dict) or type(item.get('id')) is not int:
+                malformed = True
+                continue
+            identity = item.get('id')
+            if identity in starts:
+                malformed = True
+            starts[identity] = item.get('name')
+        elif kind == 'testDone':
+            identity = event.get('testID')
+            if type(identity) is not int:
+                malformed = True
+                continue
+            if identity not in starts or identity in finished:
+                malformed = True
+            finished[identity] = event
+        elif kind == 'error':
+            errors.append(event)
+            if event.get('isFailure') is True and type(event.get('testID')) is int:
+                assertions.add(event.get('testID'))
+        elif kind == 'print' and isinstance(event.get('message'), str):
+            if type(event.get('testID')) is int and any(line.startswith(assertion_headers) for line in event['message'].splitlines()):
+                assertions.add(event.get('testID'))
+        elif kind == 'done':
+            footers.append(event.get('success'))
+    visible = {key: event for key, event in finished.items() if event.get('hidden') is False}
+    actual_names = [starts[key] for key in visible]
+    failed = {key for key, event in visible.items() if event.get('result') != 'success'}
+    complete = (not malformed and len(footers) == 1 and footers[0] is False
+                and starts.keys() == finished.keys()
+                and all(isinstance(name, str) for name in actual_names)
+                and sorted(actual_names) == sorted(phase['names'])
+                and all(type(e.get('hidden')) is bool and e.get('skipped') is False for e in finished.values())
+                and all(e.get('result') == 'success' for key, e in finished.items() if key not in visible))
+    cleanup = None
+    try:
+        cleanup = CHECK.group_revoke_cleanup_summary(text, phase_cleanup(cfg, phase))
+    except ValueError:
+        complete = False
+    assertion_only = (complete and bool(failed) and bool(errors)
+                      and all(type(e.get('testID')) is int and e.get('testID') in failed and e.get('testID') in assertions for e in errors)
+                      and not ANALYSIS.ui_warnings(text))
+    return {'started': len(starts), 'completed': len(finished),
+            'visible_names': actual_names,
+            'passed_names': [starts[k] for k, e in visible.items() if e.get('result') == 'success' and e.get('skipped') is False],
+            'failed_names': [starts[k] for k in failed],
+            'complete_selected_assertion_failure': bool(assertion_only), 'cleanup': cleanup}
+
+
+def bounded_source_post(work, cfg, old, label):
+    # Read-only even after a latched child/resource failure. The primary error
+    # and guard.reason are never cleared. One exact authored415 check per phase,
+    # including failed phases; no duplicate successful whole-source postwalk.
+    record = {'accepted': False, 'exception_type': None, 'authored_bodies': 0,
+              'source363': FINAL_SOURCE, 'portable415': FINAL_PORTABLE,
+              'deadline_seconds': SOURCE_POST_SECONDS}
+    previous_handler = signal.getsignal(signal.SIGALRM)
+    previous_timer = signal.getitimer(signal.ITIMER_REAL)
+    def timeout(signum, frame):
+        raise TimeoutError('bounded source-post expired')
+    armed = changed_handler = False
+    try:
+        if previous_timer != (0.0, 0.0):
+            raise ValueError('source-post cannot replace an existing timer')
+        signal.signal(signal.SIGALRM, timeout)
+        changed_handler = True
+        signal.setitimer(signal.ITIMER_REAL, SOURCE_POST_SECONDS)
+        armed = True
+        files = verify_work(work, cfg, old)
+        if len(files) != 415 or SOURCE.source_digest(files) != FINAL_PORTABLE:
+            raise ValueError('source-post portable415 differs')
+        record.update(accepted=True, authored_bodies=415, current_inventory_exact=True)
+    except BaseException as error:
+        record['exception_type'] = type(error).__name__
+    finally:
+        if armed:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+        if changed_handler:
+            signal.signal(signal.SIGALRM, previous_handler)
+    CHECK.write_json(work/'evidence'/(label+'.source-post.json'), record)
+    return record
+
+
+def run_phase(work, cfg, old, guard, phase):
+    label = phase['label']
+    record = {'phase': label, 'accepted': False, 'exception_type': None,
+              'expected_names': phase['names'], 'expected_tests': phase['expected']}
+    primary = None
+    command_returned = False
+    resource = {}
+    log = work/'evidence'/(label+'.log')
+    try:
+        # Exit1 is retained for actual selected assertions. Timeout/cap/floor
+        # still raise before any code can interpret a child exit0 as success.
+        CHECK.guarded(phase['command'], work, guard, label, timeout=120, accepted_exits=(0, 1))
+        command_returned = True
+        resource = json.loads(SOURCE.regular(work/'evidence'/(label+'.resource.json')))
+        if resource['latched_failure'] or guard.reason:
+            raise ValueError('latched phase/resource failure')
+        text = SOURCE.regular(log).decode()
+        record['observation'] = failure_observation(text, cfg, phase)
+        record['summary'] = result_summary(text, cfg, phase)
+        if resource['child_exit_code'] != 0:
+            raise ValueError('nonzero child cannot pass')
+        record['accepted'] = True
+    except BaseException as error:
+        primary = error
+        record['exception_type'] = type(error).__name__
+        if log.exists() and 'observation' not in record:
+            try:
+                record['observation'] = failure_observation(SOURCE.regular(log).decode(), cfg, phase)
+            except BaseException as secondary:
+                record['observation_exception_type'] = type(secondary).__name__
+    finally:
+        try:
+            post = bounded_source_post(work, cfg, old, label)
+        except BaseException as secondary:
+            post = {'accepted': False, 'exception_type': type(secondary).__name__,
+                    'receipt_write_failed': True}
+            if primary is None:
+                primary = secondary
+        record['source_post'] = post
+        record['latched_failure'] = guard.reason
+        if not post['accepted']:
+            record['accepted'] = False
+            if primary is None:
+                primary = ValueError('source-post refused')
+                record['exception_type'] = type(primary).__name__
+        if guard.reason:
+            record['accepted'] = False
+        try:
+            CHECK.write_json(work/'evidence'/(label+'.summary.json'), record)
+        except BaseException as secondary:
+            record['accepted'] = False
+            record['summary_write_exception_type'] = type(secondary).__name__
+            if primary is None:
+                primary = secondary
+    record['continue_assertion_diagnostic'] = bool(
+        command_returned and not resource.get('latched_failure')
+        and not record['accepted'] and guard.reason is None and post['accepted']
+        and record.get('observation', {}).get('complete_selected_assertion_failure')
+        and json.loads(SOURCE.regular(work/'evidence'/(label+'.resource.json')))['child_exit_code'] == 1)
+    return record, primary
 
 
 def run(work):
@@ -265,36 +482,52 @@ def run(work):
         raise ValueError('initial4GiB/cap gate')
     monitor = threading.Thread(target=guard.poll, daemon=True)
     monitor.start()
+    phases, primary = [], None
     try:
-        commands, test_command = phase_commands(work, cfg)
-        if commands:
-            raise ValueError('local analysis9 must not be executed again')
-        CHECK.write_json(work/'evidence/input-local-reuse9-plus1.json', cfg['local_validation_reuse'])
-        log = CHECK.guarded(test_command, work, guard, 'input-target25', timeout=120)
-        summary = result_summary(log.read_text(), cfg)
-        verify_work(work, cfg, old)
-        CHECK.write_json(work/'evidence/input-scoped-passed.json',
-                         {'state': 'current363_cloud25_with_pinned_local_analysis9_gateway1', 'summary': summary,
-                          'cloud_analysis_executed': 0, 'cloud_tests_executed': 25,
-                          'local_reuse_sha256': LOCAL_REUSE_SHA,
-                          'source363': FINAL_SOURCE, 'portable415': FINAL_PORTABLE,
-                          'full1329_executed': False, 'native_device_service_acceptance': False})
-        guard.sample()
+        CHECK.write_json(work/'evidence/input-local-reuse10-plus1.json', cfg['local_validation_reuse'])
+        CHECK.write_json(work/'evidence/input-prior-cloud15.json', cfg['cloud_validation_reuse'])
+        for phase in phase_commands(work, cfg):
+            result, error = run_phase(work, cfg, old, guard, phase)
+            phases.append(result)
+            if error is not None and primary is None:
+                primary = error
+            if guard.reason or not result['accepted'] and not result['continue_assertion_diagnostic']:
+                break
     except BaseException as error:
-        CHECK.write_json(work/'evidence/input-failed.json',
-                         {'type': type(error).__name__, 'detail': str(error), 'latched_failure': guard.reason})
-        raise
+        if primary is None:
+            primary = error
     finally:
         try:
             guard.sample()
             CHECK.write_json(work/'evidence/input-final-resource.json',
                              {'minimum_free_bytes': guard.minimum, 'peak_workspace_allocated_bytes': guard.peak,
                               'latched_failure': guard.reason, 'failure_wins_over_passed_receipt': True})
+        except BaseException as secondary:
+            if primary is None:
+                primary = secondary
         finally:
             guard.stop.set()
             monitor.join()
-    if guard.reason:
-        raise ValueError('final resource failure')
+    if primary is not None or guard.reason or len(phases) != 2 or not all(p['accepted'] for p in phases):
+        try:
+            CHECK.write_json(work/'evidence/input-failed.json',
+                             {'type': type(primary).__name__ if primary is not None else 'ValueError',
+                              'phases': phases, 'latched_failure': guard.reason,
+                              'entire_batch_passed': False, 'prior_source_post_exact_claimed': False})
+        finally:
+            if primary is not None:
+                raise primary
+            raise ValueError('targeted continuation failed')
+    CHECK.write_json(work/'evidence/input-scoped-passed.json',
+                     {'state': 'current363_repair9_then_diagnostic1_with_explicit_prior15', 'phases': phases,
+                      'cloud_analysis_executed': 0, 'cloud_tests_executed': 10,
+                      'local_reuse_sha256': LOCAL_REUSE_SHA, 'prior_cloud_reuse_sha256': CLOUD_REUSE_SHA,
+                      'source363': FINAL_SOURCE, 'portable415': FINAL_PORTABLE,
+                      'cleanup': {'new_fixture_sequences': 9, 'new_markers': 36,
+                                  'prior_cloud_reused_fixtures': 15, 'prior_cloud_reused_markers': 60,
+                                  'combined_fixture_sequences': 24, 'combined_markers': 96,
+                                  'newly_executed_24_fixtures': False},
+                      'full1329_executed': False, 'native_device_service_acceptance': False})
 
 
 def netns(work, run_as):

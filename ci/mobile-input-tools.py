@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""New current363 identity/dispatch/cleanup controls only; no Flutter or suite."""
+"""Only three directly affected controls and two new failure/postproof controls."""
 import copy
 import importlib.util
 import json
 from pathlib import Path
 import re
+import tempfile
+import threading
+import types
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parent.parent
 spec = importlib.util.spec_from_file_location('mobile_input_controlled', ROOT/'ci/mobile-input.py')
@@ -13,57 +17,88 @@ lane = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lane)
 
 
+def events_for(cfg, phase, *, fail=False):
+    events = []
+    for i, name in enumerate(phase['names']):
+        events.append({'type': 'testStart', 'test': {'id': i, 'name': name}})
+        if name in cfg['cleanup']['widget_names']:
+            events += [{'type': 'print', 'testID': i, 'message': 'group_revoke_cleanup '+m}
+                       for m in cfg['cleanup']['widget_markers']]
+        if fail and i == 0:
+            # Real Flutter testWidgets can report isFailure=false and a fixed
+            # TestFailure print. This is an assertion, not a loader exception.
+            events += [{'type': 'print', 'testID': i,
+                        'message': 'The following TestFailure was thrown running a test:'},
+                       {'type': 'error', 'testID': i, 'isFailure': False}]
+        events.append({'type': 'testDone', 'testID': i, 'result': 'error' if fail and i == 0 else 'success',
+                       'hidden': False, 'skipped': False})
+    events += [{'type': 'done', 'success': not fail}]
+    return events
+
+
+def machine_text(events):
+    return '\n'.join(json.dumps(e) for e in events)
+
+
 class ChatInput363Tests(unittest.TestCase):
+    # Original three method names stay stable; assertions now cover R3's
+    # exact six replacements/four new files and nine-then-one continuation.
     def test_current363_vector_reverses_only_exact_five_before_and_four_new_without_historical_alias(self):
         cfg, old = lane.descriptor()
         lane.validate_inventory(cfg, cfg['source_rows'], old)
-        self.assertEqual(len(cfg['source_rows']), 363)
+        self.assertEqual(len(cfg['delta10']), 10)
+        self.assertEqual(sum(r['before'] is not None for r in cfg['delta10']), 6)
         self.assertNotEqual(lane.FINAL_SOURCE, lane.BASE_SOURCE)
         lane.validate_local_reuse(cfg)
-        changed_reuse = copy.deepcopy(cfg)
-        changed_reuse['local_validation_reuse']['analyses9'][0]['source']['sha256'] = '0'*64
-        with self.assertRaisesRegex(ValueError, 'local analysis9/gateway1 proof'):
-            lane.validate_local_reuse(changed_reuse)
+        lane.validate_cloud_reuse(cfg)
+        for key, operation, pattern in [
+            ('local_validation_reuse', lane.validate_local_reuse, 'local analysis10/gateway1 proof'),
+            ('cloud_validation_reuse', lane.validate_cloud_reuse, 'prior cloud15 proof')]:
+            changed = copy.deepcopy(cfg)
+            changed[key]['forged'] = True
+            with self.assertRaisesRegex(ValueError, pattern):
+                operation(changed)
         wrong = copy.deepcopy(cfg['source_rows'])
         wrong[0]['sha256'] = '0'*64
         with self.assertRaisesRegex(ValueError, 'current363 source inventory'):
             lane.validate_inventory(cfg, wrong, old)
         wrong_cfg = copy.deepcopy(cfg)
-        index = next(i for i, r in enumerate(wrong_cfg['delta9']) if r['before'] is not None)
-        wrong_cfg['delta9'][index]['before']['sha256'] = '0'*64
-        with self.assertRaisesRegex(ValueError, 'historical359 reverse5'):
+        next(r for r in wrong_cfg['delta10'] if r['before'] is not None)['before']['sha256'] = '0'*64
+        with self.assertRaisesRegex(ValueError, 'historical359 reverse6'):
             lane.validate_inventory(wrong_cfg, wrong_cfg['source_rows'], old)
         extra = copy.deepcopy(cfg['source_rows'])
         extra.append({'path': 'app/tool/check.sh', 'bytes': 1, 'sha256': '0'*64})
         with self.assertRaisesRegex(ValueError, 'current363 source inventory'):
             lane.validate_inventory(cfg, extra, old)
+        self.assertFalse(cfg['cloud_validation_reuse']['prior_source_post_exact_recorded'])
+        self.assertEqual(len(cfg['local_validation_reuse']['analyses10']), 10)
 
     def test_actual_dispatch_selects_only_unstarted25_with_exact_local9_plus1_and_preserves_manual_old359(self):
         cfg, _ = lane.descriptor()
-        analyses, tests = lane.phase_commands(Path('/tmp/fresh-input363'), cfg)
-        self.assertEqual(analyses, [])
-        self.assertEqual(tests[-4:], lane.TEST_PATHS4)
-        self.assertNotIn('test/core/im/open_im_gateway_test.dart', tests)
-        self.assertEqual(tests[1:6], ['test', '--no-pub', '--machine', '--concurrency=1', '--no-enable-vmservice'])
-        pattern = re.compile(tests[tests.index('--name')+1])
-        self.assertTrue(all(pattern.fullmatch(n) for n in lane.NAMES25))
-        self.assertIsNone(pattern.fullmatch(lane.OLD5[-1]))
-        self.assertEqual(cfg['names26'], cfg['names25'] + cfg['reused_names1'])
-        old = json.loads((ROOT/'ci/mobile/required-test-names.json').read_text())['current_full1308']
-        untouched = [r['name'] for r in old if r['name'] not in lane.OLD5]
-        self.assertTrue(untouched)
-        self.assertTrue(all(pattern.fullmatch(n) is None for n in untouched))
+        phases = lane.phase_commands(Path('/tmp/fresh-input363'), cfg)
+        self.assertEqual([p['expected'] for p in phases], [9, 1])
+        self.assertEqual(phases[0]['command'][-4:], lane.PHASE9_PATHS)
+        self.assertEqual(phases[1]['command'][-1:], lane.PHASE1_PATHS)
+        selected = []
+        for phase in phases:
+            command = phase['command']
+            self.assertEqual(command[1:6], ['test', '--no-pub', '--machine', '--concurrency=1', '--no-enable-vmservice'])
+            pattern = re.compile(command[command.index('--name')+1])
+            self.assertTrue(all(pattern.fullmatch(n) for n in phase['names']))
+            self.assertTrue(all(pattern.fullmatch(n) is None for n in lane.REUSED15+[lane.OLD5[-1]]))
+            selected += phase['names']
+        first = re.compile(phases[0]['command'][phases[0]['command'].index('--name')+1])
+        self.assertIsNone(first.fullmatch(lane.PHASE1[0]))
+        self.assertEqual(set(selected+lane.REUSED15), set(lane.NAMES25))
+        self.assertEqual(len(set(selected)), 10)
+        self.assertEqual([len(lane.phase_cleanup(cfg, p)['widget_names']) for p in phases], [8, 1])
         workflow = (ROOT/'.github/workflows/mobile-input.yml').read_text()
         self.assertIn('  workflow_dispatch:', workflow)
-        self.assertNotIn('  push:', workflow)
-        self.assertNotIn('  pull_request:', workflow)
-        self.assertNotIn('  schedule:', workflow)
-        self.assertNotIn('full-regression', workflow)
+        for forbidden in ['  push:', '  pull_request:', '  schedule:', 'full-regression']:
+            self.assertNotIn(forbidden, workflow)
         self.assertIn('cancel-in-progress: false', workflow)
         historical = (ROOT/'.github/workflows/mobile-ci.yml').read_text()
         self.assertIn('ref: dfa0b855c3f90668f36aaa4fab95e32d671fd36e', historical)
-        # The official toolchain/archives/SQLite and real-HOME setup remain
-        # byte-identical after the four declared entry substitutions.
         setup = (ROOT/'ci/mobile-input-setup.sh').read_text()
         setup = setup.replace('usage: mobile-input-setup.sh COHORT FRESH_ROOT', 'usage: mobile-setup.sh COHORT FRESH_ROOT')
         setup = setup.replace('[[ "$cohort" == current363 ]]', '[[ "$cohort" == current359 ]]')
@@ -75,37 +110,106 @@ class ChatInput363Tests(unittest.TestCase):
 
     def test_exact_machine25_and_real_fixture24_reject_reused_name_skip_missing_cleanup_and_ui_warning(self):
         cfg, _ = lane.descriptor()
-        events = []
-        for i, name in enumerate(lane.NAMES25):
-            events.append({'type': 'testStart', 'test': {'id': i, 'name': name}})
-            if name in cfg['cleanup']['widget_names']:
-                events += [{'type': 'print', 'testID': i, 'message': 'group_revoke_cleanup '+m}
-                           for m in cfg['cleanup']['widget_markers']]
-            events.append({'type': 'testDone', 'testID': i, 'result': 'success', 'hidden': False, 'skipped': False})
-        events += [{'type': 'testStart', 'test': {'id': 25, 'name': 'loading actual files'}},
-                   {'type': 'testDone', 'testID': 25, 'result': 'success', 'hidden': True, 'skipped': False},
-                   {'type': 'done', 'success': True}]
-        def text(value):
-            return '\n'.join(json.dumps(e) for e in value)
-        result = lane.result_summary(text(events), cfg)
-        self.assertEqual(result['tests']['passed'], 25)
-        self.assertEqual(result['cleanup']['widget_names'], 24)
-        self.assertTrue(result['cleanup']['exact_owned_four_marker_sequences'])
-        wrong = copy.deepcopy(events)
-        wrong[0]['test']['name'] = lane.OLD5[-1]
-        with self.assertRaisesRegex(ValueError, 'name multiset'):
-            lane.result_summary(text(wrong), cfg)
-        wrong = copy.deepcopy(events)
-        next(e for e in wrong if e['type'] == 'testDone')['skipped'] = True
-        with self.assertRaisesRegex(ValueError, 'incomplete/failing'):
-            lane.result_summary(text(wrong), cfg)
-        wrong = [e for e in events if not (e['type'] == 'print' and e['testID'] == 0 and e['message'].endswith('sdk.end'))]
-        with self.assertRaisesRegex(ValueError, 'missing/duplicate/out-of-order'):
-            lane.result_summary(text(wrong), cfg)
-        warning = copy.deepcopy(events)
-        warning.insert(-1, {'type': 'print', 'testID': 0, 'message': 'A RenderFlex overflowed by 10 pixels'})
-        with self.assertRaisesRegex(ValueError, 'warning'):
-            lane.result_summary(text(warning), cfg)
+        for phase, fixtures in zip(lane.phase_commands(Path('/tmp/fresh-input363'), cfg), [8, 1]):
+            with self.subTest(phase=phase['label']):
+                events = events_for(cfg, phase)
+                result = lane.result_summary(machine_text(events), cfg, phase)
+                self.assertEqual(result['tests']['passed'], phase['expected'])
+                self.assertEqual(result['cleanup']['widget_names'], fixtures)
+                wrong = copy.deepcopy(events)
+                wrong[0]['test']['name'] = lane.REUSED15[0]
+                with self.assertRaisesRegex(ValueError, 'name multiset'):
+                    lane.result_summary(machine_text(wrong), cfg, phase)
+                wrong = copy.deepcopy(events)
+                next(e for e in wrong if e['type'] == 'testDone')['skipped'] = True
+                with self.assertRaisesRegex(ValueError, 'incomplete/failing'):
+                    lane.result_summary(machine_text(wrong), cfg, phase)
+                wrong = [e for e in events if not (e['type'] == 'print' and e['testID'] == 0 and e['message'].endswith('sdk.end'))]
+                with self.assertRaisesRegex(ValueError, 'missing/duplicate/out-of-order'):
+                    lane.result_summary(machine_text(wrong), cfg, phase)
+                warning = copy.deepcopy(events)
+                warning.insert(-1, {'type': 'print', 'testID': 0, 'message': 'A RenderFlex overflowed by 10 pixels'})
+                with self.assertRaisesRegex(ValueError, 'warning'):
+                    lane.result_summary(machine_text(warning), cfg, phase)
+
+    def test_failure_source_post_is_retained_and_never_masks_primary_or_claims_old_post(self):
+        cfg, old = lane.descriptor()
+        phase = lane.phase_commands(Path('/tmp/fresh-input363'), cfg)[1]
+        for source_fails in [False, True]:
+            with self.subTest(source_fails=source_fails), tempfile.TemporaryDirectory() as raw:
+                work = Path(raw)
+                (work/'evidence').mkdir()
+                guard = types.SimpleNamespace(reason=None)
+                def failed(*args, **kwargs):
+                    (work/'evidence'/(phase['label']+'.log')).write_text(machine_text(events_for(cfg, phase)))
+                    lane.CHECK.write_json(work/'evidence'/(phase['label']+'.resource.json'), {'child_exit_code': 0, 'latched_failure': None})
+                    raise RuntimeError('primary command failure')
+                files = {str(i): b'x' for i in range(415)}
+                with mock.patch.object(lane.CHECK, 'guarded', side_effect=failed), \
+                     mock.patch.object(lane, 'verify_work', side_effect=ValueError('post drift') if source_fails else None, return_value=files), \
+                     mock.patch.object(lane.SOURCE, 'source_digest', return_value=lane.FINAL_PORTABLE):
+                    result, primary = lane.run_phase(work, cfg, old, guard, phase)
+                self.assertIsInstance(primary, RuntimeError)
+                self.assertFalse(result['accepted'])
+                post = json.loads((work/'evidence'/(phase['label']+'.source-post.json')).read_text())
+                self.assertEqual(post['accepted'], not source_fails)
+                self.assertEqual(post['exception_type'], 'ValueError' if source_fails else None)
+                self.assertEqual(result['exception_type'], 'RuntimeError')
+                self.assertFalse(cfg['cloud_validation_reuse']['prior_source_post_exact_recorded'])
+
+    def test_assertion9_can_diagnose_last1_but_child_zero_timeout_stops_and_whole_pass_requires_both(self):
+        cfg, old = lane.descriptor()
+        class Guard:
+            def __init__(self, work):
+                self.reason = None
+                self.minimum = lane.CHECK.INITIAL
+                self.peak = 0
+                self.stop = threading.Event()
+            def sample(self):
+                return self.minimum
+            def poll(self):
+                self.stop.wait()
+        for scenario, count, passed in [('assertion', 2, False), ('timeout-child0', 1, False), ('both-success', 2, True)]:
+            with self.subTest(scenario=scenario), tempfile.TemporaryDirectory() as raw:
+                work = Path(raw)
+                (work/'evidence').mkdir()
+                called = []
+                def execute(command, actual_work, guard, label, **kwargs):
+                    called.append(label)
+                    phase = next(p for p in lane.phase_commands(work, cfg) if p['label'] == label)
+                    fail = scenario == 'assertion' and len(called) == 1
+                    log = work/'evidence'/(label+'.log')
+                    log.write_text(machine_text(events_for(cfg, phase, fail=fail)))
+                    if scenario == 'timeout-child0':
+                        guard.reason = 'phase_timeout'
+                    lane.CHECK.write_json(work/'evidence'/(label+'.resource.json'),
+                                          {'child_exit_code': 1 if fail else 0, 'latched_failure': guard.reason})
+                    if guard.reason:
+                        raise ValueError('phase failed: '+label)
+                    return log
+                files = {str(i): b'x' for i in range(415)}
+                with mock.patch.object(lane, 'descriptor', return_value=(cfg, old)), \
+                     mock.patch.object(lane, 'verify_work', return_value=files), \
+                     mock.patch.object(lane.SOURCE, 'source_digest', return_value=lane.FINAL_PORTABLE), \
+                     mock.patch.object(lane.CHECK, 'prove_namespace'), \
+                     mock.patch.object(lane.CHECK, 'Guard', Guard), \
+                     mock.patch.object(lane.CHECK, 'guarded', side_effect=execute):
+                    if passed:
+                        lane.run(work)
+                    else:
+                        with self.assertRaises(ValueError):
+                            lane.run(work)
+                self.assertEqual(len(called), count)
+                self.assertEqual((work/'evidence/input-scoped-passed.json').exists(), passed)
+                self.assertEqual(len(list((work/'evidence').glob('*.source-post.json'))), count)
+                if scenario == 'timeout-child0':
+                    self.assertEqual(json.loads((work/'evidence/input-failed.json').read_text())['latched_failure'], 'phase_timeout')
+                if passed:
+                    result = json.loads((work/'evidence/input-scoped-passed.json').read_text())
+                    self.assertEqual(result['cloud_tests_executed'], 10)
+                    self.assertEqual(result['cleanup']['prior_cloud_reused_markers'], 60)
+                    self.assertEqual(result['cleanup']['new_markers'], 36)
+                    self.assertFalse(result['cleanup']['newly_executed_24_fixtures'])
 
 
 if __name__ == '__main__':
