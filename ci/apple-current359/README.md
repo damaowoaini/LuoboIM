@@ -102,3 +102,24 @@ Only the two directly affected controls are prepared. The old split-root
 negative is explicitly replaced by a hybrid whose require path escapes its real
 gem base; hybrid positives and every alias negative prove a valid baseline.
 No controls/Ruby/native work or cloud job has been executed for R5.
+
+## R6: bounded link-refusal diagnostics only
+
+Run38990950633 passed minitest's restricted hybrid and require-path checks, then
+refused a symlink in its source tree. The specific entry/target were not retained;
+neither a selected-Ruby counterpart nor source/non-source kind can be inferred.
+R6 keeps that refusal and adds one bounded descriptor to the error evidence.
+
+The descriptor contains a relative entry (maximum512 characters, otherwise null),
+symbolic-link/changed-entry kind, and target class. Only canonical targets inside
+the already selected Ruby/system roots can show a relative target. User-home or
+other roots show no path; unresolved targets show only exception class, never
+an exception string or raw link text. Linked contents are not read. A changed
+link during observation is marked; no diagnostic grants admission.
+
+The fixed16 list, hybrid/require policy, source hashes, final path-mapping checks
+and null native approval remain unchanged. Prepare only one new filesystem
+control through the real auditor; it proves a valid baseline and exercises
+selected file/directory, system target, private/outside targets, missing target,
+and an overlong relative entry. The original two controls remain byte-identical
+and are not rerun. This R6 has executed no controls/Ruby/native/cloud work.

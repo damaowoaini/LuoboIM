@@ -259,4 +259,143 @@ void main() {
       );
     }
   });
+
+  test(
+    'encoded JSON null keeps ordinary SDK previews and forwarding available',
+    () {
+      for (final encoded in ['null', ' \nnull\t']) {
+        final wire = Message.fromJson({
+          'clientMsgID': 'ordinary-null',
+          'sendID': 'bob',
+          'recvID': 'alice',
+          'contentType': 101,
+          'status': MessageStatus.succeeded,
+          'attachedInfo': encoded,
+          'textElem': {'content': 'synthetic ordinary text'},
+        });
+        expect(wire.toJson()['attachedInfo'], encoded);
+        expect(messagePreview(wire), 'synthetic ordinary text');
+        final item = mapMessage(wire, 'alice');
+        expect(item.privacy.inspectionComplete, true);
+        expect(item.privacy.containsPrivateContent, false);
+        expect(
+          item.privacy.canRetainAt(
+            DateTime.fromMillisecondsSinceEpoch(1700000000000),
+          ),
+          true,
+        );
+        expect(item.canForward, true);
+      }
+    },
+  );
+
+  test('encoded null never masks modeled private metadata or real private descendants', () {
+    final wire = Message.fromJson({
+      'clientMsgID': 'private-null',
+      'contentType': 101,
+      'status': MessageStatus.succeeded,
+      'attachedInfo': 'null',
+      'textElem': {'content': 'synthetic private text'},
+      'attachedInfoElem': {
+        'isPrivateChat': true,
+        'burnDuration': 30,
+        'hasReadTime': 1700000000000,
+      },
+    });
+    final item = mapMessage(wire, 'alice');
+    expect(item.privacy.inspectionComplete, true);
+    expect(item.privacy.containsPrivateContent, true);
+    expect(item.privacy.expiresAtMilliseconds, 1700000030000);
+    expect(item.canForward, false);
+    expect(messagePreview(wire), '[阅后即焚消息]');
+    final quote = inspectMessagePrivacy({
+      'attachedInfo': 'null',
+      'quoteElem': {'quoteMessage': wire.toJson()},
+    });
+    expect(quote.inspectionComplete, true);
+    expect(quote.containsPrivateContent, true);
+    expect(quote.expiresAtMilliseconds, 1700000030000);
+    expect(quote.allowsRetention, false);
+  });
+
+  test('later encoded null cannot erase remembered private expiry or incomplete inspection', () async {
+    var elapsed = 0;
+    final wall = DateTime.fromMillisecondsSinceEpoch(1700000000000);
+    final ledger = MessagePrivacyLedger(monotonicMilliseconds: () => elapsed)
+      ..bind('issuer/tenant/user', 1);
+    addTearDown(ledger.dispose);
+    ledger.observe('c', {
+      'clientMsgID': 'private-null',
+      'attachedInfoElem': {
+        'isPrivateChat': true,
+        'hasReadTime': 1700000000000,
+        'burnDuration': 30,
+      },
+    }, now: wall);
+    final omitted = {'clientMsgID': 'private-null', 'attachedInfo': 'null'};
+    final stillPrivate = ledger.observe('c', omitted, now: wall);
+    expect(stillPrivate.containsPrivateContent, true);
+    expect(stillPrivate.expiresAtMilliseconds, 1700000030000);
+    expect(stillPrivate.canRetainAt(wall), false);
+    elapsed = 30001;
+    final rollback = wall.subtract(const Duration(days: 1));
+    expect(stillPrivate.canViewAt(rollback), false);
+    final expired = ledger.observe('c', omitted, now: rollback);
+    expect(expired.canViewAt(rollback), false);
+    expect(expired.allowsRetention, false);
+    expect(
+      ledger.observe('c', {
+        'clientMsgID': 'malformed-null',
+        'attachedInfo': '[]',
+      }, now: rollback).inspectionComplete,
+      false,
+    );
+    final incomplete = ledger.observe('c', {
+      'clientMsgID': 'malformed-null',
+      'attachedInfo': 'null',
+    }, now: rollback);
+    expect(incomplete.inspectionComplete, false);
+    expect(incomplete.allowsRetention, false);
+  });
+
+  test('all other encoded nonobjects malformed fields and bounded tree violations remain rejected', () {
+    for (final encoded in <Object?>[
+      '[]',
+      '[null]',
+      'true',
+      'false',
+      '0',
+      '1',
+      '"null"',
+      '"ordinary"',
+      '{',
+      'NULL',
+      'null false',
+      false,
+      0,
+      '{"isPrivateChat":"true"}',
+      '{"burnDuration":1.5}',
+      '{"hasReadTime":"1700000000000"}',
+      'null'.padLeft(65537),
+    ]) {
+      final value = inspectMessagePrivacy({'attachedInfo': encoded});
+      expect(value.inspectionComplete, false);
+      expect(value.allowsRetention, false);
+    }
+    expect(
+      inspectMessagePrivacy({'attachedInfo': 'null', 'attachedInfoElem': []})
+          .inspectionComplete,
+      false,
+    );
+    Object deep = {'attachedInfo': 'null'};
+    for (var index = 0; index < 34; index++) {
+      deep = {
+        'quoteElem': {'quoteMessage': deep},
+      };
+    }
+    expect(inspectMessagePrivacy(deep).inspectionComplete, false);
+    final cycle = <String, Object?>{'attachedInfo': 'null'};
+    cycle['quoteElem'] = {'quoteMessage': cycle};
+    expect(inspectMessagePrivacy(cycle).inspectionComplete, false);
+  });
 }

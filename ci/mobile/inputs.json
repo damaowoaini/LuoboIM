@@ -965,7 +965,7 @@
     ]
   },
   "current359": {
-    "expected_full_tests": 1304,
+    "expected_full_tests": 1308,
     "expected_target_tests": 24,
     "files": [
       {
@@ -1039,9 +1039,9 @@
         "sha256": "358da9046802d6a72e464043f0333463686ef970cff64c618ea8d1475f193f22"
       },
       {
-        "bytes": 18768,
         "path": "app/lib/core/privacy/message_privacy.dart",
-        "sha256": "a63582d594e96a3f16c6bde0e085ef4c67c5c2e7a23758b0a3f79d4c8396d00e"
+        "bytes": 18789,
+        "sha256": "c0da515e6ca3b935ac7b96c3dbae5302125c72e0c2ad38727bd84539b4f3073a"
       },
       {
         "bytes": 509,
@@ -2259,9 +2259,9 @@
         "sha256": "919108c90536dd960155b80248c34000aad481702007ad72900a9be5ce335758"
       },
       {
-        "bytes": 8160,
         "path": "app/test/features/chat/message_privacy_test.dart",
-        "sha256": "b65542e5e27f3161e64d89d20ef8a3d6026818a65413593885880e34e6879eaf"
+        "bytes": 13002,
+        "sha256": "6a80b8f4e79d2457ebb6799475b4fce6a81b6c76b8037e2b56365354bc275c90"
       },
       {
         "bytes": 15653,
@@ -2765,7 +2765,7 @@
       }
     ],
     "members": 359,
-    "source_digest": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+    "source_digest": "633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199",
     "target_paths": [
       "test/features/chat/group_announcement_store_test.dart",
       "test/features/chat/group_announcement_workflow_test.dart"
@@ -3388,7 +3388,21 @@
       "source_digest": "113f8a3ff3cfaa3d17ba77b67cb28605a1220fa86359b8f0661535180075364c",
       "source_ref": "ff7bc1f588f935d6315ad0211e68e15e58cd037e"
     },
-    "reproduction": "v16 supports only current344. Historical cohorts require their immutable commits/inputs; no alias maps old labels to new source. Optional search reference retains4 before files and1 missing-entry ASSERTFAIL+1 old-filter PASS; it is not a historical full run."
+    "reproduction": "v16 supports only current344. Historical cohorts require their immutable commits/inputs; no alias maps old labels to new source. Optional search reference retains4 before files and1 missing-entry ASSERTFAIL+1 old-filter PASS; it is not a historical full run.",
+    "current359_1304_before_attached_info_null": {
+      "source_ref": "bdffc675e6ec0f193bcb5cf786859a7746869061",
+      "source_digest": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+      "portable_digest": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3",
+      "reference_source_digest": "b29cd5d87f9309b5a78d1cf84120a0cc7710f5aa2b80613d970ca02f201c5989",
+      "inputs_pin": {
+        "path": "ci/mobile/inputs.json",
+        "bytes": 189923,
+        "sha256": "652fc6f50a172ff2db82f8fd460440f9b79938905fc8aacb3894a10329d441f3"
+      },
+      "expected_full_tests": 1304,
+      "full_run": false,
+      "meaning": "Original359 source and1304 expected inventory, not a new full/native result."
+    }
   },
   "migration": {
     "bytes": 2942,
@@ -3566,7 +3580,7 @@
     ]
   },
   "portable_digests": {
-    "current359": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3"
+    "current359": "66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb"
   },
   "portable_members": {
     "current359": 411
@@ -3834,7 +3848,13 @@
       "path": "references/integration/mobile-chat-saved-emoji-r1-candidate/candidate-manifest.json",
       "sha256": "37dc6ee8998ba458326cd8de26b7a4fecb9457f18a463b5ccee8e56b85a007b1"
     },
-    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI + frozen call-records-r1 selected14 (4replacement,10new); no generation in CI + frozen saved-emoji R1 selected14 (6replacement,8new); no source generation in CI + Location109 receipt selected8 (3replacements,5new), fixture R1 only; no source generation in CI + StageB R4 selected14 (6replace,8new); native7 separate snapshot; no source generation in CI + exact accepted announcement11 (6 replacements,5new), final fixture-format-r5; no source generation or new package in CI"
+    "source_origins": "current230 + booking/custom v8-r2 + exact hunk-combined group avatar and bulk removal; no source generation in CI + exact frozen global-search16 selected files (4 replacements,12 new); no candidate generation in CI + isolated complete QR flow21 (8existing+13new); no source generation in CI + create-group-avatar-v2 selected9 (4replacement,5new), existingcharacters1.4.1 direct classification only + frozen group-creation-entry selected7 (3 replacements,4 new); no source generation in CI + isolated chatCIDpagekeyr1 selected4 (3replacements,1new test); no source generation in CI + same294 shortcuts-r1 two-file popup-ticket/actual-route-observer correction; no source generation in CI + frozen call-records-r1 selected14 (4replacement,10new); no generation in CI + frozen saved-emoji R1 selected14 (6replacement,8new); no source generation in CI + Location109 receipt selected8 (3replacements,5new), fixture R1 only; no source generation in CI + StageB R4 selected14 (6replace,8new); native7 separate snapshot; no source generation in CI + exact accepted announcement11 (6 replacements,5new), final fixture-format-r5; no source generation or new package in CI",
+    "attached_info_null": {
+      "path": "references/integration/mobile-attached-info-null-format-r1-candidate-20261017/candidate-manifest.json",
+      "bytes": 7052,
+      "sha256": "ab24f25e3022150ea25e973c38bbedf91d4102d485afb8e42b899fd50c965597",
+      "mode": "0o644"
+    }
   },
   "reference_entry": {
     "baseline_prefix": "ci/mobile/reference/global-search-before",
@@ -3855,7 +3875,7 @@
     "not_a_323_full_or_native_result": true,
     "not_a_336_full_or_native_result": true,
     "passed_test_name": "existing explicitly named inbox filter remains available",
-    "reference_source_digest": "b29cd5d87f9309b5a78d1cf84120a0cc7710f5aa2b80613d970ca02f201c5989",
+    "reference_source_digest": "484df4757928963a1d43db25937dbce4e84524c164fce1d6a919183134fed7b1",
     "replacement_files": [
       {
         "bytes": 18789,
@@ -3883,11 +3903,11 @@
     "working_cohort": "current359"
   },
   "required_test_names": {
-    "bytes": 2254996,
+    "bytes": 2425409,
     "path": "ci/mobile/required-test-names.json",
-    "sha256": "7604204ea755fb86845a178d07428e8d300bd0c6d1f457a0f7c8262ff51362d2"
+    "sha256": "159823b546a914fe5bcb2570d666d6f4da43629ce450b2521772f2c096d80f92"
   },
-  "schema": "luobo.mobile.portable-ci-inputs.v19",
+  "schema": "luobo.mobile.portable-ci-inputs.v20",
   "sdk_portable": {
     "files": [
       {
@@ -4156,7 +4176,7 @@
     "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.x64.linux.so",
     "version": "3.5.2"
   },
-  "state": "current359_frozen_source_adoption_proposal_only_no_full_run",
+  "state": "current359_null_wire_source_successor_full1308_expected_only",
   "toolchain": {
     "dart_version": "3.13.5",
     "engine_revision": "deb287481e3ce9468f3434937ced4240a70539ca",
@@ -4214,5 +4234,60 @@
     "new_setup_gate": "fresh enforce-lockfile plus4 exact hosted-hash receipts; not independent archive body rehash",
     "old174_package_identity_blocks_preserved": true,
     "state": "V1actual178offline_success_R1classification_only_no_reresolution"
+  },
+  "attached_info_null": {
+    "before_files": [
+      {
+        "bytes": 18768,
+        "path": "app/lib/core/privacy/message_privacy.dart",
+        "sha256": "a63582d594e96a3f16c6bde0e085ef4c67c5c2e7a23758b0a3f79d4c8396d00e"
+      },
+      {
+        "bytes": 8160,
+        "path": "app/test/features/chat/message_privacy_test.dart",
+        "sha256": "b65542e5e27f3161e64d89d20ef8a3d6026818a65413593885880e34e6879eaf"
+      }
+    ],
+    "selected_files": [
+      {
+        "path": "app/lib/core/privacy/message_privacy.dart",
+        "bytes": 18789,
+        "sha256": "c0da515e6ca3b935ac7b96c3dbae5302125c72e0c2ad38727bd84539b4f3073a"
+      },
+      {
+        "path": "app/test/features/chat/message_privacy_test.dart",
+        "bytes": 13002,
+        "sha256": "6a80b8f4e79d2457ebb6799475b4fce6a81b6c76b8037e2b56365354bc275c90"
+      }
+    ],
+    "new_names": [
+      "encoded JSON null keeps ordinary SDK previews and forwarding available",
+      "encoded null never masks modeled private metadata or real private descendants",
+      "later encoded null cannot erase remembered private expiry or incomplete inspection",
+      "all other encoded nonobjects malformed fields and bounded tree violations remain rejected"
+    ],
+    "expected_full_tests": 1308,
+    "source_count_changed": false,
+    "native_acceptance_inherited": false,
+    "formatted_source_manifest": {
+      "path": "references/integration/mobile-attached-info-null-format-r1-candidate-20261017/candidate-manifest.json",
+      "bytes": 7052,
+      "sha256": "ab24f25e3022150ea25e973c38bbedf91d4102d485afb8e42b899fd50c965597",
+      "mode": "0o644"
+    },
+    "local_validation": {
+      "state": "Root_targeted_new4_old_direct2_and_two_file_analysis_pending_at_CI_freeze",
+      "new_names": [
+        "encoded JSON null keeps ordinary SDK previews and forwarding available",
+        "encoded null never masks modeled private metadata or real private descendants",
+        "later encoded null cannot erase remembered private expiry or incomplete inspection",
+        "all other encoded nonobjects malformed fields and bounded tree violations remain rejected"
+      ],
+      "old_direct_names": [
+        "serialized metadata and private descendants preserve the retention boundary",
+        "malformed or excessively nested privacy metadata cannot be treated as shareable"
+      ],
+      "format": "Root formatted2 accepted; no analyzer/test/full claims added here."
+    }
   }
 }

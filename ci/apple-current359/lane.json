@@ -244,9 +244,9 @@
   ],
   "own_inputs": [
     {
-      "bytes": 6961,
+      "bytes": 8267,
       "path": "ci/apple-current359/README.md",
-      "sha256": "6724377d0028bc320a16b81f51b111557fe0e52d7909c4fb26f50ea92bcbf9a1"
+      "sha256": "65f8cb7243b492d25baf27efe260ab12db19f76cc604324deee8cf1ee95cbaba"
     },
     {
       "bytes": 9176,
@@ -261,7 +261,7 @@
     {
       "bytes": 32359,
       "path": "ci/apple-current359/run.py",
-      "sha256": "9d9725f96c1df125c5c7ccab58554c75275ca9c4417189df5e36cfc409d05bdb"
+      "sha256": "2813dafd848aae426d45c3451ec4d168ac766c86ddecdb21bc1119fc50f32ea8"
     },
     {
       "bytes": 2662,
@@ -275,13 +275,13 @@
     },
     {
       "path": "ci/apple-current359/gem_audit.py",
-      "bytes": 19947,
-      "sha256": "0c916ba5cb31d0ffabc73664f9e3055bd0b0069c3c0ade0c6277248f980f1f57"
+      "bytes": 22508,
+      "sha256": "06155d52e8c6c57a93719f8077e8e56673238ee41c0d907d92da15e8d1df6de9"
     },
     {
       "path": "ci/apple-current359/test_gem_audit.py",
-      "bytes": 16247,
-      "sha256": "b2eb4b915ef777917be9512700c648026319d6aa561f2e60b846b4a7327f2c68"
+      "bytes": 20164,
+      "sha256": "06d9581ee626bea121a968f7c6939d161a67bfd25cf0df7d7dadf3c2e7c04b72"
     }
   ],
   "packages": 178,
@@ -344,6 +344,20 @@
       "minitest-5.20.0",
       "rexml-3.4.4"
     ],
-    "other_bundled_hybrids_actual_observed": false
+    "other_bundled_hybrids_actual_observed": false,
+    "refused_link_diagnostics": {
+      "admission": "still_refuse",
+      "relative_path_max_chars": 512,
+      "target_roots": [
+        "selected_ruby_relative",
+        "selected_system_gems_relative",
+        "user_home_redacted",
+        "outside_selected_roots_redacted",
+        "unresolved"
+      ],
+      "raw_link_target_or_exception_string": false,
+      "linked_body_read": false,
+      "scope": "first rejected tree link only, not a generic host inventory"
+    }
   }
 }

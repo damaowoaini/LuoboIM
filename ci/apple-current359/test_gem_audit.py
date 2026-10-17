@@ -246,6 +246,64 @@ class GemSourceAudit(unittest.TestCase):
                 self.assertEqual(rejected.exception.proof['field'], field)
                 self.assertEqual(rejected.exception.proof['subject'], 'unreviewed' if change == 'unlisted-bundle' else 'minitest')
 
+    def test_tree_symlink_refusal_records_bounded_relative_diagnostics_without_private_targets(self):
+        for kind in ['selected-file', 'selected-directory', 'system-file', 'user-home',
+                     'outside-root', 'missing', 'long-relative-entry']:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                source, selected, home, pin = self.fixture(root)
+                baseline = gem_audit.audit(source, selected, home, pin)
+                self.assertEqual(baseline['ruby_binary']['sha256'], selected['ruby']['sha256'])
+                ruby = Path(selected['ruby']['path']).parent.parent
+                system = Path(selected['gem_root'])
+                gem = system/'gems/cocoapods-1.17.0'
+                link = gem/'diagnostic-link'
+                target = ruby/'lib/ruby/3.3.0/logger.rb'
+                expected_root, expected_kind = 'selected_ruby', 'file'
+                if kind == 'selected-directory':
+                    target = target.parent
+                    expected_kind = 'directory'
+                elif kind == 'system-file':
+                    target = system/'gems/cocoapods-core-1.17.0/lib/cocoapods-core.rb'
+                    expected_root = 'selected_system_gems'
+                elif kind in ['user-home', 'outside-root']:
+                    target = (home if kind == 'user-home' else root/'unapproved')/'private-never-print.txt'
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes(b'private body must not be read')
+                    expected_root = 'user_home' if kind == 'user-home' else 'outside_selected_roots'
+                    expected_kind = 'not_inspected'
+                elif kind == 'missing':
+                    target = ruby/'absent-target'
+                    expected_root, expected_kind = 'unresolved', 'unresolved'
+                elif kind == 'long-relative-entry':
+                    link = gem.joinpath(*['d'*100+str(i) for i in range(6)], 'diagnostic-link')
+                    link.parent.mkdir(parents=True)
+                link.symlink_to(target, target_is_directory=kind == 'selected-directory')
+                original_open = Path.open
+                def checked_open(path, *args, **kwargs):
+                    self.assertNotEqual(path, target, 'symlink target body was read')
+                    return original_open(path, *args, **kwargs)
+                with mock.patch.object(Path, 'open', checked_open):
+                    with self.assertRaises(gem_audit.AuditFailure) as rejected:
+                        gem_audit.audit(source, selected, home, pin)
+                self.assertEqual(rejected.exception.proof['field'], 'source_walk')
+                self.assertEqual(rejected.exception.proof['subject'], 'cocoapods')
+                detail = rejected.exception.proof['link']
+                self.assertEqual(detail['link_kind'], 'symbolic_link')
+                self.assertEqual(detail['target_root'], expected_root)
+                self.assertEqual(detail['target_kind'], expected_kind)
+                self.assertFalse(detail['linked_body_read'])
+                self.assertEqual(detail['entry_relative'], None if kind == 'long-relative-entry' else 'diagnostic-link')
+                if kind in ['selected-file', 'selected-directory', 'system-file', 'long-relative-entry']:
+                    base = system if expected_root == 'selected_system_gems' else ruby
+                    self.assertEqual(detail['target_relative'], target.relative_to(base).as_posix())
+                else:
+                    self.assertIsNone(detail['target_relative'])
+                payload = json.dumps(rejected.exception.proof)
+                self.assertLess(len(payload), 4096)
+                self.assertNotIn(str(root), payload)
+                self.assertNotIn('private-never-print', payload)
+
 
 if __name__ == '__main__':
     unittest.main()

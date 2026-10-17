@@ -1,40 +1,31 @@
-# Mobile359 formal source baseline
+# Mobile359 JSON-null wire compatibility successor
 
-Portable411 = App359 + SDK51 + migration1. Adopt the exact accepted announcement11
-with this formal source successor. The 178 package/archive identities and native7
-snapshot stay unchanged. Current Android354/530 and iOS354/472 remain historical
-native identities; projected535/477 do not create native acceptance or new refs.
+Portable411 remains App359 + SDK51 + migration1. Only the existing privacy decoder
+and existing privacy test file change; source member counts stay359/411 with new
+explicit digests. The formatted source2 manifest is pinned in inputs. SDK,178
+packages, migration, native7, toolchain and all resource/network gates are unchanged.
 
-This manual workflow permits only explicit final `full-regression`: full1304 once
-then whole strict analysis. No repeated540, group58, announcement26 or other
-focused prerequisite, and no automatic/duplicate Python controls in the workflow.
-Do not dispatch full until all known issues are fixed and targeted checks pass.
-Full1304 is expected only, not executed. Optional search reference remains full+
-explicit boolean only:359 context, exactly4 original replacements, entry2 exactly
-1 real assertion failure +1 old filter positive. Default reference is off.
+The existing manual workflow still permits only final explicit `full-regression`:
+expected full1308 once, then whole strict analysis. This full was not run. There is
+no new focused mode, skip exemption or mandatory repeated target. Optional search
+reference remains explicit+full only, four exact original replacements and entry2
+one real assertion failure plus one old-filter positive. Its context digest follows
+the new two source bodies; the four historical reference bodies remain unchanged.
 
-All old required names/count arrays and evidence remain historical, including
-Card351/target540, groupRevoke354 and expected1280. Exact new24 are added to1280
-for expected1304. Actual announcement evidence is scoped19 plus7 previous exact
-successes, and2 new plus9 reused analyses. This is26 unique cases, not fresh26.
-No rerun is needed for that accepted targeted evidence. Full future evidence must
-still prove all exact1304 names, true footer/no skip/error/hidden failure, original
-parent/Card/revoke/NextUnread cleanup, and18 announcement four-marker tails.
-The6 announcement store tests do not claim SDK cleanup. UI warnings fail.
+All old name arrays, especially exact `current_full1304`, remain byte-semantic
+history. New `new_attached_info_null4` plus that exact array form `current_full1308`.
+The new parser still rejects every other non-object JSON and malformed/private
+metadata; owner/cut/expiry/inspection memory are unchanged. Root is executing only
+new4+direct old2 and changed-file analysis2 locally; evidence is pending at this
+source freeze. This candidate executes no checks and claims no fresh full result.
 
-Historical Card17 and351→354 three-chat replacements are unchanged. Exact reversible
-announcement354→359 lineage adds only6 replacements and5 new files. Historical
-Card/revoke contracts validate the restored exact354 parent, while the loader
-strictly checks actual359 bodies; old green identities are not silently renamed.
+Historical card351/group-revoke354 and announcement354-to359 source contracts
+remain exact. The source validator explicitly reverses null2 to original359 first,
+then the original announcement11 to354. Announcement26/19 workflows/controllers,
+payloads and inputs remain fixed to their historical a45 ref; isolated revoke5
+keeps50ff. No old result is renamed as a new source or native acceptance.
 
-Original announcement26/19 payloads/controllers/inputs remain byte exact. Their
-manual workflows explicitly checkout actual a45daef88c28927910023f911d15a39a070c9989,
-so their exact354 helper pins keep working after the formal baseline advances.
-Original isolated group-revoke5 continues fixed50ff. These are historical replays,
-not new full359 or native results.
-
-Real HOME, setup-only networking, offline netns,4GiB cold/1GiB continuous/.2/768MiB,
-official Flutter/Dart, strict authored inventory,178 lock, source/tool fingerprints,
-SDK51 and migration1 are preserved. No private helper inventory exception is added.
-This candidate executed no controls/readonly/materialization/Flutter/cloud. Root
-will review and run only the listed11 affected old+2 new pure controls once.
+Only new1 plus directly affected old3 pure controls are proposed; all other valid
+controls are reused. Real HOME, manual-only dispatch, strict inventory, no skip or
+hidden failure, original cleanup,4GiB cold/1GiB floor/.2/768MiB, official toolchain,
+setup-only network and offline netns are retained. Do not run a full regression yet.

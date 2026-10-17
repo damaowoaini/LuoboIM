@@ -85,6 +85,49 @@ def audit(source, selected, home, config_pin):
             checked_mappings.append((value, dict(observed), field, subject, exists))
         return p
 
+    def refuse_tree_link(entry, source_root, subject):
+        # Diagnostic only: never read the linked body or admit a symlink. Keep
+        # absolute/private targets and raw exception strings out of evidence.
+        def relative(value):
+            label = value.as_posix()
+            if (len(label) <= 512 and not value.is_absolute() and '..' not in value.parts and
+                    not any(ord(c) < 32 or 127 <= ord(c) <= 159 or 0xd800 <= ord(c) <= 0xdfff or
+                            c in '\u061c\u200e\u200f\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069' for c in label)):
+                return label
+            return None
+        detail = {'entry_relative': relative(entry.relative_to(source_root)),
+                  'link_kind': 'symbolic_link', 'target_root': 'unresolved',
+                  'target_relative': None, 'target_kind': 'unresolved',
+                  'linked_body_read': False}
+        try:
+            before = entry.lstat()
+            if not stat.S_ISLNK(before.st_mode):
+                detail['link_kind'] = 'entry_changed'
+            else:
+                target = entry.resolve(strict=True)
+                if target.is_relative_to(home):
+                    detail['target_root'] = 'user_home'
+                    detail['target_kind'] = 'not_inspected'
+                else:
+                    approved = [(label, root) for label, root in
+                                [('selected_ruby', ruby_root), ('selected_system_gems', gem_root)]
+                                if target.is_relative_to(root)]
+                    if approved:
+                        label, root = approved[0]
+                        detail.update(target_root=label, target_relative=relative(target.relative_to(root)),
+                                      target_kind='file' if target.is_file() else 'directory' if target.is_dir() else 'other')
+                    else:
+                        detail.update(target_root='outside_selected_roots', target_kind='not_inspected')
+                after = entry.lstat()
+                detail['link_stable_during_observation'] = (
+                    before.st_dev, before.st_ino, before.st_mode, before.st_ctime_ns) == (
+                    after.st_dev, after.st_ino, after.st_mode, after.st_ctime_ns)
+        except (OSError, RuntimeError) as error:
+            detail['resolution_error_class'] = type(error).__name__
+        rejected = AuditFailure('source_walk', subject, 'gem tree symlink refused')
+        rejected.proof['link'] = detail
+        raise rejected
+
     def body(p, field, subject, limit=4*1024**2):
         nonlocal total
         p = path(str(p), field, subject)
@@ -226,7 +269,8 @@ def audit(source, selected, home, config_pin):
                 raise AuditFailure('source_walk', name, type(error).__name__) from error
             for parent, dirs, paths in os.walk(computed, followlinks=False, onerror=walk_error):
                 for entry in dirs+paths:
-                    require(not (Path(parent)/entry).is_symlink(), 'source_walk', name, 'gem tree symlink refused')
+                    if (Path(parent)/entry).is_symlink():
+                        refuse_tree_link(Path(parent)/entry, computed, name)
                 for entry in sorted(paths):
                     if entry.endswith('.rb'):
                         row['ruby_sources'].append(body(Path(parent)/entry, 'ruby_source', name))

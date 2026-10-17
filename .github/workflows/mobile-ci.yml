@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       validation_mode:
-        description: "One final explicit full1304 + whole strict analyze; accepted targeted results are reused"
+        description: "One final explicit full1308 + whole strict analyze; accepted targeted results are reused"
         type: choice
         required: true
         default: full-regression

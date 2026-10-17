@@ -6,9 +6,9 @@
       "sha256": "a707e00af70215bd03546dd318fb3d46fb6cce8ca9f9526a81e5def62cc06c53"
     },
     {
-      "bytes": 6961,
+      "bytes": 8267,
       "path": "ci/apple-current359/README.md",
-      "sha256": "6724377d0028bc320a16b81f51b111557fe0e52d7909c4fb26f50ea92bcbf9a1"
+      "sha256": "65f8cb7243b492d25baf27efe260ab12db19f76cc604324deee8cf1ee95cbaba"
     },
     {
       "bytes": 9176,
@@ -17,8 +17,8 @@
     },
     {
       "path": "ci/apple-current359/gem_audit.py",
-      "bytes": 19947,
-      "sha256": "0c916ba5cb31d0ffabc73664f9e3055bd0b0069c3c0ade0c6277248f980f1f57"
+      "bytes": 22508,
+      "sha256": "06155d52e8c6c57a93719f8077e8e56673238ee41c0d907d92da15e8d1df6de9"
     },
     {
       "path": "ci/apple-current359/gem_probe.rb",
@@ -31,14 +31,14 @@
       "sha256": "3cbabbffca956f018a54469740f6ef5e244d92bd3feca1df6ad5ff25670f5393"
     },
     {
-      "bytes": 13262,
+      "bytes": 13740,
       "path": "ci/apple-current359/lane.json",
-      "sha256": "365b20e6828b20559c108ccbffe547d0659c67ca941e11e07d028e078865ca70"
+      "sha256": "3e1509f9f32b72a8d804d16074c32dbd4b1901b74ed4a67b9cc1b594d143fd5d"
     },
     {
       "bytes": 32359,
       "path": "ci/apple-current359/run.py",
-      "sha256": "9d9725f96c1df125c5c7ccab58554c75275ca9c4417189df5e36cfc409d05bdb"
+      "sha256": "2813dafd848aae426d45c3451ec4d168ac766c86ddecdb21bc1119fc50f32ea8"
     },
     {
       "bytes": 2662,
@@ -47,8 +47,8 @@
     },
     {
       "path": "ci/apple-current359/test_gem_audit.py",
-      "bytes": 16247,
-      "sha256": "b2eb4b915ef777917be9512700c648026319d6aa561f2e60b846b4a7327f2c68"
+      "bytes": 20164,
+      "sha256": "06d9581ee626bea121a968f7c6939d161a67bfd25cf0df7d7dadf3c2e7c04b72"
     }
   ],
   "identity": "current359-apple-native-resolution-v1",

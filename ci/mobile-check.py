@@ -506,8 +506,8 @@ def validation_plan(plan, mode, reference=False):
     if mode != 'full-regression' or type(reference) is not bool:
         raise ValueError('current359 permits only explicit final full-regression')
     source.announcement_contract(plan)
-    return {'test_label': 'full1304', 'expected': plan['current359']['expected_full_tests'],
-            'test_paths': [], 'names_key': 'current_full1304', 'analysis_paths': None}
+    return {'test_label': 'full1308', 'expected': plan['current359']['expected_full_tests'],
+            'test_paths': [], 'names_key': 'current_full1308', 'analysis_paths': None}
 
 
 def card_cleanup_summary(text, contract):

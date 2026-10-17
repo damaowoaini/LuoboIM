@@ -117,15 +117,15 @@ def native_source_contract(plan):
 
 def descriptor():
     plan = json.loads(regular(INPUTS))
-    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v19'
+    if (plan['schema'] != 'luobo.mobile.portable-ci-inputs.v20'
             or plan['current359']['members'] != 359
             or plan['sdk_portable']['members'] != 51
             or plan['portable_members'] != {'current359': 411}
             or plan['current359']['expected_target_tests'] != 24
-            or plan['current359']['expected_full_tests'] != 1304
+            or plan['current359']['expected_full_tests'] != 1308
             or plan['current359']['target_paths'] != ANNOUNCEMENT_TEST_PATHS
             or any(key in plan for key in ('current230', 'candidate249', 'current257', 'current269', 'current282', 'current287', 'current291', 'current292', 'current294', 'current304', 'current309', 'current310', 'current316', 'current323', 'current331', 'current336', 'current344', 'current351', 'current354'))):
-        raise ValueError('current359 schema v19 inventory differs; no historical aliases')
+        raise ValueError('current359 schema v20 inventory differs; no historical aliases')
     reference = plan['reference_entry']
     if (reference['working_cohort'] != 'current359' or reference['members'] != 359
             or reference['default_enabled'] is not False
@@ -138,6 +138,7 @@ def descriptor():
         raise ValueError('reference entry must be the explicit two-test full359 variant')
     native_source_contract(plan)
     announcement_contract(plan)
+    attached_info_null_contract(plan)
     card_contract(plan)
     group_revoke_contract(plan)
     return plan
@@ -145,7 +146,7 @@ def descriptor():
 
 def load_sources(cohort):
     if cohort != 'current359':
-        raise ValueError('schema v19 supports current359 only; historical cohorts are not aliases')
+        raise ValueError('schema v20 supports current359 only; historical cohorts are not aliases')
     plan = descriptor()
     selected = {}
     for row in plan['current359']['files']:
@@ -207,7 +208,7 @@ def required_names(plan):
     if item['path'] != 'ci/mobile/required-test-names.json':
         raise ValueError('required test names path differs')
     value = json.loads(check(regular(REPO / safe_name(item['path'])), item))
-    if value['schema'] != 'luobo.mobile.required-successful-names.v15' or value['cohort'] != 'current359':
+    if value['schema'] != 'luobo.mobile.required-successful-names.v16' or value['cohort'] != 'current359':
         raise ValueError('required test names identity differs')
     for key, expected in [('parent_full922', 922), ('new_next_unread29', 29),
                           ('parent_target281', 281), ('parent_target303', 303), ('parent_target345', 345), ('parent_target386', 386), ('current_target422', 422), ('new_location_receive36', 36), ('parent_full1068', 1068), ('new_saved_emoji41', 41), ('parent_full1027', 1027),
@@ -221,7 +222,8 @@ def required_names(plan):
                           ('parent_full1142', 1142), ('new_chat_card80', 80),
                           ('current_target540', 540), ('parent_full1222', 1222),
                           ('new_group_revoke58', 58), ('current_full1280', 1280),
-                          ('new_announcement24', 24), ('current_full1304', 1304)]:
+                          ('new_announcement24', 24), ('current_full1304', 1304),
+                          ('new_attached_info_null4', 4), ('current_full1308', 1308)]:
         entries = value[key]
         if (not isinstance(entries, list) or len({r['name'] for r in entries}) != len(entries)
                 or any(not isinstance(r['name'], str) or not r['name']
@@ -270,6 +272,7 @@ def required_names(plan):
     if value['current_full1304'] != sorted(value['current_full1280'] + value['new_announcement24'], key=lambda r: r['name']):
         raise ValueError('announcement names do not preserve exact parent names')
     announcement_contract(plan, value)
+    attached_info_null_contract(plan, value)
     group_revoke_contract(plan, value)
     card_contract(plan, value)
     cleanup_contract(plan, value)
@@ -340,10 +343,59 @@ def announcement_contract(plan, names=None):
     return contract
 
 
+
+ATTACHED_INFO_NULL_PATHS = ['app/lib/core/privacy/message_privacy.dart', 'app/test/features/chat/message_privacy_test.dart']
+ATTACHED_INFO_NULL_BEFORE2 = [
+    {'path': 'app/lib/core/privacy/message_privacy.dart', 'bytes': 18768, 'sha256': 'a63582d594e96a3f16c6bde0e085ef4c67c5c2e7a23758b0a3f79d4c8396d00e'},
+    {'path': 'app/test/features/chat/message_privacy_test.dart', 'bytes': 8160, 'sha256': 'b65542e5e27f3161e64d89d20ef8a3d6026818a65413593885880e34e6879eaf'},
+]
+ATTACHED_INFO_NULL_NAMES4 = [
+    'encoded JSON null keeps ordinary SDK previews and forwarding available',
+    'encoded null never masks modeled private metadata or real private descendants',
+    'later encoded null cannot erase remembered private expiry or incomplete inspection',
+    'all other encoded nonobjects malformed fields and bounded tree violations remain rejected',
+]
+
+
+def attached_info_null_contract(plan, names=None):
+    contract = plan['attached_info_null']
+    inventory = {row['path']: row for row in plan['current359']['files']}
+    if (contract['before_files'] != ATTACHED_INFO_NULL_BEFORE2
+            or len(contract['selected_files']) != 2
+            or {row['path'] for row in contract['selected_files']} != set(ATTACHED_INFO_NULL_PATHS)
+            or any(row != inventory.get(row['path']) for row in contract['selected_files'])
+            or contract['new_names'] != ATTACHED_INFO_NULL_NAMES4
+            or contract['expected_full_tests'] != 1308
+            or contract['source_count_changed'] is not False
+            or contract['native_acceptance_inherited'] is not False):
+        raise ValueError('attachedInfo null source/name contract differs')
+    if names is not None:
+        if (names['new_attached_info_null4'] != sorted(
+                [{'name': name, 'count': 1} for name in ATTACHED_INFO_NULL_NAMES4], key=lambda row: row['name'])
+                or names['current_full1308'] != sorted(
+                    names['current_full1304'] + names['new_attached_info_null4'], key=lambda row: row['name'])):
+            raise ValueError('attachedInfo null names do not preserve exact historical1304 plus new4')
+    return contract
+
+
+
+def attached_info_null_parent_inventory(plan):
+    """Restore only the explicit null2 delta before historical announcement354 reversal."""
+    attached_info_null_contract(plan)
+    inventory = {row['path']: row for row in plan['current359']['files']}
+    for row in ATTACHED_INFO_NULL_BEFORE2:
+        inventory[row['path']] = dict(row)
+    encoded = json.dumps(sorted(inventory.values(), key=lambda row: row['path']),
+                         ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    if len(inventory) != 359 or sha(encoded) != '2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899':
+        raise ValueError('attachedInfo historical current359 parent differs')
+    return inventory
+
+
 def announcement_parent_inventory(plan):
     """Reverse only the accepted eleven-file delta for historical351/354 contracts."""
     contract = announcement_contract(plan)
-    inventory = {r['path']: r for r in plan['current359']['files']}
+    inventory = attached_info_null_parent_inventory(plan)
     for replacement in contract['lineage']['replacements']:
         before = replacement['before']
         inventory[before['path']] = before

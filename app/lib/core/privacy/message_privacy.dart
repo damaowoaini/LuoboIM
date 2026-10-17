@@ -185,7 +185,7 @@ MessagePrivacy inspectMessagePrivacy(Object? wire) {
           final decoded = jsonDecode(encoded);
           if (decoded is Map) {
             sources.add(decoded);
-          } else {
+          } else if (decoded != null) {
             complete = false;
           }
         } catch (_) {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure Python CI gate checks, separate from current359 final explicit full1304."""
+"""Pure Python CI gate checks, separate from current359 final explicit full1308."""
 import copy
 import importlib.util
 import json
@@ -388,15 +388,15 @@ class ValidationModeTests(unittest.TestCase):
             with self.subTest(mode=mode), self.assertRaises(ValueError):
                 check.validation_plan(plan, mode)
 
-    def test_full_has_only_full1304_without_a_repeated_historical_target_prerequisite(self):
+    def test_full_has_only_full1308_without_a_repeated_historical_target_prerequisite(self):
         phase = check.validation_plan(check.source.descriptor(), 'full-regression', True)
-        self.assertEqual(phase, {'test_label': 'full1304', 'expected': 1304,
-                                'test_paths': [], 'names_key': 'current_full1304',
+        self.assertEqual(phase, {'test_label': 'full1308', 'expected': 1308,
+                                'test_paths': [], 'names_key': 'current_full1308',
                                 'analysis_paths': None})
 
     def test_reference_is_explicit_boolean_and_unknown_modes_cannot_dispatch(self):
         plan = check.source.descriptor()
-        self.assertEqual(check.validation_plan(plan, 'full-regression', False)['expected'], 1304)
+        self.assertEqual(check.validation_plan(plan, 'full-regression', False)['expected'], 1308)
         for mode, reference in [('group-revoke-58', True), ('target540', False),
                                 ('chat-card-80', False), ('full-regression', 1)]:
             with self.subTest(mode=mode, reference=reference), self.assertRaises(ValueError):
@@ -552,6 +552,29 @@ class AnnouncementCurrentTests(unittest.TestCase):
             with self.subTest(events=altered), self.assertRaises(ValueError):
                 check.announcement_cleanup_summary(text(altered), contract)
 
+
+
+class AttachedInfoNullInventoryTests(unittest.TestCase):
+    def test_exact_null4_and_two_body_pins_preserve_historical1304_without_same_count_substitution(self):
+        plan = check.source.descriptor()
+        names = check.source.required_names(plan)
+        check.source.attached_info_null_contract(plan, names)
+        self.assertEqual(len(check.source.attached_info_null_parent_inventory(plan)), 359)
+        self.assertEqual(len(check.source.announcement_parent_inventory(plan)), 354)
+        self.assertEqual(sum(row['count'] for row in names['current_full1308']), 1308)
+        wrong = copy.deepcopy(names)
+        wrong['new_attached_info_null4'][0]['name'] = 'same-count unreviewed replacement'
+        wrong['current_full1308'] = sorted(wrong['current_full1304'] + wrong['new_attached_info_null4'], key=lambda row: row['name'])
+        with self.assertRaisesRegex(ValueError, 'exact historical1304 plus new4'):
+            check.source.attached_info_null_contract(plan, wrong)
+        wrong = copy.deepcopy(names)
+        wrong['current_full1308'][0]['name'] = 'same-count dropped historical case'
+        with self.assertRaisesRegex(ValueError, 'exact historical1304 plus new4'):
+            check.source.attached_info_null_contract(plan, wrong)
+        wrong_plan = copy.deepcopy(plan)
+        wrong_plan['attached_info_null']['selected_files'][0]['sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'source/name contract differs'):
+            check.source.attached_info_null_contract(wrong_plan, names)
 
 if __name__ == '__main__':
     unittest.main()
