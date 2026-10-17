@@ -28,9 +28,10 @@ class BootstrapEnvironment(unittest.TestCase):
                     mock.patch.dict(os.environ, {'PATH': '/untrusted', 'HTTPS_PROXY': 'https://untrusted.invalid'}):
                 actual = driver.env(work, selected)
             self.assertEqual(actual['HOME'], home)
-            self.assertEqual(actual['PATH'], ':'.join([str(work/'flutter/bin'), str(pod.parent),
+            self.assertEqual(actual['PATH'], ':'.join([str(work/'tool-adapters'), str(work/'flutter/bin'), str(pod.parent),
                              str(Path(selected['ruby']['path']).parent), '/usr/bin', '/bin', '/usr/sbin']))
             self.assertEqual(actual['TMPDIR'], str(work/'tmp'))
+            self.assertEqual(actual['CFFIXED_USER_HOME'], str(work/'cf-home'))
             self.assertEqual(actual['GIT_CONFIG_GLOBAL'], '/dev/null')
             self.assertEqual(actual['xcrun_nocache'], '1')
             self.assertNotIn('HTTPS_PROXY', actual)

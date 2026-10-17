@@ -38,6 +38,8 @@ def borrowed_helper(row, name):
     return load(REPO/row['path'], name)
 
 
+xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 12726, 'sha256': '3097983491f995a4c93af02150a0414c7bb01e169b23fa2fa7bde5d51cd14fa5'}, 'current359_owned_xcrun_adapter')
+
 packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes': 10141, 'sha256': '7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248'}, 'apple359_common_packaging')
 pod_selector = borrowed_helper({'path': 'ci/apple-current354/pod_selector.py', 'bytes': 5603, 'sha256': '820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769'}, 'apple359_reviewed117_selector')
 
@@ -76,13 +78,14 @@ def env(work, selected):
     ruby = Path(selected['ruby']['path'])
     # No inherited credentials/proxies/Java/Ruby options, no HOME reassignment.
     e = {k: os.environ[k] for k in ['HOME', 'USER', 'LOGNAME'] if k in os.environ}
-    e.update(PATH=str(work/'flutter/bin')+':'+str(pod.parent)+':'+str(ruby.parent)+':/usr/bin:/bin:/usr/sbin',
+    e.update(PATH=str(work/'tool-adapters')+':'+str(work/'flutter/bin')+':'+str(pod.parent)+':'+str(ruby.parent)+':/usr/bin:/bin:/usr/sbin',
              GEM_HOME=selected['gem_root'], GEM_PATH=selected['gem_root'],
              LANG='en_US.UTF-8', CI='true', TMPDIR=str(work/'tmp'),
              DEVELOPER_DIR='/Applications/Xcode_16.4.app/Contents/Developer',
              PUB_CACHE=str(work/'pub-cache'), XDG_CONFIG_HOME=str(work/'config'),
              XDG_CACHE_HOME=str(work/'cache'), CLANG_MODULE_CACHE_PATH=str(work/'cache/clang'),
              SWIFTPM_MODULECACHE_OVERRIDE=str(work/'cache/swift-modules'),
+             CFFIXED_USER_HOME=str(work/'cf-home'),
              CP_HOME_DIR=str(work/'cocoapods'), CP_CACHE_DIR=str(work/'cocoapods/cache'),
              CP_REPOS_DIR=str(work/'cocoapods/repos'), COCOAPODS_DISABLE_STATS='true',
              COCOAPODS_SKIP_UPDATE_MESSAGE='true', FLUTTER_SUPPRESS_ANALYTICS='true',
@@ -619,7 +622,7 @@ def profile(work, stage):
     text += '(allow file-write* (subpath '+json.dumps(str(work))+') (literal "/dev/null"))'
     if stage in {'acquire', 'resolve'}:
         text += '(allow network-outbound (remote ip "*:443") (remote ip "*:53") (literal "/private/var/run/mDNSResponder"))'
-    protected = ['acquire.sb', 'resolve.sb', 'package.sb', 'activation.json']
+    protected = ['acquire.sb', 'resolve.sb', 'package.sb', 'activation.json', 'tool-adapters']
     if stage != 'acquire':
         protected += ['original-source', 'raw', 'products', 'origins', 'engine',
                       'evidence/selected-cocoapods.json', 'evidence/acquire-complete.json']
@@ -646,6 +649,7 @@ def main():
     if work != root/'luobo-apple-current359' or work.is_symlink():
         raise ValueError('fixed owned fresh run root required')
     if a.worker:
+        xcrun_adapter.check(work, HERE/'xcrun_adapter.py', sys.executable)
         if a.stage == 'acquire': acquire(work, lane, spec, plugins)
         elif a.stage == 'resolve': resolve(work, lane, spec, plugins)
         else: package(work, lane, spec)
@@ -658,12 +662,15 @@ def main():
     if a.stage == 'acquire':
         if work.exists(): raise ValueError('no partial resume or old outputs')
         mkdir(work); mkdir(work/'evidence')
+        installed = xcrun_adapter.install(work, HERE/'xcrun_adapter.py', sys.executable)
+        record(work/'evidence/xcrun-adapter-installed.json', installed)
         record(work/'activation.json', {'identity': IDENTITY, 'lane_sha256': sha(HERE/'lane.json'),
                'source_ref': spec['source_ref'], 'controller_head': os.environ.get('GITHUB_SHA')})
         for stage in ['acquire', 'resolve', 'package']:
             put(work/(stage+'.sb'), profile(work, stage))
     elif json.loads(packaging.regular(work/'activation.json'))['lane_sha256'] != sha(HERE/'lane.json'):
         raise ValueError('fixed original activation differs')
+    xcrun_adapter.check(work, HERE/'xcrun_adapter.py', sys.executable)
     guard = load(REPO/'ci/apple-sdk/resource_dual.py', 'current359_single_resource_guard')
     def interrupted(_number, _frame): raise InterruptedError('current359 native guard interrupted')
     for number in [signal.SIGTERM, signal.SIGINT]: signal.signal(number, interrupted)

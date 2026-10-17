@@ -1,7 +1,7 @@
 {
   "package": "open-im-sdk-wasm",
   "version": "3.5.1-alpha.3",
-  "scope": "Successor to isolated paired SDK8; unchanged controlled WASM/glue and worker/database protocol",
+  "scope": "Successor to accepted SDK8/InitSDK contract: decode only the pinned worker media receipt JSON envelope; unchanged worker, database RPC, WASM and Go core",
   "files": [
     {
       "path": "lib/constant/index.d.ts",
@@ -11,20 +11,20 @@
     {
       "path": "lib/index.es.js",
       "original_sha256": "bbcadba97c638bc9d42a8adf66416177d0446efa21ae25971d73f7779cae66df",
-      "patched_sha256": "75e3038435ad33ff9698636615c51eb8dc0479cd85c5c1465d0eaf07978b2b25",
-      "previous_patched_sha256": "2d7b219249bd3d0d8c730d368ede97ddc4dad40bacafd4db529c69ce160c17e2"
+      "patched_sha256": "40c81efc148ff0ec07feb1b8d93aceb3bfe82d3adcfb85d4c5dcf42346a64ebd",
+      "previous_patched_sha256": "75e3038435ad33ff9698636615c51eb8dc0479cd85c5c1465d0eaf07978b2b25"
     },
     {
       "path": "lib/index.js",
       "original_sha256": "985d5ea6e839c72cc310b6362045bc86dde43716286a97c9f36b31eba53dbc88",
-      "patched_sha256": "de530888dedc4c75f5a29709af384270e94229ffdac6c76cd0a625ec6428d739",
-      "previous_patched_sha256": "f390481393be616fb14928e346b28742d9a6bfdcbf0f72e812db07b76473f1a7"
+      "patched_sha256": "3ac90be4256fddd31e3bcf693f61701592c3a55307a4a3c32ab1b3d52f7026ae",
+      "previous_patched_sha256": "de530888dedc4c75f5a29709af384270e94229ffdac6c76cd0a625ec6428d739"
     },
     {
       "path": "lib/index.umd.js",
       "original_sha256": "7048acca4112dc8058419f88cffdd311f4daeff46fc2cd52500a940a5320fd9b",
-      "patched_sha256": "400901493266f07e2ba233b31f51bc3ccd838105c71de95c4a44584e89d19045",
-      "previous_patched_sha256": "5bcbf2f346219466185fa52cfc2d71c473fef0a7737fe5bd93b60301c0b4b41c"
+      "patched_sha256": "44b396421adce0643f103ecb6642d99d51891275ec6b8edea0076dcb2ea6a428",
+      "previous_patched_sha256": "400901493266f07e2ba233b31f51bc3ccd838105c71de95c4a44584e89d19045"
     },
     {
       "path": "lib/types/entity.d.ts",
@@ -64,7 +64,8 @@
     "Project the distinct durable own-read event without a second mark or history query",
     "Require the exact controlled WASM and matching Go glue before installing JS patches",
     "Forward only an explicit boolean loopback opt-in; preserve strict remote HTTPS/WSS defaults",
-    "Require the controlled InitSDK SyncCall result to be exactly [true] before any Login call"
+    "Require the controlled InitSDK SyncCall result to be exactly [true] before any Login call",
+    "Decode exactly one JSON layer of media registration/reservation/release receipts before the original epoch/token/file/lease checks"
   ],
   "coreFiles": [
     {

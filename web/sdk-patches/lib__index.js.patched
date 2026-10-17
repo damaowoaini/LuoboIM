@@ -555,6 +555,14 @@ function createWasmBufferFileMapBridge(getTransport) {
         const result = await transport.rpc.invoke(name, ...args, { timeout: 5000 });
         if (!result || result.errCode !== 0) throw failure(); return result.data;
     };
+    // The pinned worker RPC helper JSON-encodes object data once. Decode only
+    // these media receipts; scalar and database RPC results keep their protocol.
+    const decodeReceipt = value => {
+        if (typeof value !== 'string' || value.length > 32768) throw failure();
+        let data; try { data = JSON.parse(value); } catch { throw failure(); }
+        if (!data || typeof data !== 'object' || Array.isArray(data)) throw failure();
+        return data;
+    };
     const encode = data => JSON.stringify({ errCode: 0, errMsg: '', data });
     const current = (requestedEpoch, token) => {
         const lease = leases.get(token);
@@ -568,6 +576,7 @@ function createWasmBufferFileMapBridge(getTransport) {
         return lease;
     };
     const acknowledge = (requestedEpoch, token, lease, data, expectedSizes) => {
+        data = decodeReceipt(data);
         if (epoch !== requestedEpoch || leases.get(token) !== lease || !sameTransport(lease.transport) || !data ||
             data.epoch !== requestedEpoch || data.token !== token || !Array.isArray(data.files) || data.files.length !== lease.ids.length ||
             data.files.some((entry, i) => entry.uuid !== lease.ids[i] || !Number.isSafeInteger(entry.size) || entry.size < 0 || entry.size > 2147483647 ||
@@ -615,7 +624,7 @@ function createWasmBufferFileMapBridge(getTransport) {
             const lease = leases.get(token);
             if (!lease) return encode({ epoch: requestedEpoch, token, files: [] });
             if (lease.epoch !== requestedEpoch) throw failure();
-            const data = await call(lease.transport, 'wasmBufferFileMapRelease', requestedEpoch, token);
+            const data = decodeReceipt(await call(lease.transport, 'wasmBufferFileMapRelease', requestedEpoch, token));
             if (!data || data.epoch !== requestedEpoch || data.token !== token || !Array.isArray(data.files) || data.files.length) throw failure();
             if (leases.get(token) === lease) {
                 for (const id of lease.ids) if (claims.get(id) === lease) claims.delete(id);
