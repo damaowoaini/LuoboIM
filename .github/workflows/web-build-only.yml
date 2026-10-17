@@ -1,4 +1,4 @@
-name: Web4308 build only
+name: Web4308 build only v2
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       cohort:
         type: choice
         required: true
-        options: [web4308-build-only-v1]
+        options: [web4308-build-only-v2]
 
 permissions:
   contents: read
@@ -35,7 +35,7 @@ jobs:
           test ! -e ci-output/web-build-guard
           mkdir -p ci-output/web-build-guard
           python3 -c "import hashlib,pathlib; assert hashlib.sha256(pathlib.Path('ci/group-effects/resource_guard.py').read_bytes()).hexdigest() == 'ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c'"
-          python3 ci/group-effects/resource_guard.py --cwd "$GITHUB_WORKSPACE" --allocated-root "$GITHUB_WORKSPACE" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 900 --log "$GITHUB_WORKSPACE/ci-output/web-build-guard/setup.log" --record "$GITHUB_WORKSPACE/ci-output/web-build-guard/setup.resource.json" -- node ci/web-build.mjs web4308-build-only-v1
+          python3 ci/group-effects/resource_guard.py --cwd "$GITHUB_WORKSPACE" --allocated-root "$GITHUB_WORKSPACE" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 900 --log "$GITHUB_WORKSPACE/ci-output/web-build-guard/setup.log" --record "$GITHUB_WORKSPACE/ci-output/web-build-guard/setup.resource.json" -- node ci/web-build.mjs web4308-build-only-v2
       - name: Actual current Vite bundle offline; no tests or types
         id: bundle
         run: |

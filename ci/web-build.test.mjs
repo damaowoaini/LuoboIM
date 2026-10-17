@@ -28,6 +28,7 @@ test("reviewed4308 descriptor refuses changed source, duplicate paths and histor
     (x) => { x.cohort = "web4290-build-only-v1"; },
     (x) => { x.cohort = "web4301-build-only-v1"; },
     (x) => { x.cohort = "web4304-build-only-v1"; },
+    (x) => { x.cohort = "web4308-build-only-v1"; },
   ]) { const changed = structuredClone(input); mutate(changed); assert.throws(() => validateDescriptor(changed)); }
 });
 

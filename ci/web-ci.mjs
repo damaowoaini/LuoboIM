@@ -65,6 +65,16 @@ export function webCohort(value = "full-regression") {
   return value;
 }
 
+export function attachedInfoNullInputs(adoption) {
+  assert(adoption?.originManifestSHA256 === "e4db439d130bebc6ff8a167569f11f1740f421c9ac4456c4f22065a5681ca72a", "Reviewed attached-info null lineage required");
+  const before = [{"path":"web/src/core/messagePrivacy.ts","bytes":8398,"sha256":"75b464cbaeea1fc76164878672338ab041ad3eb5f2dc9ffc84d1186537d437f5"},{"path":"web/src/core/messagePrivacy.test.ts","bytes":5861,"sha256":"3a42f63f5372c8e6444042113739f5b0d3d8eeff31b4dcfde4fea800b4a14f1a"}];
+  const current = [{"path":"web/src/core/messagePrivacy.ts","bytes":8417,"sha256":"84c2aee8072ad73ac3ad1ddbf8d00862906cf3fd6a20b4212337fd1f0b798ecc"},{"path":"web/src/core/messagePrivacy.test.ts","bytes":9345,"sha256":"3f6fce50b1b6caa9cda4c91948ba4aa166f7488ee45e95c30df03aae7c57fab2"}];
+  assert(JSON.stringify(adoption.before) === JSON.stringify(before) && JSON.stringify(adoption.currentAfter) === JSON.stringify(current), "Exact attached-info null source/test lineage required");
+  assert(adoption.testPath === "src/core/messagePrivacy.test.ts" && adoption.newTests === 4 && adoption.requiredNames?.length === 4 && new Set(adoption.requiredNames).size === 4 && hash(Buffer.from(JSON.stringify(adoption.requiredNames))) === "cced75d7a160477f069e8f0fa0de4c5f242705adb3c16947b394673a2f9d4a15", "Exact4 attached-info null names and existing path required");
+  assert(adoption.previousExpectedFullTests === 792 && adoption.expectedFullTests === 796 && adoption.focusedManualModeAdded === false, "Explicit792+4 expected-only lineage required");
+  return { newTests: adoption.newTests, requiredNames: adoption.requiredNames, expectedFullTests: adoption.expectedFullTests };
+}
+
 export function loopbackDevEndpointsCohort(loopback) {
   assert(loopback?.originManifestSHA256 === "617d484a27b27c08e6b5c931ed3b4706d4f2bd62b033e4261f4e035c52b12d33", "Reviewed loopback transport lineage required");
   const before = [{"path":"web/src/main.tsx","bytes":681,"sha256":"ff759b0f45f7b2399b73a7f9c10803cc721186cdfbcd4931e89236cf35dd3b83"},{"path":"web/src/config/index.ts","bytes":994,"sha256":"1a6544cf6efaf6ee45b8eb31b67256d1b2ed1aa4ff3e233773d9bd6c6b397059"},{"path":"web/src/core/session/logout.ts","bytes":3296,"sha256":"c1b750b285e6feb6bc64b2a7b0238c992096b839b56aa55485f5d319da60d1ad"},{"path":"web/src/api/login.ts","bytes":7929,"sha256":"34fe2ed0c4f6ca9fd61b6f32633b105d0c19dfb02ed799d1f435fd88c7c4a42d"}];
@@ -191,13 +201,16 @@ export function verifyInputs() {
   const individual = inputs.individualForwardAdoption;
   const announcement = inputs.announcementReadAdoption;
   const loopback = inputs.loopbackDevEndpointsAdoption;
+  const attachedNull = inputs.attachedInfoNullAdoption;
+  attachedInfoNullInputs(attachedNull);
+  for (const entry of attachedNull.currentAfter) verifyFile(repo, entry);
   loopbackDevEndpointsCohort(loopback);
   for (const entry of [...loopback.currentAfter, ...loopback.adoptedTests]) verifyFile(repo, entry);
   individualForwardCohort(individual);
   announcementReadCohort(announcement);
   for (const entry of [...announcement.currentAfter, ...announcement.adoptedTests]) verifyFile(repo, entry);
   assert(card?.originManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a" && card.before.length === 13 && card.currentAfter.length === 15 && card.adoptedTests.length === 4, "Complete chat-card source/test lineage required");
-  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === loopback.expectedFullTests && loopback.previousExpectedFullTests === announcement.expectedFullTests && announcement.previousExpectedFullTests === individual.expectedFullTests, "Explicit pending689+37+5+32+21+8 regression cohort required");
+  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === attachedNull.expectedFullTests && attachedNull.previousExpectedFullTests === loopback.expectedFullTests && loopback.previousExpectedFullTests === announcement.expectedFullTests && announcement.previousExpectedFullTests === individual.expectedFullTests, "Explicit pending689+37+5+32+21+8+4 regression cohort required");
   assert(card.requiredNames.length === 37 && new Set(card.requiredNames).size === 37, "Complete unique chat-card names required");
   assert(copy.requiredNames.length === 5 && new Set([...card.requiredNames, ...copy.requiredNames]).size === 42, "Complete unique copy-retention names required");
   assert(new Set([...card.requiredNames, ...copy.requiredNames, ...individual.requiredNames]).size === 74, "Complete unique 42+32 current names required");
@@ -318,7 +331,7 @@ async function main() {
       announcementReadCohort(inputs.announcementReadAdoption), inputs.announcementReadAdoption.testPaths));
     else if (cohort === "loopback-dev-endpoints-8") await phase("loopback-dev-endpoints-8", () => runTests("loopback-dev-endpoints-8",
       loopbackDevEndpointsCohort(inputs.loopbackDevEndpointsAdoption), inputs.loopbackDevEndpointsAdoption.testPaths));
-    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames, ...inputs.announcementReadAdoption.requiredNames, ...inputs.loopbackDevEndpointsAdoption.requiredNames] }));
+    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames, ...inputs.announcementReadAdoption.requiredNames, ...inputs.loopbackDevEndpointsAdoption.requiredNames, ...inputs.attachedInfoNullAdoption.requiredNames] }));
     await phase("types-web-strict", async () => checkedProcess(await execute("types-web-strict", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"])));
     await phase("types-desktop-original", async () => checkedProcess(await execute("types-desktop-original", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.desktop.json"])));
     if (cohort === "full-regression") {

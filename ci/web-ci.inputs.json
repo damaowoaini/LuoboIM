@@ -1,7 +1,7 @@
 {
   "version": 3,
   "node": "24.21.0",
-  "fullMinimumTests": 792,
+  "fullMinimumTests": 796,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -1310,5 +1310,72 @@
       "independent_execution_in_this_CI_preparation": false
     },
     "sourceMeaning": "Explicit loopback deployment transport only; original session ownership, ordinary HTTPS443, SDK/WASM and production CSP unchanged. No actual browser or login acceptance inferred."
+  },
+  "attachedInfoNullAdoption": {
+    "originManifestSHA256": "e4db439d130bebc6ff8a167569f11f1740f421c9ac4456c4f22065a5681ca72a",
+    "before": [
+      {
+        "path": "web/src/core/messagePrivacy.ts",
+        "bytes": 8398,
+        "sha256": "75b464cbaeea1fc76164878672338ab041ad3eb5f2dc9ffc84d1186537d437f5"
+      },
+      {
+        "path": "web/src/core/messagePrivacy.test.ts",
+        "bytes": 5861,
+        "sha256": "3a42f63f5372c8e6444042113739f5b0d3d8eeff31b4dcfde4fea800b4a14f1a"
+      }
+    ],
+    "currentAfter": [
+      {
+        "path": "web/src/core/messagePrivacy.ts",
+        "bytes": 8417,
+        "sha256": "84c2aee8072ad73ac3ad1ddbf8d00862906cf3fd6a20b4212337fd1f0b798ecc"
+      },
+      {
+        "path": "web/src/core/messagePrivacy.test.ts",
+        "bytes": 9345,
+        "sha256": "3f6fce50b1b6caa9cda4c91948ba4aa166f7488ee45e95c30df03aae7c57fab2"
+      }
+    ],
+    "testPath": "src/core/messagePrivacy.test.ts",
+    "newTests": 4,
+    "requiredNames": [
+      "allows an ordinary SDK message with encoded JSON null to retain its normal policy",
+      "still restricts real private metadata and quoted private descendants beside encoded null",
+      "cannot clear known private deadlines, expired tombstones or incomplete inspection with a later null",
+      "continues rejecting non-object JSON other than null, malformed fields, size and depth violations"
+    ],
+    "preparedFullTitles": [
+      "encoded null AttachedInfo compatibility allows an ordinary SDK message with encoded JSON null to retain its normal policy",
+      "encoded null AttachedInfo compatibility still restricts real private metadata and quoted private descendants beside encoded null",
+      "encoded null AttachedInfo compatibility cannot clear known private deadlines, expired tombstones or incomplete inspection with a later null",
+      "encoded null AttachedInfo compatibility continues rejecting non-object JSON other than null, malformed fields, size and depth violations"
+    ],
+    "acceptedAuditFullNames": [
+      "encoded null AttachedInfo compatibility > allows an ordinary SDK message with encoded JSON null to retain its normal policy",
+      "encoded null AttachedInfo compatibility > still restricts real private metadata and quoted private descendants beside encoded null",
+      "encoded null AttachedInfo compatibility > cannot clear known private deadlines, expired tombstones or incomplete inspection with a later null",
+      "encoded null AttachedInfo compatibility > continues rejecting non-object JSON other than null, malformed fields, size and depth violations"
+    ],
+    "previousExpectedFullTests": 792,
+    "expectedFullTests": 796,
+    "fullState": "expected_only_not_executed",
+    "focusedManualModeAdded": false,
+    "reason": "New4 are appended to an existing test file; no filtered-skip/report exception and no repeated old tests. Local targeted receipt is separate.",
+    "sourceMeaning": "Only JSON-decoded null means absent AttachedInfo; all prior privacy guards, SDK/CSP and original test prefix are retained.",
+    "localAccepted": {
+      "RootReceipt": {
+        "path": ".qa/web-attached-null-new4-affected2-1/root-acceptance.json",
+        "bytes": 5026,
+        "sha256": "29af3618b112574eeb321b7eda08c7dc54a9da3f77d6c8905eb45f3b222827f2",
+        "mode": "0o600"
+      },
+      "newPASS": 4,
+      "directAffectedOldPASS": 2,
+      "unselectedOldNotRerun": 7,
+      "WebStrictNoEmit": "PASS",
+      "DesktopNoEmit": "prior valid result reused; zero include intersection",
+      "this_CI_preparation_executions": 0
+    }
   }
 }

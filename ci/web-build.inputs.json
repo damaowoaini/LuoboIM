@@ -1,14 +1,14 @@
 {
   "schema": "luobo.web.build-only.v1",
-  "cohort": "web4308-build-only-v1",
+  "cohort": "web4308-build-only-v2",
   "node": "24.21.0",
   "sourceFiles": 4308,
-  "sourceDigest": "7237031f2619f82424daab766d0f3d450b0de66de27ddc1207c83ec460892929",
+  "sourceDigest": "64461c97a9402dae4328c583b7200160015f0ce0da90ec0c8c0b106eba9ba9e9",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
   "sourceDeclaration": {
-    "path": "references/integration/web-loopback-formal-ci-candidate-20261017/final-web-source-vector.json",
-    "bytes": 807329,
-    "sha256": "0d31f2391f6f7a7e81509d0dfec25f0cf49c42aa748b4ea488267853b3f47871"
+    "path": "references/integration/web-attached-info-null-formal-ci-candidate-20261017/final-web-source-vector.json",
+    "bytes": 807485,
+    "sha256": "31de9d41be0ed489e37b329d6b8ee2e3fd8626d0ea9954bfc42bab7e9d385bb4"
   },
   "sourceOriginRef": null,
   "sourceObservedAtPublicRef": null,
@@ -16,23 +16,23 @@
   "controllerInputs": [
     {
       "path": ".github/workflows/web-build-only.yml",
-      "bytes": 4114,
-      "sha256": "007c55b0febae433de22cf96e6ab105548c5101fd8010851d7ca3e4e5d028bf2"
+      "bytes": 4117,
+      "sha256": "fb8aec5d6efaf78e061f1434bf01c9a9acb7ba921169fadb546c954e11aff4b2"
     },
     {
       "path": "ci/README.web-build.md",
-      "bytes": 7012,
-      "sha256": "fc183b443f4aab1a1a61be4ee107bb5de6e6d6c83fcf82aae8184d4229b32c72"
+      "bytes": 8033,
+      "sha256": "bf0d22b393cc142590ee72d83c2bb5a8cdb33697f1508d77ee4fc98cc9f1f1fc"
     },
     {
       "path": "ci/web-build.mjs",
       "bytes": 18145,
-      "sha256": "c1c7e98a02071c68ebcdbc883b45d53e65c4326a4504b7ffc791158011a98533"
+      "sha256": "d70b4f4755c1d8a61cb88e7ddef5342c7c016ed69afed7af499eb42cc3d981ea"
     },
     {
       "path": "ci/web-build.test.mjs",
-      "bytes": 3877,
-      "sha256": "225d84ffd3e729f23435d8f0738999d386a4f5244595353520739f57ab607f84"
+      "bytes": 3929,
+      "sha256": "8c0148446e1a3bd82b2389698ed63fad006e062972885c0e8933d96f21752d40"
     },
     {
       "path": "ci/web-build.csp.test.mjs",
@@ -43,13 +43,13 @@
   "borrowedInputs": [
     {
       "path": "ci/web-ci.mjs",
-      "bytes": 34510,
-      "sha256": "335c7926f2b367f403536ce95fafb9f5eaeea893fc48614d60c989938eb27e1c"
+      "bytes": 36482,
+      "sha256": "a702ee9360125f790c1e31f52fc4e9f7df28eb15a4300778d1e6058e383a3207"
     },
     {
       "path": "ci/web-ci.inputs.json",
-      "bytes": 67294,
-      "sha256": "ba24050e614a1650e45d02ec26fecbe4269cef5a637a0b0996f355caf0e1c61d"
+      "bytes": 70870,
+      "sha256": "13e2deb8788a3625f61a320f495130e662497be883aa5f10dce1f50b2ac61967"
     },
     {
       "path": "ci/group-effects/resource_guard.py",
@@ -20171,13 +20171,13 @@
     },
     {
       "path": "src/core/messagePrivacy.test.ts",
-      "bytes": 5861,
-      "sha256": "3a42f63f5372c8e6444042113739f5b0d3d8eeff31b4dcfde4fea800b4a14f1a"
+      "bytes": 9345,
+      "sha256": "3f6fce50b1b6caa9cda4c91948ba4aa166f7488ee45e95c30df03aae7c57fab2"
     },
     {
       "path": "src/core/messagePrivacy.ts",
-      "bytes": 8398,
-      "sha256": "75b464cbaeea1fc76164878672338ab041ad3eb5f2dc9ffc84d1186537d437f5"
+      "bytes": 8417,
+      "sha256": "84c2aee8072ad73ac3ad1ddbf8d00862906cf3fd6a20b4212337fd1f0b798ecc"
     },
     {
       "path": "src/core/messagePrivacyComponents.test.ts",
@@ -21620,83 +21620,45 @@
     ]
   },
   "predecessorSource": {
-    "cohort": "web4304-build-only-v1",
-    "sourceFiles": 4304,
-    "sourceDigest": "0caf95814993ac8936c1de386b2259d1f2bab5adda217436fc411af45907aa90",
+    "cohort": "web4308-build-only-v1",
+    "sourceFiles": 4308,
+    "sourceDigest": "7237031f2619f82424daab766d0f3d450b0de66de27ddc1207c83ec460892929",
     "sourceDeclaration": {
-      "path": "references/integration/web-announcement-formal-ci-candidate-20261017/final-web-source-vector.json",
-      "bytes": 806659,
-      "sha256": "057ce2fea53b4bcaeb70e456c9337e2b0fbaf8576f788deb998a3be89de46f0c"
+      "path": "references/integration/web-loopback-formal-ci-candidate-20261017/final-web-source-vector.json",
+      "bytes": 807329,
+      "sha256": "0d31f2391f6f7a7e81509d0dfec25f0cf49c42aa748b4ea488267853b3f47871"
     },
     "sourceOriginRef": null,
     "sourceObservedAtPublicRef": null
   },
   "sourceOverlay": {
-    "candidateManifestSHA256": "617d484a27b27c08e6b5c931ed3b4706d4f2bd62b033e4261f4e035c52b12d33",
+    "candidateManifestSHA256": "e4db439d130bebc6ff8a167569f11f1740f421c9ac4456c4f22065a5681ca72a",
     "before": [
       {
-        "path": "web/src/main.tsx",
-        "bytes": 681,
-        "sha256": "ff759b0f45f7b2399b73a7f9c10803cc721186cdfbcd4931e89236cf35dd3b83"
+        "path": "web/src/core/messagePrivacy.ts",
+        "bytes": 8398,
+        "sha256": "75b464cbaeea1fc76164878672338ab041ad3eb5f2dc9ffc84d1186537d437f5"
       },
       {
-        "path": "web/src/config/index.ts",
-        "bytes": 994,
-        "sha256": "1a6544cf6efaf6ee45b8eb31b67256d1b2ed1aa4ff3e233773d9bd6c6b397059"
-      },
-      {
-        "path": "web/src/core/session/logout.ts",
-        "bytes": 3296,
-        "sha256": "c1b750b285e6feb6bc64b2a7b0238c992096b839b56aa55485f5d319da60d1ad"
-      },
-      {
-        "path": "web/src/api/login.ts",
-        "bytes": 7929,
-        "sha256": "34fe2ed0c4f6ca9fd61b6f32633b105d0c19dfb02ed799d1f435fd88c7c4a42d"
+        "path": "web/src/core/messagePrivacy.test.ts",
+        "bytes": 5861,
+        "sha256": "3a42f63f5372c8e6444042113739f5b0d3d8eeff31b4dcfde4fea800b4a14f1a"
       }
     ],
     "after": [
       {
-        "path": "web/src/main.tsx",
-        "bytes": 801,
-        "sha256": "9074b47cfa4d3cd523b77370fe304d197aa73d20e1a494c673940e9377c99a63"
+        "path": "web/src/core/messagePrivacy.ts",
+        "bytes": 8417,
+        "sha256": "84c2aee8072ad73ac3ad1ddbf8d00862906cf3fd6a20b4212337fd1f0b798ecc"
       },
       {
-        "path": "web/src/config/index.ts",
-        "bytes": 1027,
-        "sha256": "10fda6ffb430a2da7d75626bc842283e3579d55ae04cb109f62817715abad511"
-      },
-      {
-        "path": "web/src/core/session/logout.ts",
-        "bytes": 3343,
-        "sha256": "d23cbe06bda6d36c36dd959bfdf0e41a2ee9c9e68e0936922b82b5c7a101e985"
-      },
-      {
-        "path": "web/src/api/login.ts",
-        "bytes": 8437,
-        "sha256": "b5db2f5ca82a6750df0a794abce7bb758c96a3490aaad7497023815c3adfa3c4"
-      },
-      {
-        "path": "web/src/core/session/devEndpoints.ts",
-        "bytes": 4794,
-        "sha256": "58529eb378b2bec89ac9277666bc43318a9003494a46e2efb6273b8f64220b89"
-      },
-      {
-        "path": "web/src/core/appConfig.ts",
-        "bytes": 702,
-        "sha256": "5cfd0226bddce023b693f5fc155e5ecdbd1cd826c81d32f14be9068f79ac4f4a"
-      },
-      {
-        "path": "web/src/core/session/devEndpoints.test.ts",
-        "bytes": 8874,
-        "sha256": "6e476df43b0aafaf00c9cbba3c6262df19fbdf24c90ae4c2b856d89fa459cc78"
-      },
-      {
-        "path": "web/src/core/appConfig.test.ts",
-        "bytes": 2431,
-        "sha256": "5e354dee761560f933f8782cd50ee39ba6c6a0982af4ac5de740c431397c9d14"
+        "path": "web/src/core/messagePrivacy.test.ts",
+        "bytes": 9345,
+        "sha256": "3f6fce50b1b6caa9cda4c91948ba4aa166f7488ee45e95c30df03aae7c57fab2"
       }
     ],
-    "state": "Root adopted selected8 locally; targeted8/logout2/Web strict PASS reported; no build result inferred"
+    "replacements": 2,
+    "additions": 0,
+    "state": "source-only CI preparation; runtime targeted evidence and any one local bundle are independent"
   }
 }

@@ -38,7 +38,7 @@ export function inspectMessagePrivacy(wire: unknown): PrivacyInfo {
     if (encoded != null && encoded !== "") {
       if (typeof encoded !== "string" || encoded.length > 65536) inspectionComplete = false;
       else {
-        try { const info: unknown = JSON.parse(encoded); if (record(info)) sources.push(info); else inspectionComplete = false; }
+        try { const info: unknown = JSON.parse(encoded); if (record(info)) sources.push(info); else if (info !== null) inspectionComplete = false; }
         catch { inspectionComplete = false; }
       }
     }

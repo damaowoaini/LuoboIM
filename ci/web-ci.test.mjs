@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput, announcementReadCohort, loopbackDevEndpointsCohort } from "./web-ci.mjs";
+import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput, announcementReadCohort, loopbackDevEndpointsCohort, attachedInfoNullInputs } from "./web-ci.mjs";
 
 function runFixture(callback) {
   const root = mkdtempSync(path.join(os.tmpdir(), "luobo-web-ci-"));
@@ -163,7 +163,8 @@ test("announcement successor rejects wrong source and keeps card individual hist
   assert.throws(() => announcementReadCohort({ ...announcement, before }), /source\/test lineage/);
   const input = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8"));
   assert.equal(input.loopbackDevEndpointsAdoption.previousExpectedFullTests, 784);
-  assert.equal(input.fullMinimumTests, 792);
+  assert.equal(input.attachedInfoNullAdoption.previousExpectedFullTests, 792);
+  assert.equal(input.fullMinimumTests, 796);
   assert.equal(input.announcementReadAdoption.previousExpectedFullTests, input.individualForwardAdoption.expectedFullTests);
   assert.equal(new Set([...input.chatCardAdoption.requiredNames, ...input.chatCardAdoption.copyRetention.requiredNames, ...input.individualForwardAdoption.requiredNames, ...announcement.requiredNames]).size, 95);
 });
@@ -186,4 +187,26 @@ test("loopback transport cohort keeps exact8 names source lineage and production
     (x) => { x.testPaths.push("src/unrelated.test.ts"); },
     (x) => { x.expectedFullTests = 784; },
   ]) { const changed = structuredClone(loopback); mutate(changed); assert.throws(() => loopbackDevEndpointsCohort(changed)); }
+});
+
+const attachedNull = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8")).attachedInfoNullAdoption;
+test("attached-info null source successor preserves exact new4 and rejects changed lineage", () => {
+  const proof = attachedInfoNullInputs(attachedNull);
+  assert.equal(proof.newTests, 4); assert.equal(proof.expectedFullTests, 796);
+  const data = reports(Array(4).fill("passed"));
+  data.audit.tests.forEach((entry, index) => { entry.name = attachedNull.requiredNames[index]; });
+  assert.equal(checked(data, 0, { exact: 4, requiredNames: proof.requiredNames }).passed, 4);
+  data.audit.tests[0].name = "unreviewed privacy name";
+  assert.throws(() => checked(data, 0, { exact: 4, requiredNames: proof.requiredNames }), /Required test/);
+  for (const mutate of [
+    (x) => { x.originManifestSHA256 = "0".repeat(64); },
+    (x) => { x.before[0].sha256 = "0".repeat(64); },
+    (x) => { x.currentAfter[1].bytes++; },
+    (x) => { x.requiredNames[0] = "unreviewed name"; },
+    (x) => { x.testPath = "src/unrelated.test.ts"; },
+    (x) => { x.expectedFullTests = 792; },
+    (x) => { x.focusedManualModeAdded = true; },
+  ]) { const changed = structuredClone(attachedNull); mutate(changed); assert.throws(() => attachedInfoNullInputs(changed)); }
+  assert.throws(() => webCohort("attached-info-null-4"), /Explicit/);
+  assert.equal(webCohort("loopback-dev-endpoints-8"), "loopback-dev-endpoints-8");
 });

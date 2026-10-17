@@ -75,3 +75,57 @@ describe("history ownership fence", () => {
     expect(fence.current(fence.capture("owner","c"),"same-user-different-issuer")).toBe(false);
   });
 });
+
+describe("encoded null AttachedInfo compatibility", () => {
+  it("allows an ordinary SDK message with encoded JSON null to retain its normal policy", () => {
+    for (const attachedInfo of ["null", " \nnull\t"]) {
+      const message = { clientMsgID: "ordinary-null", contentType: 101, textElem: { content: "synthetic ordinary text" }, attachedInfo };
+      expect(inspectMessagePrivacy(message)).toEqual({ containsPrivate: false, rootPrivate: false, inspectionComplete: true, expiresAt: undefined });
+      const ledger = new PrivateMessageLedger({ wall: () => now, monotonic: () => 0 });
+      expect(ledger.observe("issuer/tenant/user/session", "single", message)).toMatchObject({
+        containsPrivate: false, inspectionComplete: true, expired: false, allowsRetention: true,
+      });
+    }
+  });
+
+  it("still restricts real private metadata and quoted private descendants beside encoded null", () => {
+    const message = { ...privateMessage(), attachedInfo: "null" };
+    expect(inspectMessagePrivacy(message)).toEqual({
+      containsPrivate: true, rootPrivate: true, inspectionComplete: true, expiresAt: now + 30000,
+    });
+    const ledger = new PrivateMessageLedger({ wall: () => now, monotonic: () => 0 });
+    expect(ledger.observe("owner", "single", message).allowsRetention).toBe(false);
+    expect(inspectMessagePrivacy({ attachedInfo: "null", quoteElem: { quoteMessage: privateMessage() } })).toEqual({
+      containsPrivate: true, rootPrivate: false, inspectionComplete: true, expiresAt: now + 30000,
+    });
+  });
+
+  it("cannot clear known private deadlines, expired tombstones or incomplete inspection with a later null", () => {
+    let wall = now;
+    const ledger = new PrivateMessageLedger({ wall: () => wall, monotonic: () => 0 });
+    expect(ledger.observe("owner", "single", privateMessage()).expired).toBe(false);
+    const omitted = { clientMsgID: "synthetic-message", attachedInfo: "null" };
+    expect(ledger.observe("owner", "single", omitted)).toMatchObject({
+      containsPrivate: true, rootPrivate: true, inspectionComplete: true, expiresAt: now + 30000, allowsRetention: false,
+    });
+    wall = now + 30001;
+    expect(ledger.observe("owner", "single", omitted).expired).toBe(true);
+    wall = now - 60000;
+    expect(ledger.observe("owner", "another-render-surface", omitted)).toMatchObject({ expired: true, allowsRetention: false });
+    expect(ledger.observe("owner", "single", { clientMsgID: "malformed", attachedInfo: "[]" }).inspectionComplete).toBe(false);
+    expect(ledger.observe("owner", "single", { clientMsgID: "malformed", attachedInfo: "null" })).toMatchObject({
+      inspectionComplete: false, allowsRetention: false,
+    });
+  });
+
+  it("continues rejecting non-object JSON other than null, malformed fields, size and depth violations", () => {
+    for (const attachedInfo of ["[]", "[null]", "true", "false", "0", "1", '"null"', '"ordinary"', "{", "NULL", "null false",
+      '{"isPrivateChat":"true"}', '{"burnDuration":1.5}', '{"hasReadTime":"1800000000000"}', " ".repeat(65533) + "null"]) {
+      expect(inspectMessagePrivacy({ attachedInfo }).inspectionComplete).toBe(false);
+    }
+    expect(inspectMessagePrivacy({ attachedInfo: "null", attachedInfoElem: [] }).inspectionComplete).toBe(false);
+    let deep: unknown = { attachedInfo: "null" };
+    for (let index = 0; index < 34; index++) deep = { quoteElem: { quoteMessage: deep } };
+    expect(inspectMessagePrivacy(deep).inspectionComplete).toBe(false);
+  });
+});
