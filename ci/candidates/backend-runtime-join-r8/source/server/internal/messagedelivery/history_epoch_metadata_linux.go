@@ -281,6 +281,27 @@ func historyEpochVersionOne(raw bson.Raw) bool {
 	return ok && n == 1
 }
 
+// These sentinels are canonically written with BSON int32 version1. The
+// general exactFields helper intentionally admits int64 sequence/revision
+// fields; using it for version would contradict historyEpochVersionOne.
+func historyEpochMarkerFields(raw bson.Raw, flags []string) bool {
+	fields, e := raw.Elements()
+	if e != nil || len(fields) != 4+len(flags) || !importUniqueFields(raw) || !historyEpochVersionOne(raw) {
+		return false
+	}
+	for _, name := range []string{"_id", "epoch", "activation_sha256"} {
+		if _, ok := raw.Lookup(name).StringValueOK(); !ok {
+			return false
+		}
+	}
+	for _, name := range flags {
+		if _, ok := raw.Lookup(name).BooleanOK(); !ok {
+			return false
+		}
+	}
+	return true
+}
+
 func validateHistoryEpochOriginals(h namespaceimport.Header, r historyEpochTransitionRecord) error {
 	keys := historyEpochOriginalKeys()
 	if len(r.OriginalDocuments) != len(keys) || r.PreviousHeaderSHA256 != h.SHA256() {
@@ -298,12 +319,12 @@ func validateHistoryEpochOriginals(h namespaceimport.Header, r historyEpochTrans
 			return ErrConflict
 		}
 		if at < 3 {
-			if !exactFields(raw, []string{"_id", "epoch", "activation_sha256"}, []string{"version"}, []string{"legacy_writers_retired"}, "") || !historyEpochVersionOne(raw) || !raw.Lookup("legacy_writers_retired").Boolean() {
+			if !historyEpochMarkerFields(raw, []string{"legacy_writers_retired"}) || !raw.Lookup("legacy_writers_retired").Boolean() {
 				return ErrConflict
 			}
 		}
 		if at == 3 || at == 4 {
-			if !exactFields(raw, []string{"_id", "epoch", "activation_sha256"}, []string{"version"}, []string{"legacy_message_writers_retired", "legacy_group_writers_retired", "owner_bounds_seeded", "readers_bound"}, "") || !historyEpochVersionOne(raw) {
+			if !historyEpochMarkerFields(raw, []string{"legacy_message_writers_retired", "legacy_group_writers_retired", "owner_bounds_seeded", "readers_bound"}) {
 				return ErrConflict
 			}
 			for _, f := range []string{"legacy_message_writers_retired", "legacy_group_writers_retired", "owner_bounds_seeded", "readers_bound"} {

@@ -14,6 +14,8 @@ import signal
 import stat
 import subprocess
 import sys
+import time
+from datetime import datetime, timezone
 from types import SimpleNamespace
 
 HERE = Path(__file__).resolve().parent
@@ -249,6 +251,7 @@ def macos_sdk_snapshot(developer, fingerprint):
 def capture(work, phase, argv, environment):
     """Drain both actual streams with a bounded prefix; no invented stdout."""
     state = {n: {'body': bytearray(), 'bytes': 0, 'sha': hashlib.sha256()} for n in ['stdout', 'stderr']}
+    start_wall, start_mono = time.time_ns(), time.monotonic_ns()
     child = subprocess.Popen(argv, cwd=work/'source/app/ios', env=environment,
         stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     selector = selectors.DefaultSelector()
@@ -281,10 +284,156 @@ def capture(work, phase, argv, environment):
         observed = native_observation(phase, argv, child.returncode, interrupted,
             capture_completed, bytes(state['stdout']['body']))
         record(work/'evidence/native-result.json', {**observed, 'exit_code': child.returncode,
+            'outer_pid':child.pid,'capture_start_wall_ns':start_wall,'capture_start_mono_ns':start_mono,
+            'capture_end_wall_ns':time.time_ns(),'capture_end_mono_ns':time.monotonic_ns(),
             'interrupted': interrupted,
             'streams': {n: {'total_bytes': s['bytes'], 'sha256': s['sha'].hexdigest(),
                            'retained_prefix_bytes': len(s['body']), 'truncated': s['bytes'] > LOG_CAP}
                         for n, s in state.items()}, 'generated_probe_binary_executed': False})
+
+
+def denial_subject(native, audits, paths, expected, stderr):
+    if (native.get('capture_completed') is not True or native.get('interrupted') is not False
+            or not all(type(native.get(k)) is int for k in ['capture_start_wall_ns','capture_end_wall_ns',
+                'capture_start_mono_ns','capture_end_mono_ns'])):
+        raise ValueError('completed original child lifetime required')
+    begin,end = native['capture_start_wall_ns'],native['capture_end_wall_ns']
+    wall,mono = end-begin,native['capture_end_mono_ns']-native['capture_start_mono_ns']
+    if not 0 < wall <= 121_000_000_000 or not 0 < mono <= 121_000_000_000 or abs(wall-mono)>1_000_000_000:
+        raise ValueError('bounded stable child clock required')
+    matched = [(a,p) for a,p in zip(audits,paths) if a.get('outer_exec')=='/usr/bin/arch'
+        and a.get('outer_argv')==expected and a.get('response_synthesized') is False]
+    if len(matched)!=1:raise ValueError('one exact source-owned adapter audit required')
+    audit,path = matched[0];pid=audit.get('pid');at=audit.get('before_exec_wall_ns')
+    headers = set(re.findall(rb'(?m)^[^\n]{0,40}\bxcodebuild\[([1-9][0-9]{0,9}):[0-9]+\]',stderr))
+    if (type(pid) is not int or not 1<=pid<2**31 or not Path(path).name.startswith(str(pid)+'-')
+            or headers!={str(pid).encode()} or type(at) is not int or not begin<=at<=end):
+        raise ValueError('exact audit and actual xcodebuild stderr subject required')
+    return {'pid':pid,'begin_ns':at,'end_ns':end,'scope':'only source-owned xcodebuild; unknown Swift PID excluded'}
+
+
+def denial_log_argv(subject):
+    pid=subject['pid']
+    if type(pid) is not int or not 1<=pid<2**31:raise ValueError('decimal bound subject required')
+    start=datetime.fromtimestamp(subject['begin_ns']//1_000_000_000,timezone.utc)
+    finish=datetime.fromtimestamp((subject['end_ns']+999_999_999)//1_000_000_000,timezone.utc)
+    predicate=('(process == "kernel" OR process == "sandboxd") AND '
+        'eventMessage BEGINSWITH "Sandbox: xcodebuild('+str(pid)+') " AND eventMessage CONTAINS "deny("')
+    return ['/usr/bin/log','show','--style','ndjson','--color','none','--no-pager','--info','--debug',
+        '--start',start.strftime('%Y-%m-%d %H:%M:%S%z'),'--end',finish.strftime('%Y-%m-%d %H:%M:%S%z'),
+        '--predicate',predicate]
+
+
+def denial_row(value, subject, roots):
+    if not isinstance(value,dict):return None
+    emitter=value.get('process')
+    if not isinstance(emitter,str):
+        image=value.get('processImagePath')
+        emitter=Path(image).name if isinstance(image,str) else None
+    message=value.get('eventMessage');stamp=value.get('timestamp')
+    if emitter not in {'kernel','sandboxd'} or not isinstance(message,str) or len(message)>8192 or not isinstance(stamp,str):return None
+    try:
+        timestamp=datetime.fromisoformat(stamp)
+        if timestamp.tzinfo is None:return None
+        at=int(timestamp.timestamp()*1_000_000_000)
+    except (ValueError,OverflowError):return None
+    if not subject['begin_ns']<=at<=subject['end_ns']:return None
+    pattern=(r'^Sandbox: xcodebuild\('+str(subject['pid'])+r'\) (?:System Policy: )?deny\(([0-9]{1,3})\) '
+        r'([a-z0-9_-]{1,64})(?: ([^\r\n]{1,4096}))?$')
+    matched=re.fullmatch(pattern,message)
+    if not matched:return None
+    argument=matched[3] or ''
+    path={'category':'nonpublic-or-unknown-redacted','bytes':len(argument.encode()),
+          'sha256':hashlib.sha256(argument.encode()).hexdigest()}
+    if argument.startswith('/') and '..' not in argument.split('/') and not any(ord(c)<32 for c in argument):
+        for category,root in roots:
+            p=Path(argument)
+            if p.is_relative_to(root):
+                path={'category':category,'relative_path':p.relative_to(root).as_posix()};break
+    return {'timestamp':stamp,'subject_pid':subject['pid'],'emitter':emitter,
+        'authorization_operation':matched[2],'denial_code':int(matched[1]),'path':path,
+        'syscall_name_proven':False}
+
+
+def observe_owned_denials(work, environment, d, audits, paths, expected):
+    result={'schema':1,'status':'inconclusive','rows':[],'native_outcome_unchanged':True,
+        'unknown_swift_PID_observed':False,'global_configuration_changed':False,
+        'log_tool_is_first_observation_not_old20':True,'permission_cause_or_fix_proven':False}
+    child=None;selector=None;before=None;host=None
+    try:
+        native=json.loads((work/'evidence/native-result.json').read_bytes())
+        subject=denial_subject(native,audits,paths,expected,(work/'evidence/stderr.log').read_bytes())
+        result['subject']=subject
+        if os.path.lexists(Path(environment['HOME'])/'.logrc'):
+            result['status']='inconclusive_user_log_configuration_present';return result
+        host=load(REPO/'ci/apple-host-tool/run.py','temp_diagnostic_log_fingerprint')
+        before=host.fingerprint(Path('/usr/bin/log'),32<<20,True)
+        record(work/'evidence/denial-log-tool-before.json',before)
+        command=denial_log_argv(subject)
+        result['command']=command
+        boundary=d.xcrun_adapter.cache_boundary(work)
+        roots=[('work',work),('selected-Xcode',Path(DEVELOPER))]
+        roots += [('system-T',Path(n)) for n in dict.fromkeys([boundary['canonical'],boundary['lexical']])]
+        child=subprocess.Popen(command,cwd=work,env=environment,stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        selector=selectors.DefaultSelector()
+        for name in ['stdout','stderr']:selector.register(getattr(child,name),selectors.EVENT_READ,name)
+        deadline=time.monotonic()+10;total=0;lines=0;pending=b'';err_sha=hashlib.sha256();err_bytes=0
+        def line(body):
+            nonlocal lines
+            lines+=1
+            if lines>128 or len(body)>8192:raise OverflowError('bounded log line limit')
+            if not body.strip():return
+            value=json.loads(body)
+            selected=denial_row(value,subject,roots)
+            if selected is not None:
+                if len(result['rows'])>=64:raise OverflowError('bounded selected denial rows')
+                result['rows'].append(selected)
+        while selector.get_map():
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise TimeoutError('bounded log query elapsed')
+            for key,_ in selector.select(min(.2,remaining)):
+                block=os.read(key.fd,4096)
+                if not block:selector.unregister(key.fileobj);key.fileobj.close();continue
+                total+=len(block)
+                if total>65536:raise OverflowError('bounded log query byte limit')
+                if key.data=='stderr':err_sha.update(block);err_bytes+=len(block);continue
+                pending+=block
+                while b'\n' in pending:
+                    body,pending=pending.split(b'\n',1);line(body)
+                if len(pending)>8192:raise OverflowError('bounded log partial line')
+        if pending:line(pending)
+        code=child.wait(timeout=max(.001,deadline-time.monotonic()))
+        result.update(log_exit_code=code,query_bytes=total,received_lines=lines,
+            stderr_bytes=err_bytes,stderr_sha256=err_sha.hexdigest())
+        result['status']=('inconclusive_query_failed' if code else
+            'captured' if result['rows'] else 'inconclusive_no_matching_records')
+    except InterruptedError:
+        result['status']='inconclusive_interrupted';raise
+    except (OSError,ValueError,OverflowError,TimeoutError,subprocess.TimeoutExpired) as error:
+        result['status']='inconclusive_'+type(error).__name__
+    finally:
+        try:
+            if child is not None and child.poll() is None:
+                child.terminate()
+                try:child.wait(timeout=2)
+                except subprocess.TimeoutExpired:child.kill();child.wait(timeout=2)
+            if selector is not None:selector.close()
+        finally:
+            try:
+                result['log_tool_post_exact']=False
+                if before is not None:
+                    after=host.fingerprint(Path('/usr/bin/log'),32<<20,True)
+                    record(work/'evidence/denial-log-tool-after.json',{'exact':after==before,'file':after})
+                    result['log_tool_post_exact']=after==before
+                    if after!=before:result['status']='inconclusive_log_tool_changed'
+            except InterruptedError:
+                result['status']='inconclusive_interrupted';raise
+            except (OSError,ValueError) as error:
+                result['status']='inconclusive_log_tool_post_'+type(error).__name__
+            finally:
+                record(work/'evidence/denial-observation.json',result)
+    return result
 
 
 def worker(work, phase):
@@ -336,6 +485,7 @@ def worker(work, phase):
             record(work/'evidence/spm-adapter-check.json', {'actual_request_matched':matched,
                 'audit_count':len(audits),'responses_synthesized':False})
             if code == 0 and not matched: return 1
+            observe_owned_denials(work,e,d,audits,audit_paths,expected)
         if truncated: return 1
         return code
     finally:
@@ -535,6 +685,7 @@ def execute():
                 'exit_code_scope':'fresh local SPM1 with owned result path plus current source/tool/SDK/resource boundaries; accepted Swift1 not repeated',
                 'unknown_tool_start_is_not_proof_of_absence':True,
                 'tools_post_exact':tools_post_exact,'controller_post_exact':controller_post_exact,
+                'denial_observation':optional_record(works[0]/'evidence/denial-observation.json') if works else None,
                 'specific_denied_syscall_proven':False,'old_preflight_repeated':False,
                 'App359_or477_acquired_or_compiled':False,'generated_binaries_executed_or_uploaded':False})
     return outcome

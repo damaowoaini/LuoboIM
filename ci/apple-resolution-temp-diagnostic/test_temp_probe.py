@@ -214,3 +214,43 @@ class TempDiagnostic(unittest.TestCase):
                     adapter.forwarding(work,changed,cwd)
             with self.assertRaisesRegex(ValueError,'duplicate'):
                 adapter.forwarding(work,argv+['-resultBundlePath',str(work/'xcode/Resolve.xcresult')],cwd)
+
+
+    def test_owned_denial_subject_time_filter_and_path_projection_never_capture_unrelated_logs(self):
+        source=(HERE/'run.py').read_text()
+        worker=source.split('def worker(',1)[1].split('def finish_worker_boundary(',1)[0]
+        self.assertIn('observe_owned_denials(work,e,d,audits,audit_paths,expected)',worker)
+        self.assertNotIn("observation['status']",worker)
+        self.assertIn('if truncated: return 1\n        return code',worker)
+        begin=int(run.datetime(2025,10,17,tzinfo=run.timezone.utc).timestamp()*1_000_000_000)
+        end=begin+5_000_000_000
+        native={'capture_completed':True,'interrupted':False,'capture_start_wall_ns':begin,
+            'capture_end_wall_ns':end,'capture_start_mono_ns':100,'capture_end_mono_ns':5_000_000_100}
+        audit={'pid':1572,'before_exec_wall_ns':begin+1,'outer_exec':'/usr/bin/arch',
+               'outer_argv':['fixed'],'response_synthesized':False}
+        subject=run.denial_subject(native,[audit],[Path('1572-owned.json')],['fixed'],
+            b'2025-10-17 00:00:00.000 xcodebuild[1572:9] owned error\n')
+        argv=run.denial_log_argv(subject)
+        predicate=argv[argv.index('--predicate')+1]
+        self.assertEqual(argv[:3],['/usr/bin/log','show','--style'])
+        self.assertIn('process == "kernel" OR process == "sandboxd"',predicate)
+        self.assertIn('Sandbox: xcodebuild(1572) ',predicate)
+        self.assertNotIn('--last',argv)
+        def event(message,**extra):
+            return {'process':'kernel','timestamp':'2025-10-17 00:00:01+00:00','eventMessage':message,**extra}
+        prefix='Sandbox: xcodebuild(1572) deny(1) file-write-create '
+        roots=[('work',Path('/owned/work'))]
+        selected=run.denial_row(event(prefix+'/owned/work/xcode/DerivedData/a'),subject,roots)
+        self.assertEqual(selected['path'],{'category':'work','relative_path':'xcode/DerivedData/a'})
+        self.assertFalse(selected['syscall_name_proven'])
+        external=run.denial_row(event(prefix+'/Users/private-owner/secret'),subject,roots)
+        self.assertEqual(external['path']['category'],'nonpublic-or-unknown-redacted')
+        self.assertNotIn('private-owner',json.dumps(external))
+        for value in [event(prefix.replace('(1572)','(1573)')+'/owned/work/a'),
+                      event(prefix+'/owned/work/a',process='other'),
+                      event(prefix+'/owned/work/a',process=None,processImagePath=None),
+                      event(prefix+'/owned/work/a',timestamp='2025-10-17 00:00:09+00:00')]:
+            self.assertIsNone(run.denial_row(value,subject,roots))
+        with self.assertRaises(ValueError):
+            run.denial_subject(native,[audit],[Path('1573-owned.json')],['fixed'],
+                b'2025-10-17 00:00:00.000 xcodebuild[1572:9] owned error\n')

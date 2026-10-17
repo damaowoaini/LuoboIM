@@ -18,6 +18,7 @@ import (
 
 	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/google/uuid"
+	"github.com/openimsdk/open-im-server/v3/internal/groupeffects"
 	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
@@ -193,6 +194,24 @@ func TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSepa
 		}
 		if e = writer.PrepareHeldMetadata(prep, hold, header); e != nil {
 			return nil, e
+		}
+		// Verify the REAL held metadata path (not a test-inserted Ready row).
+		var effectsSchema bson.Raw
+		if e = db.Collection(groupeffects.Collection).FindOne(prep, bson.M{"_id": groupeffects.SchemaID}).Decode(&effectsSchema); e != nil {
+			return nil, e
+		}
+		fields, e := effectsSchema.Elements()
+		version, versionOK := effectsSchema.Lookup("version").Int32OK()
+		if e != nil || len(fields) != 3 || effectsSchema.Lookup("_id").StringValue() != groupeffects.SchemaID || effectsSchema.Lookup("kind").StringValue() != "group-effects-schema-v1" || !versionOK || version != 1 {
+			return nil, namespaceimport.ErrConflict
+		}
+		// Reentry must retain the original sentinel bytes and never reset it.
+		if e = writer.PrepareHeldMetadata(prep, hold, header); e != nil {
+			return nil, e
+		}
+		var replayedSchema bson.Raw
+		if e = db.Collection(groupeffects.Collection).FindOne(prep, bson.M{"_id": groupeffects.SchemaID}).Decode(&replayedSchema); e != nil || !bytes.Equal(effectsSchema, replayedSchema) {
+			return nil, errors.Join(e, namespaceimport.ErrConflict)
 		}
 		if e = writer.CheckImportCatalogReady(prep); e != nil {
 			return nil, e

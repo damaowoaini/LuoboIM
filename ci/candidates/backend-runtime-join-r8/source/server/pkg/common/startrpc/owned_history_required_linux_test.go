@@ -4,7 +4,6 @@ package startrpc
 
 import (
 	"context"
-	"encoding/json"
 	"os"
 	"sync/atomic"
 	"testing"
@@ -21,20 +20,19 @@ import (
 func TestOwnedRequiredHistoryRolesCannotFallBackToUnboundStores(t *testing.T) {
 	for _, role := range []string{"rpc-conversation", "rpc-msg"} {
 		t.Run(role+" missing private preparation rejects before resources", func(t *testing.T) {
-			input, _ := preparedHistoryRPCFixture(t)
-			input.boot.Role = role
-			raw, e := json.Marshal(input.boot)
-			if e != nil {
-				t.Fatal(e)
+			input, _ := preparedHistoryRPCFixture(t, role)
+			// Prove the v2 predecessor is valid before isolating missing reader
+			// evidence; a role/version mismatch must not satisfy this negative.
+			namespace, e := parseOwnedNamespaceStartup(input)
+			if e != nil || namespace == nil {
+				t.Fatal("unpublished v2 namespace preparation is invalid", e)
 			}
-			raw = append(raw, '\n')
-			if e = os.WriteFile(input.sourcePath, raw, 0600); e != nil {
-				t.Fatal(e)
+			defer namespace.gate.Retire()
+			if _, _, e := namespace.gate.KnownPublication(); e == nil {
+				t.Fatal("shape-only namespace preparation fabricated admission")
 			}
-			t.Setenv(OwnedRPCBootstrapSHAEnv, ownedSHA(raw))
-			input, e = loadOwnedRPCInput(role)
-			if e != nil {
-				t.Fatal("full original owned input is invalid", e)
+			if state, e := parseOwnedHistoryStartup(input); e != nil || state == nil {
+				t.Fatal("original reader preparation is invalid before removal", e)
 			}
 			t.Setenv(HistoryReaderPreparationEnv, "")
 			t.Setenv(HistoryReaderPreparationSHAEnv, "")

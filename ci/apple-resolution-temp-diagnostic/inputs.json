@@ -5,8 +5,8 @@
   "owned": [
     {
       "path": "ci/apple-resolution-temp-diagnostic/run.py",
-      "bytes": 31313,
-      "sha256": "16c1f3c3f114ed751411bd7f30390dd0780ee4c376ed528aa5fd01c4cefab650"
+      "bytes": 40509,
+      "sha256": "ee32fb597a849cba6f2e0409ce76b3655804784ab7df2bc047038c81fdf2fc04"
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/fixtures.py",
@@ -15,8 +15,8 @@
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/test_temp_probe.py",
-      "bytes": 14303,
-      "sha256": "eda7664bc35787056fd77d6a84d6858c25285a552c5ce4c43ccd314a981102d1"
+      "bytes": 17102,
+      "sha256": "e7346cf09a4ae3a4422ef40759f531464672528f46105a008262300013c62aab"
     },
     {
       "path": ".github/workflows/apple-resolution-temp-diagnostic.yml",
@@ -25,8 +25,8 @@
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/xcrun_adapter.py",
-      "bytes": 21335,
-      "sha256": "bbbb10e07f6e3c702b7ebce0a72c77ffa041d5e20390f12016e0d65dfe3d8d38"
+      "bytes": 21452,
+      "sha256": "f188fb6e2765d3de3546faf4071350e0098c515604aae51ed751906e0f43dc70"
     }
   ],
   "borrowed": [
@@ -252,9 +252,7 @@
     "TempDiagnostic.test_actual_adapter_accepts_only_the_fixed_local_spm_form_and_swift_command_has_no_App_or_fetch",
     "TempDiagnostic.test_actual_guard_call_combines_both_owned_phases_and_exact_cache_without_masking_failures"
   ],
-  "preparedAffectedPureOnly1": [
-    "TempDiagnostic.test_actual_adapter_accepts_only_the_fixed_local_spm_form_and_swift_command_has_no_App_or_fetch"
-  ],
+  "preparedAffectedPureOnly1": [],
   "unchangedSecondPureReuse": {
     "name": "TempDiagnostic.test_actual_guard_call_combines_both_owned_phases_and_exact_cache_without_masking_failures",
     "wholeMethodBodyExact": true,
@@ -372,7 +370,7 @@
     "sdkAbsenceOrPermissionCauseProven": false
   },
   "preparedNewPureOnly1": [
-    "TempDiagnostic.test_actual_diagnostic_adapter_admits_only_owned_resolve_result_bundle_and_rejects_other_operations"
+    "TempDiagnostic.test_owned_denial_subject_time_filter_and_path_projection_never_capture_unrelated_logs"
   ],
   "priorSwiftSuccessReused": {
     "phase": "swift",
@@ -517,5 +515,19 @@
     "change": "only resultBundlePath argument path/value/resolve-only gate; cache/profile/ARM/real exec methods exact",
     "oldApple359LaneSourceAndRegistryUnchanged": true,
     "oldSPMExit74StillHistoricalFailure": true
+  },
+  "denialObservation": {
+    "scope": "single source-owned xcodebuild PID/time filtered log show; no other process business logs",
+    "queryTool": "/usr/bin/log",
+    "queryToolFirstObservationNotOriginal20": true,
+    "queryTimeoutSeconds": 10,
+    "queryBytes": 65536,
+    "selectedRows": 64,
+    "lineBytes": 8192,
+    "sameWorker120SecondsAndOriginal64MiBFloor1GiB": true,
+    "profileAndEnvironmentChanged": false,
+    "noRecordsPermissionRefusalUnknownSwiftPID": "inconclusive, never no-deny or permission proof",
+    "allPriorFourPureBodiesExact": true,
+    "nativeSPMExitPreserved": true
   }
 }

@@ -1,0 +1,508 @@
+{
+  "schema": 1,
+  "state": "FROZEN_REPAIR21",
+  "source": {
+    "members": 1555,
+    "digest": "68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55"
+  },
+  "repairTargets": {
+    "internal/messagedelivery": [
+      "TestGroupHistoryMongoOriginalGenerationExportsClosedRangeWithoutLeaveGap",
+      "TestHistoryEpochMetadataPreimagesDoNotResetOrMintAuthority",
+      "TestOriginalEpochCutoverCustodyNeverBorrowsCurrentEpochOrInventsTrust",
+      "TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice",
+      "TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermission",
+      "TestOriginalHistoryVerifierSelectsExactArchivedHeaderWithoutInventingTrust",
+      "TestOriginalOwnerHistoryMongoRechecksActualSourceAndClear"
+    ],
+    "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+      "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
+      "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+    ],
+    "internal/namespaceinventory": [
+      "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume",
+      "TestImportOutputDocumentKeepsPrivateCustodyAcrossReopenAndTamper",
+      "TestImportWorkspaceRejectsSnapshotChildrenAndAliasesBeforeWrite",
+      "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture",
+      "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence",
+      "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts",
+      "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
+    ],
+    "pkg/common/startrpc": [
+      "TestOwnedRequiredHistoryRolesCannotFallBackToUnboundStores"
+    ]
+  },
+  "actualPassedTargets": {
+    "internal/api": [
+      "TestOwnedAPIActualHTTPWaitsForInflightHandlerThenClosesOriginalResources",
+      "TestOwnedAPINamespaceAdmissionPrecedesActualWorkerAndServe",
+      "TestOwnedAPIStartCancellationClosesPartialActualHandlesWithoutAnnouncement"
+    ],
+    "internal/messagedelivery": [
+      "TestDirectFutureMongoActualSourceReplayAndClearKeepOriginalAuthority",
+      "TestGroupHistoryBoundKeepsVerifiedFiniteLegacyProgressWithoutExtendingLeaveGap",
+      "TestGroupHistoryMongoBroadcastDoesNotRewriteMemberProgress",
+      "TestGroupHistoryMongoMissingOrCopiedSlotScopeCannotBecomeLegacy",
+      "TestGroupHistoryMongoNoticeScopeSurvivesLaterBroadcastAndFutureAdmission",
+      "TestHistoryReadinessPrivateOutputsNeverEnterOriginalCustody",
+      "TestHistoryReadinessSelectionBindsOriginalSignatureButCannotMintReady",
+      "TestKafkaIntakeMongoClearStillRedactsPolicyAwareDutyWhileOldWorkerIsFenced",
+      "TestMemberAdmissionJointUsesIndependentHeadsAndPreservesActualFloors",
+      "TestMemberRemovalJointOnlyActualNoticeSequencePassesClosedHistoryWindow",
+      "TestMembershipRemovalSerializesWithTheActualOrdinarySharedAllocator",
+      "TestNamespaceHistoryExplicitLegacyAndInvalidPageContracts",
+      "TestNamespaceHistoryKeepsAmbiguousGroupAndDirectAuthoritySeparate",
+      "TestNamespaceRuntimeSameInstanceBindingCannotBorrowMarkerOrPreparedCatalog",
+      "TestOriginalOwnerBoundaryRequiresOldSignatureAndExactWitness",
+      "TestOwnerFutureMongoTrueForbidHistoryRejoinRevokesOriginalSource",
+      "TestOwnerHistoryImportAndHistoricalCounterRejectBareCapabilities",
+      "TestOwnerHistoryMongoRealAdmissionKeepsIndependentGenerations",
+      "TestOwnerHistorySegmentsPreserveBaseGapFutureAndRevocation",
+      "TestOwnerHistorySegmentsRejectInventedGapOrInvalidBounds",
+      "TestProspectiveImportRejectsBarePageAndUnboundWriterBeforeIO",
+      "TestReviewedOriginalHistoryEmptyTrustRetainsPendingWithoutInventedEpoch"
+    ],
+    "internal/msggateway": [
+      "TestOwnedGatewayOccupiedListenerFailsWithoutReadyAndClosesOnlyItsPartialOwner",
+      "TestOwnedGatewayRealHTTPAndSocketStopWaitForOriginalRequestReaderAndPresence",
+      "TestOwnedGatewayUnexpectedListenerFailureCancelsTheSameOwnerAndCannotReenable",
+      "TestOwnedNamespaceWebsocketPreservesPreparedListenerAndActualServePhase"
+    ],
+    "internal/msgtransfer": [
+      "TestManagedOrdinaryBootstrapLoadsOnlyExactPrivateRequiredScope",
+      "TestManagedOrdinaryNamespaceBootstrapPreservesIsolatedDefaultAndRejectsSupervisedFallback",
+      "TestManagedOrdinaryProcessStopJoinsInDependencyOrderAndIsIdempotent",
+      "TestOwnedGroupActionStopCancelsConcurrentReadinessBeforeClosingPools",
+      "TestOwnedGroupActionTimedOutStopRetainsJoinOwnershipAndNeverClosesLiveTransport"
+    ],
+    "internal/namespaceimport": [
+      "TestImportLostCommitACKUsesExactInspectWithoutReplay",
+      "TestImportPageCopiesAndSourceDriftCannotMintPermit",
+      "TestImportPendingCaptureKeepsOriginalCutWhileLiveFenceAdvances",
+      "TestLegacyMongoCounterAbsenceDoesNotClaimZero",
+      "TestOwnerHistorySegmentPageRetainsOnlyOriginalPrivateProofIntervals",
+      "TestProspectivePageNeedsOriginalRootAndActualSemanticValidation"
+    ],
+    "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalOpenBaseIsClosedAtCutWithoutFillingFutureGap",
+      "TestHistoricalSegmentLocatorsUseActualCollectionAndNeverInferEpochOrRange",
+      "TestHistoricalTypedLineagePreservesOriginalClaimsAndProtocol",
+      "TestHistoryEpochRetirementCannotBeMintedFromDTOOrPreparedExit",
+      "TestHistoryReadinessPrivateSessionRetainsIdentityAndUnknownIntent",
+      "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient",
+      "TestNamespaceRuntimeCompleteRoleAndActualOwnerHandlesAreMandatory",
+      "TestNamespaceRuntimeMongoTargetRequiresOriginalCatalogAndIdentity",
+      "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
+      "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+      "TestOwnedServicePrivateEnvironmentKeepsIdentityAndRejectsOwnerOverrides"
+    ],
+    "internal/namespaceinventory": [
+      "TestImportCaptureStampDoesNotRenewOnResumeOrSourceDrift"
+    ],
+    "internal/rpc/rtc": [
+      "TestOwnedRTCOriginalSDKLookupWaitsForActualUserServeAndOwnerCancel",
+      "TestOwnedRTCUserActivationIsSynchronousBoundedAndNeverReplaysUnknown"
+    ],
+    "internal/tools": [
+      "TestOwnedCronActualSchedulerJoinsOriginalJobsBeforePoolsAndRefusesFailedDrain",
+      "TestOwnedCronNamespaceAdmissionPrecedesActualScheduler"
+    ],
+    "pkg/common/db/controller": [
+      "TestManagedConversationSourceProjectionBypassesStaleCacheAndPreservesModel",
+      "TestManagedConversationUnknownProofNeverFallsBackToLegacyCache"
+    ],
+    "pkg/common/db/ownedmongo": [
+      "TestOwnedMongoTargetPortPreservesOrdinaryPathAndOriginalClient"
+    ],
+    "pkg/common/discoveryregister/ownedzookeeper": [
+      "TestOwnedDiscoveryCloseCancelsAndJoinsAnUnreturnedBlockingDial",
+      "TestOwnedDiscoveryCloseJoinsRegistryAndActualGRPCConnections",
+      "TestOwnedDiscoveryLateTargetUpdatesEveryOriginalConnectionAndCloseIsPerInstance",
+      "TestOwnedDiscoverySameSchemeInstancesKeepTheirOwnResolverAndClose"
+    ],
+    "pkg/common/sensitiveword": [
+      "TestOwnedSensitiveSubscriptionInitialDialUsesOriginalCancellationAndReturnsNoOwner"
+    ],
+    "pkg/common/startrpc": [
+      "TestOwnedRPCActualStartAnnouncesThenJoinsBeforePrivateDrain",
+      "TestOwnedRPCMsgSensitiveWorkersJoinBeforeProducerPoolsAndDrain",
+      "TestOwnedRPCNamespaceAdmissionDefersActualWorkAndStopWins"
+    ]
+  },
+  "pendingPositiveTargets": {
+    "pkg/common/startrpc": [
+      "TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence"
+    ]
+  },
+  "pendingRequiredTokenTargets": {
+    "pkg/common/startrpc": [
+      "TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit"
+    ]
+  },
+  "acceptedPreviousRun": {
+    "head": "6384db596a54e1d27e3db7369f39fbd55e9b8867",
+    "run": 39041607488,
+    "job": 117422070403,
+    "attempt": 1,
+    "source": {
+      "members": 1555,
+      "digest": "686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f"
+    },
+    "selectedTop": 89,
+    "actualTopPASS": 67,
+    "actualTopFAIL": 22,
+    "unstartedTop": 0,
+    "skipped": 0,
+    "passedTopRequiredChildrenExact": true,
+    "passedTargets": {
+      "internal/api": [
+        "TestOwnedAPIActualHTTPWaitsForInflightHandlerThenClosesOriginalResources",
+        "TestOwnedAPINamespaceAdmissionPrecedesActualWorkerAndServe",
+        "TestOwnedAPIStartCancellationClosesPartialActualHandlesWithoutAnnouncement"
+      ],
+      "internal/messagedelivery": [
+        "TestDirectFutureMongoActualSourceReplayAndClearKeepOriginalAuthority",
+        "TestGroupHistoryBoundKeepsVerifiedFiniteLegacyProgressWithoutExtendingLeaveGap",
+        "TestGroupHistoryMongoBroadcastDoesNotRewriteMemberProgress",
+        "TestGroupHistoryMongoMissingOrCopiedSlotScopeCannotBecomeLegacy",
+        "TestGroupHistoryMongoNoticeScopeSurvivesLaterBroadcastAndFutureAdmission",
+        "TestHistoryReadinessPrivateOutputsNeverEnterOriginalCustody",
+        "TestHistoryReadinessSelectionBindsOriginalSignatureButCannotMintReady",
+        "TestKafkaIntakeMongoClearStillRedactsPolicyAwareDutyWhileOldWorkerIsFenced",
+        "TestMemberAdmissionJointUsesIndependentHeadsAndPreservesActualFloors",
+        "TestMemberRemovalJointOnlyActualNoticeSequencePassesClosedHistoryWindow",
+        "TestMembershipRemovalSerializesWithTheActualOrdinarySharedAllocator",
+        "TestNamespaceHistoryExplicitLegacyAndInvalidPageContracts",
+        "TestNamespaceHistoryKeepsAmbiguousGroupAndDirectAuthoritySeparate",
+        "TestNamespaceRuntimeSameInstanceBindingCannotBorrowMarkerOrPreparedCatalog",
+        "TestOriginalOwnerBoundaryRequiresOldSignatureAndExactWitness",
+        "TestOwnerFutureMongoTrueForbidHistoryRejoinRevokesOriginalSource",
+        "TestOwnerHistoryImportAndHistoricalCounterRejectBareCapabilities",
+        "TestOwnerHistoryMongoRealAdmissionKeepsIndependentGenerations",
+        "TestOwnerHistorySegmentsPreserveBaseGapFutureAndRevocation",
+        "TestOwnerHistorySegmentsRejectInventedGapOrInvalidBounds",
+        "TestProspectiveImportRejectsBarePageAndUnboundWriterBeforeIO",
+        "TestReviewedOriginalHistoryEmptyTrustRetainsPendingWithoutInventedEpoch"
+      ],
+      "internal/msggateway": [
+        "TestOwnedGatewayOccupiedListenerFailsWithoutReadyAndClosesOnlyItsPartialOwner",
+        "TestOwnedGatewayRealHTTPAndSocketStopWaitForOriginalRequestReaderAndPresence",
+        "TestOwnedGatewayUnexpectedListenerFailureCancelsTheSameOwnerAndCannotReenable",
+        "TestOwnedNamespaceWebsocketPreservesPreparedListenerAndActualServePhase"
+      ],
+      "internal/msgtransfer": [
+        "TestManagedOrdinaryBootstrapLoadsOnlyExactPrivateRequiredScope",
+        "TestManagedOrdinaryNamespaceBootstrapPreservesIsolatedDefaultAndRejectsSupervisedFallback",
+        "TestManagedOrdinaryProcessStopJoinsInDependencyOrderAndIsIdempotent",
+        "TestOwnedGroupActionStopCancelsConcurrentReadinessBeforeClosingPools",
+        "TestOwnedGroupActionTimedOutStopRetainsJoinOwnershipAndNeverClosesLiveTransport"
+      ],
+      "internal/namespaceimport": [
+        "TestImportLostCommitACKUsesExactInspectWithoutReplay",
+        "TestImportPageCopiesAndSourceDriftCannotMintPermit",
+        "TestImportPendingCaptureKeepsOriginalCutWhileLiveFenceAdvances",
+        "TestLegacyMongoCounterAbsenceDoesNotClaimZero",
+        "TestOwnerHistorySegmentPageRetainsOnlyOriginalPrivateProofIntervals",
+        "TestProspectivePageNeedsOriginalRootAndActualSemanticValidation"
+      ],
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalOpenBaseIsClosedAtCutWithoutFillingFutureGap",
+        "TestHistoricalSegmentLocatorsUseActualCollectionAndNeverInferEpochOrRange",
+        "TestHistoricalTypedLineagePreservesOriginalClaimsAndProtocol",
+        "TestHistoryEpochRetirementCannotBeMintedFromDTOOrPreparedExit",
+        "TestHistoryReadinessPrivateSessionRetainsIdentityAndUnknownIntent",
+        "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient",
+        "TestNamespaceRuntimeCompleteRoleAndActualOwnerHandlesAreMandatory",
+        "TestNamespaceRuntimeMongoTargetRequiresOriginalCatalogAndIdentity",
+        "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
+        "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+        "TestOwnedServicePrivateEnvironmentKeepsIdentityAndRejectsOwnerOverrides"
+      ],
+      "internal/namespaceinventory": [
+        "TestImportCaptureStampDoesNotRenewOnResumeOrSourceDrift"
+      ],
+      "internal/rpc/rtc": [
+        "TestOwnedRTCOriginalSDKLookupWaitsForActualUserServeAndOwnerCancel",
+        "TestOwnedRTCUserActivationIsSynchronousBoundedAndNeverReplaysUnknown"
+      ],
+      "internal/tools": [
+        "TestOwnedCronActualSchedulerJoinsOriginalJobsBeforePoolsAndRefusesFailedDrain",
+        "TestOwnedCronNamespaceAdmissionPrecedesActualScheduler"
+      ],
+      "pkg/common/db/controller": [
+        "TestManagedConversationSourceProjectionBypassesStaleCacheAndPreservesModel",
+        "TestManagedConversationUnknownProofNeverFallsBackToLegacyCache"
+      ],
+      "pkg/common/db/ownedmongo": [
+        "TestOwnedMongoTargetPortPreservesOrdinaryPathAndOriginalClient"
+      ],
+      "pkg/common/discoveryregister/ownedzookeeper": [
+        "TestOwnedDiscoveryCloseCancelsAndJoinsAnUnreturnedBlockingDial",
+        "TestOwnedDiscoveryCloseJoinsRegistryAndActualGRPCConnections",
+        "TestOwnedDiscoveryLateTargetUpdatesEveryOriginalConnectionAndCloseIsPerInstance",
+        "TestOwnedDiscoverySameSchemeInstancesKeepTheirOwnResolverAndClose"
+      ],
+      "pkg/common/sensitiveword": [
+        "TestOwnedSensitiveSubscriptionInitialDialUsesOriginalCancellationAndReturnsNoOwner"
+      ],
+      "pkg/common/startrpc": [
+        "TestOwnedRPCActualStartAnnouncesThenJoinsBeforePrivateDrain",
+        "TestOwnedRPCMsgSensitiveWorkersJoinBeforeProducerPoolsAndDrain",
+        "TestOwnedRPCNamespaceAdmissionDefersActualWorkAndStopWins"
+      ]
+    },
+    "failedTargets": {
+      "internal/messagedelivery": [
+        "TestGroupHistoryMongoOriginalGenerationExportsClosedRangeWithoutLeaveGap",
+        "TestHistoryEpochMetadataPreimagesDoNotResetOrMintAuthority",
+        "TestOriginalEpochCutoverCustodyNeverBorrowsCurrentEpochOrInventsTrust",
+        "TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice",
+        "TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermission",
+        "TestOriginalHistoryVerifierSelectsExactArchivedHeaderWithoutInventingTrust",
+        "TestOriginalOwnerHistoryMongoRechecksActualSourceAndClear"
+      ],
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+        "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+        "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
+        "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
+        "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+        "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+      ],
+      "internal/namespaceinventory": [
+        "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume",
+        "TestImportOutputDocumentKeepsPrivateCustodyAcrossReopenAndTamper",
+        "TestImportWorkspaceRejectsSnapshotChildrenAndAliasesBeforeWrite",
+        "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture",
+        "TestOriginalHistoryIndexReadsSealedRowsAndNeverGuessesAbsence",
+        "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts",
+        "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
+      ],
+      "pkg/common/startrpc": [
+        "TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence",
+        "TestOwnedRequiredHistoryRolesCannotFallBackToUnboundStores"
+      ]
+    },
+    "sourceModesLocksPostExact": true,
+    "fixtureNoResidueAndOwnedCleanupPASS": true,
+    "full14RuntimeGraphAccepted": false,
+    "binariesDownloadedOrDeployed": false,
+    "runtimeChanged": false,
+    "fullRegression": false,
+    "artifact": {
+      "artifact": 12104666790,
+      "run": 39041607488,
+      "attempt": 1,
+      "head": "6384db596a54e1d27e3db7369f39fbd55e9b8867",
+      "sha256": "aa2fbac9285613c20291863ed9065e4b2868965b02b635336ac0ed13d0932bcc",
+      "bytes": 253233,
+      "exactAPIDigest": true,
+      "files": 110,
+      "binariesDownloaded": false
+    },
+    "rootAcceptanceSHA256": "3202208f3d0d647d851a1e375755c1d1e96d954132070f6eec270166e2feb534",
+    "compiledEntries": {
+      "completed": 14,
+      "entries": [
+        {
+          "role": "api",
+          "package": "./cmd/openim-api",
+          "bytes": 99544410,
+          "sha256": "5e095438561949a35085a566c755d9efc7893dd422bd0e3ccbfae93023e05d80",
+          "executed": false
+        },
+        {
+          "role": "crontask",
+          "package": "./cmd/openim-crontask",
+          "bytes": 97004267,
+          "sha256": "0ffe4501c46656f4b747bfd8f730eb23b7fefe6230183525655e8851e2286cf5",
+          "executed": false
+        },
+        {
+          "role": "msggateway",
+          "package": "./cmd/openim-msggateway",
+          "bytes": 87427013,
+          "sha256": "eaad0371b7ebc16b1b1bb14b6d7d20a6ca1e19e6f1f4229474d0e73fd4e5f0dd",
+          "executed": false
+        },
+        {
+          "role": "msgtransfer-managed",
+          "package": "./cmd/openim-msgtransfer-managed",
+          "bytes": 97369521,
+          "sha256": "018212fba765bf3122b078a0388c8b6baca4f08c0924a58314b32552a5904115",
+          "executed": false
+        },
+        {
+          "role": "push",
+          "package": "./cmd/openim-push",
+          "bytes": 90089999,
+          "sha256": "d948f30522d7158755653843a44addb6783a9eb16eec796b0df052f6a30269e7",
+          "executed": false
+        },
+        {
+          "role": "rpc-auth",
+          "package": "./cmd/openim-rpc/openim-rpc-auth",
+          "bytes": 86234469,
+          "sha256": "ad14722e8a43840bdb0854c2e8d512dce1f919e84adb9b51d7fe2fc3fb17e1f3",
+          "executed": false
+        },
+        {
+          "role": "rpc-conversation",
+          "package": "./cmd/openim-rpc/openim-rpc-conversation",
+          "bytes": 96696364,
+          "sha256": "e1b477ddecbcd9371d7b25fcd5d6806509fab02d2bd7fd26e808eb39db28ecae",
+          "executed": false
+        },
+        {
+          "role": "rpc-encryption",
+          "package": "./cmd/openim-rpc/openim-rpc-encryption",
+          "bytes": 86832603,
+          "sha256": "2a5583f66fce744c4a1fd8b0529d77688ea7b51939f40cc52403108356887cff",
+          "executed": false
+        },
+        {
+          "role": "rpc-friend",
+          "package": "./cmd/openim-rpc/openim-rpc-friend",
+          "bytes": 88544963,
+          "sha256": "a6b5f2965b22d7bfb12285ef9cb5d55b6c341ee7e97318d4553b98ba377b3f8c",
+          "executed": false
+        },
+        {
+          "role": "rpc-group",
+          "package": "./cmd/openim-rpc/openim-rpc-group",
+          "bytes": 98826331,
+          "sha256": "595aea433ed55f51e4f564083ebdd5d6b90b9ce042e95f2790d45abd543a8bda",
+          "executed": false
+        },
+        {
+          "role": "rpc-msg",
+          "package": "./cmd/openim-rpc/openim-rpc-msg",
+          "bytes": 97624256,
+          "sha256": "d3b4325c63183b2291c4b29465cbb5ea3450d01eaf4e176ded8ca04f8c00972f",
+          "executed": false
+        },
+        {
+          "role": "rpc-rtc",
+          "package": "./cmd/openim-rpc/openim-rpc-rtc",
+          "bytes": 87344935,
+          "sha256": "908203c6f721445ce601490b9fcfd44a077881d53c97f7408b602cfdab97e8f0",
+          "executed": false
+        },
+        {
+          "role": "rpc-third",
+          "package": "./cmd/openim-rpc/openim-rpc-third",
+          "bytes": 92855647,
+          "sha256": "a95602ebefbf71cb7f639c2e9abc7ca40b1454853d066dbc52b0ab57f401db5d",
+          "executed": false
+        },
+        {
+          "role": "rpc-user",
+          "package": "./cmd/openim-rpc/openim-rpc-user",
+          "bytes": 89131293,
+          "sha256": "661dc47b49244d0f327cb901e4d01b35b8714385421a8b1aceb6f7d0aebc9535",
+          "executed": false
+        }
+      ],
+      "uploadedBinaries": false,
+      "executed": false
+    },
+    "raw": [
+      {
+        "bytes": 458022,
+        "sha256": "e6f56a4704e725fa483080654a4a7151e112f1ef236cd1bdcbb313778d2c6e18"
+      },
+      {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 9470,
+        "sha256": "378a9d50425c580f4a1df16690964c03e1934de05b90cf929a0922b7c0184dac"
+      },
+      {
+        "bytes": 260,
+        "sha256": "4bb33d1d1d653083046ec4ada20d9f2a813b46184892dbd13682a7699a011d90"
+      },
+      {
+        "bytes": 910,
+        "sha256": "b686af1f0bff30a6d5830d2ec083000e813f0821a7188747b0553fb53bcc8995"
+      }
+    ]
+  },
+  "sourceDelta": [
+    {
+      "target": "server/internal/messagedelivery/history_epoch_metadata_linux.go",
+      "beforeSHA256": "d8ea64ddd7414f3187475459eac893b20d691a8aaf8532140d3207cc0502be4e",
+      "afterSHA256": "a446e3555af409573c8863283c21b094e8bf2a3831cc50167a7820e426182078",
+      "afterBytes": 18618,
+      "mode": 420,
+      "production": true
+    },
+    {
+      "target": "server/internal/messagedelivery/history_epoch_metadata_linux_test.go",
+      "beforeSHA256": "56ae955211ad1b7b491c8d3e20d243519aebea747e5414c96924082f87a03803",
+      "afterSHA256": "1d67a42828411be4af3c22562b1f30235da01e7d1746fd77b49211c74d1be10e",
+      "afterBytes": 4754,
+      "mode": 420,
+      "production": false
+    },
+    {
+      "target": "server/internal/messagedelivery/namespace_import_metadata.go",
+      "beforeSHA256": "fe5665272864619f7e3828001a548ceb6a9df4438b03d87fe8aa4654931f6d4a",
+      "afterSHA256": "7bb5e877d2e682db52bd71864d3c5034a8e77addcf42c7eb367b79bb6209204c",
+      "afterBytes": 11217,
+      "mode": 420,
+      "production": true
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
+      "beforeSHA256": "d6a25faf35d867cbfcd5a8d312203e9361c8472b13cf580155781fbd9661bf23",
+      "afterSHA256": "7736314516b20ffae0a9cc7a67fc957d97814f7357baa8867242b3b03fd5a115",
+      "afterBytes": 20624,
+      "mode": 420,
+      "production": false
+    },
+    {
+      "target": "server/internal/namespaceinventory/import_workspace.go",
+      "beforeSHA256": "58b3d81ca7be56656898a65b0a4f9c66fa3ec3115a27049591b089192921ddfe",
+      "afterSHA256": "107baf7ead12e2fdcd836578e1639f63e35b5c24dcd0a4e55156f85b2ff2c712",
+      "afterBytes": 14282,
+      "mode": 420,
+      "production": true
+    },
+    {
+      "target": "server/internal/namespaceinventory/import_workspace_test.go",
+      "beforeSHA256": "7f6079f199cb19714610224510a24bed53ac5f7a4c7dc6cbada2a978b45191b0",
+      "afterSHA256": "f05a25a134a3efd98f4d9d934971c92339c79c7c5452ff61c8a0ab21174d8c2e",
+      "afterBytes": 3542,
+      "mode": 420,
+      "production": false
+    },
+    {
+      "target": "server/pkg/common/startrpc/owned_history_reader_linux_test.go",
+      "beforeSHA256": "19f8c2c7dc9d0af7b6311f40251ce2455a2f2a10bc012a59eee4b3e358290914",
+      "afterSHA256": "6bee8a7e3ec7e2765aa7a5589046d4e20b1411b4ff82204a20955552ae4c98fd",
+      "afterBytes": 11199,
+      "mode": 420,
+      "production": false
+    },
+    {
+      "target": "server/pkg/common/startrpc/owned_history_required_linux_test.go",
+      "beforeSHA256": "23cd4ea491f47adb0dcf7dd4c4ef8818582a2e6768e53e751b83da3fcef17cb2",
+      "afterSHA256": "92be0ba2c18b1fc717b3e608e421e8fb2dcc980c803db2e1c022c533012802d1",
+      "afterBytes": 4202,
+      "mode": 420,
+      "production": false
+    }
+  ],
+  "currentMainBuilds": 0,
+  "newBinaries": false,
+  "runtimeGraphAccepted": false,
+  "fullRegression": false,
+  "reusedMainBuilds": 14,
+  "reuseProofSHA256": "a2273b8d18c15fc98fb65317067d89584a44c4570b899e619672f6ea47826a97"
+}

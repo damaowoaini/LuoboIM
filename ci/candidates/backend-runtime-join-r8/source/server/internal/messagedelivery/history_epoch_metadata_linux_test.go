@@ -47,6 +47,29 @@ func TestHistoryEpochMetadataPreimagesDoNotResetOrMintAuthority(t *testing.T) {
 			t.Fatal("operator caller minted handles from a header")
 		}
 	})
+	t.Run("each schema marker rejects noncanonical int64 version", func(t *testing.T) {
+		for marker := 0; marker < 5; marker++ {
+			h, r := historyEpochTypedOriginalsFixture(t)
+			var doc bson.D
+			if e := bson.Unmarshal(r.OriginalDocuments[marker].Raw, &doc); e != nil {
+				t.Fatal(e)
+			}
+			for i := range doc {
+				if doc[i].Key == "version" {
+					doc[i].Value = int64(1)
+				}
+			}
+			raw, e := bson.Marshal(doc)
+			if e != nil {
+				t.Fatal(e)
+			}
+			r.OriginalDocuments[marker].Raw = raw
+			r.OriginalDocuments[marker].SHA256 = hash(raw)
+			if validateHistoryEpochOriginals(h, r) == nil {
+				t.Fatal("noncanonical schema version accepted", marker)
+			}
+		}
+	})
 	t.Run("changed raw custody rejected", func(t *testing.T) {
 		h, r := historyEpochTypedOriginalsFixture(t)
 		r.OriginalDocuments[0].SHA256 = historyReadinessDigest("other raw")

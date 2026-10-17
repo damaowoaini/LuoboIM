@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/sys/unix"
 )
 
 // ImportWorkspace stores bounded derived source work beside (never inside) the
@@ -102,7 +104,22 @@ func OpenImportWorkspace(ctx context.Context, snapshot *ImportSnapshot, live Pag
 		return nil, e
 	}
 	if !resume {
-		if e := os.Mkdir(dir, 0700); e != nil {
+		// Match the raw journal custody contract: create the fresh directory
+		// through its admitted private parent, durably retain its name, then
+		// exclusively create the 0600 lock BEFORE trying to acquire it. Resume
+		// never repairs a missing lock or adopts an existing directory.
+		parent, name, e := privateParent(dir)
+		if e != nil {
+			return nil, e
+		}
+		mkdirErr := unix.Mkdirat(parent, name, 0700)
+		syncErr, closeErr := unix.Fsync(parent), unix.Close(parent)
+		if mkdirErr != nil || syncErr != nil || closeErr != nil {
+			return nil, ErrPrivate
+		}
+		if _, e = writePrivateJSON(filepath.Join(dir, "lock"), struct {
+			Version int `json:"version"`
+		}{1}); e != nil {
 			return nil, e
 		}
 	}

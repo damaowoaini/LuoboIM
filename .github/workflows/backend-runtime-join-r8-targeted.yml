@@ -1,4 +1,4 @@
-name: Backend exact historical source and fourteen real entry compile
+name: Backend exact repair21 only / prior-source14 builds retained
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   targeted:
-    name: Exact final source / fourteen main builds and selected new plus direct targets / pending v2 explicit
+    name: Exact repair21 / old-source67 and14 reused / two graph obligations pending
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -24,10 +24,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - name: New incremental selection controls and exact source only
+      - name: New repair controls and directly affected selection audit only
         run: |
           python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
-          python3 -B ci/backend-runtime-join-r8/test_run.py
+          python3 -B ci/backend-runtime-join-r8/test_repair.py
+          python3 -B ci/backend-runtime-join-r8/test_run.py HistoricalRuntimeControls.test_actual173_difference_pending_v2_and_direct_existing_cannot_be_invented_or_replayed HistoricalRuntimeControls.test_named_audit_rejects_skips_foreign_tops_missing_required_real_children_and_nonzero_exit
           python3 -B ci/backend-runtime-join-r8/run.py --verify
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
         with:
@@ -56,7 +57,7 @@ jobs:
             --record "$GITHUB_WORKSPACE/ci-results/backend-runtime-join-r8-prepare.resource.json" \
             --min-free-mib 1024 --timeout 600 --poll-interval .2 \
             -- bash ci/backend-integration.sh prepare
-      - name: Compile fourteen actual main packages then exact new and directly affected race tests
+      - name: Only repair21 race tests; no main rebuild or new binary
         run: python3 -B ci/backend-runtime-join-r8/run.py
       - name: Always collect owned fixture residuals
         if: always()

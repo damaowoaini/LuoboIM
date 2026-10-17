@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "state": "FROZEN_SOURCE",
-  "scope": "backend_history_final14_entries_and_new65_plus_direct_only_no_deployment",
+  "scope": "backend_history_repair21_only_reuse_prior_source14_and67_no_deployment",
   "base": {
     "members": 1407,
     "digest": "5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9"
   },
   "source": {
     "members": 1555,
-    "digest": "686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f"
+    "digest": "68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -1680,15 +1680,15 @@
     {
       "target": "server/internal/messagedelivery/history_epoch_metadata_linux.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/messagedelivery/history_epoch_metadata_linux.go",
-      "bytes": 18093,
-      "sha256": "d8ea64ddd7414f3187475459eac893b20d691a8aaf8532140d3207cc0502be4e",
+      "bytes": 18618,
+      "sha256": "a446e3555af409573c8863283c21b094e8bf2a3831cc50167a7820e426182078",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/messagedelivery/history_epoch_metadata_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/messagedelivery/history_epoch_metadata_linux_test.go",
-      "bytes": 4084,
-      "sha256": "56ae955211ad1b7b491c8d3e20d243519aebea747e5414c96924082f87a03803",
+      "bytes": 4754,
+      "sha256": "1d67a42828411be4af3c22562b1f30235da01e7d1746fd77b49211c74d1be10e",
       "beforeSHA256": null
     },
     {
@@ -1872,6 +1872,13 @@
       "bytes": 9003,
       "sha256": "17ddd36f86e2f41690110a9cf46414bf9a9552dfaf2dfdd867f9644219cbf114",
       "beforeSHA256": null
+    },
+    {
+      "target": "server/internal/messagedelivery/namespace_import_metadata.go",
+      "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/messagedelivery/namespace_import_metadata.go",
+      "bytes": 11217,
+      "sha256": "7bb5e877d2e682db52bd71864d3c5034a8e77addcf42c7eb367b79bb6209204c",
+      "beforeSHA256": "fe5665272864619f7e3828001a548ceb6a9df4438b03d87fe8aa4654931f6d4a"
     },
     {
       "target": "server/internal/messagedelivery/namespace_import_page.go",
@@ -2303,8 +2310,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
-      "bytes": 19500,
-      "sha256": "d6a25faf35d867cbfcd5a8d312203e9361c8472b13cf580155781fbd9661bf23",
+      "bytes": 20624,
+      "sha256": "7736314516b20ffae0a9cc7a67fc957d97814f7357baa8867242b3b03fd5a115",
       "beforeSHA256": null
     },
     {
@@ -2751,8 +2758,8 @@
     {
       "target": "server/internal/namespaceinventory/import_workspace.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_workspace.go",
-      "bytes": 13619,
-      "sha256": "58b3d81ca7be56656898a65b0a4f9c66fa3ec3115a27049591b089192921ddfe",
+      "bytes": 14282,
+      "sha256": "107baf7ead12e2fdcd836578e1639f63e35b5c24dcd0a4e55156f85b2ff2c712",
       "beforeSHA256": null
     },
     {
@@ -2765,8 +2772,8 @@
     {
       "target": "server/internal/namespaceinventory/import_workspace_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_workspace_test.go",
-      "bytes": 2126,
-      "sha256": "7f6079f199cb19714610224510a24bed53ac5f7a4c7dc6cbada2a978b45191b0",
+      "bytes": 3542,
+      "sha256": "f05a25a134a3efd98f4d9d934971c92339c79c7c5452ff61c8a0ab21174d8c2e",
       "beforeSHA256": null
     },
     {
@@ -2947,15 +2954,15 @@
     {
       "target": "server/pkg/common/startrpc/owned_history_reader_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/pkg/common/startrpc/owned_history_reader_linux_test.go",
-      "bytes": 7967,
-      "sha256": "19f8c2c7dc9d0af7b6311f40251ce2455a2f2a10bc012a59eee4b3e358290914",
+      "bytes": 11199,
+      "sha256": "6bee8a7e3ec7e2765aa7a5589046d4e20b1411b4ff82204a20955552ae4c98fd",
       "beforeSHA256": null
     },
     {
       "target": "server/pkg/common/startrpc/owned_history_required_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/pkg/common/startrpc/owned_history_required_linux_test.go",
-      "bytes": 3962,
-      "sha256": "23cd4ea491f47adb0dcf7dd4c4ef8818582a2e6768e53e751b83da3fcef17cb2",
+      "bytes": 4202,
+      "sha256": "92be0ba2c18b1fc717b3e608e421e8fb2dcc980c803db2e1c022c533012802d1",
       "beforeSHA256": null
     },
     {
@@ -3048,6 +3055,7 @@
     "server/internal/messagedelivery/namespace_import_closure.go",
     "server/internal/messagedelivery/namespace_import_historical_seed.go",
     "server/internal/messagedelivery/namespace_import_history_segments.go",
+    "server/internal/messagedelivery/namespace_import_metadata.go",
     "server/internal/messagedelivery/namespace_import_page.go",
     "server/internal/messagedelivery/namespace_import_prospective.go",
     "server/internal/messagedelivery/namespace_import_publish.go",
@@ -3213,15 +3221,15 @@
   ],
   "finalFormatProof": {
     "productManifest": {
-      "bytes": 113487,
-      "sha256": "21a51abf5c948c17a1ebd1b9c4f07e1510be1ccd839babf055278c4c1f67a3e8"
+      "bytes": 118437,
+      "sha256": "482d4dc4e2dc5b7a223e25d334d2e76821d995c8bed1de3199dfe54b2cabe70e"
     },
     "formattedSource": {
       "members": 1555,
-      "digest": "686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f"
+      "digest": "68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55"
     },
-    "incrementalFormattedParsedGo": 3,
-    "previousFormattedOrCompiledGoExactReused": 202,
+    "incrementalFormattedParsedGo": 8,
+    "previousFormattedOrCompiledGoExactReused": 198,
     "exactActualR7GoReused": [
       "server/internal/rpc/third/owned_provider_test.go",
       "server/pkg/common/db/cache/owned_connection_setup_redis_test.go",
@@ -3230,7 +3238,7 @@
     ],
     "GoCompilationOrTests": 0
   },
-  "selectionSHA256": "fa60269119a63804032ea8e870006be69775899188de97c95c37db8710416784",
+  "selectionSHA256": "91bc81b26c4cd62748f4b8e088f6adf76e02cf9041cfb841a348646b12708fa4",
   "priorPassedTargets": {
     "internal/api": [
       "TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope",
@@ -3991,6 +3999,32 @@
         "good-drains-retained-and-unknown-never-gets-a-join",
         "repeat-Stop-does-not-renew-signal-or-erase-failure"
       ]
+    },
+    "internal/messagedelivery": {
+      "TestHistoryEpochMetadataPreimagesDoNotResetOrMintAuthority": [
+        "complete_typed_preimages_still_lack_real_capabilities",
+        "each_schema_marker_rejects_noncanonical_int64_version",
+        "changed_raw_custody_rejected",
+        "partial_old_readiness_cannot_be_used_as_predecessor",
+        "foreign_epoch_and_wrong_BSON_version_are_safe_refusals"
+      ]
+    },
+    "internal/namespaceinventory": {
+      "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture": [
+        "reopen_exact_checkpoint_and_private_body",
+        "stale_expected_state_and_missing_value_CAS_rejected",
+        "actual_source_restart_rejects_derived_read",
+        "resume_never_creates_a_missing_private_lock",
+        "resume_rejects_a_public_lock_without_changing_its_mode"
+      ]
+    },
+    "pkg/common/startrpc": {
+      "TestOwnedRequiredHistoryRolesCannotFallBackToUnboundStores": [
+        "rpc-conversation_missing_private_preparation_rejects_before_resources",
+        "rpc-msg_missing_private_preparation_rejects_before_resources",
+        "sealed_required_scope_cannot_lose_its_private_binding",
+        "legacy_and_unowned_default_paths_remain_explicit"
+      ]
     }
   },
   "entrypoints": [
@@ -4379,5 +4413,19 @@
       "TestOwnedGroupActionStopCancelsConcurrentReadinessBeforeClosingPools",
       "TestOwnedGroupActionTimedOutStopRetainsJoinOwnershipAndNeverClosesLiveTransport"
     ]
-  }
+  },
+  "repairPlan": {
+    "path": "ci/backend-runtime-join-r8/repair-plan.json",
+    "bytes": 24201,
+    "sha256": "37d2315c6f25e293440de755702df64b6853856861321b947f6a7d502879dff7",
+    "mode": 420
+  },
+  "repairControllerPins": [
+    {
+      "path": "ci/backend-runtime-join-r8/test_repair.py",
+      "bytes": 5235,
+      "sha256": "b628e86d98a3578db7c3cf89ffe5c64d2752960da5343b52fb01df5103f67aea",
+      "mode": 420
+    }
+  ]
 }

@@ -7,6 +7,7 @@ import re
 import secrets
 import stat
 import sys
+import time
 
 
 REAL_XCRUN = '/usr/bin/xcrun'
@@ -357,7 +358,8 @@ def audit(work, public, cwd):
     directory = work/'evidence/xcrun-adapter'
     if directory.resolve(strict=True) != directory: raise ValueError('owned audit directory required')
     if sum(1 for _ in directory.iterdir()) >= 256: raise ValueError('bounded argv audit cap')
-    body = (json.dumps({'schema': 2, 'outer_exec': REAL_ARCH,
+    body = (json.dumps({'schema': 2, 'pid':os.getpid(),'parent_pid':os.getppid(),
+                       'before_exec_wall_ns':time.time_ns(),'outer_exec': REAL_ARCH,
                        'outer_argv': ['-arm64e', REAL_XCRUN, '--no-cache', *public],
                        'real_tool': REAL_XCRUN, 'tool_argv': ['--no-cache', *public],
                        'cwd': 'work/'+cwd.relative_to(work).as_posix(),

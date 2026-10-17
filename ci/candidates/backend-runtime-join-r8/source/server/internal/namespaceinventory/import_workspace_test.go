@@ -3,6 +3,8 @@ package namespaceinventory
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -15,6 +17,14 @@ func TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture(t *testin
 	w, e := OpenImportWorkspace(ctx, snapshot, source, dir, header, policy, false)
 	if e != nil {
 		t.Fatal(e)
+	}
+	lockPath := filepath.Join(dir, "lock")
+	lockBefore, e := ReadPrivateDocument(lockPath, 1024)
+	var lockHeader struct {
+		Version int `json:"version"`
+	}
+	if e != nil || DecodeStrict(lockBefore, &lockHeader) != nil || lockHeader.Version != 1 {
+		t.Fatal("fresh workspace did not retain its admitted private lock", e)
 	}
 	calls := source.pageCalls
 	st, expected, e := w.Checkpoint(ctx)
@@ -56,6 +66,39 @@ func TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture(t *testin
 			t.Fatal("restart renewed derived state")
 		}
 		source.id.MongoTopology--
+	})
+	t.Run("resume never creates a missing private lock", func(t *testing.T) {
+		if e := os.Remove(lockPath); e != nil {
+			t.Fatal(e)
+		}
+		defer func() {
+			if e := os.WriteFile(lockPath, lockBefore, 0600); e != nil {
+				t.Error(e)
+			}
+		}()
+		if _, e := OpenImportWorkspace(ctx, snapshot, source, dir, header, policy, true); !errors.Is(e, ErrPrivate) {
+			t.Fatal("resume repaired or accepted a missing lock", e)
+		}
+		if _, e := os.Lstat(lockPath); !errors.Is(e, os.ErrNotExist) {
+			t.Fatal("failed resume created a lock", e)
+		}
+	})
+	t.Run("resume rejects a public lock without changing its mode", func(t *testing.T) {
+		if e := os.Chmod(lockPath, 0644); e != nil {
+			t.Fatal(e)
+		}
+		defer func() {
+			if e := os.Chmod(lockPath, 0600); e != nil {
+				t.Error(e)
+			}
+		}()
+		if _, e := OpenImportWorkspace(ctx, snapshot, source, dir, header, policy, true); !errors.Is(e, ErrPrivate) {
+			t.Fatal("unsafe lock custody accepted", e)
+		}
+		info, e := os.Lstat(lockPath)
+		if e != nil || info.Mode().Perm() != 0644 {
+			t.Fatal("resume silently changed lock custody", e)
+		}
 	})
 	if source.pageCalls != calls {
 		t.Fatal("derived resume recaptured business rows")
