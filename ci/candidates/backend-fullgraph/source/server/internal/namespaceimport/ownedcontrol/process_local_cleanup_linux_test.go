@@ -150,6 +150,11 @@ func TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths(t *testing.T) {
 			}
 			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 			defer cancel()
+			select {
+			case <-s.done:
+			case <-ctx.Done():
+				t.Fatal("original child Wait did not complete before local exit observation")
+			}
 			exit, e := s.StopForLocalCleanup(ctx)
 			if !errors.Is(e, ErrOwnedEvidence) || exit.Version != "owned-local-child-exited-v1" || exit.WaitSucceeded || exit.Owner != s.owner || exit.ObservedAbsentAt.IsZero() || s.joined {
 				t.Fatal("nonzero original Wait became canonical or remained unjoined", e)

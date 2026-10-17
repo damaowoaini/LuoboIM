@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "description": "Exact Go build inputs, independent original locks, six product mains, one new real embedded-template parser test. No server module.",
+  "parentPublicHEAD": "ce7964a0c7aa474cbc83c32dd71c1bfcfb83cfec",
+  "goVersion": "1.27.2",
+  "target": "linux/amd64 CGO_ENABLED=0",
+  "sources": {
+    "chart": {
+      "members": 258,
+      "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+    },
+    "route": {
+      "members": 33,
+      "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+    }
+  },
+  "sourceSelection": "All *.go in chart/route plus each go.mod/go.sum and chart config/version+template.xlsx; other configs/docs are neither materialized nor shipped. Includes original tests unchanged; only the named new test runs.",
+  "locks": {
+    "chart": {
+      "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+      "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+    },
+    "route": {
+      "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+      "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+    }
+  },
+  "entries": [
+    [
+      "chart",
+      "./cmd/api/chat-api",
+      "chat-api"
+    ],
+    [
+      "chart",
+      "./cmd/api/admin-api",
+      "admin-api"
+    ],
+    [
+      "chart",
+      "./cmd/rpc/chat-rpc",
+      "chat-rpc"
+    ],
+    [
+      "chart",
+      "./cmd/rpc/admin-rpc",
+      "admin-rpc"
+    ],
+    [
+      "chart",
+      "./cmd/rpc/office-rpc",
+      "office-rpc"
+    ],
+    [
+      "route",
+      ".",
+      "route-service"
+    ]
+  ],
+  "test": "TestEmbeddedImportTemplateParsesOneCompleteUser",
+  "helpers": {
+    "ci/group-effects/resource_guard.py": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c",
+    "ci/group-effects/capture.py": "d8f7dd31925857d5042e3c89a07a0bc127d1371e6063b4b186b8200d9f93c199"
+  },
+  "artifactPolicy": {
+    "binaryArtifactEnabled": true,
+    "perBinaryLimitBytes": 134217728,
+    "totalBinaryLimitBytes": 536870912,
+    "allowedBasenames": [
+      "admin-api",
+      "admin-rpc",
+      "chat-api",
+      "chat-rpc",
+      "manifest.json",
+      "office-rpc",
+      "route-service"
+    ],
+    "onlyAfterSixBuildsParserAndPost": true,
+    "scriptClaimsUploadOrDeployment": false
+  }
+}

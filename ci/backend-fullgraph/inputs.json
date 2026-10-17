@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "state": "FROZEN_FINAL_SOURCE",
-  "scope": "actual_fresh_owned_14_graph_four_scenarios_original2top3sub_and_cleanup3top9sub_no_deployment",
+  "scope": "actual_fresh_owned_14_graph_four_scenarios_fresh4top8sub_plus_prior_source_cleanup1top4sub_no_deployment",
   "source": {
     "members": 1573,
-    "digest": "f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2"
+    "digest": "051a08e83860d54309c6cb63e204676a2afefc0caf43d02798da5475ca63aa5c"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,8 +42,8 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 36142,
-      "sha256": "3d101949384c3192480b8f78af7b36000f0d8a3e6d4733e20e444f428f6f397d"
+      "bytes": 37461,
+      "sha256": "50b8a6da49a12e6591d8a63fea13acf4d1806a773a972ab5c47658b9f4369946"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 15341,
-      "sha256": "4a4060414fb181d55fc9b5eca0cbbf460876194c8d1177e4367dd7e067ba5da0"
+      "bytes": 17151,
+      "sha256": "9cd0a7fcd8203b55ac70ae85591f8d564f2ef8c0c95240fb9f571b3facf8a45e"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -752,15 +752,15 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-      "bytes": 13361,
-      "sha256": "a7679556215ac71dc4c869d4c08c6a93aaf9993092572eb4a027210f20feb9f3",
+      "bytes": 14083,
+      "sha256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-      "bytes": 24300,
-      "sha256": "cbe1a40c682a7f9269f1274950559ed400db0502e91877ed587d340cb8e6e4da",
+      "bytes": 26168,
+      "sha256": "91d405521a2f990d6fb1342acd6879b89c9bd4036a2e26a446dfb32a78472e96",
       "beforeSHA256": null
     },
     {
@@ -1053,8 +1053,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
-      "bytes": 5485,
-      "sha256": "ee0df9acd36e5af03929899163ec5f04ca655b5cbda8e04920a430e5000a0537",
+      "bytes": 5624,
+      "sha256": "4f40dfe1837207983cf907d3ed161e6c6c1c3493cec39c557512d1d5bde9cedd",
       "beforeSHA256": null
     },
     {
@@ -1256,8 +1256,8 @@
     {
       "target": "server/internal/namespaceinventory/import_read_scope.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceinventory/import_read_scope.go",
-      "bytes": 2988,
-      "sha256": "38f5f2708493cc544275eae1d0aebd216f91b02241cd3dbeaaaeec568e50535c",
+      "bytes": 2993,
+      "sha256": "f0d26184584b3381678d6f18eb30e0c41edfa4d982d477b1c0a94fc7c141e314",
       "beforeSHA256": null
     },
     {
@@ -3849,9 +3849,11 @@
     "originalOperatorContextSeconds": 1200,
     "targetGoTimeoutSeconds": 180
   },
-  "resourceStatus": "Root_reviewed_unchanged_10800s_16GiB_fixed_final_source_prepare_only_no_execution_in_candidate",
+  "resourceStatus": "Root_reviewed_unchanged_10800s_16GiB_pending_final_source_rebind_no_execution",
   "finalBindingRequired": [
-    "Root adoption and explicit manual dispatch; this candidate performs no execution"
+    "Root final formatted whole source identity and changed capsule/body/mode pins including fixture and capture/read-scope repairs",
+    "matching run.FINAL_SOURCE and inputs.source",
+    "FROZEN_FINAL_SOURCE/sourceReviewAccepted only after Root adoption/review"
   ],
   "evidenceBoundary": {
     "old14builds": "prior-source-only not current binaries and not reused",
@@ -3859,15 +3861,14 @@
     "actualGraph": 0,
     "originalPositiveAndTokenOracles": "pending actual four-scenario results then original2top3sub; no synthetic grant",
     "minio": "archived unmaintained official source only isolated compatibility fixture; production S3 unchanged",
-    "cleanup": "new2top6sub and directly affected old1top3sub pending; Go180s per package process; exact5top12sub union"
+    "cleanup": "fresh2top5sub plus Root-reviewed prior-source1top4sub; original graph fresh2top3sub; original obligation5top12sub across sources, never current-source5top12sub"
   },
   "cleanupScopes": [
     {
       "label": "cleanup-ownedcontrol",
       "targets": {
         "internal/namespaceimport/ownedcontrol": [
-          "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths",
-          "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit"
+          "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths"
         ]
       },
       "requiredSubtests": {
@@ -3875,13 +3876,7 @@
           "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths": [
             "canonical-first",
             "runtime-first",
-            "local-first",
-            "unbound_start_failure_only_waits_original_done"
-          ],
-          "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit": [
-            "unknown-middle-child-does-not-strand-later-original-owner",
-            "good-drains-retained-and-unknown-never-gets-a-join",
-            "repeat-Stop-does-not-renew-signal-or-erase-failure"
+            "local-first"
           ]
         }
       }
@@ -3905,6 +3900,27 @@
   ],
   "priorPreparedSource": {
     "members": 1573,
-    "digest": "47c38899d5cc41155a72d36fdc38d2444dc4c86e769f3c9f9dc3a2595fcefee6"
+    "digest": "f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2"
+  },
+  "cleanupReuse": {
+    "run": 39053868483,
+    "head": "ce7964a0c7aa474cbc83c32dd71c1bfcfb83cfec",
+    "source": {
+      "members": 1573,
+      "digest": "f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2"
+    },
+    "reviewSHA256": "48c619c7b7c19ad33b5bb5b9bfa38f655de918c01ad19a6784fed4d9ccc1efbf",
+    "package": "internal/namespaceimport/ownedcontrol",
+    "top": "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit",
+    "subtests": {
+      "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit": [
+        "unknown-middle-child-does-not-strand-later-original-owner",
+        "good-drains-retained-and-unknown-never-gets-a-join",
+        "repeat-Stop-does-not-renew-signal-or-erase-failure"
+      ],
+      "TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths": [
+        "unbound_start_failure_only_waits_original_done"
+      ]
+    }
   }
 }

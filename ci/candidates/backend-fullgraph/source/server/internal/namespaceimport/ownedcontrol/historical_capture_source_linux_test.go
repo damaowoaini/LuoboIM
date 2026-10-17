@@ -308,6 +308,47 @@ func TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory(t *te
 			t.Fatal("exact descriptor could not resume", e)
 		}
 	})
+	t.Run("real commit custody failure never becomes normal capture pending", func(t *testing.T) {
+		broken, _, brokenFence := materializerSourceFixture(t)
+		m := broken.materializer
+		before, _, e := m.workspace.Checkpoint(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		rows, _, _, e := m.snapshot.ReadRows(ctx, m.live, "", 1)
+		if e != nil || len(rows) != 1 {
+			t.Fatal("original first raw row unavailable", e)
+		}
+		facts, e := DecodeHistoricalRow(rows[0], m.describe)
+		if e != nil || len(facts) == 0 {
+			t.Fatal("fixture first row has no factual atom", e)
+		}
+		value, e := materializerBody(facts[0])
+		if e != nil {
+			t.Fatal(e)
+		}
+		// progressStore.save hashes its actual canonical value plus LF. Occupying
+		// that exact owned derived path with other bytes forces the REAL Commit
+		// custody rejection; the original raw journal/session remains untouched.
+		name := "derived-value-" + sha(append(append([]byte(nil), value...), '\n')) + ".json"
+		file, e := os.OpenFile(filepath.Join(broken.options.DerivedDirectory, name), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+		if e != nil {
+			t.Fatal("exclusive synthetic derived collision unavailable", e)
+		}
+		_, writeErr := file.Write([]byte("{\"synthetic_bad_derived_value\":true}\n"))
+		syncErr, closeErr := file.Sync(), file.Close()
+		if writeErr != nil || syncErr != nil || closeErr != nil {
+			t.Fatal("synthetic derived collision not durable", errors.Join(writeErr, syncErr, closeErr))
+		}
+		_, e = broken.Capture(ctx, broken.header, brokenFence)
+		if !errors.Is(e, namespaceinventory.ErrPrivate) || errors.Is(e, namespaceimport.ErrPending) {
+			t.Fatal("real Commit failure was lost or promoted to normal Pending", e)
+		}
+		after, _, checkpointErr := m.workspace.Checkpoint(ctx)
+		if checkpointErr != nil || after != before {
+			t.Fatal("failed Commit advanced original durable progress", checkpointErr)
+		}
+	})
 	i := finishMaterializedSource(t, s, fence)
 	t.Run("canonical bodies original base future and missing-proof disposition", func(t *testing.T) {
 		if i.OriginalTrust != "UNTRUSTED" || i.Counts.Origins != 2 || i.Counts.Windows != 2 || i.Counts.Quarantines != 0 || i.ProspectiveCount != 4 || i.OwnerHistorySegmentCount != 0 {

@@ -1,0 +1,49 @@
+name: Chart5 and route1 product entry builds
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chart-route-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  six-entries:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      GOWORK: "off"
+      GOTOOLCHAIN: local
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Verify exact source inputs without running Go
+        run: python3 -B ci/chart-route-build/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.2"
+          check-latest: false
+          cache: false
+      - name: Six product entry builds and the real embedded-template parser
+        run: python3 -B ci/chart-route-build/run.py
+      - name: Preserve only the six sealed product ELFs and their manifest
+        if: success()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: chart-route-six-elf-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chart-route-build-${{ github.run_id }}-${{ github.run_attempt }}/bin/
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 7
+      - name: Preserve only compact build and parser evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: chart-route-build-evidence-${{ github.run_attempt }}
+          path: ci-results/chart-route-build/
+          if-no-files-found: error
+          retention-days: 14

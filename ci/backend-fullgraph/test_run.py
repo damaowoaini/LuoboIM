@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Controller-only controls. No Go, container, DB, service or graph is executed."""
-import copy,hashlib,importlib.util,json,os,struct,tempfile,unittest
+import ast,copy,hashlib,importlib.util,json,os,struct,tempfile,unittest
 from pathlib import Path
 from unittest import mock
 HERE=Path(__file__).resolve().parent
@@ -11,11 +11,11 @@ run=load('run');builder=load('minio_build');resources=load('resources')
 
 class FullGraphControls(unittest.TestCase):
  def test_prepare_lock_fresh_scope_and_unknown_cannot_alias_old_pass_or_canonical(self):
-  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN)}
+  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN)}
   with mock.patch.object(run,'FINAL_SOURCE',None),self.assertRaises(ValueError):run.check_locked(c)
   with mock.patch.object(run,'FINAL_SOURCE',source):
    run.check_locked(c)
-   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('originalTargets',{}),('requiredOriginalSubtests',{})]:
+   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('cleanupReuse',{}),('cleanupReuse',dict(run.CLEANUP_REUSE,source=source)),('cleanupReuse',dict(run.CLEANUP_REUSE,head='f'*40)),('cleanupReuse',dict(run.CLEANUP_REUSE,reviewSHA256='f'*64)),('originalTargets',{}),('requiredOriginalSubtests',{})]:
     bad=copy.deepcopy(c);bad[key]=value
     with self.subTest(key=key),self.assertRaises(ValueError):run.check_locked(bad)
   cleanup={'version':'owned-fullgraph-resource-cleanup-v1','nonce':'a'*32,'exactContainerIDs':['b'*64],'unconfirmedIDs':[],'accepted':True}
@@ -134,6 +134,12 @@ class FullGraphControls(unittest.TestCase):
   self.assertTrue(large.startswith(diagnostic['diagnostic']))
   with self.assertRaises(ValueError):run.project_go_test_events(raw,'runtime-ack')
   with self.assertRaises(ValueError):run.project_go_test_events(json.dumps({'Action':'build-output','Output':7}).encode(),'cleanup-ownedcontrol')
+  syntax=ast.parse(Path(run.__file__).read_bytes());orchestration=next(node for node in syntax.body if isinstance(node,ast.FunctionDef) and node.name=='run')
+  calls=[node for node in ast.walk(orchestration) if isinstance(node,ast.Call)]
+  cleanup_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='run_cleanup_controls')
+  compile_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='command' and node.args and isinstance(node.args[0],ast.BinOp) and isinstance(node.args[0].left,ast.Constant) and node.args[0].left.value=='compile-')
+  minio_line=next(node.lineno for node in calls if isinstance(node.func,ast.Attribute) and isinstance(node.func.value,ast.Name) and node.func.value.id=='builder' and node.func.attr=='build')
+  self.assertLess(cleanup_line,compile_line);self.assertLess(cleanup_line,minio_line)
   parent=run.module('ci/backend-runtime-join-r7/run.py','new_fullgraph_cleanup_original_audit')
   def events(targets,required):
    rows=[]
@@ -153,8 +159,11 @@ class FullGraphControls(unittest.TestCase):
      self.assertEqual(label,scope['label']);self.assertEqual(seconds,240);self.assertEqual(environment,{'GOPROXY':'off'})
      self.assertEqual(argv[:3],['/owned/go','test','-mod=readonly']);self.assertIn('-race',argv);self.assertIn('-timeout=180s',argv)
      self.assertEqual([word for word in argv if word.startswith('./')],['./'+pkg for pkg in scope['targets']])
-     pattern=__import__('re').compile(argv[argv.index('-run')+1]);self.assertTrue(all(pattern.fullmatch(top) for tops in scope['targets'].values() for top in tops))
-     self.assertTrue(all(pattern.fullmatch(top) is None for tops in run.GRAPH_TARGETS.values() for top in tops))
+     top_pattern,child_pattern=[__import__('re').compile(part) for part in argv[argv.index('-run')+1].split('/')]
+     self.assertTrue(all(top_pattern.fullmatch(top) for tops in scope['targets'].values() for top in tops))
+     self.assertTrue(all(child_pattern.fullmatch(child) for tops in scope['requiredSubtests'].values() for subs in tops.values() for child in subs))
+     self.assertTrue(all(top_pattern.fullmatch(top) is None for tops in run.GRAPH_TARGETS.values() for top in tops));self.assertIsNone(top_pattern.fullmatch(run.CLEANUP_REUSE['top']))
+     if label=='cleanup-ownedcontrol':self.assertIsNone(child_pattern.fullmatch('unbound_start_failure_only_waits_original_done'))
      rows=events(scope['targets'],scope['requiredSubtests'])
      if mode=='missing-child' and len(calls)==1:
       removed=next(row['Test'] for row in rows if row.get('Test') and '/' in row['Test']);rows=[row for row in rows if row.get('Test')!=removed]
@@ -164,10 +173,11 @@ class FullGraphControls(unittest.TestCase):
      with self.assertRaises(ValueError):run.run_cleanup_controls('/owned/go',{'GOPROXY':'off'},command,parent,out)
      self.assertFalse((out/'cleanup-names.json').exists());continue
     result=run.run_cleanup_controls('/owned/go',{'GOPROXY':'off'},command,parent,out)
-    self.assertEqual(calls,[scope['label'] for scope in run.CLEANUP_SCOPES]);self.assertEqual((result['topPASS'],result['subPASS']),(3,9))
+    self.assertEqual(calls,[scope['label'] for scope in run.CLEANUP_SCOPES]);self.assertEqual((result['topPASS'],result['subPASS']),(2,5))
     original_required={pkg:{top:run.GRAPH_CHILDREN[top] for top in tops} for pkg,tops in run.GRAPH_TARGETS.items()}
     original=parent.audit(events(run.GRAPH_TARGETS,original_required),0,run.GRAPH_TARGETS)
-    union=run.audit_target_union(original,result);self.assertEqual((union['topPASS'],union['subPASS']),(5,12))
+    union=run.audit_target_union(original,result);self.assertEqual((union['topPASS'],union['subPASS']),(4,8))
+    self.assertEqual(union['cleanupReuse']['source'],run.CLEANUP_REUSE['source']);self.assertEqual((union['cleanupReuse']['topPASS'],union['cleanupReuse']['subPASS']),(1,4));self.assertEqual(union['originalObligation'],{'topCount':5,'subCount':12,'crossSource':True})
     bad=copy.deepcopy(result);bad['namedCompletions'].pop()
     with self.assertRaises(ValueError):run.audit_target_union(original,bad)
     bad=copy.deepcopy(result);bad['namedCompletions'].append(bad['namedCompletions'][0])

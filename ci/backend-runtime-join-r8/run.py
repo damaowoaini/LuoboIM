@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact existing controller1 finite diagnostics; prior-source66+6+7+4+4 retained."""
+"""Exact bounded Capture repair5 in two processes; prior-source66+6+7+4 retained."""
 import argparse
 from collections import Counter
 from contextlib import contextmanager
@@ -9,11 +9,11 @@ import re, stat, subprocess, sys, time
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
-SCOPE = 'backend_history_controller1_finite_diagnostic_reuse_source_bound87_prior14_no_deployment'
+SCOPE = 'backend_history_capture_bounded_scope_repair5_split2_reuse83_prior14_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
-FINAL = {'members': 1556, 'digest': '3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc'}
+FINAL = {'members': 1556, 'digest': '6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
-SELECTION_SHA = 'e027f5e42844d67777ecd2ba446974f63b403f9533f8393b821cea78a6382e9c'
+SELECTION_SHA = '0a433ed0706953bbadb348c0841926d4dd672c36c8fdb3f1e48023741a61cf9d'
 RESOURCE = {'initialBytes': 4294967296, 'floorMiB': 1024, 'allocatedMiB': 16384, 'pollSeconds': .2, 'controllerSeconds': 3000, 'compileTotalSeconds': 1200, 'testPhaseSeconds': 2250, 'testGoTimeoutSeconds': 180}
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 
@@ -21,11 +21,11 @@ REUSE_PROOF_SHA = 'a2273b8d18c15fc98fb65317067d89584a44c4570b899e619672f6ea47826
 PENDING_POSITIVE = ('pkg/common/startrpc','TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence')
 PENDING_TOKEN = ('pkg/common/startrpc','TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit')
 PREVIOUS_REPAIR_PROOF_SHA = '096dadcfbd249cc64e36f90e0361a13577908e1fc1a778543a8cc4023b2fe543'
-REPAIR_DELTA_SHA = '313bc2aeeeb5937262f8968e88d0b327e9a3792f0f2f800d51152084a61e4eff'
+REPAIR_DELTA_SHA = 'b489b6266dfebfd281fe1aa36ac9c0385253cccd7618b585c181dfea0fbae1bc'
 DIRECT_PRIOR = {('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient')}
 DIRECT_CURRENT = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish')}
 LATEST_REPAIR_PROOF_SHA = '2b6e93f014f13bf8e0a7830b7b94f15b02149f78c24229066b03629c3bbae3ff'
-REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}]
+REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}, {'label': 'targeted-tests-ownedcontrol-default-fixture', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory', 'TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish']}}]
 LAST_CAPTURE_STAMP_PROOF_SHA = 'ecb9f9fc71be15e4a0571308d0650b29799522dff2a5be59e3463691aa4c81fc'
 PREVIOUS_SPLIT_REPAIR_PROOF_SHA = '3e74a2121b5d9bf45c01d0e9b6c58e26d10a8dbe208547c9b3aef9120892c585'
 DIRECT_CAPTURE_FIXTURE = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory')}
@@ -244,7 +244,7 @@ def check_repair(c, p):
     proof = p['acceptedPreviousRun']; current = p['previousRepairRun']; latest = p['latestRepairRun']; split = p['previousSplitRepairRun']; stamp = p['lastCaptureStampRun']
     old = {'members':1555,'digest':'686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
     before = {'members':1555,'digest':'68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
-    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_CONTROLLER1_FINITE_DIAGNOSTIC' or p.get('source') != c['source']
+    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_CAPTURE_BOUNDED_SCOPE_REPAIR5' or p.get('source') != c['source']
             or sha(canonical(proof)) != REUSE_PROOF_SHA or p['reuseProofSHA256'] != REUSE_PROOF_SHA
             or proof['source'] != old or proof['run'] != 39041607488 or proof['attempt'] != 1
             or proof['head'] != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
@@ -286,6 +286,12 @@ def check_repair(c, p):
             or p['currentMainBuilds'] != 0 or p['reusedMainBuilds'] != 14
             or p['newBinaries'] is not False or p['runtimeGraphAccepted'] is not False or p['fullRegression'] is not False):
         raise ValueError('actual source-bound evidence or repair-only boundary differs')
+    diagnostic_failure = p['previousControllerDiagnosticFailure']
+    if (diagnostic_failure['source'] != {'members':1556,'digest':'3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc'}
+            or (diagnostic_failure['run'],diagnostic_failure['job'],diagnostic_failure['actualTopPASS'],diagnostic_failure['actualTopFAIL']) != (39053886420,117457803226,0,1)
+            or diagnostic_failure['wholeAccepted'] is not False
+            or diagnostic_failure['rootReceipt']['sha256'] != 'c45d1f7f0793539712cf2d84697ee11ad10b7f75be40f6138350c14e31260e8c'):
+        raise ValueError('previous diagnostic failure cannot become new PASS evidence')
     universe = pairs(c['targets'])
     passed, failed = pairs(proof['passedTargets']), pairs(proof['failedTargets'])
     current_pass, current_fail, current_incomplete = pairs(current['passedTargets']), pairs(current['failedTargets']), pairs(current['incompleteTargets'])
@@ -308,24 +314,24 @@ def check_repair(c, p):
             or split_pass & split_fail or len(split_pass) != 4 or len(split_fail) != 1 or pairs(split['incompleteTargets'])
             or split_pass | split_fail != latest_fail or capture_direct & split_pass
             or not capture_direct <= (passed - old_direct) | (current_pass - current_direct) | latest_pass
-            or stamp_pass != capture_direct or stamp_fail != split_fail or active != stamp_fail or len(active) != 1
-            or reused != ((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass | stamp_pass or len(reused) != 87
+            or stamp_pass != capture_direct or stamp_fail != split_fail or active != stamp_fail | capture_direct or len(active) != 5
+            or reused != ((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass or len(reused) != 83
             or active & (reused | pending) or active | reused | pending != universe
             or pairs(p['pendingRequiredTokenTargets']) != {PENDING_TOKEN} or pairs(c['pendingTargets']) != {PENDING_TOKEN}
-            or p['sourceReuse'] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 66, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 6, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 7, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only'}, {'source': {'members': 1556, 'digest': 'bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85'}, 'run': 39052007811, 'retainedTopCount': 4, 'derivation': 'lastCaptureStampRun four default-fixture tops; diagnostics modify only separate composition test'}]):
-        raise ValueError('controller1/reuse66+6+7+4+4/positive1/required-token1 must retain exact original names')
+            or p['sourceReuse'] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 66, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 6, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 7, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only'}]):
+        raise ValueError('repair5/reuse66+6+7+4/default4-direct/positive1/required-token1 must retain exact original names')
     entries = proof['compiledEntries']
     if (entries['completed'] != 14 or entries['uploadedBinaries'] is not False or entries['executed'] is not False
             or [(r['role'],r['package']) for r in entries['entries']] != [(r['role'],r['package']) for r in c['entrypoints']]):
         raise ValueError('old fourteen actual distinct entry evidence differs')
-    if (len(p['sourceDelta']) != 1 or {r['target'] for r in p['sourceDelta']} != {'server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go'}
+    if (len(p['sourceDelta']) != 3 or {r['target'] for r in p['sourceDelta']} != {'server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go', 'server/internal/namespaceinventory/import_read_scope.go', 'server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go'}
             or p['sourceDeltaSHA256'] != REPAIR_DELTA_SHA or sha(canonical(p['sourceDelta'])) != REPAIR_DELTA_SHA):
-        raise ValueError('exact formatted one-test diagnostic source required')
+        raise ValueError('exact formatted Capture/error-preservation source3 required')
     if p['executionScopes'] != REPAIR_SCOPES:
-        raise ValueError('exact single controller diagnostic process scope required')
+        raise ValueError('exact controller1 and directly affected default4 scopes required')
     scoped = [pair for scope in REPAIR_SCOPES for pair in pairs(scope['targets'])]
-    if len(scoped) != 1 or len(set(scoped)) != 1 or set(scoped) != active:
-        raise ValueError('repair process scope must contain exactly the original failed controller')
+    if len(scoped) != 5 or len(set(scoped)) != 5 or set(scoped) != active:
+        raise ValueError('repair scopes must partition exact controller1 plus directly affected default4')
     overlay = {r['target']:r for r in c['overlay']}
     for row in p['sourceDelta']:
         now = overlay.get(row['target'])
@@ -431,14 +437,18 @@ def execute_repair_scopes(active, command, environment, output):
         except (ValueError, TypeError, KeyError, UnicodeError) as error:
             result = {'accepted':False,'exitCode':code,'originalRawRetained':True,
                       'exceptionType':type(error).__name__,'targets':scope['targets']}
-        # Extract even when Go/audit failed. A valid diagnostic never makes a failed test pass.
-        try:
-            diagnostic = {'accepted':True,'summary':extract_controller_diagnostic(events)}
-        except (ValueError,TypeError,KeyError,UnicodeError,AttributeError) as error:
-            diagnostic = {'accepted':False,'exceptionType':type(error).__name__}
-        write(folder/'controller-diagnostic.json',diagnostic)
-        result['diagnosticAccepted'] = diagnostic['accepted']
-        result['accepted'] = result['accepted'] and diagnostic['accepted']
+        # Only the original controller top emits this diagnostic. Its failure
+        # still exports the bounded summary; default4 has no marker obligation.
+        diagnostic_required = scope['label'] == 'targeted-tests-ownedcontrol-controller'
+        result['diagnosticRequired'] = diagnostic_required
+        if diagnostic_required:
+            try:
+                diagnostic = {'accepted':True,'summary':extract_controller_diagnostic(events)}
+            except (ValueError,TypeError,KeyError,UnicodeError,AttributeError) as error:
+                diagnostic = {'accepted':False,'exceptionType':type(error).__name__}
+            write(folder/'controller-diagnostic.json',diagnostic)
+            result['diagnosticAccepted'] = diagnostic['accepted']
+            result['accepted'] = result['accepted'] and diagnostic['accepted']
         result.update(label=scope['label'], stdoutSHA256=sha(raw), stdoutBytes=len(raw))
         write(folder/'result.json',result)
         results.append(result)
@@ -449,7 +459,7 @@ def execute_repair_scopes(active, command, environment, output):
              'subPASS':sum(result.get('subPASS',0) for result in results),
              'namedCompletions':[entry for result in results if result['accepted']
                                  for entry in result['namedCompletions']],
-             'allSelectedControllerAccepted':accepted,'originalRawRetained':True}
+             'allSelectedFiveAccepted':accepted,'originalRawRetained':True}
     write(output/'targeted-tests-union.json',union)
     return union
 
@@ -555,11 +565,11 @@ def run():
         testenv = dict(env, GOPROXY='off', GOSUMDB='off', **fixtures)
         write(output/'compiled-entries.json', {'completed': 0, 'currentEntryBuildReexecuted': False, 'reusedActual14BuildSource': repair['acceptedPreviousRun']['source'], 'reusedActual14BuildRun': repair['acceptedPreviousRun']['run'], 'uploadedBinaries': False, 'executed': False})
         result = execute_repair_scopes(active, command, testenv, output)
-    write(output / 'summary.json', {'state': 'controller1_finite_diagnostic_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 66, 'previousRepairTopPASSReused': 6, 'latestRepairTopPASSReused': 7, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 4, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
+    write(output / 'summary.json', {'state': 'capture_bounded_scope_repair5_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 66, 'previousRepairTopPASSReused': 6, 'latestRepairTopPASSReused': 7, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 0, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
     return 0 if result['accepted'] else 1
 
 if __name__ == '__main__':
     p=argparse.ArgumentParser(); p.add_argument('--verify',action='store_true'); a=p.parse_args()
     if a.verify:
-        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':1, 'retainedPriorSourceTop':66, 'retainedPreviousRepairSourceTop':6, 'retainedLatestRepairSourceTop':7, 'retainedPreviousSplitSourceTop':4,'retainedLastCaptureStampSourceTop':4,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
+        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':5, 'retainedPriorSourceTop':66, 'retainedPreviousRepairSourceTop':6, 'retainedLatestRepairSourceTop':7, 'retainedPreviousSplitSourceTop':4,'retainedLastCaptureStampSourceTop':0,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
     else: raise SystemExit(run())

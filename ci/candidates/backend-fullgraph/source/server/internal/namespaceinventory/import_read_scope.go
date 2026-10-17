@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 )
 
-// Only the exact synchronous StepRoots invocation receives this private
+// Only one synchronous bounded materializer operation receives this private
 // capability. It contains no parsed objects, raw bytes or authority grant.
 // Ordinary callers still perform every original fresh check.
 type workspaceReadScopeKey struct{}
@@ -42,7 +42,7 @@ func checkWorkspaceReadScope(ctx context.Context, w *ImportWorkspace) (bool, err
 }
 
 // WithSnapshotReadScope shares only the sealed snapshot metadata validation
-// within one synchronous StepRoots call. Every private object is still freshly
+// within one synchronous bounded internal call. Every private object is freshly
 // read/hash/strict decoded. Commit uses checkFresh at BOTH original boundaries,
 // and ImportSnapshot.ReadReference retains its own two fresh checks.
 // The context must not escape or be forked by the callback. A retained context

@@ -5,13 +5,14 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE={'members': 1573, 'digest': 'f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2'}  # Exact Root-reviewed formatted R3 source; execution remains manual-only.
+FINAL_SOURCE={'members': 1573, 'digest': '051a08e83860d54309c6cb63e204676a2afefc0caf43d02798da5475ca63aa5c'}  # Exact Root-reviewed formatted R3 source; execution remains manual-only.
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
 SCENARIOS=('reader-registered-cancel','reader-writer-fence-cancel','ack','redis-unknown')
 ROLES=('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth','rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user')
-CLEANUP_SCOPES=[{'label': 'cleanup-ownedcontrol', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths', 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['canonical-first', 'runtime-first', 'local-first', 'unbound_start_failure_only_waits_original_done'], 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit': ['unknown-middle-child-does-not-strand-later-original-owner', 'good-drains-retained-and-unknown-never-gets-a-join', 'repeat-Stop-does-not-renew-signal-or-erase-failure']}}}, {'label': 'cleanup-runtimeacceptance', 'targets': {'internal/runtimeacceptance': ['TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup']}, 'requiredSubtests': {'internal/runtimeacceptance': {'TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup': ['cancel-audit-before-stop', 'timeout-before-local-wait-complete']}}}]
+CLEANUP_SCOPES=[{'label': 'cleanup-ownedcontrol', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['canonical-first', 'runtime-first', 'local-first']}}}, {'label': 'cleanup-runtimeacceptance', 'targets': {'internal/runtimeacceptance': ['TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup']}, 'requiredSubtests': {'internal/runtimeacceptance': {'TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup': ['cancel-audit-before-stop', 'timeout-before-local-wait-complete']}}}]
+CLEANUP_REUSE={'run': 39053868483, 'head': 'ce7964a0c7aa474cbc83c32dd71c1bfcfb83cfec', 'source': {'members': 1573, 'digest': 'f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2'}, 'reviewSHA256': '48c619c7b7c19ad33b5bb5b9bfa38f655de918c01ad19a6784fed4d9ccc1efbf', 'package': 'internal/namespaceimport/ownedcontrol', 'top': 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit', 'subtests': {'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit': ['unknown-middle-child-does-not-strand-later-original-owner', 'good-drains-retained-and-unknown-never-gets-a-join', 'repeat-Stop-does-not-renew-signal-or-erase-failure'], 'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['unbound_start_failure_only_waits_original_done']}}
 GRAPH_TARGETS={'pkg/common/startrpc': ['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence', 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']}
 GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
 
@@ -55,7 +56,7 @@ def check_locked(c):
  if FINAL_SOURCE is None or c.get('state')!='FROZEN_FINAL_SOURCE' or c.get('source')!=FINAL_SOURCE or c.get('sourceReviewAccepted') is not True:raise ValueError('Root final formatted whole-source identity required; prepare-only cannot execute')
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
- if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN:raise ValueError('exact cleanup3/9 plus original graph2/3 selection required')
+ if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('cleanupReuse')!=CLEANUP_REUSE or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN:raise ValueError('exact fresh cleanup2/5 plus graph2/3 and prior-source cleanup1/4 required')
 def validate_entries(bodies,c):
     rows = c['entrypoints']
     if len(rows) != 14 or len({r['role'] for r in rows}) != 14 or len({r['package'] for r in rows}) != 14:
@@ -126,7 +127,8 @@ def run_cleanup_controls(go,environment,command,parent,out):
  results=[]
  for scope in CLEANUP_SCOPES:
   names=sorted(name for tops in scope['targets'].values() for name in tops)
-  pattern='^('+'|'.join(re.escape(name) for name in names)+')$'
+  children=sorted(child for tops in scope['requiredSubtests'].values() for subs in tops.values() for child in subs)
+  pattern='^('+'|'.join(re.escape(name) for name in names)+')$/^('+'|'.join(re.escape(child) for child in children)+')$'
   raw=command(scope['label'],[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run',pattern]+['./'+pkg for pkg in scope['targets']],240,environment)
   events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()]
   result=parent.audit(events,0,scope['targets'])
@@ -135,7 +137,7 @@ def run_cleanup_controls(go,environment,command,parent,out):
   if actual!=expected:raise ValueError('all actual cleanup descendants required')
   write(out/(scope['label']+'-names.json'),result);results.append(result)
  union={'topPASS':sum(row['topPASS'] for row in results),'subPASS':sum(row['subPASS'] for row in results),'namedCompletions':[name for row in results for name in row['namedCompletions']]}
- if (union['topPASS'],union['subPASS'])!=(3,9):raise ValueError('exact cleanup3top9sub required')
+ if (union['topPASS'],union['subPASS'])!=(2,5):raise ValueError('exact fresh cleanup2top5sub required')
  write(out/'cleanup-names.json',union)
  return union
 
@@ -146,8 +148,11 @@ def audit_target_union(original,cleanup):
  for scope in CLEANUP_SCOPES:
   expected|={(pkg,top) for pkg,tops in scope['targets'].items() for top in tops}
   expected|={(pkg,top+'/'+child) for pkg,tops in scope['requiredSubtests'].items() for top,subs in tops.items() for child in subs}
- if set(actual)!=expected or any(count!=1 for count in actual.values()) or len(expected)!=17:raise ValueError('exact graph2/3 and cleanup3/9 union required')
- return {'topPASS':5,'subPASS':12,'skip':0,'fail':0,'namedCompletions':[{'package':pkg,'name':name} for pkg,name in sorted(actual)]}
+ if set(actual)!=expected or any(count!=1 for count in actual.values()) or len(expected)!=12:raise ValueError('exact fresh graph2/3 and cleanup2/5 union required')
+ prior={(CLEANUP_REUSE['package'],CLEANUP_REUSE['top'])}
+ prior|={(CLEANUP_REUSE['package'],top+'/'+child) for top,subs in CLEANUP_REUSE['subtests'].items() for child in subs}
+ if actual.keys()&prior or len(prior)!=5 or len(expected|prior)!=17:raise ValueError('prior-source cleanup1/4 must be disjoint and complete')
+ return {'source':FINAL_SOURCE,'topPASS':4,'subPASS':8,'skip':0,'fail':0,'namedCompletions':[{'package':pkg,'name':name} for pkg,name in sorted(actual)],'cleanupReuse':dict(CLEANUP_REUSE,topPASS=1,subPASS=4,namedCompletions=[{'package':pkg,'name':name} for pkg,name in sorted(prior)]),'originalObligation':{'topCount':5,'subCount':12,'crossSource':True}}
 
 def public_cleanup(row):
  if row['version']!='owned-fullgraph-resource-cleanup-v1' or type(row['accepted']) is not bool or not re.fullmatch('[0-9a-f]{32}',row['nonce']) or any(not re.fullmatch('[0-9a-f]{64}',v) for v in row['exactContainerIDs']):raise ValueError('exact resource cleanup receipt required')
@@ -297,7 +302,9 @@ def run():
   tool_sha=sha(regular(Path(go).resolve()))
   if tool_sha!=tools['go']['sha256']:raise ValueError('Go command differs from observed original tool')
   command('app-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
-  offline=dict(env,GOPROXY='off',GOSUMDB='off');binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
+  offline=dict(env,GOPROXY='off',GOSUMDB='off')
+  cleanup_audit=run_cleanup_controls(go,offline,command,parent,out)
+  binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
   entries=[{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]+c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'}]
   for entry in entries:
    role=entry['role'];binary=binroot/role;remaining=1200-(time.monotonic()-build_start)
@@ -310,7 +317,6 @@ def run():
    write(out/('compiled-'+role+'.json'),{'role':role,'package':entry['package'],'source':FINAL_SOURCE,'bytes':len(raw),'sha256':sha(raw),'executed':False})
   builds={'version':'source-bound-fullgraph-builds-v1','sourceSHA256':FINAL_SOURCE['digest'],'binaries':[b for b in binaries if b['role'] in ROLES],'legacyMessageTransfer':next(b for b in binaries if b['role']=='msgtransfer-legacy')};buildpath=private/'builds.json';buildsha=write(buildpath,builds);operator=next(b['path'] for b in binaries if b['role']=='acceptance-operator')
   minio,receipt=builder.build(root,catalog,command,go,tool_sha,env);write(out/'source-minio-build.json',receipt)
-  cleanup_audit=run_cleanup_controls(go,offline,command,parent,out)
   for image in sorted(set(catalog['images'].values())):command('image-acquire-'+str(len(results))+'-'+sha(image.encode())[:10],['/usr/bin/docker','--host','unix:///var/run/docker.sock','pull','--platform','linux/amd64',image],600)
   for scenario in SCENARIOS:
    if c['resource']['controllerSeconds']-(time.monotonic()-started)<c['resource']['scenarioSeconds']+180:raise ValueError('complete operator-context plus original cleanup budget required before new plane')
@@ -353,7 +359,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':3,'cleanupSubPASS':9,'targetedTopPASS':5,'targetedSubPASS':12,'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':2,'cleanupSubPASS':5,'targetedTopPASS':4,'targetedSubPASS':8,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=1,subPASS=4),'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

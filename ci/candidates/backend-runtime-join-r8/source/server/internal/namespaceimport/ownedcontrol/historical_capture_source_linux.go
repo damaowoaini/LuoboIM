@@ -212,7 +212,10 @@ func (s *HistoricalCaptureSource) reviewLegacy(ctx context.Context) error {
 }
 func sourcePending() error { return errors.Join(namespaceimport.ErrPending, ErrCaptureProgressPending) }
 
-// Capture advances one real bounded unit. Its original raw session/cut/time is
+// Capture advances one real bounded unit. Internal metadata reads share only
+// one synchronous validation scope; commits/raw references remain independently
+// fresh. Joined failures must never be normalized to a plain Pending result.
+// Its original raw session/cut/time is
 // retained across pending calls. A result is returned only after canonical
 // bodies, all actual set closures/pages, roots and the signed inventory close.
 func (s *HistoricalCaptureSource) Capture(ctx context.Context, h namespaceimport.Header, f namespaceimport.FenceObservation) (namespaceimport.Inventory, error) {
@@ -225,7 +228,7 @@ func (s *HistoricalCaptureSource) Capture(ctx context.Context, h namespaceimport
 		return namespaceimport.Inventory{}, ErrOwnedEvidence
 	}
 	if e := s.openDerived(ctx, true); e != nil {
-		if errors.Is(e, ErrCaptureProgressPending) {
+		if e == ErrCaptureProgressPending {
 			return namespaceimport.Inventory{}, sourcePending()
 		}
 		return namespaceimport.Inventory{}, e
@@ -240,17 +243,23 @@ func (s *HistoricalCaptureSource) Capture(ctx context.Context, h namespaceimport
 	}
 	switch st.Phase {
 	case "raw", "reduce":
-		_, e = m.Step(ctx)
+		e = m.workspace.WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+			_, stepErr := m.Step(readCtx)
+			return stepErr
+		})
 	case "roots":
 		switch {
 		case strings.HasPrefix(st.Subcursor, "history-sources:"):
+			// Never pass the private metadata scope to an external producer/verifier.
 			_, e = m.StepOriginalHistorySegments(ctx, h, s.producer, s.verifier)
 		case st.Subcursor == "prepared" || strings.HasPrefix(st.Subcursor, "output-plan:"):
-			if st.Subcursor == "output-plan:complete" {
-				e = s.beginBodies(ctx)
-			} else {
-				_, e = m.StepOutputPlan(ctx, h)
-			}
+			e = m.workspace.WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+				if st.Subcursor == "output-plan:complete" {
+					return s.beginBodies(readCtx)
+				}
+				_, stepErr := m.StepOutputPlan(readCtx, h)
+				return stepErr
+			})
 		default:
 			// This capability belongs only to this synchronous StepRoots call.
 			// Actual commits and original raw references keep fresh boundaries.
@@ -260,17 +269,21 @@ func (s *HistoricalCaptureSource) Capture(ctx context.Context, h namespaceimport
 			})
 		}
 	case "pages":
-		e = s.stepBodies(ctx)
+		e = m.workspace.WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+			return s.stepBodies(readCtx)
+		})
 	case "complete":
-		i, e := s.finalInventory(ctx)
-		if e != nil {
-			return i, e
-		}
-		return i, nil
+		var i namespaceimport.Inventory
+		e = m.workspace.WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+			var stepErr error
+			i, stepErr = s.finalInventory(readCtx)
+			return stepErr
+		})
+		return i, e
 	default:
 		return namespaceimport.Inventory{}, ErrOwnedEvidence
 	}
-	if e != nil && !errors.Is(e, ErrCaptureProgressPending) {
+	if e != nil && e != ErrCaptureProgressPending {
 		return namespaceimport.Inventory{}, e
 	}
 	return namespaceimport.Inventory{}, sourcePending()
