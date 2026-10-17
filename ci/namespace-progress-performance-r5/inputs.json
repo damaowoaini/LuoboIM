@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "namespace_progress_performance_r5_1204_short6_20_then_large1_privateFS_BSON_noDB_no_runtime",
+  "scope": "namespace_progress_performance_r6_1204_failed3_13_then_large1_privateFS_BSON_noDB_no_runtime",
   "parentRunner": {
     "path": "ci/namespace-progress-performance-r4/run.py",
     "bytes": 17775,
@@ -16,9 +16,9 @@
   "parentCount": 1203,
   "parentDigest": "2134b7ddbb9202f85878d665ac4f44ca3566d757fe51b2941d9f48796af42465",
   "effectiveCount": 1204,
-  "effectiveDigest": "5c1e62df1876f797228f36a260fb3e1c09a0c4a073af7b98b1faaa367370ccb8",
+  "effectiveDigest": "3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e",
   "effectiveDigestAlgorithm": "ascending UTF8(path)+NUL+ASCII SHA256+LF then SHA256",
-  "sourceModeSource": "verified parent1203 modes plus exact overlay3 mode0644",
+  "sourceModeSource": "verified parent1203 modes plus exact overlay4 mode0644",
   "overlay": [
     {
       "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_capture.go",
@@ -43,13 +43,21 @@
       "mode": "0o644",
       "target": "server/internal/namespaceinventory/progress_metadata_test.go",
       "beforeSHA256": null
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_page_memo_test.go",
+      "bytes": 6213,
+      "sha256": "03da3065aefee57c1fd2a4f106f3c4146075c0ad1ffd3ef3a0db4f3199f1ecf6",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_page_memo_test.go",
+      "beforeSHA256": "0632abe9506c1cb1beac83dceff7a9d7ca0605ba4e249a3c267a3657ec75afd2"
     }
   ],
   "dependencies": [
     {
       "path": ".github/workflows/namespace-progress-performance-r5-targeted.yml",
-      "bytes": 1669,
-      "sha256": "aebe09cdccf04f52b65ffa4947db592bec99d1da0ccb7667d5bfab025b1a9209",
+      "bytes": 1678,
+      "sha256": "7a95fdbcda9cfa8d7aed2e4033800978d393627672edc2964b71405d67bec287",
       "mode": 420
     },
     {
@@ -66,25 +74,22 @@
     },
     {
       "path": "ci/namespace-progress-performance-r5/run.py",
-      "bytes": 17246,
-      "sha256": "39d7d6113c0f50a7738049b93f3d80905c5e9eb54cced129144b44c23ec6a736",
+      "bytes": 18574,
+      "sha256": "88e8a530053b8e89d132536d664e665e8d4839bfe12a2413369e2f19532c9ca8",
       "mode": 420
     },
     {
       "path": "ci/namespace-progress-performance-r5/test_run.py",
-      "bytes": 9044,
-      "sha256": "947e0eca1dc2ca1b9c93bf4cc1e7cd4d9e4005b15a8c1705ca60ed457a2568f7",
+      "bytes": 9937,
+      "sha256": "c309ae93d67dd57be07ee7749a7011217c850168339c1d79aeb18d676e166df1",
       "mode": 420
     }
   ],
   "phases": {
     "short": {
       "tops": [
-        "TestNamespaceProgressContinuesAcrossEveryStage",
-        "TestNamespaceProgressImportsOldPrefixWithoutRescanning",
         "TestNamespaceProgressMemoKeepsCustody",
         "TestNamespaceProgressMetadataLookupOncePerReference",
-        "TestNamespaceProgressRejectsUnboundDerivedState",
         "TestNamespaceProgressResolvedMetadataRetainsBindings"
       ],
       "subs": [
@@ -98,13 +103,6 @@
         "TestNamespaceProgressMemoKeepsCustody/strict-redecode",
         "TestNamespaceProgressMetadataLookupOncePerReference/checked-row",
         "TestNamespaceProgressMetadataLookupOncePerReference/summary-seen",
-        "TestNamespaceProgressRejectsUnboundDerivedState/cancelled",
-        "TestNamespaceProgressRejectsUnboundDerivedState/index-tamper",
-        "TestNamespaceProgressRejectsUnboundDerivedState/partial-head",
-        "TestNamespaceProgressRejectsUnboundDerivedState/raw-tamper",
-        "TestNamespaceProgressRejectsUnboundDerivedState/restart",
-        "TestNamespaceProgressRejectsUnboundDerivedState/valid-hash-foreign-reference",
-        "TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint",
         "TestNamespaceProgressResolvedMetadataRetainsBindings/number-and-row",
         "TestNamespaceProgressResolvedMetadataRetainsBindings/pass-and-metaSHA",
         "TestNamespaceProgressResolvedMetadataRetainsBindings/private-page-and-row"
@@ -185,8 +183,8 @@
   },
   "expected": {
     "short": {
-      "topPASS": 6,
-      "subPASS": 20
+      "topPASS": 3,
+      "subPASS": 13
     },
     "large": {
       "topPASS": 1,
@@ -200,19 +198,26 @@
   },
   "history": {
     "parent1203SourceOnly": true,
-    "oldRun": 38997758491,
-    "oldActual": "new4/6 and affectedold3/6 passed; Large package600.019s timeout; remaining3top37sub not started",
-    "oldCheckpoint4_6": "historical R4 evidence only; unchanged checkpoint logic, not an R5 run",
+    "oldRun": 39000056079,
+    "oldActual": "short original3top6sub and new legacy-checkpoint1sub passed; failed13sub stopped in shared fixture; Large unstarted",
+    "reusedOriginalPassedTops": [
+      "TestNamespaceProgressContinuesAcrossEveryStage",
+      "TestNamespaceProgressImportsOldPrefixWithoutRescanning",
+      "TestNamespaceProgressRejectsUnboundDerivedState"
+    ],
+    "reusedPassedSub": "TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint",
+    "oldCheckpoint4_6": "historical R4 evidence only; unchanged checkpoint logic, not a fixture-R1 run",
     "unselectedOriginal": "strictJSON26 and classifier3 are not fresh passes here",
-    "R5GoTestsAtPreparation": 0
+    "fixtureR1GoTestsAtPreparation": 0
   },
   "origin": {
-    "sourceManifestSHA256": "061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40",
+    "originalR5SourceManifestSHA256": "061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40",
     "GoFormatAtPreparation": 0,
     "rootGofmtBeforeAdoptionRequired": true,
     "GoTestsAtPreparation": 0,
-    "lineage": "immutable R4.verify source1203 -> exactly2modified1new -> source1204",
-    "original11top49subBodiesPreserved": true,
+    "lineage": "immutable R4.verify source1203 -> R5 product2/test1 unchanged plus exact shared-fixture one-byte fix -> source1204",
+    "original11top49subNamesAssertionsPreserved": true,
+    "onlySharedFixtureSteps1to2": true,
     "original10001_and_600s_preserved": true
   },
   "notDeployable": true

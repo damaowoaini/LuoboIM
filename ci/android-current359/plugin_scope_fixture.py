@@ -12,7 +12,7 @@ import rich_current as rich
 import rich_fixture as old_fixture
 import support as s
 
-RESOLVER_SHA = 'f39e063249a2175412b2ca412900a59a67cef30410ecf0e48c5d66c3372dd6c5'
+RESOLVER_SHA = 'b0a4a11f2e4a1b49d4a2e84aabfb0daa9ba1f34929a6d0ffa372139978ea0cbb'
 START = 'def richPersist = '
 END = 'def richWrite = '
 MARKER = 'LUOBO_PLUGIN_WRITER_RETURNED '

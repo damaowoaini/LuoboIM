@@ -215,7 +215,7 @@
     {
       "bytes": 11062,
       "path": "ci/android-current359/plugin_scope_fixture.py",
-      "sha256": "9e0e360ef8e986d01e271b045fd45e91e491c9f67a9d8caecbc5be1e3e931fad"
+      "sha256": "efaa8c14fc17e58490d94f0f03e158704d86e0e81d7c4a30630d21bbc867ca19"
     },
     {
       "bytes": 1384,
@@ -228,9 +228,9 @@
       "sha256": "25699bc89f48b00bbe58e40d7bbe8a103358015e60b0c874ca0a5ee0eebe290b"
     },
     {
-      "bytes": 42467,
+      "bytes": 44288,
       "path": "ci/android-current359/resolve.gradle",
-      "sha256": "f39e063249a2175412b2ca412900a59a67cef30410ecf0e48c5d66c3372dd6c5"
+      "sha256": "b0a4a11f2e4a1b49d4a2e84aabfb0daa9ba1f34929a6d0ffa372139978ea0cbb"
     },
     {
       "bytes": 71217,
@@ -253,9 +253,9 @@
       "sha256": "1891d2bd53015f387bb08d6ae244d63c56dba31a8f6804b1058e14dd581ec851"
     },
     {
-      "bytes": 14840,
+      "bytes": 17575,
       "path": "ci/android-current359/test_identity.py",
-      "sha256": "e132604e42bd60db741593579cc3cc5c5b775955248139009b1ade235352663f"
+      "sha256": "fed1e271bf43c362801cc1acbb5990e8544b8525f99b235b10c201ffccdc4deb"
     },
     {
       "bytes": 6706,
@@ -263,7 +263,7 @@
       "sha256": "a13fb415c15df6939c521de76486edf3eaccdd41896a394ec8391ec21cd9ca41"
     }
   ],
-  "controller_revision": "null2-plugin-scope-v2-init-shadow-repair-stacktrace",
+  "controller_revision": "null2-plugin-scope-v2-init-shadow-stacktrace-component-refusal-diagnostic",
   "core_compatibility": {
     "Go_protocol_SDK_native_source_subset_exact": true,
     "new_App_Go_build_or_current_Go_version_claim": false,
@@ -363,7 +363,7 @@
     "fixture": {
       "bytes": 11062,
       "path": "ci/android-current359/plugin_scope_fixture.py",
-      "sha256": "9e0e360ef8e986d01e271b045fd45e91e491c9f67a9d8caecbc5be1e3e931fad"
+      "sha256": "efaa8c14fc17e58490d94f0f03e158704d86e0e81d7c4a30630d21bbc867ca19"
     },
     "mandatory_preseal_after_builtin_before_production_models": true,
     "owned_outputs_policy_unchanged": true,

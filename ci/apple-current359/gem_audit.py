@@ -11,6 +11,7 @@ import re
 import stat
 
 
+
 RUBY_COMMIT = '0581089df9f0af0fe6b64cb8167987c211100947'
 # gems/bundled_gems at that exact Ruby commit. This is not an arbitrary Cellar
 # exemption: even another gem/version in this Ruby tree remains unapproved.
@@ -48,6 +49,158 @@ def text(value, field, subject, maximum=4096):
 def values(value, field, subject, maximum):
     require(isinstance(value, list) and len(value) <= maximum, field, subject, 'bounded list required')
     return value
+
+
+BOOTSTRAP_CONFIG_KEYS = ('sitedir', 'sitelibdir', 'sitearchdir',
+               'vendordir', 'vendorlibdir', 'vendorarchdir')
+
+
+def _bootstrap_require(condition, reason):
+    if not condition:
+        raise ValueError(reason)
+
+
+def _bootstrap_identity(s):
+    return (s.st_dev, s.st_ino, s.st_mode, s.st_nlink, s.st_size,
+            s.st_uid, s.st_gid, s.st_mtime_ns, s.st_ctime_ns)
+
+
+BOOTSTRAP_CODES = frozenset(['configured-abi', 'configured-feature-alias', 'configured-feature-label-mismatch', 'configured-feature-not-bootstrap', 'configured-feature-not-rubygems-ruby', 'configured-feature-outside-library', 'configured-feature-path', 'configured-mappings-missing', 'configured-path-mapping-changed', 'configured-path-outside-selected-layout', 'configured-root-final-changed', 'configured-root-not-directory', 'configured-source-budget', 'configured-source-final-changed', 'configured-source-grew', 'configured-source-leaf', 'configured-source-open-changed', 'configured-source-parent', 'configured-source-read-changed', 'configured-user-root', 'selected-gem-layout', 'selected-owner-missing', 'selected-ruby-alias', 'selected-ruby-owner-changed'])
+
+
+def _bootstrap_reason(error):
+    return str(error) if type(error) is ValueError and str(error) in BOOTSTRAP_CODES else 'configured-source-io'
+
+
+class ConfiguredRubyGems:
+    def __init__(self, source, selected, home):
+        self.ruby = Path(selected['ruby']['path'])
+        self.owner = (selected['ruby'].get('uid'), selected['ruby'].get('gid'))
+        gem = Path(selected['gem_root'])
+        _bootstrap_require(gem.is_absolute() and gem.resolve(strict=True) == gem and
+                gem.name == '3.3.0' and gem.parent.name == 'gems', 'selected-gem-layout')
+        self.base = gem.parent.parent
+        self.home = Path(home).resolve(strict=True)
+        _bootstrap_require(not self.base.is_relative_to(self.home), 'configured-user-root')
+        c = source['config']
+        _bootstrap_require(c.get('ruby_version') == '3.3.0' and
+                re.fullmatch(r'[A-Za-z0-9_-]+', c.get('arch', '')) is not None,
+                'configured-abi')
+        self.expected = {}
+        for prefix, kind in [('site', 'site_ruby'), ('vendor', 'vendor_ruby')]:
+            directory = self.base/kind
+            library = directory/c['ruby_version']
+            self.expected.update({prefix+'dir': directory, prefix+'libdir': library,
+                                  prefix+'archdir': library/c['arch']})
+        self.config = {key: c.get(key) for key in BOOTSTRAP_CONFIG_KEYS}
+        self.maps = source.get('config_path_mappings')
+        _bootstrap_require(isinstance(self.maps, dict) and set(self.maps) == set(BOOTSTRAP_CONFIG_KEYS),
+                'configured-mappings-missing')
+        self.initial_maps = self.configured_paths()
+        self.library_roots = {self.expected[k] for k in
+                              ('sitelibdir', 'sitearchdir', 'vendorlibdir', 'vendorarchdir')}
+        self.files = {}
+        self.total = 0
+
+    def selected_owner(self):
+        _bootstrap_require(all(type(v) is int for v in self.owner), 'selected-owner-missing')
+        _bootstrap_require(self.ruby.is_absolute() and self.ruby.resolve(strict=True) == self.ruby,
+                'selected-ruby-alias')
+        s = self.ruby.lstat()
+        _bootstrap_require(stat.S_ISREG(s.st_mode) and (s.st_uid, s.st_gid) == self.owner,
+                'selected-ruby-owner-changed')
+
+    def configured_paths(self):
+        result = {}
+        for key in BOOTSTRAP_CONFIG_KEYS:
+            p = self.expected[key]
+            _bootstrap_require(self.config[key] == str(p) and p.resolve(strict=False) == p,
+                    'configured-path-outside-selected-layout')
+            exists = p.exists()
+            state = p.lstat() if exists else None
+            _bootstrap_require(not exists or stat.S_ISDIR(state.st_mode), 'configured-root-not-directory')
+            observed = {'lexical': str(p), 'canonical': str(p) if exists else None,
+                        'kind': 'directory' if exists else 'missing'}
+            _bootstrap_require(self.maps[key] == observed, 'configured-path-mapping-changed')
+            result[key] = {'mapping': observed, 'identity': _bootstrap_identity(state) if state else None}
+        return result
+
+    def observe(self, path):
+        self.selected_owner()
+        relative = path.relative_to(self.base)
+        descriptors, parents = [], []
+        try:
+            descriptor = os.open(self.base, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+            descriptors.append(descriptor)
+            here = self.base
+            for part in (None,)+relative.parts[:-1]:
+                if part is not None:
+                    descriptor = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+                                         dir_fd=descriptor)
+                    descriptors.append(descriptor)
+                    here = here/part
+                s = os.fstat(descriptor)
+                _bootstrap_require(stat.S_ISDIR(s.st_mode) and (s.st_uid, s.st_gid) == self.owner and
+                        not s.st_mode & 0o022, 'configured-source-parent')
+                parents.append((str(here), _bootstrap_identity(s)))
+            before = os.stat(relative.name, dir_fd=descriptor, follow_symlinks=False)
+            _bootstrap_require(stat.S_ISREG(before.st_mode) and before.st_nlink == 1 and
+                    (before.st_uid, before.st_gid) == self.owner and not before.st_mode & 0o022 and
+                    0 < before.st_size <= 4*1024**2, 'configured-source-leaf')
+            opened = os.open(relative.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK,
+                             dir_fd=descriptor)
+            descriptors.append(opened)
+            _bootstrap_require(_bootstrap_identity(os.fstat(opened)) == _bootstrap_identity(before), 'configured-source-open-changed')
+            h, count = hashlib.sha256(), 0
+            while chunk := os.read(opened, 1024**2):
+                count += len(chunk)
+                _bootstrap_require(count <= before.st_size, 'configured-source-grew')
+                h.update(chunk)
+            _bootstrap_require(count == before.st_size and _bootstrap_identity(os.fstat(opened)) == _bootstrap_identity(before) and
+                    _bootstrap_identity(os.stat(relative.name, dir_fd=descriptor, follow_symlinks=False)) == _bootstrap_identity(before) and
+                    path.resolve(strict=True) == path and _bootstrap_identity(path.lstat()) == _bootstrap_identity(before),
+                    'configured-source-read-changed')
+            return {'body': {'path': str(path), 'bytes': count, 'sha256': h.hexdigest(),
+                             'mode': stat.S_IMODE(before.st_mode)},
+                    'identity': _bootstrap_identity(before), 'parents': parents}
+        finally:
+            for descriptor in reversed(descriptors):
+                os.close(descriptor)
+
+    def admit(self, feature, load_path):
+        _bootstrap_require(feature.get('bootstrap') is True and isinstance(feature.get('paths'), list) and
+                len(feature['paths']) == 1, 'configured-feature-not-bootstrap')
+        _bootstrap_require(isinstance(feature['paths'][0], str) and 0 < len(feature['paths'][0]) <= 4096,
+                'configured-feature-path')
+        p = Path(feature['paths'][0])
+        _bootstrap_require(p.is_absolute() and '..' not in p.parts and p.resolve(strict=True) == p,
+                'configured-feature-alias')
+        matches = [root for root in self.library_roots if p.is_relative_to(root)]
+        _bootstrap_require(matches, 'configured-feature-outside-library')
+        root = max(matches, key=lambda value: len(value.parts))
+        relative = p.relative_to(root).as_posix()
+        _bootstrap_require(re.fullmatch(r'rubygems\.rb|rubygems/(?:[A-Za-z0-9_-]+/)*[A-Za-z0-9_-]+\.rb', relative)
+                is not None, 'configured-feature-not-rubygems-ruby')
+        label = feature.get('feature')
+        _bootstrap_require(isinstance(label, str) and (label == str(p) or
+                label == relative and str(root) in load_path), 'configured-feature-label-mismatch')
+        if str(p) not in self.files:
+            record = self.observe(p)
+            self.total += record['body']['bytes']
+            _bootstrap_require(len(self.files) < 128 and self.total <= 16*1024**2, 'configured-source-budget')
+            self.files[str(p)] = record
+        return self.files[str(p)]['body']
+
+    def finish(self):
+        if self.files:
+            self.selected_owner()
+        _bootstrap_require(self.configured_paths() == self.initial_maps, 'configured-root-final-changed')
+        for value, before in self.files.items():
+            _bootstrap_require(self.observe(Path(value)) == before, 'configured-source-final-changed')
+        return {'configuration_paths': self.initial_maps, 'sources': sorted(self.files.values(),
+                key=lambda row: row['body']['path']), 'loaded_body_count': len(self.files),
+                'no_directory_wide_grant': True, 'first_observation_not_official_content_proof': True,
+                'final_owner_parents_FD_path_body_rechecked': True}
 
 
 def audit(source, selected, home, config_pin):
@@ -289,12 +442,16 @@ def audit(source, selected, home, config_pin):
     require(path(source.get('gem_dir'), 'gem_dir', 'RubyGems') == gem_root and
             [path(v, 'gem_path', 'RubyGems') for v in values(source.get('gem_path'), 'gem_path', 'RubyGems', 4)] == [gem_root],
             'gem_path', 'RubyGems', 'selected system GEM_HOME/PATH only')
-    # Homebrew deliberately does not create site/vendor search dirs on install.
-    # Admit only these finite metadata entries; actual loaded files still need
-    # the two selected source roots, never a general Homebrew or user exception.
-    search_only = {Path('/opt/homebrew/lib/ruby')/kind/suffix
-                   for kind in ('site_ruby', 'vendor_ruby')
-                   for suffix in ('', '3.3.0', '3.3.0/'+config['arch'], config['arch'])}
+    # Six paths come from this selected Ruby's actual RbConfig and mappings.
+    # Only finite search metadata is admitted here; loaded bodies require the
+    # independent bootstrap RubyGems class and source-level checks below.
+    try:
+        configured = ConfiguredRubyGems(source, selected, home)
+    except (ValueError, OSError, RuntimeError) as error:
+        reason = _bootstrap_reason(error)
+        raise AuditFailure('configured_rubygems', 'RbConfig', reason) from error
+    search_only = set(configured.expected.values()) | {
+        configured.expected[key]/config['arch'] for key in ('sitedir', 'vendordir')}
     for value in values(source.get('load_path'), 'load_path', 'runtime', 128):
         p = Path(text(value, 'load_path', 'runtime'))
         require(p.is_absolute() and '..' not in p.parts, 'load_path', 'runtime', 'absolute search path required')
@@ -412,6 +569,16 @@ def audit(source, selected, home, config_pin):
                              'body_binding': [binary['sha256'], libruby['sha256']]})
             continue
         require(len(paths) == 1, 'feature.paths', label, 'one real loaded source required; unknown marker refused')
+        if (not any(Path(paths[0]).is_relative_to(root) for root in roots) and
+                any(Path(paths[0]).is_relative_to(root) for root in configured.library_roots)):
+            try:
+                loaded = configured.admit(feature, source['load_path'])
+            except (ValueError, OSError, RuntimeError) as error:
+                reason = _bootstrap_reason(error)
+                raise AuditFailure('configured_rubygems', label, reason) from error
+            features.append({'feature': label, 'kind': 'filesystem',
+                             'owner': 'selected_Ruby_configured_bootstrap_RubyGems', 'body': loaded})
+            continue
         p = path(paths[0], 'feature.paths', label)
         if Path(label).is_absolute():
             require(path(label, 'feature', label) == p, 'feature', label, 'reported file differs')
@@ -464,10 +631,20 @@ def audit(source, selected, home, config_pin):
     for entry, source_root, full_name, subject, observed in checked_leaf_aliases:
         require(leaf_alias(entry, source_root, full_name, subject, remember=False) == observed,
                 'source_alias.mapping', subject, 'leaf alias/body/parent identity changed during audit')
-    return {'schema': 5, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
+    try:
+        configured_proof = configured.finish()
+    except (ValueError, OSError, RuntimeError) as error:
+        reason = _bootstrap_reason(error)
+        raise AuditFailure('configured_rubygems', 'final_recheck', reason) from error
+    configured_bodies = [row['body'] for row in configured_proof['sources']]
+    require(total + sum(row['bytes'] for row in configured_bodies) <= 256*1024**2 and
+            len(bodies) + len(configured_bodies) < 20000,
+            'configured_rubygems', 'budget', 'source observation budget')
+    return {'schema': 6, 'ruby': source['ruby'], 'rubygems_observed': source['rubygems'],
+            'configured_bootstrap_RubyGems': configured_proof,
             'ruby_binary': binary, 'configured_shared_libruby': libruby,
             'libruby_scope': 'RbConfig selected library body; not a dyld process-map claim',
             'config': config, 'gems': specs, 'loaded_features': features,
-            'source_bodies': sorted(bodies.values(), key=lambda r: r['path']),
+            'source_bodies': sorted(list(bodies.values()) + configured_bodies, key=lambda r: r['path']),
             'preinstalled_source_first_observation': True, 'source_provenance_Root_acceptance': False,
             'scope': 'loaded Ruby/extension/spec bodies plus regular-gem Ruby trees; not arbitrary native transitive dylibs or App acceptance'}

@@ -53,7 +53,7 @@ class GemSourceAudit(unittest.TestCase):
                 'target_gem': target_gem, 'base': base}
 
     def fixture(self, root):
-        ruby_root, gem_root, home = root/'ruby', root/'system-gems', root/'real-home'
+        ruby_root, gem_root, home = root/'ruby', root/'system/lib/ruby/gems/3.3.0', root/'real-home'
         home.mkdir()
         def put(path, data=b'# actual source\n'):
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -103,6 +103,13 @@ class GemSourceAudit(unittest.TestCase):
                   'default_specifications_dir': str(default_specs),
                   'load_path': [str(stdlib), str(arch)]+[g['full_require_paths'][0] for g in gems if not g['default']],
                   'gems': gems, 'features': features}
+        for prefix, kind in [('site', 'site_ruby'), ('vendor', 'vendor_ruby')]:
+            directory = gem_root.parent.parent/kind
+            source['config'].update({prefix+'dir': str(directory),
+                                     prefix+'libdir': str(directory/'3.3.0'),
+                                     prefix+'archdir': str(directory/'3.3.0/arm64-darwin')})
+        source['config_path_mappings'] = {key: self.observed_path(source['config'][key])
+                                         for key in gem_audit.BOOTSTRAP_CONFIG_KEYS}
         pin = {'bytes': config.stat().st_size, 'sha256': hashlib.sha256(config.read_bytes()).hexdigest()}
         self.refresh_maps(source)
         return source, selected, home, pin
@@ -231,7 +238,7 @@ class GemSourceAudit(unittest.TestCase):
             self.assertFalse(proof['source_provenance_Root_acceptance'])
             self.assertTrue(all(g['spec_body']['sha256'] for g in proof['gems']))
             self.assertTrue(all(g['ruby_sources'] for g in proof['gems'] if not g['default']))
-            source['load_path'].append('/opt/homebrew/lib/ruby/site_ruby/3.3.0')
+            source['load_path'].append(source['config']['sitelibdir'])
             # Real relative file and native extension paths remain sources, not marker exceptions.
             source['features'][2]['feature'] = 'rbconfig.rb'
             extension = Path(selected['gem_root'])/'extensions/arm64-darwin/3.3.0/cocoapods-core-1.17.0'

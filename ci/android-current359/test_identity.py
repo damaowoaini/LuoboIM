@@ -1,5 +1,6 @@
 """Only directly affected source/core/consumer guards; no native tool invocation."""
 import copy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -188,6 +189,39 @@ class Current359(unittest.TestCase):
                     self.assertEqual([x['postreturn_markers']for x in summary['cases']],[4,2,2])
                     self.assertEqual(events[-1],'verify')
                 else:self.assertEqual(len(checks),1 if fault=='checker'else 0)
+
+    def test_component_refusal_diagnostics_bind_context_without_relaxing_component_or_writer_admission(self):
+        # Static source-contract guard, not a Groovy compile or runtime claim.
+        text=(HERE/'resolve.gradle').read_text()
+        prefix=text[:text.index('def selectorIdentity = ')]
+        self.assertEqual(hashlib.sha256(prefix.encode()).hexdigest(),'4cfbb4c5ccc8da2b68c1eae45de77d31ae575b8c7bf3d7943760fc99f60bd484')
+        body=text.split('def componentIdentity = { component,p,c,String role ->\n',1)[1].split('\ngradle.beforeSettings',1)[0]
+        accepted=body.split('    // Diagnostic-only;',1)[0]
+        self.assertEqual(hashlib.sha256(accepted.encode()).hexdigest(),'782366408a433075377b35ec0b2e9fe9acd40eac487a04fa7981a187f796325e')
+        self.assertTrue(body.endswith("    componentRefusalDiagnostic(component,p,c,role)\n    throw new GradleException('unknown selected component identifier refused')\n}"))
+        self.assertEqual(body.count('return '),2)
+        for expression in ["componentIdentity(edge.selected.id,p,c,'edge.selected')",
+                "componentIdentity(edge.from.id,p,c,'edge.from')",
+                "componentIdentity(component,p,c,'artifact')"]:
+            with self.subTest(call=expression):self.assertEqual(text.count(expression),1)
+        self.assertEqual(text.count('componentIdentity('),3)
+        diagnostic=text.split('// Refusal diagnostics only:',1)[1].split('def componentIdentity = ',1)[0]
+        for fragment in ['value.toString().take(limit).replaceAll(',
+                'project:componentRefusalText(p.path,256)',
+                'configuration:componentRefusalText(c.name,256)',
+                'component_class:componentRefusalText(component.getClass().name,256)',
+                'display_name:componentRefusalText(component.displayName,512)',
+                'c.incoming.resolutionResult.rootComponent.get().id',
+                'detail.same_resolution_root = (component == resolutionRoot)',
+                'same_resolution_root:null', "resolution_root_status:'unavailable'",
+                'JsonOutput.toJson(detail)', 'encoded.length() > 8192',
+                "logger.lifecycle('LUOBO_COMPONENT_IDENTITY_REFUSAL ' + encoded)",
+                'catch (Throwable unavailableDiagnostic)', 'catch (Throwable unavailableLogger)']:
+            with self.subTest(fragment=fragment):self.assertIn(fragment,diagnostic)
+        self.assertIn(r'/[\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u2028-\u202e\u2066-\u2069]/',diagnostic)
+        self.assertNotIn('.message',diagnostic)
+        self.assertEqual(hashlib.sha256(r.plugin_scope_fixture.writer_bytes(HERE)).hexdigest(),'edb7753928b27ef2d6dd8a51fb0822554563f9bcdf3a8b63cd98fbe85786008e')
+
 
 
 if __name__=='__main__':unittest.main()

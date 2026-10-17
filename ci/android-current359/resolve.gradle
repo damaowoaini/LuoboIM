@@ -443,7 +443,34 @@ def selectorIdentity = { selector ->
     }
     throw new GradleException('unknown requested component selector refused')
 }
-def componentIdentity = { component ->
+// Refusal diagnostics only: these values never grant component admission.
+def componentRefusalText = { value,int limit ->
+    if (value == null) return null
+    value.toString().take(limit).replaceAll(/[\u0000-\u001f\u007f-\u009f\u061c\u200e\u200f\u2028-\u202e\u2066-\u2069]/,'?')
+}
+def componentRefusalDiagnostic = { component,p,c,String role ->
+    try {
+        def detail = [schema:1, role:role,
+            project:componentRefusalText(p.path,256),
+            configuration:componentRefusalText(c.name,256),
+            component_class:componentRefusalText(component.getClass().name,256),
+            display_name:componentRefusalText(component.displayName,512),
+            same_resolution_root:null, resolution_root_status:'unavailable']
+        try {
+            def resolutionRoot = c.incoming.resolutionResult.rootComponent.get().id
+            detail.same_resolution_root = (component == resolutionRoot)
+            detail.resolution_root_status = 'observed'
+        } catch (Throwable unavailableRoot) { /* no guessed root or admission fallback */ }
+        def encoded = JsonOutput.toJson(detail)
+        if (encoded.length() > 8192) throw new GradleException('bounded component diagnostic required')
+        logger.lifecycle('LUOBO_COMPONENT_IDENTITY_REFUSAL ' + encoded)
+    } catch (Throwable unavailableDiagnostic) {
+        // Do not print exception messages/paths or replace the original refusal.
+        try { logger.lifecycle('LUOBO_COMPONENT_IDENTITY_REFUSAL {"schema":1,"diagnostic":"unavailable"}') }
+        catch (Throwable unavailableLogger) { /* original refusal still follows */ }
+    }
+}
+def componentIdentity = { component,p,c,String role ->
     if (component instanceof ProjectComponentIdentifier) {
         return [kind:'project', identity:component.displayName, buildTreePath:component.buildTreePath,
                 projectPath:component.projectPath]
@@ -453,6 +480,8 @@ def componentIdentity = { component ->
         return [kind:'module', identity:component.displayName, group:component.group,
                 module:component.module, version:component.version]
     }
+    // Diagnostic-only; known component branches and original refusal stay intact.
+    componentRefusalDiagnostic(component,p,c,role)
     throw new GradleException('unknown selected component identifier refused')
 }
 gradle.beforeSettings { s ->
@@ -525,9 +554,9 @@ gradle.projectsEvaluated {
                             if (!(edge instanceof ResolvedDependencyResult)) {
                                 throw new GradleException('unknown dependency result refused: ' + requested.identity)
                             }
-                            def selected = componentIdentity(edge.selected.id)
+                            def selected = componentIdentity(edge.selected.id,p,c,'edge.selected')
                             selections.add([project:p.path, configuration:c.name,
-                                    from:componentIdentity(edge.from.id), requested:requested,
+                                    from:componentIdentity(edge.from.id,p,c,'edge.from'), requested:requested,
                                     selected:selected])
                             if (edge.selected.id instanceof ProjectComponentIdentifier) {
                                 rows.add([project:p.path, configuration:c.name,
@@ -567,7 +596,7 @@ gradle.projectsEvaluated {
                                     path:file.path, bytes:file.bytes, sha256:file.sha256])
                                 return
                             }
-                            def selected = componentIdentity(component)
+                            def selected = componentIdentity(component,p,c,'artifact')
                             if (!f.isFile()) throw new GradleException('resolved external artifact missing')
                             def h = MessageDigest.getInstance('SHA-256')
                             f.withInputStream { stream ->

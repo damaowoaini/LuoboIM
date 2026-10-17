@@ -33,11 +33,14 @@ specs = Gem.loaded_specs.values.map do |spec|
     }
   }
 end
-config_keys = %w[prefix bindir libdir rubylibdir rubyarchdir ruby_version arch DLEXT ENABLE_SHARED LIBRUBY_SO]
+config_keys = %w[prefix bindir libdir rubylibdir rubyarchdir ruby_version arch DLEXT ENABLE_SHARED LIBRUBY_SO sitedir sitelibdir sitearchdir vendordir vendorlibdir vendorarchdir]
 observation = {
   'schema' => 2, 'ruby' => RUBY_VERSION, 'rubygems' => Gem::VERSION,
   'ruby_binary' => RbConfig.ruby,
   'config' => config_keys.to_h { |key| [key, RbConfig::CONFIG.fetch(key)] },
+  'config_path_mappings' => %w[sitedir sitelibdir sitearchdir vendordir vendorlibdir vendorarchdir].to_h do |key|
+    [key, observed_path(RbConfig::CONFIG.fetch(key))]
+  end,
   'gem_dir' => Gem.dir, 'gem_path' => Gem.path, 'default_dir' => Gem.default_dir,
   'default_specifications_dir' => Gem.default_specifications_dir,
   'load_path' => $LOAD_PATH.dup, 'gems' => specs
