@@ -1,0 +1,31 @@
+//go:build darwin || linux
+
+package ownedcontrol
+
+// SourceObservation is not a successful drain and is never an exclusion permit.
+// It retains only counters for the exact original owner whose writes may remain
+// unconfirmed. No command/reply/body/connection/error text enters this record.
+type SourceObservation struct {
+	Version                  string `json:"version"`
+	Role                     string `json:"role"`
+	InstanceID               string `json:"instanceID"`
+	BootstrapSHA256          string `json:"bootstrapSHA256"`
+	PolicySHA256             string `json:"policySHA256"`
+	SourceOutcomeUnconfirmed bool   `json:"sourceOutcomeUnconfirmed"`
+	Started                  uint64 `json:"started"`
+	Succeeded                uint64 `json:"succeeded"`
+	Failed                   uint64 `json:"failed"`
+	InFlight                 int    `json:"inFlight"`
+	Overflow                 bool   `json:"overflow"`
+}
+
+func WriteServerSourceObservation(path, nonce string, value SourceObservation) (string, error) {
+	if !isSHA(nonce) || value.Version != "owned-server-source-unconfirmed-v1" || value.Role != "api" || !uuidPattern.MatchString(value.InstanceID) || !isSHA(value.BootstrapSHA256) || !isSHA(value.PolicySHA256) || !value.SourceOutcomeUnconfirmed || value.InFlight < 0 || value.InFlight > 1024 {
+		return "", ErrOwnedEvidence
+	}
+	return writeServerEnvelope(path, struct {
+		Schema      int               `json:"schema"`
+		OwnerNonce  string            `json:"ownerNonce"`
+		Observation SourceObservation `json:"observation"`
+	}{1, nonce, value})
+}

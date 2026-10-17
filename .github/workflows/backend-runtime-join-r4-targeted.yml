@@ -1,0 +1,79 @@
+name: Backend runtime join incremental 40 and actual role/API compile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-runtime-join-r4-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  targeted:
+    name: Source1358 / failed and unstarted plus new and directly affected tops / owned Mongo Redis
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOMAXPROCS: '2'
+      GOMEMLIMIT: 900MiB
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: New incremental selection controls and exact source only
+        run: |
+          python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
+          python3 -B ci/backend-runtime-join-r4/test_run.py
+          python3 -B ci/backend-runtime-join-r4/run.py --verify
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Initial disk floor before owned fixtures
+        run: |
+          python3 -B - <<'PYCODE'
+          import json, os
+          from pathlib import Path
+          fs = os.statvfs(os.environ['RUNNER_TEMP'])
+          free = fs.f_bavail * fs.f_frsize
+          Path('ci-results').mkdir(exist_ok=True)
+          record = {'freeBytes': free, 'minimumInitialBytes': 4 * 1024**3, 'accepted': free >= 4 * 1024**3}
+          with Path('ci-results/backend-runtime-join-r4-bootstrap.json').open('x') as out:
+              json.dump(record, out); out.write('\n'); out.flush(); os.fsync(out.fileno())
+          if not record['accepted']:
+              raise SystemExit('4GiB initial floor; no fixture started')
+          PYCODE
+      - name: Prepare exact owned ephemeral Mongo and Redis
+        run: |
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$GITHUB_WORKSPACE/ci-results/backend-runtime-join-r4-prepare.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/backend-runtime-join-r4-prepare.resource.json" \
+            --min-free-mib 1024 --timeout 600 --poll-interval .2 \
+            -- bash ci/backend-integration.sh prepare
+      - name: Compile actual role and API entries then single incremental Go race batch
+        run: python3 -B ci/backend-runtime-join-r4/run.py
+      - name: Always collect owned fixture residuals
+        if: always()
+        run: bash ci/backend-integration.sh collect
+      - name: Always remove exact run owned fixture containers
+        if: always()
+        run: bash ci/backend-integration.sh cleanup
+      - name: Preserve explicit public evidence
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: backend-runtime-join-r4-${{ github.run_id }}
+          path: |
+            ci-results/backend-runtime-join-r4/
+            ci-results/backend-runtime-join-r4-bootstrap.json
+            ci-results/backend-runtime-join-r4-prepare.log
+            ci-results/backend-runtime-join-r4-prepare.resource.json
+            ci-results/backend-integration/
+          if-no-files-found: warn
+          retention-days: 14

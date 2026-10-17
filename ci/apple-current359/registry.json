@@ -31,14 +31,14 @@
       "sha256": "088468334147bbf6d778a041eb352972c890b66155ad1fd4f1e035e31b9a60cf"
     },
     {
-      "bytes": 20508,
+      "bytes": 21140,
       "path": "ci/apple-current359/lane.json",
-      "sha256": "d40a3bbd9b23f25c9d8cba6a509505501d2fa558671009da043aef0f8f2977d3"
+      "sha256": "2e4e792fd1bfa2c503c987223d48ae9675297183b7911df1ffd1b7ba1c5e326a"
     },
     {
-      "bytes": 42451,
+      "bytes": 42734,
       "path": "ci/apple-current359/run.py",
-      "sha256": "778373180d790475f3cdca87a9ca490a9da7c36e9c544ee32f16322cf7d79393"
+      "sha256": "09e8e1e16177060cf0e58bc5c87066d4c80993047662f95dc0b4344b641f03c5"
     },
     {
       "bytes": 3474,
@@ -99,6 +99,16 @@
       "bytes": 5813,
       "path": "ci/apple-current359/test_xcrun_entry.py",
       "sha256": "042e17d654f2fab72ae0401c1d9f58a360d1656d17a945459996acc3b12b25ef"
+    },
+    {
+      "bytes": 3700,
+      "path": "ci/apple-current359/cache_resource.py",
+      "sha256": "757c95baac62e3ff114af25665db07d7315a535bdbb31a09ce78854cd029d541"
+    },
+    {
+      "bytes": 6594,
+      "path": "ci/apple-current359/test_cache_resource.py",
+      "sha256": "16d1d83c6fe7efddd45cf362bc8988e4677ca6b4e30f28bc68243c19673bb1ff"
     }
   ],
   "identity": "current359-null2-apple-native-resolution-v2",

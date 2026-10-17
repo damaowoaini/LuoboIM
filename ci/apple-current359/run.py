@@ -39,6 +39,7 @@ def borrowed_helper(row, name):
 
 
 xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 18619, 'sha256': '800db71aa4899636801f017c90c8e9cc9adbd39b5c295448c5c4cd36978996ca'}, 'current359_owned_xcrun_adapter')
+cache_resource = borrowed_helper({'path': 'ci/apple-current359/cache_resource.py', 'bytes': 3700, 'sha256': '757c95baac62e3ff114af25665db07d7315a535bdbb31a09ce78854cd029d541'}, 'current359_exact_cache_resource')
 
 packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes': 10141, 'sha256': '7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248'}, 'apple359_common_packaging')
 pod_selector = borrowed_helper({'path': 'ci/apple-current354/pod_selector.py', 'bytes': 5603, 'sha256': '820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769'}, 'apple359_reviewed117_selector')
@@ -684,7 +685,7 @@ def main():
                               sha(HERE/'lane.json'), os.environ.get('GITHUB_SHA'), spec['source_ref'])
         args = ['/usr/bin/sandbox-exec', '-f', str(q/'preflight.sb'), sys.executable, '-B',
                 str(HERE/'tool_preflight.py'), '--worker', str(q)]
-        code = guard.run(SimpleNamespace(command=args, cwd=q, log=work/'evidence/tool-preflight-raw.log',
+        code = cache_resource.run(guard, xcrun_adapter, q, SimpleNamespace(command=args, cwd=q, log=work/'evidence/tool-preflight-raw.log',
              record=work/'evidence/tool-preflight-resource.json', min_free_mib=1024, poll_interval=.2,
              allocated_root=q, max_allocated_mib=64, timeout=120,
              secondary_root=Path(xcrun_adapter.cache_boundary(q)['canonical']), secondary_cap_mib=64))
@@ -697,7 +698,7 @@ def main():
         if a.stage == 'preflight': return 0
     args = ['/usr/bin/sandbox-exec', '-f', str(work/(a.stage+'.sb')), sys.executable, '-B',
             str(HERE/'run.py'), '--identity', IDENTITY, '--stage', a.stage, '--work', str(work), '--worker']
-    code = guard.run(SimpleNamespace(command=args, cwd=work, log=work/(a.stage+'-raw.log'),
+    code = cache_resource.run(guard, xcrun_adapter, work, SimpleNamespace(command=args, cwd=work, log=work/(a.stage+'-raw.log'),
          record=work/(a.stage+'-resource.json'), min_free_mib=1024, poll_interval=.2,
          allocated_root=work, max_allocated_mib=16*1024, timeout=1800,
          secondary_root=Path(xcrun_adapter.cache_boundary(work)['canonical']), secondary_cap_mib=64))
