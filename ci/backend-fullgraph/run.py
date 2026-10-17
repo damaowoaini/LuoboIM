@@ -258,7 +258,7 @@ def run():
  primary=None
  try:
   tools=tool_snapshot();write(out/'tools-before.json',tools)
-  builder=module('ci/backend-fullgraph/minio_build.py','owned_minio_source_builder');resources=module('ci/backend-fullgraph/resources.py','owned_fullgraph_resources');selectors=module('ci/backend-fullgraph/selectors.py','owned_fullgraph_selectors')
+  builder=module('ci/backend-fullgraph/minio_build.py','owned_minio_source_builder');resources=module('ci/backend-fullgraph/resources.py','owned_fullgraph_resources');selectors=module('ci/backend-fullgraph/service_selectors.py','owned_fullgraph_selectors')
   command_index=0
   def command(label,argv,timeout,env=None,cwd=None):
    nonlocal command_index

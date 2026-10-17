@@ -42,8 +42,8 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 36132,
-      "sha256": "7746784c5685ce3951852a3632d412307b6265f3f9c75873220c0909a5f2980f"
+      "bytes": 36140,
+      "sha256": "8830c4641760b3c0da9825a1dd15d5e0cb9df4ad20289b0204bea266edc6eebc"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -66,7 +66,7 @@
       "sha256": "a9ac98690c116869099af8fb54f8d5b46c3c7da5d1280798c2c2a4ba067a4be2"
     },
     {
-      "path": "ci/backend-fullgraph/selectors.py",
+      "path": "ci/backend-fullgraph/service_selectors.py",
       "bytes": 2076,
       "sha256": "bb0b833b952529603c5c78e457b0434f0e258ca00a5bd190d755ca33ac1adc4e"
     },
