@@ -6,9 +6,9 @@
       "sha256": "0507891b1164d2873d2f9174568e59d66092e9e1c787bc25870e277c53485b35"
     },
     {
-      "bytes": 4658,
+      "bytes": 5933,
       "path": "ci/apple-current354/README.md",
-      "sha256": "0b91527ea4c61d98d001307585fae55e4cabf3a9d9cffefdc1b05e9e87e41d04"
+      "sha256": "c11939b914aa38c3d25e2a8ee90cc4d3d0b64fabb8cca56dc0a17dfbdcfefe4d"
     },
     {
       "bytes": 7874,
@@ -21,9 +21,9 @@
       "sha256": "24314720b46cd862069ed97c9e183fb6ad091e71abad3c4cba8fa20bd7b7ced2"
     },
     {
-      "bytes": 8395,
+      "bytes": 10642,
       "path": "ci/apple-current354/lane.json",
-      "sha256": "996975ee49a10b239db4452f341cb17d9dce89af5771f01ac970be4b0b75b699"
+      "sha256": "5921e84db03e266297b315abf34024b4f6886cc23ed81f803a00941db0179717"
     },
     {
       "bytes": 10141,
@@ -36,14 +36,14 @@
       "sha256": "794c22d92cd4052e7dee3299516843bc937e17ead88fed0638efd2a109fcdbea"
     },
     {
-      "bytes": 4915,
+      "bytes": 5603,
       "path": "ci/apple-current354/pod_selector.py",
-      "sha256": "4544e096b0d3d1c66c689497eea976994e062686aa1c6cfe04637021ce4f589e"
+      "sha256": "820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769"
     },
     {
-      "bytes": 32185,
+      "bytes": 33110,
       "path": "ci/apple-current354/run.py",
-      "sha256": "bd00b931ad3d80211d9fb19af4fba45733589f1792c968090abd6e3e72d86bdc"
+      "sha256": "2e55d18b5e6a20a7526e37735a064b56aaa6833a7468912f601369c15e2e1c57"
     },
     {
       "bytes": 6518,
@@ -51,9 +51,9 @@
       "sha256": "f88c9c29b46bae7230a04486c439fe0dc90b9b00e55ed11f1fe1a45ed3d0d36b"
     },
     {
-      "bytes": 3848,
+      "bytes": 5236,
       "path": "ci/apple-current354/test_pod_selector.py",
-      "sha256": "0f26daa287ec671c1d61ef36f6ab6ff127dbf16268a86d37642623db8683eb0d"
+      "sha256": "88c043df378d53820c4c35ec5d334fc674a84b8021390f682e01f015d27d6d82"
     }
   ],
   "identity": "current354-apple-native-resolution-v1",

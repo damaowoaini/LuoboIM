@@ -68,6 +68,27 @@ class PreinstalledPodSelection(unittest.TestCase):
                     else:
                         pod_selector.select(home, aliases, prefix)
 
+    def test_reviewed117_identity_rejects_same_version_replacements_and_legacy_version(self):
+        import copy
+        with tempfile.TemporaryDirectory() as name:
+            prefix, home, ruby, pod, aliases = self.fixture(Path(name).resolve())
+            proof = pod_selector.select(home, aliases, prefix)
+            wanted = {'version': '1.17.0', 'gem_root': proof['gem_root'],
+                      **{kind: {k: proof[kind][k] for k in ['path', 'bytes', 'sha256', 'mode']}
+                         for kind in ['script', 'ruby']}}
+            pod_selector.require_identity(proof, wanted)
+            for kind, key, value in [('script', 'sha256', '0' * 64),
+                                     ('ruby', 'path', '/unreviewed/ruby'),
+                                     ('ruby', 'mode', 0o777)]:
+                changed = copy.deepcopy(proof); changed[kind][key] = value
+                with self.subTest(kind=kind, key=key), self.assertRaises(ValueError):
+                    pod_selector.require_identity(changed, wanted)
+            for key, value in [('version', '1.16.2'), ('version', '>=1.17'),
+                               ('gem_root', str(home / '.gem'))]:
+                changed = copy.deepcopy(wanted); changed[key] = value
+                with self.subTest(field=key), self.assertRaises(ValueError):
+                    pod_selector.require_identity(proof, changed)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -4,7 +4,7 @@
 
 手动 workflow 只执行 `readonly → acquire → resolve`。获取段复用 R7 原始静态 core17 和 engine50，核原实际 bind/双锁证据；不执行 Go。独立 SDK shadow 只加入原 core17，保留原件，派生副本恰两份 framework Info.plist 的 MinimumOSVersion 从 100.0 改为 15.0，其他语义与所有静态二进制不变。该适配不代替 R7 Mach-O/R10 链接证据或 App 兼容验收。
 
-固定官方 Flutter3.47.7/tag+commit、engine、Dart3.13.5。首次获取完整工具缓存来源清单，不能称 hermetic。已验 Xcode16.4/16F6 实际工具18需同字节；CocoaPods1.16.2/Ruby/gem 来源在云首次观察并保留，不能预先称已接受。HOME 原值只读；XDG、CP_HOME_DIR/CP_CACHE_DIR/CP_REPOS_DIR、Pub/Clang/Swift 缓存都在 owned root。若宿主已有会覆盖 XDG 的 Flutter/Dart HOME 状态，拒绝而非挪 HOME。
+固定官方 Flutter3.47.7/tag+commit、engine、Dart3.13.5。首次获取完整工具缓存来源清单，不能称 hermetic。已验 Xcode16.4/16F6 实际工具18需同字节；CocoaPods1.17.0/Ruby/gem 来源在云首次观察并保留，不能预先称已接受。HOME 原值只读；XDG、CP_HOME_DIR/CP_CACHE_DIR/CP_REPOS_DIR、Pub/Clang/Swift 缓存都在 owned root。若宿主已有会覆盖 XDG 的 Flutter/Dart HOME 状态，拒绝而非挪 HOME。
 
 当前工程已经接入 SPM。使用固定 Flutter 的 `build ios --debug --no-codesign --no-pub --config-only --target=lib/main.dart`：官方控制流先真实取 SPM、生成包、安装 fallback Pods，再在实际 App build 前返回。保留真实 Podfile.lock、可能存在的 Package.resolved、完整生成 Package.swift/缓存来源、原/衍生工程和失败快照；仅本地 SPM 图可以没有 Package.resolved，不能编造空锁。旧两 Pod 锁仍不入 472。
 
@@ -19,3 +19,9 @@ R1 只修 preinstalled Pod 入口发现：有限读取 `/opt/homebrew/bin/pod` �
 首次 acquire 在任何 Pod 调用前记录 `evidence/selected-cocoapods.json`，固定 canonical 脚本/Ruby 的内容、mode、dev/inode 和系统 gem root；GEM_HOME/GEM_PATH 仅该系统 gem root，HOME 原值不改，用户 gem/RUBYOPT 不继承。acquire 完成绑定 receipt SHA；resolve/package 仅读原 receipt 并重新核对，绝不重新挑另一工具，后两阶段 sandbox 禁止改 selection/acquire receipt。PATH 只含 task Flutter、已选 Pod/Ruby 目录及系统基础目录。加载 gems 仍逐源码保留并拒用户/未知来源。首次工具源记录不等于 Root 原生来源验收。
 
 R1 保持 current354/472/178/20、ff7bc1f 与 `approved_native_resolution=null`；不转成未来公告359，不安装任何 gem/brew，不启签名或包装。源码准备未运行2新控制、Ruby/Pod、readonly或云任务。
+
+R2：run38983283646 已真实选择兼容入口并执行 `pod --version` 得1.17.0，旧1.16.2门槛拒绝，尚未获取App源/core/resolve。此后继显式只接受该次已观察的Pod/Ruby path、bytes、SHA与mode（不绑定易变inode），不接受版本范围。1.16.2/R1全部原件保留。本批新增1身份控制仅准备，原选择器2和包装6/consumer3已绿复用，均未重复执行。
+
+1.17.0官方tag固定commit5493bfd201a3be9325123cfa59142760afe198d7；config.rb与旧版本仍逐字相同9929B/SHA9213f900…，原CP_HOME/CP_CACHE/CP_REPOS环境硬边界没有放宽。新增官方bin/pod、lib/cocoapods.rb、gem_version.rb与config.rb四源硬pin，在首次版本调用前核已选system gem安装体；加载后仍收集全部gem源码并核CocoaPods/Core精确1.17.0。后续resolve/package只沿原selectedreceipt重核同一工具/官方四源，不能替换工具。官方源码匹配和加载依赖证明仍待后续受审真实观察，不把本次--version当原生解析或App成功。
+
+R2仍是历史current354/472/178/20，approval=null、源ref ff7bc1f、coreCA/签名/预算均不变；App已发布359并不会把旧354工具/链接证据升级为359。359/477后继单列计划，不在本R2调用任何获取/解析或包装。

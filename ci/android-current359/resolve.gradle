@@ -1,0 +1,459 @@
+// Explicit finite R12 consumer; original R10 and resolve.gradle remain immutable.
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ModuleComponentSelector
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentSelector
+import org.gradle.api.internal.artifacts.dependencies.DefaultFileCollectionDependency
+import org.gradle.internal.component.local.model.OpaqueComponentIdentifier
+import org.gradle.internal.component.local.model.OpaqueComponentArtifactIdentifier
+
+def roots = [System.getenv('ANDROID_NATIVE_WORK')].findAll { it != null }.collect { new File(it).canonicalFile }
+if (roots.size() != 1) throw new GradleException('one owned cloud root required')
+def owned = roots[0]
+def ownedPrincipal = Files.getOwner(owned.toPath(), LinkOption.NOFOLLOW_LINKS)
+def digestBytes = { bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
+def fileDigest = { file ->
+    def h = MessageDigest.getInstance('SHA-256')
+    file.withInputStream { stream ->
+        byte[] b = new byte[65536]; int n
+        while ((n = stream.read(b)) > 0) h.update(b,0,n)
+    }
+    h.digest().encodeHex().toString()
+}
+def catalogPath = new File(owned, 'evidence/classpath-preseal/catalog.json')
+// Included builds inherit this exact -D map (StartParameter.newBuild), not -P.
+// Do not read ambient System properties or fall back to environment values.
+def properties = gradle.startParameter.getSystemPropertiesArgs()
+def expectedCatalogSha = properties['luoboClasspathCatalogSha256']
+def gate = [literal_path_exact:properties['luoboClasspathCatalog'] == catalogPath.path,
+    literal_sha_syntax:expectedCatalogSha instanceof String && expectedCatalogSha ==~ /[0-9a-f]{64}/,
+    canonical:false, regular:false, same_owner:false, single_link:false,
+    length_bounded:false, full_sha_equal:false]
+def directoryRef = null
+try {
+    def directory = gradle.startParameter.currentDir.canonicalFile
+    if (directory.toPath().startsWith(owned.toPath()))
+        directoryRef = owned.toPath().relativize(directory.toPath()).toString().take(1024)
+} catch (Exception ignored) { /* diagnostic only; no admission fallback */ }
+def gateError = null
+try {
+    gate.canonical = catalogPath.canonicalFile == catalogPath
+    gate.regular = Files.isRegularFile(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS)
+    gate.same_owner = Files.getOwner(catalogPath.toPath(), LinkOption.NOFOLLOW_LINKS) == ownedPrincipal
+    gate.single_link = Files.getAttribute(catalogPath.toPath(), 'unix:nlink', LinkOption.NOFOLLOW_LINKS) == 1
+    gate.length_bounded = catalogPath.length() > 0 && catalogPath.length() <= 2 * 1024 * 1024
+} catch (Exception error) { gateError = error }
+def gateDiagnostic = { state ->
+    def detail = [state:state, source:'StartParameter.systemPropertiesArgs',
+        current_directory_owned_relative:directoryRef, checks:gate]
+    if (gate.full_sha_equal) detail.catalog_sha256 = expectedCatalogSha
+    if (gateError != null) detail.io_error_class = gateError.getClass().name.take(256)
+    logger.lifecycle('LUOBO_CATALOG_BINDING ' + JsonOutput.toJson(detail))
+}
+if (gateError != null || gate.findAll { key,value -> key != 'full_sha_equal' }.values().any { !it }) {
+    gateDiagnostic('refused')
+    throw new GradleException('fixed owned producer catalog and literal SHA required', gateError)
+}
+def catalogBytes = Files.readAllBytes(catalogPath.toPath())
+gate.full_sha_equal = digestBytes(catalogBytes) == expectedCatalogSha
+if (!gate.full_sha_equal) {
+    gateDiagnostic('refused')
+    throw new GradleException('independent producer catalog SHA differs')
+}
+def catalog = new JsonSlurper().parseText(new String(catalogBytes, 'UTF-8'))
+def notationNames = ['GRADLE_API', 'LOCAL_GROOVY', 'GRADLE_TEST_KIT'] as Set
+if (catalog.schema != 1 || catalog.Gradle != '9.3.1' ||
+        catalog.application_or_fixture_parsed_before_producer != false ||
+        catalog.producer_archives.gradle.sha256 != '17f277867f6914d61b1aa02efab1ba7bb439ad652ca485cd8ca6842fccec6e43' ||
+        catalog.producer_archives.jdk.sha256 != '3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e' ||
+        catalog.reports.keySet() != (['actual','selector'] as Set))
+    throw new GradleException('exact independent builtin producer required')
+def approvedFiles = [:]
+catalog.reports.each { name, report ->
+    if (report.notations.keySet() != notationNames)
+        throw new GradleException('exact three builtin notations required')
+    report.notations.each { notation, source ->
+        if (source.notation != notation || source.component_class != OpaqueComponentIdentifier.name ||
+                source.files.empty || source.files.size() > 512)
+            throw new GradleException('bounded official builtin source required')
+        source.files.each { row ->
+            def prior = approvedFiles[row.path]
+            if (prior != null && (prior.sha256 != row.sha256 || prior.bytes != row.bytes))
+                throw new GradleException('producer catalog conflicts')
+            approvedFiles[row.path] = row
+        }
+    }
+}
+// Finite official ZIP member authority; never enroll an installed directory.
+def sdkExpected = new JsonSlurper().parseText('''{"platforms;android-35": {"archive_bytes": 64273788, "archive_path": "sdk-platform-source-proof/archives/android-35.zip", "archive_sha256": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0", "inventory": {"android-35/android-stubs-src.jar": {"path": "android/platforms/android-35/android-stubs-src.jar", "role": "source-only"}, "android-35/android.jar": {"path": "android/platforms/android-35/android.jar", "role": "classpath"}, "android-35/core-for-system-modules.jar": {"path": "android/platforms/android-35/core-for-system-modules.jar", "role": "classpath"}, "android-35/optional/android.car.jar": {"path": "android/platforms/android-35/optional/android.car.jar", "role": "classpath"}, "android-35/optional/android.test.base.jar": {"path": "android/platforms/android-35/optional/android.test.base.jar", "role": "classpath"}, "android-35/optional/android.test.mock.jar": {"path": "android/platforms/android-35/optional/android.test.mock.jar", "role": "classpath"}, "android-35/optional/android.test.runner.jar": {"path": "android/platforms/android-35/optional/android.test.runner.jar", "role": "classpath"}, "android-35/optional/org.apache.http.legacy.jar": {"path": "android/platforms/android-35/optional/org.apache.http.legacy.jar", "role": "classpath"}, "android-35/uiautomator.jar": {"path": "android/platforms/android-35/uiautomator.jar", "role": "classpath"}}, "official": {"checksum": "0bb560a90a7a2cbd0dd8348224d518b638fe7949", "checksum_type": "sha1", "package": "platforms;android-35", "revision": "2", "size": 64273788, "url": "https://dl.google.com/android/repository/platform-35_r02.zip"}, "primary_jar": {"bytes": 27092450, "member": "android-35/android.jar", "path": "android/platforms/android-35/android.jar", "sha256": "4566663c3876e022b4fa4ced8c8697c4ab1688267f090114fd92d027b32e619b"}}, "platforms;android-36": {"archive_bytes": 65878410, "archive_path": "sdk-platform-source-proof/archives/android-36.zip", "archive_sha256": "37607369a28c5b640b3a7998868d45898ebcb777565a0e85f9acf36f29631d2e", "inventory": {"android-36/android-stubs-src.jar": {"path": "android/platforms/android-36/android-stubs-src.jar", "role": "source-only"}, "android-36/android.jar": {"path": "android/platforms/android-36/android.jar", "role": "classpath"}, "android-36/core-for-system-modules.jar": {"path": "android/platforms/android-36/core-for-system-modules.jar", "role": "classpath"}, "android-36/optional/android.car.jar": {"path": "android/platforms/android-36/optional/android.car.jar", "role": "classpath"}, "android-36/optional/android.test.base.jar": {"path": "android/platforms/android-36/optional/android.test.base.jar", "role": "classpath"}, "android-36/optional/android.test.mock.jar": {"path": "android/platforms/android-36/optional/android.test.mock.jar", "role": "classpath"}, "android-36/optional/android.test.runner.jar": {"path": "android/platforms/android-36/optional/android.test.runner.jar", "role": "classpath"}, "android-36/optional/org.apache.http.legacy.jar": {"path": "android/platforms/android-36/optional/org.apache.http.legacy.jar", "role": "classpath"}, "android-36/optional/wear-sdk.jar": {"path": "android/platforms/android-36/optional/wear-sdk.jar", "role": "classpath"}, "android-36/uiautomator.jar": {"path": "android/platforms/android-36/uiautomator.jar", "role": "classpath"}}, "official": {"checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576", "checksum_type": "sha1", "package": "platforms;android-36", "revision": "2", "size": 65878410, "url": "https://dl.google.com/android/repository/platform-36_r02.zip"}, "primary_jar": {"bytes": 27768026, "member": "android-36/android.jar", "path": "android/platforms/android-36/android.jar", "sha256": "d9eb9da824d9e247a352f570f01e1169e725b2954bca9e283a71786c59b59f9a"}}, "platforms;android-37.0": {"archive_bytes": 67281901, "archive_path": "sdk-platform-source-proof/archives/android-37.0.zip", "archive_sha256": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d", "inventory": {"android-37.0/android-stubs-src.jar": {"path": "android/platforms/android-37.0/android-stubs-src.jar", "role": "source-only"}, "android-37.0/android.jar": {"path": "android/platforms/android-37.0/android.jar", "role": "classpath"}, "android-37.0/core-for-system-modules.jar": {"path": "android/platforms/android-37.0/core-for-system-modules.jar", "role": "classpath"}, "android-37.0/optional/android.car.jar": {"path": "android/platforms/android-37.0/optional/android.car.jar", "role": "classpath"}, "android-37.0/optional/android.test.base.jar": {"path": "android/platforms/android-37.0/optional/android.test.base.jar", "role": "classpath"}, "android-37.0/optional/android.test.mock.jar": {"path": "android/platforms/android-37.0/optional/android.test.mock.jar", "role": "classpath"}, "android-37.0/optional/android.test.runner.jar": {"path": "android/platforms/android-37.0/optional/android.test.runner.jar", "role": "classpath"}, "android-37.0/optional/org.apache.http.legacy.jar": {"path": "android/platforms/android-37.0/optional/org.apache.http.legacy.jar", "role": "classpath"}, "android-37.0/optional/wear-sdk.jar": {"path": "android/platforms/android-37.0/optional/wear-sdk.jar", "role": "classpath"}, "android-37.0/uiautomator.jar": {"path": "android/platforms/android-37.0/uiautomator.jar", "role": "classpath"}}, "official": {"checksum": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410", "checksum_type": "sha1", "package": "platforms;android-37.0", "revision": "2", "size": 67281901, "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip"}, "primary_jar": {"bytes": 43044472, "member": "android-37.0/android.jar", "path": "android/platforms/android-37.0/android.jar", "sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177"}}}''')
+def sdkProducer = catalog.SDK_platform_sources
+if (sdkProducer == null || sdkProducer.schema != 2 || sdkProducer.state != 'passed' ||
+        sdkProducer.before_first_model != true || sdkProducer.platforms.size() != 3 ||
+        sdkProducer.contract_sha256 != '52a293fde26a65cf5c3a57942a96ccba5944dcd21350973105b665291130eb71' ||
+        sdkProducer.inventory_JAR_count != 29 || sdkProducer.classpath_JAR_count != 26 ||
+        sdkProducer.source_only_JAR_count != 3 || sdkProducer.archive_SHA256_preexisting_lock != true ||
+        (sdkProducer.platforms.collect { it.package } as Set) != sdkExpected.keySet())
+    throw new GradleException('complete finite official SDK producer required')
+def sdkSources = [:]
+def sdkSourceOnly = [:]
+long sdkBytes = 0
+sdkProducer.platforms.each { source ->
+    def expected = sdkExpected[source.package]
+    def primary = source.jar
+    if (source.kind != 'official-SDK-platform-ZIP-member' || source.official != expected.official ||
+            source.official_sha1_checked != true || source.full_ZIP_CRC_and_safety_checked != true ||
+            source.archive.path != expected.archive_path || source.archive.bytes != expected.archive_bytes ||
+            source.archive.sha256 != expected.archive_sha256 || primary.path != expected.primary_jar.path ||
+            primary.bytes != expected.primary_jar.bytes || primary.sha256 != expected.primary_jar.sha256 ||
+            primary.ZIP_member != expected.primary_jar.member ||
+            source.JAR_inventory.size() != expected.inventory.size() ||
+            source.complete_official_JAR_names != expected.inventory.keySet().toList().sort() ||
+            (source.JAR_inventory.collect { it.ZIP_member } as Set) != expected.inventory.keySet() ||
+            source.classpath_JARs != source.JAR_inventory.findAll { it.role == 'classpath' } ||
+            source.source_only_JARs != source.JAR_inventory.findAll { it.role == 'source-only' })
+        throw new GradleException('SDK catalog exceeds locked archive/finite member authority')
+    source.JAR_inventory.each { jar ->
+        def spec = expected.inventory[jar.ZIP_member]
+        if (spec == null || jar.path != spec.path || jar.role != spec.role ||
+                jar.pin_authority != 'locked-official-archive-member' || jar.byte_comparison != true ||
+                !(jar.sha256 ==~ /[0-9a-f]{64}/) || !(jar.bytes instanceof Number) ||
+                jar.bytes <= 0 || jar.bytes > 128L * 1024 * 1024 ||
+                jar.installed_stat == null || jar.installed_stat.st_nlink != 1 ||
+                approvedFiles.containsKey(jar.path) || sdkSourceOnly.containsKey(jar.path) || sdkSources.containsKey(jar.path))
+            throw new GradleException('SDK member role/path/body source differs')
+        if (jar.role == 'source-only') {
+            sdkSourceOnly[jar.path] = jar
+        } else {
+            approvedFiles[jar.path] = jar
+            sdkBytes += jar.bytes
+            sdkSources[jar.path] = [kind:source.kind, package:source.package, revision:source.revision,
+                official:source.official, archive:source.archive, ZIP_member:jar.ZIP_member,
+                archive_member_sha256:jar.sha256, role:jar.role,
+                original_static_sha256:jar.ZIP_member == expected.primary_jar.member ? jar.sha256 : null]
+        }
+    }
+}
+if (sdkSources.size() != 26 || sdkSourceOnly.size() != 3 || sdkBytes > 256L * 1024 * 1024)
+    throw new GradleException('bounded finite26 SDK classpath required')
+gateDiagnostic('catalog_bytes_bound')
+def localRef = { File original ->
+    def file = original.canonicalFile
+    if (file != original.absoluteFile || !file.toPath().startsWith(owned.toPath()) ||
+            !Files.isRegularFile(file.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(file.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal ||
+            Files.getAttribute(file.toPath(), 'unix:nlink', LinkOption.NOFOLLOW_LINKS) != 1 ||
+            file.length() <= 0 || file.length() > 512L * 1024 * 1024)
+        throw new GradleException('unsafe local component file')
+    [path:owned.toPath().relativize(file.toPath()).toString(), bytes:file.length(), sha256:fileDigest(file)]
+}
+def refusal = { component, p, c, reason ->
+    def detail = [component_class:component.getClass().name.take(256), project:p.path,
+        configuration:c.name, reason:reason, catalog_sha256:expectedCatalogSha,
+        display_ref_sha256:digestBytes(component.displayName.take(1024).getBytes('UTF-8'))]
+    if (component.getClass() == OpaqueComponentArtifactIdentifier) {
+        try { detail.file = localRef(component.getFile()) }
+        catch (Exception error) { detail.file_refusal_class = error.getClass().name.take(256) }
+    }
+    if (component.getClass() == OpaqueComponentIdentifier)
+        detail.notation = component.getClassPathNotation().name().take(128)
+    logger.error('LUOBO_COMPONENT_REFUSAL ' + JsonOutput.toJson(detail))
+    throw new GradleException('unknown or unapproved local artifact component refused: ' + reason)
+}
+def approvedLocal = { File file, component, p, c ->
+    def row
+    try { row = localRef(file) }
+    catch (Exception error) { refusal(component, p, c, 'unsafe-file') }
+    if (sdkSourceOnly.containsKey(row.path))
+        refusal(component, p, c, 'source-only-sdk-member-not-classpath')
+    def expected = approvedFiles[row.path]
+    if (expected == null || expected.bytes != row.bytes || expected.sha256 != row.sha256)
+        refusal(component, p, c, 'file-not-in-independent-producer')
+    if (sdkSources.containsKey(row.path) &&
+            (Files.getAttribute(file.toPath(), 'unix:ino', LinkOption.NOFOLLOW_LINKS) != expected.installed_stat.st_ino ||
+             Files.getAttribute(file.toPath(), 'unix:dev', LinkOption.NOFOLLOW_LINKS) != expected.installed_stat.st_dev))
+        refusal(component, p, c, 'SDK-original-inode-changed')
+    row
+}
+def localIdentity = { component, p, c ->
+    if (component.getClass() == OpaqueComponentArtifactIdentifier) {
+        def file = approvedLocal(component.getFile(), component, p, c)
+        def source = sdkSources[file.path]
+        return [kind:source == null ? 'presealed-file' : 'presealed-SDK-platform-file',
+            component_class:component.getClass().name, file:file,
+            source:source, catalog_sha256:expectedCatalogSha]
+    }
+    if (component.getClass() == OpaqueComponentIdentifier) {
+        def notation = component.getClassPathNotation().name()
+        if (!notationNames.contains(notation)) refusal(component, p, c, 'notation-not-allowed')
+        def home = gradle.gradleUserHomeDir.canonicalFile
+        def cache = home == new File(owned,'gradle-cache') ? 'actual' :
+            home == new File(owned,'selector-gradle-home') ? 'selector' : null
+        if (cache == null) refusal(component, p, c, 'cache-not-allowed')
+        def expected = catalog.reports[cache].notations[notation].files
+        // Exact factory identity must be backed by an actual declared
+        // FileCollectionDependency. The notation alone cannot authorize files.
+        def declarations = c.allDependencies.findAll {
+            it instanceof DefaultFileCollectionDependency && it.getTargetComponentId() == component
+        }
+        if (declarations.empty) refusal(component, p, c, 'missing-file-collection-declaration')
+        expected.each { row -> approvedLocal(new File(owned,row.path), component, p, c) }
+        declarations.each { dependency ->
+            def actual = dependency.getFiles().files.collect { file -> approvedLocal(file,component,p,c).path } as Set
+            if (actual != (expected.collect { it.path } as Set))
+                refusal(component, p, c, 'declared-classpath-set-differs')
+        }
+        return [kind:'presealed-gradle-classpath', component_class:component.getClass().name,
+            notation:notation, cache:cache, catalog_sha256:expectedCatalogSha]
+    }
+    refusal(component, p, c, 'unsupported-component-type')
+}
+def checkedProject = { p ->
+    def directory = p.projectDir.canonicalFile
+    def script = p.buildFile.canonicalFile
+    if (p.projectDir.absoluteFile != directory || p.buildFile.absoluteFile != script ||
+            !directory.toPath().startsWith(owned.toPath()) || !script.toPath().startsWith(owned.toPath()) ||
+            !Files.isDirectory(directory.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(directory.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal) {
+        throw new GradleException('project directory/build file outside canonical owned root')
+    }
+    def exists = Files.exists(script.toPath(), LinkOption.NOFOLLOW_LINKS)
+    def defaultMissing = !exists && script.parentFile == directory &&
+            ['build.gradle', 'build.gradle.kts'].contains(script.name)
+    if ((exists && (!Files.isRegularFile(script.toPath(), LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(script.toPath(), LinkOption.NOFOLLOW_LINKS) != ownedPrincipal)) ||
+            (!exists && !defaultMissing)) {
+        throw new GradleException('owned regular or absent default project build file required')
+    }
+    def hash = null
+    if (exists) {
+        def h = MessageDigest.getInstance('SHA-256')
+        script.withInputStream { stream ->
+            byte[] b = new byte[65536]; int n
+            while ((n = stream.read(b)) > 0) h.update(b,0,n)
+        }
+        hash = h.digest().encodeHex().toString()
+    }
+    return [project:p.path, projectDir:directory.path, buildFile:script.path,
+            buildFileExists:exists, defaultBuildScriptMissing:defaultMissing,
+            buildFileSha256:hash, canonicalOwned:true]
+}
+def hosts = ['dl.google.com','maven.google.com','repo.maven.apache.org','repo1.maven.org',
+             'plugins.gradle.org','plugins-artifacts.gradle.org','storage.googleapis.com','jitpack.io'] as Set
+def checkRepo = { repo ->
+    if (repo.hasProperty('url')) {
+        def u = repo.url as URI
+        if (u.scheme == 'file') {
+            def f = new File(u).canonicalFile
+            if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('repository outside owned root')
+        } else if (u.scheme != 'https' || u.userInfo != null || u.query != null || u.fragment != null || !hosts.contains(u.host)) {
+            throw new GradleException('unexpected dependency repository')
+        }
+        if (u.host == 'jitpack.io') {
+            if (u.path != '' && u.path != '/') throw new GradleException('unexpected JitPack repository path')
+            repo.content { includeModule('com.github.davidliu','audioswitch') }
+        }
+    }
+}
+def checkModule = { group, module, v ->
+    if (group == 'com.github.davidliu' && module == 'audioswitch' &&
+            v != '039a35aefab7747c557242fa216c9ea11743b604') throw new GradleException('JitPack source commit differs')
+    if (v != null && (v.contains('+') || v.toLowerCase().contains('latest') || v.contains('SNAPSHOT') || v.startsWith('[') || v.startsWith('('))) {
+        throw new GradleException('dynamic dependency version refused')
+    }
+}
+// BEGIN independent R12 consumer. The two existing -D values already bind the
+// whole presealed document in main and included builds. Neither graph nor
+// configuration name can mint a new source catalog.
+def richField = catalog.accepted_R12_rich_consumer
+if (richField == null || richField.keySet() !=
+        (['catalog_sha256','catalog_base64','script_sha256','script_base64'] as Set) ||
+        richField.catalog_sha256 != '00d559f734c28560b9f18a27ef2fedfd5488c7eb9fa0a6d8d18930d0927d2cc7' ||
+        richField.script_sha256 != '3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3')
+    throw new GradleException('independent rich catalog/script identity refused')
+def richBytes = Base64.decoder.decode(richField.catalog_base64)
+def richScript = Base64.decoder.decode(richField.script_base64)
+if (richBytes.length > 128*1024 || richScript.length > 32*1024 ||
+        digestBytes(richBytes) != richField.catalog_sha256 || digestBytes(richScript) != richField.script_sha256)
+    throw new GradleException('independent rich source bytes differ')
+def richSource = new JsonSlurper().parseText(new String(richBytes,'UTF-8'))
+def richFactory = new GroovyShell(getClass().classLoader).evaluate(new String(richScript,'UTF-8'))
+def richGate = richFactory(owned,richSource,localRef,fileDigest,richField.catalog_sha256)
+def richPhase = gradle.startParameter.taskNames == ['assembleDebug'] ? 'apk' : 'metadata'
+def richPersist = { c,proof,String family ->
+    if (!(family in ['rich-consumed','rich-refused']) ||
+            !richSource.configurations.any { it.name==c.name } ||
+            !(richPhase in ['metadata','apk']))
+        throw new GradleException('finite rich evidence destination required')
+    def directory = new File(owned,'evidence/'+family+'/'+richPhase)
+    Files.createDirectories(directory.toPath())
+    if (directory.canonicalFile != directory || Files.getOwner(directory.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal)
+        throw new GradleException('owned rich report directory required')
+    def out = new File(directory,c.name+'.json')
+    def body = (JsonOutput.toJson(proof)+'\n').getBytes('UTF-8')
+    if (body.length>128*1024) throw new GradleException('rich report evidence cap')
+    def channel = java.nio.channels.FileChannel.open(out.toPath(),
+        java.nio.file.StandardOpenOption.CREATE_NEW,java.nio.file.StandardOpenOption.WRITE,
+        LinkOption.NOFOLLOW_LINKS)
+    try {
+        def buffer=java.nio.ByteBuffer.wrap(body)
+        while(buffer.hasRemaining()) channel.write(buffer)
+        channel.force(true)
+    } finally { channel.close() }
+    def parentChannel=java.nio.channels.FileChannel.open(directory.toPath(),java.nio.file.StandardOpenOption.READ)
+    try { parentChannel.force(true) } finally { parentChannel.close() }
+}
+def richWrite = { p,c ->
+    def proof = richGate.audit(p,c,{ refused -> richPersist(c,refused,'rich-refused') })
+    richPersist(c,proof,'rich-consumed')
+}
+// END independent R12 consumer.
+def selectorIdentity = { selector ->
+    if (selector instanceof ProjectComponentSelector) {
+        return [kind:'project', identity:selector.displayName, buildPath:selector.buildPath,
+                projectPath:selector.projectPath]
+    }
+    if (selector instanceof ModuleComponentSelector) {
+        return [kind:'module', identity:selector.displayName, group:selector.group,
+                module:selector.module, version:selector.version]
+    }
+    throw new GradleException('unknown requested component selector refused')
+}
+def componentIdentity = { component ->
+    if (component instanceof ProjectComponentIdentifier) {
+        return [kind:'project', identity:component.displayName, buildTreePath:component.buildTreePath,
+                projectPath:component.projectPath]
+    }
+    if (component instanceof ModuleComponentIdentifier) {
+        checkModule(component.group, component.module, component.version)
+        return [kind:'module', identity:component.displayName, group:component.group,
+                module:component.module, version:component.version]
+    }
+    throw new GradleException('unknown selected component identifier refused')
+}
+gradle.settingsEvaluated { s ->
+    s.pluginManagement.repositories.each(checkRepo)
+    s.pluginManagement.repositories.whenObjectAdded(checkRepo)
+}
+gradle.beforeProject { p ->
+    checkedProject(p)
+    p.repositories.whenObjectAdded(checkRepo)
+    p.buildscript.repositories.whenObjectAdded(checkRepo)
+    [p.configurations,p.buildscript.configurations].each { configs -> configs.all { c ->
+        if (richGate.scoped(p,c)) {
+            c.incoming.beforeResolve { richGate.declarations(p,c) }
+            c.incoming.afterResolve { richWrite(p,c) }
+        }
+        // Official Gradle9.3.1 DependencySubstitutions covers transitive
+        // dependencies and retains the actual requested selector type.
+        c.resolutionStrategy.dependencySubstitution.all { d ->
+            def requested = selectorIdentity(d.requested)
+            logger.lifecycle('LUOBO_SELECTOR_REQUEST ' + JsonOutput.toJson(
+                    [project:p.path, configuration:c.name, requested:requested]))
+            if (d.requested instanceof ModuleComponentSelector) {
+                if (richGate.isRich(d.requested.versionConstraint)) richGate.requested(p,c,d.requested)
+                else checkModule(d.requested.group, d.requested.module, d.requested.version)
+            }
+            // No coordinate exemption and no useTarget/version substitution.
+        }
+    } }
+}
+gradle.projectsEvaluated {
+    gradle.rootProject.tasks.named('dependencies').configure {
+        doLast {
+            def rows = []
+            def selections = []
+            def projects = []
+            gradle.rootProject.allprojects.each { p ->
+                projects.add(checkedProject(p))
+                [p.configurations, p.buildscript.configurations].each { configs ->
+                    configs.findAll { it.canBeResolved && !(it.name.toLowerCase() =~ /release|profile|test|lint/) }.each { c ->
+                        // Inspect the complete graph, including dependencies
+                        // below local projects, before filtering any artifacts.
+                        c.incoming.resolutionResult.allDependencies.each { edge ->
+                            def requested = selectorIdentity(edge.requested)
+                            if (edge instanceof UnresolvedDependencyResult) {
+                                throw new GradleException('unresolved dependency result refused: ' + requested.identity,
+                                        edge.failure)
+                            }
+                            if (!(edge instanceof ResolvedDependencyResult)) {
+                                throw new GradleException('unknown dependency result refused: ' + requested.identity)
+                            }
+                            def selected = componentIdentity(edge.selected.id)
+                            selections.add([project:p.path, configuration:c.name,
+                                    from:componentIdentity(edge.from.id), requested:requested,
+                                    selected:selected])
+                            if (edge.selected.id instanceof ProjectComponentIdentifier) {
+                                rows.add([project:p.path, configuration:c.name,
+                                        projectComponent:edge.selected.id.displayName,
+                                        selected:selected, deferred_to_actual_APK_compile:true])
+                            }
+                        }
+                        // A strict artifact view filters components, not graph
+                        // edges. Modules and independently presealed local files only.
+                        // Local AGP secondary artifacts are chosen by
+                        // the eventual real APK tasks, not this metadata read.
+                        def auditedView = c.incoming.artifactView { view ->
+                            view.setLenient(false)
+                            view.componentFilter { component ->
+                                if (component instanceof ModuleComponentIdentifier) {
+                                    checkModule(component.group, component.module, component.version)
+                                    return true
+                                }
+                                if (component instanceof ProjectComponentIdentifier) return false
+                                localIdentity(component, p, c)
+                                return true
+                            }
+                        }
+                        auditedView.getArtifacts().getArtifacts().each { a ->
+                            def f = a.file.canonicalFile
+                            if (!f.toPath().startsWith(owned.toPath())) throw new GradleException('artifact outside owned root')
+                            def component = a.id.componentIdentifier
+                            if (!(component instanceof ModuleComponentIdentifier)) {
+                                def selected = localIdentity(component, p, c)
+                                def file = approvedLocal(f, component, p, c)
+                                if (selected.kind == 'presealed-gradle-classpath' &&
+                                        !catalog.reports[selected.cache].notations[selected.notation].files.any { it.path == file.path })
+                                    refusal(component, p, c, 'artifact-outside-notation')
+                                if ((selected.kind in ['presealed-file','presealed-SDK-platform-file']) && selected.file.path != file.path)
+                                    refusal(component, p, c, 'artifact-differs-from-file-component')
+                                rows.add([project:p.path, configuration:c.name, selected:selected,
+                                    path:file.path, bytes:file.bytes, sha256:file.sha256])
+                                return
+                            }
+                            def selected = componentIdentity(component)
+                            if (!f.isFile()) throw new GradleException('resolved external artifact missing')
+                            def h = MessageDigest.getInstance('SHA-256')
+                            f.withInputStream { stream ->
+                                byte[] b = new byte[65536]; int n
+                                while ((n = stream.read(b)) > 0) h.update(b,0,n)
+                            }
+                            rows.add([project:p.path,configuration:c.name,
+                                      coordinate:selected.group + ':' + selected.module + ':' + selected.version,
+                                      selected:selected, path:owned.toPath().relativize(f.toPath()).toString(),
+                                      bytes:f.length(),sha256:h.digest().encodeHex().toString()])
+                        }
+                    }
+                }
+                p.repositories.each(checkRepo)
+                p.buildscript.repositories.each(checkRepo)
+            }
+            [ ['gradle-resolved-artifacts.json', rows], ['gradle-resolved-selectors.json', selections],
+              ['gradle-checked-projects.json', projects] ].each { entry ->
+                def out = new File(owned,'evidence/' + entry[0])
+                if (out.exists()) throw new GradleException('no overwrite of dependency evidence')
+                def stream = new FileOutputStream(out)
+                try {
+                    stream.write((JsonOutput.prettyPrint(JsonOutput.toJson(entry[1]))+'\n').getBytes('UTF-8'))
+                    stream.flush(); stream.getFD().sync()
+                } finally { stream.close() }
+            }
+        }
+    }
+}

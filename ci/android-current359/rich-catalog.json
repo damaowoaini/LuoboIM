@@ -1,0 +1,2039 @@
+{
+  "Gradle": "9.3.1",
+  "accepted_provenance": {
+    "graph_sha256": "e70247c7426c9c0afc7891eac6e10a3cb49b7fccc0ec99e17ffc041bc87c4c5e",
+    "head": "bdffc675e6ec0f193bcb5cf786859a7746869061",
+    "job": 117248837126,
+    "online_offline_equal": true,
+    "original_catalog_sha256": "db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe",
+    "producer_gradle_sha256": "8f4c7e5661e33637d0c8f24b8b50314b4c532c3118ee29e02c992637aa7425cf",
+    "producer_inputs_sha256": "9d66add1f0b6a4fee8979406002f86de9afac37b4f097b486445543ef71f96d0",
+    "production_variant_keys": [
+      "owner",
+      "attributes",
+      "capabilities",
+      "external"
+    ],
+    "raw_display_not_enrolled": true,
+    "root_acceptance_sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1",
+    "root_acceptance_source": "projection-acceptance.json",
+    "run": 38983280410,
+    "runtime_or_native_claim": false
+  },
+  "configurations": [
+    {
+      "artifacts": [
+        {
+          "bytes": 17536,
+          "filename": "annotations-13.0.jar",
+          "id": {
+            "group": "org.jetbrains",
+            "module": "annotations",
+            "version": "13.0"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.jar",
+          "sha256": "ace2a10dc8e2d5fd34925ecac03e4988b2c0f851650c94b8cef49ba1bd111478",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains",
+                "name": "annotations",
+                "version": "13.0"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains",
+              "module": "annotations",
+              "version": "13.0"
+            }
+          }
+        },
+        {
+          "bytes": 468126,
+          "filename": "kotlin-build-tools-api-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-api",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-api/2.4.21/kotlin-build-tools-api-2.4.21.jar",
+          "sha256": "c5cd6a49bd072b529ae10809111c16a7aa0f92147e95d288354017fd65799461",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-build-tools-api",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-build-tools-api",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 135623,
+          "filename": "kotlin-build-tools-compat-2.4.0.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-compat",
+            "version": "2.4.0"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-compat/2.4.0/kotlin-build-tools-compat-2.4.0.jar",
+          "sha256": "1fe7397a60b230a82ffdca2d59615dde7ac5720cec0892204a9818f30e80c16c",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-build-tools-compat",
+                "version": "2.4.0"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-build-tools-compat",
+              "version": "2.4.0"
+            }
+          }
+        },
+        {
+          "bytes": 568963,
+          "filename": "kotlin-build-tools-cri-impl-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-cri-impl",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-cri-impl/2.4.21/kotlin-build-tools-cri-impl-2.4.21.jar",
+          "sha256": "d1849f9b98033f5333905409074ca90e6a0e17258cd0eb8befa47d795e695841",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-build-tools-cri-impl",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-build-tools-cri-impl",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 3456633,
+          "filename": "kotlin-build-tools-impl-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-impl/2.4.21/kotlin-build-tools-impl-2.4.21.jar",
+          "sha256": "3152b3e1fbaa4d48f3681734a2c0efc438359a48c8a3c5cac00d874670de1377",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-build-tools-impl",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-build-tools-impl",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 58593291,
+          "filename": "kotlin-compiler-embeddable-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-compiler-embeddable/2.4.21/kotlin-compiler-embeddable-2.4.21.jar",
+          "sha256": "ef19419c765e7ac8404465fa026ca8fc4dbb8a822de0fc79aa53c8dce29f1d02",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-compiler-embeddable",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-compiler-embeddable",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 20367,
+          "filename": "kotlin-compiler-runner-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-runner",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-compiler-runner/2.4.21/kotlin-compiler-runner-2.4.21.jar",
+          "sha256": "75cd5956405697559e6925ebc5808449a2e12002d4f017275281ad3d4c0c7985",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-compiler-runner",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-compiler-runner",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 265893,
+          "filename": "kotlin-daemon-client-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-daemon-client",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-daemon-client/2.4.21/kotlin-daemon-client-2.4.21.jar",
+          "sha256": "095903c4c4713bf91a562d226d7ba0464cf5424e76342d487deec494451ab29b",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-daemon-client",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-daemon-client",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 393410,
+          "filename": "kotlin-daemon-embeddable-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-daemon-embeddable",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-daemon-embeddable/2.4.21/kotlin-daemon-embeddable-2.4.21.jar",
+          "sha256": "7b3ef24674e5bcffcadfc4e43202ea314194939ecbcdd90a4770b2f1b04e0d07",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-daemon-embeddable",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-daemon-embeddable",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 3038560,
+          "filename": "kotlin-reflect-1.6.10.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-reflect",
+            "version": "1.6.10"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-reflect/1.6.10/kotlin-reflect-1.6.10.jar",
+          "sha256": "3277ac102ae17aad10a55abec75ff5696c8d109790396434b496e75087854203",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-reflect",
+                "version": "1.6.10"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-reflect",
+              "version": "1.6.10"
+            }
+          }
+        },
+        {
+          "bytes": 46533,
+          "filename": "kotlin-script-runtime-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-script-runtime",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-script-runtime/2.4.21/kotlin-script-runtime-2.4.21.jar",
+          "sha256": "a658cf5902a1525a06c264a5e42b437e97a6679ddeef8ca641246f270cf6a013",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-script-runtime",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-script-runtime",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 1853315,
+          "filename": "kotlin-stdlib-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.21/kotlin-stdlib-2.4.21.jar",
+          "sha256": "bd8250210584cb659847dce9cda660f8e9906e5def7fbebcea93dc6dcb6a88a3",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.jvm.environment": {
+                "type": "java.lang.String",
+                "value": "standard-jvm"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              },
+              "org.jetbrains.kotlin.platform.type": {
+                "type": "java.lang.String",
+                "value": "jvm"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-stdlib",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-stdlib",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 89152,
+          "filename": "kotlin-tooling-core-2.4.21.jar",
+          "id": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-tooling-core",
+            "version": "2.4.21"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-tooling-core/2.4.21/kotlin-tooling-core-2.4.21.jar",
+          "sha256": "5fc5db083803232857408ed5c25bcc307c703b04bdef6cb2c34ebf4db611a622",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlin",
+                "name": "kotlin-tooling-core",
+                "version": "2.4.21"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlin",
+              "module": "kotlin-tooling-core",
+              "version": "2.4.21"
+            }
+          }
+        },
+        {
+          "bytes": 1548360,
+          "filename": "kotlinx-coroutines-core-jvm-1.8.0.jar",
+          "id": {
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "version": "1.8.0"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.8.0/kotlinx-coroutines-core-jvm-1.8.0.jar",
+          "sha256": "9860906a1937490bf5f3b06d2f0e10ef451e65b95b269f22daf68a3d1f5065c5",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              },
+              "org.jetbrains.kotlin.platform.type": {
+                "type": "java.lang.String",
+                "value": "jvm"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.jetbrains.kotlinx",
+                "name": "kotlinx-coroutines-core-jvm",
+                "version": "1.8.0"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.jetbrains.kotlinx",
+              "module": "kotlinx-coroutines-core-jvm",
+              "version": "1.8.0"
+            }
+          }
+        }
+      ],
+      "attributes": {},
+      "declared": [
+        {
+          "attributes": {},
+          "constraint": {
+            "branch": null,
+            "preferred": "",
+            "rejected": [],
+            "required": "2.4.0",
+            "strict": ""
+          },
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-build-tools-compat",
+          "requestedCapabilities": []
+        },
+        {
+          "attributes": {},
+          "constraint": {
+            "branch": null,
+            "preferred": "",
+            "rejected": [],
+            "required": "[2.4.0-Beta2, 2.5.0)",
+            "strict": "[2.4.0-Beta2, 2.5.0)"
+          },
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-build-tools-impl",
+          "requestedCapabilities": []
+        }
+      ],
+      "edges": [
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-compat",
+            "version": "2.4.0"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.0",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-tooling-core",
+            "requestedCapabilities": [],
+            "version": "2.4.0"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-tooling-core",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-cri-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-api",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-api",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-cri-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-api",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-api",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-cri-impl",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-cri-impl",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-runner",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-runner",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-tooling-core",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-tooling-core",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-api",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-api",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-daemon-embeddable",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-daemon-embeddable",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "1.6.10",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-reflect",
+            "requestedCapabilities": [],
+            "version": "1.6.10"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-reflect",
+            "version": "1.6.10"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-script-runtime",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-script-runtime",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "1.8.0",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "requestedCapabilities": [],
+            "version": "1.8.0"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "version": "1.8.0"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-runner",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-embeddable",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-runner",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-daemon-client",
+            "requestedCapabilities": [],
+            "version": "2.4.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-daemon-client",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-compiler-runner",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "1.8.0",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "requestedCapabilities": [],
+            "version": "1.8.0"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlinx",
+            "module": "kotlinx-coroutines-core-jvm",
+            "version": "1.8.0"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-daemon-client",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.2.21",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "requestedCapabilities": [],
+            "version": "2.2.21"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "version": "2.4.21"
+          }
+        },
+        {
+          "from": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-stdlib",
+            "version": "2.4.21"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "13.0",
+              "strict": ""
+            },
+            "group": "org.jetbrains",
+            "module": "annotations",
+            "requestedCapabilities": [],
+            "version": "13.0"
+          },
+          "selected": {
+            "group": "org.jetbrains",
+            "module": "annotations",
+            "version": "13.0"
+          }
+        },
+        {
+          "from": {
+            "kind": "producer-root"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "2.4.0",
+              "strict": ""
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-compat",
+            "requestedCapabilities": [],
+            "version": "2.4.0"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-compat",
+            "version": "2.4.0"
+          }
+        },
+        {
+          "from": {
+            "kind": "producer-root"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "[2.4.0-Beta2, 2.5.0)",
+              "strict": "[2.4.0-Beta2, 2.5.0)"
+            },
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "requestedCapabilities": [],
+            "version": "[2.4.0-Beta2, 2.5.0)"
+          },
+          "selected": {
+            "group": "org.jetbrains.kotlin",
+            "module": "kotlin-build-tools-impl",
+            "version": "2.4.21"
+          }
+        }
+      ],
+      "name": "kotlinAbiValidationCompatClasspath"
+    },
+    {
+      "artifacts": [
+        {
+          "bytes": 563455,
+          "filename": "bcpg-jdk18on-1.80.jar",
+          "id": {
+            "group": "org.bouncycastle",
+            "module": "bcpg-jdk18on",
+            "version": "1.80"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpg-jdk18on/1.80/bcpg-jdk18on-1.80.jar",
+          "sha256": "3799a0d53511b860780af43c44ae8e0519afabb263195af40174f46312cd58bd",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.bouncycastle",
+                "name": "bcpg-jdk18on",
+                "version": "1.80"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.bouncycastle",
+              "module": "bcpg-jdk18on",
+              "version": "1.80"
+            }
+          }
+        },
+        {
+          "bytes": 1144158,
+          "filename": "bcpkix-jdk18on-1.80.jar",
+          "id": {
+            "group": "org.bouncycastle",
+            "module": "bcpkix-jdk18on",
+            "version": "1.80"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpkix-jdk18on/1.80/bcpkix-jdk18on-1.80.jar",
+          "sha256": "4f4ba6a92617ea19dc183f0fa5db492eee426fdde2a0a2d6c94777ffd1af6413",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.bouncycastle",
+                "name": "bcpkix-jdk18on",
+                "version": "1.80"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.bouncycastle",
+              "module": "bcpkix-jdk18on",
+              "version": "1.80"
+            }
+          }
+        },
+        {
+          "bytes": 8684703,
+          "filename": "bcprov-jdk18on-1.80.2.jar",
+          "id": {
+            "group": "org.bouncycastle",
+            "module": "bcprov-jdk18on",
+            "version": "1.80.2"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.80.2/bcprov-jdk18on-1.80.2.jar",
+          "sha256": "b33227f07dce264daf1aac2e798ef109a4901f31abedac53635746dd93679d3b",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.bouncycastle",
+                "name": "bcprov-jdk18on",
+                "version": "1.80.2"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.bouncycastle",
+              "module": "bcprov-jdk18on",
+              "version": "1.80.2"
+            }
+          }
+        },
+        {
+          "bytes": 704813,
+          "filename": "bcutil-jdk18on-1.80.2.jar",
+          "id": {
+            "group": "org.bouncycastle",
+            "module": "bcutil-jdk18on",
+            "version": "1.80.2"
+          },
+          "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcutil-jdk18on/1.80.2/bcutil-jdk18on-1.80.2.jar",
+          "sha256": "bc78d32d7ffb141ee27e4fb77df04259d842c899e7e8eaf912f990d7253bd3b4",
+          "variant": {
+            "attributes": {
+              "artifactType": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.category": {
+                "type": "java.lang.String",
+                "value": "library"
+              },
+              "org.gradle.libraryelements": {
+                "type": "java.lang.String",
+                "value": "jar"
+              },
+              "org.gradle.status": {
+                "type": "java.lang.String",
+                "value": "release"
+              },
+              "org.gradle.usage": {
+                "type": "java.lang.String",
+                "value": "java-runtime"
+              }
+            },
+            "capabilities": [
+              {
+                "group": "org.bouncycastle",
+                "name": "bcutil-jdk18on",
+                "version": "1.80.2"
+              }
+            ],
+            "external": null,
+            "owner": {
+              "group": "org.bouncycastle",
+              "module": "bcutil-jdk18on",
+              "version": "1.80.2"
+            }
+          }
+        }
+      ],
+      "attributes": {},
+      "declared": [
+        {
+          "attributes": {},
+          "constraint": {
+            "branch": null,
+            "preferred": "",
+            "rejected": [],
+            "required": "1.80",
+            "strict": ""
+          },
+          "group": "org.bouncycastle",
+          "module": "bcpg-jdk18on",
+          "requestedCapabilities": []
+        },
+        {
+          "attributes": {},
+          "constraint": {
+            "branch": null,
+            "preferred": "",
+            "rejected": [],
+            "required": "1.80",
+            "strict": ""
+          },
+          "group": "org.bouncycastle",
+          "module": "bcpkix-jdk18on",
+          "requestedCapabilities": []
+        }
+      ],
+      "edges": [
+        {
+          "from": {
+            "group": "org.bouncycastle",
+            "module": "bcpg-jdk18on",
+            "version": "1.80"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "[1.80,1.81)",
+              "strict": ""
+            },
+            "group": "org.bouncycastle",
+            "module": "bcprov-jdk18on",
+            "requestedCapabilities": [],
+            "version": "[1.80,1.81)"
+          },
+          "selected": {
+            "group": "org.bouncycastle",
+            "module": "bcprov-jdk18on",
+            "version": "1.80.2"
+          }
+        },
+        {
+          "from": {
+            "group": "org.bouncycastle",
+            "module": "bcpkix-jdk18on",
+            "version": "1.80"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "[1.80,1.81)",
+              "strict": ""
+            },
+            "group": "org.bouncycastle",
+            "module": "bcutil-jdk18on",
+            "requestedCapabilities": [],
+            "version": "[1.80,1.81)"
+          },
+          "selected": {
+            "group": "org.bouncycastle",
+            "module": "bcutil-jdk18on",
+            "version": "1.80.2"
+          }
+        },
+        {
+          "from": {
+            "group": "org.bouncycastle",
+            "module": "bcutil-jdk18on",
+            "version": "1.80.2"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "1.80.2",
+              "strict": ""
+            },
+            "group": "org.bouncycastle",
+            "module": "bcprov-jdk18on",
+            "requestedCapabilities": [],
+            "version": "1.80.2"
+          },
+          "selected": {
+            "group": "org.bouncycastle",
+            "module": "bcprov-jdk18on",
+            "version": "1.80.2"
+          }
+        },
+        {
+          "from": {
+            "kind": "producer-root"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "1.80",
+              "strict": ""
+            },
+            "group": "org.bouncycastle",
+            "module": "bcpg-jdk18on",
+            "requestedCapabilities": [],
+            "version": "1.80"
+          },
+          "selected": {
+            "group": "org.bouncycastle",
+            "module": "bcpg-jdk18on",
+            "version": "1.80"
+          }
+        },
+        {
+          "from": {
+            "kind": "producer-root"
+          },
+          "requested": {
+            "attributes": {},
+            "capabilitySelectors": [],
+            "constraint": {
+              "branch": null,
+              "preferred": "",
+              "rejected": [],
+              "required": "1.80",
+              "strict": ""
+            },
+            "group": "org.bouncycastle",
+            "module": "bcpkix-jdk18on",
+            "requestedCapabilities": [],
+            "version": "1.80"
+          },
+          "selected": {
+            "group": "org.bouncycastle",
+            "module": "bcpkix-jdk18on",
+            "version": "1.80"
+          }
+        }
+      ],
+      "name": "kotlinBouncyCastleConfiguration"
+    }
+  ],
+  "identity": "accepted-R12-source18-JVM-context-production-four-key-v1",
+  "metadata_sources": [
+    {
+      "bytes": 1582,
+      "coordinate": "org.bouncycastle:bcpg-jdk18on:1.80",
+      "filename": "bcpg-jdk18on-1.80.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpg-jdk18on/1.80/bcpg-jdk18on-1.80.pom",
+      "sha256": "07a246c2adafb628783a1ae84ac18d4df4025df06ae3634dfe9387ab94f9ea74"
+    },
+    {
+      "bytes": 1524,
+      "coordinate": "org.bouncycastle:bcpkix-jdk18on:1.80",
+      "filename": "bcpkix-jdk18on-1.80.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpkix-jdk18on/1.80/bcpkix-jdk18on-1.80.pom",
+      "sha256": "a4a122113467b728e18f26fb0cfd57f0b1a0d7c4a53b86718ace70bf8b86ed47"
+    },
+    {
+      "bytes": 1372,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-compat:2.4.0",
+      "filename": "kotlin-build-tools-compat-2.4.0.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-compat/2.4.0/kotlin-build-tools-compat-2.4.0.pom",
+      "sha256": "42c9089dd9c9579e4c12b2ce7b5a13f4679d9e939c7c469ae4b0b50329b27dd4"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-impl:2.4.21",
+      "filename": "kotlin-build-tools-impl-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-impl/2.4.21/kotlin-build-tools-impl-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 2348,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-impl:2.4.21",
+      "filename": "kotlin-build-tools-impl-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-impl/2.4.21/kotlin-build-tools-impl-2.4.21.pom",
+      "sha256": "6ef5cb90e2d8ea75faf9ec668d306b6be7628f11ebd41878a82cae3e17dbedfb"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-compat:2.4.0",
+      "filename": "kotlin-build-tools-compat-2.4.0.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-compat/2.4.0/kotlin-build-tools-compat-2.4.0.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-tooling-core:2.4.0",
+      "filename": "kotlin-tooling-core-2.4.0.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-tooling-core/2.4.0/kotlin-tooling-core-2.4.0.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1127,
+      "coordinate": "org.jetbrains.kotlin:kotlin-tooling-core:2.4.0",
+      "filename": "kotlin-tooling-core-2.4.0.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-tooling-core/2.4.0/kotlin-tooling-core-2.4.0.pom",
+      "sha256": "7984dfcd3b4bc375186ae09efebb4812f896dba0056d0dcd6e36c8339687091b"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-tooling-core:2.4.21",
+      "filename": "kotlin-tooling-core-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-tooling-core/2.4.21/kotlin-tooling-core-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1128,
+      "coordinate": "org.jetbrains.kotlin:kotlin-tooling-core:2.4.21",
+      "filename": "kotlin-tooling-core-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-tooling-core/2.4.21/kotlin-tooling-core-2.4.21.pom",
+      "sha256": "b26b1cb6480001519d4650586cdc6054ea2d2d486ff332431c543eb8f76f41ce"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-api:2.4.21",
+      "filename": "kotlin-build-tools-api-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-api/2.4.21/kotlin-build-tools-api-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1137,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-api:2.4.21",
+      "filename": "kotlin-build-tools-api-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-api/2.4.21/kotlin-build-tools-api-2.4.21.pom",
+      "sha256": "4b909e42d55242520278d5397eca1edd58921fe128942eeff95a6da279c2eb27"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-cri-impl:2.4.21",
+      "filename": "kotlin-build-tools-cri-impl-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-cri-impl/2.4.21/kotlin-build-tools-cri-impl-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1570,
+      "coordinate": "org.jetbrains.kotlin:kotlin-build-tools-cri-impl:2.4.21",
+      "filename": "kotlin-build-tools-cri-impl-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-cri-impl/2.4.21/kotlin-build-tools-cri-impl-2.4.21.pom",
+      "sha256": "57f3c430dfec2e575bb1b64055412ace12d4ed5d9a02eb97a85dd47f53701ef1"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.21",
+      "filename": "kotlin-compiler-embeddable-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-compiler-embeddable/2.4.21/kotlin-compiler-embeddable-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 2647,
+      "coordinate": "org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.21",
+      "filename": "kotlin-compiler-embeddable-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-compiler-embeddable/2.4.21/kotlin-compiler-embeddable-2.4.21.pom",
+      "sha256": "e1620d2b18319cf7495dc67697ab03ba23a7d6d9da685285884a7a8aa08ae891"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-compiler-runner:2.4.21",
+      "filename": "kotlin-compiler-runner-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-compiler-runner/2.4.21/kotlin-compiler-runner-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1924,
+      "coordinate": "org.jetbrains.kotlin:kotlin-compiler-runner:2.4.21",
+      "filename": "kotlin-compiler-runner-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-compiler-runner/2.4.21/kotlin-compiler-runner-2.4.21.pom",
+      "sha256": "619d17c885321949eaa167af0842cad8f7aa83a4a9ca1051e5de04d11a6c0f40"
+    },
+    {
+      "bytes": 12431,
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:2.4.21",
+      "filename": "kotlin-stdlib-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-stdlib/2.4.21/kotlin-stdlib-2.4.21.module",
+      "sha256": "03b0df67c0cd74a948a45c5b03c4bbcfb31ab9b9879fb380adf7c187b6594b7f"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains:annotations:13.0",
+      "filename": "annotations-13.0.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 4930,
+      "coordinate": "org.jetbrains:annotations:13.0",
+      "filename": "annotations-13.0.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/annotations/13.0/annotations-13.0.pom",
+      "sha256": "965aeb2bedff369819bdde1bf7a0b3b89b8247dd69c88b86375d76163bb8c397"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-script-runtime:2.4.21",
+      "filename": "kotlin-script-runtime-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-script-runtime/2.4.21/kotlin-script-runtime-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1134,
+      "coordinate": "org.jetbrains.kotlin:kotlin-script-runtime:2.4.21",
+      "filename": "kotlin-script-runtime-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-script-runtime/2.4.21/kotlin-script-runtime-2.4.21.pom",
+      "sha256": "425d1683a903d085a1718122918242ad6ad0246c79283786697395e4d3a8c801"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-daemon-embeddable:2.4.21",
+      "filename": "kotlin-daemon-embeddable-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-daemon-embeddable/2.4.21/kotlin-daemon-embeddable-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1173,
+      "coordinate": "org.jetbrains.kotlin:kotlin-daemon-embeddable:2.4.21",
+      "filename": "kotlin-daemon-embeddable-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-daemon-embeddable/2.4.21/kotlin-daemon-embeddable-2.4.21.pom",
+      "sha256": "95236a3a7e9953545e2ff7c6dc0ea7ffeb27560000f20abe89dc53790fec3c7e"
+    },
+    {
+      "bytes": 4278,
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0",
+      "filename": "kotlinx-coroutines-core-jvm-1.8.0.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.8.0/kotlinx-coroutines-core-jvm-1.8.0.module",
+      "sha256": "ff6a22da40040938751db0ae21177e76517dbf126a76796f5426727bf76c1228"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-reflect:1.6.10",
+      "filename": "kotlin-reflect-1.6.10.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-reflect/1.6.10/kotlin-reflect-1.6.10.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1375,
+      "coordinate": "org.jetbrains.kotlin:kotlin-reflect:1.6.10",
+      "filename": "kotlin-reflect-1.6.10.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-reflect/1.6.10/kotlin-reflect-1.6.10.pom",
+      "sha256": "57905524274a00ae028aaccc27283f6bc5925a934a046c1cc5d06c8ee4d6d5a9"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.jetbrains.kotlin:kotlin-daemon-client:2.4.21",
+      "filename": "kotlin-daemon-client-2.4.21.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-daemon-client/2.4.21/kotlin-daemon-client-2.4.21.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1353,
+      "coordinate": "org.jetbrains.kotlin:kotlin-daemon-client:2.4.21",
+      "filename": "kotlin-daemon-client-2.4.21.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-daemon-client/2.4.21/kotlin-daemon-client-2.4.21.pom",
+      "sha256": "c2f18065fa18f5e92eff14f34029e4f70052011070655120796adbce7167ad65"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.bouncycastle:bcpkix-jdk18on:1.80",
+      "filename": "bcpkix-jdk18on-1.80.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpkix-jdk18on/1.80/bcpkix-jdk18on-1.80.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.bouncycastle:bcpg-jdk18on:1.80",
+      "filename": "bcpg-jdk18on-1.80.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcpg-jdk18on/1.80/bcpg-jdk18on-1.80.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.bouncycastle:bcutil-jdk18on:1.80.2",
+      "filename": "bcutil-jdk18on-1.80.2.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcutil-jdk18on/1.80.2/bcutil-jdk18on-1.80.2.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1348,
+      "coordinate": "org.bouncycastle:bcutil-jdk18on:1.80.2",
+      "filename": "bcutil-jdk18on-1.80.2.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcutil-jdk18on/1.80.2/bcutil-jdk18on-1.80.2.pom",
+      "sha256": "2688be1af499d525096114cc2f51c7a7a4ca23c3d27317b71e18c1c96bec03d1"
+    },
+    {
+      "bytes": 554,
+      "coordinate": "org.bouncycastle:bcprov-jdk18on:1.80.2",
+      "filename": "bcprov-jdk18on-1.80.2.module",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.80.2/bcprov-jdk18on-1.80.2.module",
+      "sha256": "e791ccfcfee9c0d299d07474d9bfcbfcbebf1181323be601220c8a823062ab99"
+    },
+    {
+      "bytes": 1164,
+      "coordinate": "org.bouncycastle:bcprov-jdk18on:1.80.2",
+      "filename": "bcprov-jdk18on-1.80.2.pom",
+      "origin": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/1.80.2/bcprov-jdk18on-1.80.2.pom",
+      "sha256": "12a505a717a3bc7647f7d8edea77732c9c6dcb53c4df62a3bb58b7a54228a28f"
+    }
+  ],
+  "origin_policy": "exact independently captured Maven Central HTTPS URL + exact body; no re-enrollment from runtime graph/cache",
+  "original_R12_provenance": {
+    "compact_zip_sha256": "338438cd3b6dc0045f9d0bf5d52276f52cea46d7a5f3816c12e1609dd9dfc0ab",
+    "graph_sha256": "9c1a08f41f9cb50ab563b40d8abe7d94d8595b194451f6ef1ad34111216d8f36",
+    "head": "a5a5422bae3e82a394927570499eb0f3e15191aa",
+    "job": 117041286451,
+    "online_offline_equal": true,
+    "producer_gradle_sha256": "349b09908302a83894d28b63ddc396c7d98892060b73f15b4f443a4038a08818",
+    "producer_inputs_sha256": "9d66add1f0b6a4fee8979406002f86de9afac37b4f097b486445543ef71f96d0",
+    "producer_registry_sha256": "17d2f9040d69594c5e59f87cf0daa7f20390e9d2346ed0e986a355cb13fa08a4",
+    "root_acceptance_sha256": "eb04d89f0a57bbbfefd3eaf7f052487a62ece2cb3d5cbcc1682e1a21e3d3c714",
+    "run": 38921205787,
+    "runtime_or_native_claim": false,
+    "selected_catalog_sha256": "9f3d94761f46f6d150fbc386d7b5c242658bc89f57d2e83a915966fd42d53627"
+  },
+  "rich": [
+    {
+      "configuration": "kotlinAbiValidationCompatClasspath",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "[2.4.0-Beta2, 2.5.0)",
+        "strict": "[2.4.0-Beta2, 2.5.0)"
+      },
+      "group": "org.jetbrains.kotlin",
+      "module": "kotlin-build-tools-impl"
+    },
+    {
+      "configuration": "kotlinBouncyCastleConfiguration",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "[1.80,1.81)",
+        "strict": ""
+      },
+      "group": "org.bouncycastle",
+      "module": "bcutil-jdk18on",
+      "source_parent": "org.bouncycastle:bcpkix-jdk18on:1.80"
+    },
+    {
+      "configuration": "kotlinBouncyCastleConfiguration",
+      "constraint": {
+        "branch": null,
+        "preferred": "",
+        "rejected": [],
+        "required": "[1.80,1.81)",
+        "strict": ""
+      },
+      "group": "org.bouncycastle",
+      "module": "bcprov-jdk18on",
+      "source_parents": [
+        "org.bouncycastle:bcpg-jdk18on:1.80",
+        "org.bouncycastle:bcutil-jdk18on:1.80"
+      ]
+    }
+  ],
+  "schema": 1,
+  "scope": {
+    "KGP_published_metadata": {
+      "bytes": 143775,
+      "path": "/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/2.4.0/kotlin-gradle-plugin-2.4.0.module",
+      "sha256": "7b7c5da8bc0b62e3f6f39e43960e777625dbf3da157a55c36a7cdc0216d306fa",
+      "source_only": true
+    },
+    "generator_classloader_instrumented_JAR_claim": false,
+    "generator_sources": [
+      {
+        "bytes": 16566,
+        "path": "official-kotlin/KotlinPluginWrapper.kt",
+        "sha256": "3ec9ce9cc3c0d9140ad0bbc824a2d596025d09927268c512a2dfbbc4f9c2ff96",
+        "url": "https://raw.githubusercontent.com/JetBrains/kotlin/add726ca8c82922b6ab4cb2a27ae738d6a780817/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/KotlinPluginWrapper.kt"
+      },
+      {
+        "bytes": 8298,
+        "path": "official-kotlin/AbiConfigs.kt",
+        "sha256": "2cd8e664f574405a3cf5b9b6c90062f05d957eacfc74b67152ff246cc89a9eab",
+        "url": "https://raw.githubusercontent.com/JetBrains/kotlin/add726ca8c82922b6ab4cb2a27ae738d6a780817/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/abi/internal/Configs.kt"
+      }
+    ],
+    "project": ":app",
+    "root_relative": "source/app/android",
+    "sources": {
+      "app/android/app/build.gradle.kts": "34544975abb19c80b8bc650fa00a487ff176ef0743ab3f4e6392c465e244f95e",
+      "app/android/build.gradle.kts": "6a26dba2cb8dfba1e74f540b0d17a89d96c1301d3c3bfda14348bed257fddcba",
+      "app/android/settings.gradle.kts": "a4b5e2c0a9b1b28eb08854e97706146542c7d950b77dd1290d0cc9d26f4369b8"
+    }
+  },
+  "source_binaries_downloaded_locally_this_candidate": 0
+}

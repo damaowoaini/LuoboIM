@@ -1,0 +1,42 @@
+{
+  "files": [
+    {
+      "bytes": 2691,
+      "path": ".github/workflows/apple-current359-resolve.yml",
+      "sha256": "a707e00af70215bd03546dd318fb3d46fb6cce8ca9f9526a81e5def62cc06c53"
+    },
+    {
+      "bytes": 2366,
+      "path": "ci/apple-current359/README.md",
+      "sha256": "4a81879ca903ebafeeffa95e2ce2cb74cdf06c85f4dd63ccf9dbb19ac53285d0"
+    },
+    {
+      "bytes": 9176,
+      "path": "ci/apple-current359/consume.py",
+      "sha256": "3f02b36096e4d61c7eb8a82a59d26b4968274254472a50d7e52bdd9522f3e213"
+    },
+    {
+      "bytes": 206038,
+      "path": "ci/apple-current359/inputs.json",
+      "sha256": "3cbabbffca956f018a54469740f6ef5e244d92bd3feca1df6ad5ff25670f5393"
+    },
+    {
+      "bytes": 10462,
+      "path": "ci/apple-current359/lane.json",
+      "sha256": "a0ed978f646a3da219c9a22f45cbf36ceb67c9ea00d1e2787614e980466bdead"
+    },
+    {
+      "bytes": 33729,
+      "path": "ci/apple-current359/run.py",
+      "sha256": "6d73062a489bd9cc272fb538d3e79c50805a4941a2017a67e0bcc7d6a0725af4"
+    },
+    {
+      "bytes": 2662,
+      "path": "ci/apple-current359/test_consumer.py",
+      "sha256": "1c330baaf75bd5919d32d3536a31942aebd976b6c22b9dd60789590c72dbb66b"
+    }
+  ],
+  "identity": "current359-apple-native-resolution-v1",
+  "schema": 1,
+  "self_pin": "registry excluded from self hash; activation pins lane,Root pins registry"
+}

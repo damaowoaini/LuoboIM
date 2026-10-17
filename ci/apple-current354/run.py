@@ -279,6 +279,19 @@ def host_snapshot(original, host):
     return rows
 
 
+def official_pod_sources(selected, lane):
+    """Check fixed host tools and immutable official source before loading the gem."""
+    wanted = lane['cocoapods_preinstalled']
+    pod_selector.require_identity(selected, wanted)
+    root = Path(selected['gem_root'])/'gems'/('cocoapods-'+wanted['version'])
+    rows = []
+    for item in wanted['source_files']:
+        consume.read_file(root, item)
+        rows.append({k: item[k] for k in ['path', 'bytes', 'sha256']})
+    return {'official_commit': wanted['official_commit'], 'version': wanted['version'],
+            'gem_root': str(root), 'files': rows}
+
+
 def pod_tool_sources(work, selected, e, lane):
     pod = pod_selector.recheck(selected, Path(e['HOME']))
     # Read the selected preinstalled script's interpreter, never install a gem or use user gems.
@@ -288,7 +301,7 @@ def pod_tool_sources(work, selected, e, lane):
     ruby = Path(header[2:]).resolve(strict=True)
     if ruby != Path(selected['ruby']['path']) or not str(ruby).startswith('/opt/homebrew/'):
         raise ValueError('preinstalled Homebrew Ruby source required')
-    program = """require 'json';require 'cocoapods';abort 'pod version' unless Pod::VERSION=='1.16.2';puts JSON.generate({ruby:RUBY_VERSION,ruby_binary:RbConfig.ruby,gems:Gem.loaded_specs.values.map{|s|{name:s.name,version:s.version.to_s,path:s.full_gem_path}}})"""
+    program = """require 'json';require 'cocoapods';abort 'pod version' unless Pod::VERSION=='1.17.0' && Gem.loaded_specs['cocoapods'].version.to_s=='1.17.0' && Gem.loaded_specs['cocoapods-core'].version.to_s=='1.17.0';puts JSON.generate({ruby:RUBY_VERSION,ruby_binary:RbConfig.ruby,gems:Gem.loaded_specs.values.map{|s|{name:s.name,version:s.version.to_s,path:s.full_gem_path}}})"""
     source = json.loads(command(work, 'pod-source', [ruby, '-e', program], work, e))
     if Path(source['ruby_binary']).resolve(strict=True) != ruby:
         raise ValueError('selected Ruby differs from actual gem interpreter')
@@ -316,15 +329,17 @@ def pod_tool_sources(work, selected, e, lane):
            'gems': rows, 'preinstalled_source_first_observation': True,
            'source_provenance_Root_acceptance': False})
     pod_selector.recheck(selected, Path(e['HOME']))
+    official_pod_sources(selected, lane)
 
 
-def selected_pod(work):
+def selected_pod(work, lane):
     raw = packaging.regular(work/'evidence/selected-cocoapods.json', 64*1024)
     acquired = json.loads(packaging.regular(work/'evidence/acquire-complete.json'))
     if acquired.get('selected_cocoapods_sha256') != packaging.sha(raw):
         raise ValueError('original acquired CocoaPods selection differs')
     selected = json.loads(raw)
     pod_selector.recheck(selected, Path(os.environ['HOME']))
+    official_pod_sources(selected, lane)
     return selected
 
 
@@ -333,10 +348,11 @@ def acquire(work, lane, spec, plugins):
     record(work/'evidence/selected-cocoapods.json', selected)
     pod = pod_selector.recheck(selected, Path(os.environ['HOME']))
     e = env(work, selected)
+    record(work/'evidence/cocoapods-official-source-pins.json', official_pod_sources(selected, lane))
     for name in ['tmp', 'cache', 'config', 'cocoapods', 'cocoapods/repos', 'cocoapods/cache', 'spm', 'origins']:
         mkdir(work/name)
-    if command(work, 'pod-version', [pod, '--version'], work, e) != b'1.16.2\n':
-        raise ValueError('preinstalled CocoaPods1.16.2 required; no gem install')
+    if command(work, 'pod-version', [pod, '--version'], work, e) != b'1.17.0\n':
+        raise ValueError('preinstalled CocoaPods1.17.0 required; no gem install')
     pod_tool_sources(work, selected, e, lane)
     source_stage(work, spec, e)
     reuse_core(work, lane, spec)
@@ -387,7 +403,7 @@ def resolve(work, lane, spec, plugins):
     acquired = json.loads(packaging.regular(work/'evidence/acquire-complete.json'))
     if acquired['identity'] != IDENTITY or acquired['source_ref'] != spec['source_ref']:
         raise ValueError('acquisition identity differs')
-    selected = selected_pod(work)
+    selected = selected_pod(work, lane)
     e = env(work, selected)
     configuration = json.loads(packaging.regular(work/'source/app/.dart_tool/package_config.json'))
     base = (work/'source/app/.dart_tool/package_config.json').as_uri()
@@ -461,7 +477,7 @@ def resolve(work, lane, spec, plugins):
 def package(work, lane, spec):
     # Current descriptor contains null; this check runs before any native command.
     resolution = packaging.require_approval(lane, packaging.regular(work/'evidence/catalogue.json'))
-    selected = selected_pod(work)
+    selected = selected_pod(work, lane)
     e = env(work, selected)
     before = capture(work, 'before-App')
     for kind, argv in packaging.app_commands(work, lane['xcodebuild']):

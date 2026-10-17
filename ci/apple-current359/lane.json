@@ -1,0 +1,288 @@
+{
+  "R10_root_acceptance": {
+    "bytes": 3140,
+    "path": "references/integration/apple-sdk-real-link-cloud-run-38966282283/root-acceptance.json",
+    "sha256": "cd65a2ab9dfb36ec468724c87cade3616b60ba218a174e91826f65e461cfc8ca"
+  },
+  "approved_native_resolution": null,
+  "borrowed": [
+    {
+      "bytes": 9781,
+      "path": "ci/apple-sdk-link/custody.py",
+      "sha256": "c242cbcc956b498b33a13dc18f87234212486616235b93de8443c63da7aac7f3"
+    },
+    {
+      "bytes": 18927,
+      "path": "ci/apple-sdk-link-real/run.py",
+      "sha256": "dff6340dd2774ffc4493194ae10635162b8907fffab217608da3f495f6fcc940"
+    },
+    {
+      "bytes": 33866,
+      "path": "ci/apple-sdk-link-real/inputs.json",
+      "sha256": "1fa9b5f3c26785cb8db1324320a24b1b663c38f45e2eabb7d07461fba4824910"
+    },
+    {
+      "bytes": 11626,
+      "path": "ci/apple-host-tool/run.py",
+      "sha256": "ef4fef688a380c0d7c39c078e812e91f89adee77b8fda1d0203cef2128cfca94"
+    },
+    {
+      "bytes": 7394,
+      "path": "ci/apple-sdk/resource_dual.py",
+      "sha256": "d1d872e0c2b394d73549f0ed071c457ee5019c41b90277c748c328b0219e7718"
+    },
+    {
+      "bytes": 7950,
+      "path": "ci/apple-sdk/core_binary.py",
+      "sha256": "76c87f6e12678f4588636793995245330e6022d8a6340ace285486b3ba36f1f9"
+    },
+    {
+      "bytes": 10141,
+      "path": "ci/apple-current354/packaging.py",
+      "sha256": "7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248"
+    },
+    {
+      "bytes": 5603,
+      "path": "ci/apple-current354/pod_selector.py",
+      "sha256": "820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769"
+    },
+    {
+      "bytes": 146462,
+      "path": "ci/apple-current354/plugins.json",
+      "sha256": "794c22d92cd4052e7dee3299516843bc937e17ead88fed0638efd2a109fcdbea"
+    }
+  ],
+  "business359": "2e5a8afd7ee7370485954061b17be776c1da6162323807b48909ae2030477899",
+  "cocoapods_config": {
+    "bytes": 9929,
+    "lines": {
+      "CP_CACHE_DIR": [
+        110,
+        113
+      ],
+      "CP_HOME_DIR": [
+        100,
+        103,
+        127,
+        133
+      ]
+    },
+    "official_commit": "5493bfd201a3be9325123cfa59142760afe198d7",
+    "sha256": "9213f9002f16869b7fc1c6c7fb87ced2333effadcab9c23fdb89e61001da34d8",
+    "url": "https://raw.githubusercontent.com/CocoaPods/CocoaPods/5493bfd201a3be9325123cfa59142760afe198d7/lib/cocoapods/config.rb",
+    "version": "1.17.0"
+  },
+  "cocoapods_preinstalled": {
+    "gem_root": "/opt/homebrew/lib/ruby/gems/3.3.0",
+    "observation": {
+      "job": 117248848625,
+      "run": 38983283646,
+      "scope": "actual preinstalled script/Ruby and version only; loaded gems/official source equality/native resolution still unexecuted",
+      "version_stdout_sha256": "00afc49f1599e59129a59b64c2b019de3fe35300c05bb9d96cb25002576ff43b"
+    },
+    "official_commit": "5493bfd201a3be9325123cfa59142760afe198d7",
+    "ruby": {
+      "bytes": 33968,
+      "mode": 365,
+      "path": "/opt/homebrew/Cellar/ruby@3.3/3.3.12/bin/ruby",
+      "sha256": "b2fcb0784f44dfe2b9926f4222699bcafdc78f17cd5a9205ddac16c87da4e303"
+    },
+    "script": {
+      "bytes": 568,
+      "mode": 493,
+      "path": "/opt/homebrew/lib/ruby/gems/3.3.0/bin/pod",
+      "sha256": "25f6cc2943b8ab12b776abeab1a29e0115ecc290a6dc109f0cda72f7c26e8efe"
+    },
+    "source_files": [
+      {
+        "bytes": 1453,
+        "path": "bin/pod",
+        "sha256": "2e1a93789cf30c8dfee03eac6dfdef7ad6da58655ed7e69736f67325d60b70d2",
+        "url": "https://raw.githubusercontent.com/CocoaPods/CocoaPods/5493bfd201a3be9325123cfa59142760afe198d7/bin/pod"
+      },
+      {
+        "bytes": 3675,
+        "path": "lib/cocoapods.rb",
+        "sha256": "213b41e2eb7fead71897657b464f4899b18042bb38ed66417a85b22e8cf07491",
+        "url": "https://raw.githubusercontent.com/CocoaPods/CocoaPods/5493bfd201a3be9325123cfa59142760afe198d7/lib/cocoapods.rb"
+      },
+      {
+        "bytes": 9929,
+        "path": "lib/cocoapods/config.rb",
+        "sha256": "9213f9002f16869b7fc1c6c7fb87ced2333effadcab9c23fdb89e61001da34d8",
+        "url": "https://raw.githubusercontent.com/CocoaPods/CocoaPods/5493bfd201a3be9325123cfa59142760afe198d7/lib/cocoapods/config.rb"
+      },
+      {
+        "bytes": 128,
+        "path": "lib/cocoapods/gem_version.rb",
+        "sha256": "df7a1345fd2b3426afcf58a00a11d5cf452f740afdc16ae47b545460a1802239",
+        "url": "https://raw.githubusercontent.com/CocoaPods/CocoaPods/5493bfd201a3be9325123cfa59142760afe198d7/lib/cocoapods/gem_version.rb"
+      }
+    ],
+    "version": "1.17.0"
+  },
+  "flutter": {
+    "commit": "abaf9c523780a608bd46686fd5e53740a07077f8",
+    "dart": "3.13.5",
+    "engine": "deb287481e3ce9468f3434937ced4240a70539ca",
+    "repository": "https://github.com/flutter/flutter.git",
+    "tag": "3.47.7"
+  },
+  "flutter_source_pins": [
+    {
+      "bytes": 41,
+      "path": "bin/internal/engine.version",
+      "sha256": "0afc1ac714118b30d5691ecb010cb23ceef7b336dfb5097f337d580b39ffed19"
+    },
+    {
+      "bytes": 5941,
+      "path": "bin/internal/update_dart_sdk.sh",
+      "sha256": "730d3f3145d0c652147043fa914ac54679ab2b4ac94f8f983e4d44f1e17cb6f7"
+    },
+    {
+      "bytes": 6531,
+      "path": "packages/flutter_tools/lib/src/base/config.dart",
+      "sha256": "307ce29f4353b1266aeac395363db11466792ed27206ffe0dda778f81c132367"
+    },
+    {
+      "bytes": 47591,
+      "path": "packages/flutter_tools/lib/src/xcode_project.dart",
+      "sha256": "9f90819da0157880d3aa4521d677cd237162a50cef9a76f3121828688baa7f06"
+    },
+    {
+      "bytes": 19894,
+      "path": "packages/flutter_tools/lib/src/macos/darwin_dependency_management.dart",
+      "sha256": "45d0f0d266bf528c16298d4050e1f557dc04a727f36ea5c7b00d2efd18d9cea5"
+    },
+    {
+      "bytes": 21279,
+      "path": "packages/flutter_tools/lib/src/macos/swift_package_manager.dart",
+      "sha256": "870e13e60e5f5f4bbd01fcb8d567aec470a292730e2276401ab8f6219b8cc6e9"
+    },
+    {
+      "bytes": 3696,
+      "path": "packages/flutter_tools/lib/src/macos/cocoapod_utils.dart",
+      "sha256": "317e8aaf955070d2508ec2815005c1dd021c47b5badc3be7faeb8566fd42e62a"
+    },
+    {
+      "bytes": 26580,
+      "path": "packages/flutter_tools/lib/src/macos/cocoapods.dart",
+      "sha256": "a5f3df4e62e4f04e70bc638b22f3057534c3910c6d56033bf9708270ef314d36"
+    },
+    {
+      "bytes": 61324,
+      "path": "packages/flutter_tools/lib/src/ios/mac.dart",
+      "sha256": "2992e06d93210e6f3cebcb40c56cbfe8458d4bed5e1cd30ce892d4f6041d6407"
+    },
+    {
+      "bytes": 27804,
+      "path": "packages/flutter_tools/lib/src/ios/xcodeproj.dart",
+      "sha256": "296b0bfb0cfef2d829d8524e86d6d4f0aba87e8ac903eda6d9ece0dde426cc81"
+    },
+    {
+      "bytes": 19722,
+      "path": "packages/flutter_tools/bin/podhelper.rb",
+      "sha256": "455e786c8c92e23bce614311549cfd38815c3c0b0a1d6a6860039ccca407b922"
+    },
+    {
+      "bytes": 35338,
+      "path": "packages/flutter_tools/lib/src/isolated/native_assets/native_assets.dart",
+      "sha256": "cc6cbd4293e96f8b0bcfe480b2e101d0c0980a686f46adf0f4eac98dfff5ce0d"
+    }
+  ],
+  "hook_source_pins": [
+    {
+      "bytes": 5874,
+      "package": "sqlite3",
+      "path": "lib/src/hook/assets.dart",
+      "sha256": "2934c9e63b5cd9205d460ce2a08347c06352e92b91ccc1527eff87326b0cad69"
+    },
+    {
+      "bytes": 5736,
+      "package": "sqlite3",
+      "path": "lib/src/hook/asset_hashes.dart",
+      "sha256": "bcb2186b0532d3931ceae3e323d3587dd3a7b528b508e26399c7da6927500929"
+    },
+    {
+      "bytes": 15472,
+      "package": "sqlite3",
+      "path": "lib/src/hook/compile/description.dart",
+      "sha256": "dfc5540cca31100fa644d432b547c8c2c13e0106f227173e7551606cc4f0e449"
+    }
+  ],
+  "identity": "current359-apple-native-resolution-v1",
+  "implementation_count": 20,
+  "native_origins": [
+    {
+      "cap_bytes": 536870912,
+      "filename": "WebRTC.xcframework.zip",
+      "kind": "WebRTC_SPM_binary",
+      "sha256": "03815cdf2f6a0ed328c94d74cce8fd1b8d2b6e95e2b37eab66795012fcecfdfa",
+      "url": "https://github.com/webrtc-sdk/Specs/releases/download/150.7871.01/WebRTC.xcframework.zip"
+    },
+    {
+      "cap_bytes": 33554432,
+      "filename": "libsqlite3.arm64.ios.dylib",
+      "kind": "sqlite3_hook",
+      "sha256": "f1bc69a4304a21e472c15f849c34ae46539483cfa7ce901f54175c6d6cc17991",
+      "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.arm64.ios.dylib"
+    },
+    {
+      "cap_bytes": 33554432,
+      "filename": "libsqlite3.arm64.ios_sim.dylib",
+      "kind": "sqlite3_hook",
+      "sha256": "1ce8ac8ebbb3f61fd6282c45a4da15b9c6c6ec169eff40a918520357a502510b",
+      "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.arm64.ios_sim.dylib"
+    },
+    {
+      "cap_bytes": 33554432,
+      "filename": "libsqlite3.arm64.macos.dylib",
+      "kind": "sqlite3_hook",
+      "sha256": "6d80ba56cff1fa44f62bebc3e6b6b71513cc628862a9745c223c7bea8bf813f3",
+      "url": "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-3.5.2/libsqlite3.arm64.macos.dylib"
+    }
+  ],
+  "own_inputs": [
+    {
+      "bytes": 2366,
+      "path": "ci/apple-current359/README.md",
+      "sha256": "4a81879ca903ebafeeffa95e2ce2cb74cdf06c85f4dd63ccf9dbb19ac53285d0"
+    },
+    {
+      "bytes": 9176,
+      "path": "ci/apple-current359/consume.py",
+      "sha256": "3f02b36096e4d61c7eb8a82a59d26b4968274254472a50d7e52bdd9522f3e213"
+    },
+    {
+      "bytes": 206038,
+      "path": "ci/apple-current359/inputs.json",
+      "sha256": "3cbabbffca956f018a54469740f6ef5e244d92bd3feca1df6ad5ff25670f5393"
+    },
+    {
+      "bytes": 33729,
+      "path": "ci/apple-current359/run.py",
+      "sha256": "6d73062a489bd9cc272fb538d3e79c50805a4941a2017a67e0bcc7d6a0725af4"
+    },
+    {
+      "bytes": 2662,
+      "path": "ci/apple-current359/test_consumer.py",
+      "sha256": "1c330baaf75bd5919d32d3536a31942aebd976b6c22b9dd60789590c72dbb66b"
+    }
+  ],
+  "packages": 178,
+  "portable411": "71cbb95b92c7a4603165a8d5e5cbba1d99cfb34cc66371a27af51db4d23b9ed3",
+  "resource": {
+    "all_owned_cap_bytes": 17179869184,
+    "cold_bytes": 21474836480,
+    "continuous_floor_bytes": 1073741824,
+    "estimate_not_measured": true,
+    "phase_bytes": 4294967296,
+    "poll_seconds": 0.2,
+    "stage_timeout_seconds": 1800
+  },
+  "schema": 1,
+  "source_members": 477,
+  "source_ref": "bdffc675e6ec0f193bcb5cf786859a7746869061",
+  "state": "source_only_resolution_pending_not_App_accepted",
+  "xcodebuild": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild"
+}

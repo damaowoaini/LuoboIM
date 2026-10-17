@@ -104,3 +104,17 @@ def recheck(proof, home, prefix=PREFIX):
     if actual != proof:
         raise ValueError('original selected CocoaPods or Ruby body changed')
     return Path(proof['script']['path'])
+
+
+def require_identity(proof, wanted):
+    """The reviewed1.17.0 host observation is exact, never a version range."""
+    if (not isinstance(proof, dict) or proof.get('schema') != SCHEMA
+            or wanted.get('version') != '1.17.0'
+            or proof.get('gem_root') != wanted.get('gem_root')):
+        raise ValueError('reviewed CocoaPods1.17.0 identity required')
+    for kind in ['script', 'ruby']:
+        expected = wanted[kind]
+        actual = proof[kind]
+        if set(expected) != {'path', 'bytes', 'sha256', 'mode'} or any(
+                actual.get(key) != expected[key] for key in expected):
+            raise ValueError('observed CocoaPods or Ruby identity differs')
