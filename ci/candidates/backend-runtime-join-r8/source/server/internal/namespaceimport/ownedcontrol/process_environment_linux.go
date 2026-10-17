@@ -22,6 +22,9 @@ type OwnedServiceEnvironment struct {
 }
 
 func ownedServiceEnvironmentKey(role, key string) bool {
+	if role == "rpc-group" {
+		return key == "LUOBO_GROUP_OWNED_RECEIVER_INPUT" || key == "LUOBO_GROUP_OWNED_RECEIVER_INPUT_SHA256"
+	}
 	if role != "rpc-rtc" && role != "api" {
 		return false
 	}
@@ -56,6 +59,19 @@ func loadOwnedServiceEnvironment(spec ServiceSpec) ([]string, error) {
 			return nil, ErrOwnedEvidence
 		}
 		keys = append(keys, key)
+	}
+	if v.Role == "rpc-group" && len(v.Values) != 0 {
+		path, pin := v.Values["LUOBO_GROUP_OWNED_RECEIVER_INPUT"], v.Values["LUOBO_GROUP_OWNED_RECEIVER_INPUT_SHA256"]
+		if len(v.Values) != 2 || !filepath.IsAbs(path) || filepath.Clean(path) != path || !isSHA(pin) {
+			return nil, ErrOwnedEvidence
+		}
+		// This is only source configuration custody. The actual group child must
+		// still execute LoadOwnedGroupReceiverBootstrap and check its original
+		// database/epoch/activation, retained profiles and private-v2 gate.
+		input, err := namespaceinventory.ReadPrivateDocument(path, 16<<10)
+		if err != nil || sha(input) != pin {
+			return nil, ErrOwnedEvidence
+		}
 	}
 	sort.Strings(keys)
 	out := make([]string, 0, len(keys))

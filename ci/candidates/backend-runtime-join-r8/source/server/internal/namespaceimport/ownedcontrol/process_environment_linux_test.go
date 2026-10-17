@@ -103,4 +103,59 @@ func TestOwnedServicePrivateEnvironmentKeepsIdentityAndRejectsOwnerOverrides(t *
 			t.Fatal("unknown runtime override accepted")
 		}
 	})
+	t.Run("group-secondary-bootstrap-is-role-bound-complete-private-and-exact", func(t *testing.T) {
+		dir := t.TempDir()
+		if os.Chmod(dir, 0700) != nil {
+			t.Fatal("private group source directory unavailable")
+		}
+		path := filepath.Join(dir, "group-input.json")
+		raw := []byte("{\"version\":\"source-loader-still-validates-the-full-original-manifest\"}\n")
+		if os.WriteFile(path, raw, 0600) != nil {
+			t.Fatal("private source write failed")
+		}
+		value := OwnedServiceEnvironment{Version: valid.Version, Role: "rpc-group", Values: map[string]string{"LUOBO_GROUP_OWNED_RECEIVER_INPUT": path, "LUOBO_GROUP_OWNED_RECEIVER_INPUT_SHA256": sha(raw)}}
+		spec, _ := environmentFixtureFile(t, value)
+		actual, e := loadOwnedServiceEnvironment(spec)
+		if e != nil || !reflect.DeepEqual(actual, []string{"LUOBO_GROUP_OWNED_RECEIVER_INPUT=" + path, "LUOBO_GROUP_OWNED_RECEIVER_INPUT_SHA256=" + sha(raw)}) {
+			t.Fatal("actual group constructor source cannot reach its existing child loader")
+		}
+		// No semantic grant is minted here: deliberately incomplete input is
+		// retained verbatim for the actual child parser, never treated as Ready.
+		for _, kind := range []string{"path-only", "sha-only", "wrong-role", "wrong-body", "public-file", "symlink", "foreign-owner-key"} {
+			copy := OwnedServiceEnvironment{Version: value.Version, Role: value.Role, Values: map[string]string{}}
+			for key, v := range value.Values {
+				copy.Values[key] = v
+			}
+			switch kind {
+			case "path-only":
+				delete(copy.Values, "LUOBO_GROUP_OWNED_RECEIVER_INPUT_SHA256")
+			case "sha-only":
+				delete(copy.Values, "LUOBO_GROUP_OWNED_RECEIVER_INPUT")
+			case "wrong-role":
+				copy.Role = "rpc-user"
+			case "wrong-body":
+				copy.Values["LUOBO_GROUP_OWNED_RECEIVER_INPUT_SHA256"] = strings.Repeat("a", 64)
+			case "public-file":
+				if os.Chmod(path, 0644) != nil {
+					t.Fatal("fixture mode update failed")
+				}
+			case "symlink":
+				alias := filepath.Join(dir, "alias.json")
+				if os.Symlink(path, alias) != nil {
+					t.Fatal("fixture alias unavailable")
+				}
+				copy.Values["LUOBO_GROUP_OWNED_RECEIVER_INPUT"] = alias
+			case "foreign-owner-key":
+				copy.Values["LUOBO_NAMESPACE_RUNTIME_PREPARATION_PATH"] = path
+			}
+			bad, _ := environmentFixtureFile(t, copy)
+			if rows, e := loadOwnedServiceEnvironment(bad); e == nil || rows != nil {
+				t.Fatal("unbound group secondary source was admitted: " + kind)
+			}
+			if os.Chmod(path, 0600) != nil {
+				t.Fatal("fixture mode restore failed")
+			}
+		}
+	})
+
 }

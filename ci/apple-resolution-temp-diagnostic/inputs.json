@@ -5,8 +5,8 @@
   "owned": [
     {
       "path": "ci/apple-resolution-temp-diagnostic/run.py",
-      "bytes": 25251,
-      "sha256": "e41ee7dc864fb897f432d475026fd8652f213e4ecaa947d165e7a12e6a11f3d0"
+      "bytes": 29570,
+      "sha256": "db382c54e139184dfbc4015d8b60eae00dbed152054b8c796fc08cf479208f56"
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/fixtures.py",
@@ -15,8 +15,8 @@
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/test_temp_probe.py",
-      "bytes": 10172,
-      "sha256": "bfd74a4efbfc29c68ea0007cb7cce1eee592e0f3d3b890c1311c37f0df3d5bc5"
+      "bytes": 12648,
+      "sha256": "e18fdc18f3a1dcf4bd6df3d886a31dd72c7ca9ae5b6a797a7ae43306ef8a5165"
     },
     {
       "path": ".github/workflows/apple-resolution-temp-diagnostic.yml",
@@ -351,5 +351,21 @@
     ],
     "unresolved_failure": "DerivedData LogStore, systemT ResultBundle and legacy Swift driver temp EPERM; specific syscall unknown",
     "notPermissionFixOrSuccessfulResolution": true
-  }
+  },
+  "macosSDKSelectionSuccessor": {
+    "root": "exact original R21 source and actual preflight/acquisition host pins; no prior Swift tiny or this local SPM outcome",
+    "selectedXcodeDeveloper": "/Applications/Xcode_16.4.app/Contents/Developer",
+    "SDKAlias": "/Applications/Xcode_16.4.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+    "old20ToolPinsUnchanged": true,
+    "SDKSettingsAndArm64InterfaceFirstObservationNotOldPins": true,
+    "nativeExecutionVerifiedHere": false,
+    "sourceFailureRun": 39040636521,
+    "sourceFailureJob": 117419281463,
+    "sourceFailureHead": "2cad4d9b86b6010dcc288bf17ce3190e180d1f70",
+    "sourceFailureArtifactSHA256": "decb45b722820a629c09b0047ce9dfc4e7d241b2205b19cf230f5d14583eff0e",
+    "sdkAbsenceOrPermissionCauseProven": false
+  },
+  "preparedNewPureOnly1": [
+    "TempDiagnostic.test_actual_sdk_source_observation_rejects_foreign_alias_and_records_real_arm64_interface_changes"
+  ]
 }

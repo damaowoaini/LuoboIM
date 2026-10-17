@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import platform
 import pwd
+import re
 import selectors
 import signal
 import stat
@@ -20,6 +21,7 @@ REPO = HERE.parents[1]
 IDENTITY = 'apple-xcode164-owned-temp-swift-spm-diagnostic-r23-v1'
 DEVELOPER = '/Applications/Xcode_16.4.app/Contents/Developer'
 SWIFTC = DEVELOPER + '/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc'
+MACOS_SDK = DEVELOPER + '/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk'
 LOG_CAP = 256 * 1024
 CAP = 64 * 1048576
 FRESH_PHASES = ('swift',)
@@ -81,7 +83,7 @@ def record(path, value):
 
 def native_argv(work, phase):
     if phase == 'swift':
-        return ['/usr/bin/arch', '-arm64', SWIFTC, '-v', '-emit-library',
+        return ['/usr/bin/arch', '-arm64', SWIFTC, '-v', '-sdk', MACOS_SDK, '-emit-library',
                 '-parse-as-library', '-module-name', 'OwnedResolutionProbe',
                 '-module-cache-path', str(work/'cache/swift-modules'),
                 '-o', str(work/'tmp/libOwnedResolutionProbe.dylib'), str(work/'source/Probe.swift')]
@@ -161,6 +163,69 @@ def tools_snapshot(spec, host):
     python = Path(sys.executable).resolve(strict=True)
     rows.append(host.fingerprint(python, 64 << 20, True))
     return rows
+
+
+def macos_sdk_snapshot(developer, fingerprint):
+    """Observe only the selected Xcode SDK alias and finite public source leaves.
+
+    These are first observations, not extra aliases for the original 20 tool
+    pins. No tool, xcrun, read of an SDK body into an artifact, or cache write.
+    """
+    developer = Path(developer)
+    if not developer.is_absolute() or developer.resolve(strict=True) != developer:
+        raise ValueError('canonical selected Xcode developer required')
+    fields = lambda s: (s.st_dev,s.st_ino,s.st_mode,s.st_uid,s.st_gid,s.st_nlink,
+                        s.st_size,s.st_mtime_ns,s.st_ctime_ns)
+    directories = {}
+    def directory(path):
+        info = path.lstat()
+        if path.resolve(strict=True) != path or not stat.S_ISDIR(info.st_mode):
+            raise ValueError('selected SDK canonical directory required')
+        directories[str(path)] = fields(info)
+        return path
+    parent = directory(developer)
+    for part in ['Platforms','MacOSX.platform','Developer','SDKs']:
+        parent = directory(parent/part)
+    alias = parent/'MacOSX.sdk'
+    alias_before = fields(alias.lstat())
+    link = None
+    if alias.is_symlink():
+        link = os.readlink(alias)
+        if not re.fullmatch(r'MacOSX[0-9]+(?:\.[0-9]+){0,2}\.sdk',link):
+            raise ValueError('selected SDK finite same-Xcode alias required')
+        canonical = directory(parent/link)
+    else:
+        canonical = directory(alias)
+    if alias.resolve(strict=True) != canonical or canonical.parent != parent:
+        raise ValueError('selected SDK canonical containment required')
+    def leaf(relative,cap):
+        p = canonical
+        parts = relative.split('/')
+        for part in parts[:-1]:p = directory(p/part)
+        return fingerprint(p/parts[-1],cap,True)
+    leaves = [leaf(n,1 << 20) for n in ['SDKSettings.plist','SDKSettings.json']]
+    module = canonical
+    for part in ['usr','lib','swift','Swift.swiftmodule']:
+        module = directory(module/part)
+    names = []
+    for p in module.iterdir():
+        if len(names) >= 32:raise ValueError('bounded Swift module entries required')
+        names.append(p.name)
+    names.sort()
+    interfaces = [n for n in ['arm64-apple-macos.swiftinterface','arm64e-apple-macos.swiftinterface'] if n in names]
+    if not interfaces:raise ValueError('selected SDK actual arm64-family Swift interface required')
+    for name in interfaces:leaves.append(leaf('usr/lib/swift/Swift.swiftmodule/'+name,8 << 20))
+    if fields(alias.lstat()) != alias_before or alias.resolve(strict=True) != canonical:
+        raise ValueError('selected SDK alias changed during observation')
+    for name,identity in directories.items():
+        if fields(Path(name).lstat()) != identity:
+            raise ValueError('selected SDK directory changed during observation')
+    return {'schema':1,'origin':'first read-only observation inside selected Xcode16.4; not an old20 tool pin',
+        'alias':str(alias),'alias_identity':list(alias_before),'relative_alias_target':link,
+        'canonical':str(canonical),'directories':{n:list(v) for n,v in sorted(directories.items())},
+        'arm64_family_interface_names':interfaces,
+        'interface_selection_meaning':'observed public source files only; compiler chooses its actual target module',
+        'files':leaves,'native_cli_executed':False,'sdk_bodies_copied_or_uploaded':False}
 
 
 def capture(work, phase, argv, environment):
@@ -346,6 +411,8 @@ def execute():
     host = load(REPO/'ci/apple-host-tool/run.py', 'temp_diagnostic_host_fingerprint')
     before_tools = tools_snapshot(spec, host)
     record(root/'evidence/tools-before.json', {'files': before_tools})
+    before_sdk = macos_sdk_snapshot(Path(DEVELOPER),host.fingerprint)
+    record(root/'evidence/macos-sdk-before.json',before_sdk)
     selected = d.pod_selector.select(Path(os.environ['HOME']))
     lane = json.loads((REPO/'ci/apple-current359/lane.json').read_bytes())
     d.pod_selector.require_identity(selected, lane['cocoapods_preinstalled'])
@@ -401,23 +468,34 @@ def execute():
                 outcome = outcome or 1
                 break
     finally:
-        tools_post_exact = controller_post_exact = False
+        tools_post_exact = controller_post_exact = sdk_post_exact = False
         try:
-            after_tools = tools_snapshot(spec,host)
-            tools_post_exact = after_tools == before_tools
-            record(root/'evidence/tools-after.json', {'exact':tools_post_exact,'files':after_tools})
-            if not tools_post_exact: raise ValueError('original tool source changed')
-            verify()
-            controller_post_exact = True
+            try:
+                after_sdk = macos_sdk_snapshot(Path(DEVELOPER),host.fingerprint)
+                sdk_exact = after_sdk == before_sdk
+                record(root/'evidence/macos-sdk-after.json',{'exact':sdk_exact,'snapshot':after_sdk})
+                if not sdk_exact:raise ValueError('selected macOS SDK source changed')
+                sdk_post_exact = True
+            finally:
+                try:
+                    after_tools = tools_snapshot(spec,host)
+                    tools_exact = after_tools == before_tools
+                    record(root/'evidence/tools-after.json', {'exact':tools_exact,'files':after_tools})
+                    if not tools_exact: raise ValueError('original tool source changed')
+                    tools_post_exact = True
+                finally:
+                    verify()
+                    controller_post_exact = True
         finally:
             all_phases_complete = (len(rows) == len(FRESH_PHASES)
                 and [r['phase'] for r in rows] == list(FRESH_PHASES)
                 and all(r['worker_observation_complete'] for r in rows))
             outcome = outcome or (0 if all_phases_complete and tools_post_exact
-                                  and controller_post_exact else 1)
+                                  and controller_post_exact and sdk_post_exact else 1)
             record(root/'evidence/summary.json', {'identity':IDENTITY,'phases':rows,
                 'exit_code':outcome,'diagnostic_only':True,'permission_fix_proven':False,
-                'diagnostic_complete':all_phases_complete and tools_post_exact and controller_post_exact,
+                'diagnostic_complete':all_phases_complete and tools_post_exact and controller_post_exact and sdk_post_exact,
+                'macos_sdk_source_post_exact':sdk_post_exact,'macos_sdk_observation_is_new_not_old20':True,
                 'worker_phase_boundaries_complete':all_phases_complete,
                 'fresh_phase_count':len(rows), 'fresh_expected_phases':list(FRESH_PHASES),
                 'fresh_native_commands_passed':all_phases_complete and all(

@@ -39,6 +39,8 @@ class TempDiagnostic(unittest.TestCase):
             swift = run.native_argv(work,'swift')
             self.assertEqual(swift[:4],['/usr/bin/arch','-arm64',run.SWIFTC,'-v'])
             self.assertEqual(swift[-1],str(work/'source/Probe.swift'))
+            self.assertEqual(swift[swift.index('-sdk')+1],run.MACOS_SDK)
+            self.assertEqual(run.MACOS_SDK,run.DEVELOPER+'/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk')
             self.assertIn('-emit-library',swift)
             swift_command = run.native_command(work,'swift')
             spm_command = run.native_command(work,'spm')
@@ -155,3 +157,37 @@ class TempDiagnostic(unittest.TestCase):
                 if failed_check is None:
                     self.assertEqual(json.loads(target.read_text()),
                         {'schema':1,'identity':run.IDENTITY,'phase':'swift','exact':True})
+
+
+    def test_actual_sdk_source_observation_rejects_foreign_alias_and_records_real_arm64_interface_changes(self):
+        host = load(REPO/'ci/apple-host-tool/run.py','temp_probe_real_sdk_fingerprint')
+        with tempfile.TemporaryDirectory() as q:
+            developer = Path(q).resolve()/'Xcode16.4/Contents/Developer'
+            parent = developer/'Platforms/MacOSX.platform/Developer/SDKs'
+            sdk = parent/'MacOSX15.5.sdk'
+            module = sdk/'usr/lib/swift/Swift.swiftmodule'
+            module.mkdir(parents=True)
+            (sdk/'SDKSettings.plist').write_bytes(b'public synthetic SDK settings plist')
+            (sdk/'SDKSettings.json').write_bytes(b'{"Version":"15.5"}')
+            interface = module/'arm64-apple-macos.swiftinterface'
+            interface.write_bytes(b'public synthetic arm64 interface')
+            alias = parent/'MacOSX.sdk';alias.symlink_to(sdk.name)
+            before = run.macos_sdk_snapshot(developer,host.fingerprint)
+            self.assertEqual(before['canonical'],str(sdk))
+            self.assertEqual(before['arm64_family_interface_names'],['arm64-apple-macos.swiftinterface'])
+            self.assertEqual(len(before['files']),3)
+            self.assertEqual(before,run.macos_sdk_snapshot(developer,host.fingerprint))
+            interface.write_bytes(b'changed public synthetic arm64 interface')
+            changed = run.macos_sdk_snapshot(developer,host.fingerprint)
+            self.assertNotEqual(before,changed)
+            self.assertNotEqual(before['files'][-1]['sha256'],changed['files'][-1]['sha256'])
+            alias.unlink();alias.symlink_to(Path(q).resolve()/'foreign/MacOSX15.5.sdk')
+            with self.assertRaisesRegex(ValueError,'finite same-Xcode alias'):
+                run.macos_sdk_snapshot(developer,host.fingerprint)
+            alias.unlink();alias.symlink_to(sdk.name)
+            interface.unlink();interface.symlink_to(sdk/'SDKSettings.plist')
+            with self.assertRaisesRegex(ValueError,'canonical bounded regular host input'):
+                run.macos_sdk_snapshot(developer,host.fingerprint)
+            interface.unlink()
+            with self.assertRaisesRegex(ValueError,'actual arm64-family Swift interface'):
+                run.macos_sdk_snapshot(developer,host.fingerprint)

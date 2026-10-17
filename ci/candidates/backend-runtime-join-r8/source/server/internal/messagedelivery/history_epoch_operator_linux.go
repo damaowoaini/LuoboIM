@@ -5,10 +5,10 @@ package messagedelivery
 import (
 	"crypto/ed25519"
 
+	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceinventory"
-	"github.com/openimsdk/protocol/sdkws"
 )
 
 // Private operator composition, not a network request/JSON permit. All process,

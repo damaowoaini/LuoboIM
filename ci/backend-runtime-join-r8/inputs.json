@@ -8,7 +8,7 @@
   },
   "source": {
     "members": 1555,
-    "digest": "adf96fb264b04f2138cbc630d8c6fe76e5178845037b336da4d842be39c2ec37"
+    "digest": "686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -1695,7 +1695,7 @@
       "target": "server/internal/messagedelivery/history_epoch_operator_linux.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/messagedelivery/history_epoch_operator_linux.go",
       "bytes": 4038,
-      "sha256": "16f13122d39c2e7f94879fbbd2de39418393f708ead915d6825da6ec670aa4a0",
+      "sha256": "22512cb8e0f187a41714733c4d48492f779e2f8af53970f4afb31b4376bf5317",
       "beforeSHA256": null
     },
     {
@@ -2534,15 +2534,15 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/process_environment_linux.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/process_environment_linux.go",
-      "bytes": 2211,
-      "sha256": "0b2b861467dc8a2b6f84a905837cbc2653797d0621d9a62718d242d7caba8555",
+      "bytes": 3008,
+      "sha256": "47812f8187b5eab4d1e67a9939e2cf4efd1a333bce26a2153d456e49f5edacd1",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/namespaceimport/ownedcontrol/process_environment_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/process_environment_linux_test.go",
-      "bytes": 4369,
-      "sha256": "e61a059aaafd80725c62552e1e62d364f23b31390237f2b081ce55bb9568790e",
+      "bytes": 6865,
+      "sha256": "465fabfaed019289b5141fded192f2540c663c06366994593854ec6e7a60bccb",
       "beforeSHA256": null
     },
     {
@@ -3213,15 +3213,15 @@
   ],
   "finalFormatProof": {
     "productManifest": {
-      "bytes": 122088,
-      "sha256": "a11e0490af209507d01ef0a11f2e45dcebf92953ff1bc50a9d8b2bce9c6d1ac2"
+      "bytes": 113487,
+      "sha256": "21a51abf5c948c17a1ebd1b9c4f07e1510be1ccd839babf055278c4c1f67a3e8"
     },
     "formattedSource": {
       "members": 1555,
-      "digest": "adf96fb264b04f2138cbc630d8c6fe76e5178845037b336da4d842be39c2ec37"
+      "digest": "686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f"
     },
-    "incrementalFormattedParsedGo": 5,
-    "previousFormattedOrCompiledGoExactReused": 200,
+    "incrementalFormattedParsedGo": 3,
+    "previousFormattedOrCompiledGoExactReused": 202,
     "exactActualR7GoReused": [
       "server/internal/rpc/third/owned_provider_test.go",
       "server/pkg/common/db/cache/owned_connection_setup_redis_test.go",
@@ -3230,7 +3230,7 @@
     ],
     "GoCompilationOrTests": 0
   },
-  "selectionSHA256": "a2f399dca2a86eb5879d5b9da421116eb8aab83110579aa628db6e7fe5d3262b",
+  "selectionSHA256": "fa60269119a63804032ea8e870006be69775899188de97c95c37db8710416784",
   "priorPassedTargets": {
     "internal/api": [
       "TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope",
@@ -3983,7 +3983,8 @@
         "partial-pair-wrong-SHA-or-foreign-role-rejects",
         "HOME-PATH-TMP-and-admission-keys-cannot-be-overridden",
         "duplicate-JSON-key-and-nonprivate-file-reject",
-        "unknown-constructor-key-NUL-newline-and-size-reject"
+        "unknown-constructor-key-NUL-newline-and-size-reject",
+        "group-secondary-bootstrap-is-role-bound-complete-private-and-exact"
       ],
       "TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit": [
         "unknown-middle-child-does-not-strand-later-original-owner",

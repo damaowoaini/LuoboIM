@@ -11,9 +11,9 @@ INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
 SCOPE = 'backend_history_final14_entries_and_new65_plus_direct_only_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
-FINAL = {'members': 1555, 'digest': 'adf96fb264b04f2138cbc630d8c6fe76e5178845037b336da4d842be39c2ec37'}
+FINAL = {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
-SELECTION_SHA = 'a2f399dca2a86eb5879d5b9da421116eb8aab83110579aa628db6e7fe5d3262b'
+SELECTION_SHA = 'fa60269119a63804032ea8e870006be69775899188de97c95c37db8710416784'
 RESOURCE = {'initialBytes': 4294967296, 'floorMiB': 1024, 'allocatedMiB': 16384, 'pollSeconds': .2, 'controllerSeconds': 3000, 'compileTotalSeconds': 1200, 'testPhaseSeconds': 2250, 'testGoTimeoutSeconds': 180}
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 
