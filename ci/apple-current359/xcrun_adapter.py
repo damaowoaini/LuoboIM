@@ -216,8 +216,9 @@ def discover_cache_directory():
 
 def cache_leaf_pattern(directory):
     # Eight alphanumeric suffix characters are the exact observed xcrun form.
-    # A new form must fail visibly, rather than widening a whole user temp root.
-    return '^'+re.escape(str(directory))+'/xcrun_db-[A-Za-z0-9]{8}$'
+    # Spell out each character class for the SBPL regex compiler. This keeps
+    # the exact same filename language without counted-repetition syntax.
+    return '^'+re.escape(str(directory))+'/xcrun_db-'+'[A-Za-z0-9]'*8+'$'
 
 
 def seal_cache_boundary(work):
@@ -263,11 +264,14 @@ def cache_boundary(work):
 
 def cache_profile(work):
     row = cache_boundary(work)
-    # Sandbox paths are canonical. Only new exact tool-cache leaves are writable;
-    # preexisting leaves (including symlinks/directories) remain explicitly denied.
-    text = '(allow file-write* (regex #'+json.dumps(cache_leaf_pattern(row['canonical']))+'))'
-    for name in row['protected_preexisting']:
-        text += '(deny file-write* (literal '+json.dumps(row['canonical']+'/'+name)+'))'
+    # Discovery proves both spellings resolve to this same original directory.
+    # Match either spelling without granting another directory or a subtree.
+    directories = list(dict.fromkeys([row['canonical'], row['lexical']]))
+    text = ''.join('(allow file-write* (regex #'+json.dumps(cache_leaf_pattern(p))+'))'
+                   for p in directories)
+    for directory in directories:
+        for name in row['protected_preexisting']:
+            text += '(deny file-write* (literal '+json.dumps(directory+'/'+name)+'))'
     return text
 
 

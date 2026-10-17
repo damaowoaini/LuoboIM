@@ -38,7 +38,7 @@ def borrowed_helper(row, name):
     return load(REPO/row['path'], name)
 
 
-xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 18619, 'sha256': '800db71aa4899636801f017c90c8e9cc9adbd39b5c295448c5c4cd36978996ca'}, 'current359_owned_xcrun_adapter')
+xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 18827, 'sha256': '9135a96cf373e3a393ec68dfad56638c49cb49499a4152de9b8f41128a6deeec'}, 'current359_owned_xcrun_adapter')
 cache_resource = borrowed_helper({'path': 'ci/apple-current359/cache_resource.py', 'bytes': 3700, 'sha256': '757c95baac62e3ff114af25665db07d7315a535bdbb31a09ce78854cd029d541'}, 'current359_exact_cache_resource')
 
 packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes': 10141, 'sha256': '7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248'}, 'apple359_common_packaging')
@@ -680,7 +680,7 @@ def main():
     def interrupted(_number, _frame): raise InterruptedError('current359 native guard interrupted')
     for number in [signal.SIGTERM, signal.SIGINT]: signal.signal(number, interrupted)
     if a.stage in {'acquire', 'preflight'}:
-        preflight = borrowed_helper({'path': 'ci/apple-current359/tool_preflight.py', 'bytes': 9003, 'sha256': '39995bba2ebeecc228821d1d27cfffd8576003e10fbf4fe198667e984c770592'}, 'current359_actual_cli_preflight')
+        preflight = borrowed_helper({'path': 'ci/apple-current359/tool_preflight.py', 'bytes': 9066, 'sha256': '730b9619e9280922a662071ad661828235046726ac2af136e0a76c1d220a110e'}, 'current359_actual_cli_preflight')
         q = preflight.prepare(work, xcrun_adapter, HERE/'xcrun_adapter.py', sys.executable,
                               sha(HERE/'lane.json'), os.environ.get('GITHUB_SHA'), spec['source_ref'])
         args = ['/usr/bin/sandbox-exec', '-f', str(q/'preflight.sb'), sys.executable, '-B',

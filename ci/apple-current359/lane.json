@@ -12,6 +12,19 @@
     "continuous_floor_bytes": 1073741824,
     "darwin_user_temp_secondary_cap_bytes": 67108864,
     "default_manual_scope": "tool-preflight-only",
+    "effective_sandbox_profile_retained": true,
+    "latest_observed": {
+      "actualVersionCommands": 4,
+      "allCommandExitCodes": 0,
+      "artifactSHA256": "200405cf3ac149f9431e6e8503ffef6310e6a0f7fb74362c3e0024ee8fce9c9b",
+      "attempt": 1,
+      "cacheWriteStderrRefused": true,
+      "fullBuildStarted": false,
+      "head": "6350237f58b87e3a3d7aaed9a4b0df9d41c45148",
+      "permissionFailureCauseProven": false,
+      "preflightPassed": false,
+      "run": 39025436412
+    },
     "network": "deny",
     "original_ARM_probe_unchanged": true,
     "runtime_or_build_verified": false,
@@ -288,7 +301,7 @@
     {
       "bytes": 42734,
       "path": "ci/apple-current359/run.py",
-      "sha256": "09e8e1e16177060cf0e58bc5c87066d4c80993047662f95dc0b4344b641f03c5"
+      "sha256": "cbf3d9967608e0fbd40b60e90b2ad656d9495637226ebe990146fb8e6cdfa6f4"
     },
     {
       "bytes": 3474,
@@ -326,9 +339,9 @@
       "sha256": "7e4087dee844f76ced62815772322be4f9b8d28cdd69fee234c7abb71513ada7"
     },
     {
-      "bytes": 18619,
+      "bytes": 18827,
       "path": "ci/apple-current359/xcrun_adapter.py",
-      "sha256": "800db71aa4899636801f017c90c8e9cc9adbd39b5c295448c5c4cd36978996ca"
+      "sha256": "9135a96cf373e3a393ec68dfad56638c49cb49499a4152de9b8f41128a6deeec"
     },
     {
       "bytes": 5245,
@@ -336,9 +349,9 @@
       "sha256": "8b64c05115c2df27c1dffad6ae35caf817a7801f905c06f1f77bf00530095664"
     },
     {
-      "bytes": 9003,
+      "bytes": 9066,
       "path": "ci/apple-current359/tool_preflight.py",
-      "sha256": "39995bba2ebeecc228821d1d27cfffd8576003e10fbf4fe198667e984c770592"
+      "sha256": "730b9619e9280922a662071ad661828235046726ac2af136e0a76c1d220a110e"
     },
     {
       "bytes": 1980,
@@ -346,9 +359,9 @@
       "sha256": "78e27384295c35244887317e2ecfd3057dc3d83bec9946e9f66ed4b4063ccbc6"
     },
     {
-      "bytes": 5813,
+      "bytes": 7144,
       "path": "ci/apple-current359/test_xcrun_entry.py",
-      "sha256": "042e17d654f2fab72ae0401c1d9f58a360d1656d17a945459996acc3b12b25ef"
+      "sha256": "80f2bff313df603d1348b30292efc6b464d771ed4c0fcf280d27585a88e70e1d"
     },
     {
       "bytes": 3700,
@@ -365,7 +378,7 @@
     "CFFIXED_USER_HOME": "work/cf-home",
     "HOME_reassigned": false,
     "PATH_prepend": "work/tool-adapters only",
-    "actual_xcode_flag_CF_cache_and_internal_xcrun_consumption": "unverified_until_next_cloud_run",
+    "actual_xcode_flag_CF_cache_and_internal_xcrun_consumption": "R17 actual ARM version argv returned0; cache stderr refused; native dependency resolution remains unverified",
     "admitted_project_operations": [
       "-resolvePackageDependencies",
       "-list",
@@ -388,6 +401,7 @@
     "responses_synthesized": false,
     "sandbox_additional_external_write_grants": {
       "HOME_reassigned": false,
+      "SBPL_exact_leaf_syntax": "eight explicit alphanumeric character classes; both verified aliases of same original UID directory; existing paths denied in both spellings",
       "leaf": "xcrun_db-[A-Za-z0-9]{8}",
       "preexisting_cache_paths": "deny writes individually; no cache bodies read",
       "scope": "current UID confstr(65537) canonical private /var/folders/*/*/T only",

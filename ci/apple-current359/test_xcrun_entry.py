@@ -77,6 +77,22 @@ class ActualEntryBoundary(unittest.TestCase):
                 for value in [root/'other',root/'xcrun_db-abc',root/'xcrun_db-Ab12Cd34'/'nested',
                               root.parent/'xcrun_db-Ab12Cd34']:
                     self.assertIsNone(re.fullmatch(pattern,str(value)))
+                # Actual hosted denials used the /var spelling. Its discovery
+                # receipt proves the /private/var spelling is the same directory.
+                aliases = ['/private/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T',
+                           '/var/folders/nj/vtw8zd2j31d1gdrtntc5y4600000gn/T']
+                alias_row = dict(sealed, canonical=aliases[0], lexical=aliases[1])
+                with mock.patch.object(a, 'cache_boundary', return_value=alias_row):
+                    alias_profile = a.cache_profile(work)
+                for directory in aliases:
+                    with self.subTest('hosted cache spelling '+directory):
+                        actual_pattern = a.cache_leaf_pattern(directory)
+                        self.assertNotIn('{', actual_pattern)
+                        self.assertIn('(regex #'+json.dumps(actual_pattern)+')', alias_profile)
+                        self.assertIn('(deny file-write* (literal '+json.dumps(directory+'/'+old.name)+'))', alias_profile)
+                        self.assertIsNotNone(re.fullmatch(actual_pattern,directory+'/xcrun_db-vNT62YK1'))
+                        for suffix in ['vNT62YK', 'vNT62YK11', 'vNT6_YK1', 'vNT62YK1/nested']:
+                            self.assertIsNone(re.fullmatch(actual_pattern,directory+'/xcrun_db-'+suffix))
                 changed = copy.deepcopy(row); changed['directory_identity'][1] += 1
                 with mock.patch.object(a, 'discover_cache_directory', return_value=changed):
                     with self.assertRaisesRegex(ValueError, 'boundary changed'): a.cache_profile(work)

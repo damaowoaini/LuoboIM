@@ -151,6 +151,7 @@ def prepare(parent, adapter, adapter_path, python, lane_sha, head, source_ref):
     for name in ['activation.json','tool-adapters','preflight.sb']:
         profile += '(deny file-write* (subpath '+json.dumps(str(work/name))+'))'
     put(work/'preflight.sb',profile.encode())
+    put(work/'evidence/preflight-profile.sb',profile.encode())
     return work
 
 
