@@ -41,6 +41,8 @@ packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes'
 pod_selector = borrowed_helper({'path': 'ci/apple-current354/pod_selector.py', 'bytes': 5603, 'sha256': '820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769'}, 'apple359_reviewed117_selector')
 
 
+gem_audit = borrowed_helper({'path': 'ci/apple-current359/gem_audit.py', 'bytes': 15989, 'sha256': '1ea544a0ddeb5868f1f9f5c3bae6630bb9f6baef0374d89db1fc939c21010515'}, 'apple359_fixed_gem_audit')
+
 custody = load(REPO/'ci/apple-sdk-link/custody.py', 'current359_custody')
 put, record, mkdir, sha = (getattr(custody, n) for n in ['put', 'record', 'mkdir', 'sha'])
 
@@ -310,33 +312,15 @@ def pod_tool_sources(work, selected, e, lane):
     ruby = Path(header[2:]).resolve(strict=True)
     if ruby != Path(selected['ruby']['path']) or not str(ruby).startswith('/opt/homebrew/'):
         raise ValueError('preinstalled Homebrew Ruby source required')
-    program = """require 'json';require 'cocoapods';abort 'pod version' unless Pod::VERSION=='1.17.0' && Gem.loaded_specs['cocoapods'].version.to_s=='1.17.0' && Gem.loaded_specs['cocoapods-core'].version.to_s=='1.17.0';puts JSON.generate({ruby:RUBY_VERSION,ruby_binary:RbConfig.ruby,gems:Gem.loaded_specs.values.map{|s|{name:s.name,version:s.version.to_s,path:s.full_gem_path}}})"""
-    source = json.loads(command(work, 'pod-source', [ruby, '-e', program], work, e))
-    if Path(source['ruby_binary']).resolve(strict=True) != ruby:
-        raise ValueError('selected Ruby differs from actual gem interpreter')
-    rows = []
-    for gem in source['gems']:
-        root = Path(gem['path']).resolve(strict=True)
-        if not str(root).startswith('/opt/homebrew/') or root.is_relative_to(Path(e['HOME'])):
-            raise ValueError('ambient user or unknown native gem source refused')
-        body_rows = []
-        for path in sorted(root.rglob('*.rb')):
-            if path.is_symlink() or path.stat().st_nlink != 1 or path.stat().st_size > 4*1024**2:
-                raise ValueError('bounded preinstalled native gem source required')
-            body = path.read_bytes()
-            body_rows.append({'path': path.relative_to(root).as_posix(),
-                              'bytes': len(body), 'sha256': packaging.sha(body)})
-        if gem['name'] == 'cocoapods':
-            wanted = lane['cocoapods_config']
-            actual = (root/'lib/cocoapods/config.rb').read_bytes()
-            if len(actual) != wanted['bytes'] or packaging.sha(actual) != wanted['sha256']:
-                raise ValueError('official CocoaPods owned-cache environment contract differs')
-        rows.append({**gem, 'ruby_sources': body_rows})
-    record(work/'evidence/native-gem-sources.json', {'ruby': source['ruby'],
-           'script': {'path': str(pod), 'bytes': pod.stat().st_size, 'sha256': sha(pod)},
-           'ruby_binary': {'path': str(ruby), 'bytes': ruby.stat().st_size, 'sha256': sha(ruby)},
-           'gems': rows, 'preinstalled_source_first_observation': True,
-           'source_provenance_Root_acceptance': False})
+    # Pinned probe distinguishes default specs, compiled startup markers and files.
+    source = json.loads(command(work, 'pod-source', [ruby, HERE/'gem_probe.rb'], work, e))
+    try:
+        proof = gem_audit.audit(source, selected, Path(e['HOME']), lane['cocoapods_config'])
+    except gem_audit.AuditFailure as error:
+        record(work/'evidence/gem-source-rejected.json', error.proof)
+        raise
+    proof['script'] = {'path': str(pod), 'bytes': pod.stat().st_size, 'sha256': sha(pod)}
+    record(work/'evidence/native-gem-sources.json', proof)
     pod_selector.recheck(selected, Path(e['HOME']))
     official_pod_sources(selected, lane)
 

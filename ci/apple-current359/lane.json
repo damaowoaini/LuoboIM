@@ -244,9 +244,9 @@
   ],
   "own_inputs": [
     {
-      "bytes": 2366,
+      "bytes": 3824,
       "path": "ci/apple-current359/README.md",
-      "sha256": "4a81879ca903ebafeeffa95e2ce2cb74cdf06c85f4dd63ccf9dbb19ac53285d0"
+      "sha256": "08f3535f844552157ab949b8307ebc83d8ec57cd4483c87d48312f8606730e67"
     },
     {
       "bytes": 9176,
@@ -259,14 +259,29 @@
       "sha256": "3cbabbffca956f018a54469740f6ef5e244d92bd3feca1df6ad5ff25670f5393"
     },
     {
-      "bytes": 33729,
+      "bytes": 32359,
       "path": "ci/apple-current359/run.py",
-      "sha256": "6d73062a489bd9cc272fb538d3e79c50805a4941a2017a67e0bcc7d6a0725af4"
+      "sha256": "f78b1d5151d9a22f9ff31263239da08dd1b87b8e3952d4d22512471480cf09ae"
     },
     {
       "bytes": 2662,
       "path": "ci/apple-current359/test_consumer.py",
       "sha256": "1c330baaf75bd5919d32d3536a31942aebd976b6c22b9dd60789590c72dbb66b"
+    },
+    {
+      "path": "ci/apple-current359/gem_probe.rb",
+      "bytes": 1965,
+      "sha256": "92e243aac67cf1a77574329dfd11a68634750a5b756d1422ea0cfdaab6838419"
+    },
+    {
+      "path": "ci/apple-current359/gem_audit.py",
+      "bytes": 15989,
+      "sha256": "1ea544a0ddeb5868f1f9f5c3bae6630bb9f6baef0374d89db1fc939c21010515"
+    },
+    {
+      "path": "ci/apple-current359/test_gem_audit.py",
+      "bytes": 8457,
+      "sha256": "ec4631f2d62790d05afb39fa2ed075b5c6ea372c0c7589aa60657c182dfcad36"
     }
   ],
   "packages": 178,
@@ -284,5 +299,14 @@
   "source_members": 477,
   "source_ref": "bdffc675e6ec0f193bcb5cf786859a7746869061",
   "state": "source_only_resolution_pending_not_App_accepted",
-  "xcodebuild": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild"
+  "xcodebuild": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
+  "preinstalled_gem_audit": {
+    "schema": 2,
+    "official_ruby_commit": "0581089df9f0af0fe6b64cb8167987c211100947",
+    "probe": "ci/apple-current359/gem_probe.rb",
+    "scope": "actual loaded files/specs/runtime and regular-gem Ruby source trees; configured libruby first observation, no dyld-map or App claim",
+    "default_computed_directory_is_source_proof": false,
+    "unknown_relative_markers": "refuse",
+    "source_provenance_Root_acceptance": false
+  }
 }
