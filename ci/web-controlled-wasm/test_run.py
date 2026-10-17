@@ -94,4 +94,45 @@ class ControllerContract(unittest.TestCase):
             self.assertFalse((root/'outside').exists())
 
 
+    def test_wasm_runtime_uses_one_processor_only_for_the_two_continuation_targets(self):
+        base=lane.clean_environment({'HOME':os.environ['HOME'],'PATH':'/synthetic/bin'},Path('/synthetic/owned'),'/synthetic/go')
+        self.assertEqual(base['GOMAXPROCS'],'2')
+        for label in ['wasmwrapper','ownread']:
+            current=lane.runtime_environment(base,label,{'GOOS':'js','GOARCH':'wasm','GOMAXPROCS':'8'})
+            self.assertEqual(current['GOMAXPROCS'],'1')
+            self.assertEqual(current['HOME'],os.environ['HOME'])
+            self.assertEqual(current['GOPROXY'],'off')
+        for label in ['fetch','metadata','download','module-verify']:
+            self.assertEqual(lane.runtime_environment(base,label)['GOMAXPROCS'],'2')
+        for label in ['build','bufferplan','abi','unselected']:
+            with self.assertRaises(ValueError):lane.runtime_environment(base,label)
+        self.assertEqual(base['GOMAXPROCS'],'2')
+        self.assertEqual(lane.ACTIVE_TESTS,['wasmwrapper','ownread'])
+        self.assertEqual(sum(len(lane.SPECS[x]['tops']) for x in lane.ACTIVE_TESTS),8)
+        self.assertEqual(sum(len(lane.SPECS[x]['subs']) for x in lane.ACTIVE_TESTS),20)
+
+    def test_real_readonly_owned_module_cache_cleanup_never_chmods_source_or_external_tree(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp).resolve();owned=root/'owned';owned.mkdir()
+            module=owned/'cache/mod/example.test/lib@v1';module.mkdir(parents=True)
+            body=module/'migrator.go';body.write_text('package exact\n');body.chmod(0o444)
+            module.chmod(0o555)
+            source=owned/'source';source.mkdir();source.chmod(0o555)
+            outside=root/'external';outside.mkdir();outside.chmod(0o555)
+            try:
+                result=lane.remove_owned_module_cache(owned)
+                self.assertTrue(result['removed'])
+                self.assertGreaterEqual(result['directoriesOwnerWriteRestored'],1)
+                self.assertFalse((owned/'cache/mod').exists())
+                self.assertEqual(source.stat().st_mode & 0o777,0o555)
+                self.assertEqual(outside.stat().st_mode & 0o777,0o555)
+                (owned/'cache/mod').symlink_to(outside,target_is_directory=True)
+                with self.assertRaises(ValueError):lane.remove_owned_module_cache(owned)
+                self.assertTrue((owned/'cache/mod').is_symlink())
+                self.assertEqual(outside.stat().st_mode & 0o777,0o555)
+                (owned/'cache/mod').unlink()
+            finally:
+                source.chmod(0o755);outside.chmod(0o755)
+
+
 if __name__=='__main__':unittest.main(verbosity=2)

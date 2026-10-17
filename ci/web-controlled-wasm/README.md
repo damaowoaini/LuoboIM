@@ -1,71 +1,39 @@
-# Controlled Web WASM targeted build
+# Controlled Web WASM continuation (8 tops / 20 subs)
 
-This manual lane produces an independent review artifact. It does not copy a
-WASM/shim to public, initialize an SDK, log in, open a business database, send a
-message, invoke native bind, or run the whole existing suites.
+This manual lane runs only the previously failed wasmwrapper (6 tops/3 subs)
+and not-yet-started ownread (2 tops/17 subs), with exact run/pass/footer audit.
+It fetches the fixed source, verifies tools, acquires and verifies the locked
+modules, and checks source/modes before and after. It does not rebuild a product
+WASM, run host bufferplan again, or replay the standalone ABI probe.
 
-The fixed base is Git commit `7b156fc5557878ad6e6a07e572694af5699c6624` from the
-public OpenIM SDK core origin, then the exact enterprise compatibility patch
-`dcbc80f89ce07eaac8a2c28c23e1cbaef0db9c2c79cacffdaa020d61a356e1f7`.
-`base-inputs.json` binds all 309 prepared core bodies/modes and 52 protocol
-bodies/modes. The reviewed additive acquired-go.sum preserves every old checksum.
-The absolute local protocol replace is changed exactly once to `../protocol`
-inside the task's private source; before and after go.mod hashes are recorded.
-No QA TLS source tree is copied.
+`reused-r2-validation.json` binds R2 run39004401325/head0fcf06a, source manifest
+`d897d794...`, actual WASM/shim hashes, the successful build and host bufferplan
+3 tops/4 subs (race), and Root's separate exact ABI145 startup observation.
+That proves registration only: init/login/database/network all remain zero.
+No R2 product artifact is downloaded into this CI. Executed8/20 and reused
+3/4 plus ABI evidence remain distinct; this is not a newly executed11/24 suite.
 
-Root must first seal and commit the combined compat21 + real buffer + own-read
-source and support manifest. The workflow takes its canonical repository path
-and SHA256 explicitly. The controller will not guess a final SHA or run from an
-unsealed partial144 API source. The final manifest requires these fields:
+Only js/wasm test execution sets GOMAXPROCS=1. Other host phase limits remain
+unchanged. All source319/overlay19/protocol52/SDK review snapshots and locks
+are unchanged. SDK/consumer snapshots stay under `ci/.../source`, not production.
 
-- `schemaVersion: 1`, `baseCommit`, `baseInputsSHA256`, `harnessInputsSHA256`.
-- `goSumSHA256` equal to the acquired reviewed lock, `requiredABI: 145`.
-- `core`: complete sorted final rows `{path,bytes,sha256,mode}` and `coreDigest`:
-  ascending UTF8 path + NUL + ASCII SHA256 + LF, then SHA256.
-- `overlay`: every unique changed/new Go row
-  `{path,target,beforeSHA256,bytes,sha256,mode}`. `path` lies under
-  `ci/web-controlled-wasm/source/core/`; `target` is relative to the core.
-  `beforeSHA256` is exact fixed base body or null for a new file.
-- `support`: exact committed source rows for the composed SDK patch files,
-  author factories, source provenance and other integration locks. These are
-  checked before/after and not executed by this build lane.
+Cleanup restores owner-write only on checked, canonical, this-UID directories
+inside the task's own `cache/mod`, through stable no-follow descriptors. It
+then removes that cache and the original exact owned trees. It never chmods
+source trees, source files or external/shared caches.
 
-Invocation after Root adoption:
+Cold admission stays4GiB; continuous floor1GiB/.2s; owned8GiB; original phase
+timeouts and outer2700s remain. Actual HOME is retained, Go locks are readonly,
+only public fetch/acquisition is online, and execution remains in a real
+nonroot empty network namespace. Output artifacts are continuation receipts,
+not a new WASM. No SDK init, login, sends, deployment or full regression.
+
+Root supplies the exact final manifest SHA:
 
 ```sh
 python3 -B ci/web-controlled-wasm/run.py --manifest ci/web-controlled-wasm/final-source.json --manifest-sha256 FINAL_SHA --verify
-# The workflow alone invokes the guarded execution after official pinned setup.
 ```
 
-There are three targeted Go commands: native race bufferplan 3 tops/4 subs;
-js/wasm wrapper 6 tops/3 subs; js/wasm own-read core 2 tops/17 subs (11 tops/24 subs total). All compile
-with `-mod=readonly -p=1`; only explicit top names run, exact child names and one
-package footer are audited. The js/wasm tests use the same Go1.27.2
-`go_js_wasm_exec` and Node24.21.0. Go js/wasm does not support race, so those two
-commands are not claimed to be race tested. No SQL/Mongo/browser fixture runs.
-
-Only public Git fetch and reviewed module acquisition have networking.
-Dependency environment uses fixed `https://proxy.golang.org`, `sum.golang.org`,
-`GOAUTH=off`, empty private/proxy overrides and no ambient credentials. Every
-other phase verifies a real non-root kernel network namespace. After download,
-`GOPROXY=off/GOSUMDB=off`, toolchain local and source/locks read-only by contract.
-Tests may write only task caches/temp; any changed source/mode/lock rejects.
-The source-only metadata verify does not materialize or execute Go.
-
-Cold admission is 4GiB free. Continuous resource guards use 1GiB free, .2s poll,
-8GiB owned allocation, per-phase timeouts plus a 2700s outer bound. All commands
-are joined by the existing resource guard. Only the task's fresh cache, temp,
-Git download and materialized source directories are removed; raw evidence,
-ownership record and independent products remain. No shared cache is read or
-removed. Actual HOME is preserved; all Go caches/TMP paths are task-owned.
-
-The rebuilt artifact is compiled from this explicit source. It is not asserted
-byte-equivalent to the opaque old WASM. ABI checks require the exact observed145
-function set, not merely a count; registration is not proof of every API's
-business behavior. No startup probe calls `initSDK`, `login`, a database or the
-network. The actual worker SQL/IndexedDB browser fixture and Web event consumer
-are separate Root-owned validations; this lane cannot claim those passed.
-
-Three new pure controller controls are prepared for a single local review run.
-The cloud workflow does not repeat them. At preparation there are zero Python
-control runs, Go tests, builds, downloads, SDK initializations or dispatches.
+New runtime/cache controls2 and directly affected old phase-order control1
+are prepared for Root's one local targeted run. Original other3 controls and
+prior successful Go/build/ABI results are reused, not repeated.

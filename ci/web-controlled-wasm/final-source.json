@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "baseCommit": "7b156fc5557878ad6e6a07e572694af5699c6624",
   "baseInputsSHA256": "7a8e8355c28421907f80f0bbc2e5231935396b0372d6bebc6d9127cf34b750c9",
-  "harnessInputsSHA256": "63c310fee26bea26d9e0b3d8f35633a7d47db0e5f2d0ef83fe2bdc81d4c1277e",
+  "harnessInputsSHA256": "6c222e887c60153276baa2980bcb85f7cc7a7c28d949fd394a2c2ab2dc0b4a76",
   "goSumSHA256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f",
   "requiredABI": 145,
   "core": [
@@ -2502,10 +2502,6 @@
   ],
   "protocolDigest": "e9117374cf571ae29529e19228a9fea2bcf556e919caa3b175810b5b72a74f19",
   "expectedTargetScope": {
-    "bufferplan": {
-      "top": 3,
-      "sub": 4
-    },
     "wasmwrapper": {
       "top": 6,
       "sub": 3
@@ -2515,14 +2511,33 @@
       "sub": 17
     },
     "total": {
-      "top": 11,
-      "sub": 24
+      "top": 8,
+      "sub": 20
     }
   },
   "usage": {
     "SDKSupport": "ci/source snapshots only; never production adoption",
     "fullRegression": false,
     "runtimeReplacement": false,
-    "nativeBind": false
+    "nativeBind": false,
+    "continuationOnly": true,
+    "newWASMBuild": false,
+    "newABIProbe": false
+  },
+  "reusedTargetScope": {
+    "run": 39004401325,
+    "buildExit": 0,
+    "hostBufferplan": {
+      "top": 3,
+      "sub": 4,
+      "race": true
+    },
+    "RootABI145": true,
+    "proof": {
+      "path": "ci/web-controlled-wasm/reused-r2-validation.json",
+      "bytes": 1433,
+      "sha256": "8b795b9f477838f61ffc5186bf193fae114ee877861c49209e81c19f313bcf8b",
+      "mode": "0o644"
+    }
   }
 }

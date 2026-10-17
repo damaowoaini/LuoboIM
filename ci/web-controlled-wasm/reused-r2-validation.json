@@ -1,0 +1,47 @@
+{
+  "run": 39004401325,
+  "job": 117313791536,
+  "head": "0fcf06a8cc38b8e1087aa8ae95dfce33f04cd709",
+  "sourceManifestSHA256": "d897d7945cb351c9afaf6ec187a31ae51cf2872f41af011ac00f269e014034e6",
+  "artifactID": 12090361429,
+  "artifactZIP_SHA256": "74498331bceea76d01a19665e8e680bc284c3931c37edb701ebf2c091c3fd5cd",
+  "ABI145Exact": true,
+  "SDKInit": 0,
+  "GoCompile": 0,
+  "runtimeReplacement": false,
+  "GoEnv": {
+    "GOMAXPROCS": "1"
+  },
+  "calls": {
+    "init": 0,
+    "login": 0,
+    "database": 0,
+    "network": 0
+  },
+  "GoShimExactCloudToolByteMatch": true,
+  "sourcePostExact": true,
+  "schemaVersion": 1,
+  "RootAcceptanceSHA256": "3401fa528831eaa1dad12a907ed59f24ff5acdc2a4e4c33eddb90a27b09cd247",
+  "artifactZIPBytes": 7086636,
+  "buildExit": 0,
+  "hostBufferplan": {
+    "topPASS": 3,
+    "subPASS": 4,
+    "race": true
+  },
+  "functionCount": 145,
+  "functionSetSHA256": "22d1a275bf9a029e994f80ea74ba293aadaf893e5774634551b5783b8b548ebc",
+  "files": [
+    {
+      "path": "openIM.wasm",
+      "bytes": 35566446,
+      "sha256": "43a4a8929e01415ec9c03b6297137878c7ddab0fe03da31a90d686016396cea7"
+    },
+    {
+      "path": "wasm_exec.js",
+      "bytes": 16992,
+      "sha256": "0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14"
+    }
+  ],
+  "scope": "R2 unchanged-source build and host bufferplan passed; separate Root startup ABI145 registration only; no API business semantics or new full suite"
+}

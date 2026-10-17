@@ -36,7 +36,8 @@ SPECS = {
   'TestOwnReadTimeEnvelopeAndIncomingIdentity','TestOwnReadTimeCoreDurablePortAndDistinctEvent'], 'subs':[
   'TestOwnReadTimeEnvelopeAndIncomingIdentity/'+s for s in ['foreign_actor','foreign_CID','foreign_peer','ordinary_message_envelope','missing_authoritative_time','duplicate_seq','outgoing_row','real_envelope_time_ignores_original_send_time','mixed_directions_keep_only_exact_incoming_rows','mixed_directions_reject_forged_outgoing_identity','mixed_directions_reject_duplicate_ID_and_seq_before_skipping']] + [
   'TestOwnReadTimeCoreDurablePortAndDistinctEvent/'+s for s in ['committed','unconfirmed','wrong_stored_identity','foreign_preflight','scope_is_captured_before_delayed_conversation_lookup','delayed_conversation_cannot_renew_history_or_owner_scope']]}}
-PHASES = ['fetch','metadata','download','module-verify','build','bufferplan','wasmwrapper','ownread','abi']
+ACTIVE_TESTS = ['wasmwrapper','ownread']
+PHASES = ['fetch','metadata','download','module-verify','wasmwrapper','ownread']
 
 
 def sha(raw):
@@ -146,6 +147,93 @@ def clean_environment(base, owned, goroot):
     return env
 
 
+def runtime_environment(base, label, extra=None):
+    if label not in PHASES:
+        raise ValueError('unknown continuation phase')
+    environment = dict(base, **(extra or {}))
+    # js/wasm cannot create a second operating-system thread. Keep host
+    # acquisition/compiler metadata phases under the original host bound.
+    if label in ACTIVE_TESTS:
+        environment['GOMAXPROCS'] = '1'
+    return environment
+
+
+def remove_owned_module_cache(owned):
+    owned = Path(owned)
+    if (not owned.is_absolute() or owned.resolve(strict=True) != owned
+            or owned.stat().st_uid != os.getuid()):
+        raise ValueError('canonical task-owned cleanup root required')
+    cache = owned/'cache/mod'
+    if not cache.exists() and not cache.is_symlink():
+        return {'removed': True, 'directoriesOwnerWriteRestored': 0}
+    for ancestor in [owned/'cache', cache]:
+        before = ancestor.lstat()
+        if (ancestor.resolve(strict=True) != ancestor or not stat.S_ISDIR(before.st_mode)
+                or before.st_uid != os.getuid()):
+            raise ValueError('exact owned regular module-cache directory required')
+    directories, pending = [], [cache]
+    identity = lambda s: (s.st_dev, s.st_ino, s.st_mode, s.st_uid, s.st_gid)
+    # Preflight the complete task-owned cache before any chmod; never follow
+    # links or modify source files, source directories or shared caches.
+    while pending:
+        directory = pending.pop()
+        before = directory.lstat()
+        if (not stat.S_ISDIR(before.st_mode) or before.st_uid != os.getuid()
+                or directory.resolve(strict=True) != directory):
+            raise ValueError('owned module-cache directory changed')
+        directories.append((directory, identity(before)))
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                value = entry.stat(follow_symlinks=False)
+                if value.st_uid != os.getuid() or not (stat.S_ISDIR(value.st_mode) or stat.S_ISREG(value.st_mode)):
+                    raise ValueError('unknown module-cache entry refused')
+                if stat.S_ISDIR(value.st_mode):
+                    pending.append(Path(entry.path))
+    changed = 0
+    for directory, before in directories:
+        fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            if identity(os.fstat(fd)) != before or identity(directory.lstat()) != before:
+                raise ValueError('owned module-cache directory replaced')
+            if not before[2] & stat.S_IWUSR:
+                os.fchmod(fd, stat.S_IMODE(before[2]) | stat.S_IWUSR)
+                changed += 1
+            if directory.lstat().st_ino != before[1] or directory.lstat().st_dev != before[0]:
+                raise ValueError('owned module-cache path replaced after chmod')
+        finally:
+            os.close(fd)
+    shutil.rmtree(cache)
+    return {'removed': not cache.exists(), 'directoriesOwnerWriteRestored': changed}
+
+
+def require_reused_validation(contract, inputs):
+    reused = inputs.get('reusedValidation', {})
+    if (reused.get('run') != 39004401325
+            or reused.get('head') != '0fcf06a8cc38b8e1087aa8ae95dfce33f04cd709'
+            or reused.get('finalManifestSHA256') != 'd897d7945cb351c9afaf6ec187a31ae51cf2872f41af011ac00f269e014034e6'
+            or reused.get('coreDigest') != contract['coreDigest']
+            or reused.get('buildExit') != 0
+            or reused.get('hostBufferplan') != {'topPASS': 3, 'subPASS': 4, 'race': True}):
+        raise ValueError('exact unchanged R2 build and host target proof required')
+    proof_row = reused.get('RootABI')
+    if not isinstance(proof_row, dict):
+        raise ValueError('Root actual standalone ABI proof pending')
+    proof = json.loads(pinned(proof_row, REPO))
+    if (proof.get('run') != 39004401325 or proof.get('sourceManifestSHA256') != reused['finalManifestSHA256']
+            or proof.get('ABI145Exact') is not True or proof.get('SDKInit') != 0
+            or proof.get('GoCompile') != 0 or proof.get('runtimeReplacement') is not False
+            or proof.get('RootAcceptanceSHA256') != '3401fa528831eaa1dad12a907ed59f24ff5acdc2a4e4c33eddb90a27b09cd247'
+            or proof.get('files') != [
+                {'path':'openIM.wasm','bytes':35566446,'sha256':'43a4a8929e01415ec9c03b6297137878c7ddab0fe03da31a90d686016396cea7'},
+                {'path':'wasm_exec.js','bytes':16992,'sha256':'0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14'}]
+            or proof.get('GoEnv') != {'GOMAXPROCS':'1'}
+            or proof.get('calls') != {'init':0,'login':0,'database':0,'network':0}
+            or proof.get('functionCount') != 145
+            or proof.get('functionSetSHA256') != sha(('\n'.join(sorted(json.loads(regular(HERE/'required-abi.json'))['functions']))+'\n').encode())):
+        raise ValueError('independently accepted R2 WASM startup proof required')
+    return reused
+
+
 def phase_allowed(label, completed):
     i=PHASES.index(label)
     if completed!=PHASES[:i]: raise ValueError('phase dispatched before verified prerequisite')
@@ -217,6 +305,7 @@ def main():
     if sha(controllerRaw)!=inputs['controllerPinsSHA256']:raise ValueError('harness controller lock differs')
     controllerPins=json.loads(controllerRaw)['files']
     for row in controllerPins:pinned(row,REPO)
+    reused = require_reused_validation(c, inputs)
     inputsBefore=sha(regular(HERE/'inputs.json'))
     guard=REPO/inputs['resourceGuard']['path']
     if sha(regular(guard))!=inputs['resourceGuard']['sha256']:raise ValueError('resource guard changed')
@@ -241,7 +330,7 @@ def main():
     isolate=['sudo','-n','unshare','--net','--','setpriv','--reuid='+str(uid),'--regid='+str(gid),'--clear-groups','--no-new-privs','--']
     def phase(label,argv,seconds=600,extra=None,cwd=None):
         isolated=phase_allowed(label,completed);folder=owned/'raw'/label;folder.mkdir()
-        phaseenv=dict(env,**(extra or {}))
+        phaseenv=runtime_environment(env,label,extra)
         if isolated:
             phaseenv.update(LUOBO_WASM_ISOLATED='1',LUOBO_WASM_HOST_NET_INODE=str(os.stat('/proc/self/ns/net').st_ino))
         # env -i removes hosted credentials and all proxy/auth fallbacks from children.
@@ -265,8 +354,8 @@ def main():
         phase('download',['go','mod','download','all'],900,{'GOPROXY':'https://proxy.golang.org','GOSUMDB':'sum.golang.org'},core)
         if vector(core)!=coreBefore or vector(owned/'source/protocol')!=protocolBefore:raise ValueError('download modified source lock')
         phase('module-verify',['go','mod','verify'],180,cwd=core)
-        phase('build',['go','build','-mod=readonly','-p=1','-trimpath','-o',str(owned/'products/openIM.wasm'),'./wasm/cmd'],900,{'GOOS':'js','GOARCH':'wasm','CGO_ENABLED':'0'},core)
-        for label,spec in SPECS.items():
+        for label in ACTIVE_TESTS:
+            spec=SPECS[label]
             opts={'GOOS':'js','GOARCH':'wasm','CGO_ENABLED':'0'} if spec['wasm'] else {'GOOS':'linux','GOARCH':'amd64','CGO_ENABLED':'1'}
             argv=['go','test','-mod=readonly','-p=1','-parallel=1','-json','-count=1','-vet=off','-timeout=180s','-run','^('+'|'.join(spec['tops'])+')$']
             if spec['wasm']:argv+=['-exec',str(Path(goroot)/'lib/wasm/go_js_wasm_exec')]
@@ -274,18 +363,15 @@ def main():
             folder=phase(label,argv+['./'+spec['package']],600,opts,core)
             events=[json.loads(x) for x in regular(folder/'stdout.log').decode().splitlines() if x.strip()]
             write(folder/'summary.json',audit_test(events,0,label))
-        shim=regular(Path(goroot)/'lib/wasm/wasm_exec.js');(owned/'products/wasm_exec.js').write_bytes(shim)
-        abi=phase('abi',['node',str(HERE/'observe.mjs'),str(owned/'products/wasm_exec.js'),str(owned/'products/openIM.wasm'),str(HERE/'required-abi.json')],60)
-        observation=json.loads(regular(abi/'stdout.log'));write(owned/'products/abi.json',observation)
         if vector(core)!=coreBefore or vector(owned/'source/protocol')!=protocolBefore:raise ValueError('source/modes/locks changed')
         for r in c['support']+controllerPins:pinned(r,REPO)
         if sha(regular(HERE/'inputs.json'))!=inputsBefore:raise ValueError('harness inputs changed')
         write(owned/'raw/source-post.json',{'core':vector(core),'protocol':vector(owned/'source/protocol'),'supportExact':True})
         shutil.copyfile(owned/'raw/source-manifest.json',owned/'products/source-manifest.json')
-        write(owned/'products/artifact-manifest.json',{'files':vector(owned/'products'),'manifestSHA256':args.manifest_sha256,'Go':metadata,'runtimeReplacement':False,'ABIIsRegistrationOnly':True})
+        write(owned/'products/continuation-manifest.json',{'files':vector(owned/'products'),'manifestSHA256':args.manifest_sha256,'Go':metadata,'executedTargetScope':{'top':8,'sub':20},'reusedValidation':reused,'runtimeReplacement':False,'WASMBuild':0,'ABIProbe':0})
         accepted=True
     finally:
-        sourcePost=False;cleanup=False;postError=None
+        sourcePost=False;cleanup=False;postError=None;moduleCleanup=None
         try:
             if core is not None and coreBefore is not None:
                 actualCore=vector(core);actualProtocol=vector(owned/'source/protocol')
@@ -299,12 +385,13 @@ def main():
         finally:
             # No services start. Remove only this run's fresh owned trees.
             try:
+                moduleCleanup=remove_owned_module_cache(owned)
                 for r in [owned/'cache',owned/'tmp',owned/'download',owned/'source']:
                     if r.exists():shutil.rmtree(r)
                 cleanup=all(not r.exists() for r in [owned/'cache',owned/'tmp',owned/'download',owned/'source'])
             finally:
                 accepted=accepted and sourcePost and cleanup and postError is None
-                write(owned/'raw/controller.json',{'accepted':accepted,'completedPhases':completed,'runtimeReplacement':False,'nativeBind':False,'SDKInit':0,'login':0,'send':0,'fullRegression':False,'ownedCacheSourceRemoved':cleanup,'sourcePostExact':sourcePost,'postErrorType':postError})
+                write(owned/'raw/controller.json',{'accepted':accepted,'completedPhases':completed,'runtimeReplacement':False,'nativeBind':False,'SDKInit':0,'login':0,'send':0,'fullRegression':False,'ownedCacheSourceRemoved':cleanup,'sourcePostExact':sourcePost,'postErrorType':postError,'moduleCacheCleanup':moduleCleanup,'executedTargetScope':{'top':8,'sub':20},'reusedValidation':reused})
     if not accepted:raise ValueError('source or phase acceptance incomplete')
     return 0
 
