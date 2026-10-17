@@ -1,4 +1,4 @@
-name: Backend Commit descriptor repair11 / original-source78 retained
+name: Backend Merkle parent repair5 / original-source84 retained
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   targeted:
-    name: Controller1 CPU + direct owned5/inventory5 / original78 and old14 retained / graph pending
+    name: Controller1 CPU + direct owned3/inventory1 / original84 and old14 retained / graph pending
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -24,10 +24,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - name: Directly affected repair controls4 only; no Go in source gate
+      - name: Directly affected repair controls3; CPU control original body reused
         run: |
           python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
-          python3 -B ci/backend-runtime-join-r8/test_repair.py
+          python3 -B ci/backend-runtime-join-r8/test_repair.py RepairControls.test_repair21_reuses_only_actual_old67_and14_keeps_both_graph_obligations RepairControls.test_actual_repair_plan_has_no_build_rejects_partial_events_and_retains_primary_post_failure RepairControls.test_split_process_dispatch_keeps_md_failure_and_missing_child_failed_but_runs_both_owned_scopes
           python3 -B ci/backend-runtime-join-r8/run.py --verify
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
         with:
@@ -56,7 +56,7 @@ jobs:
             --record "$GITHUB_WORKSPACE/ci-results/backend-runtime-join-r8-prepare.resource.json" \
             --min-free-mib 1024 --timeout 600 --poll-interval .2 \
             -- bash ci/backend-integration.sh prepare
-      - name: Only Commit repair11; original controller CPU only; no main rebuild or raw profile upload
+      - name: Only Merkle repair5; original controller CPU only; no main rebuild or raw profile upload
         run: python3 -B ci/backend-runtime-join-r8/run.py
       - name: Always collect owned fixture residuals
         if: always()

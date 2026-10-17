@@ -3,7 +3,9 @@ package namespaceinventory
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 )
 
 // A disk Merkle job authenticates one immutable derived set. Every invocation
@@ -153,6 +155,106 @@ func marshalImportValue(v any) ([]byte, error) {
 	return b, nil
 }
 
+// One parent step reads only its exact contiguous <=60 node keys from one
+// original checkpoint. A single bounded traversal shares prefix work, not raw
+// bytes or a cache. Every visited index and value keeps the original private
+// read/hash/strict validation. No context or object is reused by another step.
+func (w *ImportWorkspace) readMerkleParentRange(ctx context.Context, expected string, value DerivedMerkleState) (nodes []DerivedMerkleNode, resultErr error) {
+	if e := w.check(ctx); e != nil {
+		return nil, e
+	}
+	if !hexText(expected, 64) || !hexText(value.TreeID, 64) || value.Phase != "parents" || value.Level > 64 || value.Width == 0 || value.NextIndex >= value.Width || value.NextIndex%2 != 0 {
+		return nil, ErrChanged
+	}
+	take := min(uint64(60), value.Width-value.NextIndex)
+	if take == 0 || value.NextIndex > ^uint64(0)-(take-1) {
+		return nil, ErrLimit
+	}
+	first, last := merkleNodeKey(value.NextIndex), merkleNodeKey(value.NextIndex+(take-1))
+	lock, e := lockJournal(w.dir)
+	if e != nil {
+		return nil, e
+	}
+	defer func() {
+		if e := w.check(ctx); e != nil {
+			nodes = nil
+			resultErr = errors.Join(resultErr, e)
+		}
+		if lock.Close() != nil {
+			nodes = nil
+			resultErr = ErrPrivate
+		}
+	}()
+	state, actual, e := w.load()
+	if e != nil || actual != expected {
+		return nil, ErrChanged
+	}
+	store := progressStore{w.dir}
+	var set derivedSet
+	present, e := store.get(ctx, state.SetsRoot, merkleNodeSet(value.TreeID, value.Level), &set)
+	if e != nil || !present || set.Count != value.Width || !hexText(set.Root, 64) {
+		return nil, ErrChanged
+	}
+	// Valid radix prefixes partition the requested interval. Even a malformed
+	// sparse tree cannot turn these <=60 keys into an unbounded disk walk.
+	visited, maxVisited := uint64(0), 1+64*take
+	var visit func(string, string) error
+	visit = func(h, prefix string) error {
+		if e := ctx.Err(); e != nil {
+			return e
+		}
+		if len(prefix) > 64 {
+			return ErrChanged
+		}
+		if prefix+strings.Repeat("f", 64-len(prefix)) < first || prefix+strings.Repeat("0", 64-len(prefix)) > last {
+			return nil
+		}
+		if visited >= maxVisited {
+			return ErrLimit
+		}
+		visited++
+		node, e := store.node(h, prefix)
+		if e != nil {
+			return e
+		}
+		for _, item := range node.Items {
+			if e := ctx.Err(); e != nil {
+				return e
+			}
+			if item.Key < first || item.Key > last {
+				continue
+			}
+			offset := uint64(len(nodes))
+			if offset >= take || value.NextIndex > ^uint64(0)-offset || item.Key != merkleNodeKey(value.NextIndex+offset) {
+				return ErrChanged
+			}
+			var ref derivedValue
+			if DecodeStrict(item.Value, &ref) != nil || !hexText(ref.SHA256, 64) {
+				return ErrChanged
+			}
+			body, e := ReadPrivateDocument(store.objectPath("derived-value", ref.SHA256), (64<<10)+1)
+			var parent DerivedMerkleNode
+			if e != nil || digest(body) != ref.SHA256 || !json.Valid(body) || DecodeStrict(body, &parent) != nil || parent.Index != value.NextIndex+offset || !hexText(parent.NodeSHA256, 64) {
+				return ErrChanged
+			}
+			nodes = append(nodes, parent)
+		}
+		for _, child := range node.Children {
+			if e := visit(child.SHA, prefix+child.Digit); e != nil {
+				return e
+			}
+		}
+		return nil
+	}
+	if e = visit(set.Root, ""); e != nil {
+		return nil, e
+	}
+	if uint64(len(nodes)) != take {
+		return nil, ErrChanged
+	}
+	return nodes, nil
+}
+
 // StepMerkle preserves the input set identity, original snapshot and every
 // private object's SHA. It never memoizes a decoded object across invocations.
 func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedMerkleState, error) {
@@ -216,29 +318,37 @@ func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedM
 			return value, ErrChanged
 		}
 		if value.Width == 1 {
-			var node DerivedMerkleNode
-			entry, ok, e := w.ReadEntry(ctx, merkleNodeSet(tree, value.Level), merkleNodeKey(0))
-			if e != nil || !ok || DecodeStrict(entry.Value, &node) != nil || node.Index != 0 || !hexText(node.NodeSHA256, 64) {
+			nodes, e := w.readMerkleParentRange(ctx, expected, value)
+			if e != nil || len(nodes) != 1 {
 				return value, ErrChanged
 			}
 			value.Phase = "complete"
-			value.RootSHA256 = node.NodeSHA256
+			value.RootSHA256 = nodes[0].NodeSHA256
 		} else {
-			for n := 0; n < 30 && value.NextIndex < value.Width; n++ {
-				leftIndex := value.NextIndex
-				var left DerivedMerkleNode
-				entry, ok, e := w.ReadEntry(ctx, merkleNodeSet(tree, value.Level), merkleNodeKey(leftIndex))
-				if e != nil || !ok || DecodeStrict(entry.Value, &left) != nil || left.Index != leftIndex || !hexText(left.NodeSHA256, 64) {
+			var nodes []DerivedMerkleNode
+			if value.NextIndex < value.Width {
+				nodes, e = w.readMerkleParentRange(ctx, expected, value)
+				if e != nil {
 					return value, ErrChanged
 				}
-				sum := left.NodeSHA256
-				if leftIndex+1 < value.Width {
-					var right DerivedMerkleNode
-					entry, ok, e = w.ReadEntry(ctx, merkleNodeSet(tree, value.Level), merkleNodeKey(leftIndex+1))
-					if e != nil || !ok || DecodeStrict(entry.Value, &right) != nil || right.Index != leftIndex+1 || !hexText(right.NodeSHA256, 64) {
+			}
+			for at := 0; at < len(nodes); {
+				leftIndex := value.NextIndex
+				if nodes[at].Index != leftIndex {
+					return value, ErrChanged
+				}
+				sum := nodes[at].NodeSHA256
+				at++
+				// Comparing before addition keeps the right sibling index in range.
+				if leftIndex < value.Width-1 {
+					if leftIndex == ^uint64(0) || at >= len(nodes) || nodes[at].Index != leftIndex+1 {
 						return value, ErrChanged
 					}
-					sum = jsonSHA([]string{nodeDomain, sum, right.NodeSHA256})
+					sum = jsonSHA([]string{nodeDomain, sum, nodes[at].NodeSHA256})
+					at++
+				}
+				if value.NextIndex > ^uint64(0)-2 {
+					return value, ErrLimit
 				}
 				node := DerivedMerkleNode{Index: leftIndex / 2, NodeSHA256: sum}
 				change, e := merkleMutation(merkleNodeSet(tree, value.Level+1), merkleNodeKey(node.Index), DerivedEntry{}, node)
