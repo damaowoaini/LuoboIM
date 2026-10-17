@@ -170,7 +170,6 @@ func (w *ImportWorkspace) readMerkleParentRange(ctx context.Context, expected st
 	if take == 0 || value.NextIndex > ^uint64(0)-(take-1) {
 		return nil, ErrLimit
 	}
-	first, last := merkleNodeKey(value.NextIndex), merkleNodeKey(value.NextIndex+(take-1))
 	lock, e := lockJournal(w.dir)
 	if e != nil {
 		return nil, e
@@ -195,6 +194,15 @@ func (w *ImportWorkspace) readMerkleParentRange(ctx context.Context, expected st
 	if e != nil || !present || set.Count != value.Width || !hexText(set.Root, 64) {
 		return nil, ErrChanged
 	}
+	return w.readMerkleParentRangeInner(ctx, value, set)
+}
+
+// The caller owns the original journal lock and has authenticated this set.
+func (w *ImportWorkspace) readMerkleParentRangeInner(ctx context.Context, value DerivedMerkleState, set derivedSet) (nodes []DerivedMerkleNode, resultErr error) {
+	store := progressStore{w.dir}
+	take := min(uint64(60), value.Width-value.NextIndex)
+	first, last := merkleNodeKey(value.NextIndex), merkleNodeKey(value.NextIndex+(take-1))
+	var e error
 	// Valid radix prefixes partition the requested interval. Even a malformed
 	// sparse tree cannot turn these <=60 keys into an unbounded disk walk.
 	visited, maxVisited := uint64(0), 1+64*take
@@ -288,6 +296,13 @@ func (w *ImportWorkspace) readMerkleLeafBatch(ctx context.Context, expected stri
 	if e != nil || !present || set.Root != value.SetRoot || set.Count != value.Count {
 		return nil, "", false, ErrChanged
 	}
+	return w.readMerkleLeafBatchInner(ctx, value, set)
+}
+
+// The caller owns the same original journal lock; no reader capability escapes.
+func (w *ImportWorkspace) readMerkleLeafBatchInner(ctx context.Context, value DerivedMerkleState, set derivedSet) (keys []string, next string, done bool, resultErr error) {
+	store := progressStore{w.dir}
+	var e error
 	next = value.Cursor
 	bytesRead, visited, stopped := 0, 0, false
 	// A producer trie has no empty child subtrees. Thirty result paths, one
@@ -361,21 +376,134 @@ func (w *ImportWorkspace) readMerkleLeafBatch(ctx context.Context, expected stri
 	return keys, next, !stopped, nil
 }
 
+// This is only one invocation's authenticated read result, never a permit or
+// a reusable read scope. Commit still checks the original head after unlock.
+type merkleStepInput struct {
+	checkpoint DerivedCheckpoint
+	expected   string
+	value      DerivedMerkleState
+	prior      DerivedEntry
+	keys       []string
+	next       string
+	done       bool
+	nodes      []DerivedMerkleNode
+}
+
+// Read the head, actual job ref/body and input descriptor once under the same
+// journal lock as this step's bounded traversal. Generic readers stay unchanged.
+func (w *ImportWorkspace) readMerkleStep(ctx context.Context, tree string) (input merkleStepInput, resultErr error) {
+	if e := w.check(ctx); e != nil {
+		return input, e
+	}
+	lock, e := lockJournal(w.dir)
+	if e != nil {
+		return input, e
+	}
+	defer func() {
+		if e := w.check(ctx); e != nil {
+			input.keys, input.next, input.done, input.nodes = nil, "", false, nil
+			resultErr = errors.Join(resultErr, e)
+		}
+		if lock.Close() != nil {
+			input.keys, input.next, input.done, input.nodes = nil, "", false, nil
+			resultErr = ErrPrivate
+		}
+	}()
+	input.checkpoint, input.expected, e = w.load()
+	if e != nil {
+		return input, e
+	}
+	if !hexText(tree, 64) {
+		return input, ErrChanged
+	}
+	store := progressStore{w.dir}
+	var jobs derivedSet
+	found, e := store.get(ctx, input.checkpoint.SetsRoot, DerivedSetID("merkle-jobs", w.snapshot.Fingerprint()), &jobs)
+	if e != nil || !found {
+		return input, ErrChanged
+	}
+	var ref derivedValue
+	found, e = store.get(ctx, jobs.Root, tree, &ref)
+	if e != nil || !found {
+		return input, ErrChanged
+	}
+	// The actual ReadEntry private/hash/JSON boundary is retained, not replaced
+	// by the job's typed fields or a descriptor SHA supplied by its caller.
+	body, e := ReadPrivateDocument(store.objectPath("derived-value", ref.SHA256), (64<<10)+1)
+	if e != nil || digest(body) != ref.SHA256 || !json.Valid(body) {
+		return input, ErrChanged
+	}
+	input.prior = DerivedEntry{tree, ref.SHA256, append(json.RawMessage(nil), body...)}
+	if DecodeStrict(input.prior.Value, &input.value) != nil || input.value.TreeID != tree || !hexText(input.value.SetID, 64) || input.value.Level > 64 {
+		return input, ErrChanged
+	}
+	value := input.value
+	var set derivedSet
+	present, e := store.get(ctx, input.checkpoint.SetsRoot, value.SetID, &set)
+	if e != nil || present && (set.Count == 0 || !hexText(set.Root, 64)) {
+		return input, ErrChanged
+	}
+	// An absent set keeps the original factual empty identity ("",0). It does
+	// not become an open source, a new counter or a newly granted member set.
+	if !present {
+		set = derivedSet{}
+	}
+	if set.Root != value.SetRoot || set.Count != value.Count {
+		return input, ErrChanged
+	}
+	if value.Phase == "complete" {
+		if !hexText(value.RootSHA256, 64) {
+			return input, ErrChanged
+		}
+		return input, nil
+	}
+	if _, _, ok := merkleDomains(value.Domain); !ok {
+		return input, ErrChanged
+	}
+	switch value.Phase {
+	case "leaves":
+		if !hexText(value.SetRoot, 64) || value.Count == 0 || value.Cursor != "" && !hexText(value.Cursor, 64) {
+			return input, ErrChanged
+		}
+		input.keys, input.next, input.done, e = w.readMerkleLeafBatchInner(ctx, value, set)
+	case "parents":
+		if value.Width < 1 || value.NextIndex > value.Width || value.NextIndex%2 != 0 {
+			return input, ErrChanged
+		}
+		if value.Width == 1 || value.NextIndex < value.Width {
+			if value.NextIndex >= value.Width {
+				return input, ErrChanged
+			}
+			take := min(uint64(60), value.Width-value.NextIndex)
+			if take == 0 || value.NextIndex > ^uint64(0)-(take-1) {
+				return input, ErrLimit
+			}
+			var parents derivedSet
+			present, e = store.get(ctx, input.checkpoint.SetsRoot, merkleNodeSet(tree, value.Level), &parents)
+			if e != nil || !present || parents.Count != value.Width || !hexText(parents.Root, 64) {
+				return input, ErrChanged
+			}
+			input.nodes, e = w.readMerkleParentRangeInner(ctx, value, parents)
+		}
+	default:
+		return input, ErrChanged
+	}
+	if e != nil {
+		input.keys, input.next, input.done, input.nodes = nil, "", false, nil
+		return input, ErrChanged
+	}
+	return input, nil
+}
+
 // StepMerkle preserves the input set identity, original snapshot and every
 // private object's SHA. It never memoizes a decoded object across invocations.
 func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedMerkleState, error) {
-	checkpoint, expected, e := w.Checkpoint(ctx)
+	input, e := w.readMerkleStep(ctx, tree)
+	value, prior := input.value, input.prior
 	if e != nil {
-		return DerivedMerkleState{}, e
+		return value, e
 	}
-	value, prior, found, e := w.MerkleState(ctx, tree)
-	if e != nil || !found {
-		return value, ErrChanged
-	}
-	root, count, e := w.DerivedSetIdentity(ctx, value.SetID)
-	if e != nil || root != value.SetRoot || count != value.Count {
-		return value, ErrChanged
-	}
+	checkpoint, expected := input.checkpoint, input.expected
 	if value.Phase == "complete" {
 		if !hexText(value.RootSHA256, 64) {
 			return value, ErrChanged
@@ -388,10 +516,7 @@ func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedM
 	}
 	changes := []DerivedMutation{}
 	if value.Phase == "leaves" {
-		keys, next, done, e := w.readMerkleLeafBatch(ctx, expected, value)
-		if e != nil {
-			return value, ErrChanged
-		}
+		keys, next, done := input.keys, input.next, input.done
 		for _, key := range keys {
 			if value.LeavesBuilt == ^uint64(0) {
 				return value, ErrLimit
@@ -424,20 +549,14 @@ func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedM
 			return value, ErrChanged
 		}
 		if value.Width == 1 {
-			nodes, e := w.readMerkleParentRange(ctx, expected, value)
-			if e != nil || len(nodes) != 1 {
+			nodes := input.nodes
+			if len(nodes) != 1 {
 				return value, ErrChanged
 			}
 			value.Phase = "complete"
 			value.RootSHA256 = nodes[0].NodeSHA256
 		} else {
-			var nodes []DerivedMerkleNode
-			if value.NextIndex < value.Width {
-				nodes, e = w.readMerkleParentRange(ctx, expected, value)
-				if e != nil {
-					return value, ErrChanged
-				}
-			}
+			nodes := input.nodes
 			for at := 0; at < len(nodes); {
 				leftIndex := value.NextIndex
 				if nodes[at].Index != leftIndex {

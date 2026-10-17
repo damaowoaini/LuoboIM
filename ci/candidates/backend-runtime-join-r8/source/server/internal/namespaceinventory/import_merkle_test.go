@@ -501,4 +501,156 @@ func TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume(t *testing.T) {
 		}
 		finishLeafRoot(t, w, tree, state, keys)
 	})
+	t.Run("step read authenticates actual job descriptor and stale head across reopen", func(t *testing.T) {
+		w, tree, set, keys := leafFixture(t, []json.RawMessage{json.RawMessage(`true`), json.RawMessage(`{"value":1}`), json.RawMessage(`[1,2]`)})
+		ctx := context.Background()
+		jobSet := DerivedSetID("merkle-jobs", w.snapshot.Fingerprint())
+		job, found, e := w.ReadEntry(ctx, jobSet, tree)
+		if e != nil || !found {
+			t.Fatal("actual job body missing", e)
+		}
+		store := progressStore{w.dir}
+		path := store.objectPath("derived-value", job.SHA256)
+		original, e := os.ReadFile(path)
+		if e != nil {
+			t.Fatal(e)
+		}
+		t.Cleanup(func() {
+			if e := os.WriteFile(path, original, 0600); e != nil {
+				t.Error(e)
+			}
+			if e := os.Chmod(path, 0600); e != nil {
+				t.Error(e)
+			}
+		})
+		unchanged := func(before DerivedCheckpoint, expected string) {
+			t.Helper()
+			got, sum, e := w.Checkpoint(ctx)
+			if e != nil || got != before || sum != expected {
+				t.Fatal("failed step changed the original checkpoint", e)
+			}
+		}
+		reject := func() {
+			t.Helper()
+			before, expected, e := w.Checkpoint(ctx)
+			if e != nil {
+				t.Fatal(e)
+			}
+			if _, e = w.StepMerkle(ctx, tree); e == nil {
+				t.Fatal("invalid actual job or descriptor was consumed")
+			}
+			unchanged(before, expected)
+		}
+		if e = os.Chmod(path, 0644); e != nil {
+			t.Fatal(e)
+		}
+		reject()
+		if e = os.Chmod(path, 0600); e != nil {
+			t.Fatal(e)
+		}
+		if e = os.WriteFile(path, []byte(`{"changed":true}`), 0600); e != nil {
+			t.Fatal(e)
+		}
+		reject()
+		if e = os.WriteFile(path, original, 0600); e != nil {
+			t.Fatal(e)
+		}
+		// The real writer authenticates this new body SHA, but its unknown job
+		// field must still fail the same original strict typed decoder.
+		var unknown map[string]json.RawMessage
+		if e = json.Unmarshal(job.Value, &unknown); e != nil {
+			t.Fatal(e)
+		}
+		unknown["unreviewed_job_field"] = json.RawMessage(`true`)
+		bad, e := json.Marshal(unknown)
+		if e != nil {
+			t.Fatal(e)
+		}
+		before, expected, e := w.Checkpoint(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		if _, _, e = w.Commit(ctx, expected, before.Phase, before.Cursor, before.Subcursor, []DerivedMutation{{SetID: jobSet, Key: tree, ExpectedSHA256: job.SHA256, Value: bad}}); e != nil {
+			t.Fatal(e)
+		}
+		reject()
+		badJob, found, e := w.ReadEntry(ctx, jobSet, tree)
+		if e != nil || !found {
+			t.Fatal(e)
+		}
+		before, expected, e = w.Checkpoint(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		if _, _, e = w.Commit(ctx, expected, before.Phase, before.Cursor, before.Subcursor, []DerivedMutation{{SetID: jobSet, Key: tree, ExpectedSHA256: badJob.SHA256, Value: job.Value}}); e != nil {
+			t.Fatal(e)
+		}
+		before, _, e = w.Checkpoint(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		var descriptor derivedSet
+		present, e := store.get(ctx, before.SetsRoot, set, &descriptor)
+		if e != nil || !present {
+			t.Fatal("original set descriptor missing", e)
+		}
+		// Save a valid private COW registry/head with the wrong typed count.
+		// This is derived test corruption, not a fabricated raw source or grant.
+		replaceDescriptor := func(nextDescriptor derivedSet) {
+			t.Helper()
+			lock, e := lockJournal(w.dir)
+			if e != nil {
+				t.Fatal(e)
+			}
+			defer func() {
+				if e := lock.Close(); e != nil {
+					t.Error(e)
+				}
+			}()
+			old, sum, e := w.load()
+			if e != nil {
+				t.Fatal(e)
+			}
+			root, e := store.put(ctx, old.SetsRoot, set, nextDescriptor)
+			if e != nil {
+				t.Fatal(e)
+			}
+			next := old
+			next.Sequence++
+			next.PreviousSHA256, next.SetsRoot = sum, root
+			if e = w.save(derivedHead{old.Sequence, sum}, next); e != nil {
+				t.Fatal(e)
+			}
+		}
+		wrong := descriptor
+		wrong.Count++
+		replaceDescriptor(wrong)
+		reject()
+		replaceDescriptor(descriptor)
+		input, e := w.readMerkleStep(ctx, tree)
+		if e != nil || len(input.keys) != 3 || !input.done || input.next != keys[2] || input.value.LeavesBuilt != 0 {
+			t.Fatal("restored actual step did not retain the original leaf view", e)
+		}
+		advanced, advancedSHA, e := w.Commit(ctx, input.expected, input.checkpoint.Phase, input.checkpoint.Cursor, input.checkpoint.Subcursor, nil)
+		if e != nil {
+			t.Fatal(e)
+		}
+		if _, _, e = w.Commit(ctx, input.expected, input.checkpoint.Phase, input.checkpoint.Cursor, input.checkpoint.Subcursor, nil); !errors.Is(e, ErrChanged) {
+			t.Fatal("read result acquired a later checkpoint after unlock", e)
+		}
+		unchanged(advanced, advancedSHA)
+		if _, _, _, e = w.readMerkleLeafBatch(ctx, input.expected, input.value); !errors.Is(e, ErrChanged) {
+			t.Fatal("original direct leaf negative-control interface lost its expected-head check", e)
+		}
+		unchanged(advanced, advancedSHA)
+		w, e = OpenImportWorkspace(ctx, w.snapshot, w.live, w.dir, w.header, w.policy, true)
+		if e != nil {
+			t.Fatal(e)
+		}
+		state, e := w.StepMerkle(ctx, tree)
+		if e != nil || state.Phase != "parents" || state.LeavesBuilt != 3 || state.Cursor != keys[2] {
+			t.Fatal("reopen did not rebuild the exact original step view", e)
+		}
+		finishLeafRoot(t, w, tree, state, keys)
+	})
 }

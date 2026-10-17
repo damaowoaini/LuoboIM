@@ -19,6 +19,11 @@ class RepairControls(unittest.TestCase):
         self.assertEqual(len(runner.pairs(p['directlyAffectedCommitTargets'])),11)
         self.assertEqual(len(runner.pairs(p['newImageTargets'])),1)
         self.assertEqual(sum(r['retainedTopCount'] for r in p['sourceReuse']),84)
+        self.assertEqual(p['lastMerkleLeafRun']['actualTopPASS'],4)
+        self.assertEqual(p['lastMerkleLeafRun']['source']['digest'],'a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84')
+        for key,value in (('actualTopPASS',5),('wholeAccepted',True),('source',c['source'])):
+            bad=copy.deepcopy(p);bad['lastMerkleLeafRun'][key]=value
+            with self.subTest(leafOnly=key),self.assertRaises(ValueError):runner.check_repair(c,bad)
         self.assertEqual(p['lastMerkleParentRun']['actualTopPASS'],4)
         self.assertEqual(p['lastMerkleParentRun']['source']['digest'],'423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09')
         self.assertFalse(runner.pairs(p['directlyAffectedMerkleTargets']) & runner.pairs(p['actualPassedTargets']))
@@ -68,7 +73,7 @@ class RepairControls(unittest.TestCase):
         self.assertEqual(result['topPASS'],5)
         leaf_top='TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume'
         leaf_package='internal/namespaceinventory'
-        for leaf_child in runner.NEW_MERKLE_LEAF_CHILDREN:
+        for leaf_child in runner.NEW_MERKLE_LEAF_CHILDREN | runner.NEW_MERKLE_STEP_READ_CHILDREN:
             missing=[e for e in events if not (e.get('Package')==runner.PREFIX+leaf_package and e.get('Test')==leaf_top+'/'+leaf_child)]
             with self.subTest(leafChild=leaf_child),self.assertRaises(ValueError):
                 runner.require_children(runner.audit(missing,0,active['targets']),audited)
@@ -98,8 +103,9 @@ class RepairControls(unittest.TestCase):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
         self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,3,1])
         merkle_children=set(c['requiredSubtests']['internal/namespaceinventory']['TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume'])
-        self.assertTrue(runner.NEW_MERKLE_CHILDREN | runner.NEW_MERKLE_LEAF_CHILDREN <= merkle_children)
+        self.assertTrue(runner.NEW_MERKLE_CHILDREN | runner.NEW_MERKLE_LEAF_CHILDREN | runner.NEW_MERKLE_STEP_READ_CHILDREN <= merkle_children)
         self.assertEqual(p['newMerkleLeafRequiredChildren'],sorted(runner.NEW_MERKLE_LEAF_CHILDREN))
+        self.assertEqual(p['newMerkleStepReadRequiredChildren'],sorted(runner.NEW_MERKLE_STEP_READ_CHILDREN))
         self.assertEqual([list(scope['targets']) for scope in active['scopes']],[['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol'],['internal/namespaceinventory']])
         real_child='real_commit_custody_failure_never_becomes_normal_capture_pending'
         self.assertIn(real_child,c['requiredSubtests']['internal/namespaceimport/ownedcontrol']['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'])
