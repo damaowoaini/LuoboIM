@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import xml.etree.ElementTree as ET
 from urllib.parse import unquote, urljoin, urlsplit
 
 ALLOWED = {'dl.google.com', 'maven.google.com', 'repo.maven.apache.org', 'repo1.maven.org',
@@ -83,6 +84,63 @@ def _same_repository_url(base, relative, coordinate, filename):
     return new.geturl()
 
 
+def verification_bytes(work):
+    return _stable(Path(work)/'source/app/android/gradle/verification-metadata.xml', Path(work), 64*1024**2)
+
+
+class AcquisitionVerification:
+    """Generated verification identities are acquisition evidence, never APK scope."""
+    def __init__(self, work):
+        self.work = Path(work)
+        raw = _stable(self.work/'evidence/gradle-verification-metadata.xml', self.work, 64*1024**2)
+        if b'\x00' in raw or b'<!DOCTYPE' in raw.upper() or b'<!ENTITY' in raw.upper():
+            raise ValueError('verification XML declarations refused')
+        try:
+            root = ET.fromstring(raw.decode('utf-8'))
+        except (ET.ParseError, UnicodeDecodeError) as error:
+            raise ValueError('strict generated verification XML required') from error
+        ns = '{https://schema.gradle.org/dependency-verification}'
+        if root.tag != ns+'verification-metadata' or sum(1 for _ in root.iter()) > 100000:
+            raise ValueError('bounded verification metadata schema required')
+        components = root.findall(ns+'components')
+        if len(components) != 1:
+            raise ValueError('one actual verification components table required')
+        self.rows = {}; self.xml_sha = hashlib.sha256(raw).hexdigest()
+        for component in components[0]:
+            if component.tag != ns+'component' or set(component.attrib) != {'group', 'name', 'version'}:
+                raise ValueError('typed verification component required')
+            coordinate = _coordinate(tuple(component.attrib[k] for k in ('group', 'name', 'version')))
+            if coordinate in self.rows:
+                raise ValueError('duplicate verification component refused')
+            entries = {}
+            for artifact in component:
+                name = artifact.get('name')
+                if (artifact.tag != ns+'artifact' or set(artifact.attrib) != {'name'}
+                        or not isinstance(name, str) or not re.fullmatch(r'[A-Za-z0-9_.+\-]{1,255}', name)
+                        or name in ('.', '..') or name in entries):
+                    raise ValueError('unique typed verification artifact required')
+                entries[name] = artifact
+            self.rows[coordinate] = entries
+        self.ns = ns
+
+    def match(self, coordinate, filename, digest):
+        artifact = self.rows.get(coordinate, {}).get(filename)
+        if artifact is None:
+            raise ValueError('actual acquisition component and artifact required')
+        checksums = list(artifact)
+        if (len(checksums) != 1 or checksums[0].tag != self.ns+'sha256'
+                or set(checksums[0].attrib) - {'value', 'origin'} or list(checksums[0])):
+            raise ValueError('one unambiguous generated SHA256 required')
+        value = checksums[0].get('value')
+        if not isinstance(value, str) or not re.fullmatch(r'[0-9a-f]{64}', value):
+            raise ValueError('verification artifact checksum malformed')
+        if value != digest:
+            raise ValueError('actual acquisition component body SHA256 differs')
+        return {'coordinate': ':'.join(coordinate), 'filename': filename, 'sha256': digest,
+                'verification_metadata_sha256': self.xml_sha, 'acquisition_only': True,
+                'grants_production_component_or_configuration_scope': False}
+
+
 class PublishedFiles:
     def __init__(self, work, downloads):
         self.work = Path(work)
@@ -94,8 +152,9 @@ class PublishedFiles:
         if not isinstance(self.rows, list):
             raise ValueError('actual resolved artifact rows required')
         self.report_sha = hashlib.sha256(raw).hexdigest()
+        self.acquisition = None
 
-    def module(self, coordinate, required_url=None):
+    def module(self, coordinate, required_url=None, acquisition=False):
         group, module, version = _coordinate(coordinate)
         filename = module + '-' + version + '.module'
         directory = self.cache / group / module / version
@@ -117,6 +176,20 @@ class PublishedFiles:
         proof = {'coordinate': ':'.join(coordinate), 'path': str(path.relative_to(self.work)),
                  'url': url, 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest(),
                  'cacheKey': path.parent.name, 'cacheKeyIsOpaque': True}
+        if acquisition:
+            proof['acquisition_identity'] = self.acquisition.match(coordinate, filename, proof['sha256'])
+            directory = self.work/'evidence/maven-module-metadata'
+            directory.mkdir(mode=0o700, exist_ok=True)
+            if directory.resolve(strict=True) != directory or directory.stat().st_uid != os.getuid():
+                raise ValueError('owned module metadata capture required')
+            captured = directory/(proof['sha256']+'.module')
+            if captured.exists():
+                if _stable(captured, self.work, 2*1024**2) != raw:
+                    raise ValueError('captured module metadata differs')
+            else:
+                with os.fdopen(os.open(captured, os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW, 0o600), 'wb') as output:
+                    output.write(raw); output.flush(); os.fsync(output.fileno())
+            proof['captured_public_module'] = str(captured.relative_to(self.work))
         return data, proof, repository
 
     def alias(self, coordinate, filename, path, size, digest):
@@ -126,8 +199,14 @@ class PublishedFiles:
             raise ValueError('canonical owned resolved artifact required')
         relative = str(path.relative_to(self.work))
         matching = [x for x in self.rows if isinstance(x, dict) and x.get('path') == relative]
+        acquisition = None
         if not matching:
-            raise ValueError('file alias lacks actual resolved component')
+            try:
+                if self.acquisition is None:
+                    self.acquisition = AcquisitionVerification(self.work)
+                acquisition = self.acquisition.match(coordinate, filename, digest)
+            except OSError as error:
+                raise ValueError('file alias lacks actual resolved component') from error
         for row in matching:
             selected = row.get('selected')
             if (not isinstance(selected, dict) or selected.get('kind') != 'module'
@@ -135,7 +214,7 @@ class PublishedFiles:
                     or row.get('coordinate') != ':'.join(coordinate)
                     or type(row.get('bytes')) is not int or row['bytes'] != size or row.get('sha256') != digest):
                 raise ValueError('file alias resolved identity or body differs')
-        data, child, repository = self.module(coordinate)
+        data, child, repository = self.module(coordinate, acquisition=acquisition is not None)
         component = _component(data.get('component'))
         proofs = [child]
         if component != coordinate:
@@ -144,7 +223,7 @@ class PublishedFiles:
             parent_url = _same_repository_url(child['url'], backlink, component, parent_name)
             if parent_url != repository + _suffix(component, parent_name):
                 raise ValueError('KMP parent leaves original Maven repository')
-            parent, parent_proof, parent_repository = self.module(component, parent_url)
+            parent, parent_proof, parent_repository = self.module(component, parent_url, acquisition is not None)
             if _component(parent.get('component')) != component or parent_repository != repository:
                 raise ValueError('KMP parent identity differs')
             child_name = coordinate[1] + '-' + coordinate[2] + '.module'
@@ -179,10 +258,26 @@ class PublishedFiles:
             raise ValueError('unique published cached-name mapping required')
         entry = files[0]
         relative_url = entry.get('url')
-        if (not isinstance(relative_url, str) or not re.fullmatch(r'[A-Za-z0-9_.+\-]+', relative_url)
-                or relative_url in ('.', '..') or type(entry.get('size')) is not int or entry['size'] != size):
+        if (not isinstance(relative_url, str) or not relative_url or relative_url in ('.', '..')
+                or type(entry.get('size')) is not int or entry['size'] != size):
             raise ValueError('published file URL or size differs')
-        url = repository + _suffix(coordinate, relative_url)
+        if re.fullmatch(r'[A-Za-z0-9_.+\-]+', relative_url):
+            url = repository + _suffix(coordinate, relative_url)
+        elif acquisition is not None:
+            parsed = urlsplit(relative_url)
+            if (relative_url.startswith('/') or '\\' in relative_url or '%' in relative_url
+                    or parsed.scheme or parsed.netloc or parsed.query or parsed.fragment):
+                raise ValueError('relative acquired published artifact URL required')
+            url = urljoin(child['url'], relative_url)
+            prefix = repository+'/'+coordinate[0].replace('.', '/')+'/'+coordinate[1]+'/'
+            if not url.startswith(prefix):
+                raise ValueError('acquired variant leaves original Maven group or module')
+            tail = url[len(prefix):].split('/')
+            if len(tail) != 2 or not re.fullmatch(r'[A-Za-z0-9_.+\-]+', tail[1]) or tail[1] in ('.', '..'):
+                raise ValueError('finite acquired variant version and filename required')
+            _coordinate((coordinate[0], coordinate[1], tail[0]))
+        else:
+            raise ValueError('production published file URL must retain its original contract')
         if url not in self.downloads:
             raise ValueError('actual published artifact download missing')
         strong = False
@@ -198,11 +293,18 @@ class PublishedFiles:
             strong = True
         if not strong:
             raise ValueError('strong published file hash required')
-        return [url], {'resolved_report_sha256': self.report_sha, 'resolved_coordinate': ':'.join(coordinate),
+        result = {'resolved_report_sha256': self.report_sha, 'resolved_coordinate': ':'.join(coordinate),
                        'cached_filename': filename, 'published_relative_url': relative_url,
                        'metadata': proofs, 'target_bytes': size, 'target_sha256': digest,
                        'target_cache_key': path.parent.name, 'cache_keys_are_opaque': True,
-                       'KMP_relation_grants_no_new_component_or_repository': True}
+                  'KMP_relation_grants_no_new_component_or_repository': True}
+        if acquisition is not None:
+            result.pop('resolved_coordinate')
+            result['acquisition_coordinate'] = ':'.join(coordinate)
+            result['acquisition_identity'] = acquisition
+            result['resolved_report_matching_rows'] = 0
+            result['not_a_production_consumed_component_grant'] = True
+        return [url], result
 
 
 def _hash(path, name='sha256'):

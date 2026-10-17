@@ -1,3 +1,4 @@
+import { decodeSendFailure } from "@/core/sendFailure";
 import { captureMessageAccess, captureMessageRetention } from "@/core/messagePrivacyRuntime";
 import { captureSendOrigin, conversationSendTarget, isSendIntent, knownGroupSendAllowed, sameSendTarget, type SendIntent } from "@/core/messageSendIntent";
 import { sessionCoordinator } from "@/core/session/browser";
@@ -83,8 +84,9 @@ export function useSendMessage() {
         if (!data || data.clientMsgID !== message.clientMsgID || data.status !== 2)
           throw new Error("发送回执未能核验");
         successMessage = data as ExMessageItem;
-      } catch {
-        try { if (projection()) updateOneMessage({ ...message, status: MessageStatus.Failed }); } catch { /* UI is not delivery evidence. */ }
+      } catch (error) {
+        const sendFailure = decodeSendFailure(error);
+        try { if (projection()) updateOneMessage({ ...message, status: MessageStatus.Failed, sendFailure }); } catch { /* UI is not delivery evidence. */ }
         // Includes a reply discarded by the session/history wrapper. It cannot
         // be confirmed, cancelled, or safely replayed by this hook.
         return { state: "unconfirmed" };

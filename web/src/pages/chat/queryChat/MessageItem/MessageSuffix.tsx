@@ -1,3 +1,4 @@
+import { sendFailureText, visibleSendFailure } from "@/core/sendFailure";
 import { useMessageAccess } from "@/hooks/useMessagePrivacy";
 import { messageOwner } from "@/core/messagePrivacyRuntime";
 import { ExclamationCircleFilled, LoadingOutlined } from "@ant-design/icons";
@@ -21,6 +22,7 @@ const MessageSuffix: FC<IMessageItemProps> = ({ message, conversationID }) => {
   const sourceAccess = useMessageAccess(conversationID);
   const privacy = useMessagePrivacy(message, conversationID);
   const [showSending, setShowSending] = useState(false);
+  const sendFailure = visibleSendFailure(message.sendFailure);
 
   const { sendMessage, updateOneMessage, beginCurrentSend } = useSendMessage();
 
@@ -71,10 +73,21 @@ const MessageSuffix: FC<IMessageItemProps> = ({ message, conversationID }) => {
         />
       )}
       {!privacy.expired && message.status === MessageStatus.Failed && (
-        <button type="button" aria-label="发送失败，重试这条消息" title="发送失败，点击重试"
-          className="rounded text-base text-[var(--warn-text)]" onClick={reSend}>
-          <ExclamationCircleFilled rev={undefined} />
-        </button>
+        <div className="flex max-w-64 items-center gap-1">
+          <button type="button" aria-label="发送失败，重试这条消息" title="发送失败，点击重试"
+            className="rounded text-base text-[var(--warn-text)]" onClick={reSend}>
+            <ExclamationCircleFilled rev={undefined} />
+          </button>
+          <span role="status" className="text-xs text-[var(--warn-text)]"
+            data-send-failure-phase={sendFailure.phase}
+            data-send-failure-reason={sendFailure.reason}
+            data-send-failure-code={sendFailure.code ?? "unknown"}
+            data-send-failure-http-status={sendFailure.httpStatus ?? "unknown"}
+            data-send-failure-s3-code={sendFailure.s3Code}>
+            {sendFailureText(sendFailure, [MessageType.PictureMessage, MessageType.VoiceMessage,
+              MessageType.VideoMessage, MessageType.FileMessage].includes(message.contentType))}
+          </span>
+        </div>
       )}
       {isShowLimitTimer && (
         <div className="text-xs text-[var(--sub-text)]">{`${privacy.remainingSeconds}s`}</div>

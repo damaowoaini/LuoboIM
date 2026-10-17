@@ -18,6 +18,7 @@ import PreviewToolsBar from "@/components/PreviewToolsBar";
 import VideoPlayer from "@/components/VideoPlayer";
 import { useConversationStore, useMessageStore, useUserStore } from "@/store";
 import { PreviewGroupItem } from "@/store/type";
+import { devObjectTransportURL } from "@/core/session/devObjectTransport";
 import FileDownloadIcon from "@/svg/FileDownloadIcon";
 import { downloadFile, getDownloadTask } from "@/utils/common";
 
@@ -132,7 +133,8 @@ const MediaPreview: ForwardRefRenderFunction<
   useImperativeHandle(ref, () => ({ showAlbum }), [previewImgList]);
 
   const previewList = previewImgList.map((image) => {
-    if (!window.electronAPI || image.url.startsWith("file://") || !image.thumbUrl) {
+    if (!window.electronAPI) return devObjectTransportURL(image.url);
+    if (image.url.startsWith("file://") || !image.thumbUrl) {
       return image.url;
     }
     return imageCache[image.thumbUrl ?? ""]

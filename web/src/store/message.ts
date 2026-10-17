@@ -1,3 +1,4 @@
+import type { SendFailureDiagnostic } from "@/core/sendFailure";
 import { captureMessageAccess, forgetMessage, messageHistoryFence, messagePrivacyState, visibleMessages } from "@/core/messagePrivacyRuntime";
 import { t } from "i18next";
 import { MessageType, SessionType } from "open-im-sdk-wasm";
@@ -35,6 +36,7 @@ export interface ExType {
   gapTime?: boolean;
   jump?: boolean;
   errCode?: number;
+  sendFailure?: SendFailureDiagnostic;
 }
 
 export type ExMessageItem = MessageItem & ExType;

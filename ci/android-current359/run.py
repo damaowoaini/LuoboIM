@@ -415,12 +415,13 @@ class Job(generic.Job):
             e=parent.environment(self.w,False)
             command=self.gradle('dependencies',offline=False)+['--info','-I',parent.HERE/'resolve.gradle','--write-verification-metadata','sha256']
             log=self.cmd(command,self.w/'source/app/android',e,'gradle-dependency-setup',1800)
-            proof=maven_file_origins.audit(self.w,log.read_text(errors='replace'))
             xml=self.w/'source/app/android/gradle/verification-metadata.xml'
             if not xml.is_file() or '<sha256 ' not in xml.read_text():
                 raise ValueError('new actual dependency verification metadata required')
-            s.put(self.w/'evidence/gradle-verification-metadata.xml',xml.read_bytes())
-            proof['verification_metadata_sha256']=s.sha(xml)
+            verification=maven_file_origins.verification_bytes(self.w)
+            s.put(self.w/'evidence/gradle-verification-metadata.xml',verification)
+            proof=maven_file_origins.audit(self.w,log.read_text(errors='replace'))
+            proof['verification_metadata_sha256']=hashlib.sha256(verification).hexdigest()
             proof['preexisting_hermetic_lock']=False
             s.write_json(self.w/'evidence/dependency-origin-audit.json',proof)
             self.verify()

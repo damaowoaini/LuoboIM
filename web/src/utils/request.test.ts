@@ -53,3 +53,59 @@ describe("Tenant HTTP boundary", () => {
     try { await network.post("/message/search"); throw new Error("expected failure"); } catch (error) { expect(error).toBeInstanceOf(ApiError); expect(error).toMatchObject({ errCode: 503, message: "请求超时，请重试" }); expect(error).not.toHaveProperty("config"); }
   });
 });
+
+it("keeps an optional request scope through restore and both response boundaries", async () => {
+  function deferred<T>() {
+    let resolve!: (value: T) => void;
+    const promise = new Promise<T>(yes => { resolve = yes; });
+    return { promise, resolve };
+  }
+  const read = deferred<unknown>(), restoring = deferred<void>();
+  const stored = {
+    version: 1, issuer: "https://route.example", userID: "u", imToken: "im-u", chatToken: "chat-u",
+    tenant: { serverID: "tenant.example", serverName: "tenant", domains: ["tenant.example"], activeLine: 0 },
+  };
+  const session = new SessionCoordinator({
+    read: async () => { restoring.resolve(undefined); return read.promise; },
+    write: async () => {}, clear: async () => {},
+  });
+  let current = true;
+  const guarded: import("./request").GuardedRequestConfig = { luoboCurrent: () => current };
+  const request = createAxiosInstance("https://tenant.example/chat", "chat", session);
+  const transport = vi.fn(adapter); request.defaults.adapter = transport;
+  const blocked = request.post("/user/login_record/latest", { userID: "target" }, guarded);
+  const rejected = expect(blocked).rejects.toThrow(StaleSessionError);
+  await restoring.promise; current = false; read.resolve(stored); await rejected;
+  expect(transport).not.toHaveBeenCalled();
+
+  current = true;
+  expect((await request.post("/user/login_record/latest", { userID: "target" }, guarded)).data)
+    .toEqual({ baseURL: "https://tenant.example/chat", token: "chat-u" });
+  expect(transport).toHaveBeenCalledTimes(1);
+  const realLease = session.lease.bind(session), releases: unknown[] = [];
+  const leaseSpy = vi.spyOn(session, "lease").mockImplementation(() => {
+    const lease = realLease(), release = vi.fn(lease.release); releases.push(release);
+    return { ...lease, release };
+  });
+  try {
+    for (const failed of [false, true]) {
+      current = true;
+      const started = deferred<void>(), finish = deferred<void>();
+      request.defaults.adapter = async config => {
+        started.resolve(undefined); await finish.promise;
+        if (failed) throw Object.assign(new Error("synthetic transport failure"), {
+          config, response: { status: 503, data: { data: { ip: "198.51.100.70" } } },
+        });
+        return adapter(config);
+      };
+      const pending = request.post("/user/login_record/list", { userID: "target" }, guarded);
+      const refused = expect(pending).rejects.toThrow(StaleSessionError);
+      await started.promise; current = false; finish.resolve(undefined); await refused;
+      expect(releases).toHaveLength(failed ? 2 : 1);
+      expect(releases[failed ? 1 : 0]).toHaveBeenCalledTimes(1);
+      expect(session.current?.userID).toBe("u");
+    }
+  } finally {
+    leaseSpy.mockRestore();
+  }
+});

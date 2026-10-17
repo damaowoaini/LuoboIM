@@ -3,6 +3,7 @@ import { useMemo } from "react";
 
 import { useUserStore } from "@/store";
 import { downloadFile } from "@/utils/common";
+import { devObjectTransportURL } from "@/core/session/devObjectTransport";
 
 const CacheImage = ({ cache = true, ...props }: ImageProps & { cache?: boolean }) => {
   const getSourceUrl = useMemo(() => {
@@ -24,7 +25,7 @@ const CacheImage = ({ cache = true, ...props }: ImageProps & { cache?: boolean }
     }
     return props.src;
   }, [props.src, cache]);
-  return <Image {...props} src={getSourceUrl} />;
+  return <Image {...props} src={!window.electronAPI && getSourceUrl ? devObjectTransportURL(getSourceUrl) : getSourceUrl} />;
 };
 
 export default CacheImage;

@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
 import { getUserLatestLoginRecord } from "@/api/login";
-import { useUserStore } from "@/store";
+import { useOwnedLoginRecords } from "@/core/useOwnedLoginRecords";
 import "./styles.scss";
 
 interface UserLoginInfoProps {
@@ -9,51 +8,15 @@ interface UserLoginInfoProps {
   onClick?: () => void; // 点击事件回调
 }
 
+async function loadLatest(userID: string, _page: number, current: () => boolean) {
+  const { data } = await getUserLatestLoginRecord({ userID }, current);
+  const record = data?.record ?? null;
+  if (record && record.userID !== userID) throw new Error("Login record identity mismatch");
+  return record;
+}
+
 const UserLoginInfo = ({ userID, showInline = false, onClick }: UserLoginInfoProps) => {
-  console.log("[UserLoginInfo] 组件初始化", { userID, showInline });
-  const selfInfo = useUserStore((state) => state.selfInfo);
-  const [loginInfo, setLoginInfo] = useState<API.User.UserLoginRecord | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // 权限检查：只有 level 100 的管理员才能查看登录信息
-  const hasPermission = selfInfo.level === 100;
-
-  console.log("[UserLoginInfo] 权限检查", {
-    userID,
-    currentUserLevel: selfInfo.level,
-    hasPermission,
-  });
-
-  const loadLoginInfo = async () => {
-    try {
-      setLoading(true);
-      console.log("[UserLoginInfo] 开始获取登录信息:", userID);
-      const res = await getUserLatestLoginRecord({ userID });
-      console.log("[UserLoginInfo] 获取登录信息成功:", res);
-      if (res.data?.record) {
-        console.log("[UserLoginInfo] 登录记录:", res.data.record);
-        setLoginInfo(res.data.record);
-      } else {
-        console.warn("[UserLoginInfo] 没有登录记录数据，清空状态");
-        // 【修复】当后端返回空数据时，清空之前的登录信息状态
-        setLoginInfo(null);
-      }
-    } catch (error) {
-      console.error("[UserLoginInfo] Failed to load login info:", error);
-      // 【修复】发生错误时也要清空状态，避免显示错误的数据
-      setLoginInfo(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // 【修复】切换用户时立即清空旧数据，避免显示上一个用户的信息
-    setLoginInfo(null);
-    setLoading(true);
-    loadLoginInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userID]);
+  const { allowed: hasPermission, loading, failed, data: loginInfo } = useOwnedLoginRecords(userID, loadLatest);
 
   const formatLoginTime = (timestamp: number) => {
     if (!timestamp) return "-";
@@ -67,27 +30,10 @@ const UserLoginInfo = ({ userID, showInline = false, onClick }: UserLoginInfoPro
     });
   };
 
-  console.log("[UserLoginInfo] 渲染状态:", { userID, loading, hasLoginInfo: !!loginInfo });
-
-  // 权限检查：非管理员不显示
-  if (!hasPermission) {
-    console.warn("[UserLoginInfo] 无权限查看登录信息", {
-      userID,
-      currentUserLevel: selfInfo.level,
-    });
-    return null;
-  }
-
-  if (loading) {
-    return <div className="login-info-loading">加载中...</div>;
-  }
-
-  if (!loginInfo) {
-    console.warn("[UserLoginInfo] 没有登录信息，组件不显示", userID);
-    return null;
-  }
-
-  console.log("[UserLoginInfo] 准备渲染登录信息:", loginInfo);
+  if (!hasPermission) return null;
+  if (loading) return <div className="login-info-loading">加载中...</div>;
+  if (failed) return <div role="status">登录信息暂时无法加载。</div>;
+  if (!loginInfo) return null;
 
   // 内联显示模式（在聊天头部）
   if (showInline) {

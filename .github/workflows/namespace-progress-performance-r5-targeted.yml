@@ -1,4 +1,4 @@
-name: Namespace progress R9 sized private read then original Large diagnostic
+name: Namespace progress R10 bounded observation of original Large
 
 on:
   workflow_dispatch:
@@ -7,12 +7,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: namespace-progress-performance-r9-${{ github.ref }}
+  group: namespace-progress-performance-r10-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   original-large-profile:
-    name: Exact read4top15sub then original10001/600s and bounded profiles
+    name: Exact product1206 plus diagnostic3 original10001/600s and bounded profiles
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     env:
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
-      - name: Safety and exact inherited1205 plus Root-formatted sized-read1206
+      - name: Safety and exact product1206 plus Root-formatted diagnostic3
         run: |
           python3 -B ci/secret_scan.py --root "$GITHUB_WORKSPACE"
           python3 -B ci/namespace-progress-performance-r5/run.py --verify
@@ -36,13 +36,13 @@ jobs:
           go-version: '1.27.2'
           check-latest: false
           cache: false
-      - name: Read4top15sub and sourcepost gate then unchanged Large10001/600s/profiles
+      - name: Diagnostic sourcepost then original Large10001/600s/profiles only
         run: python3 -B ci/namespace-progress-performance-r5/run.py
       - name: Retain compact raw evidence on success or failure
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
-          name: namespace-progress-performance-r9-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ci-results/namespace-progress-performance-r9/
+          name: namespace-progress-performance-r10-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-results/namespace-progress-performance-r10/
           if-no-files-found: warn
           retention-days: 14

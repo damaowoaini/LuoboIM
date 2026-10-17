@@ -438,6 +438,9 @@ const ChatFooter = () => {
             <EditableDiv
               ref={editableDivRef as any}
               id="editable-div"
+              role="textbox"
+              aria-label="消息输入框"
+              aria-multiline={true}
               className="flex-1"
               html={html}
               onChange={onChange}

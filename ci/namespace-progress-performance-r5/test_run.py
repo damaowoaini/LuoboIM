@@ -1,4 +1,4 @@
-"""R9: directly affected dispatch/overlay controls; no Go invocation."""
+"""R10: affected Large-only dispatch plus diagnostic overlay control; no Go invocation."""
 import copy
 import hashlib
 import importlib.util
@@ -29,14 +29,10 @@ def events(label):
 
 class R5ControllerTests(unittest.TestCase):
     def test_original_large_profiles_owned_outputs_then_diagnostics_without_overwriting_main_failure(self):
-        self.assertEqual(SUBJECT.expected(), {
-            'short': {'tops': SUBJECT.READ_TOPS, 'subs': SUBJECT.READ_SUBS},
-            'large': {'tops': [SUBJECT.LARGE], 'subs': []}})
+        self.assertEqual(SUBJECT.expected(), {'large': {'tops': [SUBJECT.LARGE], 'subs': []}})
         self.assertEqual((len(SUBJECT.READ_TOPS), len(SUBJECT.READ_SUBS)), (4, 15))
         changes = ['good', 'missing-done', 'skip', 'nonzero', 'race', 'missing-footer',
-                   'foreign', 'post-failure', 'diagnostic-failure', 'short-missing-done',
-                   'short-skip', 'short-nonzero', 'short-race', 'short-missing-footer',
-                   'short-foreign', 'short-post-failure', 'short-resource-stop']
+                   'foreign', 'post-failure', 'diagnostic-failure', 'ready-post-failure', 'resource-stop']
         for change in changes:
             with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder).resolve()
@@ -46,34 +42,27 @@ class R5ControllerTests(unittest.TestCase):
 
                 def command(label, argv, timeout):
                     calls.append(label); order.append(label)
-                    common = ['fixed-isolation', 'go', 'test', '-mod=readonly', '-p=1',
-                              '-parallel=1', '-race', '-json', '-count=1', '-vet=off']
-                    if label == 'short':
-                        self.assertEqual(timeout, 180)
-                        self.assertEqual(argv, common + ['-timeout=120s', '-run',
-                            '^(' + '|'.join(SUBJECT.READ_TOPS) + ')$', './internal/namespaceinventory'])
-                        if change == 'short-resource-stop':
-                            raise ValueError('synthetic resource stop')
-                    else:
-                        self.assertEqual(label, 'large')
-                        self.assertEqual(timeout, 900)
-                        self.assertEqual(argv, common + ['-timeout=600s', '-run', '^(' + SUBJECT.LARGE + ')$',
-                            '-cpuprofile', str(profiles / 'cpu.pprof'), '-memprofile', str(profiles / 'alloc.pprof'),
-                            '-o', str(profiles / 'large.test'), './internal/namespaceinventory'])
+                    self.assertEqual(label, 'large')
+                    self.assertEqual(timeout, 900)
+                    self.assertEqual(argv, ['fixed-isolation', 'go', 'test', '-mod=readonly', '-p=1',
+                        '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=600s',
+                        '-run', '^(' + SUBJECT.LARGE + ')$',
+                        '-cpuprofile', str(profiles / 'cpu.pprof'), '-memprofile', str(profiles / 'alloc.pprof'),
+                        '-o', str(profiles / 'large.test'), './internal/namespaceinventory'])
+                    if change == 'resource-stop':
+                        raise ValueError('synthetic resource stop')
                     raw, code = events(label), 0
-                    active = change.removeprefix('short-') if label == 'short' and change.startswith('short-') else change if label == 'large' else ''
-                    if active == 'missing-done':
-                        target = SUBJECT.expected()[label]['tops'][0]
-                        raw = [e for e in raw if not (e.get('Test') == target and e['Action'] == 'pass')]
-                    elif active == 'skip':
+                    if change == 'missing-done':
+                        raw = [e for e in raw if not (e.get('Test') == SUBJECT.LARGE and e['Action'] == 'pass')]
+                    elif change == 'skip':
                         next(e for e in raw if e.get('Test') and e['Action'] == 'pass')['Action'] = 'skip'
-                    elif active == 'nonzero':
+                    elif change == 'nonzero':
                         code = 4
-                    elif active == 'race':
+                    elif change == 'race':
                         raw.insert(1, {'Package': raw[0]['Package'], 'Action': 'output', 'Output': 'WARNING: DATA RACE'})
-                    elif active == 'missing-footer':
+                    elif change == 'missing-footer':
                         raw.pop()
-                    elif active == 'foreign':
+                    elif change == 'foreign':
                         raw[1]['Test'] = SUBJECT.INDEX_TOP
                     output = root / label
                     output.mkdir()
@@ -82,7 +71,7 @@ class R5ControllerTests(unittest.TestCase):
 
                 def post(label):
                     order.append('post-' + label)
-                    if change == 'post-failure' and label == 'large' or change == 'short-post-failure' and label == 'short':
+                    if change == 'post-failure' and label == 'large' or change == 'ready-post-failure' and label == 'diagnostic-ready':
                         raise ValueError('synthetic source changed')
 
                 def diagnose():
@@ -91,26 +80,21 @@ class R5ControllerTests(unittest.TestCase):
                     self.assertEqual(observed['exit'], 4 if change == 'nonzero' else 0)
                     return {'accepted': change != 'diagnostic-failure'}
 
-                if change in ('post-failure', 'short-post-failure', 'short-resource-stop'):
-                    message = 'synthetic resource stop' if change == 'short-resource-stop' else 'synthetic source changed'
+                if change in ('post-failure', 'ready-post-failure', 'resource-stop'):
+                    message = 'synthetic resource stop' if change == 'resource-stop' else 'synthetic source changed'
                     with self.assertRaisesRegex(ValueError, message):
                         SUBJECT.execute_phases(command, ['fixed-isolation'], post, profiles, diagnose)
-                    self.assertEqual(order, ['short', 'post-short', 'large', 'post-large'] if change == 'post-failure'
-                                     else ['short', 'post-short'])
+                    self.assertEqual(order, ['post-diagnostic-ready'] if change == 'ready-post-failure'
+                                     else ['post-diagnostic-ready', 'large', 'post-large'])
                 else:
                     result = SUBJECT.execute_phases(command, ['fixed-isolation'], post, profiles, diagnose)
-                    if change.startswith('short-'):
-                        self.assertEqual(order, ['short', 'post-short'])
-                        self.assertEqual(set(result), {'short'})
-                        self.assertFalse(result['short']['accepted'])
-                    else:
-                        self.assertEqual(order, ['short', 'post-short', 'large', 'post-large', 'diagnostics', 'post-diagnostics'])
-                        self.assertTrue(result['short']['accepted'])
-                        self.assertEqual(result['large']['accepted'], change in ('good', 'diagnostic-failure'))
-                    self.assertEqual(SUBJECT.final_exit(result), 0 if change == 'good' else 4 if change in ('nonzero', 'short-nonzero') else 1)
-                self.assertEqual(calls, ['short'] if change.startswith('short-') else ['short', 'large'])
+                    self.assertEqual(order, ['post-diagnostic-ready', 'large', 'post-large', 'diagnostics', 'post-diagnostics'])
+                    self.assertEqual(set(result), {'large', 'diagnostics'})
+                    self.assertEqual(result['large']['accepted'], change in ('good', 'diagnostic-failure'))
+                    self.assertEqual(SUBJECT.final_exit(result), 0 if change == 'good' else 4 if change == 'nonzero' else 1)
+                self.assertEqual(calls, [] if change == 'ready-post-failure' else ['large'])
         with self.assertRaises(ValueError):
-            SUBJECT.audit(events('large'), 0, 'unknown')
+            SUBJECT.audit(events('large'), 0, 'short')
 
     def test_profile_reports_are_bounded_local_stable_and_never_publish_test_binary(self):
         for change in ['good', 'missing-cpu', 'invalid-cpu', 'oversized-cpu', 'symlink-cpu',
@@ -262,6 +246,51 @@ class R5ControllerTests(unittest.TestCase):
                 with self.subTest(change=change), self.assertRaises(ValueError):
                     SUBJECT.check_materialized(c, bodies, work, template)
                 path.write_bytes(original); path.chmod(0o644)
+
+
+    def test_diagnostic_overlay_preserves_exact_product_parent_and_refuses_drift(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            product = {target: b'package namespaceinventory // exact product\n' for target in SUBJECT.DIAGNOSTIC_TARGETS}
+            original = dict(product)
+            overlay = []
+            for target in sorted(SUBJECT.DIAGNOSTIC_TARGETS):
+                path = root / (SUBJECT.DIAGNOSTIC_SOURCE_ROOT + target)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b'package namespaceinventory // observation only\n'); path.chmod(0o644)
+                overlay.append({'path': str(path.relative_to(root)), 'target': target, 'bytes': path.stat().st_size,
+                    'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'mode': '0o644',
+                    'beforeSHA256': hashlib.sha256(product[target]).hexdigest()})
+            result = SUBJECT.apply_diagnostic_overlay({'diagnosticOverlay': overlay}, product, root)
+            self.assertEqual(product, original)
+            self.assertEqual(set(result), set(product))
+            self.assertTrue(all(result[p] != product[p] for p in product))
+            self.assertNotEqual(SUBJECT.DIAGNOSTIC_DIGEST, SUBJECT.FINAL_DIGEST)
+            for change in ['before', 'missing-row', 'duplicate', 'wrong-target', 'wrong-root', 'mode', 'body', 'extra-file']:
+                bad, prior = copy.deepcopy(overlay), dict(product)
+                path = root / bad[0]['path']; extra = path.with_name('unselected.go')
+                if change == 'before':
+                    prior[bad[0]['target']] += b'changed'
+                elif change == 'missing-row':
+                    bad.pop()
+                elif change == 'duplicate':
+                    bad[-1] = dict(bad[0])
+                elif change == 'wrong-target':
+                    bad[0]['target'] = 'server/internal/namespaceinventory/files.go'
+                elif change == 'wrong-root':
+                    bad[0]['path'] = SUBJECT.SOURCE_ROOT + bad[0]['target']
+                elif change == 'mode':
+                    path.chmod(0o600)
+                elif change == 'body':
+                    path.write_bytes(b'changed diagnostic source')
+                else:
+                    extra.write_bytes(b'package unselected')
+                with self.subTest(change=change), self.assertRaises(ValueError):
+                    SUBJECT.apply_diagnostic_overlay({'diagnosticOverlay': bad}, prior, root)
+                path.write_bytes(b'package namespaceinventory // observation only\n'); path.chmod(0o644)
+                if extra.exists():
+                    extra.unlink()
+            self.assertEqual(product, original)
 
 
 if __name__ == '__main__':

@@ -1,53 +1,25 @@
-import { useEffect, useState } from "react";
 import { getUserLoginRecords } from "@/api/login";
-import { useUserStore } from "@/store";
+import { useOwnedLoginRecords } from "@/core/useOwnedLoginRecords";
 import "./styles.scss";
 
 interface UserLoginRecordListProps {
   userID: string;
 }
 
+const pageSize = 10;
+async function loadRecords(userID: string, page: number, current: () => boolean) {
+  const { data } = await getUserLoginRecords({ userID, pagination: { pageNumber: page, showNumber: pageSize } }, current);
+  const records = data?.records ?? [];
+  if (!Array.isArray(records) || records.some(record => record.userID !== userID))
+    throw new Error("Login record identity mismatch");
+  return { records, total: data?.total ?? 0 };
+}
+
 const UserLoginRecordList = ({ userID }: UserLoginRecordListProps) => {
-  const selfInfo = useUserStore((state) => state.selfInfo);
-  const [records, setRecords] = useState<API.User.UserLoginRecord[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
-
-  // 权限检查：只有 level 100 的管理员才能查看登录记录
-  const hasPermission = selfInfo.level === 100;
-
-  console.log("[UserLoginRecordList] 权限检查", {
-    userID,
-    currentUserLevel: selfInfo.level,
-    hasPermission,
-  });
-
-  useEffect(() => {
-    loadRecords();
-  }, [userID, currentPage]);
-
-  const loadRecords = async () => {
-    try {
-      setLoading(true);
-      const res = await getUserLoginRecords({
-        userID,
-        pagination: {
-          pageNumber: currentPage,
-          showNumber: pageSize,
-        },
-      });
-      if (res.data) {
-        setRecords(res.data.records || []);
-        setTotal(res.data.total || 0);
-      }
-    } catch (error) {
-      console.error("Failed to load login records:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { allowed: hasPermission, page: currentPage, setPage: handlePageChange, data, loading, failed } =
+    useOwnedLoginRecords(userID, loadRecords);
+  const records = data?.records ?? [];
+  const total = data?.total ?? 0;
 
   const formatLoginTime = (timestamp: number) => {
     if (!timestamp) return "-";
@@ -62,16 +34,7 @@ const UserLoginRecordList = ({ userID }: UserLoginRecordListProps) => {
     });
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  // 权限检查：非管理员不显示
   if (!hasPermission) {
-    console.warn("[UserLoginRecordList] 无权限查看登录记录", {
-      userID,
-      currentUserLevel: selfInfo.level,
-    });
     return (
       <div className="no-permission">
         <div className="empty-icon">🔒</div>
@@ -80,7 +43,9 @@ const UserLoginRecordList = ({ userID }: UserLoginRecordListProps) => {
     );
   }
 
-  if (loading && records.length === 0) {
+  if (failed) return <div role="status">登录记录暂时无法加载。</div>;
+
+  if (loading) {
     return <div className="login-records-loading">加载中...</div>;
   }
 

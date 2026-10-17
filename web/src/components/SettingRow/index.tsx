@@ -40,6 +40,7 @@ const SettingRow: FC<ISettingRowProps> = ({
       <div className="font-medium">{title}</div>
       {children ?? (
         <Switch
+          aria-label={title}
           className="bg-[#8e9aaf]"
           loading={loading}
           checked={value}

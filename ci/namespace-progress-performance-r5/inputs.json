@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "namespace_progress_performance_r9_1206_sized_private_read4top15sub_original_large1_profile_noDB_no_runtime",
+  "scope": "namespace_progress_performance_r10_product1206_plus_diagnostic3_original_large1_profile_noDB_no_runtime",
   "parentRunner": {
     "path": "ci/namespace-progress-performance-r4/run.py",
     "bytes": 17775,
@@ -16,9 +16,9 @@
   "parentCount": 1203,
   "parentDigest": "2134b7ddbb9202f85878d665ac4f44ca3566d757fe51b2941d9f48796af42465",
   "effectiveCount": 1206,
-  "effectiveDigest": "d2381614af1f02a2dc9f49e4fb4ed059e10f93aed09686f93150a1305beda460",
+  "effectiveDigest": "7b1af56cd406a6223430c602d2457359a6e328a34c5f52b6fffe1aa4502d3c3c",
   "effectiveDigestAlgorithm": "ascending UTF8(path)+NUL+ASCII SHA256+LF then SHA256",
-  "sourceModeSource": "verified R4 modes plus borrowed R6 overlay4/R7 overlay3/Root-formatted sized-read overlay2 mode0644",
+  "sourceModeSource": "verified product1206 modes plus exact CI-only diagnostic overlay3 mode0644",
   "overlay": [
     {
       "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_capture.go",
@@ -96,8 +96,8 @@
   "dependencies": [
     {
       "path": ".github/workflows/namespace-progress-performance-r5-targeted.yml",
-      "bytes": 1703,
-      "sha256": "48b2bcefb50197af65c1b4c14e8e4c8239f292811c29eb36568db5e5b677ebba",
+      "bytes": 1692,
+      "sha256": "9b5d92b8f8d061543b4897e2c43f9f9e922ba5f520db1d49f7fef041af4840b4",
       "mode": 420
     },
     {
@@ -114,43 +114,18 @@
     },
     {
       "path": "ci/namespace-progress-performance-r5/run.py",
-      "bytes": 35987,
-      "sha256": "808fed424ac053a600282e6540a24403266a112ae7ac89caec47c9bd7b30cc59",
+      "bytes": 38837,
+      "sha256": "44575d7a78470c2b6fe1dcc417bad9fc68b22f5428c6565efc965f0762659684",
       "mode": 420
     },
     {
       "path": "ci/namespace-progress-performance-r5/test_run.py",
-      "bytes": 17275,
-      "sha256": "fa5c83e8c65f8fa5b89ef6f8f1c015749aa61fc29ac6ac199bf3eb5bba61264a",
+      "bytes": 18945,
+      "sha256": "63e2b2628bf4d32a238645e32bdbfaeab29cda3fdecceda9e46793b43191f94c",
       "mode": 420
     }
   ],
   "phases": {
-    "short": {
-      "tops": [
-        "TestInventorySizedReadPreservesLengthAndReadErrors",
-        "TestInventoryPrivateSizedFileReadAvoidsChunkAllocations",
-        "TestInventoryPrivateRoundTripAndNoClobber",
-        "TestInventoryRejectsPrivateTamperAndPathAliases"
-      ],
-      "subs": [
-        "TestInventorySizedReadPreservesLengthAndReadErrors/exact-and-later-EOF",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/short-chunks",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/EOF-with-final-bytes",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/nonEOF-with-final-bytes",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/wrappedEOF-with-final-bytes",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/nonEOF-after-exact-bytes",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/shrunk-input",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/grown-input",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/zero-progress",
-        "TestInventorySizedReadPreservesLengthAndReadErrors/admitted-maximum",
-        "TestInventoryRejectsPrivateTamperAndPathAliases/changed-derived-data",
-        "TestInventoryRejectsPrivateTamperAndPathAliases/duplicate-json-field",
-        "TestInventoryRejectsPrivateTamperAndPathAliases/world-readable",
-        "TestInventoryRejectsPrivateTamperAndPathAliases/hard-link",
-        "TestInventoryRejectsPrivateTamperAndPathAliases/symlink-parent"
-      ]
-    },
     "large": {
       "tops": [
         "TestNamespaceProgressLargeHistoryHasNoFinalFullSweep"
@@ -225,10 +200,6 @@
     ]
   },
   "expected": {
-    "short": {
-      "topPASS": 4,
-      "subPASS": 15
-    },
     "large": {
       "topPASS": 1,
       "subPASS": 0
@@ -343,6 +314,20 @@
         "sha256": "0cd1bd98a49ed6275d666d560a89a74d4de83845603312e8d8872e34aa5e9858",
         "mode": 420
       }
+    },
+    "R9Actual": {
+      "run": 39008985575,
+      "job": 117327217896,
+      "head": "57bc58fd08fea2c9e3e83b400795957cdfc1df22",
+      "product1206Digest": "d2381614af1f02a2dc9f49e4fb4ed059e10f93aed09686f93150a1305beda460",
+      "short4top15sub": "actual PASS,19 exact named completions; unchanged product evidence reused, not selected",
+      "Large": "original600s timeout/packageFAIL600.342s; three profile diagnostics exit0 do not make testPASS",
+      "receipt": {
+        "path": "references/integration/namespace-progress-r9-57bc-observer-20261017/independent-terminal-receipt.json",
+        "bytes": 19250,
+        "sha256": "02bc2abeff9d0d903b51cf58f6803007df9aa2ae60b39c6bc12d410a7b6c1492",
+        "mode": 420
+      }
     }
   },
   "origin": {
@@ -437,5 +422,54 @@
     "newFileAbsentBefore": true,
     "allOldTestBodiesPreserved": true,
     "noCacheOrGuardRelaxation": true
-  }
+  },
+  "productSource": {
+    "members": 1206,
+    "digest": "d2381614af1f02a2dc9f49e4fb4ed059e10f93aed09686f93150a1305beda460"
+  },
+  "diagnosticOrigin": {
+    "formattedSourceManifest": {
+      "path": "references/integration/namespace-progress-r10-diagnostic-source-format-r1-candidate-20261017/candidate-manifest.json",
+      "bytes": 9525,
+      "sha256": "af5033498c58de861d54ffb8e9ee4d85149f3c7ddcb78751e26ca4c50313fca0",
+      "mode": 420
+    },
+    "productMembers": 1206,
+    "productDigest": "d2381614af1f02a2dc9f49e4fb4ed059e10f93aed09686f93150a1305beda460",
+    "diagnosticMembers": 1206,
+    "diagnosticDigest": "7b1af56cd406a6223430c602d2457359a6e328a34c5f52b6fffe1aa4502d3c3c",
+    "scope": "source1206_plus_diag3_observation_only",
+    "defaultObserver": "nil; no environment toggle; scalar counters only",
+    "maxRecords": 63,
+    "maxJSONRecordBytes": 2048,
+    "preTimeout": "original t.Deadline()-30s once; immutable/atomic snapshot only",
+    "summaryCheckedRowCompleted": "ReducedSeen+ReducedRows committed lower bound, not attempted function count",
+    "acceptance": "diagnostic Large observation only; never a fresh uninstrumented product performance verdict"
+  },
+  "diagnosticOverlay": [
+    {
+      "path": "ci/namespace-progress-performance-r5/diagnostic-source/server/internal/namespaceinventory/progress_json.go",
+      "bytes": 4839,
+      "sha256": "2c695ca352bd92d3b6688d536349657e4c5288731386b6bc85e77fde505085bf",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_json.go",
+      "beforeSHA256": "84d3efae4d68a766ecc923d129b8129366debae1f1b853f534da032684a31756"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/diagnostic-source/server/internal/namespaceinventory/progress_index.go",
+      "bytes": 7847,
+      "sha256": "9e02e30c9ec7dbdc0b6ed79983d7d556ed4d5d752613be078470732eec80a72e",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_index.go",
+      "beforeSHA256": "0f46357ed071b3c7f89fdb5b7a361d73bb690ae8f60ec589598acdb8331a2fb5"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/diagnostic-source/server/internal/namespaceinventory/progress_capture_test.go",
+      "bytes": 17516,
+      "sha256": "d1b1ccd02dcb9399c4b51a502a25103c57361c97aa254efd66199b76729277a6",
+      "mode": "0o644",
+      "target": "server/internal/namespaceinventory/progress_capture_test.go",
+      "beforeSHA256": "dc25a93594299515ff30d932e482de122e0b1d00032a7554850f1599f65ae34c"
+    }
+  ]
 }

@@ -6,7 +6,7 @@ import { getChatUrl, getRouteUrl } from "@/config";
 import { useUserStore } from "@/store";
 import { AppConfig } from "@/store/type";
 import { decodeAppConfigData } from "@/core/appConfig";
-import createAxiosInstance from "@/utils/request";
+import createAxiosInstance, { type GuardedRequestConfig } from "@/utils/request";
 import { getChatToken } from "@/utils/storage";
 
 import { sessionCoordinator } from "@/core/session/browser";
@@ -293,35 +293,15 @@ export const getAppConfig = async (invitationCode?: string) => {
 };
 
 // 获取用户最新登录记录
+const loginRecordConfig = (current?: () => boolean): GuardedRequestConfig => ({ luoboCurrent: current });
+
 export const getUserLatestLoginRecord = async (
-params: API.User.GetLatestLoginRecordParams) =>
-{
-  const token = (await getChatToken()) as string;
-  return request.post<API.User.LatestLoginRecordResponse>(
-    "/user/login_record/latest",
-    params,
-    {
-      headers: {
-        operationID: uuidv4(),
-        token
-      }
-    }
-  );
-};
+  params: API.User.GetLatestLoginRecordParams, current?: () => boolean,
+) => request.post<API.User.LatestLoginRecordResponse>("/user/login_record/latest", params,
+  loginRecordConfig(current));
 
 // 获取用户登录记录列表
 export const getUserLoginRecords = async (
-params: API.User.GetLoginRecordsParams) =>
-{
-  const token = (await getChatToken()) as string;
-  return request.post<API.User.LoginRecordsResponse>(
-    "/user/login_record/list",
-    params,
-    {
-      headers: {
-        operationID: uuidv4(),
-        token
-      }
-    }
-  );
-};
+  params: API.User.GetLoginRecordsParams, current?: () => boolean,
+) => request.post<API.User.LoginRecordsResponse>("/user/login_record/list", params,
+  loginRecordConfig(current));

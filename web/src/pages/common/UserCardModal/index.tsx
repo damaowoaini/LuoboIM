@@ -87,6 +87,7 @@ const UserCardModal: ForwardRefRenderFunction<
   const target = isSelf ? selfInfo.userID : userID ?? props.cardInfo?.userID;
   const owner = sessionCoordinator.current;
   const generation = sessionCoordinator.generation;
+  const mayViewLoginRecords = selfInfo.level === 100 && selfInfo.userID === owner?.userID;
   const live = useRef({ target, groupID, isSelf, owner, generation, sourceCurrent, sourceCanShare, open: isOverlayOpen });
   live.current = { target, groupID, isSelf, owner, generation, sourceCurrent, sourceCanShare, open: isOverlayOpen };
   const closeOverlay = useCallback(() => {
@@ -315,7 +316,7 @@ const UserCardModal: ForwardRefRenderFunction<
       title={null}
       footer={null}
       open={isOverlayOpen && (!sourceCurrent || sourceCurrent())}
-      closable={false}
+      closable={true}
       width={332}
       centered
       onCancel={closeOverlay}
@@ -328,7 +329,7 @@ const UserCardModal: ForwardRefRenderFunction<
       }}
       afterClose={resetState}
       ignoreClasses=".ignore-drag, .no-padding-modal, .cursor-pointer"
-      className="no-padding-modal"
+      className="no-padding-modal [&_.ant-modal-close]:bg-white/90 [&_.ant-modal-close]:text-slate-700"
       maskTransitionName=""
     >
       <Spin spinning={isFetching}>
@@ -404,15 +405,15 @@ const UserCardModal: ForwardRefRenderFunction<
                   selectable={!retentionRestricted}
                 />
                 
-                {/* 只有高级用户才能看到登录日志 */}
-                {cardInfo?.userRole === "高级用户" && cardInfo?.userID && (
+                {/* 由当前查看者权限决定是否请求和展示登录记录。 */}
+                {mayViewLoginRecords && actionCurrent() && cardInfo?.userID && (
                   <div className="my-4">
                     <div className="mb-2 flex items-center justify-between">
                       <div className="text-[var(--sub-text)]">登录信息</div>
                       <Button 
                         type="link" 
                         size="small"
-                        onClick={() => { if (actionCurrent()) setShowLoginRecords(true); }}
+                        onClick={() => { if (mayViewLoginRecords && actionCurrent()) setShowLoginRecords(true); }}
                       >
                         查看完整记录
                       </Button>
@@ -467,7 +468,7 @@ const UserCardModal: ForwardRefRenderFunction<
         width={600}
         centered
       >
-        {cardInfo?.userID && <UserLoginRecordList userID={cardInfo.userID} />}
+        {showLoginRecords && mayViewLoginRecords && actionCurrent() && cardInfo?.userID && <UserLoginRecordList userID={cardInfo.userID} />}
       </Modal>
     </DraggableModalWrap>
   );

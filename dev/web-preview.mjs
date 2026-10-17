@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import { realpath, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { createFixtureObjectProxy } from './fixture-object-proxy.mjs';
 
 export function localTarget(raw, websocket = false) {
   const url = new URL(raw);
@@ -15,7 +16,7 @@ export function localTarget(raw, websocket = false) {
 }
 
 export async function startWebPreview({ dist, routeTarget, chatTarget, imTarget, wsTarget, port = 7778,
-  devTenant, devDomain, webRoot = resolve(import.meta.dirname, '../web') }) {
+  devTenant, devDomain, fixtureObjectCA, webRoot = resolve(import.meta.dirname, '../web') }) {
   if (!dist || !Number.isInteger(port) || port < 0 || port > 65535) throw new Error('A built dist directory and valid port are required.');
   const root = await realpath(dist);
   if (!(await stat(resolve(root, 'index.html'))).isFile()) throw new Error('The selected build has no index.html.');
@@ -42,12 +43,19 @@ export async function startWebPreview({ dist, routeTarget, chatTarget, imTarget,
   add('/im', imTarget, true);
   add('/ws', wsTarget, true, true);
   add('/msg_gateway', wsTarget, true, true);
+  let objectProxy;
+  if (fixtureObjectCA) {
+    if (port < 1 || devTenant !== 'fixture-tenant' || devDomain !== 'luobo.fixture.test')
+      throw new Error('Fixture object proxy requires the exact isolated media preview.');
+    objectProxy = await createFixtureObjectProxy({ origin: `http://127.0.0.1:${port}`, caFile: fixtureObjectCA });
+  }
   const require = createRequire(resolve(webRoot, 'package.json'));
   const { preview } = await import(pathToFileURL(require.resolve('vite')).href);
   return preview({
     configFile: false, envFile: false, root, base: '/', appType: 'spa', logLevel: 'silent',
     build: { outDir: root },
     plugins: [{ name: 'explicit-loopback-development-endpoints', configurePreviewServer(server) {
+      if (objectProxy) { server.middlewares.use(objectProxy.middleware); server.httpServer.once('close', objectProxy.close); }
       server.middlewares.use((request, response, next) => {
         if (request.url !== '/__luobo_dev__/endpoints') return next();
         response.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -66,12 +74,12 @@ export async function startWebPreview({ dist, routeTarget, chatTarget, imTarget,
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   try {
     const { values } = parseArgs({ options: Object.fromEntries(
-      ['dist', 'route-target', 'chat-target', 'im-target', 'ws-target', 'port', 'dev-tenant', 'dev-domain'].map((key) => [key, { type: 'string' }])) });
+      ['dist', 'route-target', 'chat-target', 'im-target', 'ws-target', 'port', 'dev-tenant', 'dev-domain', 'fixture-object-ca'].map((key) => [key, { type: 'string' }])) });
     const port = values.port === undefined ? 7778 : Number(values.port);
     if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid port.');
     const server = await startWebPreview({ dist: values.dist, port, routeTarget: values['route-target'],
       chatTarget: values['chat-target'], imTarget: values['im-target'], wsTarget: values['ws-target'],
-      devTenant: values['dev-tenant'], devDomain: values['dev-domain'] });
+      devTenant: values['dev-tenant'], devDomain: values['dev-domain'], fixtureObjectCA: values['fixture-object-ca'] });
     const stop = () => { server.httpServer.closeAllConnections(); server.httpServer.close(() => process.exit(0)); };
     process.once('SIGINT', stop); process.once('SIGTERM', stop);
     console.log(JSON.stringify({ state: 'web_preview_with_real_service_proxy', url: `http://127.0.0.1:${port}/#/login`,

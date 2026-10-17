@@ -1,4 +1,5 @@
 import { sessionCoordinator } from "@/core/session/browser";
+import { devObjectTransportURL } from "@/core/session/devObjectTransport";
 import { StaleSessionError } from "@/core/session/session";
 import { startTrackedDownload } from "@/core/session/trackedDownload";
 export { sanitizeHtml } from "@/core/content/html";
@@ -248,7 +249,7 @@ export const downloadFile = async (originUrl: string, data: DownloadData) => {
   linkNode.style.display = "none";
   const idx = originUrl.lastIndexOf("/");
   linkNode.download = originUrl.slice(idx + 1);
-  linkNode.href = originUrl;
+  linkNode.href = devObjectTransportURL(originUrl);
   document.body.appendChild(linkNode);
   linkNode.click();
   document.body.removeChild(linkNode);
