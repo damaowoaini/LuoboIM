@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Only the two directly affected repair-plan/phase controls; no Go, service or fixture."""
+"""Repair5 contract controls plus actual split-process dispatcher; no Go, service or fixture."""
 import copy, importlib.util, json, tempfile, unittest
 from pathlib import Path
 from unittest import mock
@@ -28,13 +28,17 @@ class RepairControls(unittest.TestCase):
         for key,value in (('wholeFixtureNoResidueAccepted',True),('actualTopIncomplete',0),('mongoResidualDatabaseCount',0)):
             bad=copy.deepcopy(p);bad['previousRepairRun'][key]=value
             with self.subTest(previousRepair=key),self.assertRaises(ValueError):runner.check_repair(c,bad)
+        bad=copy.deepcopy(p);bad['latestRepairRun']['actualTopPASS']=15
+        with self.assertRaises(ValueError):runner.check_repair(c,bad)
+        bad=copy.deepcopy(p);bad['executionScopes'][1]['targets']=bad['executionScopes'][0]['targets']
+        with self.assertRaises(ValueError):runner.check_repair(c,bad)
         for field in ('directlyAffectedPriorTargets','directlyAffectedCurrentTargets'):
             bad=copy.deepcopy(p);package=next(iter(bad[field]));bad[field][package].append('TestInventedAuthority')
             with self.subTest(impact=field),self.assertRaises(ValueError):runner.check_repair(c,bad)
 
     def test_actual_repair_plan_has_no_build_rejects_partial_events_and_retains_primary_post_failure(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),15)
+        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),5)
         self.assertFalse(runner.pairs(active['targets']) & runner.pairs(p['actualPassedTargets']))
         events=[]
         for package,tops in active['targets'].items():
@@ -46,7 +50,7 @@ class RepairControls(unittest.TestCase):
                 events.append({'Action':'pass','Package':pkg,'Test':top})
             events.append({'Action':'pass','Package':pkg})
         result=runner.require_children(runner.audit(events,0,active['targets']),active)
-        self.assertEqual(result['topPASS'],15)
+        self.assertEqual(result['topPASS'],5)
         with self.assertRaises(ValueError):runner.audit(events,1,active['targets'])
         result['namedCompletions']=[r for r in result['namedCompletions'] if '/' not in r['name']]
         with self.assertRaises(ValueError):runner.require_children(result,active)
@@ -68,5 +72,52 @@ class RepairControls(unittest.TestCase):
                 before=(output/'repair-plan-post.json').read_bytes()
                 with self.assertRaises(FileExistsError):runner.write(output/'repair-plan-post.json',{'accepted':True})
                 self.assertEqual((output/'repair-plan-post.json').read_bytes(),before)
+
+    def test_split_process_dispatch_keeps_md_failure_and_missing_child_failed_but_runs_both_owned_scopes(self):
+        c,p=self.contract();active=runner.repair_execution_plan(c,p)
+        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[3,1,1])
+        self.assertEqual([list(scope['targets']) for scope in active['scopes']],
+                         [['internal/messagedelivery'],['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol']])
+        top='TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice'
+        child='ordinary-source-receipt-keeps-policy-pair-and-rejects-single-or-foreign-hashes'
+        self.assertIn(child,active['scopes'][0]['requiredSubtests']['internal/messagedelivery'][top])
+        for mode in ('all-pass','md-nonzero','md-missing-child'):
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temporary:
+                output=Path(temporary).resolve();calls=[]
+                def command(label,argv,timeout):
+                    index=len(calls);scope=active['scopes'][index]
+                    self.assertEqual(label,scope['label']);self.assertEqual(timeout,2249-index)
+                    self.assertIn('-timeout=180s',argv);self.assertIn('-race',argv);self.assertIn('-mod=readonly',argv)
+                    self.assertEqual([arg for arg in argv if arg.startswith('./')],['./'+package for package in scope['targets']])
+                    self.assertEqual(argv[:2],['env','-i']);self.assertIn('GOAUTH=off',argv)
+                    calls.append(label);folder=output/label;folder.mkdir();events=[]
+                    for package,tops in scope['targets'].items():
+                        pkg=runner.PREFIX+package;events.append({'Action':'start','Package':pkg})
+                        for name in tops:
+                            events.append({'Action':'run','Package':pkg,'Test':name})
+                            for descendant in scope['requiredSubtests'].get(package,{}).get(name,[]):
+                                if mode=='md-missing-child' and index==0 and descendant==child:continue
+                                events += [{'Action':'run','Package':pkg,'Test':name+'/'+descendant},{'Action':'pass','Package':pkg,'Test':name+'/'+descendant}]
+                            events.append({'Action':'pass','Package':pkg,'Test':name})
+                        events.append({'Action':'pass','Package':pkg})
+                    (folder/'stdout.jsonl').write_text('\n'.join(json.dumps(event) for event in events)+'\n')
+                    return folder,1 if mode=='md-nonzero' and index==0 else 0
+                with mock.patch.object(runner.time,'monotonic',side_effect=[10.,11.,12.,13.]):
+                    result=runner.execute_repair_scopes(active,command,{'GOAUTH':'off'},output)
+                self.assertEqual(calls,[scope['label'] for scope in active['scopes']])
+                self.assertEqual(result['accepted'],mode=='all-pass')
+                self.assertTrue(all(row['accepted'] for row in result['processes'][1:]))
+                self.assertEqual(result['topPASS'],5 if mode=='all-pass' else 2)
+                self.assertEqual(json.loads((output/'targeted-tests-union.json').read_bytes()),result)
+                for label in calls:self.assertTrue((output/label/'result.json').is_file())
+                before=(output/'targeted-tests-union.json').read_bytes()
+                with self.assertRaises(FileExistsError):runner.write(output/'targeted-tests-union.json',{'accepted':True})
+                self.assertEqual((output/'targeted-tests-union.json').read_bytes(),before)
+        # A latched guard/resource rejection still stops, even if child exited0.
+        with tempfile.TemporaryDirectory() as temporary:
+            command=mock.Mock(side_effect=ValueError('guard, timeout or remaining process rejection'))
+            with self.assertRaisesRegex(ValueError,'guard, timeout'):
+                runner.execute_repair_scopes(active,command,{'GOAUTH':'off'},Path(temporary).resolve())
+            self.assertEqual(command.call_count,1)
 
 if __name__=='__main__':unittest.main(verbosity=2)

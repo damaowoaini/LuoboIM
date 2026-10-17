@@ -1,4 +1,4 @@
-"""One direct help-pipe and independent post-check control, never macOS CLI."""
+"""Static-help protocol and supervisor controls, never macOS CLI."""
 import importlib.util
 import json
 import os
@@ -20,7 +20,7 @@ class LogCLIContract(unittest.TestCase):
         real_popen = subprocess.Popen
         cases = [('complete', 'print('+repr(help_text+' '+secret)+')', 'none'),
                  ('missing', 'print("--style")', 'missing_help_tokens'),
-                 ('nonzero', 'import sys;sys.stderr.write('+repr(secret)+');sys.exit(64)', 'cli_usage_exit64'),
+                 ('nonzero', 'import sys;sys.stderr.write('+repr(secret)+');sys.exit(64)', 'cli_nonzero'),
                  ('overflow', 'print("x"*10000)', 'output_limit'),
                  ('timeout', 'import time;time.sleep(4)', 'timeout')]
         for label, script, reason in cases:
@@ -92,7 +92,11 @@ class LogCLIContract(unittest.TestCase):
                 @staticmethod
                 def run(guard,adapter,work,arguments):
                     calls.append(arguments.command)
-                    self.assertEqual(arguments.command[0],'/usr/bin/sandbox-exec')
+                    self.assertEqual(arguments.command,[sys.executable,'-B',str(lane.HERE/'run.py'),'--identity',lane.IDENTITY,'--supervisor-help',str(work)])
+                    self.assertNotIn('/usr/bin/sandbox-exec',arguments.command)
+                    boundary=json.loads((work/'evidence/execution-boundary.json').read_bytes())
+                    self.assertEqual(boundary['worker_sandbox_applied'],False)
+                    self.assertFalse((work/'diagnostic.sb').exists())
                     self.assertEqual(arguments.timeout,30)
                     self.assertEqual(arguments.min_free_mib,1024)
                     self.assertEqual(arguments.poll_interval,.2)
@@ -114,10 +118,59 @@ class LogCLIContract(unittest.TestCase):
                  mock.patch.object(lane,'load',side_effect=helper):
                 self.assertEqual(lane.execute(),0)
             self.assertEqual(len(calls),1)
-            evidence=parent/'luobo-apple-log-cli-contract-v1/evidence'
+            evidence=parent/lane.WORK_NAME/'evidence'
             summary=json.loads((evidence/'summary.json').read_bytes())
             self.assertEqual(summary['post_exact'],{'log':True,'python':True,'controllers':True})
             self.assertEqual(summary['failure'],'none')
+
+    def test_supervisor_real_fixed_help_path_and_closed_stderr_labels_never_store_text_or_accept_commands(self):
+        # These are synthetic complete stderr examples, not recovered bytes
+        # from any original macOS run. No old stderr hash-to-text lookup exists.
+        private = b'https://user:PRIVATE@private.invalid/object?token=PRIVATE'
+        examples = [(b'log: operation not permitted\n','eperm'),
+                    (b'sandbox-exec: sandbox_apply: operation not permitted\n','sandbox_refusal'),
+                    (b'usage: log show [options]\n','usage'),
+                    (b'log: '+private+b'\n','unknown'),
+                    (b'\xff','unknown'),
+                    (b'log: operation not permitted\nusage: log show\n','unknown')]
+        real_popen = subprocess.Popen
+        for stderr, expected in examples:
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as folder:
+                work=Path(folder).resolve();(work/'evidence').mkdir();commands=[]
+                def launch(command,**kwargs):
+                    commands.append(command);self.assertEqual(command,lane.COMMAND)
+                    script='import os,sys;os.write(2,'+repr(stderr)+');sys.exit(64)'
+                    return real_popen([sys.executable,'-B','-c',script],**kwargs)
+                with mock.patch.object(lane,'home_configuration_present',return_value=False), mock.patch.object(lane.subprocess,'Popen',side_effect=launch):
+                    observed=lane.help_observation(work,dict(os.environ))
+                self.assertEqual(commands,[lane.COMMAND]);self.assertEqual(observed['stderr_class'],expected)
+                self.assertEqual(observed['reason'],'cli_nonzero');self.assertFalse(observed['cause_inferred_from_exit_code'])
+                self.assertNotIn('PRIVATE',json.dumps(observed));self.assertNotIn('private.invalid',json.dumps(observed))
+                self.assertFalse(observed['execution_surface']['worker_sandbox_applied'])
+        self.assertEqual(lane.classify_static_help_stderr(b'x'*(lane.CAP+1)),'unknown')
+
+        # Execute the actual supervisor helper, its activation/controller/tool
+        # gates and real pipe observer. Only the native Popen is replaced with
+        # a finite Python process; no native/macOS/service command is run.
+        with tempfile.TemporaryDirectory() as folder:
+            work=Path(folder).resolve();(work/'evidence').mkdir()
+            before={'log':{'actual':'log'},'python':{'actual':'python'}};controllers=[{'actual':'source'}]
+            lane.put(work/'activation.json',{'identity':lane.IDENTITY,'controllers':controllers,'before':before})
+            allowed={'HOME':os.environ['HOME'],'PATH':'/usr/bin:/bin','TMPDIR':str(work)};commands=[]
+            help_text='--[no-]pager --style ndjson --color --start --end --predicate --[no-]info --[no-]debug'
+            def launch(command,**kwargs):
+                self.assertEqual(command,lane.COMMAND);commands.append(command);self.assertEqual(kwargs['env'],allowed)
+                return real_popen([sys.executable,'-B','-c','print('+repr(help_text)+')'],**kwargs)
+            with mock.patch.object(lane,'metadata',return_value={'originalEnvironmentPaths':lane.ORIGINAL_PATHS}), mock.patch.object(lane,'controller_snapshot',return_value=controllers), mock.patch.object(lane,'tool_snapshot',side_effect=lambda name:before[name]), mock.patch.object(lane,'load',return_value=object()), mock.patch.object(lane,'env',return_value=allowed), mock.patch.object(lane,'home_configuration_present',return_value=False), mock.patch.object(lane.subprocess,'Popen',side_effect=launch):
+                self.assertEqual(lane.supervisor_help(work),0)
+            self.assertEqual(commands,[lane.COMMAND])
+            proof=json.loads((work/'evidence/help-observation.json').read_bytes())
+            self.assertTrue(all(proof['supports'].values()));self.assertFalse(proof['execution_surface']['worker_sandbox_applied'])
+            # An altered private identity is refused before any native attempt.
+            (work/'activation.json').write_text(json.dumps({'identity':'foreign','controllers':controllers,'before':before}))
+            with mock.patch.object(lane,'metadata',return_value={}), mock.patch.object(lane.subprocess,'Popen') as launch:
+                with self.assertRaisesRegex(ValueError,'supervisor-source-binding'):lane.supervisor_help(work)
+            launch.assert_not_called()
 
 
 if __name__ == '__main__':

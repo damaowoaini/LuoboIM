@@ -199,4 +199,53 @@ func TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice(t *test
 			t.Fatal("legacy nonpaged caller silently treated unknown as empty/granted", e)
 		}
 	})
+	t.Run("ordinary-source-receipt-keeps-policy-pair-and-rejects-single-or-foreign-hashes", func(t *testing.T) {
+		bindingID := key(s.epoch, "kafka-source", broadcast.SourceID)
+		var actual kafkaReceipt
+		if bson.Unmarshal(original[Receipts][bindingID], &actual) != nil {
+			t.Fatal("actual original Kafka source binding unavailable")
+		}
+		pairSHA := directHistoryDigest([]any{broadcast, policySHA})
+		singleSHA := directHistoryDigest(broadcast)
+		if actual.ID != bindingID || actual.PolicySHA256 != policySHA || actual.ReceiptSHA256 != pairSHA || pairSHA == singleSHA {
+			t.Fatal("actual Kafka producer must persist the receipt and policy pair")
+		}
+		snapshot := clone()
+		rows, e := verifier.DeriveOriginalHistorySegments(ctx, h, i, s.epoch, "namespace-owner-live-history-v1", id, snapshot)
+		if e != nil || len(rows) != 1 || rows[0].Lower != 2 || rows[0].Upper != 2 || rows[0].ScopeContract != namespaceimport.OriginalGroupSequenceScopeV1 {
+			t.Fatal("actual receipt and policy pair lost the exact broadcast proof", rows, e)
+		}
+		if e = verifier.VerifyOriginalHistorySegment(ctx, h, i, rows[0], snapshot); e != nil {
+			t.Fatal("actual receipt and policy pair could not be reverified", e)
+		}
+		foreignPolicySHA := hash([]byte("foreign-original-history-policy"))
+		if foreignPolicySHA == policySHA {
+			t.Fatal("foreign policy fixture must be distinct")
+		}
+		for _, changed := range []struct {
+			name       string
+			receiptSHA string
+			policySHA  string
+		}{
+			{"single-receipt", singleSHA, policySHA},
+			{"foreign-policy-pair", directHistoryDigest([]any{broadcast, foreignPolicySHA}), foreignPolicySHA},
+		} {
+			snapshot := clone()
+			binding := actual
+			binding.ReceiptSHA256 = changed.receiptSHA
+			binding.PolicySHA256 = changed.policySHA
+			body, e := bson.Marshal(binding)
+			if e != nil {
+				t.Fatal(e)
+			}
+			snapshot[Receipts][bindingID] = body
+			derived, e := verifier.DeriveOriginalHistorySegments(ctx, h, i, s.epoch, "namespace-owner-live-history-v1", id, snapshot)
+			if !errors.Is(e, ErrConflict) || len(derived) != 0 {
+				t.Fatal("changed Kafka receipt binding became history authority", changed.name, derived, e)
+			}
+			if e = verifier.VerifyOriginalHistorySegment(ctx, h, i, rows[0], snapshot); !errors.Is(e, ErrConflict) {
+				t.Fatal("changed Kafka receipt binding reverified a prior scoped range", changed.name, e)
+			}
+		}
+	})
 }

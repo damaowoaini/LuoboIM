@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One bounded log help show observation; no system log query or native build."""
+"""Fixed static help outside worker sandbox, under original resource supervisor."""
 import argparse
 import hashlib
 import importlib.util
@@ -18,7 +18,12 @@ from types import SimpleNamespace
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-IDENTITY = 'apple-macos15-log-help-show-contract-v1'
+IDENTITY = 'apple-macos15-log-help-show-supervisor-v2'
+WORK_NAME = 'luobo-apple-log-cli-supervisor-v2'
+EXECUTION_SURFACE = {'help_process': 'resource-supervisor-without-worker-sandbox',
+    'worker_sandbox_applied': False, 'same_original_diagnostic_rules': False,
+    'file_write_network_sandbox_enforced_for_help': False,
+    'fixed_static_help_only': True, 'system_log_query_executed': False}
 COMMAND = ['/usr/bin/log', 'help', 'show']
 CAP = 8192
 SECONDS = 2
@@ -69,6 +74,7 @@ def metadata():
         raise ValueError('descriptor-shape')
     value = json.loads(raw)
     if (value.get('schema') != 1 or value.get('identity') != IDENTITY
+            or value.get('executionSurface') != EXECUTION_SURFACE
             or value.get('command') != COMMAND or value.get('originalEnvironmentPaths') != ORIGINAL_PATHS
             or value.get('limits') != {'seconds': 2, 'outputBytes': 8192, 'floorBytes': 1 << 30,
                 'allocatedBytes': 64 << 20, 'pollSeconds': .2, 'guardSeconds': 30}):
@@ -125,12 +131,34 @@ def home_configuration_present(environment):
     return os.path.lexists(home/'.logrc')
 
 
+def classify_static_help_stderr(body):
+    """Classify only complete bounded literal stderr, never an exit-code cause.
+
+    These finite grammars are observation labels. They do not reconstruct the
+    old32-byte stderr, grant permission or classify arbitrary runtime log text.
+    """
+    if not isinstance(body, bytes) or len(body) > CAP:
+        return 'unknown'
+    try:
+        body.decode('utf-8', 'strict')
+    except UnicodeError:
+        return 'unknown'
+    patterns = {
+        'sandbox_refusal': rb'(?:sandbox-exec: sandbox_(?:apply|init): operation not permitted|log: (?:not permitted|not allowed) (?:in|within) (?:a )?sandbox)\.?',
+        'eperm': rb'(?:log: )?(?:operation not permitted|eperm)\.?',
+        'usage': rb'usage: log(?: [^\r\n]*)?'}
+    found = {name for name, pattern in patterns.items() for line in body.splitlines()
+        if re.fullmatch(pattern, line.strip(), re.IGNORECASE)}
+    return next(iter(found)) if len(found) == 1 else 'unknown'
+
 def help_observation(work, environment):
     result = {'schema': 1, 'command': COMMAND, 'attempted': False,
         'status': 'inconclusive', 'reason': 'other', 'exit_code': None,
         'streams_complete': False, 'output_within_cap': True, 'supports': {},
         'support_false_means_unobserved_not_unsupported': True,
-        'raw_help_or_system_log_retained': False}
+        'raw_help_or_system_log_retained': False, 'execution_surface': dict(EXECUTION_SURFACE),
+        'stderr_class': 'unknown', 'stderr_class_is_literal_observation_only': True,
+        'cause_inferred_from_exit_code': False}
     if home_configuration_present(environment):
         result.update(reason='user_log_configuration_present')
         return result
@@ -161,7 +189,7 @@ def help_observation(work, environment):
         result['exit_code'] = child.wait(timeout=max(.001, deadline-time.monotonic()))
         result['streams_complete'] = True
         if result['exit_code'] != 0:
-            result['reason'] = 'cli_usage_exit64' if result['exit_code'] == 64 else 'cli_nonzero'
+            result['reason'] = 'cli_nonzero'
             return result
         # The two complete bounded help streams remain memory-only. Some
         # versions print static help to stderr even when help exits zero.
@@ -200,6 +228,8 @@ def help_observation(work, environment):
             result['streams'] = {k: {'bytes': s['bytes'], 'sha256': s['sha'].hexdigest(),
                 'complete': result['streams_complete']} for k, s in streams.items()}
             result['combined_observed_bytes'] = total
+            if result['streams_complete'] and result['output_within_cap']:
+                result['stderr_class'] = classify_static_help_stderr(bytes(streams['stderr']['body']))
     return result
 
 
@@ -269,14 +299,14 @@ def profile(work, stage, xcrun_adapter):
     return text.encode()
 
 
-def worker(work):
+def supervisor_help(work):
     spec = metadata()
     activation = json.loads((work/'activation.json').read_bytes())
     if activation.get('identity') != IDENTITY or activation.get('controllers') != controller_snapshot():
-        raise ValueError('worker-source-binding')
+        raise ValueError('supervisor-source-binding')
     for name in ['log', 'python']:
         if tool_snapshot(name) != activation['before'][name]:
-            raise ValueError('worker-tool-binding')
+            raise ValueError('supervisor-tool-binding')
     xcrun_adapter = load(REPO/'ci/apple-resolution-temp-diagnostic/xcrun_adapter.py', 'log_help_original_cache_adapter')
     environment = env(work, spec['originalEnvironmentPaths'], xcrun_adapter)
     result = help_observation(work, environment)
@@ -289,7 +319,7 @@ def execute():
     if platform.system() != 'Darwin' or platform.machine() != 'arm64' or sys.version_info[:3] != (3, 12, 10):
         raise ValueError('fixed-macos15-arm-python')
     parent = Path(os.environ['RUNNER_TEMP']).resolve(strict=True)
-    work = parent/'luobo-apple-log-cli-contract-v1'
+    work = parent/WORK_NAME
     if parent.stat().st_uid != os.getuid() or os.path.lexists(work):
         raise ValueError('fresh-owned-root')
     free = os.statvfs(parent)
@@ -312,24 +342,22 @@ def execute():
         xcrun_adapter = load(REPO/'ci/apple-resolution-temp-diagnostic/xcrun_adapter.py', 'log_help_original_profile_cache')
         xcrun_adapter.seal_cache_boundary(work)
         put(work/'activation.json', {'identity': IDENTITY, 'controllers': before['controllers'], 'before': before})
-        body = profile(work, 'diagnostic', xcrun_adapter)
-        body += ('(deny file-write* (literal '+json.dumps(str(work/'diagnostic.sb'))+'))').encode()
-        fd = os.open(work/'diagnostic.sb', os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
-        with os.fdopen(fd, 'wb') as stream:
-            stream.write(body); stream.flush(); os.fsync(stream.fileno())
-        put(work/'evidence/profile.json', {'bytes': len(body), 'sha256': hashlib.sha256(body).hexdigest(),
-            'same_original_diagnostic_rules': True, 'network_granted': False, 'HOME_write_granted': False})
+        # Only this fixed static-help execution moves outside the worker
+        # sandbox. No SPM/Swift/App profile/env source is changed or applied.
+        put(work/'evidence/execution-boundary.json', dict(EXECUTION_SURFACE,
+            command=COMMAND, original_resource_guard=True, clean_environment_unchanged=True,
+            seconds=SECONDS, combined_output_cap_bytes=CAP))
         guard = load(REPO/'ci/apple-sdk/resource_dual.py', 'log_help_original_resource_guard')
         cache = load(REPO/'ci/apple-current359/cache_resource.py', 'log_help_original_cache_meter')
         boundary = xcrun_adapter.cache_boundary(work)
-        command = ['/usr/bin/sandbox-exec', '-f', str(work/'diagnostic.sb'), sys.executable, '-B',
-            str(HERE/'run.py'), '--identity', IDENTITY, '--worker', str(work)]
+        command = [sys.executable, '-B', str(HERE/'run.py'), '--identity', IDENTITY,
+            '--supervisor-help', str(work)]
         code = cache.run(guard, xcrun_adapter, work, SimpleNamespace(command=command, cwd=work,
-            log=work/'evidence/worker.log', record=work/'evidence/resource.json', allocated_root=work,
+            log=work/'evidence/supervisor-help.log', record=work/'evidence/resource.json', allocated_root=work,
             max_allocated_mib=64, min_free_mib=1024, secondary_root=Path(boundary['canonical']),
             secondary_cap_mib=64, poll_interval=.2, timeout=30))
         resource = json.loads((work/'evidence/resource.json').read_bytes())
-        failure = 'none' if code == 0 else 'worker_or_resource_failed'
+        failure = 'none' if code == 0 else 'supervisor_help_or_resource_failed'
     except Exception:
         failure = 'setup_or_boundary_failed'
     finally:
@@ -339,6 +367,7 @@ def execute():
             accepted = code == 0 and all(post.get(k) is True for k in ['log', 'python', 'controllers'])
             put(work/'evidence/summary.json', {'identity': IDENTITY, 'exit_code': 0 if accepted else 1,
                 'help_cli_contract_observed': accepted, 'failure': failure, 'post_exact': post,
+                'execution_surface': dict(EXECUTION_SURFACE),
                 'resource_exit_code': None if resource is None else resource.get('exit_code'),
                 'system_log_query_executed': False, 'SPM_Swift_App_or_acquire_executed': False,
                 'old20_tools_or_SDK_observed': False, 'raw_help_or_error_text_retained': False,
@@ -350,14 +379,14 @@ def main():
     os.umask(0o077)
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--identity', required=True, choices=[IDENTITY])
-    p.add_argument('--worker', type=Path, help=argparse.SUPPRESS)
+    p.add_argument('--supervisor-help', type=Path, help=argparse.SUPPRESS)
     a = p.parse_args()
-    if a.worker is None:
+    if a.supervisor_help is None:
         return execute()
-    expected = Path(os.environ['RUNNER_TEMP']).resolve(strict=True)/'luobo-apple-log-cli-contract-v1'
-    if a.worker != expected or a.worker.resolve(strict=True) != a.worker:
-        raise ValueError('fixed-worker-root')
-    return worker(a.worker)
+    expected = Path(os.environ['RUNNER_TEMP']).resolve(strict=True)/WORK_NAME
+    if a.supervisor_help != expected or a.supervisor_help.resolve(strict=True) != a.supervisor_help:
+        raise ValueError('fixed-supervisor-root')
+    return supervisor_help(a.supervisor_help)
 
 
 if __name__ == '__main__':

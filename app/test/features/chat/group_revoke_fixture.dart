@@ -369,7 +369,11 @@ final class GroupRevokeFixture {
       if (base.traceActual) {
         debugPrintSynchronously('chat_input_unmount pumpWidget.before');
       }
-      await tester.pumpWidget(const SizedBox.shrink());
+      final unmount = tester.pumpWidget(const SizedBox.shrink());
+      if (base.traceActual) {
+        debugPrintSynchronously('chat_input_unmount pumpWidget.returned');
+      }
+      await unmount;
       if (base.traceActual) {
         debugPrintSynchronously('chat_input_unmount pumpWidget.after');
         debugPrintSynchronously('chat_input_unmount pumpAndSettle.before');

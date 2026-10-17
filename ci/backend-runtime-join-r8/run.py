@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact formatted source repair15; source-bound prior66+repair7 reused, graph obligations remain pending."""
+"""Exact formatted source repair5 in three processes; prior-source66+7+10 and graph obligations retained."""
 import argparse
 from collections import Counter
 from contextlib import contextmanager
@@ -9,11 +9,11 @@ import re, stat, subprocess, sys, time
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
-SCOPE = 'backend_history_repair15_only_reuse_source_bound66_and7_prior14_no_deployment'
+SCOPE = 'backend_history_repair5_split3_only_reuse_source_bound66_and7_and10_prior14_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
-FINAL = {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}
+FINAL = {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
-SELECTION_SHA = '9a429f65ff33fcf626546a6ef1b9cc5e897443f9c036712e7afbaf6dbe024d6f'
+SELECTION_SHA = 'e027f5e42844d67777ecd2ba446974f63b403f9533f8393b821cea78a6382e9c'
 RESOURCE = {'initialBytes': 4294967296, 'floorMiB': 1024, 'allocatedMiB': 16384, 'pollSeconds': .2, 'controllerSeconds': 3000, 'compileTotalSeconds': 1200, 'testPhaseSeconds': 2250, 'testGoTimeoutSeconds': 180}
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 
@@ -21,9 +21,12 @@ REUSE_PROOF_SHA = 'a2273b8d18c15fc98fb65317067d89584a44c4570b899e619672f6ea47826
 PENDING_POSITIVE = ('pkg/common/startrpc','TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence')
 PENDING_TOKEN = ('pkg/common/startrpc','TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit')
 PREVIOUS_REPAIR_PROOF_SHA = '096dadcfbd249cc64e36f90e0361a13577908e1fc1a778543a8cc4023b2fe543'
-REPAIR_DELTA_SHA = '6352ea9afbc773e0de946ec95db399bcb3fa44ef1067c50d35d87a0725a65aa4'
+REPAIR_DELTA_SHA = '2c417cbaaa6e9b44af83cafbe31b1c33dc9d0511deafcafffce867aa68124f5c'
 DIRECT_PRIOR = {('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient')}
 DIRECT_CURRENT = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish')}
+LATEST_REPAIR_PROOF_SHA = '2b6e93f014f13bf8e0a7830b7b94f15b02149f78c24229066b03629c3bbae3ff'
+REPAIR_SCOPES = [{'label': 'targeted-tests-messagedelivery', 'targets': {'internal/messagedelivery': ['TestGroupHistoryMongoOriginalGenerationExportsClosedRangeWithoutLeaveGap', 'TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice', 'TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermission']}}, {'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}, {'label': 'targeted-tests-ownedcontrol-target', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient']}}]
+
 
 
 def sha(raw):
@@ -235,10 +238,10 @@ def canonical(value):
 
 
 def check_repair(c, p):
-    proof = p['acceptedPreviousRun']; current = p['previousRepairRun']
+    proof = p['acceptedPreviousRun']; current = p['previousRepairRun']; latest = p['latestRepairRun']
     old = {'members':1555,'digest':'686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
     before = {'members':1555,'digest':'68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
-    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_REPAIR15' or p.get('source') != c['source']
+    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_REPAIR5' or p.get('source') != c['source']
             or sha(canonical(proof)) != REUSE_PROOF_SHA or p['reuseProofSHA256'] != REUSE_PROOF_SHA
             or proof['source'] != old or proof['run'] != 39041607488 or proof['attempt'] != 1
             or proof['head'] != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
@@ -252,6 +255,16 @@ def check_repair(c, p):
             or not current['sourceModesLocksGeneratedConfigAndRepairControllerPostExact']
             or current['wholeFixtureNoResidueAccepted'] is not False or current['mongoResidualDatabaseCount'] != 1
             or current['RedisResidualKeys'] != 0 or current['exactOwnedContainerCleanupExitCode'] != 0
+            or sha(canonical(latest)) != LATEST_REPAIR_PROOF_SHA or p['latestRepairProofSHA256'] != LATEST_REPAIR_PROOF_SHA
+            or latest['source'] != {'members':1556,'digest':'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}
+            or latest['run'] != 39046539739 or latest['attempt'] != 1
+            or latest['head'] != '1dbe0412baa8a3a04199a5ab80a559dcdf126e65'
+            or (latest['actualTopStarted'], latest['actualTopPASS'], latest['actualTopFAIL'], latest['actualTopIncomplete'], latest['actualTopUnstarted']) != (15,10,5,0,0)
+            or not latest['allActualPassedTopChildrenCompleteAndRequiredExact']
+            or not latest['sourceModesLocksGeneratedConfigAndRepairControllerPostExact']
+            or not latest['wholeFixtureNoResidueAccepted'] or latest['mongoResidualDatabaseCount'] != 0
+            or latest['RedisResidualKeys'] != 0 or latest['exactOwnedContainerCleanupExitCode'] != 0
+            or latest['currentEntryBuilds'] != 0 or latest['runtimeGraphAccepted'] is not False
             or p['currentMainBuilds'] != 0 or p['reusedMainBuilds'] != 14
             or p['newBinaries'] is not False or p['runtimeGraphAccepted'] is not False or p['fullRegression'] is not False):
         raise ValueError('actual source-bound evidence or repair-only boundary differs')
@@ -260,6 +273,7 @@ def check_repair(c, p):
     current_pass, current_fail, current_incomplete = pairs(current['passedTargets']), pairs(current['failedTargets']), pairs(current['incompleteTargets'])
     active, reused, pending = pairs(p['repairTargets']), pairs(p['actualPassedTargets']), pairs(p['pendingPositiveTargets'])
     old_direct, current_direct = pairs(p['directlyAffectedPriorTargets']), pairs(p['directlyAffectedCurrentTargets'])
+    latest_pass, latest_fail = pairs(latest['passedTargets']), pairs(latest['failedTargets'])
     if (len(universe) != 89 or len(passed) != 67 or len(failed) != 22 or passed & failed
             or passed | failed != universe or pending != {PENDING_POSITIVE}
             or len(current_pass) != 10 or len(current_fail) != 10 or len(current_incomplete) != 1
@@ -267,19 +281,26 @@ def check_repair(c, p):
             or current_pass | current_fail | current_incomplete != failed - pending
             or old_direct != DIRECT_PRIOR or current_direct != DIRECT_CURRENT
             or not old_direct <= passed or not current_direct <= current_pass
-            or active != current_fail | current_incomplete | old_direct | current_direct or len(active) != 15
-            or reused != (passed - old_direct) | (current_pass - current_direct) or len(reused) != 73
+            or latest_pass & latest_fail or len(latest_pass) != 10 or len(latest_fail) != 5
+            or pairs(latest['incompleteTargets']) or latest_pass | latest_fail != current_fail | current_incomplete | old_direct | current_direct
+            or active != latest_fail or len(active) != 5
+            or reused != (passed - old_direct) | (current_pass - current_direct) | latest_pass or len(reused) != 83
             or active & (reused | pending) or active | reused | pending != universe
             or pairs(p['pendingRequiredTokenTargets']) != {PENDING_TOKEN} or pairs(c['pendingTargets']) != {PENDING_TOKEN}
-            or p['sourceReuse'] != [{'source':old,'run':39041607488,'retainedTopCount':66,'derivation':'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets'}, {'source':before,'run':39043896233,'retainedTopCount':7,'derivation':'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets'}]):
-        raise ValueError('repair15/reuse66+7/positive1/required-token1 must retain exact original names')
+            or p['sourceReuse'] != [{'source':old,'run':39041607488,'retainedTopCount':66,'derivation':'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets'}, {'source':before,'run':39043896233,'retainedTopCount':7,'derivation':'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets'}, {'source':latest['source'],'run':39046539739,'retainedTopCount':10,'derivation':'latestRepairRun.passedTargets; exact original source only'}]):
+        raise ValueError('repair5/reuse66+7+10/positive1/required-token1 must retain exact original names')
     entries = proof['compiledEntries']
     if (entries['completed'] != 14 or entries['uploadedBinaries'] is not False or entries['executed'] is not False
             or [(r['role'],r['package']) for r in entries['entries']] != [(r['role'],r['package']) for r in c['entrypoints']]):
         raise ValueError('old fourteen actual distinct entry evidence differs')
-    if (len(p['sourceDelta']) != 11 or len({r['target'] for r in p['sourceDelta']}) != 11
+    if (len(p['sourceDelta']) != 2 or len({r['target'] for r in p['sourceDelta']}) != 2
             or p['sourceDeltaSHA256'] != REPAIR_DELTA_SHA or sha(canonical(p['sourceDelta'])) != REPAIR_DELTA_SHA):
-        raise ValueError('exact formatted eleven-source repair required')
+        raise ValueError('exact formatted two-source repair required')
+    if p['executionScopes'] != REPAIR_SCOPES:
+        raise ValueError('exact MD3 and isolated ownedcontrol1+1 process scopes required')
+    scoped = [pair for scope in REPAIR_SCOPES for pair in pairs(scope['targets'])]
+    if len(scoped) != 5 or len(set(scoped)) != 5 or set(scoped) != active:
+        raise ValueError('repair process scopes must partition exactly the five failed names')
     overlay = {r['target']:r for r in c['overlay']}
     for row in p['sourceDelta']:
         now = overlay.get(row['target'])
@@ -293,8 +314,51 @@ def repair_execution_plan(c, p):
     targets = p['repairTargets']
     required = {package:{top:children for top,children in names.items() if top in targets.get(package,[])}
                 for package,names in c['requiredSubtests'].items()}
-    return {'compile': [], 'targets': targets, 'requiredSubtests': {p:n for p,n in required.items() if n}}
+    required = {package:names for package,names in required.items() if names}
+    scopes = [{'label':scope['label'], 'targets':scope['targets'],
+               'requiredSubtests':{package:{top:children for top,children in required.get(package,{}).items()
+                                          if top in tops}
+                                  for package,tops in scope['targets'].items()}}
+              for scope in p['executionScopes']]
+    return {'compile': [], 'targets': targets, 'requiredSubtests': required, 'scopes': scopes}
 
+
+def execute_repair_scopes(active, command, environment, output):
+    # One original2250s phase budget, three real Go test processes. A normal
+    # Go nonzero still retains/audits that scope and runs the remaining scopes.
+    # The original command guard raises on latched resource/owner failures.
+    deadline = time.monotonic() + RESOURCE['testPhaseSeconds']
+    results = []
+    for scope in active['scopes']:
+        remaining = int(deadline - time.monotonic())
+        if remaining < 1:
+            raise ValueError('original test phase budget exhausted')
+        names = sorted({name for tops in scope['targets'].values() for name in tops})
+        pattern = '^(' + '|'.join(re.escape(name) for name in names) + ')$'
+        args = ['env', '-i'] + [key+'='+value for key,value in environment.items()]
+        args += ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=180s', '-run', pattern]
+        args += ['./'+package for package in scope['targets']]
+        folder, code = command(scope['label'], args, remaining)
+        raw = regular(folder/'stdout.jsonl')
+        try:
+            events = [json.loads(line) for line in raw.decode().splitlines() if line.strip()]
+            result = dict(require_children(audit(events, code, scope['targets']), scope), accepted=True)
+        except (ValueError, TypeError, KeyError, UnicodeError) as error:
+            result = {'accepted':False,'exitCode':code,'originalRawRetained':True,
+                      'exceptionType':type(error).__name__,'targets':scope['targets']}
+        result.update(label=scope['label'], stdoutSHA256=sha(raw), stdoutBytes=len(raw))
+        write(folder/'result.json',result)
+        results.append(result)
+    accepted = len(results) == 3 and all(result['accepted'] for result in results)
+    union = {'accepted':accepted, 'phaseBudgetSeconds':RESOURCE['testPhaseSeconds'],
+             'goTestTimeoutSeconds':RESOURCE['testGoTimeoutSeconds'], 'processes':results,
+             'topPASS':sum(result.get('topPASS',0) for result in results),
+             'subPASS':sum(result.get('subPASS',0) for result in results),
+             'namedCompletions':[entry for result in results if result['accepted']
+                                 for entry in result['namedCompletions']],
+             'allSelectedFiveAccepted':accepted,'originalRawRetained':True}
+    write(output/'targeted-tests-union.json',union)
+    return union
 
 
 def load_repair_plan(c):
@@ -397,20 +461,12 @@ def run():
         fixtures.update(LUOBO_INTEGRATION_MONGO_URI=MONGO, LUOBO_INTEGRATION_REDIS_SOCKET=str(socket), LUOBO_BOOKING_TEST_REDIS_ADDR='127.0.0.1:36379')
         testenv = dict(env, GOPROXY='off', GOSUMDB='off', **fixtures)
         write(output/'compiled-entries.json', {'completed': 0, 'currentEntryBuildReexecuted': False, 'reusedActual14BuildSource': repair['acceptedPreviousRun']['source'], 'reusedActual14BuildRun': repair['acceptedPreviousRun']['run'], 'uploadedBinaries': False, 'executed': False})
-        names = sorted({n for selected in active['targets'].values() for n in selected})
-        pattern = '^(' + '|'.join(re.escape(n) for n in names) + ')$'
-        args = clean(testenv) + ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=180s', '-run', pattern] + ['./' + p for p in active['targets']]
-        folder, code = command('targeted-tests', args, 2250)
-        try:
-            events = [json.loads(line) for line in regular(folder / 'stdout.jsonl').decode().splitlines() if line.strip()]
-            result = dict(require_children(audit(events, code, active['targets']), active), accepted=True)
-        except (ValueError, TypeError, KeyError, UnicodeError):
-            result = {'accepted': False, 'exitCode': code, 'originalRawRetained': True}
-    write(output / 'summary.json', {'state': 'repair15_targeted_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 66, 'previousRepairTopPASSReused': 7, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
+        result = execute_repair_scopes(active, command, testenv, output)
+    write(output / 'summary.json', {'state': 'repair5_split3_targeted_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 66, 'previousRepairTopPASSReused': 7, 'latestRepairTopPASSReused': 10, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
     return 0 if result['accepted'] else 1
 
 if __name__ == '__main__':
     p=argparse.ArgumentParser(); p.add_argument('--verify',action='store_true'); a=p.parse_args()
     if a.verify:
-        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':15, 'retainedPriorSourceTop':66, 'retainedPreviousRepairSourceTop':7,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
+        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':5, 'retainedPriorSourceTop':66, 'retainedPreviousRepairSourceTop':7, 'retainedLatestRepairSourceTop':10,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
     else: raise SystemExit(run())

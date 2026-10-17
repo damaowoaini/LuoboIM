@@ -3,8 +3,8 @@
   "cohort": "current363",
   "source_members": 363,
   "portable_members": 415,
-  "source_digest": "151ad4f19440bd4d34b5f55819183390d92367e363f11acc8b07ffc6029640d6",
-  "portable_digest": "00fb5adacb2cc3e68b6e16059d1de69feaa857ffe33c620c877dad6ccbf21054",
+  "source_digest": "9b643457758a52f6bc6751e00a7ab11793e1cd0cc71348af365544a4642d0ae3",
+  "portable_digest": "074ffe22871b22ae901d6d1d38de3806b1913fb0623d8356084e49ca818f20c2",
   "source_rows": [
     {
       "path": "app/analysis_options.yaml",
@@ -1233,8 +1233,8 @@
     },
     {
       "path": "app/test/features/chat/group_revoke_fixture.dart",
-      "bytes": 12963,
-      "sha256": "599fd3b04e5c8bc25838c17e5d0e9e7eb52e042cd0b24fe562655bca431618ac"
+      "bytes": 13107,
+      "sha256": "ad6a7263d2fa155899802e51bfa1a484742275222b9fcedffa991327665af1c4"
     },
     {
       "path": "app/test/features/chat/group_revoke_repository_test.dart",
@@ -1959,8 +1959,8 @@
       },
       "after": {
         "path": "app/test/features/chat/group_revoke_fixture.dart",
-        "bytes": 12963,
-        "sha256": "599fd3b04e5c8bc25838c17e5d0e9e7eb52e042cd0b24fe562655bca431618ac"
+        "bytes": 13107,
+        "sha256": "ad6a7263d2fa155899802e51bfa1a484742275222b9fcedffa991327665af1c4"
       }
     },
     {
@@ -2150,7 +2150,7 @@
     {
       "path": "ci/mobile-input.py",
       "bytes": 39920,
-      "sha256": "1ea78055bc325e3e6c5276c7967d97949d30336003ea50a6c285408cf134bc3d"
+      "sha256": "693462cd6d8b6c67282c3e0b132e38c727e30b0f38698fd8006426210c391e3d"
     },
     {
       "path": "ci/mobile-input-vm.py",
@@ -2250,13 +2250,13 @@
   "cloud_analysis_paths": [],
   "local_validation_reuse": {
     "state": "actual_changed_analysis1_PASS_and_prior_exact_analysis12_reused_no_widget_acceptance",
-    "source363": "151ad4f19440bd4d34b5f55819183390d92367e363f11acc8b07ffc6029640d6",
-    "portable415": "00fb5adacb2cc3e68b6e16059d1de69feaa857ffe33c620c877dad6ccbf21054",
-    "rootUnionReceiptSHA256": "96ce7ff2b452f17c62979fa2eb1581fe6668f6f2495be409059ba72125e496b7",
+    "source363": "9b643457758a52f6bc6751e00a7ab11793e1cd0cc71348af365544a4642d0ae3",
+    "portable415": "074ffe22871b22ae901d6d1d38de3806b1913fb0623d8356084e49ca818f20c2",
+    "rootUnionReceiptSHA256": "ffe43641cd29a7e0a7623277d8def0f9c64953aff037424461f42c391d7076d0",
     "productManifest": {
-      "path": "references/integration/mobile363-typing-unmount-format-r7-candidate-20261017/candidate-manifest.json",
-      "bytes": 6891,
-      "sha256": "505b8330b08005bde273c1334d8176b9dab9b99a747173c92614b83a7c32fa9f"
+      "path": "references/integration/mobile363-pumpwidget-returned-format-r8-candidate-20261018/candidate-manifest.json",
+      "bytes": 6909,
+      "sha256": "4d4ab449ea98c5ed9488e68cd4b04976759457c79b007e1e2f68b542b51bf603"
     },
     "analyses13": [
       {
@@ -2505,8 +2505,8 @@
         "path": "test/features/chat/group_revoke_fixture.dart",
         "source": {
           "path": "app/test/features/chat/group_revoke_fixture.dart",
-          "bytes": 12963,
-          "sha256": "599fd3b04e5c8bc25838c17e5d0e9e7eb52e042cd0b24fe562655bca431618ac"
+          "bytes": 13107,
+          "sha256": "ad6a7263d2fa155899802e51bfa1a484742275222b9fcedffa991327665af1c4"
         },
         "result": {
           "path": "test/features/chat/group_revoke_fixture.dart",
@@ -2593,12 +2593,12 @@
       }
     },
     "resource": {
-      "bytes": 929,
-      "sha256": "dd369d05e7d74f366f48311ae480f013c3ee56c91bd45e2bdd461de38d3b9390"
+      "bytes": 932,
+      "sha256": "756a16823aa3cd50dd9b5fe82711ac8636b377bd59817c9d515557defb9c8053"
     },
     "formatResource": {
-      "bytes": 1117,
-      "sha256": "46b66d5b0c715080b95dab937f04c4d42862eb0298aa55a39e05365f997b642d"
+      "bytes": 1125,
+      "sha256": "d85daae6ee7da50aa0269c7c7e3d5628750f758c13a0fd5d087abd9928699caa"
     },
     "script": {
       "bytes": 1058,

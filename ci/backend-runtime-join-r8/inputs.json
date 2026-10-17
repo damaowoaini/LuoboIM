@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "state": "FROZEN_SOURCE",
-  "scope": "backend_history_repair15_only_reuse_source_bound66_and7_prior14_no_deployment",
+  "scope": "backend_history_repair5_split3_only_reuse_source_bound66_and7_and10_prior14_no_deployment",
   "base": {
     "members": 1407,
     "digest": "5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9"
   },
   "source": {
     "members": 1556,
-    "digest": "c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec"
+    "digest": "1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -2038,15 +2038,15 @@
     {
       "target": "server/internal/messagedelivery/owner_history_original_scope.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/messagedelivery/owner_history_original_scope.go",
-      "bytes": 20350,
-      "sha256": "81de84987d7c389b4b3c9a50c3bac907af293f0f9892ac4b23ff2600bd7b1c6a",
+      "bytes": 20373,
+      "sha256": "ba1a6bc4b05642bc2be8d18f1c498819f662d2edd6f69d838f7a83ee23948fb7",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/messagedelivery/owner_history_original_scope_integration_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/messagedelivery/owner_history_original_scope_integration_test.go",
-      "bytes": 8151,
-      "sha256": "f043bb84b6d9f9c54b2796337372bb12a4e0f91387ba6f6cecb5550f7020eb1e",
+      "bytes": 10517,
+      "sha256": "70e53e4edebf628541da9e15085ec15058df8683891e2b811727299ddf9a9eb7",
       "beforeSHA256": null
     },
     {
@@ -3231,15 +3231,15 @@
   ],
   "finalFormatProof": {
     "productManifest": {
-      "bytes": 118437,
-      "sha256": "482d4dc4e2dc5b7a223e25d334d2e76821d995c8bed1de3199dfe54b2cabe70e"
+      "bytes": 116088,
+      "sha256": "6e38eac3c082e036ae0ccf7c76074f19da066fd5bf8c0ec81081d66c98125fb5"
     },
     "formattedSource": {
-      "members": 1555,
-      "digest": "68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55"
+      "members": 1556,
+      "digest": "1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132"
     },
-    "incrementalFormattedParsedGo": 8,
-    "previousFormattedOrCompiledGoExactReused": 198,
+    "incrementalFormattedParsedGo": 2,
+    "previousFormattedOrCompiledGoExactReused": 205,
     "exactActualR7GoReused": [
       "server/internal/rpc/third/owned_provider_test.go",
       "server/pkg/common/db/cache/owned_connection_setup_redis_test.go",
@@ -3248,7 +3248,7 @@
     ],
     "GoCompilationOrTests": 0
   },
-  "selectionSHA256": "9a429f65ff33fcf626546a6ef1b9cc5e897443f9c036712e7afbaf6dbe024d6f",
+  "selectionSHA256": "e027f5e42844d67777ecd2ba446974f63b403f9533f8393b821cea78a6382e9c",
   "priorPassedTargets": {
     "internal/api": [
       "TestAdminPreviewHTTPRequiresTwoRevocableCredentialsAndExplicitScope",
@@ -4017,6 +4017,13 @@
         "changed_raw_custody_rejected",
         "partial_old_readiness_cannot_be_used_as_predecessor",
         "foreign_epoch_and_wrong_BSON_version_are_safe_refusals"
+      ],
+      "TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice": [
+        "concrete-finite-range-keeps-broadcast-and-excludes-nontarget-notice",
+        "real-retained-envelope-and-completed-broadcast-remain-recoverable",
+        "same-count-forged-targets-cannot-pass-original-input-hash",
+        "unresolved-original-slot-is-pending-while-next-broadcast-is-produced",
+        "ordinary-source-receipt-keeps-policy-pair-and-rejects-single-or-foreign-hashes"
       ]
     },
     "internal/namespaceinventory": {
@@ -4429,15 +4436,15 @@
   },
   "repairPlan": {
     "path": "ci/backend-runtime-join-r8/repair-plan.json",
-    "bytes": 30350,
-    "sha256": "38ce7e97ffe05f978c2744b64dd5a00abfe85ba0fa64f447031f9483beba9641",
+    "bytes": 32772,
+    "sha256": "36a3dce7a43b56281e42ba522f7155a3934c10d225b0a43f5d8e499f29547976",
     "mode": 420
   },
   "repairControllerPins": [
     {
       "path": "ci/backend-runtime-join-r8/test_repair.py",
-      "bytes": 5870,
-      "sha256": "e29328bea978e2cfc0478556ec160a3428dfc5dbe609d616e1e3ee4b8c31cbb3",
+      "bytes": 10293,
+      "sha256": "9c984f262b8cba1f9cb266aac6907290d50bdc01088aaf100f117e8d926bde9e",
       "mode": 420
     }
   ]

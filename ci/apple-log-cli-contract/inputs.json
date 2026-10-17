@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "identity": "apple-macos15-log-help-show-contract-v1",
+  "identity": "apple-macos15-log-help-show-supervisor-v2",
   "command": [
     "/usr/bin/log",
     "help",
@@ -17,18 +17,18 @@
   "owned": [
     {
       "path": "ci/apple-log-cli-contract/run.py",
-      "bytes": 18005,
-      "sha256": "d297ce217dcef7eaa73d8780dd930d7c66d3dc91a7826016cd32aaa55dc2e2ea"
+      "bytes": 19548,
+      "sha256": "5a3c057b2ac3ddbaf47eb4c003b2687fbfd526536d2a76f7c3096876ad122efd"
     },
     {
       "path": "ci/apple-log-cli-contract/test_log_cli.py",
-      "bytes": 7474,
-      "sha256": "0f2a6b3f7c044331551debdf8eed2217f4ed368e28168f6033259121c6f2db90"
+      "bytes": 12285,
+      "sha256": "8c047c84f42366e43dbda2617b9258fd716bded2c460b96714f4b06c355a8834"
     },
     {
       "path": ".github/workflows/apple-log-cli-contract.yml",
-      "bytes": 1273,
-      "sha256": "0b9b7fb7b1021c2cff44c26b1a0a225395a39480b470970cd3b8ff6806e849af"
+      "bytes": 1294,
+      "sha256": "bcf1e11f06bf931d05a785dc9ef632a35ae302b00fe941af69532b7aef7352e2"
     }
   ],
   "borrowed": [
@@ -89,5 +89,26 @@
     "old20ToolsSDK": false,
     "PodRubyCommandsOrBodyObservation": false,
     "supportsFalseMeansUnobserved": true
+  },
+  "executionSurface": {
+    "help_process": "resource-supervisor-without-worker-sandbox",
+    "worker_sandbox_applied": false,
+    "same_original_diagnostic_rules": false,
+    "file_write_network_sandbox_enforced_for_help": false,
+    "fixed_static_help_only": true,
+    "system_log_query_executed": false
+  },
+  "priorInsideObservation": {
+    "run": 39046546916,
+    "observation": {
+      "bytes": 707,
+      "sha256": "cab3201946a88b6102a9deef1968e04c27ea413e7cbe87a1ed44259215b38bec"
+    },
+    "nativeExitCode": 64,
+    "stderrBytes": 32,
+    "stderrSHA256": "3d1bfc20628becabc4bda68e57c58ad567d3a8aa0c8aa281f68b58bb28a3d0e5",
+    "reasonUnproved": true,
+    "oldRawRecovered": false,
+    "repeatInsideForComparison": false
   }
 }

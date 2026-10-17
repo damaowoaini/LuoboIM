@@ -146,7 +146,7 @@ func (v *OriginalHistoryVerifier) originalGroupSequencePermission(ctx context.Co
 			return false, c.evidence(), e
 		}
 		var binding kafkaReceipt
-		if bson.Unmarshal(original, &binding) != nil || binding.ID != key(epoch, "kafka-source", source) || binding.Kind != "kafka-source-v1" || binding.Epoch != epoch || binding.SourceID != source || binding.InputSHA256 != receipt.InputSHA256 || binding.ReceiptSHA256 != directHistoryDigest(receipt) || binding.PolicySHA256 != duty.PolicySHA || !validSHA(binding.RecordSHA256) {
+		if bson.Unmarshal(original, &binding) != nil || binding.ID != key(epoch, "kafka-source", source) || binding.Kind != "kafka-source-v1" || binding.Epoch != epoch || binding.SourceID != source || binding.InputSHA256 != receipt.InputSHA256 || binding.ReceiptSHA256 != directHistoryDigest([]any{receipt, duty.PolicySHA}) || binding.PolicySHA256 != duty.PolicySHA || !validSHA(binding.RecordSHA256) {
 			return false, c.evidence(), ErrConflict
 		}
 	}
