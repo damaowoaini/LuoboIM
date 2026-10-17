@@ -76,6 +76,49 @@ class LogCLIContract(unittest.TestCase):
             self.assertFalse(result['attempted']); self.assertEqual(result['supports'], {})
             self.assertEqual(result['reason'], 'user_log_configuration_present')
 
+        # Exercise the actual controller setup and its first tool-record sink.
+        # External native/resource calls are finite test doubles; no macOS CLI.
+        with tempfile.TemporaryDirectory() as folder:
+            parent=Path(folder).resolve()
+            contract=lane.metadata()
+            snapshots={'log':dict(contract['priorLogBody']),
+                       'python':{'path':sys.executable,'bytes':1,'sha256':'test-python'}}
+            calls=[]
+            class Adapter:
+                seal_cache_boundary=staticmethod(lambda work:None)
+                private_cache_profile=staticmethod(lambda work:'(deny file-write* (subpath "/synthetic-T"))')
+                cache_boundary=staticmethod(lambda work:{'canonical':str(work/'synthetic-T')})
+            class Cache:
+                @staticmethod
+                def run(guard,adapter,work,arguments):
+                    calls.append(arguments.command)
+                    self.assertEqual(arguments.command[0],'/usr/bin/sandbox-exec')
+                    self.assertEqual(arguments.timeout,30)
+                    self.assertEqual(arguments.min_free_mib,1024)
+                    self.assertEqual(arguments.poll_interval,.2)
+                    for name in ('log','python'):
+                        row=json.loads((work/'evidence'/('tool-'+name+'-before.json')).read_bytes())
+                        self.assertEqual(row,snapshots[name])
+                    lane.put(arguments.record,{'status':'passed','exit_code':0})
+                    return 0
+            def helper(path,name):
+                if path.name=='xcrun_adapter.py':return Adapter
+                if path.name=='cache_resource.py':return Cache
+                if path.name=='resource_dual.py':return object()
+                self.fail('unexpected helper load')
+            with mock.patch.dict(os.environ,{'RUNNER_TEMP':str(parent)}), \
+                 mock.patch.object(lane.platform,'system',return_value='Darwin'), \
+                 mock.patch.object(lane.platform,'machine',return_value='arm64'), \
+                 mock.patch.object(lane.sys,'version_info',(3,12,10)), \
+                 mock.patch.object(lane,'tool_snapshot',side_effect=lambda name:dict(snapshots[name])), \
+                 mock.patch.object(lane,'load',side_effect=helper):
+                self.assertEqual(lane.execute(),0)
+            self.assertEqual(len(calls),1)
+            evidence=parent/'luobo-apple-log-cli-contract-v1/evidence'
+            summary=json.loads((evidence/'summary.json').read_bytes())
+            self.assertEqual(summary['post_exact'],{'log':True,'python':True,'controllers':True})
+            self.assertEqual(summary['failure'],'none')
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

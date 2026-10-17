@@ -43,7 +43,14 @@ func mongoCompositionDB(t *testing.T) (context.Context, *mongo.Database, namespa
 	if uri != "mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration" {
 		t.Fatal("mandatory exact owned Mongo replica-set fixture not selected")
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Minute)
+	deadline := time.Now().Add(4 * time.Minute)
+	if packageDeadline, ok := t.Deadline(); ok && packageDeadline.Add(-20*time.Second).Before(deadline) {
+		// Leave the original exact nonce claim/drop/disconnect cleanups time to
+		// finish before the unchanged 180s package alarm. Early cancellation is
+		// still a test failure unless the original controller assertions finish.
+		deadline = packageDeadline.Add(-20 * time.Second)
+	}
+	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	t.Cleanup(cancel)
 	client, e := mongo.Connect(ctx, options.Client().ApplyURI(uri).SetDirect(true).SetRetryWrites(false).SetServerSelectionTimeout(2*time.Second))
 	if e != nil {

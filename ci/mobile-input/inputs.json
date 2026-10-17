@@ -2150,12 +2150,12 @@
     {
       "path": "ci/mobile-input.py",
       "bytes": 39920,
-      "sha256": "ee5e418c6f078ca9bcd24ea40ba4803bef49781d6f6898318b34f51ec4d3ff50"
+      "sha256": "1ea78055bc325e3e6c5276c7967d97949d30336003ea50a6c285408cf134bc3d"
     },
     {
       "path": "ci/mobile-input-vm.py",
-      "bytes": 20938,
-      "sha256": "2925238c5d7249b07b4056be359c80c74a486a6aea2d0376560dc2767a0e0974"
+      "bytes": 20913,
+      "sha256": "9cc50c7a5b368bd004bb8de2fe346f0622839fee4bb612b3479bb726d92e281d"
     },
     {
       "path": ".github/workflows/mobile-input-vm-diagnostic.yml",
@@ -3761,7 +3761,7 @@
     "actual role read failure stays an error and explicit retry remains read only until confirmation"
   ],
   "vm_diagnostic": {
-    "version": "owned-flutter-wait-diagnostic-v1",
+    "version": "owned-flutter-wait-diagnostic-v2-stack-only",
     "frameworkRevision": "abaf9c523780a608bd46686fd5e53740a07077f8",
     "dartSDKRevision": "04bcd1036cdc799ac6564988f159ee454d42c822",
     "flutterSourcePins": [
@@ -3796,7 +3796,6 @@
     "samples": 2,
     "rpcMethods": [
       "getVM",
-      "getIsolate",
       "getStack"
     ],
     "responseBytes": 262144,
@@ -3805,6 +3804,8 @@
     "diagnosticDeadlineSeconds": 20,
     "privateRoot": "private-vm-diagnostic",
     "uploadPrivateURI": false,
-    "defaultNoVMServiceAccepted": false
+    "defaultNoVMServiceAccepted": false,
+    "isolateStateObserved": false,
+    "freshConnectionPerSample": true
   }
 }

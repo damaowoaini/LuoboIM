@@ -305,7 +305,7 @@ def execute():
         put(work/'evidence/controllers-before.json', before['controllers'])
         for name in ['log', 'python']:
             before[name] = tool_snapshot(name)
-            put(work/'evidence/tool-'+name+'-before.json', before[name])
+            put(work/'evidence'/('tool-'+name+'-before.json'), before[name])
         expected = spec['priorLogBody']
         if any(before['log'][k] != expected[k] for k in ['path', 'bytes', 'sha256']):
             raise ValueError('original-log-body')

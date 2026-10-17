@@ -232,7 +232,7 @@ func TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermiss
 	})
 	t.Run("private-boundary-witness-bytes-are-also-rechecked", func(t *testing.T) {
 		v, h, _, r := fixture()
-		path := filepath.Join(t.TempDir(), "original-witness.json")
+		path := filepath.Join(originalHistoryPrivateFixtureDir(t), "original-witness.json")
 		if e = os.WriteFile(path, []byte("{}"), 0600); e != nil {
 			t.Fatal(e)
 		}

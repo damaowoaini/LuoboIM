@@ -11,7 +11,7 @@ import (
 func TestImportOutputDocumentKeepsPrivateCustodyAcrossReopenAndTamper(t *testing.T) {
 	source, _, snapshot := importSnapshotFixture(t)
 	ctx := context.Background()
-	dir := filepath.Join(t.TempDir(), "output")
+	dir := filepath.Join(privateFixtureDir(t), "output")
 	w, e := OpenImportWorkspace(ctx, snapshot, source, dir, jsonSHA("header"), jsonSHA("policy"), false)
 	if e != nil {
 		t.Fatal(e)

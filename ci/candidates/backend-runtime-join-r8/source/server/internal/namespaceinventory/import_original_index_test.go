@@ -39,7 +39,7 @@ func originalIndexFixture(t *testing.T, finish bool) (*ImportWorkspace, *pagedFi
 	if e != nil {
 		t.Fatal(e)
 	}
-	w, e := OpenImportWorkspace(ctx, snapshot, source, filepath.Join(t.TempDir(), "original-index"), jsonSHA("header"), jsonSHA("policy"), false)
+	w, e := OpenImportWorkspace(ctx, snapshot, source, filepath.Join(privateFixtureDir(t), "original-index"), jsonSHA("header"), jsonSHA("policy"), false)
 	if e != nil {
 		t.Fatal(e)
 	}

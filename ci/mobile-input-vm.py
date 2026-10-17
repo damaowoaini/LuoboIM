@@ -8,10 +8,10 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parent.parent
 TARGET = 'wrong-peer wrong-recipient malformed and offline typing never enters history or the active header'
 MARKER = 'chat_input_unmount pumpWidget.before'
-RULE_SHA = 'bef5fd760ded7beab99f71cd007ace681f001ed6d28bb58ad3dd014e20ba859d'
+RULE_SHA = 'a39037c339eefa4722c0ac4d132f7f78be6979e32ab04df7d8c74d01c0e733a1'
 MAX_LINE = 262144
 URI_PATTERN = re.compile(r'(?:https?|wss?)://[^\s<>"\x27\\]+', re.IGNORECASE)
-SAMPLE_FAILURE_STAGES = frozenset(('get-isolate','get-stack','project-stack'))
+SAMPLE_FAILURE_STAGES = frozenset(('get-stack','project-stack'))
 SAMPLE_FAILURE_REASONS = frozenset((
     'control-frame-shape',
     'duplicate-upgrade-header',
@@ -176,9 +176,8 @@ class ReadOnlyVM:
         self.sock.sendall(header+mask+bytes(b^mask[i%4] for i,b in enumerate(payload)))
 
     def rpc(self,method,params):
-        if method not in ('getVM','getIsolate','getStack'):raise ValueError('non-readonly-method')
-        if (method=='getVM' and params or method=='getIsolate' and set(params)!= {'isolateId'}
-                or method=='getStack' and (set(params)!={'isolateId','limit'} or params['limit']!=32)):
+        if method not in ('getVM','getStack'):raise ValueError('non-readonly-method')
+        if (method=='getVM' and params or method=='getStack' and (set(params)!={'isolateId','limit'} or params['limit']!=32)):
             raise ValueError('rpc-parameter-scope')
         self.check();self.serial+=1;identity=str(self.serial)
         self._send(canonical({'jsonrpc':'2.0','id':identity,'method':method,'params':params}))
@@ -225,11 +224,10 @@ def safe_frame(frame):
     return result
 
 
-def safe_sample(isolate,stack):
-    if isolate.get('type')!='Isolate' or stack.get('type')!='Stack':raise ValueError('service-result-type')
-    out={'runnable':isolate.get('runnable') is True,'truncated':stack.get('truncated') is True}
-    event=isolate.get('pauseEvent') or {}
-    if pause:=safe_text(event.get('kind'),64):out['pauseKind']=pause
+def safe_sample(stack):
+    if not isinstance(stack,dict) or stack.get('type')!='Stack':raise ValueError('service-result-type')
+    # Full getIsolate metadata is deliberately unobserved, never fabricated.
+    out={'truncated':stack.get('truncated') is True,'isolateStateObserved':False}
     for key in ('frames','asyncCausalFrames'):
         frames=stack.get(key,[])
         if not isinstance(frames,list) or len(frames)>32:raise ValueError('stack-frame-limit')
@@ -253,34 +251,37 @@ def collect(uri,child,work,private,stop):
         if not same_owner(owner,current):raise ValueError('tester-incarnation-changed')
         return current
     write_private(private/'service-uri.json',{'uri':uri,'owner':owner})
-    records=[];client=None
+    # Bind the original tester/main isolate once; no full isolate/library read.
+    client=ReadOnlyVM(port,path,checked,deadline)
     try:
-        client=ReadOnlyVM(port,path,checked,deadline)
         vm=client.rpc('getVM',{})
         candidates=[v for v in vm.get('isolates',[]) if isinstance(v,dict) and v.get('name')=='main' and v.get('isSystemIsolate') is not True]
         if vm.get('pid')!=owner['pid'] or len(candidates)!=1:raise ValueError('vm-process-or-main-isolate')
         isolateID=candidates[0].get('id')
         if not isinstance(isolateID,str) or not re.fullmatch(r'isolates/[0-9]+',isolateID):raise ValueError('isolate-id-shape')
-        for index in range(2):
-            if index and stop.wait(1):raise ValueError('original-owner-stopped')
-            before=checked();row={'sample':index+1,'ownerPID':owner['pid'],'ownerStart':owner['start'],'accepted':False}
-            stage='get-isolate'
-            try:
-                iso=client.rpc('getIsolate',{'isolateId':isolateID})
-                stage='get-stack'
-                stack=client.rpc('getStack',{'isolateId':isolateID,'limit':32})
-                stage='project-stack'
-                row.update(safe_sample(iso,stack));row['accepted']=True
-            except Exception as error:
-                row['exceptionType']=type(error).__name__
-                row.update(sample_failure(stage,error))
-            after=checked();delta=after['ticks']-before['ticks']
-            if delta<0:raise ValueError('cpu-counter-incarnation')
-            row['cpuTicksDelta']=delta;row['ticksPerSecond']=os.sysconf('SC_CLK_TCK');records.append(row)
-            write_private(work/'evidence'/f'input-vm-wait-sample{index+1}.json',row)
     finally:
-        if client is not None:client.close()
-    return {'attemptedSamples':len(records),'acceptedSamples':sum(r['accepted'] for r in records),'serviceRPCsAllowed':['getVM','getIsolate','getStack'],'defaultNoVMServiceAccepted':False}
+        client.close()
+    records=[]
+    for index in range(2):
+        if index and stop.wait(1):raise ValueError('original-owner-stopped')
+        before=checked();row={'sample':index+1,'ownerPID':owner['pid'],'ownerStart':owner['start'],'accepted':False}
+        client=None;stage='get-stack'
+        try:
+            # A rejected oversized/unread frame can never poison sample two.
+            client=ReadOnlyVM(port,path,checked,deadline)
+            stack=client.rpc('getStack',{'isolateId':isolateID,'limit':32})
+            stage='project-stack'
+            row.update(safe_sample(stack));row['accepted']=True
+        except Exception as error:
+            row['exceptionType']=type(error).__name__
+            row.update(sample_failure(stage,error))
+        finally:
+            if client is not None:client.close()
+        after=checked();delta=after['ticks']-before['ticks']
+        if delta<0:raise ValueError('cpu-counter-incarnation')
+        row['cpuTicksDelta']=delta;row['ticksPerSecond']=os.sysconf('SC_CLK_TCK');records.append(row)
+        write_private(work/'evidence'/f'input-vm-wait-sample{index+1}.json',row)
+    return {'attemptedSamples':len(records),'acceptedSamples':sum(r['accepted'] for r in records),'serviceRPCsAllowed':['getVM','getStack'],'isolateStateObserved':False,'freshConnectionPerSample':True,'defaultNoVMServiceAccepted':False}
 
 
 def write_profiled_pass(work, phases, source, portable):

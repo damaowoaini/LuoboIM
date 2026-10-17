@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Only the two new repair-plan/phase controls; no Go, service or fixture."""
+"""Only the two directly affected repair-plan/phase controls; no Go, service or fixture."""
 import copy, importlib.util, json, tempfile, unittest
 from pathlib import Path
 from unittest import mock
@@ -16,7 +16,7 @@ class RepairControls(unittest.TestCase):
         for field in ('repairTargets','actualPassedTargets','pendingPositiveTargets','pendingRequiredTokenTargets'):
             bad=copy.deepcopy(p);package=next(iter(bad[field]));bad[field][package].append('TestInventedAuthority')
             with self.subTest(field=field),self.assertRaises(ValueError):runner.check_repair(c,bad)
-        bad=copy.deepcopy(p);bad['repairTargets']['pkg/common/startrpc'].append(runner.PENDING_POSITIVE[1])
+        bad=copy.deepcopy(p);bad['repairTargets'].setdefault('pkg/common/startrpc',[]).append(runner.PENDING_POSITIVE[1])
         with self.assertRaises(ValueError):runner.check_repair(c,bad)
         for key,value in (('currentMainBuilds',14),('newBinaries',True),('runtimeGraphAccepted',True),('fullRegression',True)):
             bad=copy.deepcopy(p);bad[key]=value
@@ -25,10 +25,16 @@ class RepairControls(unittest.TestCase):
         with self.assertRaises(ValueError):runner.check_repair(c,bad)
         bad=copy.deepcopy(p);bad['sourceDelta'][0]['afterSHA256']='0'*64
         with self.assertRaises(ValueError):runner.check_repair(c,bad)
+        for key,value in (('wholeFixtureNoResidueAccepted',True),('actualTopIncomplete',0),('mongoResidualDatabaseCount',0)):
+            bad=copy.deepcopy(p);bad['previousRepairRun'][key]=value
+            with self.subTest(previousRepair=key),self.assertRaises(ValueError):runner.check_repair(c,bad)
+        for field in ('directlyAffectedPriorTargets','directlyAffectedCurrentTargets'):
+            bad=copy.deepcopy(p);package=next(iter(bad[field]));bad[field][package].append('TestInventedAuthority')
+            with self.subTest(impact=field),self.assertRaises(ValueError):runner.check_repair(c,bad)
 
     def test_actual_repair_plan_has_no_build_rejects_partial_events_and_retains_primary_post_failure(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),21)
+        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),15)
         self.assertFalse(runner.pairs(active['targets']) & runner.pairs(p['actualPassedTargets']))
         events=[]
         for package,tops in active['targets'].items():
@@ -40,7 +46,7 @@ class RepairControls(unittest.TestCase):
                 events.append({'Action':'pass','Package':pkg,'Test':top})
             events.append({'Action':'pass','Package':pkg})
         result=runner.require_children(runner.audit(events,0,active['targets']),active)
-        self.assertEqual(result['topPASS'],21)
+        self.assertEqual(result['topPASS'],15)
         with self.assertRaises(ValueError):runner.audit(events,1,active['targets'])
         result['namedCompletions']=[r for r in result['namedCompletions'] if '/' not in r['name']]
         with self.assertRaises(ValueError):runner.require_children(result,active)

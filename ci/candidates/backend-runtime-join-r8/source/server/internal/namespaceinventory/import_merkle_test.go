@@ -15,7 +15,7 @@ func TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume(t *testing.T) {
 		t.Run(fmt.Sprintf("leaves%d", count), func(t *testing.T) {
 			source, _, snapshot := importSnapshotFixture(t)
 			ctx := context.Background()
-			dir := filepath.Join(t.TempDir(), "merkle")
+			dir := filepath.Join(privateFixtureDir(t), "merkle")
 			header, policy := jsonSHA("header"), jsonSHA("policy")
 			w, e := OpenImportWorkspace(ctx, snapshot, source, dir, header, policy, false)
 			if e != nil {

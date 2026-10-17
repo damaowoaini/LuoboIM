@@ -252,7 +252,12 @@ func (s *HistoricalCaptureSource) Capture(ctx context.Context, h namespaceimport
 				_, e = m.StepOutputPlan(ctx, h)
 			}
 		default:
-			_, e = m.StepRoots(ctx)
+			// This capability belongs only to this synchronous StepRoots call.
+			// Actual commits and original raw references keep fresh boundaries.
+			e = m.workspace.WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+				_, stepErr := m.StepRoots(readCtx)
+				return stepErr
+			})
 		}
 	case "pages":
 		e = s.stepBodies(ctx)

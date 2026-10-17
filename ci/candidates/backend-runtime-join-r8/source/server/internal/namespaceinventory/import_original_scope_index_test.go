@@ -34,7 +34,7 @@ func originalScopeIndexFixture(t *testing.T, duplicate, finish bool) (*ImportWor
 	if e != nil {
 		return nil, source, nil, e
 	}
-	w, e := OpenImportWorkspace(ctx, snapshot, source, filepath.Join(t.TempDir(), "scoped-original-index"), jsonSHA("header"), jsonSHA("policy"), false)
+	w, e := OpenImportWorkspace(ctx, snapshot, source, filepath.Join(privateFixtureDir(t), "scoped-original-index"), jsonSHA("header"), jsonSHA("policy"), false)
 	if e != nil {
 		return nil, source, snapshot, e
 	}

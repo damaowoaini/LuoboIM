@@ -62,6 +62,17 @@ func originalOwnedCapture(t *testing.T, ctx context.Context, db *mongo.Database)
 	}
 	return out
 }
+
+// Canonical private parent is a fixture prerequisite, not a product relaxation.
+func originalHistoryPrivateFixtureDir(t *testing.T) string {
+	t.Helper()
+	dir, e := filepath.EvalSymlinks(t.TempDir())
+	if e != nil || os.Chmod(dir, 0700) != nil {
+		t.Fatal("private original-history fixture directory unavailable")
+	}
+	return dir
+}
+
 func originalTestVerifier(t *testing.T, ctx context.Context, s *Store) (*OriginalHistoryVerifier, namespaceimport.Header, namespaceimport.Inventory) {
 	t.Helper()
 	_, cutSHA, e := s.namespaceCutover(ctx)
@@ -77,7 +88,7 @@ func originalTestVerifier(t *testing.T, ctx context.Context, s *Store) (*Origina
 	if e != nil {
 		t.Fatal(e)
 	}
-	path := filepath.Join(t.TempDir(), "original-source-trust.json")
+	path := filepath.Join(originalHistoryPrivateFixtureDir(t), "original-source-trust.json")
 	if e = os.WriteFile(path, raw, 0600); e != nil {
 		t.Fatal(e)
 	}

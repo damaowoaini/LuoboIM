@@ -17,13 +17,13 @@
   "owned": [
     {
       "path": "ci/apple-log-cli-contract/run.py",
-      "bytes": 18001,
-      "sha256": "abf70a2a5ad9c9954444db63c1e8e21a29a1050443c7a4151ee56262141399b3"
+      "bytes": 18005,
+      "sha256": "d297ce217dcef7eaa73d8780dd930d7c66d3dc91a7826016cd32aaa55dc2e2ea"
     },
     {
       "path": "ci/apple-log-cli-contract/test_log_cli.py",
-      "bytes": 4792,
-      "sha256": "04bb5b27f2d2d90439d192c879a5ebcbd5d360b4a50e6d851ba7a0706dcf15d5"
+      "bytes": 7474,
+      "sha256": "0f2a6b3f7c044331551debdf8eed2217f4ed368e28168f6033259121c6f2db90"
     },
     {
       "path": ".github/workflows/apple-log-cli-contract.yml",

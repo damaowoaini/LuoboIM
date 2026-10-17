@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact formatted source repair21; old-source14 builds/67 passes reused, graph obligations remain pending."""
+"""Exact formatted source repair15; source-bound prior66+repair7 reused, graph obligations remain pending."""
 import argparse
 from collections import Counter
 from contextlib import contextmanager
@@ -9,17 +9,21 @@ import re, stat, subprocess, sys, time
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
-SCOPE = 'backend_history_repair21_only_reuse_prior_source14_and67_no_deployment'
+SCOPE = 'backend_history_repair15_only_reuse_source_bound66_and7_prior14_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
-FINAL = {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
+FINAL = {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
-SELECTION_SHA = '91bc81b26c4cd62748f4b8e088f6adf76e02cf9041cfb841a348646b12708fa4'
+SELECTION_SHA = '9a429f65ff33fcf626546a6ef1b9cc5e897443f9c036712e7afbaf6dbe024d6f'
 RESOURCE = {'initialBytes': 4294967296, 'floorMiB': 1024, 'allocatedMiB': 16384, 'pollSeconds': .2, 'controllerSeconds': 3000, 'compileTotalSeconds': 1200, 'testPhaseSeconds': 2250, 'testGoTimeoutSeconds': 180}
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 
 REUSE_PROOF_SHA = 'a2273b8d18c15fc98fb65317067d89584a44c4570b899e619672f6ea47826a97'
 PENDING_POSITIVE = ('pkg/common/startrpc','TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence')
 PENDING_TOKEN = ('pkg/common/startrpc','TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit')
+PREVIOUS_REPAIR_PROOF_SHA = '096dadcfbd249cc64e36f90e0361a13577908e1fc1a778543a8cc4023b2fe543'
+REPAIR_DELTA_SHA = '6352ea9afbc773e0de946ec95db399bcb3fa44ef1067c50d35d87a0725a65aa4'
+DIRECT_PRIOR = {('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient')}
+DIRECT_CURRENT = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish')}
 
 
 def sha(raw):
@@ -231,37 +235,56 @@ def canonical(value):
 
 
 def check_repair(c, p):
-    proof = p['acceptedPreviousRun']
+    proof = p['acceptedPreviousRun']; current = p['previousRepairRun']
     old = {'members':1555,'digest':'686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
-    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_REPAIR21' or p.get('source') != c['source']
+    before = {'members':1555,'digest':'68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
+    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_REPAIR15' or p.get('source') != c['source']
             or sha(canonical(proof)) != REUSE_PROOF_SHA or p['reuseProofSHA256'] != REUSE_PROOF_SHA
             or proof['source'] != old or proof['run'] != 39041607488 or proof['attempt'] != 1
             or proof['head'] != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
             or proof['actualTopPASS'] != 67 or proof['actualTopFAIL'] != 22
             or not proof['sourceModesLocksPostExact'] or not proof['fixtureNoResidueAndOwnedCleanupPASS']
+            or sha(canonical(current)) != PREVIOUS_REPAIR_PROOF_SHA or p['previousRepairProofSHA256'] != PREVIOUS_REPAIR_PROOF_SHA
+            or current['source'] != before or current['run'] != 39043896233 or current['attempt'] != 1
+            or current['head'] != '230a16a43a9d1a44c9a6477119a73b2ea4ff04bb'
+            or current['actualTopStarted'] != 21 or current['actualTopPASS'] != 10
+            or current['actualTopFAIL'] != 10 or current['actualTopIncomplete'] != 1
+            or not current['sourceModesLocksGeneratedConfigAndRepairControllerPostExact']
+            or current['wholeFixtureNoResidueAccepted'] is not False or current['mongoResidualDatabaseCount'] != 1
+            or current['RedisResidualKeys'] != 0 or current['exactOwnedContainerCleanupExitCode'] != 0
             or p['currentMainBuilds'] != 0 or p['reusedMainBuilds'] != 14
             or p['newBinaries'] is not False or p['runtimeGraphAccepted'] is not False or p['fullRegression'] is not False):
-        raise ValueError('actual old-source evidence or repair-only boundary differs')
+        raise ValueError('actual source-bound evidence or repair-only boundary differs')
     universe = pairs(c['targets'])
     passed, failed = pairs(proof['passedTargets']), pairs(proof['failedTargets'])
+    current_pass, current_fail, current_incomplete = pairs(current['passedTargets']), pairs(current['failedTargets']), pairs(current['incompleteTargets'])
     active, reused, pending = pairs(p['repairTargets']), pairs(p['actualPassedTargets']), pairs(p['pendingPositiveTargets'])
+    old_direct, current_direct = pairs(p['directlyAffectedPriorTargets']), pairs(p['directlyAffectedCurrentTargets'])
     if (len(universe) != 89 or len(passed) != 67 or len(failed) != 22 or passed & failed
-            or passed | failed != universe or reused != passed or pending != {PENDING_POSITIVE}
-            or active != failed - pending or len(active) != 21 or active & (reused | pending)
-            or pairs(p['pendingRequiredTokenTargets']) != {PENDING_TOKEN}
-            or pairs(c['pendingTargets']) != {PENDING_TOKEN}):
-        raise ValueError('repair21/reuse67/positive1/required-token1 must retain exact original names')
+            or passed | failed != universe or pending != {PENDING_POSITIVE}
+            or len(current_pass) != 10 or len(current_fail) != 10 or len(current_incomplete) != 1
+            or current_pass & (current_fail | current_incomplete) or current_fail & current_incomplete
+            or current_pass | current_fail | current_incomplete != failed - pending
+            or old_direct != DIRECT_PRIOR or current_direct != DIRECT_CURRENT
+            or not old_direct <= passed or not current_direct <= current_pass
+            or active != current_fail | current_incomplete | old_direct | current_direct or len(active) != 15
+            or reused != (passed - old_direct) | (current_pass - current_direct) or len(reused) != 73
+            or active & (reused | pending) or active | reused | pending != universe
+            or pairs(p['pendingRequiredTokenTargets']) != {PENDING_TOKEN} or pairs(c['pendingTargets']) != {PENDING_TOKEN}
+            or p['sourceReuse'] != [{'source':old,'run':39041607488,'retainedTopCount':66,'derivation':'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets'}, {'source':before,'run':39043896233,'retainedTopCount':7,'derivation':'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets'}]):
+        raise ValueError('repair15/reuse66+7/positive1/required-token1 must retain exact original names')
     entries = proof['compiledEntries']
     if (entries['completed'] != 14 or entries['uploadedBinaries'] is not False or entries['executed'] is not False
             or [(r['role'],r['package']) for r in entries['entries']] != [(r['role'],r['package']) for r in c['entrypoints']]):
         raise ValueError('old fourteen actual distinct entry evidence differs')
-    if len(p['sourceDelta']) != 8 or len({r['target'] for r in p['sourceDelta']}) != 8:
-        raise ValueError('exact formatted eight-source repair required')
+    if (len(p['sourceDelta']) != 11 or len({r['target'] for r in p['sourceDelta']}) != 11
+            or p['sourceDeltaSHA256'] != REPAIR_DELTA_SHA or sha(canonical(p['sourceDelta'])) != REPAIR_DELTA_SHA):
+        raise ValueError('exact formatted eleven-source repair required')
     overlay = {r['target']:r for r in c['overlay']}
     for row in p['sourceDelta']:
         now = overlay.get(row['target'])
         if (now is None or now['sha256'] != row['afterSHA256'] or now['bytes'] != row['afterBytes']
-                or not re.fullmatch('[0-9a-f]{64}',row['beforeSHA256']) or row['beforeSHA256'] == row['afterSHA256']):
+                or row['beforeSHA256'] is not None and (not re.fullmatch('[0-9a-f]{64}',row['beforeSHA256']) or row['beforeSHA256'] == row['afterSHA256'])):
             raise ValueError('repair delta must bind actual current capsule and original source preimage')
 
 
@@ -383,11 +406,11 @@ def run():
             result = dict(require_children(audit(events, code, active['targets']), active), accepted=True)
         except (ValueError, TypeError, KeyError, UnicodeError):
             result = {'accepted': False, 'exitCode': code, 'originalRawRetained': True}
-    write(output / 'summary.json', {'state': 'repair21_targeted_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 67, 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
+    write(output / 'summary.json', {'state': 'repair15_targeted_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 66, 'previousRepairTopPASSReused': 7, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
     return 0 if result['accepted'] else 1
 
 if __name__ == '__main__':
     p=argparse.ArgumentParser(); p.add_argument('--verify',action='store_true'); a=p.parse_args()
     if a.verify:
-        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':21,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
+        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':15, 'retainedPriorSourceTop':66, 'retainedPreviousRepairSourceTop':7,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
     else: raise SystemExit(run())

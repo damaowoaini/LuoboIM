@@ -78,6 +78,12 @@ func validDerived(st DerivedCheckpoint) bool {
 	return st.Schema == 1 && hexText(st.SnapshotSHA256, 64) && hexText(st.HeaderSHA256, 64) && hexText(st.PolicySHA256, 64) && st.Sequence > 0 && derivedPhase(st.Phase) >= 0 && (st.PreviousSHA256 == "" || hexText(st.PreviousSHA256, 64)) && (st.Cursor == "" || hexText(st.Cursor, 64)) && len(st.Subcursor) <= 512 && !strings.ContainsAny(st.Subcursor, "\x00\r\n") && (st.SetsRoot == "" || hexText(st.SetsRoot, 64))
 }
 func (w *ImportWorkspace) check(ctx context.Context) error {
+	if handled, e := checkWorkspaceReadScope(ctx, w); handled {
+		return e
+	}
+	return w.checkFresh(ctx)
+}
+func (w *ImportWorkspace) checkFresh(ctx context.Context) error {
 	if w == nil || w.snapshot == nil || w.live == nil || ctx == nil {
 		return ErrInvalid
 	}
@@ -231,7 +237,7 @@ func (w *ImportWorkspace) save(old derivedHead, next DerivedCheckpoint) error {
 // journal head advances only after every immutable object/state was fsynced.
 // An interrupted state can complete only by replaying the exact same next body.
 func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor, subcursor string, changes []DerivedMutation) (st DerivedCheckpoint, sum string, resultErr error) {
-	if e := w.check(ctx); e != nil {
+	if e := w.checkFresh(ctx); e != nil {
 		return st, "", e
 	}
 	if !hexText(expectedSHA, 64) || len(changes) > 64 {
@@ -305,7 +311,7 @@ func (w *ImportWorkspace) Commit(ctx context.Context, expectedSHA, phase, cursor
 			return st, "", e
 		}
 	}
-	if e = w.check(ctx); e != nil {
+	if e = w.checkFresh(ctx); e != nil {
 		return st, "", e
 	}
 	if e = w.save(derivedHead{old.Sequence, oldSHA}, next); e != nil {
