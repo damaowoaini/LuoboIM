@@ -104,9 +104,6 @@ class PublishedFiles:
             raise ValueError('unique actual downloaded module body required')
         path = found[0]
         raw = _stable(path, self.work, 2 * 1024 * 1024)
-        if (not re.fullmatch(r'[0-9a-f]{40}', path.parent.name)
-                or hashlib.sha1(raw).hexdigest() != path.parent.name):
-            raise ValueError('module cache content key differs from actual body')
         sources = sorted(u for u in self.downloads if urlsplit(u).path.endswith(_suffix(coordinate, filename)))
         if len(sources) != 1 or (required_url is not None and sources != [required_url]):
             raise ValueError('unique actual allowed module download required')
@@ -119,13 +116,14 @@ class PublishedFiles:
         repository = url[:-len(_suffix(coordinate, filename))]
         proof = {'coordinate': ':'.join(coordinate), 'path': str(path.relative_to(self.work)),
                  'url': url, 'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest(),
-                 'cacheSHA1': path.parent.name}
+                 'cacheKey': path.parent.name, 'cacheKeyIsOpaque': True}
         return data, proof, repository
 
     def alias(self, coordinate, filename, path, size, digest):
-        if (path.resolve(strict=True) != path or not re.fullmatch(r'[0-9a-f]{40}', path.parent.name)
-                or _hash(path, 'sha1') != path.parent.name):
-            raise ValueError('resolved artifact cache content key differs')
+        info = path.stat()
+        if (path.resolve(strict=True) != path or not path.is_relative_to(self.cache)
+                or not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_size != size):
+            raise ValueError('canonical owned resolved artifact required')
         relative = str(path.relative_to(self.work))
         matching = [x for x in self.rows if isinstance(x, dict) and x.get('path') == relative]
         if not matching:
@@ -203,7 +201,7 @@ class PublishedFiles:
         return [url], {'resolved_report_sha256': self.report_sha, 'resolved_coordinate': ':'.join(coordinate),
                        'cached_filename': filename, 'published_relative_url': relative_url,
                        'metadata': proofs, 'target_bytes': size, 'target_sha256': digest,
-                       'target_cache_SHA1': path.parent.name,
+                       'target_cache_key': path.parent.name, 'cache_keys_are_opaque': True,
                        'KMP_relation_grants_no_new_component_or_repository': True}
 
 

@@ -1,4 +1,4 @@
-"""R8: one directly affected dispatch control and one bounded-profile control; no Go invocation."""
+"""R9: directly affected dispatch/overlay controls; no Go invocation."""
 import copy
 import hashlib
 import importlib.util
@@ -29,9 +29,15 @@ def events(label):
 
 class R5ControllerTests(unittest.TestCase):
     def test_original_large_profiles_owned_outputs_then_diagnostics_without_overwriting_main_failure(self):
-        self.assertEqual(SUBJECT.expected(), {'large': {'tops': [SUBJECT.LARGE], 'subs': []}})
-        for change in ['good', 'missing-done', 'skip', 'nonzero', 'race', 'missing-footer',
-                       'foreign', 'post-failure', 'diagnostic-failure']:
+        self.assertEqual(SUBJECT.expected(), {
+            'short': {'tops': SUBJECT.READ_TOPS, 'subs': SUBJECT.READ_SUBS},
+            'large': {'tops': [SUBJECT.LARGE], 'subs': []}})
+        self.assertEqual((len(SUBJECT.READ_TOPS), len(SUBJECT.READ_SUBS)), (4, 15))
+        changes = ['good', 'missing-done', 'skip', 'nonzero', 'race', 'missing-footer',
+                   'foreign', 'post-failure', 'diagnostic-failure', 'short-missing-done',
+                   'short-skip', 'short-nonzero', 'short-race', 'short-missing-footer',
+                   'short-foreign', 'short-post-failure', 'short-resource-stop']
+        for change in changes:
             with self.subTest(change=change), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder).resolve()
                 profiles = root / 'profiles'
@@ -40,25 +46,34 @@ class R5ControllerTests(unittest.TestCase):
 
                 def command(label, argv, timeout):
                     calls.append(label); order.append(label)
-                    self.assertEqual(label, 'large')
-                    self.assertEqual(timeout, 900)
-                    self.assertEqual(argv, ['fixed-isolation', 'go', 'test', '-mod=readonly', '-p=1',
-                        '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=600s',
-                        '-run', '^(' + SUBJECT.LARGE + ')$',
-                        '-cpuprofile', str(profiles / 'cpu.pprof'), '-memprofile', str(profiles / 'alloc.pprof'),
-                        '-o', str(profiles / 'large.test'), './internal/namespaceinventory'])
-                    raw, code = events('large'), 0
-                    if change == 'missing-done':
-                        raw = [e for e in raw if not (e.get('Test') == SUBJECT.LARGE and e['Action'] == 'pass')]
-                    elif change == 'skip':
+                    common = ['fixed-isolation', 'go', 'test', '-mod=readonly', '-p=1',
+                              '-parallel=1', '-race', '-json', '-count=1', '-vet=off']
+                    if label == 'short':
+                        self.assertEqual(timeout, 180)
+                        self.assertEqual(argv, common + ['-timeout=120s', '-run',
+                            '^(' + '|'.join(SUBJECT.READ_TOPS) + ')$', './internal/namespaceinventory'])
+                        if change == 'short-resource-stop':
+                            raise ValueError('synthetic resource stop')
+                    else:
+                        self.assertEqual(label, 'large')
+                        self.assertEqual(timeout, 900)
+                        self.assertEqual(argv, common + ['-timeout=600s', '-run', '^(' + SUBJECT.LARGE + ')$',
+                            '-cpuprofile', str(profiles / 'cpu.pprof'), '-memprofile', str(profiles / 'alloc.pprof'),
+                            '-o', str(profiles / 'large.test'), './internal/namespaceinventory'])
+                    raw, code = events(label), 0
+                    active = change.removeprefix('short-') if label == 'short' and change.startswith('short-') else change if label == 'large' else ''
+                    if active == 'missing-done':
+                        target = SUBJECT.expected()[label]['tops'][0]
+                        raw = [e for e in raw if not (e.get('Test') == target and e['Action'] == 'pass')]
+                    elif active == 'skip':
                         next(e for e in raw if e.get('Test') and e['Action'] == 'pass')['Action'] = 'skip'
-                    elif change == 'nonzero':
+                    elif active == 'nonzero':
                         code = 4
-                    elif change == 'race':
+                    elif active == 'race':
                         raw.insert(1, {'Package': raw[0]['Package'], 'Action': 'output', 'Output': 'WARNING: DATA RACE'})
-                    elif change == 'missing-footer':
+                    elif active == 'missing-footer':
                         raw.pop()
-                    elif change == 'foreign':
+                    elif active == 'foreign':
                         raw[1]['Test'] = SUBJECT.INDEX_TOP
                     output = root / label
                     output.mkdir()
@@ -67,28 +82,35 @@ class R5ControllerTests(unittest.TestCase):
 
                 def post(label):
                     order.append('post-' + label)
-                    if change == 'post-failure':
+                    if change == 'post-failure' and label == 'large' or change == 'short-post-failure' and label == 'short':
                         raise ValueError('synthetic source changed')
 
                 def diagnose():
                     order.append('diagnostics')
-                    # Main result must already be frozen, including failed exit.
                     observed = json.loads((root / 'large/summary.json').read_text())
                     self.assertEqual(observed['exit'], 4 if change == 'nonzero' else 0)
                     return {'accepted': change != 'diagnostic-failure'}
 
-                if change == 'post-failure':
-                    with self.assertRaisesRegex(ValueError, 'synthetic source changed'):
+                if change in ('post-failure', 'short-post-failure', 'short-resource-stop'):
+                    message = 'synthetic resource stop' if change == 'short-resource-stop' else 'synthetic source changed'
+                    with self.assertRaisesRegex(ValueError, message):
                         SUBJECT.execute_phases(command, ['fixed-isolation'], post, profiles, diagnose)
-                    self.assertEqual(order, ['large', 'post-large'])
+                    self.assertEqual(order, ['short', 'post-short', 'large', 'post-large'] if change == 'post-failure'
+                                     else ['short', 'post-short'])
                 else:
                     result = SUBJECT.execute_phases(command, ['fixed-isolation'], post, profiles, diagnose)
-                    self.assertEqual(order, ['large', 'post-large', 'diagnostics', 'post-diagnostics'])
-                    self.assertEqual(result['large']['accepted'], change in ('good', 'diagnostic-failure'))
-                    self.assertEqual(SUBJECT.final_exit(result), 0 if change == 'good' else 4 if change == 'nonzero' else 1)
-                self.assertEqual(calls, ['large'])
+                    if change.startswith('short-'):
+                        self.assertEqual(order, ['short', 'post-short'])
+                        self.assertEqual(set(result), {'short'})
+                        self.assertFalse(result['short']['accepted'])
+                    else:
+                        self.assertEqual(order, ['short', 'post-short', 'large', 'post-large', 'diagnostics', 'post-diagnostics'])
+                        self.assertTrue(result['short']['accepted'])
+                        self.assertEqual(result['large']['accepted'], change in ('good', 'diagnostic-failure'))
+                    self.assertEqual(SUBJECT.final_exit(result), 0 if change == 'good' else 4 if change in ('nonzero', 'short-nonzero') else 1)
+                self.assertEqual(calls, ['short'] if change.startswith('short-') else ['short', 'large'])
         with self.assertRaises(ValueError):
-            SUBJECT.audit(events('large'), 0, 'short')
+            SUBJECT.audit(events('large'), 0, 'unknown')
 
     def test_profile_reports_are_bounded_local_stable_and_never_publish_test_binary(self):
         for change in ['good', 'missing-cpu', 'invalid-cpu', 'oversized-cpu', 'symlink-cpu',
@@ -187,7 +209,7 @@ class R5ControllerTests(unittest.TestCase):
                 overlay.append({'path': str(path.relative_to(root)), 'target': target, 'bytes': path.stat().st_size,
                     'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'mode': '0o644',
                     'beforeSHA256': hashlib.sha256(previous[target]).hexdigest() if target in previous else None})
-            self.assertEqual(len(SUBJECT.apply_overlay({'overlay': overlay}, previous, root)), 7)
+            self.assertEqual(len(SUBJECT.apply_overlay({'overlay': overlay}, previous, root)), 9)
             for change in ['missing-modified', 'before-drift', 'new-collision', 'duplicate', 'extra', 'mode', 'wrong-lane', 'body']:
                 bad, before = copy.deepcopy(overlay), dict(previous)
                 n = next(i for i, r in enumerate(bad) if r['target'] in SUBJECT.NEW)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R8 unchanged Large10001/600s once; owned CPU/alloc profiles, no short rerun."""
+"""R9 sized private read: new/affected4top15sub then unchanged Large/profile."""
 import argparse
 from collections import Counter
 import hashlib
@@ -15,7 +15,7 @@ import time
 
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
-SCOPE = 'namespace_progress_performance_r8_1205_original_large1_CPU_alloc_diagnostic_privateFS_BSON_noDB_no_runtime'
+SCOPE = 'namespace_progress_performance_r9_1206_sized_private_read4top15sub_original_large1_profile_noDB_no_runtime'
 PREFIX = 'github.com/openimsdk/open-im-server/v3/'
 PACKAGE = 'internal/namespaceinventory'
 PARENT_PATH = 'ci/namespace-progress-performance-r4/run.py'
@@ -23,7 +23,8 @@ PARENT_INPUTS = 'ci/namespace-progress-performance-r4/inputs.json'
 PARENT_RUNNER_SHA = '0e740711a364b5ff14f52c815e966df4d3d1320f9cb48f19b69380f51f8c8275'
 PARENT_INPUTS_SHA = '50ec67c768015dd9754088bd0418cd649108f6a118375eddae3452dbc7e06d28'
 PARENT_DIGEST = '2134b7ddbb9202f85878d665ac4f44ca3566d757fe51b2941d9f48796af42465'
-FINAL_DIGEST = '75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779'
+FINAL_DIGEST = 'd2381614af1f02a2dc9f49e4fb4ed059e10f93aed09686f93150a1305beda460'
+READ_PARENT_DIGEST = '75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779'
 DIGEST_ALGORITHM = 'ascending UTF8(path)+NUL+ASCII SHA256+LF then SHA256'
 SOURCE_MANIFEST = '061e5339513ebae41a92766528109585efa3173d4970597b7b9136a133531a40'
 HISTORY = {'R6Actual': {'run': 39001760279, 'job': 117305993492, 'head': '8608b7f313a58aaef46ecaaacb1806baae1c754a', 'source1204Digest': '3f2056a4907185381fc7c3a07ce8ac9a2735722128a15b3d14587a92e31ff98e', 'short3top13sub': 'actual PASS; reused historical only, not selected again', 'successfulNames': {'tops': ['TestNamespaceProgressMemoKeepsCustody', 'TestNamespaceProgressMetadataLookupOncePerReference', 'TestNamespaceProgressResolvedMetadataRetainsBindings'], 'subs': ['TestNamespaceProgressMemoKeepsCustody/bounded-eviction', 'TestNamespaceProgressMemoKeepsCustody/copy-isolation', 'TestNamespaceProgressMemoKeepsCustody/foreign-reference', 'TestNamespaceProgressMemoKeepsCustody/invocation-local', 'TestNamespaceProgressMemoKeepsCustody/limits', 'TestNamespaceProgressMemoKeepsCustody/private-mode', 'TestNamespaceProgressMemoKeepsCustody/raw-tamper', 'TestNamespaceProgressMemoKeepsCustody/strict-redecode', 'TestNamespaceProgressMetadataLookupOncePerReference/checked-row', 'TestNamespaceProgressMetadataLookupOncePerReference/summary-seen', 'TestNamespaceProgressResolvedMetadataRetainsBindings/number-and-row', 'TestNamespaceProgressResolvedMetadataRetainsBindings/pass-and-metaSHA', 'TestNamespaceProgressResolvedMetadataRetainsBindings/private-page-and-row']}, 'Large10001': 'actually started, Go600s timeout/packageFAIL; no completed top result', 'receipt': {'path': 'references/integration/native-r8-diag-perf-r6-observer-20261017/custody-perf-39001760279/independent-terminal-receipt.json', 'bytes': 8954, 'sha256': 'af73ee46c77d1dafe071394f7eec3ee8838543ce999db8972f6fb701506e515c'}}, 'earlierHistoryUnchanged': {'parent1203SourceOnly': True, 'oldRun': 39000056079, 'oldActual': 'short original3top6sub and new legacy-checkpoint1sub passed; failed13sub stopped in shared fixture; Large unstarted', 'reusedOriginalPassedTops': ['TestNamespaceProgressContinuesAcrossEveryStage', 'TestNamespaceProgressImportsOldPrefixWithoutRescanning', 'TestNamespaceProgressRejectsUnboundDerivedState'], 'reusedPassedSub': 'TestNamespaceProgressResolvedMetadataRetainsBindings/legacy-checkpoint', 'oldCheckpoint4_6': 'historical R4 evidence only; unchanged checkpoint logic, not a fixture-R1 run', 'unselectedOriginal': 'strictJSON26 and classifier3 are not fresh passes here', 'fixtureR1GoTestsAtPreparation': 0}, 'unselectedOriginal': 'No full11/49, strictJSON26, classifier3 or current short3/13 rerun', 'R7GoAtPreparation': 0}
@@ -32,9 +33,10 @@ SOURCE_PARENT = {'count': 1204, 'digest': '3f2056a4907185381fc7c3a07ce8ac9a27357
 SOURCE_ROOT = 'ci/namespace-progress-performance-r5/source/'
 MODIFIED = frozenset('server/internal/namespaceinventory/' + n for n in
                      ['progress_capture.go', 'progress_journal.go', 'progress_page_memo_test.go',
-                      'progress_batch.go', 'progress_index.go'])
+                      'progress_batch.go', 'progress_index.go', 'files.go'])
 NEW = frozenset(['server/internal/namespaceinventory/progress_metadata_test.go',
-                 'server/internal/namespaceinventory/progress_index_decode_test.go'])
+                 'server/internal/namespaceinventory/progress_index_decode_test.go',
+                 'server/internal/namespaceinventory/private_sized_read_test.go'])
 OVERLAY_TARGETS = MODIFIED | NEW
 R6_OVERLAY_TARGETS = frozenset(SOURCE_PARENT['borrowedOverlayTargets'])
 INDEX_TOP = 'TestNamespaceProgressIndexDecodePreservesOriginalStrictOracle'
@@ -55,7 +57,7 @@ FIXTURE_NEW = FIXTURE_OLD.replace(b'Steps: 1,', b'Steps: 2,')
 HISTORY['R7Actual'] = {
     'run': 39004002126, 'job': 117312617652,
     'head': 'd1403c6864eb185afe9bdec522f30a6bb68da93b',
-    'source1205Digest': FINAL_DIGEST,
+    'source1205Digest': READ_PARENT_DIGEST,
     'short2top19sub': 'actual PASS; exact successful names retained below, historical only, not selected again',
     'successfulNames': {'tops': sorted([INDEX_TOP, PUBLICATION_TOP]),
         'subs': sorted([INDEX_TOP + '/' + s for s in INDEX_SUBS]
@@ -63,6 +65,10 @@ HISTORY['R7Actual'] = {
     'Large10001': 'actually started; original600s timeout/packageFAIL in summary-rows, no named completion',
     'receipt': {'path': 'references/integration/namespace-progress-r7-d140-observer-20261017/independent-terminal-receipt.json',
         'bytes': 13913, 'sha256': 'f2409335251c610c01f3ce1abd8a6cb5fa81fdedcd09022718eea42f8881d5ad'}}
+HISTORY['R8Actual'] = {'run': 39006556096, 'job': 117320106934, 'head': '0eb83f386c6a157903aa806ca32d0585b09463c4', 'source1205Digest': '75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779', 'Large': 'original600s timeout/packageFAIL; profile3 exit0 does not make testPASS', 'receipt': {'path': 'references/integration/namespace-progress-r8-0eb83-observer-20261017/independent-terminal-receipt.json', 'bytes': 12354, 'sha256': '0cd1bd98a49ed6275d666d560a89a74d4de83845603312e8d8872e34aa5e9858', 'mode': 420}}
+READ_ORIGIN = {'sourceManifest': {'path': 'references/integration/namespace-private-sized-read-source-format-r1-candidate-20261017/candidate-manifest.json', 'bytes': 4309, 'sha256': '22e3d7da9269fe314768c1436e0d2cf35a6876cb4fd485cb90361b6fa235b90d', 'mode': 420}, 'formatted2': {'path': '.qa/namespace-private-sized-read-format2-1/root-acceptance.json', 'bytes': 946, 'sha256': 'a2dd74bec0d537a5e5397ee9535d90e986136024dc8b1aa0aff61b11cd83f934', 'mode': 420}, 'parent1205Digest': '75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779', 'originalFileSHA256': '9e5cf0bcc9bc37483a4c9a2948872163fa7ac7c18cdd8475ca769d71aad2264b', 'newFileAbsentBefore': True, 'allOldTestBodiesPreserved': True, 'noCacheOrGuardRelaxation': True}
+READ_TOPS = ['TestInventorySizedReadPreservesLengthAndReadErrors', 'TestInventoryPrivateSizedFileReadAvoidsChunkAllocations', 'TestInventoryPrivateRoundTripAndNoClobber', 'TestInventoryRejectsPrivateTamperAndPathAliases']
+READ_SUBS = ['TestInventorySizedReadPreservesLengthAndReadErrors/exact-and-later-EOF', 'TestInventorySizedReadPreservesLengthAndReadErrors/short-chunks', 'TestInventorySizedReadPreservesLengthAndReadErrors/EOF-with-final-bytes', 'TestInventorySizedReadPreservesLengthAndReadErrors/nonEOF-with-final-bytes', 'TestInventorySizedReadPreservesLengthAndReadErrors/wrappedEOF-with-final-bytes', 'TestInventorySizedReadPreservesLengthAndReadErrors/nonEOF-after-exact-bytes', 'TestInventorySizedReadPreservesLengthAndReadErrors/shrunk-input', 'TestInventorySizedReadPreservesLengthAndReadErrors/grown-input', 'TestInventorySizedReadPreservesLengthAndReadErrors/zero-progress', 'TestInventorySizedReadPreservesLengthAndReadErrors/admitted-maximum', 'TestInventoryRejectsPrivateTamperAndPathAliases/changed-derived-data', 'TestInventoryRejectsPrivateTamperAndPathAliases/duplicate-json-field', 'TestInventoryRejectsPrivateTamperAndPathAliases/world-readable', 'TestInventoryRejectsPrivateTamperAndPathAliases/hard-link', 'TestInventoryRejectsPrivateTamperAndPathAliases/symlink-parent']
 PROFILE_CONTRACT = {'profileMaxBytes': 8 << 20, 'reportMaxBytes': 128 << 10,
     'binaryMaxBytes': 256 << 20, 'topNodes': 30, 'toolTimeoutSeconds': 60,
     'memProfileRate': 'Go default sampled; no override', 'uploadTestBinary': False,
@@ -93,7 +99,8 @@ def core():
 
 
 def expected():
-    return {'large': {'tops': [LARGE], 'subs': []}}
+    return {'short': {'tops': READ_TOPS, 'subs': READ_SUBS},
+            'large': {'tops': [LARGE], 'subs': []}}
 
 
 def run_expression(label):
@@ -116,8 +123,8 @@ def digest(items):
 
 def apply_overlay(c, previous, root):
     result, seen = dict(previous), set()
-    if len(c['overlay']) != 7:
-        raise ValueError('exact borrowed R6 four plus formatted R7 three overlay required')
+    if len(c['overlay']) != 9:
+        raise ValueError('exact R6four/R7three/Root-formatted sized-readtwo overlay required')
     for row in c['overlay']:
         target = core().name(row['target'])
         before = previous.get(target)
@@ -125,13 +132,13 @@ def apply_overlay(c, previous, root):
                 or (before is not None) != (target in MODIFIED)
                 or row['beforeSHA256'] != (sha(before) if before is not None else None)
                 or row['path'] != SOURCE_ROOT + target or row['mode'] != '0o644'):
-            raise ValueError('exact1203-before borrowed R6 and formatted R7 sources required')
+            raise ValueError('exact1203-before R6/R7/read sources required')
         seen.add(target)
         result[target] = core().pinned(row, root)
     source = root / SOURCE_ROOT
     actual = {str(p.relative_to(root)) for p in source.rglob('*') if p.is_file() or p.is_symlink()}
     if seen != OVERLAY_TARGETS or actual != {r['path'] for r in c['overlay']}:
-        raise ValueError('extra or missing R6/R7 source')
+        raise ValueError('extra or missing R6/R7/read source')
     return result
 
 
@@ -152,19 +159,19 @@ def check_fixture_change(before, after):
 def verify():
     c = json.loads(regular(INPUTS))
     if (c['schema'] != 1 or c['scope'] != SCOPE or c['parentCount'] != 1203
-            or c['parentDigest'] != PARENT_DIGEST or c['effectiveCount'] != 1205
+            or c['parentDigest'] != PARENT_DIGEST or c['effectiveCount'] != 1206
             or c['effectiveDigest'] != FINAL_DIGEST or c['effectiveDigestAlgorithm'] != DIGEST_ALGORITHM
-            or c['sourceModeSource'] != 'verified R4 modes plus borrowed R6 overlay4 and formatted R7 overlay3 mode0644'
+            or c['sourceModeSource'] != 'verified R4 modes plus borrowed R6 overlay4/R7 overlay3/Root-formatted sized-read overlay2 mode0644'
             or c['parentRunner']['path'] != PARENT_PATH or c['parentRunner']['sha256'] != PARENT_RUNNER_SHA
             or c['parentInputs']['path'] != PARENT_INPUTS or c['parentInputs']['sha256'] != PARENT_INPUTS_SHA
             or c['phases'] != expected() or c['preservedOriginalTargets'] != parent().expected()
             or c['history'] != HISTORY or c['origin'] != ORIGIN or c['sourceParent'] != SOURCE_PARENT
-            or c['profileContract'] != PROFILE_CONTRACT
-            or c['expected'] != {'large': {'topPASS': 1, 'subPASS': 0},
+            or c['profileContract'] != PROFILE_CONTRACT or c['readSourceOrigin'] != READ_ORIGIN
+            or c['expected'] != {'short': {'topPASS': 4, 'subPASS': 15}, 'large': {'topPASS': 1, 'subPASS': 0},
                                  'skip': 0, 'fail': 0, 'vet': False, 'fullRegression': False, 'databaseFixture': False}
             or len(c['dependencies']) != len(DEPENDENCY_PATHS)
             or {r['path'] for r in c['dependencies']} != DEPENDENCY_PATHS):
-        raise ValueError('exact R8 unchanged Large1 profile-only source1205 contract required')
+        raise ValueError('exact R9 source1206 read4top15sub then unchanged Large1/profile contract required')
     for row in c['dependencies'] + [c['parentRunner'], c['parentInputs']]:
         core().pinned(row, REPO)
     prior, before = parent().verify()  # Source only; no parent run/CLI/Go.
@@ -174,8 +181,17 @@ def verify():
     check_r6_source_parent(before, bodies)
     modes = dict(prior['sourceModes'])
     modes.update({r['target']: 0o644 for r in c['overlay']})
-    if len(bodies) != 1205 or digest(rows(bodies)) != FINAL_DIGEST or set(modes) != set(bodies):
-        raise ValueError('source1205 bodies/modes/digest differ')
+    if len(bodies) != 1206 or digest(rows(bodies)) != FINAL_DIGEST or set(modes) != set(bodies):
+        raise ValueError('source1206 bodies/modes/digest differ')
+    inherited1205 = dict(bodies)
+    inherited1205['server/internal/namespaceinventory/files.go'] = before['server/internal/namespaceinventory/files.go']
+    inherited1205.pop('server/internal/namespaceinventory/private_sized_read_test.go')
+    if len(inherited1205) != 1205 or digest(rows(inherited1205)) != READ_PARENT_DIGEST:
+        raise ValueError('original R7/R8 source1205 must remain an exact historical parent')
+    read_test = bodies['server/internal/namespaceinventory/private_sized_read_test.go']
+    if (Counter(x.decode() for x in re.findall(rb'^func (Test\w+)\(', read_test, re.M)) != Counter(READ_TOPS[:2])
+            or re.findall(rb'^\s*\{"([^"\n]+)",', read_test, re.M) != [s.split('/', 1)[1].encode() for s in READ_SUBS[:10]]):
+        raise ValueError('exact new2 read tests and10 IO boundary cases required')
     for p, raw in before.items():
         if p == FIXTURE_TARGET:
             check_fixture_change(raw, bodies[p])
@@ -200,7 +216,7 @@ def verify():
 
 def audit(events, code, label):
     if label not in expected():
-        raise ValueError('only unchanged original Large phase allowed')
+        raise ValueError('only exact new/affected read short or original Large phase allowed')
     return core().audit(events, code, PACKAGE, expected()[label])
 
 
@@ -321,6 +337,20 @@ def profile_diagnostics(command, isolation, profile_dir, output):
 
 
 def execute_phases(command, isolation, post, profile_dir, diagnose):
+    short_argv = isolation + ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json',
+        '-count=1', '-vet=off', '-timeout=120s', '-run', run_expression('short'), './' + PACKAGE]
+    try:
+        folder, code = command('short', short_argv, 180)
+        try:
+            events = [json.loads(x) for x in regular(folder / 'stdout.jsonl').decode().splitlines() if x.strip()]
+            short = {'accepted': True, 'exit': code, **audit(events, code, 'short')}
+        except (ValueError, UnicodeError, TypeError, KeyError):
+            short = {'accepted': False, 'exit': code, 'rawRetained': True}
+        write(folder / 'summary.json', short)
+    finally:
+        post('short')
+    if not short['accepted']:
+        return {'short': short}
     argv = isolation + ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1',
         '-vet=off', '-timeout=600s', '-run', run_expression('large'),
         '-cpuprofile', str(profile_dir / 'cpu.pprof'), '-memprofile', str(profile_dir / 'alloc.pprof'),
@@ -340,10 +370,12 @@ def execute_phases(command, isolation, post, profile_dir, diagnose):
         diagnostics = diagnose()  # Natural failed test still reaches read-only diagnostics.
     finally:
         post('diagnostics')
-    return {'large': outcome, 'diagnostics': diagnostics}
+    return {'short': short, 'large': outcome, 'diagnostics': diagnostics}
 
 
 def final_exit(outcomes):
+    if not outcomes['short']['accepted']:
+        return outcomes['short']['exit'] or 1
     accepted = outcomes['large']['accepted'] and outcomes['diagnostics']['accepted']
     return 0 if accepted else (outcomes['large']['exit'] or 1)
 
@@ -376,14 +408,14 @@ def run():
     c, bodies = verify()
     selected = expected()
     temporary = Path(os.environ['RUNNER_TEMP'])
-    work = temporary / ('namespace-progress-performance-r8-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'])
+    work = temporary / ('namespace-progress-performance-r9-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'])
     if not temporary.is_absolute() or temporary.resolve() != temporary or work.exists():
         raise ValueError('fresh canonical work required')
     fs = os.statvfs(temporary)
     if fs.f_bavail * fs.f_frsize < 4 * 1024**3:
         raise ValueError('4GiB bootstrap floor; no Go child started')
     work.mkdir(mode=0o700)
-    output = REPO / 'ci-results/namespace-progress-performance-r8'
+    output = REPO / 'ci-results/namespace-progress-performance-r9'
     output.mkdir(mode=0o700, parents=True, exist_ok=False)
     version = subprocess.check_output(['go', 'version'], text=True, timeout=15).strip()
     if version != 'go version go1.27.2 linux/amd64':
@@ -404,7 +436,7 @@ def run():
     locks = {path: bodies[path] for path in ['server/go.mod', 'server/go.sum']}
     write(output / 'source.json', {'scope': SCOPE, 'commit': os.environ['GITHUB_SHA'], 'inputsSHA256': sha(regular(INPUTS)),
           'parent1203Digest': PARENT_DIGEST, 'parent1201Digest': parent().PARENT_DIGEST,
-          'effectiveCount': 1205, 'effectiveDigest': FINAL_DIGEST, 'goVersion': version,
+          'effectiveCount': 1206, 'effectiveDigest': FINAL_DIGEST, 'goVersion': version,
           'phases': selected, 'locksBefore': rows(locks), 'generatedPublicConfigSHA256': sha(template),
           'noRuntimeAdoption': True, 'DBFixtureSelected': False, 'currentLargeTop': 1, 'currentLargeSub': 0,
           'profileContract': PROFILE_CONTRACT,
@@ -457,9 +489,9 @@ def run():
 
     outcomes = execute_phases(command, isolation, post, work / 'profiles',
         lambda: profile_diagnostics(command, isolation, work / 'profiles', output / 'diagnostics'))
-    accepted = outcomes['large']['accepted'] and outcomes['diagnostics']['accepted']
-    write(output / 'summary.json', {'state': 'r8_original_large_and_bounded_profiles_complete' if accepted else 'failed_or_incomplete',
-          'scope': SCOPE, 'phases': outcomes, 'effectiveCount': 1205, 'sourceDigest': FINAL_DIGEST,
+    accepted = final_exit(outcomes) == 0
+    write(output / 'summary.json', {'state': 'r9_sized_read_short_then_original_large_and_bounded_profiles_complete' if accepted else 'failed_or_incomplete',
+          'scope': SCOPE, 'phases': outcomes, 'effectiveCount': 1206, 'sourceDigest': FINAL_DIGEST,
           'currentExecutionExpected': c['expected'], 'historicalResultsOnly': c['history'],
           'fullOriginal11_49Rerun': False, 'wholeRegression': False, 'vetRun': False,
           'runtimeSwitch': False, 'notDeployable': True, 'databaseVendorCallbackFixture': False,
@@ -478,9 +510,9 @@ if __name__ == '__main__':
     try:
         if args.verify:
             verify()
-            print('Exact unchanged R7 source1205; original Large1 CPU/alloc diagnostic only, old oracle2/19 historical; no Go/DB execution.')
+            print('Exact source1206; sized-read4top15sub gate then original Large1/profiles; old decoder2/19 historical; no Go/DB execution.')
         else:
             raise SystemExit(run())
     except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError, json.JSONDecodeError):
-        print('R8 Large profiling validation incomplete; original raw retained.', file=sys.stderr)
+        print('R9 sized-read/Large profiling validation incomplete; original raw retained.', file=sys.stderr)
         raise SystemExit(2)

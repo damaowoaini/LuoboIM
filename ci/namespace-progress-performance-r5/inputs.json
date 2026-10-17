@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "scope": "namespace_progress_performance_r8_1205_original_large1_CPU_alloc_diagnostic_privateFS_BSON_noDB_no_runtime",
+  "scope": "namespace_progress_performance_r9_1206_sized_private_read4top15sub_original_large1_profile_noDB_no_runtime",
   "parentRunner": {
     "path": "ci/namespace-progress-performance-r4/run.py",
     "bytes": 17775,
@@ -15,10 +15,10 @@
   },
   "parentCount": 1203,
   "parentDigest": "2134b7ddbb9202f85878d665ac4f44ca3566d757fe51b2941d9f48796af42465",
-  "effectiveCount": 1205,
-  "effectiveDigest": "75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779",
+  "effectiveCount": 1206,
+  "effectiveDigest": "d2381614af1f02a2dc9f49e4fb4ed059e10f93aed09686f93150a1305beda460",
   "effectiveDigestAlgorithm": "ascending UTF8(path)+NUL+ASCII SHA256+LF then SHA256",
-  "sourceModeSource": "verified R4 modes plus borrowed R6 overlay4 and formatted R7 overlay3 mode0644",
+  "sourceModeSource": "verified R4 modes plus borrowed R6 overlay4/R7 overlay3/Root-formatted sized-read overlay2 mode0644",
   "overlay": [
     {
       "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/progress_capture.go",
@@ -75,13 +75,29 @@
       "mode": "0o644",
       "target": "server/internal/namespaceinventory/progress_index_decode_test.go",
       "beforeSHA256": null
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/files.go",
+      "target": "server/internal/namespaceinventory/files.go",
+      "bytes": 7938,
+      "sha256": "01cbca8323d5618044e2cc40a157908a4fb6b2579dc37627a2b6655719049cfc",
+      "mode": "0o644",
+      "beforeSHA256": "9e5cf0bcc9bc37483a4c9a2948872163fa7ac7c18cdd8475ca769d71aad2264b"
+    },
+    {
+      "path": "ci/namespace-progress-performance-r5/source/server/internal/namespaceinventory/private_sized_read_test.go",
+      "target": "server/internal/namespaceinventory/private_sized_read_test.go",
+      "bytes": 4445,
+      "sha256": "5160f7a699948ca529c6d470fc357229c3587c94b681463e5f62627700219e83",
+      "mode": "0o644",
+      "beforeSHA256": null
     }
   ],
   "dependencies": [
     {
       "path": ".github/workflows/namespace-progress-performance-r5-targeted.yml",
       "bytes": 1703,
-      "sha256": "ef9a35785a3efbbcfe7b59c78b42be988098529a8b56b4f5b21615162f4ff90b",
+      "sha256": "48b2bcefb50197af65c1b4c14e8e4c8239f292811c29eb36568db5e5b677ebba",
       "mode": 420
     },
     {
@@ -98,18 +114,43 @@
     },
     {
       "path": "ci/namespace-progress-performance-r5/run.py",
-      "bytes": 31368,
-      "sha256": "1288f434701c77cbd9ce5b1751814c6512cba94d439123e612019294c168f429",
+      "bytes": 35987,
+      "sha256": "808fed424ac053a600282e6540a24403266a112ae7ac89caec47c9bd7b30cc59",
       "mode": 420
     },
     {
       "path": "ci/namespace-progress-performance-r5/test_run.py",
-      "bytes": 15496,
-      "sha256": "2ef7a7d4434d590142d8effcf1d3e1defb28c7c3a0e28412503e08f79f1c2c88",
+      "bytes": 17275,
+      "sha256": "fa5c83e8c65f8fa5b89ef6f8f1c015749aa61fc29ac6ac199bf3eb5bba61264a",
       "mode": 420
     }
   ],
   "phases": {
+    "short": {
+      "tops": [
+        "TestInventorySizedReadPreservesLengthAndReadErrors",
+        "TestInventoryPrivateSizedFileReadAvoidsChunkAllocations",
+        "TestInventoryPrivateRoundTripAndNoClobber",
+        "TestInventoryRejectsPrivateTamperAndPathAliases"
+      ],
+      "subs": [
+        "TestInventorySizedReadPreservesLengthAndReadErrors/exact-and-later-EOF",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/short-chunks",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/EOF-with-final-bytes",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/nonEOF-with-final-bytes",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/wrappedEOF-with-final-bytes",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/nonEOF-after-exact-bytes",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/shrunk-input",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/grown-input",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/zero-progress",
+        "TestInventorySizedReadPreservesLengthAndReadErrors/admitted-maximum",
+        "TestInventoryRejectsPrivateTamperAndPathAliases/changed-derived-data",
+        "TestInventoryRejectsPrivateTamperAndPathAliases/duplicate-json-field",
+        "TestInventoryRejectsPrivateTamperAndPathAliases/world-readable",
+        "TestInventoryRejectsPrivateTamperAndPathAliases/hard-link",
+        "TestInventoryRejectsPrivateTamperAndPathAliases/symlink-parent"
+      ]
+    },
     "large": {
       "tops": [
         "TestNamespaceProgressLargeHistoryHasNoFinalFullSweep"
@@ -184,6 +225,10 @@
     ]
   },
   "expected": {
+    "short": {
+      "topPASS": 4,
+      "subPASS": 15
+    },
     "large": {
       "topPASS": 1,
       "subPASS": 0
@@ -285,6 +330,19 @@
         "bytes": 13913,
         "sha256": "f2409335251c610c01f3ce1abd8a6cb5fa81fdedcd09022718eea42f8881d5ad"
       }
+    },
+    "R8Actual": {
+      "run": 39006556096,
+      "job": 117320106934,
+      "head": "0eb83f386c6a157903aa806ca32d0585b09463c4",
+      "source1205Digest": "75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779",
+      "Large": "original600s timeout/packageFAIL; profile3 exit0 does not make testPASS",
+      "receipt": {
+        "path": "references/integration/namespace-progress-r8-0eb83-observer-20261017/independent-terminal-receipt.json",
+        "bytes": 12354,
+        "sha256": "0cd1bd98a49ed6275d666d560a89a74d4de83845603312e8d8872e34aa5e9858",
+        "mode": 420
+      }
     }
   },
   "origin": {
@@ -360,5 +418,24 @@
     "uploadTestBinary": false,
     "primaryExitPreserved": true,
     "freshSourceBeforeAndAfterDiagnostics": true
+  },
+  "readSourceOrigin": {
+    "sourceManifest": {
+      "path": "references/integration/namespace-private-sized-read-source-format-r1-candidate-20261017/candidate-manifest.json",
+      "bytes": 4309,
+      "sha256": "22e3d7da9269fe314768c1436e0d2cf35a6876cb4fd485cb90361b6fa235b90d",
+      "mode": 420
+    },
+    "formatted2": {
+      "path": ".qa/namespace-private-sized-read-format2-1/root-acceptance.json",
+      "bytes": 946,
+      "sha256": "a2dd74bec0d537a5e5397ee9535d90e986136024dc8b1aa0aff61b11cd83f934",
+      "mode": 420
+    },
+    "parent1205Digest": "75dde0dd7d846cf83d0eb08cf876dd2cd14b56b97a04ec5b17ccd44b4cfb3779",
+    "originalFileSHA256": "9e5cf0bcc9bc37483a4c9a2948872163fa7ac7c18cdd8475ca769d71aad2264b",
+    "newFileAbsentBefore": true,
+    "allOldTestBodiesPreserved": true,
+    "noCacheOrGuardRelaxation": true
   }
 }

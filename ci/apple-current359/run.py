@@ -263,6 +263,47 @@ def flutter_setup(work, lane, e):
            'original_engine50_exact': True, 'Root_native_dependency_acceptance': False})
 
 
+def check_public_plugin_source(work, declaration, root, row):
+    try:
+        return consume.read_file(root, row)
+    except (ValueError, OSError) as failure:
+        # Only this fixed public plugin declaration boundary emits diagnostics.
+        # Never export source text or an absolute cache/account path.
+        actual = {'available': False}
+        try:
+            root = Path(root)
+            if root.resolve(strict=True) != root or not root.is_dir() or not root.is_relative_to(work):
+                raise ValueError('unsafe public root')
+            path = root
+            for part in consume.safe_name(row['path']).split('/'):
+                path = path/part
+                if path.is_symlink(): raise ValueError('public symlink refused')
+            with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as stream:
+                before = os.fstat(stream.fileno())
+                if (not stat.S_ISREG(before.st_mode) or before.st_nlink != 1
+                        or before.st_uid != os.getuid() or not 0 <= before.st_size <= 128*1024**2):
+                    raise ValueError('unsafe public file')
+                digest = hashlib.sha256(); total = 0
+                for block in iter(lambda: stream.read(65536), b''):
+                    total += len(block)
+                    if total > 128*1024**2: raise ValueError('public diagnostic limit')
+                    digest.update(block)
+                after = os.fstat(stream.fileno())
+            identity = lambda s: (s.st_dev, s.st_ino, s.st_mode, s.st_uid, s.st_nlink,
+                                  s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+            if identity(before) != identity(after) or identity(after) != identity(path.lstat()) or total != before.st_size:
+                raise ValueError('unstable public file')
+            actual = {'available': True, 'bytes': total, 'sha256': digest.hexdigest(), 'stable': True}
+        except (ValueError, OSError) as diagnostic_error:
+            actual['unavailableReason'] = type(diagnostic_error).__name__
+        record(work/'evidence/public-plugin-input-failure.json', {
+            'schema': 1, 'declaration': declaration['name'], 'publicRelativePath': row['path'],
+            'declared': {'bytes': row['bytes'], 'sha256': row['sha256']}, 'actual': actual,
+            'failureType': type(failure).__name__, 'originalGateStillRefused': True,
+            'sourceContentsOrAbsoluteRootRecorded': False})
+        raise
+
+
 def packages(work, plugins, e):
     command(work, 'pub-get', [work/'flutter/bin/flutter', 'pub', 'get', '--enforce-lockfile'], work/'source/app', e)
     config = json.loads(packaging.regular(work/'source/app/.dart_tool/package_config.json'))
@@ -277,7 +318,7 @@ def packages(work, plugins, e):
         roots[row['name']] = root
     for declaration in plugins['declarations']:
         for row in declaration['native_files'] + [declaration['pubspec']]:
-            consume.read_file(roots[declaration['name']], row)
+            check_public_plugin_source(work, declaration, roots[declaration['name']], row)
     for hook in plugins['hooks']:
         consume.read_file(roots[hook['name']], hook['hook'])
     lane = json.loads((HERE/'lane.json').read_bytes())

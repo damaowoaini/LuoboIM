@@ -264,13 +264,13 @@
     },
     {
       "path": "ci/android-current359/maven_file_origins.py",
-      "bytes": 13791,
-      "sha256": "561f52b35c2fe2b8fb2745fb39d89e510aefd5e2354329fab1d3f8823091b073"
+      "bytes": 13684,
+      "sha256": "3156d68a6aca776e15c8e8616888876e9e3dff58377f2af0b1f8a14b47b2714c"
     },
     {
       "path": "ci/android-current359/test_maven_file_origins.py",
-      "bytes": 8070,
-      "sha256": "a108751c0631ab80deac0b0b132149d0fa84d283aa88cce236a6c3f8ebe09d42"
+      "bytes": 8967,
+      "sha256": "2dd7f69aaa412fb2e72908738e4bf30d312a2ec9a4508625c8522228790a8ec1"
     }
   ],
   "controller_revision": "null2-plugin-scope-v2-init-shadow-stacktrace-exact-configuration-root",

@@ -74,7 +74,12 @@ class PublishedFileOrigins(unittest.TestCase):
         raw = json.dumps(child).encode()
         if variant == 'duplicate-key': raw = raw.replace(b'"formatVersion": "1.1"', b'"formatVersion":"1.1","formatVersion":"1.1"')
         metadata = cached(group, module, version, 'runtime-annotation-android-1.9.0.module', raw)
-        if variant == 'cache-key': metadata.parent.rename(metadata.parent.with_name('0'*40))
+        if variant == 'opaque-cache-keys':
+            metadata.parent.rename(metadata.parent.with_name('opaque-module-cache-key'))
+            destination = target.parent.with_name('opaque-artifact-cache-key')
+            target.parent.rename(destination)
+            target = destination/target.name
+            row['path'] = str(target.relative_to(work))
         (evidence/'gradle-resolved-artifacts.json').write_text(json.dumps([row, copy.deepcopy(row)]))
         log = '\n'.join('Downloading '+url+' to owned/cache' for url in downloads)
         return log, artifact_url, coordinate
@@ -82,12 +87,12 @@ class PublishedFileOrigins(unittest.TestCase):
     def test_published_file_alias_requires_actual_resolved_identity_body_and_downloads(self):
         variants = ['valid', 'missing-artifact-download', 'missing-module-download', 'wrong-size', 'wrong-hash',
                     'no-strong-hash', 'wrong-resolved-coordinate', 'wrong-resolved-body', 'traversal', 'external-url',
-                    'ambiguous-name', 'unknown-name', 'unapproved-origin', 'duplicate-key', 'cache-key']
+                    'ambiguous-name', 'unknown-name', 'unapproved-origin', 'duplicate-key', 'opaque-cache-keys']
         for variant in variants:
             with self.subTest(variant=variant), tempfile.TemporaryDirectory() as temp:
                 work = Path(temp).resolve()
                 log, url, coordinate = self.fixture(work, variant)
-                if variant != 'valid':
+                if variant not in ('valid', 'opaque-cache-keys'):
                     with self.assertRaises(ValueError): origins.audit(work, log)
                     continue
                 proof = origins.audit(work, log)
@@ -96,6 +101,13 @@ class PublishedFileOrigins(unittest.TestCase):
                 self.assertEqual(selected[0]['observed_sources'], [url])
                 self.assertEqual(selected[0]['published_file_alias']['resolved_coordinate'], coordinate)
                 self.assertEqual(len(selected[0]['published_file_alias']['metadata']), 1)
+                metadata_proof = selected[0]['published_file_alias']['metadata'][0]
+                actual_metadata = work/metadata_proof['path']
+                self.assertEqual(metadata_proof['sha256'], hashlib.sha256(actual_metadata.read_bytes()).hexdigest())
+                self.assertTrue(metadata_proof['cacheKeyIsOpaque'])
+                if variant == 'opaque-cache-keys':
+                    self.assertEqual(metadata_proof['cacheKey'], 'opaque-module-cache-key')
+                    self.assertEqual(selected[0]['published_file_alias']['target_cache_key'], 'opaque-artifact-cache-key')
                 self.assertTrue(proof['all_actual_artifact_sources_accounted'])
 
     def test_kmp_alias_requires_reciprocal_downloaded_parent_without_graph_grant(self):
