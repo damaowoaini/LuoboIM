@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "state": "FROZEN_SOURCE",
-  "scope": "backend_history_capture_order_repair5_split2_only_reuse_source_bound66_and6_and7_and4_prior14_no_deployment",
+  "scope": "backend_history_controller1_finite_diagnostic_reuse_source_bound87_prior14_no_deployment",
   "base": {
     "members": 1407,
     "digest": "5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9"
   },
   "source": {
     "members": 1556,
-    "digest": "bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85"
+    "digest": "3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -2311,8 +2311,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
-      "bytes": 21049,
-      "sha256": "1b070f1b1c82c92136a0c5f91d79d4fdf77cc48443b5b5611b2e763870268715",
+      "bytes": 28521,
+      "sha256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
       "beforeSHA256": null
     },
     {
@@ -3236,7 +3236,7 @@
     },
     "formattedSource": {
       "members": 1556,
-      "digest": "bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85"
+      "digest": "3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc"
     },
     "incrementalFormattedParsedGo": 1,
     "previousFormattedOrCompiledGoExactReused": 206,
@@ -3246,7 +3246,19 @@
       "server/pkg/common/db/cache/owned_source_redis.go",
       "server/pkg/common/db/s3/cos/cos.go"
     ],
-    "GoCompilationOrTests": 0
+    "GoCompilationOrTests": 0,
+    "incrementalDiagnosticFormat": {
+      "formattedLeafBytes": 28521,
+      "formattedLeafSHA256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
+      "rawCandidateManifestSHA256": "ad28eb3cc66aacadd4c948109e406148f57fe4f920d1f1d3c42f0765c836ce3a",
+      "rootFormatReceiptPath": ".qa/backend-controller-adapter-diagnostic-batch-1/formatted.json",
+      "rootFormatReceiptSHA256": "147cc0ade4b6a174d06e71132154756ef06ba67a43a3d5e387485b2975f2a33c",
+      "rootFormatReceiptBytes": 1401
+    },
+    "parentFormattedSource": {
+      "members": 1556,
+      "digest": "bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85"
+    }
   },
   "selectionSHA256": "e027f5e42844d67777ecd2ba446974f63b403f9533f8393b821cea78a6382e9c",
   "priorPassedTargets": {
@@ -4436,15 +4448,15 @@
   },
   "repairPlan": {
     "path": "ci/backend-runtime-join-r8/repair-plan.json",
-    "bytes": 36518,
-    "sha256": "957b73388328c6a6fd858bdf21acd544c21d2307125e97742e6911885ce52445",
+    "bytes": 41658,
+    "sha256": "47a9d28e14b47a9a19c8c9ab712c34416724adbdf626dcc95a3b7e68efc0fa6d",
     "mode": 420
   },
   "repairControllerPins": [
     {
       "path": "ci/backend-runtime-join-r8/test_repair.py",
-      "bytes": 11092,
-      "sha256": "edf91c646ca30bc2287dcb255420572515744487a598a17a25131b5fc996c083",
+      "bytes": 11973,
+      "sha256": "2e3cb747cf85ea4f132b9f1b1e43afc41e99f833f2e05b32b993ef78bf7f0760",
       "mode": 420
     }
   ]

@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
@@ -22,6 +23,7 @@ import (
 	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+	"github.com/openimsdk/open-im-server/v3/internal/namespaceinventory"
 	"github.com/openimsdk/open-im-server/v3/pkg/msgprocessor"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -128,6 +130,7 @@ func mongoCompositionDB(t *testing.T) (context.Context, *mongo.Database, namespa
 // All actual Writer ports/Permits remain intact. Recovery must use its exact
 // immutable receipt, not retry the closure or publish business operation.
 type mongoCompositionACKLoss struct {
+	trace                                *mongoCompositionTrace
 	real                                 *messagedelivery.NamespaceImportWriter
 	normalCID                            string
 	applies                              map[uint64]int
@@ -137,11 +140,16 @@ type mongoCompositionACKLoss struct {
 }
 
 func (w *mongoCompositionACKLoss) CheckTarget(ctx context.Context, h namespaceimport.Header) error {
-	return w.real.CheckTarget(ctx, h)
+	started := time.Now()
+	err := w.real.CheckTarget(ctx, h)
+	w.trace.call("writer.check-target", started, err)
+	return err
 }
 func (w *mongoCompositionACKLoss) ApplyPage(ctx context.Context, p *namespaceimport.Permit, v namespaceimport.VerifiedPage) (namespaceimport.PageReceipt, error) {
 	w.applies[v.Data().Index]++
+	started := time.Now()
 	receipt, e := w.real.ApplyPage(ctx, p, v)
+	w.trace.call("writer.apply-page", started, e)
 	if e != nil {
 		return receipt, e
 	}
@@ -155,11 +163,16 @@ func (w *mongoCompositionACKLoss) ApplyPage(ctx context.Context, p *namespaceimp
 }
 func (w *mongoCompositionACKLoss) InspectPage(ctx context.Context, h namespaceimport.Header, id namespaceimport.PageIdentity) (namespaceimport.PageInspection, error) {
 	w.pageInspects++
-	return w.real.InspectPage(ctx, h, id)
+	started := time.Now()
+	result, err := w.real.InspectPage(ctx, h, id)
+	w.trace.call("writer.inspect-page", started, err)
+	return result, err
 }
 func (w *mongoCompositionACKLoss) PublishCutover(ctx context.Context, p *namespaceimport.Permit, v namespaceimport.VerifiedManifest) (namespaceimport.CutoverReceipt, error) {
 	w.publishes++
+	started := time.Now()
 	receipt, e := w.real.PublishCutover(ctx, p, v)
+	w.trace.call("writer.publish-cutover", started, e)
 	if e != nil {
 		return receipt, e
 	}
@@ -171,11 +184,16 @@ func (w *mongoCompositionACKLoss) PublishCutover(ctx context.Context, p *namespa
 }
 func (w *mongoCompositionACKLoss) InspectCutover(ctx context.Context, h namespaceimport.Header) (namespaceimport.CutoverInspection, error) {
 	w.cutInspects++
-	return w.real.InspectCutover(ctx, h)
+	started := time.Now()
+	result, err := w.real.InspectCutover(ctx, h)
+	w.trace.call("writer.inspect-cutover", started, err)
+	return result, err
 }
 
 func TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate(t *testing.T) {
 	ctx, db, h := mongoCompositionDB(t)
+	trace := newMongoCompositionTrace()
+	defer trace.finish(t, ctx)
 	var writer *messagedelivery.NamespaceImportWriter
 	originals := map[string]map[string]bson.Raw{}
 	f := ownedcontrol.NewHistoricalMongoCompositionForTest(ctx, t, h, func(prep context.Context, header namespaceimport.Header, hold *ownedcontrol.AdmissionHold, rawRows map[string][]bson.Raw) (map[string][]bson.Raw, error) {
@@ -262,7 +280,8 @@ func TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSepa
 	if normal == notice {
 		t.Fatal("real protocol namespace pair collapsed")
 	}
-	wrapped := &mongoCompositionACKLoss{real: writer, normalCID: normal, applies: map[uint64]int{}}
+	wrapped := &mongoCompositionACKLoss{real: writer, normalCID: normal, applies: map[uint64]int{}, trace: trace}
+	source := &mongoCompositionObservedSource{real: f.Source, trace: trace}
 	top := t.TempDir()
 	if e := os.Chmod(top, 0700); e != nil {
 		t.Fatal(e)
@@ -282,11 +301,13 @@ func TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSepa
 			}
 		}
 	})
-	controller, e := namespaceimport.NewController(f.Config, wrapped, f.Source, f.Source, f.ControlPlaneForTest(), journal)
+	controller, e := namespaceimport.NewController(f.Config, wrapped, source, f.Source, f.ControlPlaneForTest(), journal)
 	if e != nil {
 		t.Fatal("real controller constructor rejected composition", e)
 	}
+	beginAt := time.Now()
 	state, e := controller.Begin(ctx)
+	trace.operation("controller.begin", beginAt, state, e, ctx)
 	if e != nil || state.Phase != "fenced" {
 		t.Fatal("real Controller.Begin failed", e)
 	}
@@ -296,7 +317,9 @@ func TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSepa
 		if step >= 30000 {
 			t.Fatal("bounded source/controller fixture did not complete")
 		}
+		stepAt := time.Now()
 		state, e = controller.Step(ctx)
+		trace.operation("controller.step", stepAt, state, e, ctx)
 		if errors.Is(e, namespaceimport.ErrCommitUnconfirmed) {
 			if state.Phase != "pending-page" && state.Phase != "pending-cutover" {
 				t.Fatal("unknown commit lost original pending identity", e)
@@ -312,11 +335,13 @@ func TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSepa
 			if e != nil {
 				t.Fatal(e)
 			}
-			controller, e = namespaceimport.NewController(f.Config, wrapped, f.Source, f.Source, f.ControlPlaneForTest(), journal)
+			controller, e = namespaceimport.NewController(f.Config, wrapped, source, f.Source, f.ControlPlaneForTest(), journal)
 			if e != nil {
 				t.Fatal(e)
 			}
+			beginAt = time.Now()
 			restored, e := controller.Begin(ctx)
+			trace.operation("controller.reopen-begin", beginAt, restored, e, ctx)
 			if e != nil || restored.PendingAttemptID != state.PendingAttemptID || restored.PendingPage != state.PendingPage || restored.PendingManifestSHA256 != state.PendingManifestSHA256 {
 				t.Fatal("restart replaced original pending command", e)
 			}
@@ -488,4 +513,174 @@ func TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSepa
 			t.Fatal("missing original trust was silently discarded", e)
 		}
 	})
+}
+
+// Diagnostics are local to this one existing test. They observe the exact real
+// calls, never retain results/capabilities or affect the returned error/value.
+// No background observer, profile, extra custody read or deadline is introduced.
+type mongoCompositionCallTotals struct {
+	Calls         uint64            `json:"calls"`
+	WallMicros    int64             `json:"wall_micros"`
+	MaxWallMicros int64             `json:"max_wall_micros"`
+	ErrorTags     map[string]uint64 `json:"error_tags"`
+}
+type mongoCompositionTraceEvent struct {
+	Operation     string   `json:"operation"`
+	Call          uint64   `json:"call"`
+	Phase         string   `json:"phase"`
+	NextPage      uint64   `json:"next_page"`
+	WallMicros    int64    `json:"wall_micros"`
+	ElapsedMicros int64    `json:"elapsed_micros"`
+	ErrorTags     []string `json:"error_tags"`
+	Context       string   `json:"context"`
+}
+type mongoCompositionTrace struct {
+	started       time.Time
+	cpuStart      syscall.Rusage
+	cpuStartOK    bool
+	Calls         map[string]*mongoCompositionCallTotals `json:"calls"`
+	Events        []mongoCompositionTraceEvent           `json:"events"`
+	EventOverflow uint64                                 `json:"event_overflow"`
+	lastPhase     string
+	lastError     string
+	lastPage      uint64
+}
+
+func newMongoCompositionTrace() *mongoCompositionTrace {
+	d := &mongoCompositionTrace{started: time.Now(), Calls: map[string]*mongoCompositionCallTotals{}}
+	d.cpuStartOK = syscall.Getrusage(syscall.RUSAGE_SELF, &d.cpuStart) == nil
+	return d
+}
+func mongoCompositionErrorTags(err error) []string {
+	if err == nil {
+		return []string{"ok"}
+	}
+	tags := []string{}
+	for _, kind := range []struct {
+		err error
+		tag string
+	}{
+		{context.DeadlineExceeded, "deadline-exceeded"}, {context.Canceled, "cancelled"},
+		{namespaceimport.ErrPending, "pending"}, {namespaceimport.ErrCommitUnconfirmed, "commit-unconfirmed"},
+		{namespaceimport.ErrUntrusted, "import-untrusted"}, {namespaceimport.ErrConflict, "import-conflict"},
+		{namespaceimport.ErrInvalid, "import-invalid"}, {ownedcontrol.ErrOwnedEvidence, "owned-evidence"},
+		{namespaceinventory.ErrChanged, "inventory-changed"}, {namespaceinventory.ErrPrivate, "private-file"},
+		{namespaceinventory.ErrInvalid, "inventory-invalid"},
+	} {
+		if errors.Is(err, kind.err) {
+			tags = append(tags, kind.tag)
+		}
+	}
+	if len(tags) == 0 {
+		return []string{"other"}
+	}
+	return tags
+}
+func mongoCompositionContextClass(ctx context.Context) string {
+	if ctx == nil {
+		return "absent"
+	}
+	switch ctx.Err() {
+	case nil:
+		return "active"
+	case context.DeadlineExceeded:
+		return "deadline-exceeded"
+	case context.Canceled:
+		return "cancelled"
+	default:
+		return "other"
+	}
+}
+func (d *mongoCompositionTrace) call(method string, started time.Time, err error) {
+	if d == nil {
+		return
+	}
+	v := d.Calls[method]
+	if v == nil {
+		v = &mongoCompositionCallTotals{ErrorTags: map[string]uint64{}}
+		d.Calls[method] = v
+	}
+	elapsed := time.Since(started).Microseconds()
+	v.Calls++
+	v.WallMicros += elapsed
+	if elapsed > v.MaxWallMicros {
+		v.MaxWallMicros = elapsed
+	}
+	for _, tag := range mongoCompositionErrorTags(err) {
+		v.ErrorTags[tag]++
+	}
+}
+func (d *mongoCompositionTrace) operation(method string, started time.Time, s namespaceimport.State, err error, ctx context.Context) {
+	d.call(method, started, err)
+	phase := s.Phase
+	switch phase {
+	case "", "fenced", "captured", "pending-page", "pending-cutover", "published":
+	default:
+		phase = "other"
+	}
+	tags := mongoCompositionErrorTags(err)
+	key := strings.Join(tags, ",")
+	changed := method != "controller.step" || phase != d.lastPhase || key != d.lastError || (err != nil && !errors.Is(err, namespaceimport.ErrPending))
+	d.lastPhase, d.lastError, d.lastPage = phase, key, s.NextPage
+	if !changed {
+		return
+	}
+	if len(d.Events) >= 32 {
+		d.EventOverflow++
+		return
+	}
+	d.Events = append(d.Events, mongoCompositionTraceEvent{method, d.Calls[method].Calls, phase, s.NextPage, time.Since(started).Microseconds(), time.Since(d.started).Microseconds(), tags, mongoCompositionContextClass(ctx)})
+}
+func (d *mongoCompositionTrace) finish(t *testing.T, ctx context.Context) {
+	var end syscall.Rusage
+	cpuOK := d.cpuStartOK && syscall.Getrusage(syscall.RUSAGE_SELF, &end) == nil
+	var userMicros, systemMicros int64
+	if cpuOK {
+		userMicros = (end.Utime.Sec-d.cpuStart.Utime.Sec)*1000000 + end.Utime.Usec - d.cpuStart.Utime.Usec
+		systemMicros = (end.Stime.Sec-d.cpuStart.Stime.Sec)*1000000 + end.Stime.Usec - d.cpuStart.Stime.Usec
+		if userMicros < 0 || systemMicros < 0 {
+			cpuOK = false
+			userMicros, systemMicros = 0, 0
+		}
+	}
+	body, err := json.Marshal(struct {
+		Schema          string                 `json:"schema"`
+		WallMicros      int64                  `json:"wall_micros"`
+		CPUAvailable    bool                   `json:"cpu_available"`
+		UserCPUMicros   int64                  `json:"user_cpu_micros"`
+		SystemCPUMicros int64                  `json:"system_cpu_micros"`
+		Context         string                 `json:"context"`
+		FinalPhase      string                 `json:"final_phase"`
+		FinalPage       uint64                 `json:"final_next_page"`
+		Trace           *mongoCompositionTrace `json:"trace"`
+	}{"historical-controller-finite-diagnostic-v1", time.Since(d.started).Microseconds(), cpuOK, userMicros, systemMicros, mongoCompositionContextClass(ctx), d.lastPhase, d.lastPage, d})
+	if err != nil {
+		t.Log("historical controller finite diagnostic unavailable")
+		return
+	}
+	t.Logf("historical controller finite diagnostic %s", body)
+}
+
+type mongoCompositionObservedSource struct {
+	real  *ownedcontrol.HistoricalCaptureSource
+	trace *mongoCompositionTrace
+}
+
+func (s *mongoCompositionObservedSource) Capture(ctx context.Context, h namespaceimport.Header, f namespaceimport.FenceObservation) (namespaceimport.Inventory, error) {
+	started := time.Now()
+	i, err := s.real.Capture(ctx, h, f)
+	s.trace.call("source.capture", started, err)
+	return i, err
+}
+func (s *mongoCompositionObservedSource) Revalidate(ctx context.Context, h namespaceimport.Header, i namespaceimport.Inventory) error {
+	started := time.Now()
+	err := s.real.Revalidate(ctx, h, i)
+	s.trace.call("source.revalidate", started, err)
+	return err
+}
+func (s *mongoCompositionObservedSource) ReadPage(ctx context.Context, i namespaceimport.Inventory, index uint64) (namespaceimport.CapturedPage, error) {
+	started := time.Now()
+	p, err := s.real.ReadPage(ctx, i, index)
+	s.trace.call("source.read-page", started, err)
+	return p, err
 }

@@ -126,10 +126,6 @@ func Start(ctx context.Context, in Inputs) (*Session, error) {
 		return out, e
 	}
 	out.Agent = agent
-	original, e := messagedelivery.LoadOriginalHistoryVerifier(in.Capture.OriginalHistoryTrustPath, in.Capture.OriginalHistoryTrustSHA256, in.Config.Header)
-	if e != nil {
-		return out, e
-	}
 	dir := filepath.Join(in.Work, "controller")
 	if e = os.Mkdir(dir, 0700); e != nil {
 		return out, e
@@ -139,7 +135,7 @@ func Start(ctx context.Context, in Inputs) (*Session, error) {
 		return out, e
 	}
 	out.journal = journal
-	controller, source, e := ownedcontrol.NewOwnedHistoricalImportController(in.Config, writer, journal, agent, in.Live, messagedelivery.DescribeNamespace, in.Capture, original, original)
+	controller, source, e := messagedelivery.NewReviewedHistoricalImportController(in.Config, writer, journal, agent, in.Live, in.Capture, in.Capture.OriginalHistoryTrustPath, in.Capture.OriginalHistoryTrustSHA256)
 	if e != nil {
 		return out, e
 	}

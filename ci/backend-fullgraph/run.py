@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE={'members': 1573, 'digest': '47c38899d5cc41155a72d36fdc38d2444dc4c86e769f3c9f9dc3a2595fcefee6'}  # Exact Root-reviewed formatted R3 source; execution remains manual-only.
+FINAL_SOURCE={'members': 1573, 'digest': 'f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2'}  # Exact Root-reviewed formatted R3 source; execution remains manual-only.
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -298,7 +298,7 @@ def run():
   if tool_sha!=tools['go']['sha256']:raise ValueError('Go command differs from observed original tool')
   command('app-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off');binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
-  entries=c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'},{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]
+  entries=[{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]+c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'}]
   for entry in entries:
    role=entry['role'];binary=binroot/role;remaining=1200-(time.monotonic()-build_start)
    if remaining<1:raise ValueError('actual14 and auxiliary compile budget exhausted')

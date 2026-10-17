@@ -1,17 +1,13 @@
 {
   "schema": 1,
-  "state": "FROZEN_CAPTURE_ORDER_REPAIR5",
+  "state": "FROZEN_CONTROLLER1_FINITE_DIAGNOSTIC",
   "source": {
     "members": 1556,
-    "digest": "bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85"
+    "digest": "3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc"
   },
   "repairTargets": {
     "internal/namespaceimport/ownedcontrol": [
-      "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
-      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
-      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
-      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+      "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate"
     ]
   },
   "actualPassedTargets": {
@@ -73,10 +69,14 @@
       "TestProspectivePageNeedsOriginalRootAndActualSemanticValidation"
     ],
     "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
       "TestHistoricalOpenBaseIsClosedAtCutWithoutFillingFutureGap",
       "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
       "TestHistoricalSegmentLocatorsUseActualCollectionAndNeverInferEpochOrRange",
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
       "TestHistoricalTypedLineagePreservesOriginalClaimsAndProtocol",
+      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
       "TestHistoryEpochRetirementCannotBeMintedFromDTOOrPreparedExit",
       "TestHistoryReadinessPrivateSessionRetainsIdentityAndUnknownIntent",
       "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient",
@@ -429,18 +429,10 @@
   },
   "sourceDelta": [
     {
-      "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-      "beforeSHA256": "0b19607f10b5b626647426eb6a51926528dd7404edd7b7b64d63513f337093af",
-      "afterSHA256": "cbe1a40c682a7f9269f1274950559ed400db0502e91877ed587d340cb8e6e4da",
-      "afterBytes": 24300,
-      "mode": 420,
-      "production": false
-    },
-    {
-      "target": "server/internal/namespaceimport/ownedcontrol/export_test.go",
-      "beforeSHA256": "5b793dd0b0a707432097b3e23b992615614a7909ee0997ebdb9b8ed57f8d2d7c",
-      "afterSHA256": "58ebe79b0f9d3a22fa43ca0151cd7d0e5acd5b8fcb23f4d458fdd92d06198701",
-      "afterBytes": 10983,
+      "target": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
+      "beforeSHA256": "1b070f1b1c82c92136a0c5f91d79d4fdf77cc48443b5b5611b2e763870268715",
+      "afterSHA256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
+      "afterBytes": 28521,
       "mode": 420,
       "production": false
     }
@@ -595,9 +587,18 @@
       "run": 39048615208,
       "retainedTopCount": 4,
       "derivation": "previousSplitRepairRun.passedTargets; exact original source only"
+    },
+    {
+      "source": {
+        "members": 1556,
+        "digest": "bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85"
+      },
+      "run": 39052007811,
+      "retainedTopCount": 4,
+      "derivation": "lastCaptureStampRun four default-fixture tops; diagnostics modify only separate composition test"
     }
   ],
-  "sourceDeltaSHA256": "f0b924526bd57868777a936c338b8bc85eef31b4f6fbe7c9f33f01b5827bb909",
+  "sourceDeltaSHA256": "313bc2aeeeb5937262f8968e88d0b327e9a3792f0f2f800d51152084a61e4eff",
   "latestRepairRun": {
     "schema": 1,
     "head": "1dbe0412baa8a3a04199a5ab80a559dcdf126e65",
@@ -718,17 +719,6 @@
           "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate"
         ]
       }
-    },
-    {
-      "label": "targeted-tests-ownedcontrol-default-fixture",
-      "targets": {
-        "internal/namespaceimport/ownedcontrol": [
-          "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
-          "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
-          "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-          "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
-        ]
-      }
     }
   ],
   "previousSplitRepairRun": {
@@ -823,5 +813,135 @@
       "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
       "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
     ]
-  }
+  },
+  "lastCaptureStampRun": {
+    "run": 39052007811,
+    "job": 117452331138,
+    "attempt": 1,
+    "head": "619272eabb85d8f68265a135111de1950dae530f",
+    "artifact": 12107764534,
+    "artifactSHA256": "5de98590c019334b360126dc1d96899a77a9782910f04f1f1729e1da03f638df",
+    "artifactBytes": 67110,
+    "source": {
+      "members": 1556,
+      "digest": "bc6455501c2d62f57e984fccf2f8d5705e7f0379b00efc3438c466115c96ef85"
+    },
+    "actualTopPASS": 4,
+    "actualTopFAIL": 1,
+    "actualTopIncomplete": 0,
+    "actualSubPASS": 9,
+    "sourceModesLocksGeneratedConfigPostExact": true,
+    "MongoUserDatabases": 0,
+    "RedisKeys": 0,
+    "ownedContainerCleanupExit": 0,
+    "currentMainBuilds": 0,
+    "wholeAccepted": false,
+    "runtimeChanged": false,
+    "fullRegression": false,
+    "passedTargets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+        "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+        "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+        "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+      ]
+    },
+    "failedTargets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate"
+      ]
+    },
+    "acceptedNamed": [
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/continuation_uses_real_Store_receipt_id_cursor_and_closes_last_leaf"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/first_page_consumes64_actual_sorted_leaves_without_truncating"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/inconsistent_checkpoint_is_not_used_as_source_authority"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/caller-mutated_inventory_and_foreign_index_fail"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/canonical_bodies_original_base_future_and_missing-proof_disposition"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/completed_workspace_reopens_at_exact_page_and_original_capture_time"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/live_identity_restart_and_lost_exclusion_still_reject"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/pristine_descriptor_crash_recovery_and_changed_source_options"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/reviewed_source_trust_cannot_change_mid-capture_or_resume"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+      }
+    ],
+    "rootReceipt": {
+      "path": ".qa/backend1573-fullgraph-mobile-cancel-backend-stamp-batch-1/root-backend-current-partial-acceptance.json",
+      "bytes": 12725,
+      "sha256": "e8a511278a5166db7f734337e945b96f6820fe8efc4090ad3b425adc3f9036a2"
+    },
+    "rawIndex": [
+      {
+        "name": "backend-integration/container-cleanup.json",
+        "bytes": 79,
+        "sha256": "1e8af2429fc836352d3a2ecb6160fcb61e328d9e79ed6aa5f621a4f6873b7c55"
+      },
+      {
+        "name": "backend-integration/mongo-final.json",
+        "bytes": 21,
+        "sha256": "dd4010eba8d1071bd1776aa19eb4bdb754214fc4381e0e4834a8bfa92bc3b5d2"
+      },
+      {
+        "name": "backend-integration/redis-final-count.txt",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "name": "backend-runtime-join-r8/source-post.json",
+        "bytes": 260,
+        "sha256": "1cc1462f2f461391883e88fab3e61f9f5b90cc450d3d5d3823341e0f2d09bea9"
+      },
+      {
+        "name": "backend-runtime-join-r8/targeted-tests-ownedcontrol-controller/stdout.jsonl",
+        "bytes": 2412,
+        "sha256": "82de11df5b24985cd40bc897ed23b9e7f0fd24ebb9c779dea4f31d0559adf749"
+      },
+      {
+        "name": "backend-runtime-join-r8/targeted-tests-ownedcontrol-default-fixture/stdout.jsonl",
+        "bytes": 19025,
+        "sha256": "6d11d24a1f75f15d0e935ef9f9a2fb37e71ebe8c889eb9d75be1890e99eb8250"
+      }
+    ]
+  },
+  "lastCaptureStampProofSHA256": "ecb9f9fc71be15e4a0571308d0650b29799522dff2a5be59e3463691aa4c81fc"
 }
