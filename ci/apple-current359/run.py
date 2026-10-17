@@ -38,7 +38,7 @@ def borrowed_helper(row, name):
     return load(REPO/row['path'], name)
 
 
-xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 12726, 'sha256': '3097983491f995a4c93af02150a0414c7bb01e169b23fa2fa7bde5d51cd14fa5'}, 'current359_owned_xcrun_adapter')
+xcrun_adapter = borrowed_helper({'path': 'ci/apple-current359/xcrun_adapter.py', 'bytes': 18619, 'sha256': '800db71aa4899636801f017c90c8e9cc9adbd39b5c295448c5c4cd36978996ca'}, 'current359_owned_xcrun_adapter')
 
 packaging = borrowed_helper({'path': 'ci/apple-current354/packaging.py', 'bytes': 10141, 'sha256': '7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248'}, 'apple359_common_packaging')
 pod_selector = borrowed_helper({'path': 'ci/apple-current354/pod_selector.py', 'bytes': 5603, 'sha256': '820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769'}, 'apple359_reviewed117_selector')
@@ -620,6 +620,7 @@ def package(work, lane, spec):
 def profile(work, stage):
     text = '(version 1)(allow default)(deny network*)(deny file-write*)'
     text += '(allow file-write* (subpath '+json.dumps(str(work))+') (literal "/dev/null"))'
+    text += xcrun_adapter.cache_profile(work)
     if stage in {'acquire', 'resolve'}:
         text += '(allow network-outbound (remote ip "*:443") (remote ip "*:53") (literal "/private/var/run/mDNSResponder"))'
     protected = ['acquire.sb', 'resolve.sb', 'package.sb', 'activation.json', 'tool-adapters']
@@ -635,7 +636,7 @@ def main():
     os.umask(0o077)  # only this task process and descendants, never user global settings
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--identity', choices=[IDENTITY], required=True)
-    p.add_argument('--stage', choices=['readonly', 'acquire', 'resolve', 'package'], default='readonly')
+    p.add_argument('--stage', choices=['readonly', 'preflight', 'acquire', 'resolve', 'package'], default='readonly')
     p.add_argument('--work', type=Path)
     p.add_argument('--worker', action='store_true', help=argparse.SUPPRESS)
     a = p.parse_args()
@@ -649,7 +650,9 @@ def main():
     if work != root/'luobo-apple-current359' or work.is_symlink():
         raise ValueError('fixed owned fresh run root required')
     if a.worker:
+        if a.stage == 'preflight': raise ValueError('preflight uses its own fixed worker only')
         xcrun_adapter.check(work, HERE/'xcrun_adapter.py', sys.executable)
+        xcrun_adapter.cache_boundary(work)
         if a.stage == 'acquire': acquire(work, lane, spec, plugins)
         elif a.stage == 'resolve': resolve(work, lane, spec, plugins)
         else: package(work, lane, spec)
@@ -659,11 +662,12 @@ def main():
     minimum = 20*GIB if a.stage == 'acquire' else 4*GIB
     s = os.statvfs(root)
     if s.f_bavail*s.f_frsize < minimum: raise ValueError('cold20GiB/phase4GiB admission required')
-    if a.stage == 'acquire':
+    if a.stage in {'acquire', 'preflight'}:
         if work.exists(): raise ValueError('no partial resume or old outputs')
         mkdir(work); mkdir(work/'evidence')
         installed = xcrun_adapter.install(work, HERE/'xcrun_adapter.py', sys.executable)
         record(work/'evidence/xcrun-adapter-installed.json', installed)
+        record(work/'evidence/darwin-xcrun-cache-boundary.json', xcrun_adapter.seal_cache_boundary(work))
         record(work/'activation.json', {'identity': IDENTITY, 'lane_sha256': sha(HERE/'lane.json'),
                'source_ref': spec['source_ref'], 'controller_head': os.environ.get('GITHUB_SHA')})
         for stage in ['acquire', 'resolve', 'package']:
@@ -674,8 +678,8 @@ def main():
     guard = load(REPO/'ci/apple-sdk/resource_dual.py', 'current359_single_resource_guard')
     def interrupted(_number, _frame): raise InterruptedError('current359 native guard interrupted')
     for number in [signal.SIGTERM, signal.SIGINT]: signal.signal(number, interrupted)
-    if a.stage == 'acquire':
-        preflight = borrowed_helper({'path': 'ci/apple-current359/tool_preflight.py', 'bytes': 8602, 'sha256': '39c6301939fed230f068ce3cf40ed29966c172277da9c48dac2c55fc3b215e79'}, 'current359_actual_cli_preflight')
+    if a.stage in {'acquire', 'preflight'}:
+        preflight = borrowed_helper({'path': 'ci/apple-current359/tool_preflight.py', 'bytes': 9003, 'sha256': '39995bba2ebeecc228821d1d27cfffd8576003e10fbf4fe198667e984c770592'}, 'current359_actual_cli_preflight')
         q = preflight.prepare(work, xcrun_adapter, HERE/'xcrun_adapter.py', sys.executable,
                               sha(HERE/'lane.json'), os.environ.get('GITHUB_SHA'), spec['source_ref'])
         args = ['/usr/bin/sandbox-exec', '-f', str(q/'preflight.sb'), sys.executable, '-B',
@@ -683,18 +687,22 @@ def main():
         code = guard.run(SimpleNamespace(command=args, cwd=q, log=work/'evidence/tool-preflight-raw.log',
              record=work/'evidence/tool-preflight-resource.json', min_free_mib=1024, poll_interval=.2,
              allocated_root=q, max_allocated_mib=64, timeout=120,
-             secondary_root=None, secondary_cap_mib=None))
+             secondary_root=Path(xcrun_adapter.cache_boundary(q)['canonical']), secondary_cap_mib=64))
         # Copy only these bounded public command/source records, never an env or
         # private fixture. Preserve failure before refusing expensive acquire.
         shutil.copytree(q/'evidence', work/'evidence/tool-preflight')
+        xcrun_adapter.cache_boundary(q)
         if code != 0 or not (q/'evidence/complete.json').is_file():
             raise ValueError('actual CLI preflight failed; acquisition not started')
+        if a.stage == 'preflight': return 0
     args = ['/usr/bin/sandbox-exec', '-f', str(work/(a.stage+'.sb')), sys.executable, '-B',
             str(HERE/'run.py'), '--identity', IDENTITY, '--stage', a.stage, '--work', str(work), '--worker']
-    return guard.run(SimpleNamespace(command=args, cwd=work, log=work/(a.stage+'-raw.log'),
+    code = guard.run(SimpleNamespace(command=args, cwd=work, log=work/(a.stage+'-raw.log'),
          record=work/(a.stage+'-resource.json'), min_free_mib=1024, poll_interval=.2,
          allocated_root=work, max_allocated_mib=16*1024, timeout=1800,
-         secondary_root=None, secondary_cap_mib=None))
+         secondary_root=Path(xcrun_adapter.cache_boundary(work)['canonical']), secondary_cap_mib=64))
+    xcrun_adapter.cache_boundary(work)
+    return code
 
 
 if __name__ == '__main__':

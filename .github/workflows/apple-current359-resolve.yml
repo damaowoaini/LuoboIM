@@ -7,6 +7,11 @@ on:
         type: choice
         required: true
         options: [current359-null2-apple-native-resolution-v2]
+      scope:
+        type: choice
+        required: true
+        default: tool-preflight-only
+        options: [tool-preflight-only, resolution]
 
 permissions:
   contents: read
@@ -35,10 +40,15 @@ jobs:
       - name: Verify independent current359 source controller
         run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-null2-apple-native-resolution-v2 --stage readonly'
       - name: Exact source477 original core engine and hosted dependency acquisition
+        if: inputs.scope == 'resolution'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-null2-apple-native-resolution-v2 --stage acquire --work "$APPLE_APP_WORK"'
+      - name: Short actual Apple ARM entry and private Darwin cache preflight only
+        if: inputs.scope == 'tool-preflight-only'
+        run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-null2-apple-native-resolution-v2 --stage preflight --work "$APPLE_APP_WORK"'
       - name: Real SPM and fallback CocoaPods native resolution without App compilation
+        if: inputs.scope == 'resolution'
         run: '"$APPLE_APP_PYTHON" -B ci/apple-current359/run.py --identity current359-null2-apple-native-resolution-v2 --stage resolve --work "$APPLE_APP_WORK"'
       - name: Preserve compact raw and native resolution evidence on failure as well
         if: always()

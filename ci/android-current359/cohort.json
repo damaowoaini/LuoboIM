@@ -215,7 +215,7 @@
     {
       "bytes": 11062,
       "path": "ci/android-current359/plugin_scope_fixture.py",
-      "sha256": "8c0589089e415707ce7615e3f89f88412ce5b0be6f0cf9098d0327cda3337d54"
+      "sha256": "9cf879810f9655de88ac581d36c967d31452e93767af56025a91bec4eb5d73fa"
     },
     {
       "bytes": 1384,
@@ -248,9 +248,9 @@
       "sha256": "7db6e5a21b7c318d6477a6f0755dd93d0e083857fd74b035a219048277402930"
     },
     {
-      "bytes": 31948,
+      "bytes": 32056,
       "path": "ci/android-current359/run.py",
-      "sha256": "1e463d9fc2dd16860d99062cefa75b94a48e99d83b49a09600686747426f7a9c"
+      "sha256": "55296b8293fdeceeae34d50dd06dc5615dbab54186099fab3daebe3d856c543d"
     },
     {
       "bytes": 19978,
@@ -388,7 +388,7 @@
     "fixture": {
       "bytes": 11062,
       "path": "ci/android-current359/plugin_scope_fixture.py",
-      "sha256": "8c0589089e415707ce7615e3f89f88412ce5b0be6f0cf9098d0327cda3337d54"
+      "sha256": "9cf879810f9655de88ac581d36c967d31452e93767af56025a91bec4eb5d73fa"
     },
     "mandatory_preseal_after_builtin_before_production_models": true,
     "owned_outputs_policy_unchanged": true,

@@ -3,12 +3,14 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import stat
 import sys
 
 
 REAL_XCRUN = '/usr/bin/xcrun'
+REAL_ARCH = '/usr/bin/arch'
 IDENTITY = 'current359-null2-apple-native-resolution-v2'
 SCRIPT_CAP = 64 * 1024
 VALUE_FLAGS = {'-project', '-workspace', '-scheme', '-configuration', '-target',
@@ -155,11 +157,118 @@ def forwarding(work, argv, cwd):
 
 
 def script_body(source, python):
-    if (not python.startswith('/') or len(python) > 120
-            or any(c.isspace() for c in python) or '\x00' in python):
-        raise ValueError('fixed absolute Python shebang required')
+    if (not isinstance(python, str) or not re.fullmatch(r'/[A-Za-z0-9_./-]{1,119}', python)
+            or '..' in python.split('/')):
+        raise ValueError('fixed absolute Python entry required')
     if not source or len(source) > SCRIPT_CAP: raise ValueError('adapter source cap')
-    return ('#!'+python+'\n').encode()+source
+    # arch applies its subtype preference to the interpreter of a shebang.
+    # The platform shell supplies that entry; the pinned Python is an ordinary
+    # shell exec. The final real Apple exec below explicitly reapplies arm64e.
+    # This header is also a Python multiline string, so __file__ stays this file.
+    return ('#!/bin/sh\n""":"\nexec '+python+' -B "$0" "$@"\n":"""\n').encode()+source
+
+
+def apple_execution(argv):
+    if not isinstance(argv, list) or argv[:2] != [REAL_XCRUN, '--no-cache']:
+        raise ValueError('reviewed real Apple argv required')
+    return [REAL_ARCH, '-arm64e', *argv]
+
+
+def cache_directory_identity(path, uid):
+    """Stable, current-user private directory. No creation and no contents read."""
+    path = Path(path)
+    if not path.is_absolute() or path.resolve(strict=True) != path:
+        raise ValueError('canonical Darwin temporary directory required')
+    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        before = os.fstat(fd)
+        if (not stat.S_ISDIR(before.st_mode) or before.st_uid != uid
+                or stat.S_IMODE(before.st_mode) != 0o700):
+            raise ValueError('current-user private Darwin temporary directory required')
+        after = os.fstat(fd)
+        at = path.lstat()
+        keys = ('st_dev', 'st_ino', 'st_uid', 'st_gid', 'st_mode')
+        identity = [getattr(before, key) for key in keys]
+        if identity != [getattr(after, key) for key in keys] or identity != [getattr(at, key) for key in keys]:
+            raise ValueError('Darwin temporary directory changed')
+        return identity
+    finally:
+        os.close(fd)
+
+
+def discover_cache_directory():
+    # Apple unistd.h fixes _CS_DARWIN_USER_TEMP_DIR=65537. Reject its documented
+    # TMPDIR/P_tmpdir fallbacks: only the actual hosted-user /var/folders T.
+    if sys.platform != 'darwin': raise ValueError('Darwin cache query required')
+    value = os.confstr(65537)
+    if (not isinstance(value, str) or not re.fullmatch(
+            r'/(?:private/)?var/folders/[A-Za-z0-9_-]{2}/[A-Za-z0-9_-]{20,64}/T/', value)):
+        raise ValueError('fixed Darwin user temporary directory shape required')
+    lexical = Path(value)
+    canonical = lexical.resolve(strict=True)
+    if canonical != Path('/private')/str(lexical).lstrip('/') and canonical != lexical:
+        raise ValueError('unexpected Darwin temporary directory alias')
+    if not str(canonical).startswith('/private/var/folders/'):
+        raise ValueError('fixed canonical Darwin temporary directory root required')
+    return {'schema': 1, 'lexical': str(lexical), 'canonical': str(canonical),
+            'uid': os.getuid(), 'directory_identity': cache_directory_identity(canonical, os.getuid())}
+
+
+def cache_leaf_pattern(directory):
+    # Eight alphanumeric suffix characters are the exact observed xcrun form.
+    # A new form must fail visibly, rather than widening a whole user temp root.
+    return '^'+re.escape(str(directory))+'/xcrun_db-[A-Za-z0-9]{8}$'
+
+
+def seal_cache_boundary(work):
+    row = discover_cache_directory()
+    root = Path(row['canonical'])
+    protected = []
+    for number, child in enumerate(root.iterdir()):
+        if number >= 4096: raise ValueError('bounded Darwin temporary directory inventory required')
+        if child.name.startswith('xcrun_db-'):
+            if len(protected) >= 256 or len(child.name) > 128:
+                raise ValueError('bounded preexisting cache protection required')
+            # Only public tool cache names; no body, environment or private path
+            # outside this fixed current-user directory is inventoried.
+            if not re.fullmatch(r'xcrun_db-[A-Za-z0-9_-]{1,96}', child.name):
+                raise ValueError('unexpected preexisting xcrun cache name')
+            protected.append(child.name)
+    row['protected_preexisting'] = sorted(protected)
+    target = Path(work)/'tool-adapters/darwin-cache.json'
+    body = (json.dumps(row, sort_keys=True)+'\n').encode()
+    fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o400)
+    with os.fdopen(fd, 'wb') as out:
+        out.write(body); out.flush(); os.fsync(out.fileno())
+    return row
+
+
+def cache_boundary(work):
+    path = Path(work)/'tool-adapters/darwin-cache.json'
+    st = path.lstat()
+    if (path.resolve(strict=True) != path or not stat.S_ISREG(st.st_mode)
+            or st.st_uid != os.getuid() or stat.S_IMODE(st.st_mode) != 0o400
+            or st.st_nlink != 1 or not 1 <= st.st_size <= 65536):
+        raise ValueError('immutable owned Darwin cache boundary required')
+    row = json.loads(path.read_bytes())
+    current = discover_cache_directory()
+    if {k: row.get(k) for k in current} != current:
+        raise ValueError('Darwin cache boundary changed')
+    names = row.get('protected_preexisting')
+    if (not isinstance(names, list) or len(names) > 256 or names != sorted(set(names))
+            or any(not isinstance(n, str) or not re.fullmatch(r'xcrun_db-[A-Za-z0-9_-]{1,96}', n) for n in names)):
+        raise ValueError('preexisting cache protection differs')
+    return row
+
+
+def cache_profile(work):
+    row = cache_boundary(work)
+    # Sandbox paths are canonical. Only new exact tool-cache leaves are writable;
+    # preexisting leaves (including symlinks/directories) remain explicitly denied.
+    text = '(allow file-write* (regex #'+json.dumps(cache_leaf_pattern(row['canonical']))+'))'
+    for name in row['protected_preexisting']:
+        text += '(deny file-write* (literal '+json.dumps(row['canonical']+'/'+name)+'))'
+    return text
 
 
 def check(work, source_path, python):
@@ -179,7 +288,9 @@ def check(work, source_path, python):
             raise ValueError('owned adapter support directory differs')
     return {'script_sha256': hashlib.sha256(expected).hexdigest(), 'script_bytes': len(expected),
             'source_sha256': hashlib.sha256(Path(source_path).read_bytes()).hexdigest(),
-            'real_exec': REAL_XCRUN, 'no_cache': True, 'tool_response_synthesized': False}
+            'entry_interpreter': '/bin/sh', 'fixed_python': python,
+            'outer_exec': REAL_ARCH, 'real_tool': REAL_XCRUN,
+            'required_architecture': 'arm64e', 'no_cache': True, 'tool_response_synthesized': False}
 
 
 def install(work, source_path, python):
@@ -201,7 +312,9 @@ def audit(work, public, cwd):
     directory = work/'evidence/xcrun-adapter'
     if directory.resolve(strict=True) != directory: raise ValueError('owned audit directory required')
     if sum(1 for _ in directory.iterdir()) >= 256: raise ValueError('bounded argv audit cap')
-    body = (json.dumps({'schema': 1, 'real_exec': REAL_XCRUN, 'argv': ['--no-cache', *public],
+    body = (json.dumps({'schema': 2, 'outer_exec': REAL_ARCH,
+                       'outer_argv': ['-arm64e', REAL_XCRUN, '--no-cache', *public],
+                       'real_tool': REAL_XCRUN, 'tool_argv': ['--no-cache', *public],
                        'cwd': 'work/'+cwd.relative_to(work).as_posix(),
                        'environment_recorded': False, 'response_synthesized': False},
                       sort_keys=True)+'\n').encode()
@@ -221,10 +334,11 @@ def main():
             or json.loads((work/'activation.json').read_bytes()).get('identity') != IDENTITY):
         raise ValueError('fixed CI-owned activation required')
     cwd = Path.cwd()
+    cache_boundary(work)
     argv, public = forwarding(work, sys.argv[1:], cwd)
     audit(work, public, cwd)
     # The only execution boundary. stdout/stderr/exit/signal behavior belongs to Apple.
-    os.execv(REAL_XCRUN, argv)
+    os.execv(REAL_ARCH, apple_execution(argv))
 
 
 if __name__ == '__main__':

@@ -121,6 +121,7 @@ def metadata():
             raise ValueError('explicit359 source controller or borrowed input differs')
     require_core_equivalence(inputs,original,context)
     plugin_scope.contract(HERE,inputs)
+    plugin_scope_fixture.writer_bytes(HERE)  # Validate production writer binding before setup/acquisition.
     check_catalogue(context)
     if (context['original_core_spec_sha256']!=s.sha(generic.HERE/'core-reuse.json')
             or context['original_context_sha256']!=s.sha(generic.HERE/'current-app-cohort.json')

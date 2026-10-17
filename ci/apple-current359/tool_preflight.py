@@ -54,7 +54,7 @@ def file_identity(path):
     # an arbitrary command. Only these explicit, source-reviewed tool roots.
     real = path.resolve(strict=True)
     roots = [Path('/usr/bin'), Path(DEVELOPER)/'usr/bin']
-    if not any(real.is_relative_to(root) for root in roots):
+    if not any(real.is_relative_to(root) for root in roots) and not (path == real == Path('/bin/sh')):
         raise ValueError('official fixed tool target required')
     with os.fdopen(os.open(real, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as f:
         before = os.fstat(f.fileno())
@@ -78,8 +78,10 @@ def inspect_results(rows, audit_rows):
         r = rows[label]
         if r['exit_code'] != 0 or r['stdout'] != EXPECTED_VERSION or r['stderr']:
             raise ValueError('actual fixed Xcode version CLI failed')
-    if not audit_rows or any(r.get('real_exec') != '/usr/bin/xcrun'
-            or r.get('argv') != ['--no-cache','xcodebuild','-version']
+    if not audit_rows or any(r.get('outer_exec') != '/usr/bin/arch'
+            or r.get('outer_argv') != ['-arm64e','/usr/bin/xcrun','--no-cache','xcodebuild','-version']
+            or r.get('real_tool') != '/usr/bin/xcrun'
+            or r.get('tool_argv') != ['--no-cache','xcodebuild','-version']
             or r.get('response_synthesized') is not False for r in audit_rows):
         raise ValueError('actual installed adapter invocation missing or differs')
     git = rows['system-git-version']
@@ -122,7 +124,8 @@ def execute(work):
     # Its success never overrides the system-Git or Flutter-argv failures.
     found = rows['real-find-git']
     exact = (DEVELOPER+'/usr/bin/git\n').encode()
-    tools = [file_identity('/usr/bin/arch'),file_identity('/usr/bin/git'),file_identity('/usr/bin/xcrun')]
+    tools = [file_identity('/usr/bin/arch'),file_identity('/bin/sh'),
+             file_identity('/usr/bin/git'),file_identity('/usr/bin/xcrun')]
     if found['exit_code'] == 0 and found['stdout'] == exact and not found['stderr']:
         target = DEVELOPER+'/usr/bin/git'; tools.append(file_identity(target)); call('xcode-git-version',[target,'--version'])
     record(work/'evidence/tool-identities.json', {'tools': tools, 'source_ref': activation.get('source_ref'),
@@ -138,10 +141,13 @@ def prepare(parent, adapter, adapter_path, python, lane_sha, head, source_ref):
     work.mkdir(parents=True,mode=0o700,exist_ok=False)
     for name in ['evidence','tmp','source/app/ios']: (work/name).mkdir(parents=True,mode=0o700,exist_ok=False)
     adapter.install(work,adapter_path,python)
+    cache = adapter.seal_cache_boundary(work)
+    record(work/'evidence/darwin-xcrun-cache-boundary.json', cache)
     record(work/'activation.json', {'identity': IDENTITY, 'lane_sha256': lane_sha,
         'controller_head': head, 'source_ref': source_ref, 'scope': 'actual-cli-preflight-only'})
     profile = '(version 1)(allow default)(deny network*)(deny file-write*)'
     profile += '(allow file-write* (subpath '+json.dumps(str(work))+') (literal "/dev/null"))'
+    profile += adapter.cache_profile(work)
     for name in ['activation.json','tool-adapters','preflight.sb']:
         profile += '(deny file-write* (subpath '+json.dumps(str(work/name))+'))'
     put(work/'preflight.sb',profile.encode())

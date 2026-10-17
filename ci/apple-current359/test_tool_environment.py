@@ -35,13 +35,21 @@ class BootstrapEnvironment(unittest.TestCase):
             self.assertEqual(actual['GIT_CONFIG_GLOBAL'], '/dev/null')
             self.assertEqual(actual['xcrun_nocache'], '1')
             self.assertNotIn('HTTPS_PROXY', actual)
-            for stage in ['acquire', 'resolve', 'package']:
-                profile = driver.profile(work, stage).decode()
-                self.assertIn('(deny file-write*)', profile)
-                self.assertNotIn('sysctl', profile)
-                self.assertNotIn('/var/folders', profile)
-                self.assertNotIn('(allow sysctl', profile)
-            self.assertNotIn('allow network-outbound', driver.profile(work, 'package').decode())
+            # The exact hosted-user cache boundary has its own real-FS control.
+            # All three workers must include that same sealed narrow rule, while
+            # retaining original source/activation and package-network denials.
+            grant = '(allow file-write* (regex #"^/private/var/folders/ab/abcdefghijklmnopqrst/T/xcrun_db-[A-Za-z0-9]{8}$"))'
+            with mock.patch.object(driver.xcrun_adapter, 'cache_profile', return_value=grant) as boundary:
+                for stage in ['acquire', 'resolve', 'package']:
+                    profile = driver.profile(work, stage).decode()
+                    self.assertIn('(deny file-write*)', profile)
+                    self.assertNotIn('sysctl', profile)
+                    self.assertIn(grant, profile)
+                    self.assertIn('(deny file-write* (subpath '+driver.json.dumps(str(work/'tool-adapters'))+'))', profile)
+                    self.assertNotIn('(allow sysctl', profile)
+                self.assertEqual(boundary.call_count, 3)
+                self.assertEqual(boundary.call_args.args, (work,))
+                self.assertNotIn('allow network-outbound', driver.profile(work, 'package').decode())
 
     def test_actual_bootstrap_requires_exact_read_query_signature_stable_tool_and_clean_result(self):
         with tempfile.TemporaryDirectory() as temp:
