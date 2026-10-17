@@ -11,11 +11,11 @@ run=load('run');builder=load('minio_build');resources=load('resources')
 
 class FullGraphControls(unittest.TestCase):
  def test_prepare_lock_fresh_scope_and_unknown_cannot_alias_old_pass_or_canonical(self):
-  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN)}
+  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'ownedcontrolReuse':copy.deepcopy(run.OWNEDCONTROL_REUSE),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN)}
   with mock.patch.object(run,'FINAL_SOURCE',None),self.assertRaises(ValueError):run.check_locked(c)
   with mock.patch.object(run,'FINAL_SOURCE',source):
    run.check_locked(c)
-   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('cleanupReuse',{}),('cleanupReuse',dict(run.CLEANUP_REUSE,source=source)),('cleanupReuse',dict(run.CLEANUP_REUSE,head='f'*40)),('cleanupReuse',dict(run.CLEANUP_REUSE,reviewSHA256='f'*64)),('originalTargets',{}),('requiredOriginalSubtests',{})]:
+   for key,value in [('reuseOldBinary',True),('existingGreenTestsToRerun',['old67']),('scenarios',['ack','redis-unknown']),('source',{'members':1,'digest':'2'*64}),('cleanupScopes',[]),('cleanupReuse',{}),('cleanupReuse',dict(run.CLEANUP_REUSE,source=source)),('cleanupReuse',dict(run.CLEANUP_REUSE,head='f'*40)),('cleanupReuse',dict(run.CLEANUP_REUSE,reviewSHA256='f'*64)),('ownedcontrolReuse',{}),('ownedcontrolReuse',dict(run.OWNEDCONTROL_REUSE,source=source)),('ownedcontrolReuse',dict(run.OWNEDCONTROL_REUSE,reviewSHA256='f'*64)),('originalTargets',{}),('requiredOriginalSubtests',{})]:
     bad=copy.deepcopy(c);bad[key]=value
     with self.subTest(key=key),self.assertRaises(ValueError):run.check_locked(bad)
   cleanup={'version':'owned-fullgraph-resource-cleanup-v1','nonce':'a'*32,'exactContainerIDs':['b'*64],'unconfirmedIDs':[],'accepted':True}
@@ -125,7 +125,7 @@ class FullGraphControls(unittest.TestCase):
    saved=json.dumps({'events':projected,'diagnostic':diagnostic})
    for private in ('RUNTIME_PRIVATE_UNSCOPED','RUNTIME_PRIVATE_TEST','NOT_A_COMPILER_EVENT'):self.assertNotIn(private,saved)
   runtime=('\n'.join(json.dumps(row) for row in rows[1:])+'\n').encode()
-  self.assertIsNone(run.project_go_test_events(runtime,'cleanup-ownedcontrol')[1])
+  self.assertIsNone(run.project_go_test_events(runtime,'cleanup-runtimeacceptance')[1])
   large=public+'界'*23000
   bounded=json.dumps({'Action':'build-output','ImportPath':'public/package','Output':large}).encode()
   _,diagnostic=run.project_go_test_events(bounded,'cleanup-runtimeacceptance')
@@ -133,13 +133,41 @@ class FullGraphControls(unittest.TestCase):
   self.assertEqual(diagnostic['completeBytes'],len(large.encode()));self.assertEqual(diagnostic['completeSHA256'],hashlib.sha256(large.encode()).hexdigest())
   self.assertTrue(large.startswith(diagnostic['diagnostic']))
   with self.assertRaises(ValueError):run.project_go_test_events(raw,'runtime-ack')
-  with self.assertRaises(ValueError):run.project_go_test_events(json.dumps({'Action':'build-output','Output':7}).encode(),'cleanup-ownedcontrol')
+  with self.assertRaises(ValueError):run.project_go_test_events(json.dumps({'Action':'build-output','Output':7}).encode(),'cleanup-runtimeacceptance')
   syntax=ast.parse(Path(run.__file__).read_bytes());orchestration=next(node for node in syntax.body if isinstance(node,ast.FunctionDef) and node.name=='run')
   calls=[node for node in ast.walk(orchestration) if isinstance(node,ast.Call)]
   cleanup_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='run_cleanup_controls')
   compile_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='command' and node.args and isinstance(node.args[0],ast.BinOp) and isinstance(node.args[0].left,ast.Constant) and node.args[0].left.value=='compile-')
   minio_line=next(node.lineno for node in calls if isinstance(node.func,ast.Attribute) and isinstance(node.func.value,ast.Name) and node.func.value.id=='builder' and node.func.attr=='build')
   self.assertLess(cleanup_line,compile_line);self.assertLess(cleanup_line,minio_line)
+  # The exact collector helper keeps closed fixture observations on failure,
+  # never arbitrary runtime Output, error strings, paths or foreign test data.
+  top='TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup';package='github.com/openimsdk/open-im-server/v3/internal/runtimeacceptance';marker='LUOBO_RUNTIME_CLEANUP_DIAG_V1 '
+  kinds=['cancel-audit-before-stop','timeout-before-local-wait-complete']
+  def observation(kind):return {'version':'runtime-cleanup-fixture-observation-v1','kind':kind,'stage':'assert-complete','errorClass':'deadline','shortErrorClass':'unobserved','role':'none','binaryBytes':12345,'childReturned':True,'finalReturned':True,'observedExits':1,'complete':False,'launcherClosed':False,'signal0':'seen','signal1':'one','primaryPreserved':True,'elapsedMicros':8000000,'firstStopMicros':0,'finalCleanupMicros':3000000}
+  def frame(value,test=None,pkg=package,action='output'):
+   return {'Action':action,'Package':pkg,'Test':test or top+'/'+value['kind'],'Output':marker+json.dumps(value,separators=(',',':'))+'\n'}
+  def encoded(rows):return ('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
+  valid=[frame(observation(kind)) for kind in kinds]
+  foreign=[dict(valid[0],Package='foreign',Output=marker+'PRIVATE_FOREIGN\n'),dict(valid[0],Test='TestForeign',Output=marker+'PRIVATE_TEST\n'),dict(valid[0],Output='PRIVATE_RUNTIME_OUTPUT\n')]
+  result=run.runtime_cleanup_observations(encoded(valid+foreign),'cleanup-runtimeacceptance')
+  self.assertTrue(result['diagnosticsComplete']);self.assertEqual(result['rejectedMarkers'],0);self.assertEqual(result['observations'],[observation(kind) for kind in kinds])
+  self.assertNotIn('PRIVATE_',json.dumps(result));self.assertLessEqual(len(json.dumps(result).encode()),4096)
+  self.assertFalse(run.runtime_cleanup_observations(encoded(valid[:1]),'cleanup-runtimeacceptance')['diagnosticsComplete'])
+  for key,value in [('rawError','PRIVATE_URL_TOKEN'),('errorClass','PRIVATE_PATH'),('stage','unknown'),('binaryBytes',True),('binaryBytes',(1<<30)+1),('observedExits',3),('complete',1),('elapsedMicros',180000001),('signal0','PRIVATE_NONCE')]:
+   bad=observation(kinds[0]);bad[key]=value
+   rejected=run.runtime_cleanup_observations(encoded([frame(bad),valid[1]]),'cleanup-runtimeacceptance')
+   self.assertFalse(rejected['diagnosticsComplete']);self.assertEqual(rejected['rejectedMarkers'],1);self.assertNotIn('PRIVATE_',json.dumps(rejected))
+  for bad in [dict(valid[0],Output=marker+'{"version":'),dict(valid[0],Output=marker+'x'*2049+'\n'),dict(valid[0],Test=top+'/'+kinds[1]),dict(valid[0],Output=marker+'{"kind":"a","kind":"b"}\n')]:
+   rejected=run.runtime_cleanup_observations(encoded([bad,valid[1]]),'cleanup-runtimeacceptance');self.assertFalse(rejected['diagnosticsComplete']);self.assertGreater(rejected['rejectedMarkers'],0)
+  self.assertFalse(run.runtime_cleanup_observations(encoded(valid+[valid[0]]),'cleanup-runtimeacceptance')['diagnosticsComplete'])
+  with self.assertRaises(ValueError):run.runtime_cleanup_observations(encoded(valid),'runtime-ack')
+  # The actual command writes safe observations before its latched failure raise.
+  command_node=next(node for node in ast.walk(orchestration) if isinstance(node,ast.FunctionDef) and node.name=='command')
+  observed_write=next(node.lineno for node in ast.walk(command_node) if isinstance(node,ast.Call) and isinstance(node.func,ast.Name) and node.func.id=='write' and any(isinstance(part,ast.Constant) and part.value=='runtime-cleanup-observations.json' for arg in node.args for part in ast.walk(arg)))
+  failed_raise=next(node.lineno for node in ast.walk(command_node) if isinstance(node,ast.Raise) and any(isinstance(part,ast.Constant) and part.value=='actual phase failed; private raw retained' for part in ast.walk(node)))
+  self.assertLess(observed_write,failed_raise)
+  self.assertFalse(any(isinstance(node,ast.Raise) and any(isinstance(part,ast.Constant) and part.value=='both exact bounded cleanup fixture observations required' for part in ast.walk(node)) for node in ast.walk(command_node)))
   parent=run.module('ci/backend-runtime-join-r7/run.py','new_fullgraph_cleanup_original_audit')
   def events(targets,required):
    rows=[]
@@ -163,7 +191,7 @@ class FullGraphControls(unittest.TestCase):
      self.assertTrue(all(top_pattern.fullmatch(top) for tops in scope['targets'].values() for top in tops))
      self.assertTrue(all(child_pattern.fullmatch(child) for tops in scope['requiredSubtests'].values() for subs in tops.values() for child in subs))
      self.assertTrue(all(top_pattern.fullmatch(top) is None for tops in run.GRAPH_TARGETS.values() for top in tops));self.assertIsNone(top_pattern.fullmatch(run.CLEANUP_REUSE['top']))
-     if label=='cleanup-ownedcontrol':self.assertIsNone(child_pattern.fullmatch('unbound_start_failure_only_waits_original_done'))
+     self.assertNotEqual(label,'cleanup-ownedcontrol');self.assertIsNone(top_pattern.fullmatch(run.OWNEDCONTROL_REUSE['top']))
      rows=events(scope['targets'],scope['requiredSubtests'])
      if mode=='missing-child' and len(calls)==1:
       removed=next(row['Test'] for row in rows if row.get('Test') and '/' in row['Test']);rows=[row for row in rows if row.get('Test')!=removed]
@@ -173,11 +201,11 @@ class FullGraphControls(unittest.TestCase):
      with self.assertRaises(ValueError):run.run_cleanup_controls('/owned/go',{'GOPROXY':'off'},command,parent,out)
      self.assertFalse((out/'cleanup-names.json').exists());continue
     result=run.run_cleanup_controls('/owned/go',{'GOPROXY':'off'},command,parent,out)
-    self.assertEqual(calls,[scope['label'] for scope in run.CLEANUP_SCOPES]);self.assertEqual((result['topPASS'],result['subPASS']),(2,5))
+    self.assertEqual(calls,[scope['label'] for scope in run.CLEANUP_SCOPES]);self.assertEqual((result['topPASS'],result['subPASS']),(1,2))
     original_required={pkg:{top:run.GRAPH_CHILDREN[top] for top in tops} for pkg,tops in run.GRAPH_TARGETS.items()}
     original=parent.audit(events(run.GRAPH_TARGETS,original_required),0,run.GRAPH_TARGETS)
-    union=run.audit_target_union(original,result);self.assertEqual((union['topPASS'],union['subPASS']),(4,8))
-    self.assertEqual(union['cleanupReuse']['source'],run.CLEANUP_REUSE['source']);self.assertEqual((union['cleanupReuse']['topPASS'],union['cleanupReuse']['subPASS']),(1,4));self.assertEqual(union['originalObligation'],{'topCount':5,'subCount':12,'crossSource':True})
+    union=run.audit_target_union(original,result);self.assertEqual((union['topPASS'],union['subPASS']),(3,5))
+    self.assertEqual(union['cleanupReuse']['source'],run.CLEANUP_REUSE['source']);self.assertEqual((union['cleanupReuse']['topPASS'],union['cleanupReuse']['subPASS']),(1,4));self.assertEqual(union['originalObligation'],{'topCount':5,'subCount':12,'crossSource':True});self.assertEqual((union['ownedcontrolReuse']['topPASS'],union['ownedcontrolReuse']['subPASS']),(1,3));self.assertEqual(union['ownedcontrolReuse']['source'],run.OWNEDCONTROL_REUSE['source'])
     bad=copy.deepcopy(result);bad['namedCompletions'].pop()
     with self.assertRaises(ValueError):run.audit_target_union(original,bad)
     bad=copy.deepcopy(result);bad['namedCompletions'].append(bad['namedCompletions'][0])

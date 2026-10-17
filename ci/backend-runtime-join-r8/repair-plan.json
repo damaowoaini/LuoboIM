@@ -1,17 +1,14 @@
 {
   "schema": 1,
-  "state": "FROZEN_CAPTURE_BOUNDED_SCOPE_REPAIR5",
+  "state": "FROZEN_CONTROLLER_PROGRESS_REPAIR2",
   "source": {
     "members": 1556,
-    "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
+    "digest": "fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a"
   },
   "repairTargets": {
     "internal/namespaceimport/ownedcontrol": [
-      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
       "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
-      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
-      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory"
     ]
   },
   "actualPassedTargets": {
@@ -73,10 +70,13 @@
       "TestProspectivePageNeedsOriginalRootAndActualSemanticValidation"
     ],
     "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
       "TestHistoricalOpenBaseIsClosedAtCutWithoutFillingFutureGap",
       "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
       "TestHistoricalSegmentLocatorsUseActualCollectionAndNeverInferEpochOrRange",
       "TestHistoricalTypedLineagePreservesOriginalClaimsAndProtocol",
+      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
       "TestHistoryEpochRetirementCannotBeMintedFromDTOOrPreparedExit",
       "TestHistoryReadinessPrivateSessionRetainsIdentityAndUnknownIntent",
       "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient",
@@ -429,26 +429,18 @@
   },
   "sourceDelta": [
     {
-      "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-      "beforeSHA256": "a7679556215ac71dc4c869d4c08c6a93aaf9993092572eb4a027210f20feb9f3",
-      "afterSHA256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
-      "afterBytes": 14083,
-      "mode": 420,
-      "production": true
-    },
-    {
-      "target": "server/internal/namespaceinventory/import_read_scope.go",
-      "beforeSHA256": "38f5f2708493cc544275eae1d0aebd216f91b02241cd3dbeaaaeec568e50535c",
-      "afterSHA256": "f0d26184584b3381678d6f18eb30e0c41edfa4d982d477b1c0a94fc7c141e314",
-      "afterBytes": 2993,
-      "mode": 420,
-      "production": true
-    },
-    {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-      "beforeSHA256": "cbe1a40c682a7f9269f1274950559ed400db0502e91877ed587d340cb8e6e4da",
-      "afterSHA256": "91d405521a2f990d6fb1342acd6879b89c9bd4036a2e26a446dfb32a78472e96",
-      "afterBytes": 26168,
+      "beforeSHA256": "91d405521a2f990d6fb1342acd6879b89c9bd4036a2e26a446dfb32a78472e96",
+      "afterSHA256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
+      "afterBytes": 27088,
+      "mode": 420,
+      "production": false
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
+      "beforeSHA256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
+      "afterSHA256": "060394fc3c8fe32269bb8a3ea0e84ec55922ddfcb114624a4e7f402b9b0b6670",
+      "afterBytes": 32546,
       "mode": 420,
       "production": false
     }
@@ -603,9 +595,18 @@
       "run": 39048615208,
       "retainedTopCount": 4,
       "derivation": "previousSplitRepairRun.passedTargets; exact original source only"
+    },
+    {
+      "source": {
+        "members": 1556,
+        "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
+      },
+      "run": 39056484267,
+      "retainedTopCount": 3,
+      "derivation": "lastBoundedCaptureRun.passedTargets; reusedPartialChildren are separate actual old6sub, not whole failed parent PASS"
     }
   ],
-  "sourceDeltaSHA256": "b489b6266dfebfd281fe1aa36ac9c0385253cccd7618b585c181dfea0fbae1bc",
+  "sourceDeltaSHA256": "7e90a6d295f39fd46f01849532110b7dd3e39621b0ba651bb1a448513a7c7505",
   "latestRepairRun": {
     "schema": 1,
     "head": "1dbe0412baa8a3a04199a5ab80a559dcdf126e65",
@@ -728,15 +729,13 @@
       }
     },
     {
-      "label": "targeted-tests-ownedcontrol-default-fixture",
+      "label": "targeted-tests-ownedcontrol-corrupt-commit",
       "targets": {
         "internal/namespaceimport/ownedcontrol": [
-          "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
-          "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
-          "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-          "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+          "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory"
         ]
-      }
+      },
+      "child": "real_commit_custody_failure_never_becomes_normal_capture_pending"
     }
   ],
   "previousSplitRepairRun": {
@@ -978,5 +977,147 @@
       "bytes": 3555,
       "sha256": "c45d1f7f0793539712cf2d84697ee11ad10b7f75be40f6138350c14e31260e8c"
     }
-  }
+  },
+  "lastBoundedCaptureRun": {
+    "run": 39056484267,
+    "job": 117465382674,
+    "head": "bbb59602ada7de1a88d260ea39153962add29e46",
+    "artifact": {
+      "artifact": 12109961077,
+      "run": 39056484267,
+      "attempt": 1,
+      "head": "bbb59602ada7de1a88d260ea39153962add29e46",
+      "sha256": "babca10c2496f07ccafbd42fd6fa0269d6f67ada4b68070a3682392c599827c0",
+      "bytes": 67168,
+      "exactAPIDigest": true,
+      "files": 49,
+      "binariesDownloaded": false
+    },
+    "source": {
+      "members": 1556,
+      "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
+    },
+    "sourceAndControllerPostExact": true,
+    "actualTopPASS": 3,
+    "actualTopFAIL": 2,
+    "actualSubPASS": 9,
+    "actualSubFAIL": 1,
+    "namedPASS": [
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/pristine_descriptor_crash_recovery_and_changed_source_options",
+        "seconds": 0.04
+      },
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/canonical_bodies_original_base_future_and_missing-proof_disposition",
+        "seconds": 1.6
+      },
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/completed_workspace_reopens_at_exact_page_and_original_capture_time",
+        "seconds": 0.17
+      },
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/caller-mutated_inventory_and_foreign_index_fail",
+        "seconds": 0.12
+      },
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/reviewed_source_trust_cannot_change_mid-capture_or_resume",
+        "seconds": 0
+      },
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/live_identity_restart_and_lost_exclusion_still_reject",
+        "seconds": 0
+      },
+      {
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/first_page_consumes64_actual_sorted_leaves_without_truncating",
+        "seconds": 0.55
+      },
+      {
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/continuation_uses_real_Store_receipt_id_cursor_and_closes_last_leaf",
+        "seconds": 0.02
+      },
+      {
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget/inconsistent_checkpoint_is_not_used_as_source_authority",
+        "seconds": 0.01
+      },
+      {
+        "name": "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+        "seconds": 11.68
+      },
+      {
+        "name": "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+        "seconds": 18.25
+      },
+      {
+        "name": "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
+        "seconds": 16.27
+      }
+    ],
+    "namedFAIL": [
+      {
+        "name": "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
+        "seconds": 166.42
+      },
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory/real_commit_custody_failure_never_becomes_normal_capture_pending",
+        "seconds": 2.37
+      },
+      {
+        "name": "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+        "seconds": 23.19
+      }
+    ],
+    "diagnosticAccepted": true,
+    "newCorruptCommitAssertionExecuted": false,
+    "residualMongo": 0,
+    "residualRedis": 0,
+    "ownedContainerCleanupExit": 0,
+    "currentMainBuilds": 0,
+    "wholeAccepted": false,
+    "runtimeChanged": false,
+    "fullRegression": false,
+    "rootReceipt": {
+      "path": ".qa/backend-capture-cleanup-six-build-batch-1/root-backend-controller-timeout-and-new-fixture-failure-review.json",
+      "bytes": 3781,
+      "sha256": "82072a25c16cd113414ed3852287489c59c21b763ef2303f89d91d9e545e1835"
+    },
+    "passedTargets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+        "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+        "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+      ]
+    },
+    "failedTargets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
+        "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory"
+      ]
+    },
+    "reusedPartialChildren": {
+      "internal/namespaceimport/ownedcontrol": {
+        "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory": [
+          "caller-mutated_inventory_and_foreign_index_fail",
+          "canonical_bodies_original_base_future_and_missing-proof_disposition",
+          "completed_workspace_reopens_at_exact_page_and_original_capture_time",
+          "live_identity_restart_and_lost_exclusion_still_reject",
+          "pristine_descriptor_crash_recovery_and_changed_source_options",
+          "reviewed_source_trust_cannot_change_mid-capture_or_resume"
+        ]
+      }
+    }
+  },
+  "lastBoundedCaptureRunSHA256": "f46d40ff9d90a2ad8ae981e3915f93fb0d5c4f00b57235ac01d47174cd87fd10",
+  "partialChildReuse": {
+    "internal/namespaceimport/ownedcontrol": {
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory": [
+        "caller-mutated_inventory_and_foreign_index_fail",
+        "canonical_bodies_original_base_future_and_missing-proof_disposition",
+        "completed_workspace_reopens_at_exact_page_and_original_capture_time",
+        "live_identity_restart_and_lost_exclusion_still_reject",
+        "pristine_descriptor_crash_recovery_and_changed_source_options",
+        "reviewed_source_trust_cannot_change_mid-capture_or_resume"
+      ]
+    }
+  },
+  "newCorruptCommitAssertionPreviouslyExecuted": false
 }

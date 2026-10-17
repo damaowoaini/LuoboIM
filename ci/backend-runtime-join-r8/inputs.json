@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "state": "FROZEN_SOURCE",
-  "scope": "backend_history_capture_bounded_scope_repair5_split2_reuse83_prior14_no_deployment",
+  "scope": "backend_history_controller_progress_and_corrupt_commit_child_repair2_reuse86_no_deployment",
   "base": {
     "members": 1407,
     "digest": "5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9"
   },
   "source": {
     "members": 1556,
-    "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
+    "digest": "fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -2276,8 +2276,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-      "bytes": 26168,
-      "sha256": "91d405521a2f990d6fb1342acd6879b89c9bd4036a2e26a446dfb32a78472e96",
+      "bytes": 27088,
+      "sha256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
       "beforeSHA256": null
     },
     {
@@ -2311,8 +2311,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
-      "bytes": 28521,
-      "sha256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
+      "bytes": 32546,
+      "sha256": "060394fc3c8fe32269bb8a3ea0e84ec55922ddfcb114624a4e7f402b9b0b6670",
       "beforeSHA256": null
     },
     {
@@ -3230,60 +3230,93 @@
     "server/pkg/common/startrpc/owned_start_unix.go"
   ],
   "finalFormatProof": {
-    "productManifest": {
-      "bytes": 3936,
-      "sha256": "973c20bcd6097c8bfadb8df24b99d3cb154e01320ef9925b21f5c9c6d22a6ed2"
-    },
-    "formattedSource": {
+    "parentFormattedSource": {
       "members": 1556,
       "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
     },
-    "incrementalFormattedParsedGo": 3,
-    "previousFormattedOrCompiledGoExactReused": 204,
-    "exactActualR7GoReused": [
-      "server/internal/rpc/third/owned_provider_test.go",
-      "server/pkg/common/db/cache/owned_connection_setup_redis_test.go",
-      "server/pkg/common/db/cache/owned_source_redis.go",
-      "server/pkg/common/db/s3/cos/cos.go"
-    ],
-    "GoCompilationOrTests": 0,
-    "incrementalDiagnosticFormat": {
-      "formattedLeafBytes": 28521,
-      "formattedLeafSHA256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
-      "rawCandidateManifestSHA256": "ad28eb3cc66aacadd4c948109e406148f57fe4f920d1f1d3c42f0765c836ce3a",
-      "rootFormatReceiptPath": ".qa/backend-controller-adapter-diagnostic-batch-1/formatted.json",
-      "rootFormatReceiptSHA256": "147cc0ade4b6a174d06e71132154756ef06ba67a43a3d5e387485b2975f2a33c",
-      "rootFormatReceiptBytes": 1401
+    "parentFormatProof": {
+      "productManifest": {
+        "bytes": 3936,
+        "sha256": "973c20bcd6097c8bfadb8df24b99d3cb154e01320ef9925b21f5c9c6d22a6ed2"
+      },
+      "formattedSource": {
+        "members": 1556,
+        "digest": "6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb"
+      },
+      "incrementalFormattedParsedGo": 3,
+      "previousFormattedOrCompiledGoExactReused": 204,
+      "exactActualR7GoReused": [
+        "server/internal/rpc/third/owned_provider_test.go",
+        "server/pkg/common/db/cache/owned_connection_setup_redis_test.go",
+        "server/pkg/common/db/cache/owned_source_redis.go",
+        "server/pkg/common/db/s3/cos/cos.go"
+      ],
+      "GoCompilationOrTests": 0,
+      "incrementalDiagnosticFormat": {
+        "formattedLeafBytes": 28521,
+        "formattedLeafSHA256": "dbc8f117ca461b6d6c2d379219ec05436eb37fe86207e53153b3ecfa9be6369b",
+        "rawCandidateManifestSHA256": "ad28eb3cc66aacadd4c948109e406148f57fe4f920d1f1d3c42f0765c836ce3a",
+        "rootFormatReceiptPath": ".qa/backend-controller-adapter-diagnostic-batch-1/formatted.json",
+        "rootFormatReceiptSHA256": "147cc0ade4b6a174d06e71132154756ef06ba67a43a3d5e387485b2975f2a33c",
+        "rootFormatReceiptBytes": 1401
+      },
+      "parentFormattedSource": {
+        "members": 1556,
+        "digest": "3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc"
+      },
+      "incrementalCaptureScopeFormat": {
+        "rootFormatReceiptPath": ".qa/backend-capture-cleanup-six-build-batch-1/formatted.json",
+        "rootFormatReceiptSHA256": "b38708bd44c56fe7a47acce233bf6e5be08ad71a5ea071286ec50e30e59d53bf",
+        "rootFormatReceiptBytes": 2611,
+        "selectedLeaves": [
+          {
+            "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
+            "bytes": 14083,
+            "sha256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
+            "formatChanged": false
+          },
+          {
+            "sourceTarget": "server/internal/namespaceinventory/import_read_scope.go",
+            "bytes": 2993,
+            "sha256": "f0d26184584b3381678d6f18eb30e0c41edfa4d982d477b1c0a94fc7c141e314",
+            "formatChanged": false
+          },
+          {
+            "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
+            "bytes": 26168,
+            "sha256": "91d405521a2f990d6fb1342acd6879b89c9bd4036a2e26a446dfb32a78472e96",
+            "formatChanged": false
+          }
+        ]
+      }
     },
-    "parentFormattedSource": {
+    "formattedSource": {
       "members": 1556,
-      "digest": "3d5e5d074fe677abcc526b7386f44220f8ebe1d6b9748d7524db6541872a0bcc"
+      "digest": "fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a"
     },
-    "incrementalCaptureScopeFormat": {
-      "rootFormatReceiptPath": ".qa/backend-capture-cleanup-six-build-batch-1/formatted.json",
-      "rootFormatReceiptSHA256": "b38708bd44c56fe7a47acce233bf6e5be08ad71a5ea071286ec50e30e59d53bf",
-      "rootFormatReceiptBytes": 2611,
-      "selectedLeaves": [
-        {
-          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-          "bytes": 14083,
-          "sha256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
-          "formatChanged": false
-        },
-        {
-          "sourceTarget": "server/internal/namespaceinventory/import_read_scope.go",
-          "bytes": 2993,
-          "sha256": "f0d26184584b3381678d6f18eb30e0c41edfa4d982d477b1c0a94fc7c141e314",
-          "formatChanged": false
-        },
-        {
-          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-          "bytes": 26168,
-          "sha256": "91d405521a2f990d6fb1342acd6879b89c9bd4036a2e26a446dfb32a78472e96",
-          "formatChanged": false
-        }
-      ]
-    }
+    "incrementalFormattedParsedGo": 2,
+    "GoCompilationOrTests": 0,
+    "rootFormatReceipt": {
+      "path": ".qa/backend-failed-fixture-finite-diagnostics-batch-1/formatted-backend.json",
+      "bytes": 1735,
+      "sha256": "4a3d6fadd4d4a67db093f7fe581460f62635c8e220acc3b60eb7cfcc7796b257"
+    },
+    "selectedLeaves": [
+      {
+        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
+        "bytes": 27088,
+        "sha256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
+        "formatChanged": false,
+        "manifestSHA256": "d6f0c95cdfc22c84ce4576d8789e98557b47538e63db7f70a00ee435c77f45b5"
+      },
+      {
+        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go",
+        "bytes": 32546,
+        "sha256": "060394fc3c8fe32269bb8a3ea0e84ec55922ddfcb114624a4e7f402b9b0b6670",
+        "formatChanged": true,
+        "manifestSHA256": "1296f1131794c84566af4c76bff63369e5e84736732d1137a27d294c9abf6618"
+      }
+    ]
   },
   "selectionSHA256": "0a433ed0706953bbadb348c0841926d4dd672c36c8fdb3f1e48023741a61cf9d",
   "priorPassedTargets": {
@@ -4494,15 +4527,15 @@
   },
   "repairPlan": {
     "path": "ci/backend-runtime-join-r8/repair-plan.json",
-    "bytes": 43137,
-    "sha256": "5ff8d49c586d7cc334d575a89702a17e388295536825983f312ed712c91c9ce3",
+    "bytes": 48852,
+    "sha256": "8a76f25b2ff149f48139e63f38773cc21446eb0e71ea918693939858ff692fe7",
     "mode": 420
   },
   "repairControllerPins": [
     {
       "path": "ci/backend-runtime-join-r8/test_repair.py",
-      "bytes": 12741,
-      "sha256": "aabe0d1e524941de7011cd78be4d47d021580606137043942f5409e08d6bccbf",
+      "bytes": 14614,
+      "sha256": "0e7f16dd329346ccddf3113616f36fb450de835def43e9f3d29ff6c7a85562e3",
       "mode": 420
     }
   ]

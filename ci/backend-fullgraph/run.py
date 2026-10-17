@@ -5,13 +5,14 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE={'members': 1573, 'digest': '051a08e83860d54309c6cb63e204676a2afefc0caf43d02798da5475ca63aa5c'}  # Exact Root-reviewed formatted R3 source; execution remains manual-only.
+FINAL_SOURCE={'members': 1573, 'digest': 'dd529a76e7b66b5251a953de08450c718c0da08c8f1d28059267adcc304b1118'}  # Exact Root-reviewed final source; execution remains manual-only.
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
 SCENARIOS=('reader-registered-cancel','reader-writer-fence-cancel','ack','redis-unknown')
 ROLES=('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth','rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user')
-CLEANUP_SCOPES=[{'label': 'cleanup-ownedcontrol', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['canonical-first', 'runtime-first', 'local-first']}}}, {'label': 'cleanup-runtimeacceptance', 'targets': {'internal/runtimeacceptance': ['TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup']}, 'requiredSubtests': {'internal/runtimeacceptance': {'TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup': ['cancel-audit-before-stop', 'timeout-before-local-wait-complete']}}}]
+CLEANUP_SCOPES=[{'label': 'cleanup-runtimeacceptance', 'targets': {'internal/runtimeacceptance': ['TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup']}, 'requiredSubtests': {'internal/runtimeacceptance': {'TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup': ['cancel-audit-before-stop', 'timeout-before-local-wait-complete']}}}]
+OWNEDCONTROL_REUSE={'run': 39056217977, 'head': 'bbb59602ada7de1a88d260ea39153962add29e46', 'source': {'members': 1573, 'digest': '051a08e83860d54309c6cb63e204676a2afefc0caf43d02798da5475ca63aa5c'}, 'reviewSHA256': '78d31ff864cae6df41e6a98ccbe4eb407bf2a9acfe8bf82c20c5cff167882073', 'package': 'internal/namespaceimport/ownedcontrol', 'top': 'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths', 'subtests': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['canonical-first', 'runtime-first', 'local-first']}}
 CLEANUP_REUSE={'run': 39053868483, 'head': 'ce7964a0c7aa474cbc83c32dd71c1bfcfb83cfec', 'source': {'members': 1573, 'digest': 'f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2'}, 'reviewSHA256': '48c619c7b7c19ad33b5bb5b9bfa38f655de918c01ad19a6784fed4d9ccc1efbf', 'package': 'internal/namespaceimport/ownedcontrol', 'top': 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit', 'subtests': {'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit': ['unknown-middle-child-does-not-strand-later-original-owner', 'good-drains-retained-and-unknown-never-gets-a-join', 'repeat-Stop-does-not-renew-signal-or-erase-failure'], 'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['unbound_start_failure_only_waits_original_done']}}
 GRAPH_TARGETS={'pkg/common/startrpc': ['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence', 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']}
 GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
@@ -56,7 +57,7 @@ def check_locked(c):
  if FINAL_SOURCE is None or c.get('state')!='FROZEN_FINAL_SOURCE' or c.get('source')!=FINAL_SOURCE or c.get('sourceReviewAccepted') is not True:raise ValueError('Root final formatted whole-source identity required; prepare-only cannot execute')
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
- if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('cleanupReuse')!=CLEANUP_REUSE or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN:raise ValueError('exact fresh cleanup2/5 plus graph2/3 and prior-source cleanup1/4 required')
+ if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('cleanupReuse')!=CLEANUP_REUSE or c.get('ownedcontrolReuse')!=OWNEDCONTROL_REUSE or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN:raise ValueError('exact fresh cleanup1/2 plus graph2/3 and prior-source cleanup2/7 required')
 def validate_entries(bodies,c):
     rows = c['entrypoints']
     if len(rows) != 14 or len({r['role'] for r in rows}) != 14 or len({r['package'] for r in rows}) != 14:
@@ -123,6 +124,34 @@ def project_go_test_events(raw,phase):
   diagnostic={'phase':phase,'publicSourceOnly':True,'selection':'go-test-build-output-without-Test-only','completeBytes':total,'completeSHA256':digest.hexdigest(),'diagnostic':text,'truncated':len(text.encode('utf-8'))<total}
  return events,diagnostic
 
+def runtime_cleanup_observations(raw,phase):
+ if phase!='cleanup-runtimeacceptance':raise ValueError('only exact runtime cleanup fixture observations are public')
+ marker='LUOBO_RUNTIME_CLEANUP_DIAG_V1 ';top='TestFullgraphEarlyFailureKeepsOriginalChildrenForFinalCleanup';package='github.com/openimsdk/open-im-server/v3/internal/runtimeacceptance'
+ kinds={'cancel-audit-before-stop','timeout-before-local-wait-complete'};stages={'begin','private-directory','launcher-open','executable-path','executable-canonical','executable-read','child-directory','bootstrap-write','receipt-write','child-start','child-ready','fixture-ready','assert-early-incomplete','short-cleanup','assert-short-incomplete','final-cleanup-start','signal-wait','release-write','final-cleanup-return','assert-primary','assert-complete','count-check','repeat-cleanup','complete'}
+ fields={'version','kind','stage','errorClass','shortErrorClass','role','binaryBytes','childReturned','finalReturned','observedExits','complete','launcherClosed','signal0','signal1','primaryPreserved','elapsedMicros','firstStopMicros','finalCleanupMicros'}
+ classes={'none','deadline','cancelled','owned-evidence','not-exist','permission','other'};signals={'unobserved','seen','one','other','unreadable'};rows={};rejected=0
+ def unique(pairs):
+  result=dict(pairs)
+  if len(result)!=len(pairs):raise ValueError('duplicate diagnostic field')
+  return result
+ for line in raw.splitlines():
+  try:event=json.loads(line)
+  except (ValueError,TypeError):rejected+=1;continue
+  if not isinstance(event,dict) or event.get('Action')!='output' or event.get('Package')!=package or not isinstance(event.get('Test'),str) or event.get('Test') not in {top+'/'+kind for kind in kinds}:continue
+  output=event.get('Output')
+  if not isinstance(output,str) or not output.startswith(marker):continue
+  try:
+   if len(output.encode('utf-8'))>2048 or not output.endswith('\n') or output.count('\n')!=1:raise ValueError('bounded single diagnostic line required')
+   value=json.loads(output[len(marker):-1],object_pairs_hook=unique)
+   if not isinstance(value,dict) or set(value)!=fields or value['version']!='runtime-cleanup-fixture-observation-v1' or value['kind'] not in kinds or event['Test']!=top+'/'+value['kind'] or value['stage'] not in stages or value['errorClass'] not in classes or value['shortErrorClass'] not in classes|{'unobserved'} or value['role'] not in {'none','rpc-msg','msgtransfer-legacy'} or value['signal0'] not in signals or value['signal1'] not in signals:raise ValueError('closed diagnostic enums required')
+   if any(type(value[key]) is not bool for key in ('childReturned','finalReturned','complete','launcherClosed','primaryPreserved')):raise ValueError('closed diagnostic booleans required')
+   for key,maximum in [('binaryBytes',1<<30),('observedExits',2),('elapsedMicros',180000000),('firstStopMicros',180000000),('finalCleanupMicros',180000000)]:
+    if type(value[key]) is not int or not 0<=value[key]<=maximum:raise ValueError('bounded diagnostic integers required')
+   if value['kind'] in rows:raise ValueError('one diagnostic per exact failed child required')
+  except (ValueError,TypeError,KeyError,UnicodeError):rejected+=1;continue
+  rows[value['kind']]=value
+ return {'version':'runtime-cleanup-fixture-observations-v1','diagnosticsComplete':set(rows)==kinds and rejected==0,'rejectedMarkers':min(rejected,4096),'observations':[rows[key] for key in sorted(rows)]}
+
 def run_cleanup_controls(go,environment,command,parent,out):
  results=[]
  for scope in CLEANUP_SCOPES:
@@ -137,7 +166,7 @@ def run_cleanup_controls(go,environment,command,parent,out):
   if actual!=expected:raise ValueError('all actual cleanup descendants required')
   write(out/(scope['label']+'-names.json'),result);results.append(result)
  union={'topPASS':sum(row['topPASS'] for row in results),'subPASS':sum(row['subPASS'] for row in results),'namedCompletions':[name for row in results for name in row['namedCompletions']]}
- if (union['topPASS'],union['subPASS'])!=(2,5):raise ValueError('exact fresh cleanup2top5sub required')
+ if (union['topPASS'],union['subPASS'])!=(1,2):raise ValueError('exact fresh runtime cleanup1top2sub required')
  write(out/'cleanup-names.json',union)
  return union
 
@@ -148,11 +177,14 @@ def audit_target_union(original,cleanup):
  for scope in CLEANUP_SCOPES:
   expected|={(pkg,top) for pkg,tops in scope['targets'].items() for top in tops}
   expected|={(pkg,top+'/'+child) for pkg,tops in scope['requiredSubtests'].items() for top,subs in tops.items() for child in subs}
- if set(actual)!=expected or any(count!=1 for count in actual.values()) or len(expected)!=12:raise ValueError('exact fresh graph2/3 and cleanup2/5 union required')
- prior={(CLEANUP_REUSE['package'],CLEANUP_REUSE['top'])}
- prior|={(CLEANUP_REUSE['package'],top+'/'+child) for top,subs in CLEANUP_REUSE['subtests'].items() for child in subs}
- if actual.keys()&prior or len(prior)!=5 or len(expected|prior)!=17:raise ValueError('prior-source cleanup1/4 must be disjoint and complete')
- return {'source':FINAL_SOURCE,'topPASS':4,'subPASS':8,'skip':0,'fail':0,'namedCompletions':[{'package':pkg,'name':name} for pkg,name in sorted(actual)],'cleanupReuse':dict(CLEANUP_REUSE,topPASS=1,subPASS=4,namedCompletions=[{'package':pkg,'name':name} for pkg,name in sorted(prior)]),'originalObligation':{'topCount':5,'subCount':12,'crossSource':True}}
+ if set(actual)!=expected or any(count!=1 for count in actual.values()) or len(expected)!=8:raise ValueError('exact fresh graph2/3 and runtime cleanup1/2 union required')
+ prior=[]
+ for binding in (CLEANUP_REUSE,OWNEDCONTROL_REUSE):
+  names={(binding['package'],binding['top'])}|{(binding['package'],top+'/'+child) for top,subs in binding['subtests'].items() for child in subs}
+  prior.append(names)
+ if len(prior[0])!=5 or len(prior[1])!=4 or prior[0]&prior[1] or actual.keys()&(prior[0]|prior[1]) or len(expected|prior[0]|prior[1])!=17:raise ValueError('two prior-source cleanup records must be disjoint and complete')
+ receipt=lambda binding,names,subs:dict(binding,topPASS=1,subPASS=subs,namedCompletions=[{'package':pkg,'name':name} for pkg,name in sorted(names)])
+ return {'source':FINAL_SOURCE,'topPASS':3,'subPASS':5,'skip':0,'fail':0,'namedCompletions':[{'package':pkg,'name':name} for pkg,name in sorted(actual)],'cleanupReuse':receipt(CLEANUP_REUSE,prior[0],4),'ownedcontrolReuse':receipt(OWNEDCONTROL_REUSE,prior[1],3),'originalObligation':{'topCount':5,'subCount':12,'crossSource':True}}
 
 def public_cleanup(row):
  if row['version']!='owned-fullgraph-resource-cleanup-v1' or type(row['accepted']) is not bool or not re.fullmatch('[0-9a-f]{32}',row['nonce']) or any(not re.fullmatch('[0-9a-f]{64}',v) for v in row['exactContainerIDs']):raise ValueError('exact resource cleanup receipt required')
@@ -287,8 +319,13 @@ def run():
     # resource credentials/configs exist. No operator/DB/SDK text is selected.
     raw=regular(folder/'stderr',32<<20) if (folder/'stderr').exists() else b''
     write(out/(f'compile-failure-{command_index:04d}.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
+   fixture_observations=None
    if label=='pending-two-original-oracles' or label in {scope['label'] for scope in CLEANUP_SCOPES}:
-    events,diagnostic=project_go_test_events(regular(folder/'stdout',32<<20),label)
+    raw_events=regular(folder/'stdout',32<<20)
+    if label=='cleanup-runtimeacceptance':
+     fixture_observations=runtime_cleanup_observations(raw_events,label)
+     write(out/'runtime-cleanup-observations.json',dict(fixture_observations,source=FINAL_SOURCE))
+    events,diagnostic=project_go_test_events(raw_events,label)
     if diagnostic is not None:write(out/(f'go-test-compile-diagnostic-{command_index:04d}.json'),diagnostic)
     write(out/('oracle-events.json' if label=='pending-two-original-oracles' else label+'-events.json'),events)
    if failed:raise ValueError('actual phase failed; private raw retained')
@@ -359,7 +396,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':2,'cleanupSubPASS':5,'targetedTopPASS':4,'targetedSubPASS':8,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=1,subPASS=4),'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':1,'cleanupSubPASS':2,'targetedTopPASS':3,'targetedSubPASS':5,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=1,subPASS=4),'ownedcontrolReuse':dict(OWNEDCONTROL_REUSE,topPASS=1,subPASS=3),'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

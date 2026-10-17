@@ -4,7 +4,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SessionCoordinator, type Session } from "./session/session";
 import type { AppConfig } from "@/store/type";
-import { ApiError } from "@/utils/request";
+import { ApiError, TransportApiError } from "@/utils/request";
 import { decodeAppConfigData } from "./appConfig";
 import { appConfigFailureDescription } from "./appConfigFailure";
 
@@ -140,8 +140,10 @@ describe("real app-config store request publication", () => {
   it("keeps only bounded current failure reasons and clears them on retry without publishing upstream private details", async () => {
     const privateText = "synthetic-private URL, token and server body";
     const cases = [
-      { error: new ApiError(503, "请求超时，请重试"), expected: { reason: "timeout", code: 503 } },
-      { error: new ApiError(503, privateText), expected: { reason: "connection", code: 503 } },
+      { error: new TransportApiError("timeout"), expected: { reason: "timeout", code: 503 } },
+      { error: new TransportApiError("connection"), expected: { reason: "connection", code: 503 } },
+      { error: new ApiError(503, privateText), expected: { reason: "rejected", code: 503 } },
+      { error: new ApiError(503, "请求超时，请重试"), expected: { reason: "rejected", code: 503 } },
       { error: new ApiError(401, privateText), expected: { reason: "rejected", code: 401 } },
       { error: new ApiError(502, privateText), expected: { reason: "rejected", code: 502 } },
       { error: new ApiError(Number.MAX_SAFE_INTEGER, privateText), expected: { reason: "rejected" } },

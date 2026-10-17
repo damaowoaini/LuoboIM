@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Repair5 contract controls plus actual split-process dispatcher; no Go, service or fixture."""
+"""Repair2 contract controls plus actual split-process dispatcher; no Go, service or fixture."""
 import copy, importlib.util, json, tempfile, unittest
 from pathlib import Path
 from unittest import mock
@@ -40,7 +40,7 @@ class RepairControls(unittest.TestCase):
 
     def test_actual_repair_plan_has_no_build_rejects_partial_events_and_retains_primary_post_failure(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),5)
+        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),2)
         self.assertFalse(runner.pairs(active['targets']) & runner.pairs(p['actualPassedTargets']))
         audited=copy.deepcopy(active)
         first_package=next(iter(active['targets']));first_top=active['targets'][first_package][0]
@@ -56,7 +56,7 @@ class RepairControls(unittest.TestCase):
                 events.append({'Action':'pass','Package':pkg,'Test':top})
             events.append({'Action':'pass','Package':pkg})
         result=runner.require_children(runner.audit(events,0,active['targets']),audited)
-        self.assertEqual(result['topPASS'],5)
+        self.assertEqual(result['topPASS'],2)
         with self.assertRaises(ValueError):runner.audit(events,1,active['targets'])
         result['namedCompletions']=[r for r in result['namedCompletions'] if '/' not in r['name']]
         with self.assertRaises(ValueError):runner.require_children(result,audited)
@@ -81,14 +81,16 @@ class RepairControls(unittest.TestCase):
 
     def test_split_process_dispatch_keeps_md_failure_and_missing_child_failed_but_runs_both_owned_scopes(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,4])
+        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,1])
         self.assertEqual([list(scope['targets']) for scope in active['scopes']],[['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol']])
         real_child='real_commit_custody_failure_never_becomes_normal_capture_pending'
         self.assertIn(real_child,c['requiredSubtests']['internal/namespaceimport/ownedcontrol']['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'])
-        self.assertFalse(runner.pairs(p['actualPassedTargets']) & runner.pairs(p['directlyAffectedCaptureFixtureTargets']))
+        self.assertEqual(len(runner.pairs(p['actualPassedTargets']) & runner.pairs(p['directlyAffectedCaptureFixtureTargets'])),3)
+        self.assertEqual(active['scopes'][1]['child'],real_child)
+        self.assertEqual(active['scopes'][1]['requiredSubtests']['internal/namespaceimport/ownedcontrol'],{'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory':[real_child]})
         active=copy.deepcopy(active);first=active['scopes'][0];package=next(iter(first['targets']));top=first['targets'][package][0]
         child='control-required-descendant';first['requiredSubtests']={package:{top:[child]}}
-        diagnostic={'schema':'historical-controller-finite-diagnostic-v1','wall_micros':5,'cpu_available':True,'user_cpu_micros':2,'system_cpu_micros':1,'context':'active','final_phase':'published','final_next_page':1,'trace':{'calls':{'controller.step':{'calls':1,'wall_micros':3,'max_wall_micros':3,'error_tags':{'ok':1}}},'events':[{'operation':'controller.step','call':1,'phase':'published','next_page':1,'wall_micros':3,'elapsed_micros':5,'error_tags':['ok'],'context':'active'}],'event_overflow':0}}
+        diagnostic={'schema':'historical-controller-finite-diagnostic-v2','wall_micros':5,'cpu_available':True,'user_cpu_micros':2,'system_cpu_micros':1,'context':'active','final_phase':'published','final_next_page':1,'trace':{'calls':{'controller.step':{'calls':1,'wall_micros':3,'max_wall_micros':3,'error_tags':{'ok':1}}},'events':[{'operation':'controller.step','call':1,'phase':'published','next_page':1,'wall_micros':3,'elapsed_micros':5,'error_tags':['ok'],'context':'active'}],'event_overflow':0,'progress_samples':[]}}
         def output_event(value):
             return {'Action':'output','Package':runner.PREFIX+package,'Test':top,'Output':'    historical_mongo_composition_linux_test.go:1: '+runner.DIAGNOSTIC_PREFIX+json.dumps(value)+'\n'}
         for mode in ('all-pass','first-nonzero','first-missing-child','missing-diagnostic'):
@@ -101,6 +103,7 @@ class RepairControls(unittest.TestCase):
                     self.assertEqual([arg for arg in argv if arg.startswith('./')],['./'+package])
                     self.assertEqual(argv[:2],['env','-i']);self.assertIn('GOAUTH=off',argv)
                     expected='^('+'|'.join(sorted(scope['targets'][package]))+')$'
+                    if 'child' in scope:expected+='/^'+scope['child']+'$'
                     self.assertEqual(argv[argv.index('-run')+1],expected)
                     calls.append(label);folder=output/label;folder.mkdir();pkg=runner.PREFIX+package;events=[{'Action':'start','Package':pkg}]
                     for name in scope['targets'][package]:
@@ -123,6 +126,18 @@ class RepairControls(unittest.TestCase):
                 before=(output/'targeted-tests-union.json').read_bytes()
                 with self.assertRaises(FileExistsError):runner.write(output/'targeted-tests-union.json',{'accepted':True})
                 self.assertEqual((output/'targeted-tests-union.json').read_bytes(),before)
+        observed=copy.deepcopy(diagnostic)
+        observed['trace']['calls'].update({'source.capture':{'calls':1,'wall_micros':1,'max_wall_micros':1,'error_tags':{'pending':1}},'source.progress-inspect':{'calls':1,'wall_micros':1,'max_wall_micros':1,'error_tags':{'ok':1}}})
+        observed['trace']['progress_samples']=[{'capture_call':1,'sequence':3,'phase':'reduce','subcursor_class':'reduce-owners','cursor_present':True,'compared_to_previous':False,'cursor_changed':False,'subcursor_changed':False,'wall_micros':1,'elapsed_micros':2,'error_tags':['ok'],'context':'active'}]
+        self.assertEqual(runner.extract_controller_diagnostic([output_event(observed)]),observed)
+        for field,value in [('cursor','must-not-be-exported'),('subcursor_class','raw-private-value'),('capture_call',2)]:
+            bad=copy.deepcopy(observed);bad['trace']['progress_samples'][0][field]=value
+            with self.subTest(progress=field),self.assertRaises(ValueError):runner.extract_controller_diagnostic([output_event(bad)])
+        bad=copy.deepcopy(observed);bad['trace']['progress_samples']*=17
+        with self.assertRaises(ValueError):runner.extract_controller_diagnostic([output_event(bad)])
+        unavailable=copy.deepcopy(observed);sample=unavailable['trace']['progress_samples'][0]
+        sample.update(sequence=0,phase='unavailable',subcursor_class='unavailable',error_tags=['private-file'])
+        self.assertEqual(runner.extract_controller_diagnostic([output_event(unavailable)]),unavailable)
         event=output_event(diagnostic);text=event['Output'];split=len(text)//2
         self.assertEqual(runner.extract_controller_diagnostic([dict(event,Output=text[:split]),dict(event,Output=text[split:])]),diagnostic)
         for field,value in [('schema','foreign'),('config','must-not-be-exported')]:

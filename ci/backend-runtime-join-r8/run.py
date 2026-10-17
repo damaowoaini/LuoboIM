@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact bounded Capture repair5 in two processes; prior-source66+6+7+4 retained."""
+"""Exact controller progress plus failed commit child; prior-source86 tops and six children retained."""
 import argparse
 from collections import Counter
 from contextlib import contextmanager
@@ -9,9 +9,9 @@ import re, stat, subprocess, sys, time
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
-SCOPE = 'backend_history_capture_bounded_scope_repair5_split2_reuse83_prior14_no_deployment'
+SCOPE = 'backend_history_controller_progress_and_corrupt_commit_child_repair2_reuse86_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
-FINAL = {'members': 1556, 'digest': '6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb'}
+FINAL = {'members': 1556, 'digest': 'fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
 SELECTION_SHA = '0a433ed0706953bbadb348c0841926d4dd672c36c8fdb3f1e48023741a61cf9d'
 RESOURCE = {'initialBytes': 4294967296, 'floorMiB': 1024, 'allocatedMiB': 16384, 'pollSeconds': .2, 'controllerSeconds': 3000, 'compileTotalSeconds': 1200, 'testPhaseSeconds': 2250, 'testGoTimeoutSeconds': 180}
@@ -21,11 +21,12 @@ REUSE_PROOF_SHA = 'a2273b8d18c15fc98fb65317067d89584a44c4570b899e619672f6ea47826
 PENDING_POSITIVE = ('pkg/common/startrpc','TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence')
 PENDING_TOKEN = ('pkg/common/startrpc','TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit')
 PREVIOUS_REPAIR_PROOF_SHA = '096dadcfbd249cc64e36f90e0361a13577908e1fc1a778543a8cc4023b2fe543'
-REPAIR_DELTA_SHA = 'b489b6266dfebfd281fe1aa36ac9c0385253cccd7618b585c181dfea0fbae1bc'
+REPAIR_DELTA_SHA = '7e90a6d295f39fd46f01849532110b7dd3e39621b0ba651bb1a448513a7c7505'
 DIRECT_PRIOR = {('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient')}
 DIRECT_CURRENT = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish')}
 LATEST_REPAIR_PROOF_SHA = '2b6e93f014f13bf8e0a7830b7b94f15b02149f78c24229066b03629c3bbae3ff'
-REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}, {'label': 'targeted-tests-ownedcontrol-default-fixture', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory', 'TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish']}}]
+REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}, {'label': 'targeted-tests-ownedcontrol-corrupt-commit', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory']}, 'child': 'real_commit_custody_failure_never_becomes_normal_capture_pending'}]
+LAST_BOUNDED_CAPTURE_SHA = 'f46d40ff9d90a2ad8ae981e3915f93fb0d5c4f00b57235ac01d47174cd87fd10'
 LAST_CAPTURE_STAMP_PROOF_SHA = 'ecb9f9fc71be15e4a0571308d0650b29799522dff2a5be59e3463691aa4c81fc'
 PREVIOUS_SPLIT_REPAIR_PROOF_SHA = '3e74a2121b5d9bf45c01d0e9b6c58e26d10a8dbe208547c9b3aef9120892c585'
 DIRECT_CAPTURE_FIXTURE = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory')}
@@ -244,7 +245,7 @@ def check_repair(c, p):
     proof = p['acceptedPreviousRun']; current = p['previousRepairRun']; latest = p['latestRepairRun']; split = p['previousSplitRepairRun']; stamp = p['lastCaptureStampRun']
     old = {'members':1555,'digest':'686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
     before = {'members':1555,'digest':'68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
-    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_CAPTURE_BOUNDED_SCOPE_REPAIR5' or p.get('source') != c['source']
+    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_CONTROLLER_PROGRESS_REPAIR2' or p.get('source') != c['source']
             or sha(canonical(proof)) != REUSE_PROOF_SHA or p['reuseProofSHA256'] != REUSE_PROOF_SHA
             or proof['source'] != old or proof['run'] != 39041607488 or proof['attempt'] != 1
             or proof['head'] != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
@@ -292,6 +293,17 @@ def check_repair(c, p):
             or diagnostic_failure['wholeAccepted'] is not False
             or diagnostic_failure['rootReceipt']['sha256'] != 'c45d1f7f0793539712cf2d84697ee11ad10b7f75be40f6138350c14e31260e8c'):
         raise ValueError('previous diagnostic failure cannot become new PASS evidence')
+    bounded = p['lastBoundedCaptureRun']
+    if (sha(canonical(bounded)) != LAST_BOUNDED_CAPTURE_SHA or p['lastBoundedCaptureRunSHA256'] != LAST_BOUNDED_CAPTURE_SHA
+            or bounded['source'] != {'members':1556,'digest':'6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb'}
+            or (bounded['run'],bounded['job'],bounded['head']) != (39056484267,117465382674,'bbb59602ada7de1a88d260ea39153962add29e46')
+            or (bounded['actualTopPASS'],bounded['actualTopFAIL'],bounded['actualSubPASS'],bounded['actualSubFAIL']) != (3,2,9,1)
+            or not bounded['sourceAndControllerPostExact'] or not bounded['diagnosticAccepted']
+            or bounded['newCorruptCommitAssertionExecuted'] is not False or bounded['wholeAccepted'] is not False
+            or (bounded['residualMongo'],bounded['residualRedis'],bounded['ownedContainerCleanupExit'],bounded['currentMainBuilds']) != (0,0,0,0)
+            or bounded['rootReceipt']['sha256'] != '82072a25c16cd113414ed3852287489c59c21b763ef2303f89d91d9e545e1835'
+            or p['partialChildReuse'] != bounded['reusedPartialChildren'] or p['newCorruptCommitAssertionPreviouslyExecuted'] is not False):
+        raise ValueError('last bounded Capture failure/partial child facts cannot become new PASS')
     universe = pairs(c['targets'])
     passed, failed = pairs(proof['passedTargets']), pairs(proof['failedTargets'])
     current_pass, current_fail, current_incomplete = pairs(current['passedTargets']), pairs(current['failedTargets']), pairs(current['incompleteTargets'])
@@ -314,24 +326,25 @@ def check_repair(c, p):
             or split_pass & split_fail or len(split_pass) != 4 or len(split_fail) != 1 or pairs(split['incompleteTargets'])
             or split_pass | split_fail != latest_fail or capture_direct & split_pass
             or not capture_direct <= (passed - old_direct) | (current_pass - current_direct) | latest_pass
-            or stamp_pass != capture_direct or stamp_fail != split_fail or active != stamp_fail | capture_direct or len(active) != 5
-            or reused != ((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass or len(reused) != 83
+            or stamp_pass != capture_direct or stamp_fail != split_fail or active != pairs(bounded['failedTargets']) or len(active) != 2
+            or pairs(bounded['passedTargets']) != capture_direct - active
+            or reused != ((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass | pairs(bounded['passedTargets']) or len(reused) != 86
             or active & (reused | pending) or active | reused | pending != universe
             or pairs(p['pendingRequiredTokenTargets']) != {PENDING_TOKEN} or pairs(c['pendingTargets']) != {PENDING_TOKEN}
-            or p['sourceReuse'] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 66, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 6, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 7, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only'}]):
-        raise ValueError('repair5/reuse66+6+7+4/default4-direct/positive1/required-token1 must retain exact original names')
+            or p['sourceReuse'] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 66, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 6, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 7, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only'}, {'source': {'members': 1556, 'digest': '6da45b178a7eb31b07b9591a91599435d00419b157e5d0a378626f92521528eb'}, 'run': 39056484267, 'retainedTopCount': 3, 'derivation': 'lastBoundedCaptureRun.passedTargets; reusedPartialChildren are separate actual old6sub, not whole failed parent PASS'}]):
+        raise ValueError('repair2/reuse86/partial6/positive1/required-token1 must retain exact original names')
     entries = proof['compiledEntries']
     if (entries['completed'] != 14 or entries['uploadedBinaries'] is not False or entries['executed'] is not False
             or [(r['role'],r['package']) for r in entries['entries']] != [(r['role'],r['package']) for r in c['entrypoints']]):
         raise ValueError('old fourteen actual distinct entry evidence differs')
-    if (len(p['sourceDelta']) != 3 or {r['target'] for r in p['sourceDelta']} != {'server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go', 'server/internal/namespaceinventory/import_read_scope.go', 'server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go'}
+    if (len(p['sourceDelta']) != 2 or {r['target'] for r in p['sourceDelta']} != {'server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go', 'server/internal/namespaceimport/ownedcontrol/historical_mongo_composition_linux_test.go'}
             or p['sourceDeltaSHA256'] != REPAIR_DELTA_SHA or sha(canonical(p['sourceDelta'])) != REPAIR_DELTA_SHA):
-        raise ValueError('exact formatted Capture/error-preservation source3 required')
+        raise ValueError('exact formatted fixture/finite progress diagnostic test2 required')
     if p['executionScopes'] != REPAIR_SCOPES:
-        raise ValueError('exact controller1 and directly affected default4 scopes required')
+        raise ValueError('exact controller1 and original failed commit child scopes required')
     scoped = [pair for scope in REPAIR_SCOPES for pair in pairs(scope['targets'])]
-    if len(scoped) != 5 or len(set(scoped)) != 5 or set(scoped) != active:
-        raise ValueError('repair scopes must partition exact controller1 plus directly affected default4')
+    if len(scoped) != 2 or len(set(scoped)) != 2 or set(scoped) != active:
+        raise ValueError('repair scopes must partition exact controller1 and original failed child parent')
     overlay = {r['target']:r for r in c['overlay']}
     for row in p['sourceDelta']:
         now = overlay.get(row['target'])
@@ -346,11 +359,17 @@ def repair_execution_plan(c, p):
     required = {package:{top:children for top,children in names.items() if top in targets.get(package,[])}
                 for package,names in c['requiredSubtests'].items()}
     required = {package:names for package,names in required.items() if names}
-    scopes = [{'label':scope['label'], 'targets':scope['targets'],
-               'requiredSubtests':{package:{top:children for top,children in required.get(package,{}).items()
-                                          if top in tops}
-                                  for package,tops in scope['targets'].items()}}
-              for scope in p['executionScopes']]
+    scopes = []
+    for scope in p['executionScopes']:
+        item = dict(scope)
+        item['requiredSubtests'] = {package:{top:children for top,children in required.get(package,{}).items() if top in tops}
+                                   for package,tops in scope['targets'].items()}
+        if 'child' in scope:
+            package = next(iter(scope['targets'])); top = scope['targets'][package][0]
+            if scope['child'] not in required[package][top]: raise ValueError('original selected child absent')
+            item['requiredSubtests'] = {package:{top:[scope['child']]}}
+            required[package][top] = [scope['child']]
+        scopes.append(item)
     return {'compile': [], 'targets': targets, 'requiredSubtests': required, 'scopes': scopes}
 
 
@@ -358,10 +377,11 @@ def repair_execution_plan(c, p):
 DIAGNOSTIC_TOP = 'TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate'
 DIAGNOSTIC_PACKAGE = PREFIX + 'internal/namespaceimport/ownedcontrol'
 DIAGNOSTIC_PREFIX = 'historical controller finite diagnostic '
-DIAGNOSTIC_METHODS = {'controller.begin','controller.step','controller.reopen-begin','source.capture','source.revalidate','source.read-page','writer.check-target','writer.apply-page','writer.inspect-page','writer.publish-cutover','writer.inspect-cutover'}
+DIAGNOSTIC_METHODS = {'controller.begin','controller.step','controller.reopen-begin','source.capture','source.progress-inspect','source.revalidate','source.read-page','writer.check-target','writer.apply-page','writer.inspect-page','writer.publish-cutover','writer.inspect-cutover'}
 DIAGNOSTIC_ERRORS = {'ok','deadline-exceeded','cancelled','pending','commit-unconfirmed','import-untrusted','import-conflict','import-invalid','owned-evidence','inventory-changed','private-file','inventory-invalid','other'}
 DIAGNOSTIC_PHASES = {'','fenced','captured','pending-page','pending-cutover','published','other'}
 DIAGNOSTIC_CONTEXTS = {'absent','active','deadline-exceeded','cancelled','other'}
+PROGRESS_CLASSES = frozenset(['complete', 'history-sources:begin', 'history-sources:rows', 'history-sources:tree', 'namespace-roots', 'other', 'output-plan:boundaries', 'output-plan:complete', 'output-plan:final-counts', 'output-plan:namespaces', 'output-plan:prospective', 'output-plan:segments', 'prepared', 'raw-atoms', 'raw-row', 'reduce-facts', 'reduce-groups', 'reduce-owners', 'roots-global', 'roots-groups', 'roots-owners', 'roots-start', 'source-bodies:canonical-roots', 'source-bodies:complete', 'source-bodies:coverage', 'source-bodies:data-pages', 'source-bodies:global-closures', 'source-bodies:namespace-closures', 'source-bodies:pages-root', 'source-bodies:prospective', 'source-roots:mongo', 'source-roots:redis', 'source-roots:rows', 'source-roots:seal', 'unavailable'])
 def extract_controller_diagnostic(events):
     def fields(value, keys):
         if not isinstance(value,dict) or set(value) != set(keys): raise ValueError('diagnostic fields differ')
@@ -394,10 +414,10 @@ def extract_controller_diagnostic(events):
     if DIAGNOSTIC_PREFIX in line or len(found)!=1: raise ValueError('missing or incomplete diagnostic summary')
     d=found[0]
     fields(d,('schema','wall_micros','cpu_available','user_cpu_micros','system_cpu_micros','context','final_phase','final_next_page','trace'))
-    if d['schema']!='historical-controller-finite-diagnostic-v1' or type(d['cpu_available']) is not bool or d['context'] not in DIAGNOSTIC_CONTEXTS or d['final_phase'] not in DIAGNOSTIC_PHASES: raise ValueError('diagnostic schema invalid')
+    if d['schema']!='historical-controller-finite-diagnostic-v2' or type(d['cpu_available']) is not bool or d['context'] not in DIAGNOSTIC_CONTEXTS or d['final_phase'] not in DIAGNOSTIC_PHASES: raise ValueError('diagnostic schema invalid')
     for key in ('wall_micros','user_cpu_micros','system_cpu_micros','final_next_page'): integer(d[key])
     if not d['cpu_available'] and (d['user_cpu_micros'] or d['system_cpu_micros']): raise ValueError('unavailable CPU mislabeled')
-    trace=d['trace'];fields(trace,('calls','events','event_overflow'));integer(trace['event_overflow'])
+    trace=d['trace'];fields(trace,('calls','events','event_overflow','progress_samples'));integer(trace['event_overflow'])
     if not isinstance(trace['calls'],dict) or not set(trace['calls']) <= DIAGNOSTIC_METHODS or not trace['calls']: raise ValueError('diagnostic methods invalid')
     for method,v in trace['calls'].items():
         fields(v,('calls','wall_micros','max_wall_micros','error_tags'))
@@ -411,6 +431,23 @@ def extract_controller_diagnostic(events):
         for key in ('call','next_page','wall_micros','elapsed_micros'): integer(e[key])
         if not 1<=e['call']<=trace['calls'][e['operation']]['calls']: raise ValueError('diagnostic event call mismatch')
         tags(e['error_tags'])
+    # Sparse original observations are never a completion/progress requirement.
+    samples = trace['progress_samples']
+    if samples is None: samples = []
+    if not isinstance(samples,list) or len(samples)>16: raise ValueError('progress samples overflow')
+    last_call = 0
+    for sample in samples:
+        fields(sample,('capture_call','sequence','phase','subcursor_class','cursor_present','compared_to_previous','cursor_changed','subcursor_changed','wall_micros','elapsed_micros','error_tags','context'))
+        for key in ('capture_call','sequence','wall_micros','elapsed_micros'): integer(sample[key])
+        for key in ('cursor_present','compared_to_previous','cursor_changed','subcursor_changed'):
+            if type(sample[key]) is not bool: raise ValueError('progress boolean invalid')
+        call = sample['capture_call']
+        if (call<=last_call or (call!=1 and call%64) or call>trace['calls'].get('source.capture',{}).get('calls',0)
+                or sample['phase'] not in {'raw','reduce','roots','pages','complete','other','unavailable'}
+                or sample['subcursor_class'] not in PROGRESS_CLASSES or sample['context'] not in DIAGNOSTIC_CONTEXTS):
+            raise ValueError('progress observation shape invalid')
+        tags(sample['error_tags']);last_call=call
+    if trace['calls'].get('source.progress-inspect',{}).get('calls',0) != len(samples): raise ValueError('progress sampling cost mismatch')
     return d
 
 def execute_repair_scopes(active, command, environment, output):
@@ -425,6 +462,7 @@ def execute_repair_scopes(active, command, environment, output):
             raise ValueError('original test phase budget exhausted')
         names = sorted({name for tops in scope['targets'].values() for name in tops})
         pattern = '^(' + '|'.join(re.escape(name) for name in names) + ')$'
+        if 'child' in scope: pattern += '/^' + re.escape(scope['child']) + '$'
         args = ['env', '-i'] + [key+'='+value for key,value in environment.items()]
         args += ['go', 'test', '-mod=readonly', '-p=1', '-parallel=1', '-race', '-json', '-count=1', '-vet=off', '-timeout=180s', '-run', pattern]
         args += ['./'+package for package in scope['targets']]
@@ -438,7 +476,7 @@ def execute_repair_scopes(active, command, environment, output):
             result = {'accepted':False,'exitCode':code,'originalRawRetained':True,
                       'exceptionType':type(error).__name__,'targets':scope['targets']}
         # Only the original controller top emits this diagnostic. Its failure
-        # still exports the bounded summary; default4 has no marker obligation.
+        # still exports the bounded summary; failed commit child has no marker obligation.
         diagnostic_required = scope['label'] == 'targeted-tests-ownedcontrol-controller'
         result['diagnosticRequired'] = diagnostic_required
         if diagnostic_required:
@@ -459,7 +497,7 @@ def execute_repair_scopes(active, command, environment, output):
              'subPASS':sum(result.get('subPASS',0) for result in results),
              'namedCompletions':[entry for result in results if result['accepted']
                                  for entry in result['namedCompletions']],
-             'allSelectedFiveAccepted':accepted,'originalRawRetained':True}
+             'allSelectedTwoAccepted':accepted,'originalRawRetained':True}
     write(output/'targeted-tests-union.json',union)
     return union
 

@@ -315,15 +315,36 @@ func TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory(t *te
 		if e != nil {
 			t.Fatal(e)
 		}
-		rows, _, _, e := m.snapshot.ReadRows(ctx, m.live, "", 1)
-		if e != nil || len(rows) != 1 {
-			t.Fatal("original first raw row unavailable", e)
+		var atom HistoricalFact
+		found := false
+		// Catalog rows legitimately produce no atoms. Follow the ACTUAL durable
+		// raw cursor, using Capture itself to commit each preceding metadata row.
+		// This is a small fixture sanity bound, not a production history limit.
+		for scanned := 0; scanned < 128; scanned++ {
+			before, _, e = m.workspace.Checkpoint(ctx)
+			if e != nil || before.Phase != "raw" {
+				t.Fatal("fixture raw progress unavailable before factual row", e)
+			}
+			rows, _, _, readErr := m.snapshot.ReadRows(ctx, m.live, before.Cursor, 1)
+			if readErr != nil || len(rows) != 1 {
+				t.Fatal("bounded original raw search found no factual row", readErr)
+			}
+			facts, decodeErr := DecodeHistoricalRow(rows[0], m.describe)
+			if decodeErr != nil {
+				t.Fatal("actual raw classifier rejected fixture row", decodeErr)
+			}
+			if len(facts) != 0 {
+				atom, found = facts[0], true
+				break
+			}
+			if _, advanceErr := broken.Capture(ctx, broken.header, brokenFence); !errors.Is(advanceErr, namespaceimport.ErrPending) {
+				t.Fatal("original metadata row did not advance through actual Capture", advanceErr)
+			}
 		}
-		facts, e := DecodeHistoricalRow(rows[0], m.describe)
-		if e != nil || len(facts) == 0 {
-			t.Fatal("fixture first row has no factual atom", e)
+		if !found {
+			t.Fatal("bounded fixture search exhausted before any factual atom")
 		}
-		value, e := materializerBody(facts[0])
+		value, e := materializerBody(atom)
 		if e != nil {
 			t.Fatal(e)
 		}

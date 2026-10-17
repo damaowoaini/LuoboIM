@@ -534,16 +534,35 @@ type mongoCompositionTraceEvent struct {
 	ErrorTags     []string `json:"error_tags"`
 	Context       string   `json:"context"`
 }
+type mongoCompositionProgressSample struct {
+	CaptureCall        uint64   `json:"capture_call"`
+	Sequence           uint64   `json:"sequence"`
+	Phase              string   `json:"phase"`
+	SubcursorClass     string   `json:"subcursor_class"`
+	CursorPresent      bool     `json:"cursor_present"`
+	ComparedToPrevious bool     `json:"compared_to_previous"`
+	CursorChanged      bool     `json:"cursor_changed"`
+	SubcursorChanged   bool     `json:"subcursor_changed"`
+	WallMicros         int64    `json:"wall_micros"`
+	ElapsedMicros      int64    `json:"elapsed_micros"`
+	ErrorTags          []string `json:"error_tags"`
+	Context            string   `json:"context"`
+}
+
 type mongoCompositionTrace struct {
-	started       time.Time
-	cpuStart      syscall.Rusage
-	cpuStartOK    bool
-	Calls         map[string]*mongoCompositionCallTotals `json:"calls"`
-	Events        []mongoCompositionTraceEvent           `json:"events"`
-	EventOverflow uint64                                 `json:"event_overflow"`
-	lastPhase     string
-	lastError     string
-	lastPage      uint64
+	started           time.Time
+	cpuStart          syscall.Rusage
+	cpuStartOK        bool
+	Calls             map[string]*mongoCompositionCallTotals `json:"calls"`
+	Events            []mongoCompositionTraceEvent           `json:"events"`
+	EventOverflow     uint64                                 `json:"event_overflow"`
+	lastPhase         string
+	lastError         string
+	lastPage          uint64
+	ProgressSamples   []mongoCompositionProgressSample `json:"progress_samples"`
+	progressSampleOK  bool
+	progressCursor    string
+	progressSubcursor string
 }
 
 func newMongoCompositionTrace() *mongoCompositionTrace {
@@ -631,6 +650,92 @@ func (d *mongoCompositionTrace) operation(method string, started time.Time, s na
 	}
 	d.Events = append(d.Events, mongoCompositionTraceEvent{method, d.Calls[method].Calls, phase, s.NextPage, time.Since(started).Microseconds(), time.Since(d.started).Microseconds(), tags, mongoCompositionContextClass(ctx)})
 }
+
+// Only finite checkpoint classes cross the test log boundary. Raw cursor,
+// subcursor, tenant, owner, CID and hashes remain local to this original test.
+func mongoCompositionProgressClass(c namespaceinventory.DerivedCheckpoint) (string, string) {
+	phase := c.Phase
+	switch phase {
+	case "raw":
+		if c.Subcursor == "" {
+			return phase, "raw-row"
+		}
+		return phase, "raw-atoms"
+	case "reduce":
+		if strings.HasPrefix(c.Subcursor, "groups:") {
+			return phase, "reduce-groups"
+		}
+		if strings.HasPrefix(c.Subcursor, "owners:") {
+			return phase, "reduce-owners"
+		}
+		if c.Subcursor == "" {
+			return phase, "reduce-facts"
+		}
+	case "roots":
+		switch c.Subcursor {
+		case "":
+			return phase, "roots-start"
+		case "prepared":
+			return phase, "prepared"
+		case "source-roots:rows", "source-roots:mongo", "source-roots:redis", "source-roots:seal",
+			"history-sources:begin", "history-sources:rows", "history-sources:tree",
+			"output-plan:namespaces", "output-plan:boundaries", "output-plan:prospective",
+			"output-plan:segments", "output-plan:final-counts", "output-plan:complete":
+			return phase, c.Subcursor
+		}
+		if strings.HasPrefix(c.Subcursor, "global:") {
+			return phase, "roots-global"
+		}
+		if strings.HasPrefix(c.Subcursor, "groups:") {
+			return phase, "roots-groups"
+		}
+		if strings.HasPrefix(c.Subcursor, "owners:") {
+			return phase, "roots-owners"
+		}
+		if strings.HasPrefix(c.Subcursor, "namespace-roots:") {
+			return phase, "namespace-roots"
+		}
+	case "pages":
+		switch c.Subcursor {
+		case "source-bodies:coverage", "source-bodies:prospective", "source-bodies:canonical-roots",
+			"source-bodies:data-pages", "source-bodies:namespace-closures", "source-bodies:global-closures",
+			"source-bodies:pages-root", "source-bodies:complete":
+			return phase, c.Subcursor
+		}
+	case "complete":
+		return phase, "complete"
+	default:
+		return "other", "other"
+	}
+	return phase, "other"
+}
+
+func (d *mongoCompositionTrace) sampleProgress(ctx context.Context, source *ownedcontrol.HistoricalCaptureSource) {
+	call := d.Calls["source.capture"].Calls
+	if len(d.ProgressSamples) >= 16 || (call != 1 && call%64 != 0) || ctx == nil || ctx.Err() != nil {
+		return
+	}
+	started := time.Now()
+	progress, err := source.InspectProgress(ctx)
+	d.call("source.progress-inspect", started, err)
+	sample := mongoCompositionProgressSample{CaptureCall: call, Phase: "unavailable", SubcursorClass: "unavailable",
+		WallMicros: time.Since(started).Microseconds(), ElapsedMicros: time.Since(d.started).Microseconds(),
+		ErrorTags: mongoCompositionErrorTags(err), Context: mongoCompositionContextClass(ctx)}
+	if err == nil {
+		c := progress.Checkpoint
+		sample.Sequence = c.Sequence
+		sample.Phase, sample.SubcursorClass = mongoCompositionProgressClass(c)
+		sample.CursorPresent = c.Cursor != ""
+		sample.ComparedToPrevious = d.progressSampleOK
+		if d.progressSampleOK {
+			sample.CursorChanged = c.Cursor != d.progressCursor
+			sample.SubcursorChanged = c.Subcursor != d.progressSubcursor
+		}
+		d.progressSampleOK, d.progressCursor, d.progressSubcursor = true, c.Cursor, c.Subcursor
+	}
+	d.ProgressSamples = append(d.ProgressSamples, sample)
+}
+
 func (d *mongoCompositionTrace) finish(t *testing.T, ctx context.Context) {
 	var end syscall.Rusage
 	cpuOK := d.cpuStartOK && syscall.Getrusage(syscall.RUSAGE_SELF, &end) == nil
@@ -653,7 +758,7 @@ func (d *mongoCompositionTrace) finish(t *testing.T, ctx context.Context) {
 		FinalPhase      string                 `json:"final_phase"`
 		FinalPage       uint64                 `json:"final_next_page"`
 		Trace           *mongoCompositionTrace `json:"trace"`
-	}{"historical-controller-finite-diagnostic-v1", time.Since(d.started).Microseconds(), cpuOK, userMicros, systemMicros, mongoCompositionContextClass(ctx), d.lastPhase, d.lastPage, d})
+	}{"historical-controller-finite-diagnostic-v2", time.Since(d.started).Microseconds(), cpuOK, userMicros, systemMicros, mongoCompositionContextClass(ctx), d.lastPhase, d.lastPage, d})
 	if err != nil {
 		t.Log("historical controller finite diagnostic unavailable")
 		return
@@ -670,6 +775,7 @@ func (s *mongoCompositionObservedSource) Capture(ctx context.Context, h namespac
 	started := time.Now()
 	i, err := s.real.Capture(ctx, h, f)
 	s.trace.call("source.capture", started, err)
+	s.trace.sampleProgress(ctx, s.real)
 	return i, err
 }
 func (s *mongoCompositionObservedSource) Revalidate(ctx context.Context, h namespaceimport.Header, i namespaceimport.Inventory) error {

@@ -1,5 +1,5 @@
 import { AppConfigResponseError } from "./appConfig";
-import { ApiError } from "@/utils/request";
+import { ApiError, TransportApiError } from "@/utils/request";
 
 export interface AppConfigFailure {
   reason: "timeout" | "connection" | "response" | "rejected" | "unknown";
@@ -10,12 +10,10 @@ export interface AppConfigFailure {
 // upstream URLs, credentials or response bodies and never enter this state.
 export function appConfigFailure(error: unknown): AppConfigFailure {
   if (error instanceof AppConfigResponseError) return { reason: "response" };
+  if (error instanceof TransportApiError) return { reason: error.transportKind, code: 503 };
   if (error instanceof ApiError) {
     const code = Number.isSafeInteger(error.errCode) && Math.abs(error.errCode) <= 99999999
       ? error.errCode : undefined;
-    if (code === 503) {
-      return { reason: error.message === "请求超时，请重试" ? "timeout" : "connection", code };
-    }
     return { reason: "rejected", ...(code === undefined ? {} : { code }) };
   }
   return { reason: "unknown" };

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { AxiosAdapter, AxiosHeaders } from "axios";
 import { endpoints, SessionCoordinator, StaleSessionError } from "@/core/session/session";
 vi.mock("@/core/session/browser", () => ({ sessionCoordinator: undefined }));
-import createAxiosInstance, { ApiError } from "./request";
+import createAxiosInstance, { ApiError, TransportApiError } from "./request";
 const response = (id = "u", host = "tenant.example") => ({ issuer: "https://route.example", userID: id, imToken: `im-${id}`, chatToken: `chat-${id}`, serverInfo: { serverID: host, serverName: "tenant", domains: [host] } });
 const coordinator = () => new SessionCoordinator({ read: async () => undefined, write: async () => {}, clear: async () => {} });
 const adapter: AxiosAdapter = async config => ({ config, data: { errCode: 0, data: { baseURL: config.baseURL, token: config.headers.token } }, headers: new AxiosHeaders(), status: 200, statusText: "OK" });
@@ -50,7 +50,23 @@ describe("Tenant HTTP boundary", () => {
     await expect(request.post("/account")).rejects.toMatchObject({ errCode: 401 });
     await session.commit(response()); const network = createAxiosInstance("https://tenant.example/api", "im", session);
     network.defaults.adapter = async config => { throw Object.assign(new Error("sensitive detail"), { config, code: "ECONNABORTED" }); };
-    try { await network.post("/message/search"); throw new Error("expected failure"); } catch (error) { expect(error).toBeInstanceOf(ApiError); expect(error).toMatchObject({ errCode: 503, message: "请求超时，请重试" }); expect(error).not.toHaveProperty("config"); }
+    try { await network.post("/message/search"); throw new Error("expected failure"); } catch (error) { expect(error).toBeInstanceOf(ApiError); expect(error).toBeInstanceOf(TransportApiError); expect(error).toMatchObject({ errCode: 503, message: "请求超时，请重试", transportKind: "timeout" }); expect(error).not.toHaveProperty("config"); }
+    for (const code of ["ETIMEDOUT", "ERR_NETWORK"]) {
+      network.defaults.adapter = async config => { throw Object.assign(new Error("sensitive detail"), { config, code }); };
+      const error: unknown = await network.post("/message/search").catch(value => value);
+      expect(error).toBeInstanceOf(TransportApiError);
+      expect(error).toMatchObject({ transportKind: code === "ERR_NETWORK" ? "connection" : "timeout" });
+      expect(error).not.toHaveProperty("config");
+      expect(JSON.stringify(error)).not.toContain("sensitive detail");
+    }
+    network.defaults.adapter = async config => ({ config, data: { errCode: 503, errMsg: "请求超时，请重试" }, headers: new AxiosHeaders(), status: 200, statusText: "OK" });
+    const business: unknown = await network.post("/message/search").catch(value => value);
+    expect(business).toBeInstanceOf(ApiError); expect(business).not.toBeInstanceOf(TransportApiError);
+    expect(business).toMatchObject({ errCode: 503, message: "请求超时，请重试" });
+    network.defaults.adapter = async config => { throw Object.assign(new Error("sensitive server detail"), { config, code: "ERR_BAD_RESPONSE", response: { status: 500 } }); };
+    const http: unknown = await network.post("/message/search").catch(value => value);
+    expect(http).toBeInstanceOf(ApiError); expect(http).not.toBeInstanceOf(TransportApiError);
+    expect(http).toMatchObject({ errCode: 500 }); expect(http).not.toHaveProperty("config");
   });
 });
 

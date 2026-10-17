@@ -11,6 +11,13 @@ export class ApiError extends Error {
   readonly registration:RegistrationFlags;
   constructor(readonly errCode: number, readonly errDlt: string, data?:unknown) { super(errDlt); this.name = "ApiError";this.registration=registrationFlags(data); }
 }
+// This brand is created only at the Axios transport boundary. A business
+// envelope with errCode503 remains an ordinary ApiError.
+export class TransportApiError extends ApiError {
+  constructor(readonly transportKind: "timeout" | "connection") {
+    super(503, transportKind === "timeout" ? "请求超时，请重试" : "网络连接失败，请重试");
+  }
+}
 const createAxiosInstance = (base: string | (() => string), tokenMode: TokenMode | boolean = "im", coordinator: SessionCoordinator = sessionCoordinator) => {
   const mode = typeof tokenMode === "boolean" ? tokenMode ? "im" : "chat" : tokenMode;
   const request = axios.create({ timeout: 25000 });
@@ -50,6 +57,10 @@ const createAxiosInstance = (base: string | (() => string), tokenMode: TokenMode
     if ((error.config as ScopedConfig | undefined)?.luoboCurrent?.() === false) throw new StaleSessionError();
     // Do not propagate Axios request configuration, which contains tokens and
     // password material, to old UI console/error handlers.
+    if (!error.response && (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT"))
+      throw new TransportApiError("timeout");
+    if (!error.response && error.code === "ERR_NETWORK")
+      throw new TransportApiError("connection");
     throw new ApiError(error.response?.status ?? 503, error.code === "ECONNABORTED" ? "请求超时，请重试" : "网络连接失败，请重试",(error.response?.data as {data?:unknown}|undefined)?.data);
   });
   return request;

@@ -1,5 +1,7 @@
 import { readSdkLoginFailure } from "@/core/session/loginFailure";
 import { appConfigFailureDescription } from "@/core/appConfigFailure";
+import { sessionCoordinator } from "@/core/session/browser";
+import { getRouteUrl } from "@/core/session/route";
 import { useUserStore } from "@/store";
 import { SettingOutlined } from "@ant-design/icons";
 import { Alert, Button } from "antd";
@@ -23,6 +25,35 @@ export const Login = () => {
   const appConfigStatus = useUserStore(state=>state.appConfigStatus);
   const configFailure = useUserStore(state=>state.appConfigFailure);
   const retryConfig = useUserStore(state=>state.getAppConfigByReq);
+  useEffect(() => {
+    if (appConfigStatus !== "error" ||
+      (configFailure?.reason !== "timeout" && configFailure?.reason !== "connection")) return;
+    const issuer = getRouteUrl(), generation = sessionCoordinator.generation;
+    let retired = false, inFlight = false, visibility = document.visibilityState;
+    const recover = () => {
+      const state = useUserStore.getState();
+      if (retired || inFlight || document.visibilityState !== "visible" ||
+        issuer !== getRouteUrl() || generation !== sessionCoordinator.generation ||
+        state.appConfigStatus !== "error" ||
+        (state.appConfigFailure?.reason !== "timeout" && state.appConfigFailure?.reason !== "connection")) return;
+      inFlight = true;
+      const settled = () => { inFlight = false; };
+      void state.getAppConfigByReq().then(settled, settled);
+    };
+    const onVisibility = () => {
+      const next = document.visibilityState;
+      const restored = visibility === "hidden" && next === "visible";
+      visibility = next;
+      if (restored) recover();
+    };
+    window.addEventListener("online", recover);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      retired = true;
+      window.removeEventListener("online", recover);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [appConfigStatus, configFailure?.reason]);
   const [formType, setFormType] = useState<FormType>(0);
   const [registrationRecovery]=useState(()=>new RegistrationRecovery());
   const registrationView=useSyncExternalStore(registrationRecovery.subscribe,registrationRecovery.getSnapshot,registrationRecovery.getSnapshot);
