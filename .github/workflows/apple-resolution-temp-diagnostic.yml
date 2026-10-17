@@ -1,0 +1,45 @@
+name: Xcode164 owned temporary-path Swift and local SPM diagnostic only
+
+on:
+  workflow_dispatch:
+    inputs:
+      diagnostic:
+        type: choice
+        required: true
+        options: [apple-xcode164-owned-temp-swift-spm-diagnostic-r23-v1]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apple-temp-diagnostic-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  native-temporary-paths:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Fixed hosted Python and ARM environment
+        run: |
+          umask 077
+          test "$(uname -m)" = arm64
+          python="$RUNNER_TOOL_CACHE/Python/3.12.10/arm64/bin/python3"
+          test -x "$python"
+          echo "APPLE_TEMP_PYTHON=$python" >> "$GITHUB_ENV"
+      - name: Actual small Swift then local-only SPM under original private sandbox
+        run: '"$APPLE_TEMP_PYTHON" -B ci/apple-resolution-temp-diagnostic/run.py --identity apple-xcode164-owned-temp-swift-spm-diagnostic-r23-v1'
+      - name: Bounded public logs and identities only, never generated binaries
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: apple-temp-diagnostic-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/luobo-apple-temp-diagnostic-r23/evidence/*.json
+            ${{ runner.temp }}/luobo-apple-temp-diagnostic-r23/*/luobo-apple-current359/evidence/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn

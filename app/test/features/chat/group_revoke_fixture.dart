@@ -366,8 +366,18 @@ final class GroupRevokeFixture {
       debugPrintSynchronously('group_revoke_cleanup sdk.end');
     } finally {
       debugPrintSynchronously('group_revoke_cleanup unmount.begin');
+      if (base.traceActual) {
+        debugPrintSynchronously('chat_input_unmount pumpWidget.before');
+      }
       await tester.pumpWidget(const SizedBox.shrink());
+      if (base.traceActual) {
+        debugPrintSynchronously('chat_input_unmount pumpWidget.after');
+        debugPrintSynchronously('chat_input_unmount pumpAndSettle.before');
+      }
       await tester.pumpAndSettle();
+      if (base.traceActual) {
+        debugPrintSynchronously('chat_input_unmount pumpAndSettle.after');
+      }
       sourceCid.dispose();
       base.reading.dispose();
       base.backgrounds.dispose();

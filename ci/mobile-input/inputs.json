@@ -1,54 +1,54 @@
 {
-  "schema": "luobo.mobile.input.current363.failed3.then.diagnostic1.reuse22.v5",
+  "schema": "luobo.mobile.input.current363.diagnostic1.reuse25.v6",
   "cohort": "current363",
   "source_members": 363,
   "portable_members": 415,
-  "source_digest": "0df8e3655a8fa697d4cc0a3c86bd4b194def70d3e37cd4199d8afcc68a72da30",
-  "portable_digest": "87f68117111647c8cff1c66b8d9eb30fdf41d0bf617849d31c6dcfeb65a2d93b",
+  "source_digest": "151ad4f19440bd4d34b5f55819183390d92367e363f11acc8b07ffc6029640d6",
+  "portable_digest": "00fb5adacb2cc3e68b6e16059d1de69feaa857ffe33c620c877dad6ccbf21054",
   "source_rows": [
     {
-      "bytes": 111,
       "path": "app/analysis_options.yaml",
+      "bytes": 111,
       "sha256": "872d8b3d2403144614257402ab556348adcd20532e8f57709d29d94dad0e3ea9"
     },
     {
-      "bytes": 22417,
       "path": "app/lib/app.dart",
+      "bytes": 22417,
       "sha256": "64a3c6ded6e2d225e285b994a095bfb848094123f28cf3787a83d6869601f619"
     },
     {
-      "bytes": 4031,
       "path": "app/lib/core/access/access_store.dart",
+      "bytes": 4031,
       "sha256": "ec2e1ce80e0e11a9e7f9b7585e09de6e93de58d8de91d12d9203f610ec23e6fb"
     },
     {
-      "bytes": 15262,
       "path": "app/lib/core/access/app_access.dart",
+      "bytes": 15262,
       "sha256": "fb89789b73ed064d6a873f524b4a6353e9eef863b5df30b5787e8b50fbcd1bff"
     },
     {
-      "bytes": 3366,
       "path": "app/lib/core/access/native_access.dart",
+      "bytes": 3366,
       "sha256": "714de5bde7d696845f5b4f8b5b887dd0c84efbabf95ae53f37e8c89eac64040d"
     },
     {
-      "bytes": 5991,
       "path": "app/lib/core/app_runtime.dart",
+      "bytes": 5991,
       "sha256": "b21afde684c0efef95e25f549c893f12750e7e3faabb039ded720a77d0e06585"
     },
     {
-      "bytes": 1713,
       "path": "app/lib/core/config/app_config.dart",
+      "bytes": 1713,
       "sha256": "b736a86b217812eb0fb0d804e5cc47c23d6ca94780469c5462510fae904a6fd8"
     },
     {
-      "bytes": 3493,
       "path": "app/lib/core/config/route_config_loader.dart",
+      "bytes": 3493,
       "sha256": "34b3360a54ca6254f2b8d85794cfd6ee5dd61b32a72fa8d4b40d675cc8702731"
     },
     {
-      "bytes": 2894,
       "path": "app/lib/core/error/app_failure.dart",
+      "bytes": 2894,
       "sha256": "a9e13e77b1e98caa104f239a012df5beda625543e4a90b6c8406beae4986d93b"
     },
     {
@@ -62,18 +62,18 @@
       "sha256": "dfbfcca2f014b936cfcc13406d516f04c7e2239a968ad6476f8b498745d0843d"
     },
     {
-      "bytes": 3208,
       "path": "app/lib/core/network/api_client.dart",
+      "bytes": 3208,
       "sha256": "e3d12dcb1b0a2bc75f2d967254aa64d33b294122347159499d3c7f5d130dc2a8"
     },
     {
-      "bytes": 1785,
       "path": "app/lib/core/network/current_session_revoker.dart",
+      "bytes": 1785,
       "sha256": "7947eb3d0f760692070310cd862ee20db6514ec5ce943cc6c132a204c1509351"
     },
     {
-      "bytes": 2401,
       "path": "app/lib/core/network/tenant_api.dart",
+      "bytes": 2401,
       "sha256": "358da9046802d6a72e464043f0333463686ef970cff64c618ea8d1475f193f22"
     },
     {
@@ -82,93 +82,93 @@
       "sha256": "c0da515e6ca3b935ac7b96c3dbae5302125c72e0c2ad38727bd84539b4f3073a"
     },
     {
-      "bytes": 509,
       "path": "app/lib/core/storage/consent_store.dart",
+      "bytes": 509,
       "sha256": "16f1be674def01bbedb4e2d2509230ca4d5941d215f5007341987604c2d4c6da"
     },
     {
-      "bytes": 7158,
       "path": "app/lib/core/storage/object_uploader.dart",
+      "bytes": 7158,
       "sha256": "1492fae454a7fcd7708c0fd228495f01ab07a7f7b416d9c82922672a4195303b"
     },
     {
-      "bytes": 5430,
       "path": "app/lib/core/storage/remote_attachment_store.dart",
+      "bytes": 5430,
       "sha256": "cf2621a499905e7a93e68c7e09f9afcc3dc9b15649ac00a93f9ee79c308dca59"
     },
     {
-      "bytes": 1349,
       "path": "app/lib/core/storage/secure_credential_store.dart",
+      "bytes": 1349,
       "sha256": "2646b89a3ca23216955ec108975a2a0f8f431ad7ca522a17625c7d8ed6e42b82"
     },
     {
-      "bytes": 2847,
       "path": "app/lib/core/storage/staged_image.dart",
+      "bytes": 2847,
       "sha256": "812fda27c157e464d47dacd8ab1260b3db3864c4e2b40dfe6ae7ca26a07de5ca"
     },
     {
-      "bytes": 854,
       "path": "app/lib/core/tenant/session_access.dart",
+      "bytes": 854,
       "sha256": "2a92b5584d26539a5e514c4fb1901adfd94a1206737cf820d427d8f1964b68e9"
     },
     {
-      "bytes": 11786,
       "path": "app/lib/core/tenant/session_coordinator.dart",
+      "bytes": 11786,
       "sha256": "0d8707a664cb2ab4708852f329c2a1b2daf91288f399be89d14dbe284e310cb5"
     },
     {
-      "bytes": 5028,
       "path": "app/lib/core/tenant/session_credentials.dart",
+      "bytes": 5028,
       "sha256": "17051729d91d7880570c0b2147ee386305a75358eea713010431888ce50dd3ad"
     },
     {
-      "bytes": 208,
       "path": "app/lib/core/tenant/session_revoker.dart",
+      "bytes": 208,
       "sha256": "ae548d33e585350eb23d1c83eda07fe01fd640e2ee51a4ddb85ddf79885f45aa"
     },
     {
-      "bytes": 535,
       "path": "app/lib/design/components/brand_mark.dart",
+      "bytes": 535,
       "sha256": "bef7c6cb2ebaa6dd52819c5459ac8e28b787b2c5608e42be7edb9ac23ab7dfa2"
     },
     {
-      "bytes": 5379,
       "path": "app/lib/design/components/feedback.dart",
+      "bytes": 5379,
       "sha256": "c9705bde73b2dec9ad208c7ef905fe90ad2c6c3feb5dbd9fe6063bbc963ffd41"
     },
     {
-      "bytes": 1738,
       "path": "app/lib/design/tokens.dart",
+      "bytes": 1738,
       "sha256": "b68cafb099694acf585f224632adf201775482d44d67a13acb3977c5c8797e07"
     },
     {
-      "bytes": 8497,
       "path": "app/lib/features/app_lock/presentation/app_access_host.dart",
+      "bytes": 8497,
       "sha256": "90abb3dc6ee440b5f54ad6d18e18ef43b4ecdbaa4d9660ccace3f597bd752fc1"
     },
     {
-      "bytes": 6937,
       "path": "app/lib/features/app_lock/presentation/app_lock_settings_page.dart",
+      "bytes": 6937,
       "sha256": "05b4d80c9d0753a8468cfc4df7e7cfd38dfc064d7994c0a5d9b3dc068cba7491"
     },
     {
-      "bytes": 4962,
       "path": "app/lib/features/auth/data/auth_repository.dart",
+      "bytes": 4962,
       "sha256": "9f81efe0ee7ed54d77a8fcf243d83b4592e37005cda113d38c94a1a0d0d92dc1"
     },
     {
-      "bytes": 21254,
       "path": "app/lib/features/auth/presentation/auth_page.dart",
+      "bytes": 21254,
       "sha256": "9be658add45afe824261f7e1e2d006694ac6652ae74a108f70ca7011ded41106"
     },
     {
-      "bytes": 16234,
       "path": "app/lib/features/chat/data/chat_background_store.dart",
+      "bytes": 16234,
       "sha256": "87701f120338fbfe924f3aa9efa9050dc7a520669ae3d142d160c95a05267e5d"
     },
     {
-      "bytes": 5025,
       "path": "app/lib/features/chat/data/chat_reading_preferences.dart",
+      "bytes": 5025,
       "sha256": "5c89cdefde7fd731172604d6eb73c59a6382262d6d72b3fc81a6749cef6d94a3"
     },
     {
@@ -177,153 +177,153 @@
       "sha256": "cfceb78c3f1f69182160eee20103128a0378c3b317ff2e6127b320021fec66e7"
     },
     {
-      "bytes": 5012,
       "path": "app/lib/features/chat/data/group_announcement_store.dart",
+      "bytes": 5012,
       "sha256": "b5da8994042e75f703e4cae3ac3f4a4e1b773fdb166b31a46323a15d0c7a6be4"
     },
     {
-      "bytes": 4269,
       "path": "app/lib/features/chat/data/group_mention_authority.dart",
+      "bytes": 4269,
       "sha256": "d7fe2be90867f1c8912d191061ad82833772453aaa102894a02b77196748ab9d"
     },
     {
-      "bytes": 13443,
       "path": "app/lib/features/chat/data/message_mapper.dart",
+      "bytes": 13443,
       "sha256": "1199183a036b040c14e92f708c2fafe852bc83d9a9b3f5e2f9af0404251119cc"
     },
     {
-      "bytes": 2250,
       "path": "app/lib/features/chat/data/native_location_once.dart",
+      "bytes": 2250,
       "sha256": "915bc2d4e0656041032dfd086c59eb03d46fd8afacf4de159bd1c90d82c532b4"
     },
     {
-      "bytes": 1643,
       "path": "app/lib/features/chat/data/retained_merge_codec.dart",
+      "bytes": 1643,
       "sha256": "d73b1d6824949020837113ec243a9fc7539b89840e81a3c85902d1a22d53bb4a"
     },
     {
-      "bytes": 7197,
       "path": "app/lib/features/chat/data/saved_emoji_store.dart",
+      "bytes": 7197,
       "sha256": "a4c6b2f65c50bde23a4ef119b46ca67e63b7d11a7eca5f258143654d1398bff2"
     },
     {
-      "bytes": 2174,
       "path": "app/lib/features/chat/domain/chat_batch.dart",
+      "bytes": 2174,
       "sha256": "fecf039001dfa8c0f33b148e0db4c26ba9234edcd8a49a3c6880a2d9261ecab4"
     },
     {
-      "bytes": 2104,
       "path": "app/lib/features/chat/domain/chat_card.dart",
+      "bytes": 2104,
       "sha256": "b06391da2496e745cbf5c842b16ef076b6d418af8f1e4657d2b95444bb91b372"
     },
     {
-      "bytes": 4005,
       "path": "app/lib/features/chat/domain/chat_location.dart",
+      "bytes": 4005,
       "sha256": "6b1eddf79c2dfd83ceb12ffbec5d96f23359f960d99318d5af4f7f170ba3f5e4"
     },
     {
-      "bytes": 2777,
       "path": "app/lib/features/chat/domain/chat_mention.dart",
+      "bytes": 2777,
       "sha256": "dab2567320613adb88871be72dbf5a52789ec8ce051481ce85e38bd788078173"
     },
     {
-      "bytes": 5053,
       "path": "app/lib/features/chat/domain/chat_message.dart",
+      "bytes": 5053,
       "sha256": "078e179505789b7b94adc34e7bb86da2524ebcb360a485bddad38adcb842d3c6"
     },
     {
-      "bytes": 307,
       "path": "app/lib/features/chat/domain/chat_search.dart",
+      "bytes": 307,
       "sha256": "55c37322ef43a93514f392f23960239c0304104bb8dad5dccd7c306d6bc6a5a4"
     },
     {
-      "bytes": 611,
       "path": "app/lib/features/chat/domain/chat_snapshot.dart",
+      "bytes": 611,
       "sha256": "1e7ba929bef0da4a5920298a3c57288e6fb3591d2d181caa6d7571007f56363f"
     },
     {
-      "bytes": 7311,
       "path": "app/lib/features/chat/domain/location_pick.dart",
+      "bytes": 7311,
       "sha256": "e3e107772ffd27195f909d57d2b1f315671c76280230faf904450bf44f845d0e"
     },
     {
-      "bytes": 195,
       "path": "app/lib/features/chat/domain/message_privacy.dart",
+      "bytes": 195,
       "sha256": "eeff2f1cfc2dc211bc73abc6ebad15a7b043d3ed7e5f345ff53e0ad59e492b01"
     },
     {
-      "bytes": 2841,
       "path": "app/lib/features/chat/domain/saved_emoji.dart",
+      "bytes": 2841,
       "sha256": "42b6453996b40e736932134f6a97e1de4f8034c023d9d6e2d4afe764a85679d3"
     },
     {
-      "bytes": 10358,
       "path": "app/lib/features/chat/presentation/chat_background_page.dart",
+      "bytes": 10358,
       "sha256": "5eb914c9bc78903fbce1865a790b380887e60d42c0a20aa3f253bb189fdc398e"
     },
     {
-      "bytes": 5623,
       "path": "app/lib/features/chat/presentation/chat_batch_selection.dart",
+      "bytes": 5623,
       "sha256": "a69251efef048ab106dbfff9f9eb0aaf3f91e23ddb927348bea216d334816a55"
     },
     {
-      "bytes": 2644,
       "path": "app/lib/features/chat/presentation/chat_batch_widgets.dart",
+      "bytes": 2644,
       "sha256": "2a9630b3fc00cf9a60846973a2e8d0245a99708d6b0f19575ff4e60279854299"
     },
     {
-      "bytes": 3280,
       "path": "app/lib/features/chat/presentation/chat_call_picker.dart",
+      "bytes": 3280,
       "sha256": "a2ae51280d38ee6ec62354d21a7c0d0643da34ec91065da8f4fec84ccf2edab4"
     },
     {
-      "bytes": 14774,
       "path": "app/lib/features/chat/presentation/chat_card_picker_page.dart",
+      "bytes": 14774,
       "sha256": "22051912b973b503d66baf9fabf13c2ced87e2994184eb918b005315ba73c165"
     },
     {
-      "bytes": 7884,
       "path": "app/lib/features/chat/presentation/chat_card_view.dart",
+      "bytes": 7884,
       "sha256": "235575755def6c78083b4ef60f6e3314d97a0c37bb87960de465e7c5e4e3807e"
     },
     {
-      "bytes": 1698,
       "path": "app/lib/features/chat/presentation/chat_content_access.dart",
+      "bytes": 1698,
       "sha256": "306862cf2a4aacb5e0133c50beeda7d10b85076bd686e4026922784770fcf9b0"
     },
     {
-      "bytes": 24936,
       "path": "app/lib/features/chat/presentation/chat_controller.dart",
+      "bytes": 24936,
       "sha256": "9790c4561e52fbf0a1396b50d7704945b967d83d093a1356869989c6670b6f92"
     },
     {
-      "bytes": 9243,
       "path": "app/lib/features/chat/presentation/chat_font_size_page.dart",
+      "bytes": 9243,
       "sha256": "6232716d5659470cf99f9e7cba6816fc6653c1187da6dc2a5478a39249681759"
     },
     {
-      "bytes": 8761,
       "path": "app/lib/features/chat/presentation/chat_forward_page.dart",
+      "bytes": 8761,
       "sha256": "521cc19051eaf9ca2b67d01ef23a6c30dab328c3acfa4a0adb707dedda82ce4c"
     },
     {
-      "bytes": 22041,
       "path": "app/lib/features/chat/presentation/chat_location_picker_page.dart",
+      "bytes": 22041,
       "sha256": "c4b4f29451097dca4f42d6c19f78bb0b7c3cd0c5733fa75a9f1d3fd0a856af46"
     },
     {
-      "bytes": 10811,
       "path": "app/lib/features/chat/presentation/chat_location_view.dart",
+      "bytes": 10811,
       "sha256": "ac12ccf7844f7e0be2c39c4e0abfd31aab00ca9a21263470952f711fd21f2282"
     },
     {
-      "bytes": 16685,
       "path": "app/lib/features/chat/presentation/chat_media_actions.dart",
+      "bytes": 16685,
       "sha256": "324e991eafbeec1e03fd42263f4fe06ca90e979e14c1198f055b95534e0e6edb"
     },
     {
-      "bytes": 2739,
       "path": "app/lib/features/chat/presentation/chat_merged_messages_page.dart",
+      "bytes": 2739,
       "sha256": "32515e4b0c659f47aa751ad4aa87613701e622c80426cf8280c8b45cab9de210"
     },
     {
@@ -332,13 +332,13 @@
       "sha256": "398c2a83d33894a229bcbbd150bd1b312dd1360debe87bd3eb85f046113fe0c2"
     },
     {
-      "bytes": 5269,
       "path": "app/lib/features/chat/presentation/chat_search_controller.dart",
+      "bytes": 5269,
       "sha256": "5d9601fd0bb2d3878c1a4bcc4c12687a3e4172c7254ba2fd83c6e32b62ba8916"
     },
     {
-      "bytes": 8845,
       "path": "app/lib/features/chat/presentation/chat_search_page.dart",
+      "bytes": 8845,
       "sha256": "1a7fb71de966a54818c459f5ebc2cda80b58c5ca496b618edcae077e3bcb8270"
     },
     {
@@ -347,13 +347,13 @@
       "sha256": "acaf98571022b05397204ae5812b8e5e9939978d8b1665bd3f906266b458fddb"
     },
     {
-      "bytes": 17053,
       "path": "app/lib/features/chat/presentation/group_announcement_panel.dart",
+      "bytes": 17053,
       "sha256": "5c45548163ed6dc9fc8ef0f96dd405199e4e19bc1b8e078694772955491dbecf"
     },
     {
-      "bytes": 5350,
       "path": "app/lib/features/chat/presentation/group_mention_picker.dart",
+      "bytes": 5350,
       "sha256": "ff642b4dc6c4ebdfc81e0e6f73e77cfd340b8220fc36cca4056c8e3a8f6d923d"
     },
     {
@@ -362,793 +362,793 @@
       "sha256": "85097e13a469a21c2ea7d2251f6ad110e78189a6508cc6d2178e4e2c8f32ffe5"
     },
     {
-      "bytes": 2322,
       "path": "app/lib/features/chat/presentation/mentioned_message_text.dart",
+      "bytes": 2322,
       "sha256": "55d24ae6de1947d87a4a97659d5bb94c838b4772b35a2623c239c962c7014826"
     },
     {
-      "bytes": 7169,
       "path": "app/lib/features/chat/presentation/message_media.dart",
+      "bytes": 7169,
       "sha256": "49a73b9fcf6c3d79f5722fafae288cdb0acd14304455d48eade37cf0cabb7be0"
     },
     {
-      "bytes": 2613,
       "path": "app/lib/features/chat/presentation/message_privacy_content.dart",
+      "bytes": 2613,
       "sha256": "0df219c4dbd01fe7136f0149513bce14d72292cf9ee4ad677c496f3d337d7a68"
     },
     {
-      "bytes": 5431,
       "path": "app/lib/features/chat/presentation/message_readers_sheet.dart",
+      "bytes": 5431,
       "sha256": "bc0d14813a7f0deda59e4b28d64dd22a0aa31b19c329ea78e73db4904a2633a5"
     },
     {
-      "bytes": 30617,
       "path": "app/lib/features/chat/presentation/saved_emoji_sheet.dart",
+      "bytes": 30617,
       "sha256": "75028483bea1014d61bf13f9bfb733070a4c53e2789d3e3ee4841905e1616602"
     },
     {
-      "bytes": 341,
       "path": "app/lib/features/complaint/complaint_providers.dart",
+      "bytes": 341,
       "sha256": "c0dc1797ea70944e22521be756840a440538212b476a58ea0e26a4665eaced9c"
     },
     {
-      "bytes": 7982,
       "path": "app/lib/features/complaint/data/complaint_repository.dart",
+      "bytes": 7982,
       "sha256": "5ba0f3f4713ad4915e96f02bd8d01ab4885194308fc0a565583721ebbcc5386e"
     },
     {
-      "bytes": 15839,
       "path": "app/lib/features/complaint/presentation/complaint_page.dart",
+      "bytes": 15839,
       "sha256": "4dd339f0117b8497af62c34b20c4c57c99e3abf662409e08cc626b9eaaa492ff"
     },
     {
-      "bytes": 5897,
       "path": "app/lib/features/complaint/presentation/my_complaints_page.dart",
+      "bytes": 5897,
       "sha256": "59bf08e5af4c853e2112afa41d15aea88ccfd7fe7d9429f65cdb46668a5e8fd0"
     },
     {
-      "bytes": 3389,
       "path": "app/lib/features/contacts/contacts_providers.dart",
+      "bytes": 3389,
       "sha256": "b6020e3953aadb576ca69fa49772b1340403d7390a8d537b67b9336c5fa30e5e"
     },
     {
-      "bytes": 14770,
       "path": "app/lib/features/contacts/data/contacts_repository.dart",
+      "bytes": 14770,
       "sha256": "8c561c087370f2958e7f8aeb94f2c1ed6df7e40d66d14cef67352836bcc1acac"
     },
     {
-      "bytes": 1431,
       "path": "app/lib/features/contacts/domain/contact.dart",
+      "bytes": 1431,
       "sha256": "b9ce5f3ddd66a0b14703a837bfd8dd856abd4e90578a9e02a5cdf6a35e18ff44"
     },
     {
-      "bytes": 6027,
       "path": "app/lib/features/contacts/presentation/contact_requests_page.dart",
+      "bytes": 6027,
       "sha256": "8d2472eb77e60c193d4efbb497baf3ec955d5b5eed021706738f63e1e5888fd1"
     },
     {
-      "bytes": 6431,
       "path": "app/lib/features/contacts/presentation/contact_search_page.dart",
+      "bytes": 6431,
       "sha256": "33caa0947556cc07b57c9a50aab79099f7d570f8b9e2faa5affc9dc38923e7fb"
     },
     {
-      "bytes": 1174,
       "path": "app/lib/features/contacts/presentation/contact_widgets.dart",
+      "bytes": 1174,
       "sha256": "47c63935c72fc8f966156357ef2373f017491ee712ed7325acfcc5aec16ec917"
     },
     {
-      "bytes": 9435,
       "path": "app/lib/features/contacts/presentation/contacts_page.dart",
+      "bytes": 9435,
       "sha256": "77eba05f7a37be9f5dbe7d116959b3b4af9c96b85fcbfd44dfb5a0ea3046a230"
     },
     {
-      "bytes": 10205,
       "path": "app/lib/features/contacts/presentation/select_contacts_page.dart",
+      "bytes": 10205,
       "sha256": "f577dde7dfa9bafa36cde6ef7f8c762c2d4f12883e349b29c5348ef1b171f199"
     },
     {
-      "bytes": 35748,
       "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
+      "bytes": 35748,
       "sha256": "0ff0d3400e866dbb7d5ddb3ea4f5733313af9873c9d6985c3a77d20b83f2ce18"
     },
     {
-      "bytes": 7551,
       "path": "app/lib/features/conversation/data/conversation_repository.dart",
+      "bytes": 7551,
       "sha256": "299b465182570c55a2b829c36b13b7db6c62454f157e4549ffd26417373501e8"
     },
     {
-      "bytes": 1952,
       "path": "app/lib/features/conversation/domain/conversation.dart",
+      "bytes": 1952,
       "sha256": "5e114b9a1c8559f24236662f6bb050dd73550d7f38551b9955fffdc8ddf3d098"
     },
     {
-      "bytes": 752,
       "path": "app/lib/features/conversation/domain/recipient_identity.dart",
+      "bytes": 752,
       "sha256": "db59309bd1fc3c4411a71602366e100479df13662a3a3641c10df729de73a5d3"
     },
     {
-      "bytes": 3115,
       "path": "app/lib/features/conversation/presentation/conversation_unread_signal.dart",
+      "bytes": 3115,
       "sha256": "ba906c0f03229127f9cca987bdf1ee6bde1a390e7bb52538a2de0074f41ac456"
     },
     {
-      "bytes": 9721,
       "path": "app/lib/features/conversation/presentation/conversations_controller.dart",
+      "bytes": 9721,
       "sha256": "cebb0c6b7c38ce13a2b39fee43047d27722a54fd45db1d709a4351e687e95dae"
     },
     {
-      "bytes": 29311,
       "path": "app/lib/features/conversation/presentation/conversations_page.dart",
+      "bytes": 29311,
       "sha256": "c92e1fa9cddd6cc0e1f9f3cd7bd9da509af9e7a4db700dfc2169463713792d87"
     },
     {
-      "bytes": 354,
       "path": "app/lib/features/favorite/data/favorite_attachment_store.dart",
+      "bytes": 354,
       "sha256": "2ecaa05097c4a82d9c40651749d88b52af79f88e584cab30a35cd7bcad028fff"
     },
     {
-      "bytes": 8016,
       "path": "app/lib/features/favorite/data/favorite_exporter.dart",
+      "bytes": 8016,
       "sha256": "c77f1986b2357187dc15ee1df5759dcc3258d3bd14c844312fbdd92974710e89"
     },
     {
-      "bytes": 12124,
       "path": "app/lib/features/favorite/data/favorite_repository.dart",
+      "bytes": 12124,
       "sha256": "cb24c70ca10638a86286d2b64a254add81458db8f359ca3e50b40d1c4209e812"
     },
     {
-      "bytes": 10373,
       "path": "app/lib/features/favorite/domain/favorite.dart",
+      "bytes": 10373,
       "sha256": "efd86884649d28d668f745585f07942f649ed333fb5fdeb0f54fc97b5a6f9e47"
     },
     {
-      "bytes": 2456,
       "path": "app/lib/features/favorite/favorite_providers.dart",
+      "bytes": 2456,
       "sha256": "ce2ee0d800ace472c36925a199a233cf0f05c1219937cb82a8e4fa8b1be0d0ba"
     },
     {
-      "bytes": 8093,
       "path": "app/lib/features/favorite/presentation/favorite_categories_page.dart",
+      "bytes": 8093,
       "sha256": "88e98f4810426d0922bb904e735e4302130937f10cf2ec51737ec615a82383dd"
     },
     {
-      "bytes": 18541,
       "path": "app/lib/features/favorite/presentation/favorite_detail_page.dart",
+      "bytes": 18541,
       "sha256": "f1e22e4343642e2a09297afe177fda08ea821984a336156933bd0bb4892d2d36"
     },
     {
-      "bytes": 8755,
       "path": "app/lib/features/favorite/presentation/favorite_forward_page.dart",
+      "bytes": 8755,
       "sha256": "4d575eaab5ad26d72ab6de4b6b468854537a082f9cf849664d07eb7d2827f1f3"
     },
     {
-      "bytes": 2989,
       "path": "app/lib/features/favorite/presentation/favorite_list_controller.dart",
+      "bytes": 2989,
       "sha256": "63df8587952c9997700a9831b9db584b379bd0f9d265ad636449f56aa529215e"
     },
     {
-      "bytes": 7746,
       "path": "app/lib/features/favorite/presentation/favorite_media_preview.dart",
+      "bytes": 7746,
       "sha256": "f4d735afa9e0cd0002229a3c6d671e83bb4fe8ad2f569d6831644738909810fd"
     },
     {
-      "bytes": 9622,
       "path": "app/lib/features/favorite/presentation/favorite_stats_page.dart",
+      "bytes": 9622,
       "sha256": "56fcf0a874633ff8cbbefb95409040356d660698c6467ee546103671046a3b26"
     },
     {
-      "bytes": 4376,
       "path": "app/lib/features/favorite/presentation/favorite_widgets.dart",
+      "bytes": 4376,
       "sha256": "d346b8d84d5782df0806c20176a78116aa60920e0dfc47a08fd737418d6bb0d5"
     },
     {
-      "bytes": 24155,
       "path": "app/lib/features/favorite/presentation/favorites_page.dart",
+      "bytes": 24155,
       "sha256": "3ee4b34082820bf799b9e16dfa407a281ca90c3a97e592338afb8efa2bee8fc0"
     },
     {
-      "bytes": 18719,
       "path": "app/lib/features/group/data/group_repository.dart",
+      "bytes": 18719,
       "sha256": "febf050af779434f60ec596963e3193ca07f791bb6f9c5362c48807d8569b337"
     },
     {
-      "bytes": 1691,
       "path": "app/lib/features/group/domain/group.dart",
+      "bytes": 1691,
       "sha256": "d6e28ca24db983ead0b3bad7ecd63de62850c414393031d1f2e486e640cecf4d"
     },
     {
-      "bytes": 15358,
       "path": "app/lib/features/group/presentation/create_group_page.dart",
+      "bytes": 15358,
       "sha256": "becac201a69023df4c9ba50a283d3cffeb68a68892c5e6e692588b93656eac44"
     },
     {
-      "bytes": 6395,
       "path": "app/lib/features/group/presentation/group_creation_action.dart",
+      "bytes": 6395,
       "sha256": "ca3f9b2c30acff22af627fde321e6d2a063c056698556077d2b250f5909a3b68"
     },
     {
-      "bytes": 22993,
       "path": "app/lib/features/group/presentation/group_members_page.dart",
+      "bytes": 22993,
       "sha256": "42dfcd2a4e9a4c7c6078d8e16b40956b77016420cb450e16e6541a41d12726c9"
     },
     {
-      "bytes": 30868,
       "path": "app/lib/features/group/presentation/group_page.dart",
+      "bytes": 30868,
       "sha256": "ac72ebeca2cdb65211af09102adfa95a64cce4050c659a55d899b48fc44165b8"
     },
     {
-      "bytes": 5289,
       "path": "app/lib/features/meeting/booking/booking_providers.dart",
+      "bytes": 5289,
       "sha256": "221396ce22834c2ebecfe2ecaf97760e98077f94fcaf80e9bd6d2ab343d70f98"
     },
     {
-      "bytes": 11464,
       "path": "app/lib/features/meeting/booking/data/booking_contract.dart",
+      "bytes": 11464,
       "sha256": "3953ad2717c0e9881c070532fb042816d99818aa9514353a87bbd09e48355f6d"
     },
     {
-      "bytes": 19213,
       "path": "app/lib/features/meeting/booking/data/booking_pending_journal.dart",
+      "bytes": 19213,
       "sha256": "55db0f98834b4d5a9bfc0f6685719ebf626a397ac70a5119980d90231d6fa85e"
     },
     {
-      "bytes": 7525,
       "path": "app/lib/features/meeting/booking/data/meeting_booking_repository.dart",
+      "bytes": 7525,
       "sha256": "2d5eac85f84e079fa50c332239741b405affe3252ed5df55e57c4ee6b3b081c0"
     },
     {
-      "bytes": 1648,
       "path": "app/lib/features/meeting/booking/data/tenant_booking_adapter.dart",
+      "bytes": 1648,
       "sha256": "c6977320f81835ff376ffc89a1b5d8cd1e8605e04436721904f41309fea0b17d"
     },
     {
-      "bytes": 4185,
       "path": "app/lib/features/meeting/booking/domain/booking_view.dart",
+      "bytes": 4185,
       "sha256": "7ccdc39c4aab7ad2e5c9da699bf4913b2df9692013ab6c03bfda8e3cbfcac1c0"
     },
     {
-      "bytes": 9147,
       "path": "app/lib/features/meeting/booking/presentation/booking_controller.dart",
+      "bytes": 9147,
       "sha256": "16077a2406c68d33a8daa6e05ddc8fa6e8df8f3f2a0a0902adaa7968763ce1ea"
     },
     {
-      "bytes": 6408,
       "path": "app/lib/features/meeting/booking/presentation/booking_detail_page.dart",
+      "bytes": 6408,
       "sha256": "bd723789705e743b3b37d0f1f7361bbd989037efc6d818b19d96c6c1a26775a5"
     },
     {
-      "bytes": 10721,
       "path": "app/lib/features/meeting/booking/presentation/booking_editor_page.dart",
+      "bytes": 10721,
       "sha256": "8b02688901950f06cf527d306d3bd744bfce5266e626d5ad6addec10328ba0ac"
     },
     {
-      "bytes": 3981,
       "path": "app/lib/features/meeting/booking/presentation/booking_recovery_panel.dart",
+      "bytes": 3981,
       "sha256": "4a40c02343dc47a871721084e3e07730702dbc0699e50311e4bc50fe8aec8cb4"
     },
     {
-      "bytes": 5107,
       "path": "app/lib/features/meeting/booking/presentation/bookings_page.dart",
+      "bytes": 5107,
       "sha256": "29731745cfecb9c9b9ac0fe25a205396adac4297fc5f9f73e5c03cbb6bb1031d"
     },
     {
-      "bytes": 9315,
       "path": "app/lib/features/meeting/data/meeting_repository.dart",
+      "bytes": 9315,
       "sha256": "9a53a6a5a82c86ada4041b86b3ac161f2386330f0dadde2ad3c6ffded3edb508"
     },
     {
-      "bytes": 4890,
       "path": "app/lib/features/meeting/domain/meeting.dart",
+      "bytes": 4890,
       "sha256": "ff892764689fc65fed0a9e8e75dbc76d931458ae017242326c6b0a5608ecbfb4"
     },
     {
-      "bytes": 399,
       "path": "app/lib/features/meeting/meeting_providers.dart",
+      "bytes": 399,
       "sha256": "c5becf1dfae24e369d4bb8f75cc982f5b853472dca6d681915fca60ca1ba529e"
     },
     {
-      "bytes": 2401,
       "path": "app/lib/features/meeting/presentation/meeting_controller.dart",
+      "bytes": 2401,
       "sha256": "bdd057be3467ae83e2e02e030f3a24573aaf420fed35a3792bacd0e07838b0c6"
     },
     {
-      "bytes": 14299,
       "path": "app/lib/features/meeting/presentation/meeting_detail_page.dart",
+      "bytes": 14299,
       "sha256": "2ff99b6504cbe60201a3d1f2da261fe50c04ab6d2cf5eb432feccaba95f13196"
     },
     {
-      "bytes": 7830,
       "path": "app/lib/features/meeting/presentation/meeting_editor_page.dart",
+      "bytes": 7830,
       "sha256": "ee2169b01715baf210476691dec1c95e10b857fc7ae10bf05433e017c8ff0443"
     },
     {
-      "bytes": 227,
       "path": "app/lib/features/meeting/presentation/meeting_format.dart",
+      "bytes": 227,
       "sha256": "5e32a53eee71480689d3001e9485a4f64db92beb62fb72c3a09b7fb36d8f9e8e"
     },
     {
-      "bytes": 6898,
       "path": "app/lib/features/meeting/presentation/meetings_page.dart",
+      "bytes": 6898,
       "sha256": "e8336844c41aaa8bbb49a600c9623cf6dc06095d2ce141e35b1272cd72465d77"
     },
     {
-      "bytes": 1703,
       "path": "app/lib/features/mine/account_providers.dart",
+      "bytes": 1703,
       "sha256": "1a9056d1ae7740b4eab7b8d1f3edf9c0d05d3726005635b385d54eed1762bba7"
     },
     {
-      "bytes": 7772,
       "path": "app/lib/features/mine/data/account_repository.dart",
+      "bytes": 7772,
       "sha256": "01da1e0d967ae93dfdcf3692e169e421f59ee3e7f585925bf92654e1175d37ee"
     },
     {
-      "bytes": 4290,
       "path": "app/lib/features/mine/data/account_security_repository.dart",
+      "bytes": 4290,
       "sha256": "88688b636f65235367a8a5f4460d49cd69dac722320cf9272f7cd81a873769f6"
     },
     {
-      "bytes": 1025,
       "path": "app/lib/features/mine/data/mine_repository.dart",
+      "bytes": 1025,
       "sha256": "5afb51461ad63313cf9db2844ccaf279961fff648e7685d0524dde42c6726937"
     },
     {
-      "bytes": 14324,
       "path": "app/lib/features/mine/presentation/account_profile_page.dart",
+      "bytes": 14324,
       "sha256": "3552ffe1d828dd31460cf7faa526a036ce05660afcb5e70097f274661ceb3038"
     },
     {
-      "bytes": 6845,
       "path": "app/lib/features/mine/presentation/account_settings_page.dart",
+      "bytes": 6845,
       "sha256": "7dc9c28ecf65662375c1482dba0e12bad0b1ee92fbb0544b2318095e50e203bd"
     },
     {
-      "bytes": 8531,
       "path": "app/lib/features/mine/presentation/cancel_account_page.dart",
+      "bytes": 8531,
       "sha256": "e9f4da9c17462080c7d2390a43a5c1cacb2f8a2beb340ba681cd3864559aea43"
     },
     {
-      "bytes": 6609,
       "path": "app/lib/features/mine/presentation/change_password_page.dart",
+      "bytes": 6609,
       "sha256": "b4ab825eec72e0bab0367a30a96146e36348af7412492c3699a36f678b0d8fce"
     },
     {
-      "bytes": 13445,
       "path": "app/lib/features/mine/presentation/mine_page.dart",
+      "bytes": 13445,
       "sha256": "e03f19d4b017b83736da361528e261e6348f4f5594d0accafefd57938db1bac7"
     },
     {
-      "bytes": 5165,
       "path": "app/lib/features/moments/data/moment_media_preparer.dart",
+      "bytes": 5165,
       "sha256": "6f2451af559436f8fdcde267e0e66b5fbdd90eb8b5e3f46eee7e0e34c3eb3bbf"
     },
     {
-      "bytes": 5964,
       "path": "app/lib/features/moments/data/moments_repository.dart",
+      "bytes": 5964,
       "sha256": "44ebac09b13d020a00960b6b69bc30b20d7893152f71b10d727f8df091b64d4d"
     },
     {
-      "bytes": 8140,
       "path": "app/lib/features/moments/domain/moment.dart",
+      "bytes": 8140,
       "sha256": "4cdb190f62ba4684114657036a4796291f06d2a0866f25e14c77d0b4fc04529e"
     },
     {
-      "bytes": 2494,
       "path": "app/lib/features/moments/moments_providers.dart",
+      "bytes": 2494,
       "sha256": "782b9442361f6422f22f02e5b05ebc099f218b746999298652db1f1bd5529c3e"
     },
     {
-      "bytes": 5669,
       "path": "app/lib/features/moments/presentation/moment_audience_page.dart",
+      "bytes": 5669,
       "sha256": "841c938fb24cfa8304c5016d29b65798c81d02b4c94341feccd794024d19d24d"
     },
     {
-      "bytes": 7950,
       "path": "app/lib/features/moments/presentation/moment_interactions_page.dart",
+      "bytes": 7950,
       "sha256": "55bad0597b488e778bbf56164f391228801fbff03225ab73ab0145b4ab41bb2b"
     },
     {
-      "bytes": 2867,
       "path": "app/lib/features/moments/presentation/moment_list_controller.dart",
+      "bytes": 2867,
       "sha256": "78c18e41e732442187c4503437beb87702250e1e32b99326b569f86861e4c7dc"
     },
     {
-      "bytes": 19868,
       "path": "app/lib/features/moments/presentation/moment_publish_page.dart",
+      "bytes": 19868,
       "sha256": "d2bed3d4d41fe7b98efcb06ae520a12d627d0cfc7c1ebc302f30d56f3cd7a340"
     },
     {
-      "bytes": 15143,
       "path": "app/lib/features/moments/presentation/moment_widgets.dart",
+      "bytes": 15143,
       "sha256": "a1fb055577c2de488e61be9c589e64b5212e0c06f7459c8bb4c25aa2680166db"
     },
     {
-      "bytes": 11436,
       "path": "app/lib/features/moments/presentation/moments_page.dart",
+      "bytes": 11436,
       "sha256": "1745a35cd4dc000b46966c1ca3098a1fb2d2f3a7da8de3ca659c83debadc62e8"
     },
     {
-      "bytes": 4563,
       "path": "app/lib/features/personal/data/personal_archive.dart",
+      "bytes": 4563,
       "sha256": "d4674a05f478929256651b9f54e1698c2bce05c0187224c3483475dc56a8f647"
     },
     {
-      "bytes": 6353,
       "path": "app/lib/features/personal/data/personal_repository.dart",
+      "bytes": 6353,
       "sha256": "2dabc8df3d748e2e4046ff0d2c7baeb2cb548d62e497373d887a802269df6473"
     },
     {
-      "bytes": 3940,
       "path": "app/lib/features/personal/domain/personal_item.dart",
+      "bytes": 3940,
       "sha256": "04dfe33791d8c097b507cf91c586f9da1e28077dfb55a9f310a1b478091b0708"
     },
     {
-      "bytes": 989,
       "path": "app/lib/features/personal/personal_provider.dart",
+      "bytes": 989,
       "sha256": "a173c255d3b266a6b8366b8b2245ec80b91ea29363b013dba14b216cd436e729"
     },
     {
-      "bytes": 27726,
       "path": "app/lib/features/personal/presentation/personal_page.dart",
+      "bytes": 27726,
       "sha256": "c3bbd8ff492ad9d73d17846e56c891aa09ea06f4a4509a1686364c95d9dafd91"
     },
     {
-      "bytes": 6830,
       "path": "app/lib/features/qr/data/qr_platform.dart",
+      "bytes": 6830,
       "sha256": "a631049d92a1ec2aeed3a5ce8eba6bb69ca78d4b09d28eeb3e73ef0887aca328"
     },
     {
-      "bytes": 3611,
       "path": "app/lib/features/qr/data/qr_repository.dart",
+      "bytes": 3611,
       "sha256": "76a7107d7ada9bf4f2c2f9de573e0c02928a8586122c64e652ef96376489a7ac"
     },
     {
-      "bytes": 4170,
       "path": "app/lib/features/qr/domain/qr_invite.dart",
+      "bytes": 4170,
       "sha256": "93915de6bef8099e9f1efbbd6cccf345e5beb5ab2393209897d4815973d91821"
     },
     {
-      "bytes": 6676,
       "path": "app/lib/features/qr/presentation/qr_code_page.dart",
+      "bytes": 6676,
       "sha256": "817767bea9cd19c9fc675398b53ee0bec2034c69640114322865ca4f0441e127"
     },
     {
-      "bytes": 855,
       "path": "app/lib/features/qr/presentation/qr_route_watch.dart",
+      "bytes": 855,
       "sha256": "8501a06f7f4c9b553d926409c095bf3b46af83870e3a487ea5f8d84c8172015c"
     },
     {
-      "bytes": 14876,
       "path": "app/lib/features/qr/presentation/qr_scan_page.dart",
+      "bytes": 14876,
       "sha256": "bdca644e6233d698e630349772e5a4ee7f1dce563bbd3a946a83059c965d4dea"
     },
     {
-      "bytes": 9365,
       "path": "app/lib/features/rtc/data/call_records_repository.dart",
+      "bytes": 9365,
       "sha256": "3775af28c76a4b86f92a1b0aacf8862caacc1a9a329bce04422f4283b2d76e1b"
     },
     {
-      "bytes": 8497,
       "path": "app/lib/features/rtc/data/im_rtc_transport.dart",
+      "bytes": 8497,
       "sha256": "7213bef7f58e47601cb051fd4fb36467098f25bf4ed7108ed6911773dc2857e3"
     },
     {
-      "bytes": 6447,
       "path": "app/lib/features/rtc/data/livekit_media_session.dart",
+      "bytes": 6447,
       "sha256": "1dceed984d2691afd0db64bfe34001160de932026fe4fe777ac7150ed0179fa0"
     },
     {
-      "bytes": 473,
       "path": "app/lib/features/rtc/data/rtc_permissions.dart",
+      "bytes": 473,
       "sha256": "ce91e6b7f95904d47d7142ce835b0781831b438644a23cd88de46c5b897b2cd5"
     },
     {
-      "bytes": 11150,
       "path": "app/lib/features/rtc/domain/call_history_recorder.dart",
+      "bytes": 11150,
       "sha256": "7e0bf30a58a7f1c3343e4023fdd94ea046ffdee6e285cd2c92d439e9f5b4a993"
     },
     {
-      "bytes": 7917,
       "path": "app/lib/features/rtc/domain/call_record.dart",
+      "bytes": 7917,
       "sha256": "1a7acdc73b3827eb3c4fc8ad0e4b0e16b83e220e0eab0e53f4adf05bf8d51a62"
     },
     {
-      "bytes": 2160,
       "path": "app/lib/features/rtc/domain/rtc_call.dart",
+      "bytes": 2160,
       "sha256": "6fdc3614db594ff8a7ef19c5a98d8cca1083dc27fe7d13e9a2679c951fc2193f"
     },
     {
-      "bytes": 14565,
       "path": "app/lib/features/rtc/domain/rtc_coordinator.dart",
+      "bytes": 14565,
       "sha256": "92a4594c85a82088033e247bbc886906e7b32bcef0be26d39a5dca3b4c84acaf"
     },
     {
-      "bytes": 13277,
       "path": "app/lib/features/rtc/presentation/call_records_page.dart",
+      "bytes": 13277,
       "sha256": "907e04e77d81c01976e448e95df54e79b3ff5e71992a3b47392e799a07d081d6"
     },
     {
-      "bytes": 503,
       "path": "app/lib/features/rtc/presentation/call_records_providers.dart",
+      "bytes": 503,
       "sha256": "899ecc262df308c2107c52fe75ed94dbc4c243abebcecae4905a2b9221310534"
     },
     {
-      "bytes": 11936,
       "path": "app/lib/features/rtc/presentation/rtc_page.dart",
+      "bytes": 11936,
       "sha256": "b55cef3ec3f54113a649aa752f65b288496e2891373e571ad5f9c594cdba89e5"
     },
     {
-      "bytes": 663,
       "path": "app/lib/features/rtc/presentation/rtc_providers.dart",
+      "bytes": 663,
       "sha256": "c2cb7190a54090cdc945c4351bf0239bf1a9c7c87ac14bae6d3c209e8ca8ed95"
     },
     {
-      "bytes": 8244,
       "path": "app/lib/features/search/data/global_search_repository.dart",
+      "bytes": 8244,
       "sha256": "25e5a1e60110655912050b39f76ebf6fc5595d7c0eb5f9a4cc84ebef77b45163"
     },
     {
-      "bytes": 2166,
       "path": "app/lib/features/search/domain/global_search.dart",
+      "bytes": 2166,
       "sha256": "3da2f5ddc58d6515ccaab2ac63409bc4db5bf618b2f05b18ed5d0026e2b162df"
     },
     {
-      "bytes": 6374,
       "path": "app/lib/features/search/presentation/global_search_controller.dart",
+      "bytes": 6374,
       "sha256": "e980a52055ac3e6a121d7d40004c204a5fc87ec4f53807ac959d2934a89882b7"
     },
     {
-      "bytes": 5793,
       "path": "app/lib/features/search/presentation/global_search_file_page.dart",
+      "bytes": 5793,
       "sha256": "e8a3880ff86686464759eda7adc26acbc7ccc9374168c7e1f4881e204936e264"
     },
     {
-      "bytes": 2904,
       "path": "app/lib/features/search/presentation/global_search_matches_page.dart",
+      "bytes": 2904,
       "sha256": "6cc792d8cbf69fdf3eb1f6632cf5b4b5390a4bf983aa67015dc6e5f823f0a5b6"
     },
     {
-      "bytes": 7782,
       "path": "app/lib/features/search/presentation/global_search_page.dart",
+      "bytes": 7782,
       "sha256": "38ab04205cebe4f6cfeee45395db04852e2871e7d68a4ad9d7f891cd48c2c54c"
     },
     {
-      "bytes": 229,
       "path": "app/lib/main.dart",
+      "bytes": 229,
       "sha256": "dda32bed39d418a01b6a852dbfbaed5b0a575b54c75a7594c4e7ecd6086e1ac0"
     },
     {
-      "bytes": 7700,
       "path": "app/lib/providers.dart",
+      "bytes": 7700,
       "sha256": "ca1ecfd2f433c11fb36f342376714dfcba33d8cc266a8d274cfb75deb9c98b19"
     },
     {
-      "bytes": 42399,
       "path": "app/pubspec.lock",
+      "bytes": 42399,
       "sha256": "0e678e98a6efc7cbb34c6c3a58f8b890171bd443c2b61e6f5ec525853c4f34fa"
     },
     {
-      "bytes": 1005,
       "path": "app/pubspec.yaml",
+      "bytes": 1005,
       "sha256": "0224da8c6c4e8922c921e4009d1e443b545d3d922d3ab77f41fe2dc707f7efa1"
     },
     {
-      "bytes": 5170,
       "path": "app/test/core/abandoned_login_test.dart",
+      "bytes": 5170,
       "sha256": "ad679e4add8881e4c97981117a67bbbf6dc0d781fdb3d2d666c677cb0918913b"
     },
     {
-      "bytes": 17421,
       "path": "app/test/core/access/app_access_test.dart",
+      "bytes": 17421,
       "sha256": "52bdf7f52562942d965c3ab38c27a5a19fd2dbf64f8605d5b42ebfc7b1c26558"
     },
     {
-      "bytes": 3591,
       "path": "app/test/core/access/gateway_access_test.dart",
+      "bytes": 3591,
       "sha256": "e1d649f69338d6e835300fdb0c9c354972a8f49e16e65f1658d0c0ec05ec1c3f"
     },
     {
-      "bytes": 3064,
       "path": "app/test/core/access/native_access_test.dart",
+      "bytes": 3064,
       "sha256": "3efab1e234a97d2459396be49de8f1b36fee2d249a458f6ae01eb2a999b709b1"
     },
     {
-      "bytes": 3668,
       "path": "app/test/core/api_client_test.dart",
+      "bytes": 3668,
       "sha256": "960092922304f315d8ce0a0dcf45d676af94e8c16f956d0b54705f7e7537f687"
     },
     {
-      "bytes": 5919,
       "path": "app/test/core/current_session_revoker_test.dart",
+      "bytes": 5919,
       "sha256": "e75129e1e5adc7a4b4b627c489013a2e5f46f1e8fb6c8fa60e98369428f5d456"
     },
     {
-      "bytes": 1810,
       "path": "app/test/core/im/capture_theme.dart",
+      "bytes": 1810,
       "sha256": "cf5c291fa63bc5cfd627f798fd8c5b06baecbc32efed84b200b338e5c195e318"
     },
     {
-      "bytes": 11543,
       "path": "app/test/core/im/open_im_gateway_test.dart",
+      "bytes": 11543,
       "sha256": "bf3d30efa310b12c39f37015b5e6dee53e33797ae02ce3ae0e12937d6643b7f9"
     },
     {
-      "bytes": 8712,
       "path": "app/test/core/im/sdk_harness.dart",
+      "bytes": 8712,
       "sha256": "0b4b90f7e2b5d0168ccfa85b66abee9c16f28d158ec555566be7441f82b4f7ba"
     },
     {
-      "bytes": 7119,
       "path": "app/test/core/object_uploader_test.dart",
+      "bytes": 7119,
       "sha256": "383ae02bef1c92316827eb4ce4c66507f299031cdbb46ba21ec156b4e6519e46"
     },
     {
-      "bytes": 7753,
       "path": "app/test/core/privacy/message_privacy_ledger_test.dart",
+      "bytes": 7753,
       "sha256": "99bc127ff0b53bcf8378ca438cac43f74ac42fa366a2f2aff157351bad1e90c6"
     },
     {
-      "bytes": 4479,
       "path": "app/test/core/privacy_bootstrap_test.dart",
+      "bytes": 4479,
       "sha256": "9c5d3836b020754f2a994bb9928654f3a46f8240dedbd1c74cdc36f05808dc1a"
     },
     {
-      "bytes": 6068,
       "path": "app/test/core/production_providers_test.dart",
+      "bytes": 6068,
       "sha256": "1d26d35f2d127c1433b0b905bd4d01a8007d377d5bcd4e759ed25463a1eb4947"
     },
     {
-      "bytes": 2144,
       "path": "app/test/core/route_config_loader_test.dart",
+      "bytes": 2144,
       "sha256": "f75db375d524ca8fc07983278051d99e867b5ed8f21e0abc94b93365532e7ea1"
     },
     {
-      "bytes": 5298,
       "path": "app/test/core/session_coordinator_test.dart",
+      "bytes": 5298,
       "sha256": "dfff4ffd15854be9610a7322be0c7264260e0b22b912e8607a2d48f6e1d21c9a"
     },
     {
-      "bytes": 2695,
       "path": "app/test/core/staged_image_test.dart",
+      "bytes": 2695,
       "sha256": "e4b4d760f67010f87f51d16a7a4c9426e828cbda59b72faae14f17dc6f8b9d55"
     },
     {
-      "bytes": 1920,
       "path": "app/test/core/tenant_namespace_test.dart",
+      "bytes": 1920,
       "sha256": "251cef4fb32d82f4ed397ddcfb4b05a568fc70a834302675768770ca553f3bc9"
     },
     {
-      "bytes": 6715,
       "path": "app/test/features/app_lock/app_lock_pages_test.dart",
+      "bytes": 6715,
       "sha256": "13560265f0003e47bfd28f368b31dca97ca52762a26f282a7539d365e1d8dc02"
     },
     {
-      "bytes": 8650,
       "path": "app/test/features/app_lock/app_lock_routes_test.dart",
+      "bytes": 8650,
       "sha256": "42b55f992bfc5db3541dca163e94d6e8a8b6d7c2444a01339940b763c9abe9b4"
     },
     {
-      "bytes": 15184,
       "path": "app/test/features/auth/auth_flow_test.dart",
+      "bytes": 15184,
       "sha256": "b4a0d081791d60eb81fb5c2b25406cc8394a3e7f86319179feaa62c959008229"
     },
     {
-      "bytes": 2984,
       "path": "app/test/features/auth/auth_repository_test.dart",
+      "bytes": 2984,
       "sha256": "6b7a9dba30629d218f1d04d49ff186821c8ec5b46763c90b93a08dfa3f3eb402"
     },
     {
-      "bytes": 3080,
       "path": "app/test/features/chat/batch_harness.dart",
+      "bytes": 3080,
       "sha256": "1315efd743d3e4f8ab69bd2d192da9fb9686c4e65c5f3490488ea52361f1aad3"
     },
     {
-      "bytes": 10900,
       "path": "app/test/features/chat/batch_media_access_test.dart",
+      "bytes": 10900,
       "sha256": "867afc7cdd663d649b4e04cbbfd559dec8c392ae68afb399309af685c511f1a4"
     },
     {
-      "bytes": 4327,
       "path": "app/test/features/chat/batch_merge_projection_test.dart",
+      "bytes": 4327,
       "sha256": "a8e3586eb5889d157ae5fa8195a57e5f869013156a505b0d2f3b05d9fa6c6857"
     },
     {
-      "bytes": 8488,
       "path": "app/test/features/chat/batch_merge_test.dart",
+      "bytes": 8488,
       "sha256": "02dc98bd084006ee0b075496af27ebffc2736ebe967e51ed5bd39b042f66d350"
     },
     {
-      "bytes": 9601,
       "path": "app/test/features/chat/batch_page_test.dart",
+      "bytes": 9601,
       "sha256": "470dc4e30ca07b71b9f0dca19098de3cad6f553378f8175a6e0d442e78edf76a"
     },
     {
-      "bytes": 8218,
       "path": "app/test/features/chat/batch_selection_test.dart",
+      "bytes": 8218,
       "sha256": "97ef4c8ead5dbbdc4ffa05693c433c2657d9da370448192ed3f8fbf23597c75f"
     },
     {
-      "bytes": 1344,
       "path": "app/test/features/chat/batch_timeout_test.dart",
+      "bytes": 1344,
       "sha256": "6562f60dff40e8eb0aa025cbf541674b7d9777599452a75b83a65a3a8fbda09b"
     },
     {
-      "bytes": 6704,
       "path": "app/test/features/chat/chat_attachment_test.dart",
+      "bytes": 6704,
       "sha256": "c8f8c207e0365fc386cb0fff2a1d1246a807b7d3193f48bca6d486cf476a661c"
     },
     {
-      "bytes": 6364,
       "path": "app/test/features/chat/chat_background_entry_test.dart",
+      "bytes": 6364,
       "sha256": "1b5ffc56ffdc08c990b13afc155bc8667230b66aa04effb529469be19c9f0a70"
     },
     {
-      "bytes": 9546,
       "path": "app/test/features/chat/chat_background_fixture.dart",
+      "bytes": 9546,
       "sha256": "3c1e2c7d3868720758a1b6ebe8846536a23a994a12800810c7b90b1de273cc37"
     },
     {
-      "bytes": 12874,
       "path": "app/test/features/chat/chat_background_page_test.dart",
+      "bytes": 12874,
       "sha256": "6a0e885fa28befd39ad4dd91ab4029ac30aa5a00115293097ba2d20502c5724a"
     },
     {
-      "bytes": 12692,
       "path": "app/test/features/chat/chat_background_recovery_test.dart",
+      "bytes": 12692,
       "sha256": "8be26bb4c836dda1ccbad45ea2b89033c16e1b941064a132fa8026df73e239c3"
     },
     {
-      "bytes": 10093,
       "path": "app/test/features/chat/chat_background_store_test.dart",
+      "bytes": 10093,
       "sha256": "0b912f5a55056334c4582ccf7d7fd389fa8879c1cc7dc347cc021b579e8ef93a"
     },
     {
-      "bytes": 8983,
       "path": "app/test/features/chat/chat_business_test.dart",
+      "bytes": 8983,
       "sha256": "21f894cfe063c80bfa613d17457519c4d09e54d58cb242048a16d8d24b4d7805"
     },
     {
-      "bytes": 15167,
       "path": "app/test/features/chat/chat_card_fixture.dart",
+      "bytes": 15167,
       "sha256": "fa6be455bb3c6168adf5ef5870cf4d606fe6820d302710a9e1acf11564dfd3f5"
     },
     {
-      "bytes": 4700,
       "path": "app/test/features/chat/chat_card_model_test.dart",
+      "bytes": 4700,
       "sha256": "cee206de82e97b07fa801b0d7821e460797d2a7c3c61a5bb3cb122e32374daf6"
     },
     {
-      "bytes": 17602,
       "path": "app/test/features/chat/chat_card_repository_test.dart",
+      "bytes": 17602,
       "sha256": "4597c4916442d00748770e279c5c4e46295cee0f785e615b79fb74bb78045559"
     },
     {
-      "bytes": 41713,
       "path": "app/test/features/chat/chat_card_workflow_test.dart",
+      "bytes": 41713,
       "sha256": "9efb93f4acaa6516eb1a630d3d81df68b9c69f2b1569b81cc4e5869aeefeef55"
     },
     {
-      "bytes": 7363,
       "path": "app/test/features/chat/chat_favorite_test.dart",
+      "bytes": 7363,
       "sha256": "f7fcd841c389bbaeac2806f0920742697b714dfd4319b002d805c2e40f9b7f88"
     },
     {
-      "bytes": 4690,
       "path": "app/test/features/chat/chat_font_entry_test.dart",
+      "bytes": 4690,
       "sha256": "9278f9576bec50f0e1f81d9bf9af67293fae034988701c26c1ff861a7958f409"
     },
     {
-      "bytes": 7081,
       "path": "app/test/features/chat/chat_font_fixture.dart",
+      "bytes": 7081,
       "sha256": "46726962cbb4204c912e3212c06a2b62241f093a5d7f1dfd734dd0c84517b5e0"
     },
     {
-      "bytes": 6659,
       "path": "app/test/features/chat/chat_font_size_page_test.dart",
+      "bytes": 6659,
       "sha256": "86b1abec4987d928d50298bb8c10af12b572e171264bd41920323f30532a272c"
     },
     {
-      "bytes": 10091,
       "path": "app/test/features/chat/chat_forward_page_test.dart",
+      "bytes": 10091,
       "sha256": "d282006d2afa3e10b4f6871e2a43b402e4334bcdb77e62207a7d6cb335f9ca91"
     },
     {
@@ -1157,33 +1157,33 @@
       "sha256": "e3a9f011b0131bcb71cabcca1a7d2839d687a13ffc1ab723e1a2401439c10826"
     },
     {
-      "bytes": 8459,
       "path": "app/test/features/chat/chat_location_fixture.dart",
+      "bytes": 8459,
       "sha256": "ab81dc3f9b9fc6ac3cc27b8699c0cdda84dbcc33cf3b3381f424d65be7d3770a"
     },
     {
-      "bytes": 6785,
       "path": "app/test/features/chat/chat_location_test.dart",
+      "bytes": 6785,
       "sha256": "876245dfb71a730fb0094825742e805ff0bb46454707171836335e0d3d87ee77"
     },
     {
-      "bytes": 15359,
       "path": "app/test/features/chat/chat_location_workflow_test.dart",
+      "bytes": 15359,
       "sha256": "95ec565a5dbebc8498a5c0dc4504244b621bd3274814c6b9a063dd7b0959990b"
     },
     {
-      "bytes": 3650,
       "path": "app/test/features/chat/chat_page_test.dart",
+      "bytes": 3650,
       "sha256": "79f8462d60784c37901260ed2b1f61db47d4c164c067d3b0c23eecb3fc597e2d"
     },
     {
-      "bytes": 11833,
       "path": "app/test/features/chat/chat_read_receipt_test.dart",
+      "bytes": 11833,
       "sha256": "e472469ca1955545ba40d2dd8f0a31f9e39780401fc4720c35b1c861498630a3"
     },
     {
-      "bytes": 4745,
       "path": "app/test/features/chat/chat_reading_preferences_test.dart",
+      "bytes": 4745,
       "sha256": "6e664ad811f03de718166f324c0f9e225594fc018e6d1e8a5a76bbc1e065c549"
     },
     {
@@ -1192,13 +1192,13 @@
       "sha256": "418e6516f558196db6f82ea607806ead7bda1c03a1aa4daa742692ca70cff39f"
     },
     {
-      "bytes": 3344,
       "path": "app/test/features/chat/chat_search_page_test.dart",
+      "bytes": 3344,
       "sha256": "995607bd16541bf828171fc617736f58326fccb6b585ebfdd79a7b395a86afbd"
     },
     {
-      "bytes": 7901,
       "path": "app/test/features/chat/chat_search_test.dart",
+      "bytes": 7901,
       "sha256": "4bb9b7bd642bf2e5dd00aadc28a31bbd32fcb89928bc30d98ab0bb1da4fbdbcc"
     },
     {
@@ -1207,113 +1207,113 @@
       "sha256": "a39a9cfb67dd1d1116f55b9cf6008bb263b7ad118c85102b180681f1e7666bd1"
     },
     {
-      "bytes": 5174,
       "path": "app/test/features/chat/conversation_history_clear_race_test.dart",
+      "bytes": 5174,
       "sha256": "ee4f914a23ebf51edcb105ac3ff513d76f73e491458e179fd1174d671b0fb2fa"
     },
     {
-      "bytes": 12175,
       "path": "app/test/features/chat/global_history_clear_test.dart",
+      "bytes": 12175,
       "sha256": "7ce9634305d6aa47596ab0cf1c515d091873f041001f3436e85ba047f06d1ee8"
     },
     {
-      "bytes": 9327,
       "path": "app/test/features/chat/group_announcement_fixture.dart",
+      "bytes": 9327,
       "sha256": "3397f18eae8f9d7918472daea7cad83b4ea7ac0c5f1a4e39c35b6107d9789374"
     },
     {
-      "bytes": 7195,
       "path": "app/test/features/chat/group_announcement_store_test.dart",
+      "bytes": 7195,
       "sha256": "adea1dda8a54e1ab230a18166160b5bae74c9dbc6fc049ff3af1aa7f4e7b9e88"
     },
     {
-      "bytes": 14398,
       "path": "app/test/features/chat/group_announcement_workflow_test.dart",
+      "bytes": 14398,
       "sha256": "c8fc525c1f8865ebb67d92b0cad07b7ebe4942dac25b1b92bf4442a801103534"
     },
     {
-      "bytes": 12553,
       "path": "app/test/features/chat/group_revoke_fixture.dart",
-      "sha256": "0762d2d4f76461f02244f6af0d5549d9bb52d966942216856f15f52933cde63f"
+      "bytes": 12963,
+      "sha256": "599fd3b04e5c8bc25838c17e5d0e9e7eb52e042cd0b24fe562655bca431618ac"
     },
     {
-      "bytes": 18730,
       "path": "app/test/features/chat/group_revoke_repository_test.dart",
+      "bytes": 18730,
       "sha256": "0091e9bbf1f0c56dd31be0910d0ee417ab348a653af8224293bb07edde360a00"
     },
     {
-      "bytes": 16691,
       "path": "app/test/features/chat/group_revoke_workflow_test.dart",
+      "bytes": 16691,
       "sha256": "70864cc212a4d0c514daf963a28d7d3593ab4ae22bddd339abcb5ca81819926b"
     },
     {
-      "bytes": 12544,
       "path": "app/test/features/chat/legacy_custom_summary_test.dart",
+      "bytes": 12544,
       "sha256": "7f2f6c94c654c00a3a0bed9fd512368608acf15ecdb44e637b8d3df2e7bfec51"
     },
     {
-      "bytes": 6144,
       "path": "app/test/features/chat/legacy_message_mapping_test.dart",
+      "bytes": 6144,
       "sha256": "d6dc664e391dd72328582c2cc7854e85ed55e21c175d2af25227b07c89547183"
     },
     {
-      "bytes": 7554,
       "path": "app/test/features/chat/location_map_host_test.dart",
+      "bytes": 7554,
       "sha256": "c312f40cac5fe55ca5f4d64e0b87e1398be89a7a74cb896b539bd6120906991c"
     },
     {
-      "bytes": 7883,
       "path": "app/test/features/chat/location_pick_test.dart",
+      "bytes": 7883,
       "sha256": "acb43f74eb8918a5b24b5d7986a893918d132f18577ed56f91a4c9ad3c0ed9dc"
     },
     {
-      "bytes": 10890,
       "path": "app/test/features/chat/location_send_fixture.dart",
+      "bytes": 10890,
       "sha256": "cb49397ccc7138516a7649d6c9eb73874a9f85c7b80dd2564194fa607e322043"
     },
     {
-      "bytes": 5560,
       "path": "app/test/features/chat/location_send_repository_test.dart",
+      "bytes": 5560,
       "sha256": "b17cc6e81b9ef31b45ab254145a0c198386d7491d6d95daf456184e51a4be53b"
     },
     {
-      "bytes": 21023,
       "path": "app/test/features/chat/location_send_workflow_test.dart",
+      "bytes": 21023,
       "sha256": "8ea5133b36036b8642eb47b66022e1a5ef280bfcf2e5015f3fffc0240da6e59d"
     },
     {
-      "bytes": 7363,
       "path": "app/test/features/chat/mention_composer_test.dart",
+      "bytes": 7363,
       "sha256": "fca0e65cfef77e43ec26998569edb237472c67bed187ece8ba6927e29f543557"
     },
     {
-      "bytes": 5598,
       "path": "app/test/features/chat/mention_forward_test.dart",
+      "bytes": 5598,
       "sha256": "d18e0464781b2bbbea8f941441a24f54935721aee0874087e9134a731e98e5a6"
     },
     {
-      "bytes": 4458,
       "path": "app/test/features/chat/mention_harness.dart",
+      "bytes": 4458,
       "sha256": "6c39fe7ba84e7b91b8f2e6bb3fe84b242899ae0098df5e9d2c33fae0da4f66d1"
     },
     {
-      "bytes": 4061,
       "path": "app/test/features/chat/mention_mapper_test.dart",
+      "bytes": 4061,
       "sha256": "1e865f40f36d2ade760ffd3968dc65cac13cd5ca0f2435a803aeb3de9155a70e"
     },
     {
-      "bytes": 8192,
       "path": "app/test/features/chat/mention_page_test.dart",
+      "bytes": 8192,
       "sha256": "83fcbc156a450199d62c06eba636fae31df61d307ffd400a4c1971e02eaf1049"
     },
     {
-      "bytes": 13648,
       "path": "app/test/features/chat/mention_repository_test.dart",
+      "bytes": 13648,
       "sha256": "c19985d041c9daa2cc43dc4080a677571eed162d4b3dee285001c586588c2746"
     },
     {
-      "bytes": 3988,
       "path": "app/test/features/chat/message_privacy_content_test.dart",
+      "bytes": 3988,
       "sha256": "919108c90536dd960155b80248c34000aad481702007ad72900a9be5ce335758"
     },
     {
@@ -1322,503 +1322,503 @@
       "sha256": "6a80b8f4e79d2457ebb6799475b4fce6a81b6c76b8037e2b56365354bc275c90"
     },
     {
-      "bytes": 15653,
       "path": "app/test/features/chat/privacy_followup_actions_test.dart",
+      "bytes": 15653,
       "sha256": "8e754b8918c8a7d9570835c73a7e5fcc137c34f3014dde100068ff382e2e9bd4"
     },
     {
-      "bytes": 2719,
       "path": "app/test/features/chat/privacy_followup_memory_test.dart",
+      "bytes": 2719,
       "sha256": "94efd37aedd9ba08a1a0fd214146d3c28460ed78d3392346c73e689f9d9a2823"
     },
     {
-      "bytes": 1838,
       "path": "app/test/features/chat/privacy_followup_policy_test.dart",
+      "bytes": 1838,
       "sha256": "768d6dd9dc2ac4d11964200ebc301b517a1096cf6f39ae0dffb7c41aad2135b5"
     },
     {
-      "bytes": 2603,
       "path": "app/test/features/chat/privacy_fullscreen_test.dart",
+      "bytes": 2603,
       "sha256": "92e704a8f03249226e53eb33d646682ca45d640600e0c7644c44a83e8dcff5d8"
     },
     {
-      "bytes": 2576,
       "path": "app/test/features/chat/privacy_search_projection_test.dart",
+      "bytes": 2576,
       "sha256": "ed02bee12255f545344c769996415458b36d8ec0e9b2ecf8de3a07f42c66465d"
     },
     {
-      "bytes": 5050,
       "path": "app/test/features/chat/private_message_deletion_race_test.dart",
+      "bytes": 5050,
       "sha256": "19d08e0751aef3d00973ef4c9e49a145238ebdd7225f8df190ab0f77a2512632"
     },
     {
-      "bytes": 4280,
       "path": "app/test/features/chat/private_message_state_test.dart",
+      "bytes": 4280,
       "sha256": "1a1f8ff35c3a653cce0c6edc0040cb130371590e111586a7f7ffa5b8e10ed13c"
     },
     {
-      "bytes": 2276,
       "path": "app/test/features/chat/saved_emoji_entry_test.dart",
+      "bytes": 2276,
       "sha256": "f7408bffdc4a4d938bbfb843fe5f29e117eb2f5f9ea6ad8f9032ac01f593c4db"
     },
     {
-      "bytes": 13226,
       "path": "app/test/features/chat/saved_emoji_fixture.dart",
+      "bytes": 13226,
       "sha256": "1918da57a3d917ca6e7dbf912d00cf45be9614e82e7f54bc507ab66089553e29"
     },
     {
-      "bytes": 13308,
       "path": "app/test/features/chat/saved_emoji_repository_test.dart",
+      "bytes": 13308,
       "sha256": "14c8dd6539ef57df3ddc4fda17b9a97c47848d7fc48a135390dee6d29965bed4"
     },
     {
-      "bytes": 6863,
       "path": "app/test/features/chat/saved_emoji_store_test.dart",
+      "bytes": 6863,
       "sha256": "d1c244c50d3a8136ecef99db747a3454c510416d5d71075a312ea2b303958473"
     },
     {
-      "bytes": 21374,
       "path": "app/test/features/chat/saved_emoji_workflow_test.dart",
+      "bytes": 21374,
       "sha256": "191473b9e0274a55d53cfee291021099c2d05ce60ee98f36989762e5636b7f3b"
     },
     {
-      "bytes": 4999,
       "path": "app/test/features/chat/voice_recorder_test.dart",
+      "bytes": 4999,
       "sha256": "f5c93fd7c47eda56930c03df675d185557f580ab38cef4b3db65b83f39121220"
     },
     {
-      "bytes": 15499,
       "path": "app/test/features/complaint/complaint_test.dart",
+      "bytes": 15499,
       "sha256": "c8f573d1ac276c429ef894bf0c1f1946ac4894ff05376c1ae8974a89d7bdea3d"
     },
     {
-      "bytes": 11264,
       "path": "app/test/features/contacts/contact_lookup_safety_test.dart",
+      "bytes": 11264,
       "sha256": "b36d05414607828ad87fe9d59d1229c1c0d94c391ec3c1df38d15c5c93aef6b9"
     },
     {
-      "bytes": 10608,
       "path": "app/test/features/contacts/contacts_pages_test.dart",
+      "bytes": 10608,
       "sha256": "37cc8b26ed66a7f2ddf06701034d1080808dcf737b4ba58b1a0054a441f24a1d"
     },
     {
-      "bytes": 11426,
       "path": "app/test/features/contacts/contacts_repository_test.dart",
+      "bytes": 11426,
       "sha256": "4948a2cf56946d6c33546d039d4a68bd9939c50400de0ef1747d03f63299d99d"
     },
     {
-      "bytes": 5687,
       "path": "app/test/features/conversation/contact_shortcuts_fixture.dart",
+      "bytes": 5687,
       "sha256": "e1257a33c2b76d75be2d2fe5a44d212f849d583018cc7acabd64d55ed0d696d5"
     },
     {
-      "bytes": 20985,
       "path": "app/test/features/conversation/contact_shortcuts_test.dart",
+      "bytes": 20985,
       "sha256": "0bf8955f453aad07a7506f6b351b4b7d14adfa8d5d1fb2d1295691c869e07099"
     },
     {
-      "bytes": 5083,
       "path": "app/test/features/conversation/conversation_repository_test.dart",
+      "bytes": 5083,
       "sha256": "363768da0084598a3dd474a96f41d9434ef6f9fe9b2ca0abcbf0bc0a4906670d"
     },
     {
-      "bytes": 3835,
       "path": "app/test/features/conversation/conversations_page_test.dart",
+      "bytes": 3835,
       "sha256": "71238af91422f64d19c0cc8debae3a95c81fb37941f7fb6e382799629a4a417e"
     },
     {
-      "bytes": 5936,
       "path": "app/test/features/conversation/next_unread_controller_test.dart",
+      "bytes": 5936,
       "sha256": "6014e86cb268aea91610be2b7935856c03a4b25b1543efd7e95662ce549637d8"
     },
     {
-      "bytes": 7580,
       "path": "app/test/features/conversation/next_unread_fixture.dart",
+      "bytes": 7580,
       "sha256": "d281d38cc15716fff7fd6ddbcad10484470f0b1f3b91a1d7626b6f4ecec5aac0"
     },
     {
-      "bytes": 14995,
       "path": "app/test/features/conversation/next_unread_page_test.dart",
+      "bytes": 14995,
       "sha256": "8b354b2b7aae9221d1c92265a808a5dd6ecc4a405271d56f538a143eecbe45a4"
     },
     {
-      "bytes": 7483,
       "path": "app/test/features/conversation/next_unread_repository_test.dart",
+      "bytes": 7483,
       "sha256": "d8161a5054f6225c61fe9ef9d26ef45937a957dfe88c18289ef5eb667a394d4f"
     },
     {
-      "bytes": 6319,
       "path": "app/test/features/favorite/favorite_attachment_store_test.dart",
+      "bytes": 6319,
       "sha256": "10a54415c33446295808defb8be0915e372b54a63ba5ac8ad1f654f669190f20"
     },
     {
-      "bytes": 6854,
       "path": "app/test/features/favorite/favorite_exporter_test.dart",
+      "bytes": 6854,
       "sha256": "31736ab3026181439e4497e89bb97a5732bd0b059a791f39126936c8f5a217ed"
     },
     {
-      "bytes": 6186,
       "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+      "bytes": 6186,
       "sha256": "7e8a98c9386e2a0c83b765de6cddd9be8d382866b8840ace92decf2a793b4a61"
     },
     {
-      "bytes": 6839,
       "path": "app/test/features/favorite/favorite_harness.dart",
+      "bytes": 6839,
       "sha256": "38c2cca0e07ddb8564208e730efb1374008013fefead344c2d14fb6392ce0e1a"
     },
     {
-      "bytes": 12623,
       "path": "app/test/features/favorite/favorite_pages_test.dart",
+      "bytes": 12623,
       "sha256": "15291d98cf9be88f09ee8e06d2b7d13b7af52660021a1994269f48082fcd54e6"
     },
     {
-      "bytes": 15222,
       "path": "app/test/features/favorite/favorite_privacy_ledger_test.dart",
+      "bytes": 15222,
       "sha256": "bfcbccd7ea98056885d50e4dff35d531d048139cc7cc4dfa6eeee314403ecbc8"
     },
     {
-      "bytes": 11617,
       "path": "app/test/features/favorite/favorite_repository_test.dart",
+      "bytes": 11617,
       "sha256": "6ccc0e058b200a06acf4ead104481f939b8d91e91755545facf21cc70e37dbaf"
     },
     {
-      "bytes": 1101,
       "path": "app/test/features/group/batch_remove_entry_test.dart",
+      "bytes": 1101,
       "sha256": "81e5910a6c5ec8a40e1b539066db1a0c94da8796ec9c74009bcf618cd9d36740"
     },
     {
-      "bytes": 8082,
       "path": "app/test/features/group/batch_remove_fixture.dart",
+      "bytes": 8082,
       "sha256": "11dd2c6695412ead8b11d218d6d9c4a5e8301e750595cbbc6d092480283885e0"
     },
     {
-      "bytes": 14143,
       "path": "app/test/features/group/batch_remove_page_test.dart",
+      "bytes": 14143,
       "sha256": "f36891679bac1174583a12233312dbe41045ef0ccbaea10094e350024ceab87a"
     },
     {
-      "bytes": 7664,
       "path": "app/test/features/group/batch_remove_repository_test.dart",
+      "bytes": 7664,
       "sha256": "e9fefa91061b6f04971fae679e5d92f49476911a1d417b80792026a716ce2635"
     },
     {
-      "bytes": 12401,
       "path": "app/test/features/group/chat_cid_route_test.dart",
+      "bytes": 12401,
       "sha256": "5d8783dc99ca61734b5ff60f6756df6a4ae9f01246bbc1297be94176b8d53d2b"
     },
     {
-      "bytes": 5362,
       "path": "app/test/features/group/create_group_entry_test.dart",
+      "bytes": 5362,
       "sha256": "2118a18799c3407e1760b0abf6009f366bea237d11d067dd767eda53f5c1d235"
     },
     {
-      "bytes": 11332,
       "path": "app/test/features/group/create_group_fixture.dart",
+      "bytes": 11332,
       "sha256": "7a97d076583fea43b4f34fc32cf7a79b2e81b4d93a8cdd6b22c3928413d6532c"
     },
     {
-      "bytes": 6094,
       "path": "app/test/features/group/create_group_repository_test.dart",
+      "bytes": 6094,
       "sha256": "1d704f5203c6a2caf6c0d48fbf5b5601d229da84a4a7a78ec1cb54fe2be6edd4"
     },
     {
-      "bytes": 16680,
       "path": "app/test/features/group/create_group_workflow_test.dart",
+      "bytes": 16680,
       "sha256": "8e6f9155a72f47c3628e0be35925379b6d199a8ae7d69a50e44027c758897310"
     },
     {
-      "bytes": 2547,
       "path": "app/test/features/group/group_avatar_entry_test.dart",
+      "bytes": 2547,
       "sha256": "1d3dffdeeaacb6a63c9a7a7ef95f1bb12f7b3dc6c901b272224797574ac2a671"
     },
     {
-      "bytes": 8905,
       "path": "app/test/features/group/group_avatar_fixture.dart",
+      "bytes": 8905,
       "sha256": "51ecee50d3cbed7a773f8033cd3ec1421c55c00cf471e0e26bb980533a63569b"
     },
     {
-      "bytes": 3835,
       "path": "app/test/features/group/group_avatar_repository_test.dart",
+      "bytes": 3835,
       "sha256": "d8150466662ae09c7aee8d7d3c0865acbcf1798a01e8a2c19cf38b73e17f9652"
     },
     {
-      "bytes": 13153,
       "path": "app/test/features/group/group_avatar_workflow_test.dart",
+      "bytes": 13153,
       "sha256": "69e8376306787ede4d6a5c17e1ed24c0570330969d02213cc6e3ce693560e0fe"
     },
     {
-      "bytes": 7316,
       "path": "app/test/features/group/group_creation_entry_fixture.dart",
+      "bytes": 7316,
       "sha256": "358ff6f02b3952286ca61e8aa95cbcd3177b28148b0b0187a32f2c7ee0903576"
     },
     {
-      "bytes": 1689,
       "path": "app/test/features/group/group_creation_entry_test.dart",
+      "bytes": 1689,
       "sha256": "492bd40e1107fd5888ef922b4687ce90265d3f09e8b03fc0fd6d93ca813e5c8b"
     },
     {
-      "bytes": 16289,
       "path": "app/test/features/group/group_creation_entry_workflow_test.dart",
+      "bytes": 16289,
       "sha256": "7b8e7a686f28e19cb2eeb92b580180089363e4fe3c9c81a42b90077c815a1e11"
     },
     {
-      "bytes": 9674,
       "path": "app/test/features/meeting/booking/booking_capability_discovery_test.dart",
+      "bytes": 9674,
       "sha256": "e5d142433ec684f0f94110c40689d44ffd3a639541eb7f02c39822d8d691c073"
     },
     {
-      "bytes": 5235,
       "path": "app/test/features/meeting/booking/booking_controller_test.dart",
+      "bytes": 5235,
       "sha256": "e55817903a681499adad4b7e25f7915a653dc6b967c70788ff5b5a105a302411"
     },
     {
-      "bytes": 28169,
       "path": "app/test/features/meeting/booking/booking_pages_test.dart",
+      "bytes": 28169,
       "sha256": "01f16880593a9f37468a8d4bd3574179e247a41f79f8bf4e84194f8fb4215ff7"
     },
     {
-      "bytes": 25519,
       "path": "app/test/features/meeting/booking/booking_pending_journal_test.dart",
+      "bytes": 25519,
       "sha256": "5f5380d17a7e549fee81f1e69055b0a3f3bf22c1e5b820021b90fb4d859055e5"
     },
     {
-      "bytes": 5070,
       "path": "app/test/features/meeting/booking/booking_provider_lifecycle_test.dart",
+      "bytes": 5070,
       "sha256": "65f815aa4f0fe527f4d66a71f48669975a71054f54e6af919d1553da53115c40"
     },
     {
-      "bytes": 3659,
       "path": "app/test/features/meeting/booking/booking_routes_test.dart",
+      "bytes": 3659,
       "sha256": "2ae65c33d92c0ad87537b4c0806e478b3df81facd3ed27f158a8a071085c4d9f"
     },
     {
-      "bytes": 4777,
       "path": "app/test/features/meeting/booking/booking_test_harness.dart",
+      "bytes": 4777,
       "sha256": "c57809de6c0d5e3cb0b3fd31206b6b694e76d919bf0d3443499e209737707dc6"
     },
     {
-      "bytes": 1808,
       "path": "app/test/features/meeting/booking/booking_view_test.dart",
+      "bytes": 1808,
       "sha256": "d25f1a90938b224b9cc2870a90fb0adbd0e2c05bfe5651a8e93121bcb2048ab5"
     },
     {
-      "bytes": 3250,
       "path": "app/test/features/meeting/meeting_harness.dart",
+      "bytes": 3250,
       "sha256": "875064567e488d9c1de112710fa736a12a149ed0b914f3c2ebab3ecee89fc394"
     },
     {
-      "bytes": 4750,
       "path": "app/test/features/meeting/meeting_pages_test.dart",
+      "bytes": 4750,
       "sha256": "6655b15fcb4240febcc622ad4a6b7827403457d1786a01cdfcc2412226146160"
     },
     {
-      "bytes": 10162,
       "path": "app/test/features/meeting/meeting_repository_test.dart",
+      "bytes": 10162,
       "sha256": "54715ccff17a3a9b766259ed00c79063ce1444b9ee01d35e1855367d57b597ab"
     },
     {
-      "bytes": 14074,
       "path": "app/test/features/meeting/meeting_routes_test.dart",
+      "bytes": 14074,
       "sha256": "a661dd8e7f424e8807278490bb427d398df70764a0bcd8ac170507d20e33c4b3"
     },
     {
-      "bytes": 8459,
       "path": "app/test/features/mine/account_cancellation_test.dart",
+      "bytes": 8459,
       "sha256": "80a4c60b2b76014200f7cc83b11c8c433e7d28a7cdc565726d8f18832d8b4f7d"
     },
     {
-      "bytes": 7500,
       "path": "app/test/features/mine/account_history_test.dart",
+      "bytes": 7500,
       "sha256": "25ff060aa0848fef960f452438553e468f3c1e54e107b5d1af7d4928d8d0d889"
     },
     {
-      "bytes": 2273,
       "path": "app/test/features/mine/account_pages_test.dart",
+      "bytes": 2273,
       "sha256": "41d03c48eb3d540fca108fc1d0cfbbb3496c6fc8a218660f6a27daa7b2ed737c"
     },
     {
-      "bytes": 8214,
       "path": "app/test/features/mine/account_repository_test.dart",
+      "bytes": 8214,
       "sha256": "89633af3dfb2bc8563ab491a9fe660e212026220b85bf4aaa255ef6f1fe3a1ab"
     },
     {
-      "bytes": 8137,
       "path": "app/test/features/mine/account_security_test.dart",
+      "bytes": 8137,
       "sha256": "fd3678fdfedc092b41366671460e6f185a1347291dd1ba116293c1dad8961202"
     },
     {
-      "bytes": 5434,
       "path": "app/test/features/moments/moment_controller_test.dart",
+      "bytes": 5434,
       "sha256": "a5ce72477efc18ff2a3b63b4d9fde751d1d24931ac21ea58834e33dfef3574d0"
     },
     {
-      "bytes": 5542,
       "path": "app/test/features/moments/moment_harness.dart",
+      "bytes": 5542,
       "sha256": "b6c67db142f61153c3aa45c2a5976be0061571c67d18b5c8ca7fdbc4a346e5dc"
     },
     {
-      "bytes": 9677,
       "path": "app/test/features/moments/moment_pages_test.dart",
+      "bytes": 9677,
       "sha256": "583bba82dcab9d74d92fa5d0471151b8956fbfcf10bbcdf1ec9a10260d640a73"
     },
     {
-      "bytes": 9491,
       "path": "app/test/features/moments/moments_repository_test.dart",
+      "bytes": 9491,
       "sha256": "16b0e0ad92709a3ebb42731a44ab0d07cc3861ae1aab3757d22573a253069eff"
     },
     {
-      "bytes": 1253,
       "path": "app/test/features/personal/legacy_export_test.dart",
+      "bytes": 1253,
       "sha256": "ce3c6329cd684cff55700c60beb8816482ce505689cbadb622659817876b7703"
     },
     {
-      "bytes": 9574,
       "path": "app/test/features/personal/personal_action_epoch_test.dart",
+      "bytes": 9574,
       "sha256": "827a18f8fe272057a1dea989703962c29bc001f1b714c84ceefb50fe9af769f2"
     },
     {
-      "bytes": 4312,
       "path": "app/test/features/personal/personal_archive_parts_test.dart",
+      "bytes": 4312,
       "sha256": "3e32fbe0c3f51094bff9c62f85f05e9a486da805611b1f649b71198941baad04"
     },
     {
-      "bytes": 821,
       "path": "app/test/features/personal/personal_archive_roundtrip_test.dart",
+      "bytes": 821,
       "sha256": "8cb17c759685901d797fcf933b2f6fe2619492281d34f014cbe729dfbd286d56"
     },
     {
-      "bytes": 2347,
       "path": "app/test/features/personal/personal_editor_test.dart",
+      "bytes": 2347,
       "sha256": "fd0f1b5f28a8a5de0be29e74b87e4498d722c69f4e4a641772845916766b5e9a"
     },
     {
-      "bytes": 3690,
       "path": "app/test/features/personal/personal_page_lifecycle_test.dart",
+      "bytes": 3690,
       "sha256": "b54993c65eeb2cdfe0e1461a8dae6492c29416c4a84824a9ca76302ea40c2722"
     },
     {
-      "bytes": 7440,
       "path": "app/test/features/personal/personal_repository_test.dart",
+      "bytes": 7440,
       "sha256": "2e3f84b99ff9f41c1407c3a36ca5e20450a70ddfd893cfb6105b468cdb55acba"
     },
     {
-      "bytes": 8428,
       "path": "app/test/features/qr/qr_code_page_test.dart",
+      "bytes": 8428,
       "sha256": "8826cbdc813ba057b891af5a489e9db99ab4a81c789a79ce5bae13074030949a"
     },
     {
-      "bytes": 4949,
       "path": "app/test/features/qr/qr_entry_navigation_test.dart",
+      "bytes": 4949,
       "sha256": "be8fe73cba81d499f9a91a0795e7543eed77f593e1d31064cd0c7df06d54c777"
     },
     {
-      "bytes": 10826,
       "path": "app/test/features/qr/qr_flow_fixture.dart",
+      "bytes": 10826,
       "sha256": "e73305deb83aa4161a33266f74e0fef863c4747c12647896d33f5a26a3830edd"
     },
     {
-      "bytes": 4509,
       "path": "app/test/features/qr/qr_invite_test.dart",
+      "bytes": 4509,
       "sha256": "318d66a751ee64756867391e1626986edbea246e65fef71d8fee0923b17c0b35"
     },
     {
-      "bytes": 1005,
       "path": "app/test/features/qr/qr_png_render_test.dart",
+      "bytes": 1005,
       "sha256": "d56fd7dbba883def700bd3c64e50c787a27e2ac0bd8ddd21ea48c2b043c5a05b"
     },
     {
-      "bytes": 3844,
       "path": "app/test/features/qr/qr_repository_test.dart",
+      "bytes": 3844,
       "sha256": "648832fde36dbfaab02d2b1fcd8f437647c2f8a0a0b8c728e1e4e4b93646c8af"
     },
     {
-      "bytes": 17599,
       "path": "app/test/features/qr/qr_scan_page_test.dart",
+      "bytes": 17599,
       "sha256": "8a945ded02dda58794ef84a68a86fc84fbcca342152b33a26c8b81efbcfc59b3"
     },
     {
-      "bytes": 5189,
       "path": "app/test/features/rtc/call_history_lifetime_test.dart",
+      "bytes": 5189,
       "sha256": "b2fb8d76055edb84e9c417338b213546ad40ebaf6a3a88acaf9ccb7e7777ab81"
     },
     {
-      "bytes": 15631,
       "path": "app/test/features/rtc/call_history_pipeline_test.dart",
+      "bytes": 15631,
       "sha256": "c1ab3e9c6bb2387ea38931082d99e34a0b7869fec5df6a28c38f3169ea89a773"
     },
     {
-      "bytes": 11929,
       "path": "app/test/features/rtc/call_records_fixture.dart",
+      "bytes": 11929,
       "sha256": "89183b7863c023218aa89049d1f31bfe7ae10b626619aebb18f3bbde87275ef5"
     },
     {
-      "bytes": 17328,
       "path": "app/test/features/rtc/call_records_page_test.dart",
+      "bytes": 17328,
       "sha256": "0c6de879fa4149ffb6ca4151754d409037e47f0ffa637f4c23c9188b0303baa4"
     },
     {
-      "bytes": 11559,
       "path": "app/test/features/rtc/call_records_repository_test.dart",
+      "bytes": 11559,
       "sha256": "3cbb7a91aaccf483ed556c8ce395e30bc912adc3b71fb5ef477218f3d3e201c4"
     },
     {
-      "bytes": 3821,
       "path": "app/test/features/rtc/rtc_page_test.dart",
+      "bytes": 3821,
       "sha256": "a5f233156cc9db9a3682e61d7b37d35bf3d2a375851ed5471c9b331c03173ddf"
     },
     {
-      "bytes": 18736,
       "path": "app/test/features/rtc/rtc_test.dart",
+      "bytes": 18736,
       "sha256": "20225bf1ca3d9885630de3d8df547837a85b7a10320c6414c0f31d75ae948dcd"
     },
     {
-      "bytes": 6130,
       "path": "app/test/features/search/global_search_controller_test.dart",
+      "bytes": 6130,
       "sha256": "475c5bf66b19794343b29b32f9b2e14ce59d1a914d35163d8f3242a85153c8d2"
     },
     {
-      "bytes": 1218,
       "path": "app/test/features/search/global_search_entry_test.dart",
+      "bytes": 1218,
       "sha256": "17edabb8f098184a1ec4373e8999b949c962ae283590ea4eebf2c5ba7581f667"
     },
     {
-      "bytes": 11961,
       "path": "app/test/features/search/global_search_fixture.dart",
+      "bytes": 11961,
       "sha256": "fcba4aef8e7f06837af23bea259e334eb9e2a8d3ec81cf34024b83d8eead93e2"
     },
     {
-      "bytes": 9749,
       "path": "app/test/features/search/global_search_pages_test.dart",
+      "bytes": 9749,
       "sha256": "271d47ffb3b0cb7faca7f090565b476f3538bf288fe1af512655d9fb1a4610fd"
     },
     {
-      "bytes": 12421,
       "path": "app/test/features/search/global_search_repository_test.dart",
+      "bytes": 12421,
       "sha256": "a86a24903d548e8b17e15262606403191f51522066b789f63f0d7796747b4f15"
     },
     {
-      "bytes": 9833,
       "path": "app/test/features/search/global_source_navigation_test.dart",
+      "bytes": 9833,
       "sha256": "1c7842ad0f048cc82d54055aee69a8d7d9f7c5363be48a1ec245d08736ef3e35"
     },
     {
-      "bytes": 676,
       "path": "app/test/support/http_adapter.dart",
+      "bytes": 676,
       "sha256": "6b28819ec545295b8d3a60e440b93ccc9c17dd7ca8d0d9567146fa2e74a0fba3"
     },
     {
-      "bytes": 957,
       "path": "app/tool/app_access_native_smoke.dart",
+      "bytes": 957,
       "sha256": "83999bd5e226c1a1a8c3f80ca672867679d6b768321b3ef3203a602b09d9d0cf"
     },
     {
-      "bytes": 2037,
       "path": "app/tool/fixture_main.dart",
+      "bytes": 2037,
       "sha256": "99a54b1952fd06c39313abf385c177620c696a844b7931031ec9622e0a4e2159"
     },
     {
-      "bytes": 3962,
       "path": "app/tool/native_storage_smoke.dart",
+      "bytes": 3962,
       "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
     }
   ],
@@ -1905,8 +1905,8 @@
         "sha256": "be8ecae48cdd344757a9b4a9e3805272dbb43e84fa35657ea460bee983ed5b56"
       },
       "after": {
-        "bytes": 8712,
         "path": "app/test/core/im/sdk_harness.dart",
+        "bytes": 8712,
         "sha256": "0b4b90f7e2b5d0168ccfa85b66abee9c16f28d158ec555566be7441f82b4f7ba"
       }
     },
@@ -1927,8 +1927,8 @@
         "sha256": "ea5e7f6a6a959e74a80fe8789f268778463661969216f5839a239ac768340856"
       },
       "after": {
-        "bytes": 8459,
         "path": "app/test/features/chat/chat_location_fixture.dart",
+        "bytes": 8459,
         "sha256": "ab81dc3f9b9fc6ac3cc27b8699c0cdda84dbcc33cf3b3381f424d65be7d3770a"
       }
     },
@@ -1958,9 +1958,9 @@
         "sha256": "61eb1863cfddf10108bccf8efd99fbc82493d98e20686551bda2a86cd82ee3c8"
       },
       "after": {
-        "bytes": 12553,
         "path": "app/test/features/chat/group_revoke_fixture.dart",
-        "sha256": "0762d2d4f76461f02244f6af0d5549d9bb52d966942216856f15f52933cde63f"
+        "bytes": 12963,
+        "sha256": "599fd3b04e5c8bc25838c17e5d0e9e7eb52e042cd0b24fe562655bca431618ac"
       }
     },
     {
@@ -1971,8 +1971,8 @@
         "sha256": "f5e11ef3e487122efca82c3660c2ec1dab1b72cdf8b2d6aea4cee930b47f61fd"
       },
       "after": {
-        "bytes": 16691,
         "path": "app/test/features/chat/group_revoke_workflow_test.dart",
+        "bytes": 16691,
         "sha256": "70864cc212a4d0c514daf963a28d7d3593ab4ae22bddd339abcb5ca81819926b"
       }
     }
@@ -2097,8 +2097,8 @@
       "storage.begin",
       "storage.end"
     ],
-    "fixtureCount": 24,
-    "expectedOrderedMarkers": 96,
+    "fixtureCount": 25,
+    "expectedOrderedMarkers": 100,
     "otherTwoOldCases": "original source teardown only; no new printed cleanup claim"
   },
   "helper_pins": [
@@ -2139,8 +2139,8 @@
     },
     {
       "path": ".github/workflows/mobile-input.yml",
-      "bytes": 1704,
-      "sha256": "dd99e342e00cfb1661c7684c62760985344b977d5b660b64594b64ca20f31d96"
+      "bytes": 1687,
+      "sha256": "937b8cf202126345d1cef16aa716a3cbfb3d0d5345cadee578fd45d3d7d6e9e8"
     },
     {
       "path": ".github/workflows/mobile-ci.yml",
@@ -2149,8 +2149,8 @@
     },
     {
       "path": "ci/mobile-input.py",
-      "bytes": 36950,
-      "sha256": "c5e57034e7e28eac826da390bf38211dea4e5d1fa73e06c9e59b6990f254ceeb"
+      "bytes": 38746,
+      "sha256": "51eb41eafa3890336eb23ac60606e59c746b6005443cec4505ade521aefdba42"
     }
   ],
   "old_test_source_pins": [
@@ -2197,14 +2197,14 @@
     "nativeSourceRefAndInputsUnchanged": true,
     "historicalFull359WorkflowRef": "dfa0b855c3f90668f36aaa4fab95e32d671fd36e",
     "fixtureRepairManifest": {
-      "path": "references/integration/mobile363-chat-input-failure-format-r6-candidate-20261017/candidate-manifest.json",
-      "sha256": "2b959df37db6bda7c3f9ccbded62238df4d5a29edc46838a80482243a39d0441"
+      "path": "references/integration/mobile363-typing-unmount-format-r7-candidate-20261017/candidate-manifest.json",
+      "sha256": "505b8330b08005bde273c1334d8176b9dab9b99a747173c92614b83a7c32fa9f"
     },
     "originalCloudBatchPostExactNotRecorded": true,
-    "manualContinuationSelected": "phase3 moderation+affected retry+focused-positive then isolated negative1; previous focused PASS and R4 retry PASS historical only, not reused",
+    "manualContinuationSelected": "only isolated negative1; prior25 cloud PASS plus exact local gateway1 reused; four opt-in await markers preserve all behavior",
     "previousFixtureRepairManifest": {
-      "path": "references/integration/mobile363-chat-input-failure-format-r5-candidate-20261017/candidate-manifest.json",
-      "sha256": "1873257cecd025b5b31e0746a5fec77ba712617a5f34e3e095f5c3366fa706d7"
+      "path": "references/integration/mobile363-chat-input-failure-format-r6-candidate-20261017/candidate-manifest.json",
+      "sha256": "2b959df37db6bda7c3f9ccbded62238df4d5a29edc46838a80482243a39d0441"
     }
   },
   "names25": [
@@ -2239,14 +2239,14 @@
   ],
   "cloud_analysis_paths": [],
   "local_validation_reuse": {
-    "state": "actual_changed_analysis2_PASS_and_prior_exact_analysis11_reused_no_widget_acceptance",
-    "source363": "0df8e3655a8fa697d4cc0a3c86bd4b194def70d3e37cd4199d8afcc68a72da30",
-    "portable415": "87f68117111647c8cff1c66b8d9eb30fdf41d0bf617849d31c6dcfeb65a2d93b",
-    "rootUnionReceiptSHA256": "ae961a6916b29e9189fc51e6a0fb2c265885b5ace281225a40c055cd38b8caef",
+    "state": "actual_changed_analysis1_PASS_and_prior_exact_analysis12_reused_no_widget_acceptance",
+    "source363": "151ad4f19440bd4d34b5f55819183390d92367e363f11acc8b07ffc6029640d6",
+    "portable415": "00fb5adacb2cc3e68b6e16059d1de69feaa857ffe33c620c877dad6ccbf21054",
+    "rootUnionReceiptSHA256": "96ce7ff2b452f17c62979fa2eb1581fe6668f6f2495be409059ba72125e496b7",
     "productManifest": {
-      "path": "references/integration/mobile363-chat-input-failure-format-r6-candidate-20261017/candidate-manifest.json",
-      "bytes": 7430,
-      "sha256": "2b959df37db6bda7c3f9ccbded62238df4d5a29edc46838a80482243a39d0441"
+      "path": "references/integration/mobile363-typing-unmount-format-r7-candidate-20261017/candidate-manifest.json",
+      "bytes": 6891,
+      "sha256": "505b8330b08005bde273c1334d8176b9dab9b99a747173c92614b83a7c32fa9f"
     },
     "analyses13": [
       {
@@ -2495,8 +2495,8 @@
         "path": "test/features/chat/group_revoke_fixture.dart",
         "source": {
           "path": "app/test/features/chat/group_revoke_fixture.dart",
-          "bytes": 12553,
-          "sha256": "0762d2d4f76461f02244f6af0d5549d9bb52d966942216856f15f52933cde63f"
+          "bytes": 12963,
+          "sha256": "599fd3b04e5c8bc25838c17e5d0e9e7eb52e042cd0b24fe562655bca431618ac"
         },
         "result": {
           "path": "test/features/chat/group_revoke_fixture.dart",
@@ -2511,7 +2511,7 @@
           "bytes": 56,
           "sha256": "c52f6a5d2438b05866311c6ca0bfb2ed84358fe3abe391d3a1f68662dfb0aaed"
         },
-        "execution": "new_analysis2"
+        "execution": "new_analysis1"
       },
       {
         "path": "test/features/chat/group_revoke_workflow_test.dart",
@@ -2533,14 +2533,13 @@
           "bytes": 62,
           "sha256": "90d913b13778475ae756bba87639b5bd57a5ac03c9bce38991b12e7d1036455f"
         },
-        "execution": "new_analysis2"
+        "execution": "exact_unchanged_file_reused"
       }
     ],
-    "new_analysis_paths2": [
-      "test/features/chat/group_revoke_fixture.dart",
-      "test/features/chat/group_revoke_workflow_test.dart"
+    "new_analysis_paths1": [
+      "test/features/chat/group_revoke_fixture.dart"
     ],
-    "reused_analysis_paths11": [
+    "reused_analysis_paths12": [
       "lib/core/im/im_event.dart",
       "lib/core/im/open_im_gateway.dart",
       "lib/features/chat/data/chat_repository.dart",
@@ -2551,7 +2550,8 @@
       "test/features/chat/chat_input_fixture.dart",
       "test/features/chat/chat_location_fixture.dart",
       "test/features/chat/chat_reedit_workflow_test.dart",
-      "test/features/chat/chat_typing_workflow_test.dart"
+      "test/features/chat/chat_typing_workflow_test.dart",
+      "test/features/chat/group_revoke_workflow_test.dart"
     ],
     "gateway1": {
       "name": "repeated exit is idempotent and old listener generations cannot enter a new account",
@@ -2583,35 +2583,31 @@
       }
     },
     "resource": {
-      "bytes": 930,
-      "sha256": "d41e296d562a762f3ca62935a74253da85d8a11f33b8ca38a8318acad27e2e34"
+      "bytes": 929,
+      "sha256": "dd369d05e7d74f366f48311ae480f013c3ee56c91bd45e2bdd461de38d3b9390"
     },
     "formatResource": {
-      "bytes": 1126,
-      "sha256": "ccefe7c896c510d50b59286503fae4bda6421fab6f8aa8500dffef105d45d197"
+      "bytes": 1117,
+      "sha256": "46b66d5b0c715080b95dab937f04c4d42862eb0298aa55a39e05365f997b642d"
     },
     "script": {
       "bytes": 1058,
-      "sha256": "5af51e2595fa48e44dda98caa508fc258c0e9e5dacab982754dd1aca162fd233"
+      "sha256": "79d01886e3a3edfefec498671ea8964e10e8f67d9fe35e3f2e5322deb3179faf"
     },
     "all415AuthoredSourcesPostExact": true,
     "cloud15SourcePostExactClaimed": false,
     "cloudReexecution": {
       "analysis": 0,
       "gateway1": false,
-      "tests": 4
+      "tests": 1
     },
     "priorR3BothPhaseSourcePostExact": true
   },
-  "phase3_names": [
-    "actual long press group moderation inspects roles then confirms one standard revoke",
-    "actual role read failure stays an error and explicit retry remains read only until confirmation",
-    "real focused composer sends bounded yes and throttles further input without sending a message"
-  ],
+  "phase3_names": [],
   "phase1_names": [
     "wrong-peer wrong-recipient malformed and offline typing never enters history or the active header"
   ],
-  "reused_cloud_names22": [
+  "reused_cloud_names25": [
     "self revoke ACK restores text once through the real composer without sending",
     "self at-text ACK restores exact mention identities instead of guessing from draft text",
     "unknown revoke never offers re-edit even when the native side removed the original",
@@ -2625,6 +2621,7 @@
     "an explicit delete notice after self revoke cancels its retained re-edit action",
     "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
     "owner logout while revoke waits keeps the ACK from writing the retired composer",
+    "real focused composer sends bounded yes and throttles further input without sending a message",
     "input idle and focus loss stop typing through no without replaying a yes",
     "live exact-peer typing updates the real header and each yes renews only a short TTL",
     "online-only typing uses the same transient yes-no path while a group composer sends none",
@@ -2632,28 +2629,576 @@
     "background and foreign coverage discard typing state until a new foreground event arrives",
     "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
     "actual self message menu keeps ordinary single chat revoke usable",
+    "actual long press group moderation inspects roles then confirms one standard revoke",
     "real doubletap dispatches once and native unknown offers only read review even after reopen",
-    "chat restores a draft and sends through the real method codec without overflow at large text"
+    "chat restores a draft and sends through the real method codec without overflow at large text",
+    "actual role read failure stays an error and explicit retry remains read only until confirmation"
   ],
-  "phase3_paths": [
-    "test/features/chat/group_revoke_workflow_test.dart",
-    "test/features/chat/chat_typing_workflow_test.dart"
-  ],
+  "phase3_paths": [],
   "phase1_paths": [
     "test/features/chat/chat_typing_workflow_test.dart"
   ],
   "cloud_validation_reuse": {
-    "original_cloud15": {
-      "run": 39034473775,
-      "job": 117401417624,
-      "head": "6e1449c6027d4d768999a85afd9e9d027697ba22",
-      "attempt": 1,
-      "artifact": 12101941530,
-      "artifactSHA256": "2922e8cc60a79c8452f6ec5d4b4ef601987afc1b6a661b00a25e8d508694601d",
-      "raw_log_sha256": "27527c550d6ac85e14fc014b5e9d5ee5dd3e605be54c1c220a5e30d4ba01e03a",
-      "raw_resource_sha256": "ff804879d28c5f139fbc2ed2b69a6e385a776137a6b75143ee778224d1b5ca8f",
-      "root_partial_receipt_sha256": "e1798d2126f846c56f6e908edabca7bc129880af6f2e59477506a47b79ec5f51",
-      "actual_passed_names15": [
+    "prior_cloud22": {
+      "original_cloud15": {
+        "run": 39034473775,
+        "job": 117401417624,
+        "head": "6e1449c6027d4d768999a85afd9e9d027697ba22",
+        "attempt": 1,
+        "artifact": 12101941530,
+        "artifactSHA256": "2922e8cc60a79c8452f6ec5d4b4ef601987afc1b6a661b00a25e8d508694601d",
+        "raw_log_sha256": "27527c550d6ac85e14fc014b5e9d5ee5dd3e605be54c1c220a5e30d4ba01e03a",
+        "raw_resource_sha256": "ff804879d28c5f139fbc2ed2b69a6e385a776137a6b75143ee778224d1b5ca8f",
+        "root_partial_receipt_sha256": "e1798d2126f846c56f6e908edabca7bc129880af6f2e59477506a47b79ec5f51",
+        "actual_passed_names15": [
+          "self revoke ACK restores text once through the real composer without sending",
+          "unknown revoke never offers re-edit even when the native side removed the original",
+          "an acknowledged moderated peer text never becomes the local sender draft",
+          "private self text can be revoked but cannot be retained as a re-edit draft",
+          "incomplete attached privacy metadata cannot be retained by successful self revoke",
+          "explicit re-edit preserves an existing draft until the user clears it",
+          "foreign route coverage permanently retires the old re-edit callback after return",
+          "history clear after ACK immediately blocks a retained re-edit action",
+          "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+          "an explicit delete notice after self revoke cancels its retained re-edit action",
+          "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+          "owner logout while revoke waits keeps the ACK from writing the retired composer",
+          "real focused composer sends bounded yes and throttles further input without sending a message",
+          "input idle and focus loss stop typing through no without replaying a yes",
+          "live exact-peer typing updates the real header and each yes renews only a short TTL"
+        ],
+        "actual_cleanup15": [
+          {
+            "name": "self revoke ACK restores text once through the real composer without sending",
+            "test_id": 3,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "unknown revoke never offers re-edit even when the native side removed the original",
+            "test_id": 5,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "an acknowledged moderated peer text never becomes the local sender draft",
+            "test_id": 6,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "private self text can be revoked but cannot be retained as a re-edit draft",
+            "test_id": 7,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "incomplete attached privacy metadata cannot be retained by successful self revoke",
+            "test_id": 8,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "explicit re-edit preserves an existing draft until the user clears it",
+            "test_id": 9,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "foreign route coverage permanently retires the old re-edit callback after return",
+            "test_id": 10,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "history clear after ACK immediately blocks a retained re-edit action",
+            "test_id": 11,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+            "test_id": 12,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "an explicit delete notice after self revoke cancels its retained re-edit action",
+            "test_id": 13,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+            "test_id": 14,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "owner logout while revoke waits keeps the ACK from writing the retired composer",
+            "test_id": 15,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "real focused composer sends bounded yes and throttles further input without sending a message",
+            "test_id": 19,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "input idle and focus loss stop typing through no without replaying a yes",
+            "test_id": 20,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "live exact-peer typing updates the real header and each yes renews only a short TTL",
+            "test_id": 21,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          }
+        ],
+        "accepted_cleanup_fixtures": 15,
+        "accepted_cleanup_markers": 60,
+        "source_digest_at_initial_gate": "a4915d9f88c8f16d694abe0e8fb2cba6a99075c6b869a0ed0527618d2389961e",
+        "portable_digest_at_initial_gate": "47ed38574138262db0fea7b44c4a0f08c55e88659a5af78152c2c03d4ac51413",
+        "prior_source_post_exact_recorded": false,
+        "prior_phase_latched_failure": "phase_timeout",
+        "new_execution_claimed": false
+      },
+      "continuation_cloud8": {
+        "run": 39036060511,
+        "job": 117405946599,
+        "head": "992b7447bb1177e44d3407c11853f3e6f5ab578d",
+        "attempt": 1,
+        "artifact": 12101944252,
+        "artifactBytes": 40410,
+        "artifactSHA256": "190ea764be816e4cf564d3d04517a86261b45712331e9fbb2d61e498b46d080d",
+        "root_partial_receipt": {
+          "bytes": 5554,
+          "sha256": "7e79006d3cbd59d3273b815c1d468fca129d5373ad2eb169cd88eb81cb1c32e8"
+        },
+        "raw": {
+          "input-repair9.log": {
+            "bytes": 13504,
+            "sha256": "1fcef43ba80910b3c0a9f752492f898713568895718af7f96d4b4bd16242bccd"
+          },
+          "input-repair9.resource.json": {
+            "bytes": 1708,
+            "sha256": "e9005ebe97265e99c864c452f21632a59f93c66875d0bfd6be70086af2842a01"
+          },
+          "input-repair9.source-post.json": {
+            "bytes": 304,
+            "sha256": "2180304e24105ca202e8f993f608186c2c5997db42affe11e63e4ec08e92ecc8"
+          },
+          "input-repair9.summary.json": {
+            "bytes": 3349,
+            "sha256": "9e8d6165948ecc748c9d129a6bfd1da1c2e79962623a8558a6d03ab884c5d04b"
+          },
+          "input-typing-diagnostic1.source-post.json": {
+            "bytes": 304,
+            "sha256": "2180304e24105ca202e8f993f608186c2c5997db42affe11e63e4ec08e92ecc8"
+          },
+          "input-final-resource.json": {
+            "bytes": 169,
+            "sha256": "d960e216ac822275d51125cee00e12a76342be2850a80005c218abeb1b92d175"
+          }
+        },
+        "actual_passed_names8": [
+          "self at-text ACK restores exact mention identities instead of guessing from draft text",
+          "online-only typing uses the same transient yes-no path while a group composer sends none",
+          "live online-only no clears the header without an ordinary receive refresh",
+          "background and foreign coverage discard typing state until a new foreground event arrives",
+          "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
+          "actual self message menu keeps ordinary single chat revoke usable",
+          "real doubletap dispatches once and native unknown offers only read review even after reopen",
+          "chat restores a draft and sends through the real method codec without overflow at large text"
+        ],
+        "actual_cleanup7": [
+          {
+            "name": "self at-text ACK restores exact mention identities instead of guessing from draft text",
+            "test_id": 13,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "online-only typing uses the same transient yes-no path while a group composer sends none",
+            "test_id": 17,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "live online-only no clears the header without an ordinary receive refresh",
+            "test_id": 18,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "background and foreign coverage discard typing state until a new foreground event arrives",
+            "test_id": 19,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
+            "test_id": 20,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "actual self message menu keeps ordinary single chat revoke usable",
+            "test_id": 4,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          },
+          {
+            "name": "real doubletap dispatches once and native unknown offers only read review even after reopen",
+            "test_id": 5,
+            "markers": [
+              "sdk.begin",
+              "sdk.end",
+              "unmount.begin",
+              "unmount.end"
+            ]
+          }
+        ],
+        "passed_draft_names1": [
+          "chat restores a draft and sends through the real method codec without overflow at large text"
+        ],
+        "accepted_cleanup_fixtures": 7,
+        "accepted_cleanup_markers": 28,
+        "source363_at_gate_and_post": "2820dddc3f7213871c9d14a566eb4ca9f267f8010f6d5bd2d9443e0855bac393",
+        "portable415_at_gate_and_post": "02b8360346ae1f7bb9cfd2af03dc85d873681507e7a043e3cf60b3961b1f6979",
+        "both_phase_source_post_exact": true,
+        "failed_group_complete_cleanup_counted_as_pass": false
+      },
+      "actual_passed_names22": [
+        "self revoke ACK restores text once through the real composer without sending",
+        "self at-text ACK restores exact mention identities instead of guessing from draft text",
+        "unknown revoke never offers re-edit even when the native side removed the original",
+        "an acknowledged moderated peer text never becomes the local sender draft",
+        "private self text can be revoked but cannot be retained as a re-edit draft",
+        "incomplete attached privacy metadata cannot be retained by successful self revoke",
+        "explicit re-edit preserves an existing draft until the user clears it",
+        "foreign route coverage permanently retires the old re-edit callback after return",
+        "history clear after ACK immediately blocks a retained re-edit action",
+        "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+        "an explicit delete notice after self revoke cancels its retained re-edit action",
+        "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+        "owner logout while revoke waits keeps the ACK from writing the retired composer",
+        "input idle and focus loss stop typing through no without replaying a yes",
+        "live exact-peer typing updates the real header and each yes renews only a short TTL",
+        "online-only typing uses the same transient yes-no path while a group composer sends none",
+        "live online-only no clears the header without an ordinary receive refresh",
+        "background and foreign coverage discard typing state until a new foreground event arrives",
+        "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
+        "actual self message menu keeps ordinary single chat revoke usable",
+        "real doubletap dispatches once and native unknown offers only read review even after reopen",
+        "chat restores a draft and sends through the real method codec without overflow at large text"
+      ],
+      "actual_cleanup21": [
+        {
+          "name": "self revoke ACK restores text once through the real composer without sending",
+          "test_id": 3,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "self at-text ACK restores exact mention identities instead of guessing from draft text",
+          "test_id": 13,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "unknown revoke never offers re-edit even when the native side removed the original",
+          "test_id": 5,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "an acknowledged moderated peer text never becomes the local sender draft",
+          "test_id": 6,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "private self text can be revoked but cannot be retained as a re-edit draft",
+          "test_id": 7,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "incomplete attached privacy metadata cannot be retained by successful self revoke",
+          "test_id": 8,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "explicit re-edit preserves an existing draft until the user clears it",
+          "test_id": 9,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "foreign route coverage permanently retires the old re-edit callback after return",
+          "test_id": 10,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "history clear after ACK immediately blocks a retained re-edit action",
+          "test_id": 11,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+          "test_id": 12,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "an explicit delete notice after self revoke cancels its retained re-edit action",
+          "test_id": 13,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+          "test_id": 14,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "owner logout while revoke waits keeps the ACK from writing the retired composer",
+          "test_id": 15,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "input idle and focus loss stop typing through no without replaying a yes",
+          "test_id": 20,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "live exact-peer typing updates the real header and each yes renews only a short TTL",
+          "test_id": 21,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "online-only typing uses the same transient yes-no path while a group composer sends none",
+          "test_id": 17,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "live online-only no clears the header without an ordinary receive refresh",
+          "test_id": 18,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "background and foreign coverage discard typing state until a new foreground event arrives",
+          "test_id": 19,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
+          "test_id": 20,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "actual self message menu keeps ordinary single chat revoke usable",
+          "test_id": 4,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "real doubletap dispatches once and native unknown offers only read review even after reopen",
+          "test_id": 5,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        }
+      ],
+      "accepted_cleanup_fixtures": 21,
+      "accepted_cleanup_markers": 84,
+      "prior_source_post_exact_recorded": false,
+      "prior_source_post_field_refers_to": "original_cloud15_only; continuation_cloud8 has its independent exact post",
+      "new_execution_claimed": false,
+      "original_cloud15_reused_names14": [
         "self revoke ACK restores text once through the real composer without sending",
         "unknown revoke never offers re-edit even when the native side removed the original",
         "an acknowledged moderated peer text never becomes the local sender draft",
@@ -2666,11 +3211,10 @@
         "an explicit delete notice after self revoke cancels its retained re-edit action",
         "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
         "owner logout while revoke waits keeps the ACK from writing the retired composer",
-        "real focused composer sends bounded yes and throttles further input without sending a message",
         "input idle and focus loss stop typing through no without replaying a yes",
         "live exact-peer typing updates the real header and each yes renews only a short TTL"
       ],
-      "actual_cleanup15": [
+      "original_cloud15_reused_cleanup14": [
         {
           "name": "self revoke ACK restores text once through the real composer without sending",
           "test_id": 3,
@@ -2792,16 +3336,6 @@
           ]
         },
         {
-          "name": "real focused composer sends bounded yes and throttles further input without sending a message",
-          "test_id": 19,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        },
-        {
           "name": "input idle and focus loss stop typing through no without replaying a yes",
           "test_id": 20,
           "markers": [
@@ -2822,145 +3356,97 @@
           ]
         }
       ],
-      "accepted_cleanup_fixtures": 15,
-      "accepted_cleanup_markers": 60,
-      "source_digest_at_initial_gate": "a4915d9f88c8f16d694abe0e8fb2cba6a99075c6b869a0ed0527618d2389961e",
-      "portable_digest_at_initial_gate": "47ed38574138262db0fea7b44c4a0f08c55e88659a5af78152c2c03d4ac51413",
-      "prior_source_post_exact_recorded": false,
-      "prior_phase_latched_failure": "phase_timeout",
+      "previous_pass_excluded_for_direct_recheck": [
+        "real focused composer sends bounded yes and throttles further input without sending a message"
+      ],
+      "latest_R4_retry_pass": {
+        "run": 39037461732,
+        "job": 117410072277,
+        "attempt": 1,
+        "head": "2b101c0875166284bb41289a9eaa54efdea1872e",
+        "artifact": 12102991631,
+        "artifactSHA256": "8c7e5fcff88da40def252690f6e5b06aa4a5017ae43a158d9056f7a388341626",
+        "source363": "301ffb559964674e6fcfae5aa58cf814b0e7587d1d58ff939e7ba7155054d321",
+        "portable415": "4a5584b1144e40399e08e8ca656dc204706c983cea01ccacd9cbff9605fa6b93",
+        "passed_names": [
+          "actual role read failure stays an error and explicit retry remains read only until confirmation"
+        ],
+        "both_phase_source_post_exact": true,
+        "rootPartialReceipt": {
+          "bytes": 6561,
+          "sha256": "1951e32a760cd85d796a2490a5f2240043c409186f800615899e26e7d0e04fef"
+        },
+        "retained_as_history_only": true,
+        "reused_for_current_scope": false,
+        "reason": "shared-close directly affected; retry selected again"
+      }
+    },
+    "continuation_cloud3": {
+      "run": 39038340794,
+      "job": 117412592904,
+      "attempt": 1,
+      "head": "52e4a2f9cd1c4530f455d5e5adad17cdafdab9ae",
+      "artifact": 12102219246,
+      "artifactBytes": 40901,
+      "artifactSHA256": "5c73b1f0393a152f6d6b221e31ed48c8b28b27a5ab2df30afa6e866d1b5803b5",
+      "rootReceipt": {
+        "bytes": 5271,
+        "sha256": "32c6443af57e23f61c6f810452fee2f64f1f62faf87ece8fb97deaad0fea5de3"
+      },
+      "actual_passed_names3": [
+        "actual long press group moderation inspects roles then confirms one standard revoke",
+        "actual role read failure stays an error and explicit retry remains read only until confirmation",
+        "real focused composer sends bounded yes and throttles further input without sending a message"
+      ],
+      "actual_cleanup3": [
+        {
+          "name": "actual long press group moderation inspects roles then confirms one standard revoke",
+          "testID": 3,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "actual role read failure stays an error and explicit retry remains read only until confirmation",
+          "testID": 4,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        },
+        {
+          "name": "real focused composer sends bounded yes and throttles further input without sending a message",
+          "testID": 8,
+          "markers": [
+            "sdk.begin",
+            "sdk.end",
+            "unmount.begin",
+            "unmount.end"
+          ]
+        }
+      ],
+      "accepted_cleanup_fixtures": 3,
+      "accepted_cleanup_markers": 12,
+      "source363_at_gate_and_post": "0df8e3655a8fa697d4cc0a3c86bd4b194def70d3e37cd4199d8afcc68a72da30",
+      "portable415_at_gate_and_post": "87f68117111647c8cff1c66b8d9eb30fdf41d0bf617849d31c6dcfeb65a2d93b",
+      "both_phase_source_post_exact": true,
+      "actual_log": {
+        "bytes": 4703,
+        "sha256": "a32f234d668241fe24fbc1f5b8f815e61df8c2a5c3683b06013330cff77aa146"
+      },
+      "actual_summary": {
+        "bytes": 2197,
+        "sha256": "fe4c0326161454159f8fba25c90abe04472871265c96b1498813c79e7d9ea2e8"
+      },
+      "negative_phase_timeout_not_accepted": true,
       "new_execution_claimed": false
     },
-    "continuation_cloud8": {
-      "run": 39036060511,
-      "job": 117405946599,
-      "head": "992b7447bb1177e44d3407c11853f3e6f5ab578d",
-      "attempt": 1,
-      "artifact": 12101944252,
-      "artifactBytes": 40410,
-      "artifactSHA256": "190ea764be816e4cf564d3d04517a86261b45712331e9fbb2d61e498b46d080d",
-      "root_partial_receipt": {
-        "bytes": 5554,
-        "sha256": "7e79006d3cbd59d3273b815c1d468fca129d5373ad2eb169cd88eb81cb1c32e8"
-      },
-      "raw": {
-        "input-repair9.log": {
-          "bytes": 13504,
-          "sha256": "1fcef43ba80910b3c0a9f752492f898713568895718af7f96d4b4bd16242bccd"
-        },
-        "input-repair9.resource.json": {
-          "bytes": 1708,
-          "sha256": "e9005ebe97265e99c864c452f21632a59f93c66875d0bfd6be70086af2842a01"
-        },
-        "input-repair9.source-post.json": {
-          "bytes": 304,
-          "sha256": "2180304e24105ca202e8f993f608186c2c5997db42affe11e63e4ec08e92ecc8"
-        },
-        "input-repair9.summary.json": {
-          "bytes": 3349,
-          "sha256": "9e8d6165948ecc748c9d129a6bfd1da1c2e79962623a8558a6d03ab884c5d04b"
-        },
-        "input-typing-diagnostic1.source-post.json": {
-          "bytes": 304,
-          "sha256": "2180304e24105ca202e8f993f608186c2c5997db42affe11e63e4ec08e92ecc8"
-        },
-        "input-final-resource.json": {
-          "bytes": 169,
-          "sha256": "d960e216ac822275d51125cee00e12a76342be2850a80005c218abeb1b92d175"
-        }
-      },
-      "actual_passed_names8": [
-        "self at-text ACK restores exact mention identities instead of guessing from draft text",
-        "online-only typing uses the same transient yes-no path while a group composer sends none",
-        "live online-only no clears the header without an ordinary receive refresh",
-        "background and foreign coverage discard typing state until a new foreground event arrives",
-        "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
-        "actual self message menu keeps ordinary single chat revoke usable",
-        "real doubletap dispatches once and native unknown offers only read review even after reopen",
-        "chat restores a draft and sends through the real method codec without overflow at large text"
-      ],
-      "actual_cleanup7": [
-        {
-          "name": "self at-text ACK restores exact mention identities instead of guessing from draft text",
-          "test_id": 13,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        },
-        {
-          "name": "online-only typing uses the same transient yes-no path while a group composer sends none",
-          "test_id": 17,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        },
-        {
-          "name": "live online-only no clears the header without an ordinary receive refresh",
-          "test_id": 18,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        },
-        {
-          "name": "background and foreign coverage discard typing state until a new foreground event arrives",
-          "test_id": 19,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        },
-        {
-          "name": "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
-          "test_id": 20,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        },
-        {
-          "name": "actual self message menu keeps ordinary single chat revoke usable",
-          "test_id": 4,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        },
-        {
-          "name": "real doubletap dispatches once and native unknown offers only read review even after reopen",
-          "test_id": 5,
-          "markers": [
-            "sdk.begin",
-            "sdk.end",
-            "unmount.begin",
-            "unmount.end"
-          ]
-        }
-      ],
-      "passed_draft_names1": [
-        "chat restores a draft and sends through the real method codec without overflow at large text"
-      ],
-      "accepted_cleanup_fixtures": 7,
-      "accepted_cleanup_markers": 28,
-      "source363_at_gate_and_post": "2820dddc3f7213871c9d14a566eb4ca9f267f8010f6d5bd2d9443e0855bac393",
-      "portable415_at_gate_and_post": "02b8360346ae1f7bb9cfd2af03dc85d873681507e7a043e3cf60b3961b1f6979",
-      "both_phase_source_post_exact": true,
-      "failed_group_complete_cleanup_counted_as_pass": false
-    },
-    "actual_passed_names22": [
+    "actual_passed_names25": [
       "self revoke ACK restores text once through the real composer without sending",
       "self at-text ACK restores exact mention identities instead of guessing from draft text",
       "unknown revoke never offers re-edit even when the native side removed the original",
@@ -2974,6 +3460,7 @@
       "an explicit delete notice after self revoke cancels its retained re-edit action",
       "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
       "owner logout while revoke waits keeps the ACK from writing the retired composer",
+      "real focused composer sends bounded yes and throttles further input without sending a message",
       "input idle and focus loss stop typing through no without replaying a yes",
       "live exact-peer typing updates the real header and each yes renews only a short TTL",
       "online-only typing uses the same transient yes-no path while a group composer sends none",
@@ -2981,10 +3468,12 @@
       "background and foreign coverage discard typing state until a new foreground event arrives",
       "real back navigation cancels outgoing timers and a fresh chat does not resurrect old typing",
       "actual self message menu keeps ordinary single chat revoke usable",
+      "actual long press group moderation inspects roles then confirms one standard revoke",
       "real doubletap dispatches once and native unknown offers only read review even after reopen",
-      "chat restores a draft and sends through the real method codec without overflow at large text"
+      "chat restores a draft and sends through the real method codec without overflow at large text",
+      "actual role read failure stays an error and explicit retry remains read only until confirmation"
     ],
-    "actual_cleanup21": [
+    "actual_cleanup24": [
       {
         "name": "self revoke ACK restores text once through the real composer without sending",
         "test_id": 3,
@@ -3116,6 +3605,16 @@
         ]
       },
       {
+        "name": "real focused composer sends bounded yes and throttles further input without sending a message",
+        "testID": 8,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
         "name": "input idle and focus loss stop typing through no without replaying a yes",
         "test_id": 20,
         "markers": [
@@ -3186,6 +3685,16 @@
         ]
       },
       {
+        "name": "actual long press group moderation inspects roles then confirms one standard revoke",
+        "testID": 3,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
         "name": "real doubletap dispatches once and native unknown offers only read review even after reopen",
         "test_id": 5,
         "markers": [
@@ -3194,195 +3703,23 @@
           "unmount.begin",
           "unmount.end"
         ]
+      },
+      {
+        "name": "actual role read failure stays an error and explicit retry remains read only until confirmation",
+        "testID": 4,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
       }
     ],
-    "accepted_cleanup_fixtures": 21,
-    "accepted_cleanup_markers": 84,
+    "accepted_cleanup_fixtures": 24,
+    "accepted_cleanup_markers": 96,
     "prior_source_post_exact_recorded": false,
-    "prior_source_post_field_refers_to": "original_cloud15_only; continuation_cloud8 has its independent exact post",
-    "new_execution_claimed": false,
-    "original_cloud15_reused_names14": [
-      "self revoke ACK restores text once through the real composer without sending",
-      "unknown revoke never offers re-edit even when the native side removed the original",
-      "an acknowledged moderated peer text never becomes the local sender draft",
-      "private self text can be revoked but cannot be retained as a re-edit draft",
-      "incomplete attached privacy metadata cannot be retained by successful self revoke",
-      "explicit re-edit preserves an existing draft until the user clears it",
-      "foreign route coverage permanently retires the old re-edit callback after return",
-      "history clear after ACK immediately blocks a retained re-edit action",
-      "new sticky private facts after ACK prevent the old re-edit callback from copying text",
-      "an explicit delete notice after self revoke cancels its retained re-edit action",
-      "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
-      "owner logout while revoke waits keeps the ACK from writing the retired composer",
-      "input idle and focus loss stop typing through no without replaying a yes",
-      "live exact-peer typing updates the real header and each yes renews only a short TTL"
-    ],
-    "original_cloud15_reused_cleanup14": [
-      {
-        "name": "self revoke ACK restores text once through the real composer without sending",
-        "test_id": 3,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "unknown revoke never offers re-edit even when the native side removed the original",
-        "test_id": 5,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "an acknowledged moderated peer text never becomes the local sender draft",
-        "test_id": 6,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "private self text can be revoked but cannot be retained as a re-edit draft",
-        "test_id": 7,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "incomplete attached privacy metadata cannot be retained by successful self revoke",
-        "test_id": 8,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "explicit re-edit preserves an existing draft until the user clears it",
-        "test_id": 9,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "foreign route coverage permanently retires the old re-edit callback after return",
-        "test_id": 10,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "history clear after ACK immediately blocks a retained re-edit action",
-        "test_id": 11,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "new sticky private facts after ACK prevent the old re-edit callback from copying text",
-        "test_id": 12,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "an explicit delete notice after self revoke cancels its retained re-edit action",
-        "test_id": 13,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
-        "test_id": 14,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "owner logout while revoke waits keeps the ACK from writing the retired composer",
-        "test_id": 15,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "input idle and focus loss stop typing through no without replaying a yes",
-        "test_id": 20,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
-        "name": "live exact-peer typing updates the real header and each yes renews only a short TTL",
-        "test_id": 21,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      }
-    ],
-    "previous_pass_excluded_for_direct_recheck": [
-      "real focused composer sends bounded yes and throttles further input without sending a message"
-    ],
-    "latest_R4_retry_pass": {
-      "run": 39037461732,
-      "job": 117410072277,
-      "attempt": 1,
-      "head": "2b101c0875166284bb41289a9eaa54efdea1872e",
-      "artifact": 12102991631,
-      "artifactSHA256": "8c7e5fcff88da40def252690f6e5b06aa4a5017ae43a158d9056f7a388341626",
-      "source363": "301ffb559964674e6fcfae5aa58cf814b0e7587d1d58ff939e7ba7155054d321",
-      "portable415": "4a5584b1144e40399e08e8ca656dc204706c983cea01ccacd9cbff9605fa6b93",
-      "passed_names": [
-        "actual role read failure stays an error and explicit retry remains read only until confirmation"
-      ],
-      "both_phase_source_post_exact": true,
-      "rootPartialReceipt": {
-        "bytes": 6561,
-        "sha256": "1951e32a760cd85d796a2490a5f2240043c409186f800615899e26e7d0e04fef"
-      },
-      "retained_as_history_only": true,
-      "reused_for_current_scope": false,
-      "reason": "shared-close directly affected; retry selected again"
-    }
+    "prior_source_post_field_refers_to": "original cloud15 only; R3 and R5 phase post-proofs are separately true, never retroactive",
+    "new_execution_claimed": false
   },
   "universe_names27": [
     "self revoke ACK restores text once through the real composer without sending",

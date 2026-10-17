@@ -1,4 +1,4 @@
-name: Manual Mobile current363 repair3 then diagnostic1
+name: Manual Mobile current363 isolated diagnostic1; source-bound prior25 reused
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  current363-repair3-diagnostic1:
+  current363-diagnostic1:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -27,7 +27,7 @@ jobs:
           sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
       - name: Prepare actual363 source and same official toolchain178locked dependencies
         run: bash ci/mobile-input-setup.sh current363 "$MOBILE_WORK"
-      - name: Only moderation, affected retry and focused typing (3), then isolated negative1; prior22 and analysis13 reused
+      - name: Only isolated negative1; prior25 cloud, gateway1 and exact analysis13 reused
         run: |
           set -euo pipefail
           sudo unshare --net -- python3 "$GITHUB_WORKSPACE/ci/mobile-input.py" netns \

@@ -1,0 +1,243 @@
+{
+  "schema": 1,
+  "identity": "apple-xcode164-owned-temp-swift-spm-diagnostic-r23-v1",
+  "state": "source-only; no execution",
+  "owned": [
+    {
+      "path": "ci/apple-resolution-temp-diagnostic/run.py",
+      "bytes": 20504,
+      "sha256": "a745c52cb6f4155f69ae293af2a22b87b83b64f63635ae8ad6cb33d2cd7a2025"
+    },
+    {
+      "path": "ci/apple-resolution-temp-diagnostic/fixtures.py",
+      "bytes": 4003,
+      "sha256": "ae1217ec1c307c609f4e255e7db3fe211683bd1e9965684473bbf52035e0734c"
+    },
+    {
+      "path": "ci/apple-resolution-temp-diagnostic/test_temp_probe.py",
+      "bytes": 7788,
+      "sha256": "2f4ebad2be3ff371975090c6c5de568640c2356134a7e14692161cbd7e76f2e0"
+    },
+    {
+      "path": ".github/workflows/apple-resolution-temp-diagnostic.yml",
+      "bytes": 1674,
+      "sha256": "bab64cda92575ae80499bb19fadd109f50e34fa55ab9617067318c113160e9a8"
+    }
+  ],
+  "borrowed": [
+    {
+      "path": "ci/apple-current359/run.py",
+      "bytes": 42809,
+      "sha256": "f64756379696d7e2dcaf914dbb8a7933dcf051e7c1f5612f5b8bcd35775d2fbc"
+    },
+    {
+      "path": "ci/apple-current359/consume.py",
+      "bytes": 9182,
+      "sha256": "66b9b78666e36d753310bbc853e10f784a3123379992debb8fd8fc52789b5c37"
+    },
+    {
+      "path": "ci/apple-current359/xcrun_adapter.py",
+      "bytes": 20918,
+      "sha256": "644351abdc5c93da1fee65f30e94d44a9ebe162b404d62a050b9a98dc9e8c2ae"
+    },
+    {
+      "path": "ci/apple-current359/cache_resource.py",
+      "bytes": 4639,
+      "sha256": "c10e12df95014cb3107fca9974bd955ac88b0b1248e7bf211471208d77867996"
+    },
+    {
+      "path": "ci/apple-current359/lane.json",
+      "bytes": 21768,
+      "sha256": "a737054b02a0b864be10ded37c07c2a4188775603044ea8a33c5002ce0e23865"
+    },
+    {
+      "path": "ci/apple-current354/packaging.py",
+      "bytes": 10141,
+      "sha256": "7e2f2e05ba18c7754c1dcffe9361b185ee41ea878069b35446cf8e111c5c1248"
+    },
+    {
+      "path": "ci/apple-current354/pod_selector.py",
+      "bytes": 5603,
+      "sha256": "820076795d8e383677c194985f3a64097aa0f2bb1e3a68d77a33fef5be614769"
+    },
+    {
+      "path": "ci/apple-current359/gem_audit.py",
+      "bytes": 41364,
+      "sha256": "3b1745ac8d2b7bd4876b1e4c0304af846b5089aa11f52044de2a1c058dfde101"
+    },
+    {
+      "path": "ci/apple-sdk-link/custody.py",
+      "bytes": 9781,
+      "sha256": "c242cbcc956b498b33a13dc18f87234212486616235b93de8443c63da7aac7f3"
+    },
+    {
+      "path": "ci/apple-sdk/resource_dual.py",
+      "bytes": 7394,
+      "sha256": "d1d872e0c2b394d73549f0ed071c457ee5019c41b90277c748c328b0219e7718"
+    },
+    {
+      "path": "ci/apple-host-tool/run.py",
+      "bytes": 11626,
+      "sha256": "ef4fef688a380c0d7c39c078e812e91f89adee77b8fda1d0203cef2128cfca94"
+    },
+    {
+      "path": "ci/apple-sdk-link-real/inputs.json",
+      "bytes": 33866,
+      "sha256": "1fa9b5f3c26785cb8db1324320a24b1b663c38f45e2eabb7d07461fba4824910"
+    }
+  ],
+  "host_pins": [
+    {
+      "bytes": 356421520,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend",
+      "sha256": "bf77cc8826cd1a74f1a9734c5c63a182bd26b9472682b58f01e435cc064e1bc8"
+    },
+    {
+      "bytes": 264942528,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "sha256": "4c458256bcdf913774de1bb4a37768244d3b41f32ad55afb2dfec3432f46f4fe"
+    },
+    {
+      "bytes": 4344144,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld",
+      "sha256": "648a8aac7f6f829a42305d24dddd7a3cfa48ee0bd9d4e7ec1ded5c51edea372b"
+    },
+    {
+      "bytes": 226192,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo",
+      "sha256": "1cd322ae54394e71eefceda6a74946ef0ff678924f890de7520341c34133ef84"
+    },
+    {
+      "bytes": 138992,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar",
+      "sha256": "f362372395c1dd8ef349b6ceaad3b7958f1207a32e95d285721eba4c84ca55ae"
+    },
+    {
+      "bytes": 29681456,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-nm",
+      "sha256": "1fbc38dab9a9bce506c32ba2a6e7be281645aaf7e9c47526b3693d6c9f388ccd"
+    },
+    {
+      "bytes": 137664,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/llvm-otool",
+      "sha256": "1cb32a54070f97a9a33bad5f16bbd6b5d5cb69fb4164d46a419197f405853a24"
+    },
+    {
+      "bytes": 118864,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/git",
+      "sha256": "7f30f076d0e9c38f772a76449fca9da8cf97f6a3d43b94c90a00e4f9ce7ad39e"
+    },
+    {
+      "bytes": 551104,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/file",
+      "sha256": "926f3fdd8fefe73b596806f6844a4d62b7c4e6bc5e247f6cbd22e5b6424881dd"
+    },
+    {
+      "bytes": 102560,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/sandbox-exec",
+      "sha256": "2ff75194b3e5689debee061c69f27f873ca21ff8fc54b7d49cbf5f2fb673f6ea"
+    },
+    {
+      "bytes": 117392,
+      "official_system_hardlink": true,
+      "path": "/usr/bin/xcrun",
+      "sha256": "5fa85ff21b06b348024e1ab8b71585c37f8d7b3b5daeca0f43de597b3b455a72"
+    },
+    {
+      "bytes": 152096,
+      "official_system_hardlink": true,
+      "path": "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12",
+      "sha256": "d4f152f2a753c94e0e7935c8ebbe6b2609979e1df7898422b577d0076383d08b"
+    },
+    {
+      "bytes": 2854,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/SDKSettings.plist",
+      "sha256": "e806133c5c4ebfce0bc53659e98b6cc06ddafb1d1b933800e3ca890753c65fb9"
+    },
+    {
+      "bytes": 2297,
+      "official_system_hardlink": true,
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/SDKSettings.plist",
+      "sha256": "32e765ce8dc192103a947647429422464ed8433371f616609819db7b10a85bbe"
+    },
+    {
+      "path": "/Applications/Xcode_16.4.app/Contents/Developer/usr/bin/xcodebuild",
+      "bytes": 182656,
+      "sha256": "d9a999fe2691cec2b6f84a7cce4b84f83d4b28a1d8261851ecebde80c38825cb",
+      "official_system_hardlink": true
+    },
+    {
+      "path": "/Applications/Xcode_16.4.app/Contents/Info.plist",
+      "bytes": 32979,
+      "sha256": "cd2c5ad123051dfbbfc316a048bb376b253af190bd10ae37c797d3e5c165cad8",
+      "official_system_hardlink": false
+    },
+    {
+      "path": "/Applications/Xcode_16.4.app/Contents/version.plist",
+      "bytes": 521,
+      "sha256": "b44fcf33ce9e1ac6759f5e71f682bcf734743e6ecd8ad6263116338236b25926",
+      "official_system_hardlink": false
+    },
+    {
+      "path": "/usr/bin/codesign",
+      "bytes": 378144,
+      "sha256": "1ee421cb4ddc493c4a5312294a36c4f76742381abdd7e46d745ecd62db9839b5",
+      "official_system_hardlink": true
+    },
+    {
+      "path": "/usr/bin/arch",
+      "bytes": 121216,
+      "sha256": "7c896f94f87af8fdc373c4490515d9831ed6bbc94bd82ddba075905b099d5903",
+      "official_system_hardlink": true
+    },
+    {
+      "path": "/bin/sh",
+      "bytes": 101232,
+      "sha256": "fcde7861d5e4f86f3a90d4fc3132f8712cf139f9fda52a59361d35007b605d61",
+      "official_system_hardlink": true
+    }
+  ],
+  "swiftc_alias_target": "/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend",
+  "originalToolProof": {
+    "run": 39032636948,
+    "job": 117396042230,
+    "head": "dfa0b855c3f90668f36aaa4fab95e32d671fd36e",
+    "rawSHA256": "7a2f57316b4b42b8533277a63a3b234c5c889dc99864edbcb4ad3cf6268d8e8c",
+    "scope": "exact original R21 source and actual preflight/acquisition host pins; no prior Swift tiny or this local SPM outcome"
+  },
+  "AppSourceMaterialized": 0,
+  "native_package_count": 0,
+  "dependency_downloads": 0,
+  "scope": "actual Swift tiny library compile only plus local-only project dependency resolution; generated library never run/uploaded; not App build/source477 acceptance",
+  "limits": {
+    "all_owned_plus_exact_new_external_cache_unique_bytes": 67108864,
+    "secondary_bytes": 67108864,
+    "minimum_free_bytes": 1073741824,
+    "poll_seconds": 0.2,
+    "phase_timeout_seconds": 120,
+    "stdout_retained_prefix_per_phase": 262144,
+    "stderr_retained_prefix_per_phase": 262144,
+    "total_phases": 2
+  },
+  "oldCohortUnchanged": {
+    "sourceRef": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1",
+    "business359": "633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199",
+    "portable411": "66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb",
+    "native477": "not materialized, no new resolution or App conclusion"
+  },
+  "preparedPureOnly2": [
+    "TempDiagnostic.test_actual_adapter_accepts_only_the_fixed_local_spm_form_and_swift_command_has_no_App_or_fetch",
+    "TempDiagnostic.test_actual_guard_call_combines_both_owned_phases_and_exact_cache_without_masking_failures"
+  ]
+}

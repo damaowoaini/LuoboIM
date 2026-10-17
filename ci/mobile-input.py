@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manual current363/415 failed moderation, affected retry and focused typing (3), then negative1; prior22 reused."""
+"""Manual current363/415 only isolated negative1; source-bound prior25 and gateway1 reused."""
 import argparse
 import importlib.util
 import json
@@ -26,11 +26,11 @@ SOURCE = CHECK.source
 ANALYSIS = module('input_inherited_analysis', REPO/'ci/mobile-announcement.py')
 BASE_SOURCE = '633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199'
 BASE_PORTABLE = '66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb'
-FINAL_SOURCE = '0df8e3655a8fa697d4cc0a3c86bd4b194def70d3e37cd4199d8afcc68a72da30'
-FINAL_PORTABLE = '87f68117111647c8cff1c66b8d9eb30fdf41d0bf617849d31c6dcfeb65a2d93b'
-LOCAL_REUSE_SHA = 'dc40848794861281d0884ca9c77947e484928c79202da5048c7c282fec8d4648'
+FINAL_SOURCE = '151ad4f19440bd4d34b5f55819183390d92367e363f11acc8b07ffc6029640d6'
+FINAL_PORTABLE = '00fb5adacb2cc3e68b6e16059d1de69feaa857ffe33c620c877dad6ccbf21054'
+LOCAL_REUSE_SHA = 'f8a4f1423ca3635b1469a9526ede3059ffde3e0817af6cb63d43282bd586a75c'
 ORIGINAL_CLOUD15_SHA = 'b2438f78ab68b2e34c111cc8052e85e1563c3fcc0c136a397acb80bcc87387ba'
-CLOUD_REUSE_SHA = '5a78a8ae9e9640577f8f1ea6b149dd6847d7c91e7390abe6ae3ba46f2d206d5e'
+CLOUD_REUSE_SHA = '8fe4cd26676632f2dc83032daac6d136b01e33b2d332e6bac5cd8257890c0e28'
 SOURCE_POST_SECONDS = 30
 RESOURCE = {'initial_bytes': 4294967296, 'floor_bytes': 1073741824,
             'allocated_cap_bytes': 805306368, 'poll_seconds': .2, 'phase_seconds': 120}
@@ -42,9 +42,9 @@ OLD5 = ['actual self message menu keeps ordinary single chat revoke usable', 'ac
 NAMES26 = NEW21 + OLD5
 NAMES25 = NAMES26[:-1]
 ANALYSIS_PATHS10 = ANALYSIS_PATHS9[:6] + ['test/core/im/sdk_harness.dart'] + ANALYSIS_PATHS9[6:]
-CHANGED_ANALYSIS2 = ['test/features/chat/group_revoke_fixture.dart', 'test/features/chat/group_revoke_workflow_test.dart']
+CHANGED_ANALYSIS1 = ['test/features/chat/group_revoke_fixture.dart']
 ANALYSIS_PATHS13 = ['lib/core/im/im_event.dart', 'lib/core/im/open_im_gateway.dart', 'lib/features/chat/data/chat_repository.dart', 'lib/features/chat/presentation/chat_page.dart', 'lib/features/chat/presentation/chat_typing_controller.dart', 'lib/features/chat/presentation/mention_text_controller.dart', 'test/core/im/sdk_harness.dart', 'test/features/chat/chat_input_fixture.dart', 'test/features/chat/chat_location_fixture.dart', 'test/features/chat/chat_reedit_workflow_test.dart', 'test/features/chat/chat_typing_workflow_test.dart', 'test/features/chat/group_revoke_fixture.dart', 'test/features/chat/group_revoke_workflow_test.dart']
-REUSED_ANALYSIS11 = [p for p in ANALYSIS_PATHS13 if p not in CHANGED_ANALYSIS2]
+REUSED_ANALYSIS12 = [p for p in ANALYSIS_PATHS13 if p not in CHANGED_ANALYSIS1]
 ORIGINAL_PHASE9 = [OLD5[0], OLD5[1], OLD5[2], OLD5[3], NEW21[1], *NEW21[17:]]
 PHASE1 = [NEW21[16]]
 REUSED15 = [name for name in NAMES25 if name not in ORIGINAL_PHASE9 + PHASE1]
@@ -55,6 +55,8 @@ PHASE3_PATHS = ['test/features/chat/group_revoke_workflow_test.dart', 'test/feat
 UNIVERSE27 = NAMES26 + [RETRY]
 REUSED22 = [n for n in NAMES25 if n not in [OLD5[1], PHASE1[0], FOCUSED]]
 REUSED_WIDGET21 = [n for n in REUSED22 if n != OLD5[3]]
+REUSED25 = [n for n in UNIVERSE27 if n not in PHASE1+[OLD5[-1]]]
+REUSED_WIDGET24 = [n for n in REUSED25 if n != OLD5[3]]
 PHASE1_PATHS = ['test/features/chat/chat_typing_workflow_test.dart']
 HELPERS = ['ci/mobile-source.py', 'ci/mobile-check.py', 'ci/mobile-announcement.py', 'ci/mobile/inputs.json', 'ci/mobile/required-test-names.json', 'ci/mobile-setup.sh', 'ci/mobile-input-setup.sh', '.github/workflows/mobile-input.yml', '.github/workflows/mobile-ci.yml', 'ci/mobile-input.py']
 
@@ -97,7 +99,7 @@ def validate_inventory(cfg, actual_rows, old_plan):
 
 
 def validate_local_reuse(cfg):
-    # Eleven exact previous analyses plus Root's current two, not new cloud
+    # Twelve exact previous analyses plus Root's current one, not new cloud
     # analysis. Old15's missing source-post is never backfilled by later runs.
     proof = cfg['local_validation_reuse']
     canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
@@ -108,12 +110,12 @@ def validate_local_reuse(cfg):
             or proof['all415AuthoredSourcesPostExact'] is not True
             or proof['cloud15SourcePostExactClaimed'] is not False
             or [r['path'] for r in proof['analyses13']] != ANALYSIS_PATHS13
-            or proof['reused_analysis_paths11'] != REUSED_ANALYSIS11
-            or proof['new_analysis_paths2'] != CHANGED_ANALYSIS2
+            or proof['reused_analysis_paths12'] != REUSED_ANALYSIS12
+            or proof['new_analysis_paths1'] != CHANGED_ANALYSIS1
             or len(proof['analyses13']) != 13
             or proof['gateway1']['name'] != OLD5[-1]
             or proof['gateway1']['source'] != rows['app/test/core/im/open_im_gateway_test.dart']
-            or proof['cloudReexecution'] != {'analysis': 0, 'gateway1': False, 'tests': 4}):
+            or proof['cloudReexecution'] != {'analysis': 0, 'gateway1': False, 'tests': 1}):
         raise ValueError('local analysis union scope/source differs')
     for entry in proof['analyses13']:
         if (entry['source'] != rows['app/'+entry['path']]
@@ -144,10 +146,10 @@ def validate_original_cloud15_reuse(cfg):
             raise ValueError('prior cloud15 cleanup sequence differs')
 
 
-def validate_cloud_reuse(cfg):
-    proof = cfg['cloud_validation_reuse']
+def validate_cloud22_reuse(cfg):
+    proof = cfg['cloud_validation_reuse']['prior_cloud22']
     canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
-    if SOURCE.sha(canonical) != CLOUD_REUSE_SHA:
+    if SOURCE.sha(canonical) != '5a78a8ae9e9640577f8f1ea6b149dd6847d7c91e7390abe6ae3ba46f2d206d5e':
         raise ValueError('prior cloud22 proof differs')
     validate_original_cloud15_reuse({'cloud_validation_reuse': proof['original_cloud15'], 'cleanup': cfg['cleanup']})
     r3 = proof['continuation_cloud8']
@@ -178,9 +180,37 @@ def validate_cloud_reuse(cfg):
             raise ValueError('prior cloud22 cleanup sequence differs')
 
 
+def validate_cloud_reuse(cfg):
+    proof = cfg['cloud_validation_reuse']
+    canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    if SOURCE.sha(canonical) != CLOUD_REUSE_SHA:
+        raise ValueError('prior cloud25 proof differs')
+    validate_cloud22_reuse(cfg)
+    r5 = proof['continuation_cloud3']
+    if (r5['run'] != 39038340794 or r5['job'] != 117412592904 or r5['attempt'] != 1
+            or r5['head'] != '52e4a2f9cd1c4530f455d5e5adad17cdafdab9ae'
+            or r5['actual_passed_names3'] != PHASE3
+            or [r['name'] for r in r5['actual_cleanup3']] != PHASE3
+            or r5['accepted_cleanup_fixtures'] != 3 or r5['accepted_cleanup_markers'] != 12
+            or r5['source363_at_gate_and_post'] != '0df8e3655a8fa697d4cc0a3c86bd4b194def70d3e37cd4199d8afcc68a72da30'
+            or r5['portable415_at_gate_and_post'] != '87f68117111647c8cff1c66b8d9eb30fdf41d0bf617849d31c6dcfeb65a2d93b'
+            or r5['both_phase_source_post_exact'] is not True
+            or r5['negative_phase_timeout_not_accepted'] is not True
+            or r5['new_execution_claimed'] is not False
+            or proof['actual_passed_names25'] != REUSED25
+            or [r['name'] for r in proof['actual_cleanup24']] != REUSED_WIDGET24
+            or proof['accepted_cleanup_fixtures'] != 24 or proof['accepted_cleanup_markers'] != 96
+            or proof['prior_source_post_exact_recorded'] is not False
+            or proof['new_execution_claimed'] is not False):
+        raise ValueError('prior cloud25 scope/source/cleanup lineage differs')
+    for row in [*r5['actual_cleanup3'], *proof['actual_cleanup24']]:
+        if row['markers'] != cfg['cleanup']['widget_markers']:
+            raise ValueError('prior cloud25 cleanup sequence differs')
+
+
 def descriptor():
     cfg = json.loads(SOURCE.regular(INPUTS))
-    if (cfg['schema'] != 'luobo.mobile.input.current363.failed3.then.diagnostic1.reuse22.v5'
+    if (cfg['schema'] != 'luobo.mobile.input.current363.diagnostic1.reuse25.v6'
             or cfg['cohort'] != 'current363' or cfg['resource'] != RESOURCE
             or cfg['source_digest'] != FINAL_SOURCE or cfg['portable_digest'] != FINAL_PORTABLE
             or cfg['source_members'] != 363 or cfg['portable_members'] != 415
@@ -190,9 +220,9 @@ def descriptor():
             or cfg['universe_names27'] != UNIVERSE27
             or len(set(cfg['universe_names27'])) != 27
             or cfg['names25'] != NAMES25 or cfg['reused_names1'] != [OLD5[-1]]
-            or cfg['phase3_names'] != PHASE3 or cfg['phase1_names'] != PHASE1
-            or cfg['reused_cloud_names22'] != REUSED22
-            or cfg['phase3_paths'] != PHASE3_PATHS or cfg['phase1_paths'] != PHASE1_PATHS
+            or cfg['phase3_names'] != [] or cfg['phase1_names'] != PHASE1
+            or cfg['reused_cloud_names25'] != REUSED25
+            or cfg['phase3_paths'] != [] or cfg['phase1_paths'] != PHASE1_PATHS
             or cfg['cloud_analysis_paths'] != []
             or len(cfg['names25']) != 25 or len(set(cfg['names25'])) != 25
             or [r['path'] for r in cfg['helper_pins']] != HELPERS
@@ -325,8 +355,7 @@ def phase_commands(work, cfg):
     validate_local_reuse(cfg)
     validate_cloud_reuse(cfg)
     phases = []
-    for label, names, paths in [('input-repair3', PHASE3, PHASE3_PATHS),
-                                ('input-typing-diagnostic1', PHASE1, PHASE1_PATHS)]:
+    for label, names, paths in [('input-typing-diagnostic1', PHASE1, PHASE1_PATHS)]:
         command = [str(work/'flutter/bin/flutter'), 'test', '--no-pub', '--machine', '--concurrency=1',
                    '--no-enable-vmservice', '--name', '^(?:'+'|'.join(map(re.escape, names))+')$'] + paths
         phases.append({'label': label, 'names': names, 'expected': len(names),
@@ -528,7 +557,7 @@ def run(work):
     phases, primary = [], None
     try:
         CHECK.write_json(work/'evidence/input-local-reuse13-plus1.json', cfg['local_validation_reuse'])
-        CHECK.write_json(work/'evidence/input-prior-cloud22.json', cfg['cloud_validation_reuse'])
+        CHECK.write_json(work/'evidence/input-prior-cloud25.json', cfg['cloud_validation_reuse'])
         for phase in phase_commands(work, cfg):
             result, error = run_phase(work, cfg, old, guard, phase)
             phases.append(result)
@@ -551,7 +580,7 @@ def run(work):
         finally:
             guard.stop.set()
             monitor.join()
-    if primary is not None or guard.reason or len(phases) != 2 or not all(p['accepted'] for p in phases):
+    if primary is not None or guard.reason or len(phases) != 1 or not all(p['accepted'] for p in phases):
         try:
             CHECK.write_json(work/'evidence/input-failed.json',
                              {'type': type(primary).__name__ if primary is not None else 'ValueError',
@@ -562,12 +591,12 @@ def run(work):
                 raise primary
             raise ValueError('targeted continuation failed')
     CHECK.write_json(work/'evidence/input-scoped-passed.json',
-                     {'state': 'current363_repair3_then_diagnostic1_with_explicit_prior22', 'phases': phases,
-                      'cloud_analysis_executed': 0, 'cloud_tests_executed': 4,
+                     {'state': 'current363_diagnostic1_with_explicit_prior25', 'phases': phases,
+                      'cloud_analysis_executed': 0, 'cloud_tests_executed': 1,
                       'local_reuse_sha256': LOCAL_REUSE_SHA, 'prior_cloud_reuse_sha256': CLOUD_REUSE_SHA,
                       'source363': FINAL_SOURCE, 'portable415': FINAL_PORTABLE,
-                      'cleanup': {'new_fixture_sequences': 4, 'new_markers': 16,
-                                  'prior_cloud_reused_fixtures': 21, 'prior_cloud_reused_markers': 84,
+                      'cleanup': {'new_fixture_sequences': 1, 'new_markers': 4,
+                                  'prior_cloud_reused_fixtures': 24, 'prior_cloud_reused_markers': 96,
                                   'combined_fixture_sequences': 25, 'combined_markers': 100,
                                   'newly_executed_25_fixtures': False,
                                   'cloud_named_union27_includes_local_gateway1': True},
