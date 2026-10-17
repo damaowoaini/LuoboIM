@@ -22,6 +22,7 @@ DEVELOPER = '/Applications/Xcode_16.4.app/Contents/Developer'
 SWIFTC = DEVELOPER + '/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc'
 LOG_CAP = 256 * 1024
 CAP = 64 * 1048576
+FRESH_PHASES = ('swift',)
 
 
 def load(path, name):
@@ -53,6 +54,7 @@ def verify():
     if spec['identity'] != IDENTITY or spec['schema'] != 1:
         raise ValueError('diagnostic identity required')
     for r in spec['owned'] + spec['borrowed']: checked(REPO, r)
+    prior_spm_failure(spec)
     return spec
 
 
@@ -79,7 +81,7 @@ def record(path, value):
 
 def native_argv(work, phase):
     if phase == 'swift':
-        return ['/usr/bin/arch', '-arm64e', SWIFTC, '-v', '-emit-library',
+        return ['/usr/bin/arch', '-arm64', SWIFTC, '-v', '-emit-library',
                 '-parse-as-library', '-module-name', 'OwnedResolutionProbe',
                 '-module-cache-path', str(work/'cache/swift-modules'),
                 '-o', str(work/'tmp/libOwnedResolutionProbe.dylib'), str(work/'source/Probe.swift')]
@@ -87,6 +89,54 @@ def native_argv(work, phase):
     return ['/usr/bin/arch', '-arm64e', 'xcrun', 'xcodebuild',
             '-resolvePackageDependencies', '-project', 'Runner.xcodeproj',
             '-clonedSourcePackagesDirPath', str(work/'source/app/build/ios/SourcePackages')]
+
+
+def native_command(work, phase):
+    argv = native_argv(work, phase)
+    return {'schema':2, 'phase':phase, 'argv':argv, 'cwd':'work/source/app/ios',
+        'outer_exec':argv[0], 'architecture':argv[1][1:],
+        'requested_tool':SWIFTC if phase == 'swift' else DEVELOPER+'/usr/bin/xcodebuild',
+        'tool_entry':'direct fixed Swift compiler' if phase == 'swift' else 'unchanged original xcrun adapter',
+        'outer_launcher_attempt_recorded':True, 'actual_tool_started':None,
+        'actual_tool_start_evidence':'not observed in pre-launch command record',
+        'full_environment_recorded':False}
+
+
+def native_observation(phase, argv, code, interrupted, capture_completed, stdout):
+    if phase not in {'swift','spm'}:
+        raise ValueError('finite phase required')
+    succeeded = capture_completed and not interrupted and code == 0
+    # A spawned arch process is not evidence that its requested tool started.
+    # For a failed SPM command, this fixed actual xcodebuild output is a
+    # separate positive observation; an adapter exec-attempt alone is not.
+    xcode_started = (phase == 'spm' and stdout.startswith(
+        ('Command line invocation:\n    '+DEVELOPER+'/usr/bin/xcodebuild ').encode()))
+    started = True if succeeded or xcode_started else None
+    evidence = ('successful actual command exit' if succeeded else
+        'fixed Xcode16.4 xcodebuild command-line stdout' if xcode_started else
+        'not established by outer launcher capture')
+    return {'schema':2, 'phase':phase, 'attempted_outer_exec':argv[0],
+        'attempted_outer_argv':argv[1:], 'requested_architecture':argv[1][1:],
+        'requested_tool':SWIFTC if phase == 'swift' else DEVELOPER+'/usr/bin/xcodebuild',
+        'outer_launcher_started':True, 'capture_completed':capture_completed,
+        'native_invoked':True, 'native_invoked_scope':'outer launcher only; not requested-tool startup',
+        'actual_tool_started':started, 'actual_tool_start_evidence':evidence,
+        'native_command_succeeded':succeeded}
+
+
+def prior_spm_failure(spec):
+    prior = spec['priorSPMFailureReused']
+    if (prior.get('run') != 39039632749 or prior.get('job') != 117416293104
+            or prior.get('attempt') != 1 or prior.get('phase') != 'spm'
+            or prior.get('head') != '9886c542dbd10174f7cf4127bce50de9a1af40b7'
+            or prior.get('status') != 'failed' or prior.get('exit_code') != 74
+            or prior.get('executed_this_run') is not False
+            or prior.get('actual_tool_started') is not True
+            or prior.get('source_post_exact') is not True
+            or prior.get('worker_boundary_post_exact') is not True
+            or prior.get('tools_post_exact') is not True):
+        raise ValueError('exact prior SPM failure evidence required; never a PASS')
+    return prior
 
 
 def source_snapshot(work, fixtures):
@@ -113,7 +163,7 @@ def tools_snapshot(spec, host):
     return rows
 
 
-def capture(work, argv, environment):
+def capture(work, phase, argv, environment):
     """Drain both actual streams with a bounded prefix; no invented stdout."""
     state = {n: {'body': bytearray(), 'bytes': 0, 'sha': hashlib.sha256()} for n in ['stdout', 'stderr']}
     child = subprocess.Popen(argv, cwd=work/'source/app/ios', env=environment,
@@ -121,6 +171,7 @@ def capture(work, argv, environment):
     selector = selectors.DefaultSelector()
     for name in state: selector.register(getattr(child, name), selectors.EVENT_READ, name)
     interrupted = False
+    capture_completed = False
     try:
         while selector.get_map():
             for key, _ in selector.select(.2):
@@ -129,7 +180,9 @@ def capture(work, argv, environment):
                     selector.unregister(key.fileobj); key.fileobj.close(); continue
                 s = state[key.data]; s['bytes'] += len(block); s['sha'].update(block)
                 s['body'].extend(block[:max(0, LOG_CAP-len(s['body']))])
-        return child.wait(), any(s['bytes'] > LOG_CAP for s in state.values())
+        code = child.wait()
+        capture_completed = True
+        return code, any(s['bytes'] > LOG_CAP for s in state.values())
     except BaseException:
         interrupted = True
         raise
@@ -142,14 +195,18 @@ def capture(work, argv, environment):
         selector.close()
         for name, s in state.items():
             put(work/'evidence'/(name+'.log'), bytes(s['body']))
-        record(work/'evidence/native-result.json', {'exit_code': child.returncode,
-            'interrupted': interrupted, 'native_invoked': True,
+        observed = native_observation(phase, argv, child.returncode, interrupted,
+            capture_completed, bytes(state['stdout']['body']))
+        record(work/'evidence/native-result.json', {**observed, 'exit_code': child.returncode,
+            'interrupted': interrupted,
             'streams': {n: {'total_bytes': s['bytes'], 'sha256': s['sha'].hexdigest(),
                            'retained_prefix_bytes': len(s['body']), 'truncated': s['bytes'] > LOG_CAP}
                         for n, s in state.items()}, 'generated_probe_binary_executed': False})
 
 
 def worker(work, phase):
+    if phase not in FRESH_PHASES:
+        raise ValueError('only corrected Swift phase may execute; original SPM failure is reused')
     spec = verify(); d = driver(); fixtures = load(HERE/'fixtures.py', 'temp_diagnostic_fixtures')
     a = json.loads((work/'activation.json').read_bytes())
     if (a.get('diagnostic_identity') != IDENTITY or a.get('phase') != phase
@@ -172,12 +229,12 @@ def worker(work, phase):
         'internal_Xcode_XPC_child_environment_observed': False,
         'specific_denied_syscall_observed': False,
         'network_granted': False, 'App_compilation': False})
-    argv = native_argv(work, phase)
-    record(work/'evidence/native-command.json', {'argv': argv, 'cwd': 'work/source/app/ios',
-        'outer_exec': '/usr/bin/arch', 'architecture': 'arm64e', 'full_environment_recorded': False})
+    command = native_command(work, phase)
+    argv = command['argv']
+    record(work/'evidence/native-command.json', command)
     code = 1
     try:
-        code, truncated = capture(work, argv, e)
+        code, truncated = capture(work, phase, argv, e)
         if phase == 'swift' and code == 0:
             host = load(REPO/'ci/apple-host-tool/run.py', 'temp_diagnostic_output_fingerprint')
             output = host.fingerprint(work/'tmp/libOwnedResolutionProbe.dylib', 16 << 20)
@@ -284,14 +341,16 @@ def execute():
     if s.f_bavail*s.f_frsize < 1 << 30: raise ValueError('1GiB admission required')
     root.mkdir(mode=0o700)
     (root/'evidence').mkdir(mode=0o700)
+    prior = prior_spm_failure(spec)
+    record(root/'evidence/prior-spm-failure.json', prior)
     host = load(REPO/'ci/apple-host-tool/run.py', 'temp_diagnostic_host_fingerprint')
     before_tools = tools_snapshot(spec, host)
     record(root/'evidence/tools-before.json', {'files': before_tools})
     selected = d.pod_selector.select(Path(os.environ['HOME']))
     lane = json.loads((REPO/'ci/apple-current359/lane.json').read_bytes())
     d.pod_selector.require_identity(selected, lane['cocoapods_preinstalled'])
-    works = [root/n/'luobo-apple-current359' for n in ['swift','spm']]
-    for phase, work in zip(['swift','spm'], works):
+    works = [root/n/'luobo-apple-current359' for n in FRESH_PHASES]
+    for phase, work in zip(FRESH_PHASES, works):
         work.mkdir(mode=0o700, parents=True)
         for path in ['evidence','tmp','pub-cache','config','cache/clang','cache/swift-modules','cocoapods/cache','cocoapods/repos']:
             (work/path).mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -313,22 +372,28 @@ def execute():
         record(work/'evidence/source-pre.json', {'files':source_snapshot(work,fixtures)})
     record(root/'evidence/budget.json', {'primary_plus_secondary_unique_cap_bytes':CAP,
         'all_phase_outputs_share_primary':True,'private_cache_double_counted_in_primary':False,
+        'fresh_phases':list(FRESH_PHASES),'prior_SPM_failure_reused_not_executed':True,
         'secondary_cap_bytes':CAP,'minimum_free_bytes':1<<30,'poll_seconds':.2,
         'phase_timeout_seconds':120,'original_shared_guard_changed':False,
         'system_T_or_HOME_write_grant_added':False,'cache_bodies_read_or_deleted':False})
     outcome, rows = 0, []
     try:
-        for phase, work in zip(['swift','spm'],works):
+        for phase, work in zip(FRESH_PHASES,works):
             guard = load(REPO/'ci/apple-sdk/resource_dual.py', 'temp_diagnostic_guard_'+phase)
             command = ['/usr/bin/sandbox-exec','-f',str(work/'diagnostic.sb'),sys.executable,'-B',
                        str(HERE/'run.py'),'--identity',IDENTITY,'--worker',str(work),'--phase',phase]
             code = guarded_probe(guard,d.xcrun_adapter,d.cache_resource,root,works,work,command)
             result = json.loads((work/'evidence/resource.json').read_bytes())
-            complete = may_continue(result, optional_record(work/'evidence/native-result.json'),
+            native = optional_record(work/'evidence/native-result.json')
+            complete = may_continue(result, native,
                 optional_record(work/'evidence/source-post.json'),
                 optional_record(work/'evidence/worker-boundary-post.json'), phase)
             rows.append({'phase':phase,'exit_code':code,'resource_status':result['status'],
-                         'worker_observation_complete':complete})
+                         'worker_observation_complete':complete,
+                         'outer_launcher_started':isinstance(native,dict) and native.get('outer_launcher_started') is True,
+                         'capture_completed':isinstance(native,dict) and native.get('capture_completed') is True,
+                         'actual_tool_started':native.get('actual_tool_started') if isinstance(native,dict) else None,
+                         'native_command_succeeded':isinstance(native,dict) and native.get('native_command_succeeded') is True})
             outcome = outcome or code
             verify()
             record(work/'evidence/controller-source-post.json', {'exact':True,'scope':'pinned borrowed and new controllers only'})
@@ -345,7 +410,8 @@ def execute():
             verify()
             controller_post_exact = True
         finally:
-            all_phases_complete = (len(rows) == 2 and [r['phase'] for r in rows] == ['swift','spm']
+            all_phases_complete = (len(rows) == len(FRESH_PHASES)
+                and [r['phase'] for r in rows] == list(FRESH_PHASES)
                 and all(r['worker_observation_complete'] for r in rows))
             outcome = outcome or (0 if all_phases_complete and tools_post_exact
                                   and controller_post_exact else 1)
@@ -353,7 +419,17 @@ def execute():
                 'exit_code':outcome,'diagnostic_only':True,'permission_fix_proven':False,
                 'diagnostic_complete':all_phases_complete and tools_post_exact and controller_post_exact,
                 'worker_phase_boundaries_complete':all_phases_complete,
-                'all_native_commands_passed':all_phases_complete and all(r['exit_code'] == 0 for r in rows),
+                'fresh_phase_count':len(rows), 'fresh_expected_phases':list(FRESH_PHASES),
+                'fresh_native_commands_passed':all_phases_complete and all(
+                    r['exit_code'] == 0 and r['native_command_succeeded'] for r in rows),
+                'prior_phase_results':[prior], 'prior_SPM_failure_reused':True,
+                'SPM_executed_this_run':False, 'SPM_resolution_passed':False,
+                'all_native_commands_passed':False,
+                'all_native_tools_started_proven':all_phases_complete and all(
+                    r['actual_tool_started'] is True for r in rows) and prior['actual_tool_started'] is True,
+                'diagnostic_complete_meaning':'fresh Swift observation/post-check complete; prior SPM exit74 retained as failure, not resolution success',
+                'exit_code_scope':'fresh Swift1 and its source/tool/resource boundaries only; prior SPM failure is not re-executed',
+                'unknown_tool_start_is_not_proof_of_absence':True,
                 'tools_post_exact':tools_post_exact,'controller_post_exact':controller_post_exact,
                 'specific_denied_syscall_proven':False,'old_preflight_repeated':False,
                 'App359_or477_acquired_or_compiled':False,'generated_binaries_executed_or_uploaded':False})

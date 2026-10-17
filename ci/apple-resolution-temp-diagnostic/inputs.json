@@ -5,8 +5,8 @@
   "owned": [
     {
       "path": "ci/apple-resolution-temp-diagnostic/run.py",
-      "bytes": 20504,
-      "sha256": "a745c52cb6f4155f69ae293af2a22b87b83b64f63635ae8ad6cb33d2cd7a2025"
+      "bytes": 25251,
+      "sha256": "e41ee7dc864fb897f432d475026fd8652f213e4ecaa947d165e7a12e6a11f3d0"
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/fixtures.py",
@@ -15,8 +15,8 @@
     },
     {
       "path": "ci/apple-resolution-temp-diagnostic/test_temp_probe.py",
-      "bytes": 7788,
-      "sha256": "2f4ebad2be3ff371975090c6c5de568640c2356134a7e14692161cbd7e76f2e0"
+      "bytes": 10172,
+      "sha256": "bfd74a4efbfc29c68ea0007cb7cce1eee592e0f3d3b890c1311c37f0df3d5bc5"
     },
     {
       "path": ".github/workflows/apple-resolution-temp-diagnostic.yml",
@@ -219,7 +219,7 @@
   "AppSourceMaterialized": 0,
   "native_package_count": 0,
   "dependency_downloads": 0,
-  "scope": "actual Swift tiny library compile only plus local-only project dependency resolution; generated library never run/uploaded; not App build/source477 acceptance",
+  "scope": "fresh corrected direct Swift tiny1 only; original local SPM exit74 reused as failure; generated library never run/uploaded; not App/source477 acceptance",
   "limits": {
     "all_owned_plus_exact_new_external_cache_unique_bytes": 67108864,
     "secondary_bytes": 67108864,
@@ -228,7 +228,13 @@
     "phase_timeout_seconds": 120,
     "stdout_retained_prefix_per_phase": 262144,
     "stderr_retained_prefix_per_phase": 262144,
-    "total_phases": 2
+    "total_phases": 1,
+    "fresh_phases": [
+      "swift"
+    ],
+    "prior_failed_phase_reused_not_run": [
+      "spm"
+    ]
   },
   "oldCohortUnchanged": {
     "sourceRef": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1",
@@ -239,5 +245,111 @@
   "preparedPureOnly2": [
     "TempDiagnostic.test_actual_adapter_accepts_only_the_fixed_local_spm_form_and_swift_command_has_no_App_or_fetch",
     "TempDiagnostic.test_actual_guard_call_combines_both_owned_phases_and_exact_cache_without_masking_failures"
-  ]
+  ],
+  "preparedAffectedPureOnly1": [
+    "TempDiagnostic.test_actual_adapter_accepts_only_the_fixed_local_spm_form_and_swift_command_has_no_App_or_fetch"
+  ],
+  "unchangedSecondPureReuse": {
+    "name": "TempDiagnostic.test_actual_guard_call_combines_both_owned_phases_and_exact_cache_without_masking_failures",
+    "wholeMethodBodyExact": true,
+    "executedHere": false
+  },
+  "directSwiftArchitectureSuccessor": {
+    "run": 39039632749,
+    "job": 117416293104,
+    "head": "9886c542dbd10174f7cf4127bce50de9a1af40b7",
+    "artifactSHA256": "4f67d8ea5b7aa92ca8dbb98827d18b9c926b25574d6180744a04b2df0f886b8d",
+    "swiftArchitecture": "arm64",
+    "SPMOriginalAdapterArchitecture": "arm64e",
+    "reason": "actual direct swiftc launch under arm64e failed before tool startup; fixed hosted platform is arm64",
+    "arm64SwiftExecutionValidated": false,
+    "profileOrEnvironmentChanged": false,
+    "specificDerivedDataDeniedSyscallKnown": false
+  },
+  "priorSPMFailureReused": {
+    "phase": "spm",
+    "status": "failed",
+    "exit_code": 74,
+    "executed_this_run": false,
+    "run": 39039632749,
+    "job": 117416293104,
+    "attempt": 1,
+    "head": "9886c542dbd10174f7cf4127bce50de9a1af40b7",
+    "artifactSHA256": "4f67d8ea5b7aa92ca8dbb98827d18b9c926b25574d6180744a04b2df0f886b8d",
+    "actual_tool_started": true,
+    "actual_tool_start_evidence": "fixed Xcode16.4 actual command-line stdout and package graph output",
+    "actual_adapter_request_matched": true,
+    "source_post_exact": true,
+    "worker_boundary_post_exact": true,
+    "tools_post_exact": true,
+    "rootFailureReview": {
+      "path": ".qa/mobile-unmount-apple-temp-batch10-1/root-apple-terminal-failure-review.json",
+      "bytes": 1800,
+      "sha256": "27c21e04e312225ee6b26d69402311a4bda037bb60f2a0cc359a82e21d2dd454"
+    },
+    "rawBodies": [
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/evidence/summary.json",
+        "bytes": 793,
+        "sha256": "142895471c5951487b785a524c5c393612ff1ddf98d7f7e111bfe3bfe4ec10c7"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/evidence/tools-after.json",
+        "bytes": 9502,
+        "sha256": "d9b81479ef750e4dcd22343ce6375ff7581c987446f81bd583e76e14aa5d4a39"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/native-command.json",
+        "bytes": 455,
+        "sha256": "ff3f0c552b1b821b821f93c3a7e3efcc82be9c0f97af10717a3b45cb3238c31c"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/native-result.json",
+        "bytes": 525,
+        "sha256": "55091f72d38792bac87520e229a0ae017cfe04694e8bd9955928979389317bd7"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/resource.json",
+        "bytes": 1448,
+        "sha256": "68cff43a4b1794c553e02794fb5417f21b16e6d4c20fcd7fb2d6bc073fc30458"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/profile.sb",
+        "bytes": 2981,
+        "sha256": "e3bb112a47a478cde3a418c0f844c10636ceb7ce7a804fa278b600ff2cb69c83"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/child-boundary.json",
+        "bytes": 1101,
+        "sha256": "f5c8e754371873dbb871ed071172d841b927af3e207d3935fdc78a68c7e7560c"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/source-post.json",
+        "bytes": 1014,
+        "sha256": "48d1c36f9fdd36c4e3cebddd9592393ca4ea48936dba22af2c644e2ab62b1b2a"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/worker-boundary-post.json",
+        "bytes": 124,
+        "sha256": "be22699945bef4e76f0156b68989daa4bc4cdf38163f6c004687f93473da41e0"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/spm-adapter-check.json",
+        "bytes": 91,
+        "sha256": "70b213b73dad3434e0fda8520498d9e7022770c3cd665acd884eed03411a4cc1"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/stdout.log",
+        "bytes": 596,
+        "sha256": "a54e54d871d7c196c0f116196cd1307f5367eae7290ac62c592ceeedc660c459"
+      },
+      {
+        "path": ".qa/mobile-unmount-apple-temp-batch10-1/apple-artifact/spm/luobo-apple-current359/evidence/stderr.log",
+        "bytes": 5816,
+        "sha256": "946be24093ec4737a4ad546508e06b6ca7266131ac86de7b023c4016f842bb7f"
+      }
+    ],
+    "unresolved_failure": "DerivedData LogStore, systemT ResultBundle and legacy Swift driver temp EPERM; specific syscall unknown",
+    "notPermissionFixOrSuccessfulResolution": true
+  }
 }
