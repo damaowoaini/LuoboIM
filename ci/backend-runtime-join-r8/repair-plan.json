@@ -1,19 +1,17 @@
 {
   "schema": 1,
-  "state": "FROZEN_REPAIR5",
+  "state": "FROZEN_CAPTURE_ORDER_REPAIR5",
   "source": {
     "members": 1556,
-    "digest": "1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132"
+    "digest": "cc3425c0f40b7b60e7e1f285c21c26f8f2597b977b362650de695c610fed342b"
   },
   "repairTargets": {
-    "internal/messagedelivery": [
-      "TestGroupHistoryMongoOriginalGenerationExportsClosedRangeWithoutLeaveGap",
-      "TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice",
-      "TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermission"
-    ],
     "internal/namespaceimport/ownedcontrol": [
       "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
-      "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient"
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
     ]
   },
   "actualPassedTargets": {
@@ -28,6 +26,7 @@
       "TestGroupHistoryMongoBroadcastDoesNotRewriteMemberProgress",
       "TestGroupHistoryMongoMissingOrCopiedSlotScopeCannotBecomeLegacy",
       "TestGroupHistoryMongoNoticeScopeSurvivesLaterBroadcastAndFutureAdmission",
+      "TestGroupHistoryMongoOriginalGenerationExportsClosedRangeWithoutLeaveGap",
       "TestHistoryEpochMetadataPreimagesDoNotResetOrMintAuthority",
       "TestHistoryReadinessPrivateOutputsNeverEnterOriginalCustody",
       "TestHistoryReadinessSelectionBindsOriginalSignatureButCannotMintReady",
@@ -39,6 +38,8 @@
       "TestNamespaceHistoryKeepsAmbiguousGroupAndDirectAuthoritySeparate",
       "TestNamespaceRuntimeSameInstanceBindingCannotBorrowMarkerOrPreparedCatalog",
       "TestOriginalEpochCutoverCustodyNeverBorrowsCurrentEpochOrInventsTrust",
+      "TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice",
+      "TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermission",
       "TestOriginalHistoryVerifierSelectsExactArchivedHeaderWithoutInventingTrust",
       "TestOriginalOwnerBoundaryRequiresOldSignatureAndExactWitness",
       "TestOriginalOwnerHistoryMongoRechecksActualSourceAndClear",
@@ -72,16 +73,13 @@
       "TestProspectivePageNeedsOriginalRootAndActualSemanticValidation"
     ],
     "internal/namespaceimport/ownedcontrol": [
-      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
       "TestHistoricalOpenBaseIsClosedAtCutWithoutFillingFutureGap",
       "TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex",
       "TestHistoricalSegmentLocatorsUseActualCollectionAndNeverInferEpochOrRange",
-      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
       "TestHistoricalTypedLineagePreservesOriginalClaimsAndProtocol",
-      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish",
       "TestHistoryEpochRetirementCannotBeMintedFromDTOOrPreparedExit",
       "TestHistoryReadinessPrivateSessionRetainsIdentityAndUnknownIntent",
+      "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient",
       "TestNamespaceRuntimeCompleteRoleAndActualOwnerHandlesAreMandatory",
       "TestNamespaceRuntimeMongoTargetRequiresOriginalCatalogAndIdentity",
       "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
@@ -431,18 +429,18 @@
   },
   "sourceDelta": [
     {
-      "target": "server/internal/messagedelivery/owner_history_original_scope.go",
-      "beforeSHA256": "81de84987d7c389b4b3c9a50c3bac907af293f0f9892ac4b23ff2600bd7b1c6a",
-      "afterSHA256": "ba1a6bc4b05642bc2be8d18f1c498819f662d2edd6f69d838f7a83ee23948fb7",
-      "afterBytes": 20373,
+      "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
+      "beforeSHA256": "0b19607f10b5b626647426eb6a51926528dd7404edd7b7b64d63513f337093af",
+      "afterSHA256": "cbe1a40c682a7f9269f1274950559ed400db0502e91877ed587d340cb8e6e4da",
+      "afterBytes": 24300,
       "mode": 420,
-      "production": true
+      "production": false
     },
     {
-      "target": "server/internal/messagedelivery/owner_history_original_scope_integration_test.go",
-      "beforeSHA256": "f043bb84b6d9f9c54b2796337372bb12a4e0f91387ba6f6cecb5550f7020eb1e",
-      "afterSHA256": "70e53e4edebf628541da9e15085ec15058df8683891e2b811727299ddf9a9eb7",
-      "afterBytes": 10517,
+      "target": "server/internal/namespaceimport/ownedcontrol/export_test.go",
+      "beforeSHA256": "5b793dd0b0a707432097b3e23b992615614a7909ee0997ebdb9b8ed57f8d2d7c",
+      "afterSHA256": "45ed49034e80047ec24bde917a065b11e69d6d34286c4f8760aaea74a6c28c52",
+      "afterBytes": 10846,
       "mode": 420,
       "production": false
     }
@@ -569,7 +567,7 @@
       },
       "run": 39041607488,
       "retainedTopCount": 66,
-      "derivation": "acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets"
+      "derivation": "acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets"
     },
     {
       "source": {
@@ -577,8 +575,8 @@
         "digest": "68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55"
       },
       "run": 39043896233,
-      "retainedTopCount": 7,
-      "derivation": "previousRepairRun.passedTargets minus directlyAffectedCurrentTargets"
+      "retainedTopCount": 6,
+      "derivation": "previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets"
     },
     {
       "source": {
@@ -586,11 +584,20 @@
         "digest": "c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec"
       },
       "run": 39046539739,
-      "retainedTopCount": 10,
-      "derivation": "latestRepairRun.passedTargets; exact original source only"
+      "retainedTopCount": 7,
+      "derivation": "latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only"
+    },
+    {
+      "source": {
+        "members": 1556,
+        "digest": "1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132"
+      },
+      "run": 39048615208,
+      "retainedTopCount": 4,
+      "derivation": "previousSplitRepairRun.passedTargets; exact original source only"
     }
   ],
-  "sourceDeltaSHA256": "2c417cbaaa6e9b44af83cafbe31b1c33dc9d0511deafcafffce867aa68124f5c",
+  "sourceDeltaSHA256": "46928b87690e12f3b33a2b46bd62c36a6846cb1adc9fe44fc39cb27bb2fcfc14",
   "latestRepairRun": {
     "schema": 1,
     "head": "1dbe0412baa8a3a04199a5ab80a559dcdf126e65",
@@ -705,16 +712,6 @@
   "latestRepairProofSHA256": "2b6e93f014f13bf8e0a7830b7b94f15b02149f78c24229066b03629c3bbae3ff",
   "executionScopes": [
     {
-      "label": "targeted-tests-messagedelivery",
-      "targets": {
-        "internal/messagedelivery": [
-          "TestGroupHistoryMongoOriginalGenerationExportsClosedRangeWithoutLeaveGap",
-          "TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice",
-          "TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermission"
-        ]
-      }
-    },
-    {
       "label": "targeted-tests-ownedcontrol-controller",
       "targets": {
         "internal/namespaceimport/ownedcontrol": [
@@ -723,12 +720,108 @@
       }
     },
     {
-      "label": "targeted-tests-ownedcontrol-target",
+      "label": "targeted-tests-ownedcontrol-default-fixture",
       "targets": {
         "internal/namespaceimport/ownedcontrol": [
-          "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient"
+          "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+          "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+          "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+          "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
         ]
       }
     }
-  ]
+  ],
+  "previousSplitRepairRun": {
+    "schema": 1,
+    "head": "d3e5ec02eb43b370b30af90231c8bf22a7b12daf",
+    "run": 39048615208,
+    "job": 117442325784,
+    "attempt": 1,
+    "source": {
+      "members": 1556,
+      "digest": "1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132"
+    },
+    "artifact": {
+      "artifact": 12106857511,
+      "run": 39048615208,
+      "attempt": 1,
+      "head": "d3e5ec02eb43b370b30af90231c8bf22a7b12daf",
+      "sha256": "68604fc7d6757e3a5deec486595c4552747b393a940dbec89efa7c1156eef710",
+      "bytes": 86465,
+      "exactAPIDigest": true,
+      "files": 53,
+      "binariesDownloaded": false
+    },
+    "actualTopStarted": 5,
+    "actualTopPASS": 4,
+    "actualTopFAIL": 1,
+    "actualTopIncomplete": 0,
+    "actualTopUnstarted": 0,
+    "passedTargets": {
+      "internal/messagedelivery": [
+        "TestGroupHistoryMongoOriginalGenerationExportsClosedRangeWithoutLeaveGap",
+        "TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice",
+        "TestOriginalHistoryMongoPreparedPagerReusesCandidateButNeverSequencePermission"
+      ],
+      "internal/namespaceimport/ownedcontrol": [
+        "TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient"
+      ]
+    },
+    "failedTargets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate"
+      ]
+    },
+    "incompleteTargets": {},
+    "allActualPassedTopChildrenCompleteAndRequiredExact": true,
+    "currentEntryBuilds": 0,
+    "sourceModesLocksGeneratedConfigAndRepairControllerPostExact": true,
+    "mongoResidualDatabaseCount": 0,
+    "RedisResidualKeys": 0,
+    "exactOwnedContainerCleanupExitCode": 0,
+    "wholeFixtureNoResidueAccepted": true,
+    "runtimeGraphAccepted": false,
+    "fullRegression": false,
+    "runtimeChanged": false,
+    "rootAcceptance": {
+      "bytes": 13070,
+      "sha256": "7e85aa2441bcbd1e1f88bf160b20febebf69b25ae43360559689e21e4c7e7a63"
+    },
+    "raw": [
+      {
+        "name": "backend-integration/container-cleanup.json",
+        "bytes": 79,
+        "sha256": "1e8af2429fc836352d3a2ecb6160fcb61e328d9e79ed6aa5f621a4f6873b7c55"
+      },
+      {
+        "name": "backend-integration/residual-check.json",
+        "bytes": 451,
+        "sha256": "f51f18373267df70bb24348c60f6ffe35baba7502209d1cd9c23c68f517b6b95"
+      },
+      {
+        "name": "backend-runtime-join-r8/repair-plan-post.json",
+        "bytes": 144,
+        "sha256": "a6f7c3442d39270790dbb9851dbb2f6f7821d112cd17897f22fdcad9848b06fe"
+      },
+      {
+        "name": "backend-runtime-join-r8/source-post.json",
+        "bytes": 260,
+        "sha256": "9801206a1a08df2680efa022331fcc7c218f9b600dc83e8d696a34bc4d207464"
+      },
+      {
+        "name": "backend-runtime-join-r8/targeted-tests-union.json",
+        "bytes": 10557,
+        "sha256": "afc0e3c43c446c3ce5cca5c61a1244a2d7b4caa7915c6e06bcdfce74b4b5bd7d"
+      }
+    ]
+  },
+  "previousSplitRepairProofSHA256": "3e74a2121b5d9bf45c01d0e9b6c58e26d10a8dbe208547c9b3aef9120892c585",
+  "directlyAffectedCaptureFixtureTargets": {
+    "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+      "TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget",
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish"
+    ]
+  }
 }

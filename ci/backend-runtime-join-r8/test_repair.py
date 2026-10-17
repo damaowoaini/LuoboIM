@@ -32,7 +32,9 @@ class RepairControls(unittest.TestCase):
         with self.assertRaises(ValueError):runner.check_repair(c,bad)
         bad=copy.deepcopy(p);bad['executionScopes'][1]['targets']=bad['executionScopes'][0]['targets']
         with self.assertRaises(ValueError):runner.check_repair(c,bad)
-        for field in ('directlyAffectedPriorTargets','directlyAffectedCurrentTargets'):
+        bad=copy.deepcopy(p);bad['previousSplitRepairRun']['actualTopPASS']=5
+        with self.assertRaises(ValueError):runner.check_repair(c,bad)
+        for field in ('directlyAffectedPriorTargets','directlyAffectedCurrentTargets','directlyAffectedCaptureFixtureTargets'):
             bad=copy.deepcopy(p);package=next(iter(bad[field]));bad[field][package].append('TestInventedAuthority')
             with self.subTest(impact=field),self.assertRaises(ValueError):runner.check_repair(c,bad)
 
@@ -40,20 +42,24 @@ class RepairControls(unittest.TestCase):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
         self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),5)
         self.assertFalse(runner.pairs(active['targets']) & runner.pairs(p['actualPassedTargets']))
+        audited=copy.deepcopy(active)
+        first_package=next(iter(active['targets']));first_top=active['targets'][first_package][0]
+        # Parser-only child fixture; not added to actual Go source/selection.
+        audited['requiredSubtests'].setdefault(first_package,{})[first_top]=['control-required-descendant']
         events=[]
         for package,tops in active['targets'].items():
             pkg=runner.PREFIX+package;events.append({'Action':'start','Package':pkg})
             for top in tops:
                 events.append({'Action':'run','Package':pkg,'Test':top})
-                for child in active['requiredSubtests'].get(package,{}).get(top,[]):
+                for child in audited['requiredSubtests'].get(package,{}).get(top,[]):
                     events += [{'Action':'run','Package':pkg,'Test':top+'/'+child},{'Action':'pass','Package':pkg,'Test':top+'/'+child}]
                 events.append({'Action':'pass','Package':pkg,'Test':top})
             events.append({'Action':'pass','Package':pkg})
-        result=runner.require_children(runner.audit(events,0,active['targets']),active)
+        result=runner.require_children(runner.audit(events,0,active['targets']),audited)
         self.assertEqual(result['topPASS'],5)
         with self.assertRaises(ValueError):runner.audit(events,1,active['targets'])
         result['namedCompletions']=[r for r in result['namedCompletions'] if '/' not in r['name']]
-        with self.assertRaises(ValueError):runner.require_children(result,active)
+        with self.assertRaises(ValueError):runner.require_children(result,audited)
         bad=copy.deepcopy(events);bad.insert(1,{'Action':'run','Package':runner.PREFIX+runner.PENDING_POSITIVE[0],'Test':runner.PENDING_POSITIVE[1]})
         with self.assertRaises(ValueError):runner.audit(bad,0,active['targets'])
         # Exercise the production repair wrapper, not a mirrored finally.
@@ -75,13 +81,17 @@ class RepairControls(unittest.TestCase):
 
     def test_split_process_dispatch_keeps_md_failure_and_missing_child_failed_but_runs_both_owned_scopes(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[3,1,1])
+        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,4])
         self.assertEqual([list(scope['targets']) for scope in active['scopes']],
-                         [['internal/messagedelivery'],['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol']])
+                         [['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol']])
         top='TestOriginalGroupHistoryMongoFiniteRangeCannotLaunderTargetedNotice'
         child='ordinary-source-receipt-keeps-policy-pair-and-rejects-single-or-foreign-hashes'
-        self.assertIn(child,active['scopes'][0]['requiredSubtests']['internal/messagedelivery'][top])
-        for mode in ('all-pass','md-nonzero','md-missing-child'):
+        self.assertIn(child,c['requiredSubtests']['internal/messagedelivery'][top])
+        # Parser-only descendant, never added to the actual Go source/contract.
+        active=copy.deepcopy(active)
+        first=active['scopes'][0];package=next(iter(first['targets']));top=first['targets'][package][0]
+        child='control-required-descendant';first['requiredSubtests'].setdefault(package,{})[top]=[child]
+        for mode in ('all-pass','first-nonzero','first-missing-child'):
             with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temporary:
                 output=Path(temporary).resolve();calls=[]
                 def command(label,argv,timeout):
@@ -96,18 +106,18 @@ class RepairControls(unittest.TestCase):
                         for name in tops:
                             events.append({'Action':'run','Package':pkg,'Test':name})
                             for descendant in scope['requiredSubtests'].get(package,{}).get(name,[]):
-                                if mode=='md-missing-child' and index==0 and descendant==child:continue
+                                if mode=='first-missing-child' and index==0 and descendant==child:continue
                                 events += [{'Action':'run','Package':pkg,'Test':name+'/'+descendant},{'Action':'pass','Package':pkg,'Test':name+'/'+descendant}]
                             events.append({'Action':'pass','Package':pkg,'Test':name})
                         events.append({'Action':'pass','Package':pkg})
                     (folder/'stdout.jsonl').write_text('\n'.join(json.dumps(event) for event in events)+'\n')
-                    return folder,1 if mode=='md-nonzero' and index==0 else 0
-                with mock.patch.object(runner.time,'monotonic',side_effect=[10.,11.,12.,13.]):
+                    return folder,1 if mode=='first-nonzero' and index==0 else 0
+                with mock.patch.object(runner.time,'monotonic',side_effect=[10.,11.,12.]):
                     result=runner.execute_repair_scopes(active,command,{'GOAUTH':'off'},output)
                 self.assertEqual(calls,[scope['label'] for scope in active['scopes']])
                 self.assertEqual(result['accepted'],mode=='all-pass')
                 self.assertTrue(all(row['accepted'] for row in result['processes'][1:]))
-                self.assertEqual(result['topPASS'],5 if mode=='all-pass' else 2)
+                self.assertEqual(result['topPASS'],5 if mode=='all-pass' else 4)
                 self.assertEqual(json.loads((output/'targeted-tests-union.json').read_bytes()),result)
                 for label in calls:self.assertTrue((output/label/'result.json').is_file())
                 before=(output/'targeted-tests-union.json').read_bytes()

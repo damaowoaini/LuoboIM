@@ -41,7 +41,8 @@ func NewHistoricalMongoCompositionForTest(ctx context.Context, t *testing.T, h n
 	config := namespaceimport.Config{Header: h, Writers: []namespaceimport.WriterIdentity{{Deployment: "synthetic-composition-writer", Incarnation: "synthetic-incarnation", BinarySHA256: historicalJSONSHA("synthetic-binary"), SourceSHA256: historicalJSONSHA("synthetic-source")}}, Credentials: []namespaceimport.CredentialIdentity{{Scope: "synthetic-mongo", CredentialID: "synthetic-retired", Version: "test-v1"}}, KafkaPartitions: []namespaceimport.KafkaPartitionIdentity{{Plane: "producer-to-allocation", Topic: "synthetic-intake", Group: "synthetic-old-group", Partition: 0}, {Plane: "allocation-to-persistence", Topic: "synthetic-store", Group: "synthetic-old-store", Partition: 0}}, ProbeKeyID: "synthetic-probe-key", ProbePublicKey: probeKey.Public().(ed25519.PublicKey), CaptureKeyID: "test-key", CapturePublicKey: captureKey.Public().(ed25519.PublicKey), CaptureAgent: "synthetic-private-capture", OperationTimeout: time.Minute, PermitLifetime: 20 * time.Second, PageBytes: 1 << 20, PageRows: 1}
 	config.Header.DeploymentPolicySHA256 = namespaceimport.DeploymentPolicySHA256(config)
 	h = config.Header
-	source, _, _ := materializerSourceFixtureWithHeader(t, h, func(hold *AdmissionHold, f *materializerPageFixture) error {
+	var captureRaw func(context.Context) error
+	source, _, _ := materializerSourceFixtureWithCaptureMode(t, h, func(hold *AdmissionHold, f *materializerPageFixture) error {
 		if prepare == nil {
 			return namespaceimport.ErrInvalid
 		}
@@ -87,9 +88,17 @@ func NewHistoricalMongoCompositionForTest(ctx context.Context, t *testing.T, h n
 			}
 		}
 		return nil
+	}, func(run func(context.Context) error) {
+		if captureRaw != nil || run == nil {
+			t.Fatal("raw capture continuation must be registered exactly once")
+		}
+		captureRaw = run
 	})
+	if captureRaw == nil || source.materializer != nil {
+		t.Fatal("Controller fixture captured before its original Acquire")
+	}
 	result := &HistoricalMongoCompositionForTest{Source: source, Hold: source.agent.hold, Config: config}
-	result.control = &historicalMongoSyntheticControl{fixture: result, key: probeKey, stoppedAt: time.Now().UTC().Add(-10 * time.Second)}
+	result.control = &historicalMongoSyntheticControl{fixture: result, key: probeKey, stoppedAt: time.Now().UTC(), captureRaw: captureRaw}
 	return result
 }
 
@@ -111,13 +120,58 @@ func (f *HistoricalMongoCompositionForTest) UseOriginalHistoryVerifierForTest(pr
 }
 
 type historicalMongoSyntheticControl struct {
-	fixture   *HistoricalMongoCompositionForTest
-	key       ed25519.PrivateKey
-	stoppedAt time.Time
+	fixture          *HistoricalMongoCompositionForTest
+	key              ed25519.PrivateKey
+	stoppedAt        time.Time
+	captureRaw       func(context.Context) error
+	acquireAttempted bool
+	acquireFence     namespaceimport.FenceObservation
+	acquireFailure   error
 }
 
 func (c *historicalMongoSyntheticControl) Acquire(ctx context.Context, r namespaceimport.ProbeRequest) (namespaceimport.FenceObservation, error) {
-	return c.answer(ctx, r)
+	// This retained test control may acquire once. Even a failed/ambiguous
+	// first attempt cannot obtain a new nonce, cut or snapshot timestamp.
+	if c.acquireAttempted {
+		if c.acquireFailure != nil {
+			return namespaceimport.FenceObservation{}, c.acquireFailure
+		}
+		return namespaceimport.FenceObservation{}, namespaceimport.ErrConflict
+	}
+	c.acquireAttempted = true
+	fence, e := c.answer(ctx, r)
+	if e != nil {
+		c.acquireFailure = e
+		return namespaceimport.FenceObservation{}, e
+	}
+	c.acquireFence = fence
+	if c.captureRaw == nil || c.fixture.Source.materializer != nil {
+		c.acquireFailure = namespaceimport.ErrConflict
+		return namespaceimport.FenceObservation{}, c.acquireFailure
+	}
+	if e = c.captureRaw(ctx); e != nil {
+		c.acquireFailure = e
+		return namespaceimport.FenceObservation{}, e
+	}
+	// Observe only the actual immutable clock recorded by BeginCapture. These
+	// checks cannot repair/backdate the raw session or manufacture a valid cut.
+	capturedAt := c.fixture.Source.materializer.snapshot.Identity().CapturedAt
+	if capturedAt.Before(c.acquireFence.IssuedAt) || capturedAt.Before(c.stoppedAt) {
+		c.acquireFailure = namespaceimport.ErrUntrusted
+		return namespaceimport.FenceObservation{}, c.acquireFailure
+	}
+	for _, sample := range c.acquireFence.Drained {
+		if capturedAt.Before(sample.CurrentSampleAt) {
+			c.acquireFailure = namespaceimport.ErrUntrusted
+			return namespaceimport.FenceObservation{}, c.acquireFailure
+		}
+	}
+	if e = ctx.Err(); e != nil {
+		c.acquireFailure = e
+		return namespaceimport.FenceObservation{}, e
+	}
+	c.captureRaw = nil
+	return c.acquireFence, nil
 }
 func (c *historicalMongoSyntheticControl) Observe(ctx context.Context, r namespaceimport.ProbeRequest) (namespaceimport.FenceObservation, error) {
 	return c.answer(ctx, r)
@@ -131,8 +185,15 @@ func (c *historicalMongoSyntheticControl) answer(ctx context.Context, r namespac
 	if r.Header != f.Config.Header || r.LeaseID != "" && r.LeaseID != f.Hold.LeaseID() {
 		return namespaceimport.FenceObservation{}, namespaceimport.ErrConflict
 	}
+	// Record the two synthetic samples in their actual order. The fixture does
+	// not claim a real broker drain, and never invents earlier clock values to
+	// fit a snapshot that was already captured.
+	previousSample := time.Now().UTC()
+	sample := time.Now().UTC()
 	now := time.Now().UTC()
-	sample := now.Add(-time.Millisecond)
+	if !previousSample.Before(sample) || sample.After(now) {
+		return namespaceimport.FenceObservation{}, namespaceimport.ErrUntrusted
+	}
 	out := namespaceimport.FenceObservation{HeaderSHA256: r.Header.SHA256(), Nonce: r.Nonce, LeaseID: f.Hold.LeaseID(), Generation: 1, KeyID: f.Config.ProbeKeyID, IssuedAt: now, ValidUntil: now.Add(time.Minute), ExclusionMode: "held-until-explicit-release", AdmissionGuardRecord: "synthetic-composition-hold-only", AdmissionGuardSHA256: f.Hold.RecordSHA256()}
 	for _, w := range f.Config.Writers {
 		out.Joined = append(out.Joined, namespaceimport.JoinedWriter{Identity: w, StopRecord: "synthetic-stop", JoinRecord: "synthetic-join", ProcessExitAt: c.stoppedAt})
@@ -141,7 +202,7 @@ func (c *historicalMongoSyntheticControl) answer(ctx context.Context, r namespac
 		out.Revoked = append(out.Revoked, namespaceimport.RevokedCredential{Identity: v, RevocationRecord: "synthetic-denial", RevocationGeneration: 1, State: "revoked"})
 	}
 	for _, v := range f.Config.KafkaPartitions {
-		out.Drained = append(out.Drained, namespaceimport.DrainedPartition{Identity: v, LeaderEpoch: 1, PreviousEnd: 9, CurrentEnd: 9, CommittedNext: 9, PreviousSampleAt: sample.Add(-time.Millisecond), CurrentSampleAt: sample, BrokerObservationRecord: "synthetic-offsets"})
+		out.Drained = append(out.Drained, namespaceimport.DrainedPartition{Identity: v, LeaderEpoch: 1, PreviousEnd: 9, CurrentEnd: 9, CommittedNext: 9, PreviousSampleAt: previousSample, CurrentSampleAt: sample, BrokerObservationRecord: "synthetic-offsets"})
 	}
 	body, e := json.Marshal(out)
 	if e != nil {

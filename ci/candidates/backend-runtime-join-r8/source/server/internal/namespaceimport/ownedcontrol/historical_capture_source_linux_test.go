@@ -111,6 +111,14 @@ func materializerSourceFixture(t *testing.T, before ...func(*materializerPageFix
 }
 func materializerSourceFixtureWithHeader(t *testing.T, h namespaceimport.Header, prepare func(*AdmissionHold, *materializerPageFixture) error, before ...func(*materializerPageFixture)) (*HistoricalCaptureSource, *materializerPageFixture, namespaceimport.FenceObservation) {
 	t.Helper()
+	return materializerSourceFixtureWithCaptureMode(t, h, prepare, nil, before...)
+}
+
+// Only the Controller composition defers the original raw-capture block. The
+// default fixture still executes that same block synchronously at its original
+// position, with the same background context and registered cleanup order.
+func materializerSourceFixtureWithCaptureMode(t *testing.T, h namespaceimport.Header, prepare func(*AdmissionHold, *materializerPageFixture) error, deferRaw func(func(context.Context) error), before ...func(*materializerPageFixture)) (*HistoricalCaptureSource, *materializerPageFixture, namespaceimport.FenceObservation) {
+	t.Helper()
 	ctx := context.Background()
 	top := t.TempDir()
 	if e := os.Chmod(top, 0700); e != nil {
@@ -185,29 +193,39 @@ func materializerSourceFixtureWithHeader(t *testing.T, h namespaceimport.Header,
 		}
 	}
 	rawDir := filepath.Join(top, "raw")
-	limits := namespaceinventory.DefaultLimits()
-	limits.Rows = 1
-	summary, e := namespaceinventory.BeginResumableCapture(ctx, f, f.id.Binding, rawDir, limits, namespaceinventory.ProgressBudget{Steps: 1, SourcePages: 1})
-	if e != nil {
-		t.Fatal(e)
-	}
-	for n := 0; !summary.RecordedTwoPassComplete; n++ {
-		if n > 2048 {
-			t.Fatal("fixture capture did not converge")
+	captureRaw := func(ctx context.Context) (*HistoricalMaterializer, error) {
+		limits := namespaceinventory.DefaultLimits()
+		limits.Rows = 1
+		summary, e := namespaceinventory.BeginResumableCapture(ctx, f, f.id.Binding, rawDir, limits, namespaceinventory.ProgressBudget{Steps: 1, SourcePages: 1})
+		if e != nil {
+			return nil, e
 		}
-		summary, e = namespaceinventory.ResumeResumableCapture(ctx, f, f.id.Binding, rawDir, namespaceinventory.ProgressBudget{Steps: 4, SourcePages: 2})
+		for n := 0; !summary.RecordedTwoPassComplete; n++ {
+			if n > 2048 {
+				return nil, errors.New("fixture capture did not converge")
+			}
+			summary, e = namespaceinventory.ResumeResumableCapture(ctx, f, f.id.Binding, rawDir, namespaceinventory.ProgressBudget{Steps: 4, SourcePages: 2})
+			if e != nil {
+				return nil, e
+			}
+		}
+		snapshot, e := namespaceinventory.OpenImportSnapshot(ctx, f, rawDir, f.id.Binding)
+		if e != nil {
+			return nil, e
+		}
+		derived := filepath.Join(top, "derived")
+		m, e := NewHistoricalMaterializer(ctx, hold, snapshot, f, derived, h.SHA256(), historicalJSONSHA("history-policy"), false, factualDescribe)
+		if e != nil {
+			return nil, e
+		}
+		return m, nil
+	}
+	var m *HistoricalMaterializer
+	if deferRaw == nil {
+		m, e = captureRaw(ctx)
 		if e != nil {
 			t.Fatal(e)
 		}
-	}
-	snapshot, e := namespaceinventory.OpenImportSnapshot(ctx, f, rawDir, f.id.Binding)
-	if e != nil {
-		t.Fatal(e)
-	}
-	derived := filepath.Join(top, "derived")
-	m, e := NewHistoricalMaterializer(ctx, hold, snapshot, f, derived, h.SHA256(), historicalJSONSHA("history-policy"), false, factualDescribe)
-	if e != nil {
-		t.Fatal(e)
 	}
 	trustPath := filepath.Join(top, "trust.json")
 	trust, _ := json.Marshal(struct {
@@ -224,7 +242,22 @@ func materializerSourceFixtureWithHeader(t *testing.T, h namespaceimport.Header,
 		t.Fatal(e)
 	}
 	key := ed25519.NewKeyFromSeed(make([]byte, ed25519.SeedSize))
-	source := &HistoricalCaptureSource{agent: &OwnedAgent{header: h, hold: hold}, header: h, live: f, describe: factualDescribe, options: HistoricalCaptureOptions{ConnectionPath: connectionPath, RawDirectory: rawDir, DerivedDirectory: derived, PolicySHA256: m.policySHA, OriginalHistoryTrustPath: trustPath, OriginalHistoryTrustSHA256: sha(trust), CaptureAgent: "synthetic-private-capture", CaptureKeyID: "test-key", CapturePrivateKey: key, CapturePublicKey: key.Public().(ed25519.PublicKey), PageBytes: 1 << 20, PageRows: 1}, producer: materializerMissingTrust{}, verifier: materializerMissingTrust{}, materializer: m, descriptorSHA: historicalJSONSHA("test-source-descriptor")}
+	source := &HistoricalCaptureSource{agent: &OwnedAgent{header: h, hold: hold}, header: h, live: f, describe: factualDescribe, options: HistoricalCaptureOptions{ConnectionPath: connectionPath, RawDirectory: rawDir, DerivedDirectory: filepath.Join(top, "derived"), PolicySHA256: historicalJSONSHA("history-policy"), OriginalHistoryTrustPath: trustPath, OriginalHistoryTrustSHA256: sha(trust), CaptureAgent: "synthetic-private-capture", CaptureKeyID: "test-key", CapturePrivateKey: key, CapturePublicKey: key.Public().(ed25519.PublicKey), PageBytes: 1 << 20, PageRows: 1}, producer: materializerMissingTrust{}, verifier: materializerMissingTrust{}, materializer: m, descriptorSHA: historicalJSONSHA("test-source-descriptor")}
+	if deferRaw != nil {
+		deferRaw(func(captureCtx context.Context) error {
+			if source.materializer != nil {
+				return ErrOwnedEvidence
+			}
+			// The caller holds the exact original Acquire result before reaching
+			// this block. No snapshot clock or original fence is rewritten.
+			materializer, captureErr := captureRaw(captureCtx)
+			if captureErr != nil {
+				return captureErr
+			}
+			source.materializer = materializer
+			return nil
+		})
+	}
 	fence := namespaceimport.FenceObservation{HeaderSHA256: h.SHA256(), LeaseID: hold.LeaseID(), AdmissionGuardSHA256: hold.RecordSHA256(), ExclusionMode: "held-until-explicit-release"}
 	return source, f, fence
 }

@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "state": "FROZEN_SOURCE",
-  "scope": "backend_history_repair5_split3_only_reuse_source_bound66_and7_and10_prior14_no_deployment",
+  "scope": "backend_history_capture_order_repair5_split2_only_reuse_source_bound66_and6_and7_and4_prior14_no_deployment",
   "base": {
     "members": 1407,
     "digest": "5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9"
   },
   "source": {
     "members": 1556,
-    "digest": "1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132"
+    "digest": "cc3425c0f40b7b60e7e1f285c21c26f8f2597b977b362650de695c610fed342b"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -2241,8 +2241,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/export_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/export_test.go",
-      "bytes": 8405,
-      "sha256": "5b793dd0b0a707432097b3e23b992615614a7909ee0997ebdb9b8ed57f8d2d7c",
+      "bytes": 10846,
+      "sha256": "45ed49034e80047ec24bde917a065b11e69d6d34286c4f8760aaea74a6c28c52",
       "beforeSHA256": null
     },
     {
@@ -2276,8 +2276,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-      "bytes": 22891,
-      "sha256": "0b19607f10b5b626647426eb6a51926528dd7404edd7b7b64d63513f337093af",
+      "bytes": 24300,
+      "sha256": "cbe1a40c682a7f9269f1274950559ed400db0502e91877ed587d340cb8e6e4da",
       "beforeSHA256": null
     },
     {
@@ -3231,12 +3231,12 @@
   ],
   "finalFormatProof": {
     "productManifest": {
-      "bytes": 116088,
-      "sha256": "6e38eac3c082e036ae0ccf7c76074f19da066fd5bf8c0ec81081d66c98125fb5"
+      "bytes": 115691,
+      "sha256": "baaa04ff491be7359a18c4b98d2e0ed1dca783e913878c16e41a09f9593694c7"
     },
     "formattedSource": {
       "members": 1556,
-      "digest": "1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132"
+      "digest": "cc3425c0f40b7b60e7e1f285c21c26f8f2597b977b362650de695c610fed342b"
     },
     "incrementalFormattedParsedGo": 2,
     "previousFormattedOrCompiledGoExactReused": 205,
@@ -4436,15 +4436,15 @@
   },
   "repairPlan": {
     "path": "ci/backend-runtime-join-r8/repair-plan.json",
-    "bytes": 32772,
-    "sha256": "36a3dce7a43b56281e42ba522f7155a3934c10d225b0a43f5d8e499f29547976",
+    "bytes": 36518,
+    "sha256": "1d29a5936c39bfd3fafb211aa4c0d7ac0471388f4a6af8b7e0eb47d217f7013b",
     "mode": 420
   },
   "repairControllerPins": [
     {
       "path": "ci/backend-runtime-join-r8/test_repair.py",
-      "bytes": 10293,
-      "sha256": "9c984f262b8cba1f9cb266aac6907290d50bdc01088aaf100f117e8d926bde9e",
+      "bytes": 11092,
+      "sha256": "edf91c646ca30bc2287dcb255420572515744487a598a17a25131b5fc996c083",
       "mode": 420
     }
   ]
