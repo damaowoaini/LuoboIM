@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "baseCommit": "7b156fc5557878ad6e6a07e572694af5699c6624",
   "baseInputsSHA256": "7a8e8355c28421907f80f0bbc2e5231935396b0372d6bebc6d9127cf34b750c9",
-  "harnessInputsSHA256": "088527fbf0a9725d68a7c97b57725a471931de1dba87652fba57b71e15d91b09",
+  "harnessInputsSHA256": "63c310fee26bea26d9e0b3d8f35633a7d47db0e5f2d0ef83fe2bdc81d4c1277e",
   "goSumSHA256": "8eb9b73313a7f774bfef48814bfc1b73e7ff7f57bd37f9d40555e8d24f70262f",
   "requiredABI": 145,
   "core": [

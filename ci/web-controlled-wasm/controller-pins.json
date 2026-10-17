@@ -52,13 +52,13 @@
     {
       "path": "ci/web-controlled-wasm/run.py",
       "bytes": 20524,
-      "sha256": "9faad08cf692f05a20f6335b20422a2d97619aa6b4444b2a591e63c0fc5d97d4",
+      "sha256": "d04927582e19ddcabc7adc95fc968ad3381b0088e5c1b9fd90c1d351e7191670",
       "mode": "0o644"
     },
     {
       "path": "ci/web-controlled-wasm/test_run.py",
-      "bytes": 4698,
-      "sha256": "2593f2c44513cf2ffc26f6ba4876c9e5d08da422dc491a2b64b53e4ef2dd3479",
+      "bytes": 7172,
+      "sha256": "d22eb51dcc95f39b26165099553d0b147ae312321bfe2d774eabc2c432cdfcf2",
       "mode": "0o644"
     }
   ]

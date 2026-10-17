@@ -36,5 +36,5 @@
   },
   "wasmRace": "Go js/wasm does not support race; Node wasm targeted tests are not claimed race-tested",
   "fullRegression": false,
-  "controllerPinsSHA256": "ce2a442b5fe9996cba3caa2ef864546751442b65d0c7f06202b8b6f16ca6647f"
+  "controllerPinsSHA256": "8518b571f634e8ad9acf36860dfd2ef0065282548b49df200ca6e548bccbe5e0"
 }

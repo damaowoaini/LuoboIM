@@ -57,4 +57,41 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(env['GOPRIVATE'],'');self.assertNotIn('GITHUB_TOKEN',env)
         with self.assertRaises(ValueError):lane.require_guard({'status':'passed','exit_code':0,'minimum_observed_free_bytes':1024},0)
 
+    def test_real_tar_extraction_normalizes_fixed_git_file_modes_and_still_refuses_unsafe_members(self):
+        # Invoke the production extractor on real tar bytes and owned files.
+        def archive(entries):
+            stream=lane.io.BytesIO()
+            with lane.tarfile.open(fileobj=stream,mode='w') as tar:
+                for name,mode,kind,body in entries:
+                    member=lane.tarfile.TarInfo(name);member.mode=mode;member.type=kind
+                    if kind==lane.tarfile.REGTYPE:
+                        member.size=len(body);tar.addfile(member,lane.io.BytesIO(body))
+                    else:
+                        member.linkname='../outside';tar.addfile(member)
+            return stream.getvalue()
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp).resolve();destination=root/'safe';destination.mkdir()
+            bodies={'ordinary.go':b'package exact\n','executable.sh':b'#!/bin/sh\nexit 0\n','special.go':b'package special\n'}
+            entries=[('ordinary.go',0o664,lane.tarfile.REGTYPE,bodies['ordinary.go']),
+                     ('executable.sh',0o775,lane.tarfile.REGTYPE,bodies['executable.sh']),
+                     ('special.go',0o4777,lane.tarfile.REGTYPE,bodies['special.go'])]
+            lane.extract_archive(archive(entries),destination)
+            actual=lane.vector(destination)
+            self.assertEqual({r['path']:r['mode'] for r in actual},
+                             {'ordinary.go':'0o644','executable.sh':'0o755','special.go':'0o755'})
+            for row in actual:
+                self.assertEqual((destination/row['path']).read_bytes(),bodies[row['path']])
+                self.assertEqual(row['sha256'],lane.sha(bodies[row['path']]))
+            invalid=[('parent',[('../outside',0o664,lane.tarfile.REGTYPE,b'x')]),
+                     ('absolute',[('/outside',0o664,lane.tarfile.REGTYPE,b'x')]),
+                     ('symlink',[('link',0o777,lane.tarfile.SYMTYPE,b'')]),
+                     ('hardlink',[('link',0o777,lane.tarfile.LNKTYPE,b'')]),
+                     ('duplicate',[('same',0o664,lane.tarfile.REGTYPE,b'x'),('same',0o664,lane.tarfile.REGTYPE,b'y')])]
+            for label,entries in invalid:
+                with self.subTest(invalid=label):
+                    target=root/label;target.mkdir()
+                    with self.assertRaises(ValueError):lane.extract_archive(archive(entries),target)
+            self.assertFalse((root/'outside').exists())
+
+
 if __name__=='__main__':unittest.main(verbosity=2)

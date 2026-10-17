@@ -166,7 +166,7 @@ def extract_archive(raw, destination):
             if total>16*1024*1024:raise ValueError('fixed core archive decoded limit')
             out.parent.mkdir(parents=True,exist_ok=True)
             with out.open('xb') as f:shutil.copyfileobj(t.extractfile(member),f)
-            out.chmod(member.mode & 0o777)
+            out.chmod(member.mode & 0o755)
 
 
 def prepare(base, c, owned, archive):
