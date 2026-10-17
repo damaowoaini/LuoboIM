@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE={'members': 1575, 'digest': '868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
+FINAL_SOURCE={'members': 1575, 'digest': '55636eb7494b1095febac99fd1af5790ab5c3a7a1c31a8d9cdae329e70060280'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -17,6 +17,7 @@ CLEANUP_COMPLETE_SCOPES=[{'label': 'cleanup-ownedcontrol', 'targets': {'internal
 CLEANUP_RECENT_REUSE={'run': 39060706865, 'job': 117477900963, 'head': 'f48bd32eeea5b31568fe2e2e03ea56a47c655264', 'source': {'members': 1575, 'digest': '52ddd8742eef822c04d14b99f6ccf47acd12f43c7df06d98fe6fe389da231b58'}, 'reviewSHA256': '41a7f45b3323effb1529bf6e417bbe31cd53cc41fbe354f260cccc335d346794', 'artifact': {'artifact': 12111770451, 'run': 39060706865, 'attempt': 1, 'head': 'f48bd32eeea5b31568fe2e2e03ea56a47c655264', 'sha256': '483cdf79808816f7778eaedb27378e09d85b903370964f66ab083d75b4e8e714', 'bytes': 9702, 'exactAPIDigest': True, 'files': 12, 'binariesDownloaded': False}, 'topPASS': 3, 'subPASS': 9, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/unknown-middle-child-does-not-strand-later-original-owner'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/good-drains-retained-and-unknown-never-gets-a-join'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit/repeat-Stop-does-not-renew-signal-or-erase-failure'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/actual-original-image-and-bounded-file-pins'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/real-fd-path-stability-and-mid-read-cancellation'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal/cancelled-validation-keeps-live-child-unsignalled'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal/same-original-wait-during-image-validation-is-local-only'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedLocalCleanupCancelledValidationAndOriginalDoneStayLocal'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths/canonical-first'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths/runtime-first'}], 'partialChildParent': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['canonical-first', 'runtime-first']}, 'oldParentFAILNotReused': True, 'sourceAndToolsPostExact': True}
 CLEANUP_FIXTURE_REPAIR={'target': 'server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go', 'beforeSHA256': '4f40dfe1837207983cf907d3ed161e6c6c1c3493cec39c557512d1d5bde9cedd', 'afterSHA256': 'bcf11c0283992a27812fa20666dad5d7ecb95d514e5bb0e0ceee7816279030b8', 'bytes': 6777, 'productionChanges': 0}
 CLEANUP_REUSE={'run': 39053868483, 'head': 'ce7964a0c7aa474cbc83c32dd71c1bfcfb83cfec', 'source': {'members': 1573, 'digest': 'f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2'}, 'reviewSHA256': '48c619c7b7c19ad33b5bb5b9bfa38f655de918c01ad19a6784fed4d9ccc1efbf', 'package': 'internal/namespaceimport/ownedcontrol', 'subtests': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['unbound_start_failure_only_waits_original_done']}}
+LAUNCHER_PASSED_REUSE={'run': 39075035152, 'job': 117520306290, 'head': 'a6d9276c53a75e8ca19e351cab1d34b419b560e7', 'source': {'members': 1575, 'digest': '868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717'}, 'reviewSHA256': '412fdacae0a1a8ff842d92269d2bf00fb0a578b3ed1eab928ee86d2e56ac1f38', 'artifact': {'artifact': 12115839677, 'run': 39075035152, 'attempt': 1, 'head': 'a6d9276c53a75e8ca19e351cab1d34b419b560e7', 'sha256': '674eadc00436aa018a1fe7828be0568f3ce80f499ef53b487deacfcb5709099a', 'bytes': 52320, 'exactAPIDigest': True, 'files': 66, 'binariesDownloaded': False}, 'launcherNamesSHA256': '6471ec2f43ce64c92e2c399c7a0630e1d86740c9e2ee2a69352573e14b61c932', 'topPASS': 1, 'subPASS': 0, 'skip': 0, 'fail': 0, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedLauncherHoldPersistsAndCannotPrepareMetadata'}], 'sourceToolsPostExact': True, 'currentSourcePASS': False, 'runtimeAccepted': False}
 GRAPH_TARGETS={'pkg/common/startrpc': ['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence', 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']}
 GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
 
@@ -88,6 +89,8 @@ def validate_entries(bodies,c):
 
 def verify():
  c=json.loads(regular(INPUTS));check_locked(c)
+ check_launcher_reuse(c.get('launcherPassedReuse'))
+ if c.get('launcherTestsToRun')!=[]:raise ValueError('unchanged launcher must use exact historical receipt without Go dispatch')
  for row in c['dependencies']:pin(row)
  parent=module(c['sourceProvider'],'fullgraph_actual_source_parent');old,bodies,recipe=parent.verify()
  if old['source']!=c['parent']:raise ValueError('explicit parent identity differs')
@@ -212,6 +215,19 @@ def run_launcher_control(go,environment,command,parent,out):
  actual=parent.audit(events,0,targets)
  receipt=check_launcher_names(dict(source=FINAL_SOURCE,**{key:actual[key] for key in ('topPASS','subPASS','skip','fail','namedCompletions')}))
  write(out/'launcher-names.json',receipt)
+ return receipt
+
+def check_launcher_reuse(value):
+ # Compare the closed original receipt, including JSON numeric/boolean types.
+ # Its source is868e, never FINAL_SOURCE. It is not new-source Go acceptance.
+ if not isinstance(value,dict) or json.dumps(value,sort_keys=True,separators=(',',':'))!=json.dumps(LAUNCHER_PASSED_REUSE,sort_keys=True,separators=(',',':')):raise ValueError('exact Root accepted historical launcher receipt required')
+ return value
+
+def load_launcher_reuse(out):
+ # Only runtimeacceptance/bootstrap changed. Original ownedcontrol test/code,
+ # local dependency closure and locks are source-identical; no Go is dispatched.
+ receipt=dict(LAUNCHER_PASSED_REUSE)
+ write(out/'launcher-passed-reuse.json',check_launcher_reuse(receipt))
  return receipt
 
 def load_cleanup_reuse(out):
@@ -387,7 +403,7 @@ def run():
   fixture_token=None
   command('app-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off')
-  launcher_audit=run_launcher_control(go,offline,command,parent,out)
+  launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
   binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
   entries=[{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]+c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'}]
@@ -439,8 +455,7 @@ def run():
   if {r['name'] for r in audit['namedCompletions'] if '/' in r['name']}!=expected:raise ValueError('exact original two tops/three children required')
   write(out/'oracle-names.json',audit)
   targeted_audit=audit_current_oracles(audit,cleanup_audit)
-  launcher_audit=check_launcher_names(launcher_audit)
-  targeted_audit=dict(targeted_audit,topPASS=targeted_audit['topPASS']+1,namedCompletions=sorted(targeted_audit['namedCompletions']+launcher_audit['namedCompletions'],key=lambda row:(row['package'],row['name'])),launcherDirect=dict(topCount=1,subCount=0,source=FINAL_SOURCE))
+  targeted_audit=dict(targeted_audit,launcherPassedReuse=check_launcher_reuse(launcher_reuse),actualLauncherTestsDispatched=0)
   write(out/'targeted-names.json',targeted_audit)
  except BaseException as error:primary=error;raise
  finally:
@@ -453,7 +468,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':1,'launcherSubPASS':0,'targetedTopPASS':3,'targetedSubPASS':3,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

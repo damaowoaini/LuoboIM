@@ -1,4 +1,4 @@
-name: Fresh owned actual14 graph / launcher1top0sub + original2top3sub / current3top3sub / cleanup reused / cross-source7top16sub
+name: Fresh owned actual14 graph / original2top3sub / launcher868e1top0sub reused / cleanup reused / cross-source7top16sub
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
           umask 077
           python3 -B ci/backend-fullgraph/run.py --admit
       - id: controller
-        name: Launcher1top0sub then build actual14 plus two auxiliaries; original2top3sub and four scenarios; current3top3sub
+        name: Reuse launcher868e1top0sub then build actual14 plus two auxiliaries; original2top3sub and four scenarios
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

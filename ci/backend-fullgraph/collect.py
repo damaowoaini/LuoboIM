@@ -44,7 +44,7 @@ def pack(out):
  run.write(compact/'custody.json',{'files':manifest,'bodyBytes':total,'privateLogs':0,'binaries':0,'credentials':0,'decodedLimitBytes':64<<20,'compressedLimitBytes':16<<20})
 
 def checked_launcher_evidence(out):
- return run.check_launcher_names(json.loads(run.regular(out/'launcher-names.json',65536)))
+ return run.check_launcher_reuse(json.loads(run.regular(out/'launcher-passed-reuse.json',65536)))
 
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
@@ -99,7 +99,7 @@ def collect():
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
  accepted=launcher_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherControlAccepted':launcher_accepted,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  pack(out)
  return 0 if accepted else 1
 

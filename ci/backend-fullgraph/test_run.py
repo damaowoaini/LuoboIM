@@ -301,8 +301,13 @@ class FullGraphControls(unittest.TestCase):
   self.assertFalse(any(isinstance(n.func,ast.Name) and n.func.id=='run_cleanup_controls' for n in calls))
   compile_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='command' and node.args and isinstance(node.args[0],ast.BinOp) and isinstance(node.args[0].left,ast.Constant) and node.args[0].left.value=='compile-')
   minio_line=next(node.lineno for node in calls if isinstance(node.func,ast.Attribute) and isinstance(node.func.value,ast.Name) and node.func.value.id=='builder' and node.func.attr=='build')
-  launcher_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='run_launcher_control')
+  launcher_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='load_launcher_reuse')
+  self.assertFalse(any(isinstance(node.func,ast.Name) and node.func.id=='run_launcher_control' for node in calls))
   self.assertLess(launcher_line,cleanup_line);self.assertLess(cleanup_line,compile_line);self.assertLess(cleanup_line,minio_line)
+  summary_node=next(node.args[1] for node in calls if isinstance(node.func,ast.Name) and node.func.id=='write' and isinstance(node.args[0],ast.BinOp) and isinstance(node.args[0].right,ast.Constant) and node.args[0].right.value=='summary.json')
+  summary_fields={key.value:value for key,value in zip(summary_node.keys,summary_node.values)}
+  self.assertEqual(ast.literal_eval(summary_fields['targetedTopPASS']),2);self.assertEqual(ast.literal_eval(summary_fields['launcherTopPASS']),0);self.assertEqual(ast.literal_eval(summary_fields['actualLauncherTestsDispatched']),0)
+
   with tempfile.TemporaryDirectory() as directory:
    out=Path(directory);reused=run.load_cleanup_reuse(out)
    self.assertEqual(reused,run.CLEANUP_PASSED_REUSE)
@@ -414,20 +419,30 @@ class FullGraphControls(unittest.TestCase):
     launcher=run.run_launcher_control('/owned/go',{'GOPROXY':'off'},launcher_command,parent,out)
     self.assertEqual((launcher['source'],launcher['topPASS'],launcher['subPASS'],launcher['skip'],launcher['fail']),(run.FINAL_SOURCE,1,0,0,0));self.assertEqual(calls,['launcher-ownedcontrol'])
     self.assertEqual(json.loads((out/'launcher-names.json').read_bytes()),launcher)
-    collector=load('collect');self.assertEqual(collector.checked_launcher_evidence(out),launcher)
+    collector=load('collect')
+    # A fresh-looking names file is never substituted for old-source custody.
+    with self.assertRaises(FileNotFoundError):collector.checked_launcher_evidence(out)
     invalid=[dict(launcher,source={'members':1575,'digest':'f'*64}),dict(launcher,topPASS=True),dict(launcher,subPASS=1),dict(launcher,skip=1),dict(launcher,fail=1),dict(launcher,namedCompletions=[]),dict(launcher,namedCompletions=launcher['namedCompletions']*2),dict(launcher,extra='private')]
     for value in invalid:
      with self.assertRaises(ValueError):run.check_launcher_names(value)
-    # A later runtime failure retains this public launcher result but cannot
-    # turn it into startup/cleanup acceptance. No external resources are used.
+    with mock.patch.object(run,'run_launcher_control',side_effect=AssertionError('Go must not be dispatched')) as dispatch:
+     prior=run.load_launcher_reuse(out);dispatch.assert_not_called()
+    self.assertEqual(prior,run.LAUNCHER_PASSED_REUSE);self.assertEqual(json.loads((out/'launcher-passed-reuse.json').read_bytes()),prior)
+    self.assertNotEqual(prior['source'],run.FINAL_SOURCE);self.assertFalse(prior['currentSourcePASS']);self.assertEqual((prior['run'],prior['job'],prior['head']),(39075035152,117520306290,'a6d9276c53a75e8ca19e351cab1d34b419b560e7'))
+    self.assertEqual(collector.checked_launcher_evidence(out),prior)
+    rejected=[dict(prior,source=run.FINAL_SOURCE),dict(prior,run=1),dict(prior,job=1),dict(prior,head='f'*40),dict(prior,topPASS=True),dict(prior,topPASS=1.0),dict(prior,namedCompletions=[]),dict(prior,currentSourcePASS=True),dict(prior,extra='private')]
+    for value in rejected:
+     with self.assertRaises(ValueError):run.check_launcher_reuse(value)
+    # Runtime failure preserves only the real historical receipt; current
+    # source/runtime still cannot pass. No resource or Go command is invoked.
     with tempfile.TemporaryDirectory() as directory:
      repo=Path(directory).resolve();allocation=repo/'allocation';allocation.mkdir(mode=0o700);(allocation/'work').mkdir(mode=0o700)
      owner={'fixture':'original-owner'};run.write(allocation/'allocation-owner.json',owner)
-     target=repo/'ci-results/backend-fullgraph';target.mkdir(parents=True);run.write(target/'launcher-names.json',launcher);run.write(target/'summary.json',{'accepted':False})
+     target=repo/'ci-results/backend-fullgraph';target.mkdir(parents=True);run.write(target/'launcher-passed-reuse.json',prior);run.write(target/'summary.json',{'accepted':False})
      with mock.patch.object(collector.run,'REPO',repo),mock.patch.object(collector.run,'allocation_root',return_value=allocation),mock.patch.object(collector.run,'job_identity',return_value=owner),mock.patch.object(collector.run,'module',return_value=object()),mock.patch.object(collector,'pack'):
       self.assertEqual(collector.collect(),1)
-     observed=json.loads((target/'collection.json').read_bytes());self.assertTrue(observed['launcherControlAccepted']);self.assertFalse(observed['accepted']);self.assertEqual(json.loads((target/'launcher-names.json').read_bytes()),launcher)
-    (out/'launcher-names.json').unlink()
+     observed=json.loads((target/'collection.json').read_bytes());self.assertTrue(observed['launcherReuseAccepted']);self.assertFalse(observed['accepted']);self.assertEqual(json.loads((target/'launcher-passed-reuse.json').read_bytes()),prior)
+    (out/'launcher-passed-reuse.json').unlink()
     with self.assertRaises(FileNotFoundError):collector.checked_launcher_evidence(out)
 
  def test_unbound_child_reuse_never_supplies_a_current_parent_or_changed_cleanup(self):

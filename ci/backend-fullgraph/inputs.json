@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "state": "FROZEN_FINAL_SOURCE",
-  "scope": "launcher1top0sub_plus_original_graph2top3sub_current3top3sub_and_four_planes_prior_cleanup_source_bound_reuse_no_deployment",
+  "scope": "original_graph2top3sub_and_four_planes_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1575,
-    "digest": "868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717"
+    "digest": "55636eb7494b1095febac99fd1af5790ab5c3a7a1c31a8d9cdae329e70060280"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 52083,
-      "sha256": "b3a9e8dae645981a2e790ca731f6964da34fa75d6866b4eb9bcd922f1a78ba17"
+      "bytes": 53824,
+      "sha256": "dc912092354f431ff31096b72def4c458f63fbc1eae86213ec382a6b4fdb8a5b"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 31675,
-      "sha256": "4eda79579af59cb9117845d73dca181f2316f0dbb0995ec35b811e7c0e3c0712"
+      "bytes": 31680,
+      "sha256": "9a455fdff48529afb0dc93edf7ebbe779d4a79adf236067dfb4998d55fc7e714"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 47615,
-      "sha256": "488094f3ba368ae6ca9d2b1787e60c289e0ba84a3bf1ccb9a90820765b68987b"
+      "bytes": 49394,
+      "sha256": "23cf6abba9ff234f7a80ca984d29600deab639643b65c4cf0f83e262c24b8940"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -72,8 +72,8 @@
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",
-      "bytes": 10587,
-      "sha256": "0cb2001d161268e862966072dab50f2a3d561fbb0673e514c2cca1de06f26abf"
+      "bytes": 10573,
+      "sha256": "fb4e2505ce204c32ec9668c1dc762d664c4a46dae2ab934ebf641a26beff359c"
     }
   ],
   "overlay": [
@@ -1361,8 +1361,8 @@
     {
       "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/bootstrap_linux.go",
-      "bytes": 32034,
-      "sha256": "49ef15327e70e375bfb73bae55eff32f22057f2f7e3fcb7230feee3250586b88",
+      "bytes": 32521,
+      "sha256": "724892450bb0d412f80af390c3ccb252aafee7437c02b0105111e757fc73909c",
       "beforeSHA256": null
     },
     {
@@ -4207,5 +4207,67 @@
     "copyBinary": false,
     "sameRepositoryOnly": true
   },
-  "minioFixtureBinding": null
+  "minioFixtureBinding": {
+    "rootFixtureAccepted": true,
+    "rootAcceptanceSHA256": "761f2e085d049f8a55f4fa1a418c9b6a8dea1eaddae30c2574a44c713201909c",
+    "repository": "damaowoaini/LuoboIM",
+    "run": 39075035152,
+    "head": "a6d9276c53a75e8ca19e351cab1d34b419b560e7",
+    "attempt": 1,
+    "jobID": 117520306290,
+    "jobConclusion": "failure",
+    "runConclusion": "failure",
+    "artifactID": 12116773175,
+    "artifactBytes": 70210032,
+    "artifactSHA256": "509aac21b6f81ac1221e7277b3a02a02f899a89be7e1e4a97489ae29979066bf",
+    "manifestSHA256": "de86afd4bc16bacc7bf8f320c7428068f4f32e545f6c71069f8f392ff721f5be",
+    "receipt": {
+      "version": "owned-minio-source-build-receipt-v1",
+      "repository": "https://github.com/minio/minio",
+      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
+      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
+      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
+      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
+      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "cgoEnabled": "0",
+      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
+      "binaryBytes": 146777192
+    }
+  },
+  "launcherPassedReuse": {
+    "run": 39075035152,
+    "job": 117520306290,
+    "head": "a6d9276c53a75e8ca19e351cab1d34b419b560e7",
+    "source": {
+      "members": 1575,
+      "digest": "868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717"
+    },
+    "reviewSHA256": "412fdacae0a1a8ff842d92269d2bf00fb0a578b3ed1eab928ee86d2e56ac1f38",
+    "artifact": {
+      "artifact": 12115839677,
+      "run": 39075035152,
+      "attempt": 1,
+      "head": "a6d9276c53a75e8ca19e351cab1d34b419b560e7",
+      "sha256": "674eadc00436aa018a1fe7828be0568f3ce80f499ef53b487deacfcb5709099a",
+      "bytes": 52320,
+      "exactAPIDigest": true,
+      "files": 66,
+      "binariesDownloaded": false
+    },
+    "launcherNamesSHA256": "6471ec2f43ce64c92e2c399c7a0630e1d86740c9e2ee2a69352573e14b61c932",
+    "topPASS": 1,
+    "subPASS": 0,
+    "skip": 0,
+    "fail": 0,
+    "namedCompletions": [
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedLauncherHoldPersistsAndCannotPrepareMetadata"
+      }
+    ],
+    "sourceToolsPostExact": true,
+    "currentSourcePASS": false,
+    "runtimeAccepted": false
+  },
+  "launcherTestsToRun": []
 }
