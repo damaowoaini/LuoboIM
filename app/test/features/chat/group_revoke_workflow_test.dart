@@ -19,17 +19,21 @@ void main() {
         expect(f.roleReads, 1);
         expect(
           f.allRoleReadRequests,
-          contains({
-            'groupID': 'group-a',
-            'userIDList': ['alice'],
-          }),
+          contains(
+            equals({
+              'groupID': 'group-a',
+              'userIDList': ['alice'],
+            }),
+          ),
         );
         expect(
           f.allRoleReadRequests,
-          contains({
-            'groupID': 'group-a',
-            'userIDList': ['alice', 'bob'],
-          }),
+          contains(
+            equals({
+              'groupID': 'group-a',
+              'userIDList': ['alice', 'bob'],
+            }),
+          ),
         );
         expect(f.revokes, 0);
         await tester.tap(f.confirm.hitTestable());

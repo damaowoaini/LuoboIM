@@ -1,10 +1,10 @@
 {
-  "schema": "luobo.mobile.input.current363.failed2.then.diagnostic1.reuse23.v4",
+  "schema": "luobo.mobile.input.current363.failed3.then.diagnostic1.reuse22.v5",
   "cohort": "current363",
   "source_members": 363,
   "portable_members": 415,
-  "source_digest": "301ffb559964674e6fcfae5aa58cf814b0e7587d1d58ff939e7ba7155054d321",
-  "portable_digest": "4a5584b1144e40399e08e8ca656dc204706c983cea01ccacd9cbff9605fa6b93",
+  "source_digest": "0df8e3655a8fa697d4cc0a3c86bd4b194def70d3e37cd4199d8afcc68a72da30",
+  "portable_digest": "87f68117111647c8cff1c66b8d9eb30fdf41d0bf617849d31c6dcfeb65a2d93b",
   "source_rows": [
     {
       "bytes": 111,
@@ -1232,9 +1232,9 @@
       "sha256": "c8fc525c1f8865ebb67d92b0cad07b7ebe4942dac25b1b92bf4442a801103534"
     },
     {
-      "bytes": 12098,
+      "bytes": 12553,
       "path": "app/test/features/chat/group_revoke_fixture.dart",
-      "sha256": "cd3d0dee87c6ca610546eaba8d6472281e62c9012ae123607755681e6a659dd9"
+      "sha256": "0762d2d4f76461f02244f6af0d5549d9bb52d966942216856f15f52933cde63f"
     },
     {
       "bytes": 18730,
@@ -1242,9 +1242,9 @@
       "sha256": "0091e9bbf1f0c56dd31be0910d0ee417ab348a653af8224293bb07edde360a00"
     },
     {
-      "bytes": 16613,
+      "bytes": 16691,
       "path": "app/test/features/chat/group_revoke_workflow_test.dart",
-      "sha256": "2d92f1b43c77a88e16152efe0a50799157aa9d77375e310ab71fe9dbbca7faf4"
+      "sha256": "70864cc212a4d0c514daf963a28d7d3593ab4ae22bddd339abcb5ca81819926b"
     },
     {
       "bytes": 12544,
@@ -1958,9 +1958,9 @@
         "sha256": "61eb1863cfddf10108bccf8efd99fbc82493d98e20686551bda2a86cd82ee3c8"
       },
       "after": {
-        "bytes": 12098,
+        "bytes": 12553,
         "path": "app/test/features/chat/group_revoke_fixture.dart",
-        "sha256": "cd3d0dee87c6ca610546eaba8d6472281e62c9012ae123607755681e6a659dd9"
+        "sha256": "0762d2d4f76461f02244f6af0d5549d9bb52d966942216856f15f52933cde63f"
       }
     },
     {
@@ -1971,9 +1971,9 @@
         "sha256": "f5e11ef3e487122efca82c3660c2ec1dab1b72cdf8b2d6aea4cee930b47f61fd"
       },
       "after": {
-        "bytes": 16613,
+        "bytes": 16691,
         "path": "app/test/features/chat/group_revoke_workflow_test.dart",
-        "sha256": "2d92f1b43c77a88e16152efe0a50799157aa9d77375e310ab71fe9dbbca7faf4"
+        "sha256": "70864cc212a4d0c514daf963a28d7d3593ab4ae22bddd339abcb5ca81819926b"
       }
     }
   ],
@@ -2139,8 +2139,8 @@
     },
     {
       "path": ".github/workflows/mobile-input.yml",
-      "bytes": 1690,
-      "sha256": "8a526756e78f11c69718ac0b57d8fede62b583b1a352897053d54cd5188bcaec"
+      "bytes": 1704,
+      "sha256": "dd99e342e00cfb1661c7684c62760985344b977d5b660b64594b64ca20f31d96"
     },
     {
       "path": ".github/workflows/mobile-ci.yml",
@@ -2149,15 +2149,15 @@
     },
     {
       "path": "ci/mobile-input.py",
-      "bytes": 36430,
-      "sha256": "05caa7e9e7e68f157732ea70733d7a1f870b3c18db1fe4cecf276086d0a7fe61"
+      "bytes": 36950,
+      "sha256": "c5e57034e7e28eac826da390bf38211dea4e5d1fa73e06c9e59b6990f254ceeb"
     }
   ],
   "old_test_source_pins": [
     {
       "path": "app/test/features/chat/group_revoke_workflow_test.dart",
-      "bytes": 16613,
-      "sha256": "2d92f1b43c77a88e16152efe0a50799157aa9d77375e310ab71fe9dbbca7faf4"
+      "bytes": 16691,
+      "sha256": "70864cc212a4d0c514daf963a28d7d3593ab4ae22bddd339abcb5ca81819926b"
     },
     {
       "path": "app/test/features/chat/chat_page_test.dart",
@@ -2197,14 +2197,14 @@
     "nativeSourceRefAndInputsUnchanged": true,
     "historicalFull359WorkflowRef": "dfa0b855c3f90668f36aaa4fab95e32d671fd36e",
     "fixtureRepairManifest": {
-      "path": "references/integration/mobile363-chat-input-failure-format-r5-candidate-20261017/candidate-manifest.json",
-      "sha256": "1873257cecd025b5b31e0746a5fec77ba712617a5f34e3e095f5c3366fa706d7"
+      "path": "references/integration/mobile363-chat-input-failure-format-r6-candidate-20261017/candidate-manifest.json",
+      "sha256": "2b959df37db6bda7c3f9ccbded62238df4d5a29edc46838a80482243a39d0441"
     },
     "originalCloudBatchPostExactNotRecorded": true,
-    "manualContinuationSelected": "phase2 failed moderation+affected old retry then isolated phase1; prior23 cloud+gateway1 reused; no current widget PASS yet",
+    "manualContinuationSelected": "phase3 moderation+affected retry+focused-positive then isolated negative1; previous focused PASS and R4 retry PASS historical only, not reused",
     "previousFixtureRepairManifest": {
-      "path": "references/integration/mobile363-chat-input-failure-format-r4-candidate-20261017/candidate-manifest.json",
-      "sha256": "9c031a72b9e658cc8df95945fb3dd5d7ccdf18c78a134b5889c92449879b25b8"
+      "path": "references/integration/mobile363-chat-input-failure-format-r5-candidate-20261017/candidate-manifest.json",
+      "sha256": "1873257cecd025b5b31e0746a5fec77ba712617a5f34e3e095f5c3366fa706d7"
     }
   },
   "names25": [
@@ -2239,14 +2239,14 @@
   ],
   "cloud_analysis_paths": [],
   "local_validation_reuse": {
-    "state": "actual_changed_analysis4_PASS_and_prior_exact_analysis9_reused_no_widget_acceptance",
-    "source363": "301ffb559964674e6fcfae5aa58cf814b0e7587d1d58ff939e7ba7155054d321",
-    "portable415": "4a5584b1144e40399e08e8ca656dc204706c983cea01ccacd9cbff9605fa6b93",
-    "rootUnionReceiptSHA256": "18defcf04239b7000a101eefe7af4ed84356dea06cb211566a0c148cdec3056b",
+    "state": "actual_changed_analysis2_PASS_and_prior_exact_analysis11_reused_no_widget_acceptance",
+    "source363": "0df8e3655a8fa697d4cc0a3c86bd4b194def70d3e37cd4199d8afcc68a72da30",
+    "portable415": "87f68117111647c8cff1c66b8d9eb30fdf41d0bf617849d31c6dcfeb65a2d93b",
+    "rootUnionReceiptSHA256": "ae961a6916b29e9189fc51e6a0fb2c265885b5ace281225a40c055cd38b8caef",
     "productManifest": {
-      "path": "references/integration/mobile363-chat-input-failure-format-r5-candidate-20261017/candidate-manifest.json",
-      "bytes": 8403,
-      "sha256": "1873257cecd025b5b31e0746a5fec77ba712617a5f34e3e095f5c3366fa706d7"
+      "path": "references/integration/mobile363-chat-input-failure-format-r6-candidate-20261017/candidate-manifest.json",
+      "bytes": 7430,
+      "sha256": "2b959df37db6bda7c3f9ccbded62238df4d5a29edc46838a80482243a39d0441"
     },
     "analyses13": [
       {
@@ -2445,7 +2445,7 @@
           "bytes": 57,
           "sha256": "dccd34a6953be363762f4a6206fb609751a1bcedcdf7fa37a9523b35f652b90d"
         },
-        "execution": "new_analysis4"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "test/features/chat/chat_reedit_workflow_test.dart",
@@ -2489,14 +2489,14 @@
           "bytes": 61,
           "sha256": "ba6eee91af6034e5f509835101f4944608fa4079d023c0a225a859a2214692ac"
         },
-        "execution": "new_analysis4"
+        "execution": "exact_unchanged_file_reused"
       },
       {
         "path": "test/features/chat/group_revoke_fixture.dart",
         "source": {
           "path": "app/test/features/chat/group_revoke_fixture.dart",
-          "bytes": 12098,
-          "sha256": "cd3d0dee87c6ca610546eaba8d6472281e62c9012ae123607755681e6a659dd9"
+          "bytes": 12553,
+          "sha256": "0762d2d4f76461f02244f6af0d5549d9bb52d966942216856f15f52933cde63f"
         },
         "result": {
           "path": "test/features/chat/group_revoke_fixture.dart",
@@ -2511,14 +2511,14 @@
           "bytes": 56,
           "sha256": "c52f6a5d2438b05866311c6ca0bfb2ed84358fe3abe391d3a1f68662dfb0aaed"
         },
-        "execution": "new_analysis4"
+        "execution": "new_analysis2"
       },
       {
         "path": "test/features/chat/group_revoke_workflow_test.dart",
         "source": {
           "path": "app/test/features/chat/group_revoke_workflow_test.dart",
-          "bytes": 16613,
-          "sha256": "2d92f1b43c77a88e16152efe0a50799157aa9d77375e310ab71fe9dbbca7faf4"
+          "bytes": 16691,
+          "sha256": "70864cc212a4d0c514daf963a28d7d3593ab4ae22bddd339abcb5ca81819926b"
         },
         "result": {
           "path": "test/features/chat/group_revoke_workflow_test.dart",
@@ -2533,16 +2533,14 @@
           "bytes": 62,
           "sha256": "90d913b13778475ae756bba87639b5bd57a5ac03c9bce38991b12e7d1036455f"
         },
-        "execution": "new_analysis4"
+        "execution": "new_analysis2"
       }
     ],
-    "new_analysis_paths4": [
-      "test/features/chat/chat_location_fixture.dart",
-      "test/features/chat/chat_typing_workflow_test.dart",
+    "new_analysis_paths2": [
       "test/features/chat/group_revoke_fixture.dart",
       "test/features/chat/group_revoke_workflow_test.dart"
     ],
-    "reused_analysis_paths9": [
+    "reused_analysis_paths11": [
       "lib/core/im/im_event.dart",
       "lib/core/im/open_im_gateway.dart",
       "lib/features/chat/data/chat_repository.dart",
@@ -2551,7 +2549,9 @@
       "lib/features/chat/presentation/mention_text_controller.dart",
       "test/core/im/sdk_harness.dart",
       "test/features/chat/chat_input_fixture.dart",
-      "test/features/chat/chat_reedit_workflow_test.dart"
+      "test/features/chat/chat_location_fixture.dart",
+      "test/features/chat/chat_reedit_workflow_test.dart",
+      "test/features/chat/chat_typing_workflow_test.dart"
     ],
     "gateway1": {
       "name": "repeated exit is idempotent and old listener generations cannot enter a new account",
@@ -2584,33 +2584,34 @@
     },
     "resource": {
       "bytes": 930,
-      "sha256": "250bd8abd5756f4a3d90390f6c413102d7af227c7570dd5e87be54683a2e9a5c"
+      "sha256": "d41e296d562a762f3ca62935a74253da85d8a11f33b8ca38a8318acad27e2e34"
     },
     "formatResource": {
-      "bytes": 1117,
-      "sha256": "5a1989c9f9ad0801f0a0653b28668fa8c0e7781a4fa7e8339f52cfcba0456a07"
+      "bytes": 1126,
+      "sha256": "ccefe7c896c510d50b59286503fae4bda6421fab6f8aa8500dffef105d45d197"
     },
     "script": {
       "bytes": 1058,
-      "sha256": "e08672124336b74437fb6abdaff97cf71f8f78894f5704f8638b2d905147dac7"
+      "sha256": "5af51e2595fa48e44dda98caa508fc258c0e9e5dacab982754dd1aca162fd233"
     },
     "all415AuthoredSourcesPostExact": true,
     "cloud15SourcePostExactClaimed": false,
     "cloudReexecution": {
       "analysis": 0,
       "gateway1": false,
-      "tests": 3
+      "tests": 4
     },
     "priorR3BothPhaseSourcePostExact": true
   },
-  "phase2_names": [
+  "phase3_names": [
     "actual long press group moderation inspects roles then confirms one standard revoke",
-    "actual role read failure stays an error and explicit retry remains read only until confirmation"
+    "actual role read failure stays an error and explicit retry remains read only until confirmation",
+    "real focused composer sends bounded yes and throttles further input without sending a message"
   ],
   "phase1_names": [
     "wrong-peer wrong-recipient malformed and offline typing never enters history or the active header"
   ],
-  "reused_cloud_names23": [
+  "reused_cloud_names22": [
     "self revoke ACK restores text once through the real composer without sending",
     "self at-text ACK restores exact mention identities instead of guessing from draft text",
     "unknown revoke never offers re-edit even when the native side removed the original",
@@ -2624,7 +2625,6 @@
     "an explicit delete notice after self revoke cancels its retained re-edit action",
     "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
     "owner logout while revoke waits keeps the ACK from writing the retired composer",
-    "real focused composer sends bounded yes and throttles further input without sending a message",
     "input idle and focus loss stop typing through no without replaying a yes",
     "live exact-peer typing updates the real header and each yes renews only a short TTL",
     "online-only typing uses the same transient yes-no path while a group composer sends none",
@@ -2635,8 +2635,9 @@
     "real doubletap dispatches once and native unknown offers only read review even after reopen",
     "chat restores a draft and sends through the real method codec without overflow at large text"
   ],
-  "phase2_paths": [
-    "test/features/chat/group_revoke_workflow_test.dart"
+  "phase3_paths": [
+    "test/features/chat/group_revoke_workflow_test.dart",
+    "test/features/chat/chat_typing_workflow_test.dart"
   ],
   "phase1_paths": [
     "test/features/chat/chat_typing_workflow_test.dart"
@@ -2959,7 +2960,7 @@
       "both_phase_source_post_exact": true,
       "failed_group_complete_cleanup_counted_as_pass": false
     },
-    "actual_passed_names23": [
+    "actual_passed_names22": [
       "self revoke ACK restores text once through the real composer without sending",
       "self at-text ACK restores exact mention identities instead of guessing from draft text",
       "unknown revoke never offers re-edit even when the native side removed the original",
@@ -2973,7 +2974,6 @@
       "an explicit delete notice after self revoke cancels its retained re-edit action",
       "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
       "owner logout while revoke waits keeps the ACK from writing the retired composer",
-      "real focused composer sends bounded yes and throttles further input without sending a message",
       "input idle and focus loss stop typing through no without replaying a yes",
       "live exact-peer typing updates the real header and each yes renews only a short TTL",
       "online-only typing uses the same transient yes-no path while a group composer sends none",
@@ -2984,7 +2984,7 @@
       "real doubletap dispatches once and native unknown offers only read review even after reopen",
       "chat restores a draft and sends through the real method codec without overflow at large text"
     ],
-    "actual_cleanup22": [
+    "actual_cleanup21": [
       {
         "name": "self revoke ACK restores text once through the real composer without sending",
         "test_id": 3,
@@ -3116,16 +3116,6 @@
         ]
       },
       {
-        "name": "real focused composer sends bounded yes and throttles further input without sending a message",
-        "test_id": 19,
-        "markers": [
-          "sdk.begin",
-          "sdk.end",
-          "unmount.begin",
-          "unmount.end"
-        ]
-      },
-      {
         "name": "input idle and focus loss stop typing through no without replaying a yes",
         "test_id": 20,
         "markers": [
@@ -3206,11 +3196,193 @@
         ]
       }
     ],
-    "accepted_cleanup_fixtures": 22,
-    "accepted_cleanup_markers": 88,
+    "accepted_cleanup_fixtures": 21,
+    "accepted_cleanup_markers": 84,
     "prior_source_post_exact_recorded": false,
     "prior_source_post_field_refers_to": "original_cloud15_only; continuation_cloud8 has its independent exact post",
-    "new_execution_claimed": false
+    "new_execution_claimed": false,
+    "original_cloud15_reused_names14": [
+      "self revoke ACK restores text once through the real composer without sending",
+      "unknown revoke never offers re-edit even when the native side removed the original",
+      "an acknowledged moderated peer text never becomes the local sender draft",
+      "private self text can be revoked but cannot be retained as a re-edit draft",
+      "incomplete attached privacy metadata cannot be retained by successful self revoke",
+      "explicit re-edit preserves an existing draft until the user clears it",
+      "foreign route coverage permanently retires the old re-edit callback after return",
+      "history clear after ACK immediately blocks a retained re-edit action",
+      "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+      "an explicit delete notice after self revoke cancels its retained re-edit action",
+      "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+      "owner logout while revoke waits keeps the ACK from writing the retired composer",
+      "input idle and focus loss stop typing through no without replaying a yes",
+      "live exact-peer typing updates the real header and each yes renews only a short TTL"
+    ],
+    "original_cloud15_reused_cleanup14": [
+      {
+        "name": "self revoke ACK restores text once through the real composer without sending",
+        "test_id": 3,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "unknown revoke never offers re-edit even when the native side removed the original",
+        "test_id": 5,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "an acknowledged moderated peer text never becomes the local sender draft",
+        "test_id": 6,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "private self text can be revoked but cannot be retained as a re-edit draft",
+        "test_id": 7,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "incomplete attached privacy metadata cannot be retained by successful self revoke",
+        "test_id": 8,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "explicit re-edit preserves an existing draft until the user clears it",
+        "test_id": 9,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "foreign route coverage permanently retires the old re-edit callback after return",
+        "test_id": 10,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "history clear after ACK immediately blocks a retained re-edit action",
+        "test_id": 11,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "new sticky private facts after ACK prevent the old re-edit callback from copying text",
+        "test_id": 12,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "an explicit delete notice after self revoke cancels its retained re-edit action",
+        "test_id": 13,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "same-State CID ABA during a dispatched revoke cannot restore its late acknowledged text",
+        "test_id": 14,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "owner logout while revoke waits keeps the ACK from writing the retired composer",
+        "test_id": 15,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "input idle and focus loss stop typing through no without replaying a yes",
+        "test_id": 20,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      },
+      {
+        "name": "live exact-peer typing updates the real header and each yes renews only a short TTL",
+        "test_id": 21,
+        "markers": [
+          "sdk.begin",
+          "sdk.end",
+          "unmount.begin",
+          "unmount.end"
+        ]
+      }
+    ],
+    "previous_pass_excluded_for_direct_recheck": [
+      "real focused composer sends bounded yes and throttles further input without sending a message"
+    ],
+    "latest_R4_retry_pass": {
+      "run": 39037461732,
+      "job": 117410072277,
+      "attempt": 1,
+      "head": "2b101c0875166284bb41289a9eaa54efdea1872e",
+      "artifact": 12102991631,
+      "artifactSHA256": "8c7e5fcff88da40def252690f6e5b06aa4a5017ae43a158d9056f7a388341626",
+      "source363": "301ffb559964674e6fcfae5aa58cf814b0e7587d1d58ff939e7ba7155054d321",
+      "portable415": "4a5584b1144e40399e08e8ca656dc204706c983cea01ccacd9cbff9605fa6b93",
+      "passed_names": [
+        "actual role read failure stays an error and explicit retry remains read only until confirmation"
+      ],
+      "both_phase_source_post_exact": true,
+      "rootPartialReceipt": {
+        "bytes": 6561,
+        "sha256": "1951e32a760cd85d796a2490a5f2240043c409186f800615899e26e7d0e04fef"
+      },
+      "retained_as_history_only": true,
+      "reused_for_current_scope": false,
+      "reason": "shared-close directly affected; retry selected again"
+    }
   },
   "universe_names27": [
     "self revoke ACK restores text once through the real composer without sending",

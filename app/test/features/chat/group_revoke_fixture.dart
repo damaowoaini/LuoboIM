@@ -343,14 +343,26 @@ final class GroupRevokeFixture {
     release();
     debugPrintSynchronously('group_revoke_cleanup sdk.begin');
     try {
-      await base.actual(tester, () async {
-        if (base.started) {
-          await sdk.dispose().timeout(const Duration(seconds: 20));
-          if (base.traceActual) {
-            debugPrintSynchronously('chat_input_actual sdk.wrapper.end');
+      Object? disposeError;
+      StackTrace? disposeStack;
+      await tester.runAsync(() async {
+        try {
+          if (base.started) {
+            await sdk.dispose().timeout(const Duration(seconds: 20));
+            if (base.traceActual) {
+              debugPrintSynchronously('chat_input_actual sdk.wrapper.end');
+            }
           }
+        } catch (error, stack) {
+          // runAsync reports uncaught errors instead of forwarding them. Keep
+          // the actual failure and stack for the caller outside its real zone.
+          disposeError = error;
+          disposeStack = stack;
         }
       });
+      if (disposeError != null) {
+        Error.throwWithStackTrace(disposeError!, disposeStack!);
+      }
       debugPrintSynchronously('group_revoke_cleanup sdk.end');
     } finally {
       debugPrintSynchronously('group_revoke_cleanup unmount.begin');
