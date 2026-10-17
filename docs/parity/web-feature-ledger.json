@@ -1,0 +1,5183 @@
+{
+  "schema_version": 1,
+  "platform": "web",
+  "source_baseline": "155a3d25c5d795ba6cd8ea6a143db22d8d8f50b2",
+  "source_root": "references/web-more",
+  "scope": "旧Web与Electron共用React视图功能复刻；浏览器与桌面专属能力明确分列。原生Electron包装不因Web换肤自动视作验收通过。",
+  "known_migration_requirements": [
+    "原SDK为 open-im-sdk-wasm 3.5.1-alpha.3，需与新OpenIM兼容性实际验证",
+    "Source methods/route presence do not prove controls currently render or server supports endpoint",
+    "已实现route多租户完整会话；真实route→chart→IM仍待验",
+    "完整旧功能保留源码，现代依赖适配构建通过；不能据此视为全部产品验收"
+  ],
+  "coverage": {
+    "features": 107,
+    "unresolved_source_paths": [],
+    "unmapped_callbacks": "pending; review web-source-evidence.json",
+    "unmapped_sdk_calls": "pending; review web-source-evidence.json"
+  },
+  "features": [
+    {
+      "id": "WEB-DADCDAFA7AB6",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "手机号邮箱密码登录",
+      "trigger": "手机号邮箱密码登录",
+      "user_expected": "完成“手机号邮箱密码登录”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/LoginForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_real_service_partial_verified",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_real_service_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验",
+          {
+            "source": "docs/architecture/web-live-integration.json",
+            "result": "真实邮箱密码+route→Go/WASM→WS101通过；手机号密码UI未测"
+          },
+          {
+            "source": "docs/architecture/web-cross-tenant-live.json",
+            "result": "actual A→B→A identical userIDs/conversationID, independent backend data/caches/secrets, actual Go/WASM full document boundaries; browser text/contact/draft isolation pass"
+          }
+        ]
+      },
+      "currentControlledSDKCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "new controlled SDK: both fixture accounts actual password UI login; other auth variants remain pending",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-3E3A55107955",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "验证码登录",
+      "trigger": "验证码登录",
+      "user_expected": "完成“验证码登录”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/LoginForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      }
+    },
+    {
+      "id": "WEB-6B02C2B8C6F9",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "国际区号选择",
+      "trigger": "国际区号选择",
+      "user_expected": "完成“国际区号选择”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/LoginForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      }
+    },
+    {
+      "id": "WEB-7E9A3B8BB061",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "协议阅读同意",
+      "trigger": "协议阅读同意",
+      "user_expected": "完成“协议阅读同意”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/LoginForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      }
+    },
+    {
+      "id": "WEB-2ECE1D819E37",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "找回密码入口",
+      "trigger": "找回密码入口",
+      "user_expected": "完成“找回密码入口”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/LoginForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      }
+    },
+    {
+      "id": "WEB-98924C326EE6",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "手机号邮箱注册",
+      "trigger": "手机号邮箱注册",
+      "user_expected": "完成“手机号邮箱注册”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/RegisterForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/",
+          "web/src/core/registrationRecovery.ts"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts",
+          "web/src/core/registrationRecovery.test.ts",
+          "web/src/core/registrationForm.test.ts",
+          "web/src/core/registrationMutation.test.ts",
+          "docs/architecture/web-registration-unknown-contract.json"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验",
+          "注册调用后任何失败均冻结原内存草稿；只显式原账号密码登录，不自动注册/发码；退场或issuer变化迟返0commit"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      },
+      "registrationRecoveryCheckpoint": {
+        "focusedTests": 21,
+        "routeAPIRace": "10top+5subcases",
+        "state": "source_verified_browser_pending",
+        "liveDistIncludesChange": false,
+        "evidence": "docs/architecture/web-registration-unknown-contract.json"
+      }
+    },
+    {
+      "id": "WEB-8E43AF19753F",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "注册验证码发送预校验",
+      "trigger": "注册验证码发送预校验",
+      "user_expected": "完成“注册验证码发送预校验”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/RegisterForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/",
+          "web/src/core/registrationRecovery.ts"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts",
+          "web/src/core/registrationRecovery.test.ts",
+          "web/src/core/registrationForm.test.ts",
+          "web/src/core/registrationMutation.test.ts",
+          "docs/architecture/web-registration-unknown-contract.json"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验",
+          "注册调用后任何失败均冻结原内存草稿；只显式原账号密码登录，不自动注册/发码；退场或issuer变化迟返0commit"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      },
+      "registrationRecoveryCheckpoint": {
+        "focusedTests": 21,
+        "routeAPIRace": "10top+5subcases",
+        "state": "source_verified_browser_pending",
+        "liveDistIncludesChange": false,
+        "evidence": "docs/architecture/web-registration-unknown-contract.json"
+      }
+    },
+    {
+      "id": "WEB-3BE15C349069",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "注册邀请码",
+      "trigger": "注册邀请码",
+      "user_expected": "完成“注册邀请码”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/RegisterForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/",
+          "web/src/core/registrationRecovery.ts"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts",
+          "web/src/core/registrationRecovery.test.ts",
+          "web/src/core/registrationForm.test.ts",
+          "web/src/core/registrationMutation.test.ts",
+          "docs/architecture/web-registration-unknown-contract.json"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验",
+          "注册调用后任何失败均冻结原内存草稿；只显式原账号密码登录，不自动注册/发码；退场或issuer变化迟返0commit"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      },
+      "registrationRecoveryCheckpoint": {
+        "focusedTests": 21,
+        "routeAPIRace": "10top+5subcases",
+        "state": "source_verified_browser_pending",
+        "liveDistIncludesChange": false,
+        "evidence": "docs/architecture/web-registration-unknown-contract.json"
+      }
+    },
+    {
+      "id": "WEB-10FF27F567CD",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "设置昵称密码并自动登录",
+      "trigger": "设置昵称密码并自动登录",
+      "user_expected": "完成“设置昵称密码并自动登录”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/RegisterForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/",
+          "web/src/core/registrationRecovery.ts"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts",
+          "web/src/core/registrationRecovery.test.ts",
+          "web/src/core/registrationForm.test.ts",
+          "web/src/core/registrationMutation.test.ts",
+          "docs/architecture/web-registration-unknown-contract.json"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验",
+          "注册调用后任何失败均冻结原内存草稿；只显式原账号密码登录，不自动注册/发码；退场或issuer变化迟返0commit"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      },
+      "registrationRecoveryCheckpoint": {
+        "focusedTests": 21,
+        "routeAPIRace": "10top+5subcases",
+        "state": "source_verified_browser_pending",
+        "liveDistIncludesChange": false,
+        "evidence": "docs/architecture/web-registration-unknown-contract.json"
+      }
+    },
+    {
+      "id": "WEB-437389F883E8",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "找回密码验证码发送",
+      "trigger": "找回密码验证码发送",
+      "user_expected": "完成“找回密码验证码发送”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/ModifyForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      }
+    },
+    {
+      "id": "WEB-B5FEE657D203",
+      "platform": "browser_and_desktop",
+      "module": "auth",
+      "title": "重置密码",
+      "trigger": "重置密码",
+      "user_expected": "完成“重置密码”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/ModifyForm.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_service_e2e",
+        "paths": [
+          "web/src/api/login.ts",
+          "web/src/core/session/",
+          "web/src/pages/login/"
+        ],
+        "evidence": [
+          "docs/architecture/web-verification.json",
+          "web/src/core/session/session.test.ts",
+          "web/src/utils/request.test.ts"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "真实IAB登录/注册/找回/服务设置桌面及390px检查；实际服务和设备联调待验"
+        ]
+      }
+    },
+    {
+      "id": "WEB-597109125EC9",
+      "platform": "browser_and_desktop",
+      "module": "session",
+      "title": "手动服务地址配置",
+      "trigger": "手动服务地址配置",
+      "user_expected": "完成“手动服务地址配置”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/login/ConfigModal.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_real_service_partial_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "partial_real_service_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-live-integration.json",
+            "result": "真实HTTPS /routing base通过设置保存并client_config成功"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-C52029E13B60",
+      "platform": "browser_and_desktop",
+      "module": "session",
+      "title": "Web租户路由接入",
+      "trigger": "Web租户路由接入",
+      "user_expected": "旧版直接chat/account接口；新Web须接入route认证并原子保存serverInfo、chatToken、imToken，切线同步重连SDK。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/api/login.ts",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_real_service_partial_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "partial_real_service_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-live-integration.json",
+            "result": "真实单租户账号路由与完整IM登录通过；跨租户同user待测"
+          },
+          {
+            "source": "docs/architecture/web-cross-tenant-live.json",
+            "result": "actual A→B→A identical userIDs/conversationID, independent backend data/caches/secrets, actual Go/WASM full document boundaries; browser text/contact/draft isolation pass"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-38BE9807D71B",
+      "platform": "browser_and_desktop",
+      "module": "session",
+      "title": "认证恢复与登录重定向",
+      "trigger": "认证恢复与登录重定向",
+      "user_expected": "完成“认证恢复与登录重定向”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/layout/MainContentWrap.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_real_service_partial_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "partial_real_service_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-live-integration.json",
+            "result": "真实持久会话刷新和双用户切换通过，已修mutation卸载导致导航丢失"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-08082647E629",
+      "platform": "browser_and_desktop",
+      "module": "session",
+      "title": "SDK初始化与退出释放",
+      "trigger": "SDK初始化与退出释放",
+      "user_expected": "完成“SDK初始化与退出释放”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/layout/MainContentWrap.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_real_service_partial_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "partial_real_service_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-live-integration.json",
+            "result": "实际Go/WASM登录及退出后完整文档重载再登录另一用户通过；跨租户待测"
+          },
+          {
+            "source": "docs/architecture/web-cross-tenant-live.json",
+            "result": "actual A→B→A identical userIDs/conversationID, independent backend data/caches/secrets, actual Go/WASM full document boundaries; browser text/contact/draft isolation pass"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-83EB26702C0C",
+      "platform": "browser_and_desktop",
+      "module": "conversation",
+      "title": "会话列表与分页",
+      "trigger": "会话列表与分页",
+      "user_expected": "完成“会话列表与分页”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/ConversationSider/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-522398122D3B",
+      "platform": "browser_and_desktop",
+      "module": "conversation",
+      "title": "断网同步状态",
+      "trigger": "断网同步状态",
+      "user_expected": "完成“断网同步状态”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/ConversationSider/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-D66CD23EF24E",
+      "platform": "browser_and_desktop",
+      "module": "conversation",
+      "title": "会话草稿与未读",
+      "trigger": "会话草稿与未读",
+      "user_expected": "完成“会话草稿与未读”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/ConversationSider/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_real_service_partial_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "partial_real_service_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-live-integration.json",
+            "result": "本轮实际离线接收2未读、打开清零与换号空草稿通过；复杂草稿附件恢复待测"
+          },
+          {
+            "source": "docs/architecture/web-group-blacklist-actual-adoption-root-verification.json",
+            "result": "Currentgroup53/QueryChat8 actualcomponentPASS includedfull420: temporarymute/loadingdoesnotattemptclear andrealFooterrestoresknownsavedDraft. Generaldraftowner/unmount/mediarecovery isnotclosed bythisbatch; broader prioracceptance statusretained."
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-0149ED4E4BE4",
+      "platform": "browser_and_desktop",
+      "module": "conversation",
+      "title": "会话置顶取消置顶",
+      "trigger": "会话置顶取消置顶",
+      "user_expected": "完成“会话置顶取消置顶”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/ConversationSider/ConversationMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteConversationAndDeleteAllMsg",
+          "markConversationMessageAsRead",
+          "pinConversation"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-A9D74CD89E03",
+      "platform": "browser_and_desktop",
+      "module": "conversation",
+      "title": "会话免打扰",
+      "trigger": "会话免打扰",
+      "user_expected": "完成“会话免打扰”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/ConversationSider/ConversationMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteConversationAndDeleteAllMsg",
+          "markConversationMessageAsRead",
+          "pinConversation"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-F511A6719AF2",
+      "platform": "browser_and_desktop",
+      "module": "conversation",
+      "title": "会话已读",
+      "trigger": "会话已读",
+      "user_expected": "完成“会话已读”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/ConversationSider/ConversationMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteConversationAndDeleteAllMsg",
+          "markConversationMessageAsRead",
+          "pinConversation"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "currentControlledSDKCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "one new normal message reached peer and became read",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-8E68D809570F",
+      "platform": "browser_and_desktop",
+      "module": "conversation",
+      "title": "移除会话",
+      "trigger": "移除会话",
+      "user_expected": "完成“移除会话”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/ConversationSider/ConversationMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteConversationAndDeleteAllMsg",
+          "markConversationMessageAsRead",
+          "pinConversation"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-BBED94CCCC59",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "输入文本表情发送",
+      "trigger": "输入文本表情发送",
+      "user_expected": "完成“输入文本表情发送”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createQuoteMessage",
+          "createTextAtMessage",
+          "createTextMessage",
+          "setConversationDraft",
+          "typingStatusUpdate"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "Text/customemoji creation and fixed-target send; currentdraft monotonicrevision. Full native/picker/network delivery separate.",
+        "native_or_authenticated_browser": false
+      },
+      "currentControlledSDKCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "one actual plain text send, both UI rows; expression input not covered here",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-8BCC4FE8BA78",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "群聊@成员与所有人",
+      "trigger": "群聊@成员与所有人",
+      "user_expected": "完成“群聊@成员与所有人”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createQuoteMessage",
+          "createTextAtMessage",
+          "createTextMessage",
+          "setConversationDraft",
+          "typingStatusUpdate"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-3D7CC0A3BAF2",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "消息草稿保存",
+      "trigger": "消息草稿保存",
+      "user_expected": "完成“消息草稿保存”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createQuoteMessage",
+          "createTextAtMessage",
+          "createTextMessage",
+          "setConversationDraft",
+          "typingStatusUpdate"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-group-blacklist-actual-adoption-root-verification.json",
+            "result": "Currentgroup53/QueryChat8 actualcomponentPASS includedfull420: temporarymute/loadingdoesnotattemptclear andrealFooterrestoresknownsavedDraft. Generaldraftowner/unmount/mediarecovery isnotclosed bythisbatch; broader prioracceptance statusretained."
+          }
+        ]
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "ObservedvalidACK clears only sameintent/editorrevision; edited-away-and-back draft retained.",
+        "native_or_authenticated_browser": false
+      }
+    },
+    {
+      "id": "WEB-AF2009E4C887",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "引用回复",
+      "trigger": "引用回复",
+      "user_expected": "完成“引用回复”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createQuoteMessage",
+          "createTextAtMessage",
+          "createTextMessage",
+          "setConversationDraft",
+          "typingStatusUpdate"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-F21ED1175A5E",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "拖拽粘贴图片文件发送",
+      "trigger": "拖拽粘贴图片文件发送",
+      "user_expected": "完成“拖拽粘贴图片文件发送”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createQuoteMessage",
+          "createTextAtMessage",
+          "createTextMessage",
+          "setConversationDraft",
+          "typingStatusUpdate"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "Real drop/paste/sidebar/DOM hooks retain oldmodal andsourceCID identity; mockOS/native.",
+        "native_or_authenticated_browser": false
+      }
+    },
+    {
+      "id": "WEB-D74CEB6058EF",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "选择图片视频文件发送",
+      "trigger": "选择图片视频文件发送",
+      "user_expected": "完成“选择图片视频文件发送”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/SendActionBar/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/chat/queryChat/MessageItem/",
+          "web/src/hooks/useMessageFileDownloadState.tsx",
+          "web/electron/main/downloadManage.ts",
+          "web/electron/security/attachmentExport.ts"
+        ],
+        "evidence": [
+          "docs/architecture/electron-native-live.json",
+          "docs/architecture/object-upload-recovery.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_native_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/electron-native-live.json",
+            "result": "actual product main/preload file:// login and system picker/cache bytes pass; first object PUT507, failed bubble and authority marker0; upload/download acceptance remains incomplete"
+          },
+          {
+            "source": "docs/architecture/electron-native-live.json",
+            "result": "Actual86B file picker/cache/upload/recovery/single authoritative commit; native peer download/restart/open/system save-dialog export equal; large files/media/cancel and otherOS pending"
+          }
+        ]
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "Realfooter/upload creators fixedintent duringasynclocalfilepreparation; noactualOSpicker.",
+        "native_or_authenticated_browser": false
+      },
+      "currentControlledMediaCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "single image/file normal picker send, exact server acceptance and peer receive; image pixels/original preview and byte-exact file download",
+        "notCovered": "video, drag/paste, large files, cancel/retry, all progress states, external open/native Save As",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-70AE39E60728",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "发送个人名片",
+      "trigger": "发送个人名片",
+      "user_expected": "完成“发送个人名片”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/SendActionBar/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "RealChooseModal card creation fixedcurrentintent; names/explicit targets held beforeawait.",
+        "native_or_authenticated_browser": false
+      }
+    },
+    {
+      "id": "WEB-DAC7D825E916",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "截图后发送",
+      "trigger": "截图后发送",
+      "user_expected": "完成“截图后发送”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/SendActionBar/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-CE6ADD783F0B",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "多选批量删除",
+      "trigger": "多选批量删除",
+      "user_expected": "完成“多选批量删除”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/MultipleActionBar.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "deleteMessageFromLocalStorage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-090CF6A88CDC",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "多选逐条转发",
+      "trigger": "多选逐条转发",
+      "user_expected": "完成“多选逐条转发”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/MultipleActionBar.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "deleteMessageFromLocalStorage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/chat/queryChat/ChatFooter/MultipleActionBar.tsx",
+          "web/src/pages/common/ChooseModal/index.tsx",
+          "web/src/core/individualForward.ts",
+          "web/src/i18n/resources/zh.json",
+          "web/src/i18n/resources/en.json"
+        ],
+        "evidence": [
+          {
+            "date": "2026-10-17",
+            "source": "Root_local_targeted_and_typechecks",
+            "published_commit": "87a4f0b979cab6cde4518fb50e58379bff92bf60",
+            "adopted_source4301": "dcbebe0d5d014533a25b7d4d1d0cfae603a1467d5fd924cb06aa6ce6f81270e6",
+            "root_receipt": {
+              "path": "references/integration/web-individual-forward-r5-candidate-20261017/root-targeted-acceptance.json",
+              "bytes": 474,
+              "sha256": "4ae490b92c18ed9ee9b3ff39b223402e372d92649f13a7f531000c789cb0f447"
+            },
+            "result": "32 new individual-forward cases plus7 directly affected old cases passed; only1 affected warning case rechecked clean; Web/Desktop noEmit0 and CI3 passed. No repeat39/aggregate74/full763 or new bundle build.",
+            "limits": "Authenticated browser/Electron/device/actual WASM business-send acceptance remains pending; original absence was an inherited design omission, not a falsely proved old working control."
+          }
+        ]
+      },
+      "acceptance": {
+        "status": "targeted_components_pass_browser_and_service_pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          "web/src/core/individualForward/operation.test.ts",
+          "web/src/core/individualForward/components.test.tsx",
+          "references/integration/web-individual-forward-r5-candidate-20261017/root-targeted-acceptance.json"
+        ],
+        "feature_specific_cases": [
+          "Original source owner/CID/history/privacy and fresh selected source IDs; immutable explicit targets.",
+          "Ordered per-source/per-target ACK/rejected/unknown/not-attempted receipts; no replay of acknowledged or unknown tuples.",
+          "Optional additional text only after all primary messages for that recipient ACK; original merge/single/card paths preserved.",
+          "Real toolbar/modal/retained callbacks and320px usable controls; source validity and target-send admission independently checked."
+        ]
+      },
+      "legacyEntryAudit": {
+        "classifications": [
+          "legacy_design_goal_no_individual_multi_forward_control"
+        ],
+        "evidence": "docs/parity/web-admin-entry-findings.json",
+        "preserveAcceptanceTarget": true
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "Explicitselectednonactive/multitarget+additionaltext forward preserved; sourceowner/CID fences.",
+        "native_or_authenticated_browser": false
+      }
+    },
+    {
+      "id": "WEB-4C6A6D52BE64",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "多选合并转发",
+      "trigger": "多选合并转发",
+      "user_expected": "完成“多选合并转发”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/MultipleActionBar.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "deleteMessageFromLocalStorage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "entryAudit": {
+        "state": "confirmed_source_defect_fixed_focused_tests_passed_runtime_pending",
+        "findings": [
+          "ENTRY-WEB-FORWARD-ACK"
+        ],
+        "evidence": "docs/parity/web-admin-entry-findings.json",
+        "actualBrowserAcceptance": "pending"
+      }
+    },
+    {
+      "id": "WEB-9899B628F770",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "复制消息",
+      "trigger": "复制消息",
+      "user_expected": "完成“复制消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "revokeMessage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-D18D8E337DD2",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "回复消息",
+      "trigger": "回复消息",
+      "user_expected": "完成“回复消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "revokeMessage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-7301FF893862",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "撤回消息",
+      "trigger": "撤回消息",
+      "user_expected": "完成“撤回消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "revokeMessage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-98DA15BE0F77",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "转发消息",
+      "trigger": "转发消息",
+      "user_expected": "完成“转发消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "revokeMessage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "entryAudit": {
+        "state": "confirmed_source_defect_fixed_focused_tests_passed_runtime_pending",
+        "findings": [
+          "ENTRY-WEB-FORWARD-ACK"
+        ],
+        "evidence": "docs/parity/web-admin-entry-findings.json",
+        "actualBrowserAcceptance": "pending"
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "Realsourceforward/choosemodal identity/retention andfixedtarget resolution; realtransportnotexercised.",
+        "native_or_authenticated_browser": false
+      }
+    },
+    {
+      "id": "WEB-F24ACD63911F",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "删除消息",
+      "trigger": "删除消息",
+      "user_expected": "完成“删除消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "revokeMessage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-7F9FABD5B9C8",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "多选消息",
+      "trigger": "多选消息",
+      "user_expected": "完成“多选消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageMenuContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "revokeMessage"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-55EA77A9F140",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "聊天图片视频展示预览",
+      "trigger": "聊天图片视频展示预览",
+      "user_expected": "完成“聊天图片视频展示预览”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MediaMessageRender.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "currentControlledMediaCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "single image/file normal picker send, exact server acceptance and peer receive; image pixels/original preview and byte-exact file download",
+        "notCovered": "video, drag/paste, large files, cancel/retry, all progress states, external open/native Save As",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-95944C660C39",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "播放语音消息",
+      "trigger": "播放语音消息",
+      "user_expected": "完成“播放语音消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-26FCE27A9DB2",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "文件上传下载进度",
+      "trigger": "文件上传下载进度",
+      "user_expected": "完成“文件上传下载进度”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/FileMessageRenderer.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/chat/queryChat/MessageItem/",
+          "web/src/hooks/useMessageFileDownloadState.tsx",
+          "web/electron/main/downloadManage.ts",
+          "web/electron/security/attachmentExport.ts"
+        ],
+        "evidence": [
+          "docs/architecture/electron-native-live.json",
+          "docs/architecture/object-upload-recovery.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_native_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/electron-native-live.json",
+            "result": "actual product main/preload file:// login and system picker/cache bytes pass; first object PUT507, failed bubble and authority marker0; upload/download acceptance remains incomplete"
+          },
+          {
+            "source": "docs/architecture/electron-native-live.json",
+            "result": "Actual86B file picker/cache/upload/recovery/single authoritative commit; native peer download/restart/open/system save-dialog export equal; large files/media/cancel and otherOS pending"
+          }
+        ]
+      },
+      "currentControlledMediaCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "single image/file normal picker send, exact server acceptance and peer receive; image pixels/original preview and byte-exact file download",
+        "notCovered": "video, drag/paste, large files, cancel/retry, all progress states, external open/native Save As",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-DF9722A427F3",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "文件打开及另存",
+      "trigger": "文件打开及另存",
+      "user_expected": "完成“文件打开及另存”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/FileMessageRenderer.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/chat/queryChat/MessageItem/",
+          "web/src/hooks/useMessageFileDownloadState.tsx",
+          "web/electron/main/downloadManage.ts",
+          "web/electron/security/attachmentExport.ts"
+        ],
+        "evidence": [
+          "docs/architecture/electron-native-live.json",
+          "docs/architecture/object-upload-recovery.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_native_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/electron-native-live.json",
+            "result": "Actual86B file picker/cache/upload/recovery/single authoritative commit; native peer download/restart/open/system save-dialog export equal; large files/media/cancel and otherOS pending"
+          }
+        ]
+      },
+      "currentControlledMediaCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "single image/file normal picker send, exact server acceptance and peer receive; image pixels/original preview and byte-exact file download",
+        "notCovered": "video, drag/paste, large files, cancel/retry, all progress states, external open/native Save As",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-6A9B0254486C",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "位置消息展示及打开地图",
+      "trigger": "位置消息展示及打开地图",
+      "user_expected": "完成“位置消息展示及打开地图”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/LocationMessageRenderer.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-47FCD1FA4ECD",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "名片消息打开用户资料",
+      "trigger": "名片消息打开用户资料",
+      "user_expected": "完成“名片消息打开用户资料”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/CardMessageRenderer.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-31A02F2EF832",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "引用消息跳转原文",
+      "trigger": "引用消息跳转原文",
+      "user_expected": "完成“引用消息跳转原文”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/QuoteMessageRenderer.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-0DF5D5F79F0F",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "合并聊天记录预览",
+      "trigger": "合并聊天记录预览",
+      "user_expected": "完成“合并聊天记录预览”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MergeMessageRenderer.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-563927A77E7B",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "单聊已读回执",
+      "trigger": "单聊已读回执",
+      "user_expected": "完成“单聊已读回执”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageReadState.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "getGroupMessageReaderList",
+          "off",
+          "on"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "currentControlledSDKCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "new single-chat peerReadSeq matched actual sent seq",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-1CAA382693D3",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "消息发送中失败与重试",
+      "trigger": "消息发送中失败与重试",
+      "user_expected": "完成“消息发送中失败与重试”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MessageItem/MessageSuffix.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteMessage",
+          "fileMapSet"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "RealSuffix retry+sender/store: same-viewpolicydeny restoresFailed0send; actualobservedACK2 settlesaftermute; staleowner/nav latecallback0writes.",
+        "native_or_authenticated_browser": false
+      }
+    },
+    {
+      "id": "WEB-7C732539DF80",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "聊天消息定时销毁设置",
+      "trigger": "聊天消息定时销毁设置",
+      "user_expected": "完成“聊天消息定时销毁设置”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/MsgDestructSetting.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-1C7AB0CC6A52",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "单聊设置置顶免打扰",
+      "trigger": "单聊设置置顶免打扰",
+      "user_expected": "完成“单聊设置置顶免打扰”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/SingleSetting/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteFriend"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-FEA31CB5499F",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "清空单聊历史",
+      "trigger": "清空单聊历史",
+      "user_expected": "完成“清空单聊历史”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/SingleSetting/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteFriend"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_group_settings_regression": {
+        "state": "current4280_full625_types0_build47_pass",
+        "scope": "Clear-history original owner/nav confirmation and settlement; already-started original CID work follows existing wrapper",
+        "actualAnnouncementTargetPass": 22,
+        "actualSettingsTargetPass": 81,
+        "sourceDigest": "655e52345fa0ef0f0b971d7e2514d8b14a23360532b32fbd65ac1d4782be6f64",
+        "evidence": "../architecture/web-group-announcement-settings-actual-adoption-root-verification.json",
+        "limit": "No real history cleared; no claim that navigation cancels already-started clear.",
+        "full625": {
+          "pass": 625,
+          "fail": 0,
+          "skip": 0,
+          "files": 61
+        }
+      }
+    },
+    {
+      "id": "WEB-EBAC60721DA8",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "从单聊扩建群",
+      "trigger": "从单聊扩建群",
+      "user_expected": "完成“从单聊扩建群”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/SingleSetting/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteFriend"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-4A84337D2DF4",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "会话文本图片视频文件搜索",
+      "trigger": "会话文本图片视频文件搜索",
+      "user_expected": "完成“会话文本图片视频文件搜索”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/SearchMessageDrawer/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "entryAudit": {
+        "state": "confirmed_source_defect_fixed_focused_tests_passed_runtime_pending",
+        "findings": [
+          "ENTRY-WEB-SEARCH-CURSOR"
+        ],
+        "evidence": "docs/parity/web-admin-entry-findings.json",
+        "actualBrowserAcceptance": "pending"
+      }
+    },
+    {
+      "id": "WEB-C389B361FB65",
+      "platform": "browser_and_desktop",
+      "module": "chat",
+      "title": "未读消息位置及回到底部",
+      "trigger": "未读消息位置及回到底部",
+      "user_expected": "完成“未读消息位置及回到底部”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/UnreadMessageSlider.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-9FBC130CA936",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "群名称头像公告修改",
+      "trigger": "群名称头像公告修改",
+      "user_expected": "完成“群名称头像公告修改”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "uploadFile"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_group_settings_regression": {
+        "state": "current4280_full625_types0_build47_pass",
+        "scope": "Announcement draft/author owner, navigation and Drawer boundaries",
+        "actualAnnouncementTargetPass": 22,
+        "actualSettingsTargetPass": 81,
+        "sourceDigest": "655e52345fa0ef0f0b971d7e2514d8b14a23360532b32fbd65ac1d4782be6f64",
+        "evidence": "../architecture/web-group-announcement-settings-actual-adoption-root-verification.json",
+        "limit": "Name/avatar edits are not covered; avatar post-upload write is under separate repair.",
+        "full625": {
+          "pass": 625,
+          "fail": 0,
+          "skip": 0,
+          "files": 61
+        }
+      }
+    },
+    {
+      "id": "WEB-93B45A144CD8",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "我的群昵称修改",
+      "trigger": "我的群昵称修改",
+      "user_expected": "完成“我的群昵称修改”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "uploadFile"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-F5CB82B35C2F",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "群置顶免打扰",
+      "trigger": "群置顶免打扰",
+      "user_expected": "完成“群置顶免打扰”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "uploadFile"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-FC698C1F155D",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "退出解散群",
+      "trigger": "退出解散群",
+      "user_expected": "完成“退出解散群”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupSettings.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "uploadFile"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_group_settings_regression": {
+        "state": "current4280_full625_types0_build47_pass",
+        "scope": "Quit/dismiss original confirmation and latest role; closed Drawer retires old callbacks",
+        "actualAnnouncementTargetPass": 22,
+        "actualSettingsTargetPass": 81,
+        "sourceDigest": "655e52345fa0ef0f0b971d7e2514d8b14a23360532b32fbd65ac1d4782be6f64",
+        "evidence": "../architecture/web-group-announcement-settings-actual-adoption-root-verification.json",
+        "limit": "No real quit/dismiss or authenticated UI acceptance.",
+        "full625": {
+          "pass": 625,
+          "fail": 0,
+          "skip": 0,
+          "files": 61
+        }
+      }
+    },
+    {
+      "id": "WEB-E41429AEC57C",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "查看搜索群成员",
+      "trigger": "查看搜索群成员",
+      "user_expected": "完成“查看搜索群成员”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupMemberList.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "changeGroupMemberMute",
+          "kickGroupMember"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_group_management_regression": {
+        "state": "applied4274_component_hook_verified_full_ui_pending",
+        "source_digest": "e343051061fd883415b27d00c291eb3b5c7cf9465f66680f555f3df1cc8318c2",
+        "target_pass": 59,
+        "included_full_pass": 522,
+        "scope": "Realnormal/search memberrows with latestread/owner/nav/eventprovenance; nofabricatedarray[-1] fromunknownrow; joinedGroupItemnofakeUID.",
+        "evidence": "docs/architecture/web-member-owner-login-actual-adoption-root-verification.json",
+        "actual_native_group_actions": 0
+      }
+    },
+    {
+      "id": "WEB-0FF9C7718BB3",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "邀请移除群成员",
+      "trigger": "邀请移除群成员",
+      "user_expected": "完成“邀请移除群成员”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupMemberList.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "changeGroupMemberMute",
+          "kickGroupMember"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_group_management_regression": {
+        "state": "applied4274_component_hook_verified_full_ui_pending",
+        "source_digest": "e343051061fd883415b27d00c291eb3b5c7cf9465f66680f555f3df1cc8318c2",
+        "target_pass": 59,
+        "included_full_pass": 522,
+        "scope": "Removalonly: originalmember/group/owner+latestactor/targetroles andretainedconfirm gates; nativeSDKmock. Invitationnotthiscohort.",
+        "evidence": "docs/architecture/web-member-owner-login-actual-adoption-root-verification.json",
+        "actual_native_group_actions": 0
+      }
+    },
+    {
+      "id": "WEB-BD9DEA377AAA",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "设置管理员转让群主",
+      "trigger": "设置管理员转让群主",
+      "user_expected": "完成“设置管理员转让群主”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupMemberRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_group_management_regression": {
+        "state": "applied4274_component_hook_verified_full_ui_pending",
+        "source_digest": "e343051061fd883415b27d00c291eb3b5c7cf9465f66680f555f3df1cc8318c2",
+        "target_pass": 59,
+        "included_full_pass": 522,
+        "scope": "Administratorrole toggleonly: exactoriginalmember+latestgroupowner,selfrevision,targetfacts; notwholetransferflow.",
+        "evidence": "docs/architecture/web-member-owner-login-actual-adoption-root-verification.json",
+        "actual_native_group_actions": 0
+      }
+    },
+    {
+      "id": "WEB-5A996D9CB12E",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "群成员禁言及解除",
+      "trigger": "群成员禁言及解除",
+      "user_expected": "完成“群成员禁言及解除”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/GroupMemberRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "candidate_verification": {
+        "state": "applied4274_original20assertions_and_member59_in_full522",
+        "candidate_manifest": "references/integration/web-group-member-mute-ui-candidate/candidate-manifest.json",
+        "manifest_sha256": "187f528bf72221f99aa555bb05c0d515e7d86a3bc744c5346def551be89abe12",
+        "actual_before": {
+          "pass": 12,
+          "assert_fail": 8
+        },
+        "actual_after": {
+          "pass": 20,
+          "fail": 0
+        },
+        "scope": "Timestampms/localtimer+manualmutedSeconds payloadandrolevisibilityonly; mocks native SDK. Existingcrossownerconfirmation issue separatelyconfirmedinsource; no fullgroupmanagementsecurityclaim.",
+        "owner_finding": "docs/security/web-group-member-action-owner-source-finding.json",
+        "adoption_evidence": "docs/architecture/web-member-owner-login-actual-adoption-root-verification.json",
+        "actual_component_pass": 20
+      },
+      "current_group_management_regression": {
+        "state": "applied4274_component_hook_verified_full_ui_pending",
+        "source_digest": "e343051061fd883415b27d00c291eb3b5c7cf9465f66680f555f3df1cc8318c2",
+        "target_pass": 59,
+        "included_full_pass": 522,
+        "scope": "Original20ms/timer/manualseconds assertions+newimmutablemuteintent/latesttarget/dialog/role/owner/nav/activitychecks; mutedadminpositive.",
+        "evidence": "docs/architecture/web-member-owner-login-actual-adoption-root-verification.json",
+        "actual_native_group_actions": 0
+      }
+    },
+    {
+      "id": "WEB-CEE8BC3226E7",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "群成员资料查看与加好友权限",
+      "trigger": "群成员资料查看与加好友权限",
+      "user_expected": "完成“群成员资料查看与加好友权限”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/MemberPermissionSelectContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "current_group_management_regression": {
+        "state": "applied4274_component_hook_verified_full_ui_pending",
+        "source_digest": "e343051061fd883415b27d00c291eb3b5c7cf9465f66680f555f3df1cc8318c2",
+        "target_pass": 59,
+        "included_full_pass": 522,
+        "scope": "Memberprofile opening originalscope/group/actor+current lookMemberInfo localpolicy; noactualfriendrequest acceptance.",
+        "evidence": "docs/architecture/web-member-owner-login-actual-adoption-root-verification.json",
+        "actual_native_group_actions": 0
+      },
+      "current_group_settings_regression": {
+        "state": "current4280_full625_types0_build47_pass",
+        "scope": "Both group permission fields 0/1, latest admin/owner, active Drawer scope",
+        "actualAnnouncementTargetPass": 22,
+        "actualSettingsTargetPass": 81,
+        "sourceDigest": "655e52345fa0ef0f0b971d7e2514d8b14a23360532b32fbd65ac1d4782be6f64",
+        "evidence": "../architecture/web-group-announcement-settings-actual-adoption-root-verification.json",
+        "limit": "Real member profile/friend-add journeys require separate acceptance.",
+        "full625": {
+          "pass": 625,
+          "fail": 0,
+          "skip": 0,
+          "files": 61
+        }
+      }
+    },
+    {
+      "id": "WEB-833BD05EDCAD",
+      "platform": "browser_and_desktop",
+      "module": "group",
+      "title": "入群验证方式设置",
+      "trigger": "入群验证方式设置",
+      "user_expected": "完成“入群验证方式设置”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/GroupSetting/VerificationSelectContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-5E6951A53DAF",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "好友通讯录字母索引",
+      "trigger": "好友通讯录字母索引",
+      "user_expected": "完成“好友通讯录字母索引”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/contact/myFriends/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-164BD5A4C842",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "加入管理群列表",
+      "trigger": "加入管理群列表",
+      "user_expected": "完成“加入管理群列表”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/contact/myGroups/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-80D098603436",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "好友申请查询同意拒绝",
+      "trigger": "好友申请查询同意拒绝",
+      "user_expected": "完成“好友申请查询同意拒绝”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/contact/newFriends/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "acceptFriendApplication",
+          "refuseFriendApplication"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-7A051C9AE982",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "入群邀请申请同意拒绝",
+      "trigger": "入群邀请申请同意拒绝",
+      "user_expected": "完成“入群邀请申请同意拒绝”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/contact/groupNotifications/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "acceptGroupApplication",
+          "refuseGroupApplication"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-FCA5E8938EB0",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "用户资料发消息通话",
+      "trigger": "用户资料发消息通话",
+      "user_expected": "完成“用户资料发消息通话”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/UserCardModal/CardActionRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteFriend"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-BC0F2C1FC919",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "添加删除好友",
+      "trigger": "添加删除好友",
+      "user_expected": "完成“添加删除好友”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/UserCardModal/CardActionRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteFriend"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-9E8D950035DE",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "拉黑解除拉黑",
+      "trigger": "拉黑解除拉黑",
+      "user_expected": "完成“拉黑解除拉黑”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/UserCardModal/CardActionRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "deleteFriend"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-C1A314D172FC",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "发送好友申请与验证消息",
+      "trigger": "发送好友申请与验证消息",
+      "user_expected": "完成“发送好友申请与验证消息”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/UserCardModal/SendRequest.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-209EC01ACADF",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "个人头像昵称资料编辑",
+      "trigger": "个人头像昵称资料编辑",
+      "user_expected": "完成“个人头像昵称资料编辑”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/UserCardModal/EditSelfInfo.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-F4221431ED97",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "群资料查看申请入群",
+      "trigger": "群资料查看申请入群",
+      "user_expected": "完成“群资料查看申请入群”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/GroupCardModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-97E7020EAED5",
+      "platform": "browser_and_desktop",
+      "module": "contacts",
+      "title": "联系人群多选及转发确认",
+      "trigger": "联系人群多选及转发确认",
+      "user_expected": "完成“联系人群多选及转发确认”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/ChooseModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createCardMessage",
+          "createCustomMessage",
+          "createForwardMessage",
+          "createGroup",
+          "createMergerMessage",
+          "createTextMessage",
+          "inviteUserToGroup",
+          "kickGroupMember",
+          "transferGroupOwner",
+          "uploadFile"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "entryAudit": {
+        "state": "confirmed_source_defect_fixed_focused_tests_passed_runtime_pending",
+        "findings": [
+          "ENTRY-WEB-FORWARD-ACK"
+        ],
+        "evidence": "docs/parity/web-admin-entry-findings.json",
+        "actualBrowserAcceptance": "pending"
+      },
+      "current_send_intent_regression": {
+        "state": "applied_current4271_component_regression_verified_full_ui_pending",
+        "evidence": "docs/architecture/web-send-member-actual-adoption-root-verification.json",
+        "source_digest": "7f9ee5e5c19b09bf7ba4ec079bbc4b41e6ada2ac6ddb7e136c35c200a898cb30",
+        "target_after_pass": 48,
+        "included_full_pass": 483,
+        "scope": "RealChooseModal batch selected immutabletargets and sourcehistory; wholechooserUI/networkacceptance pending.",
+        "native_or_authenticated_browser": false
+      }
+    },
+    {
+      "id": "WEB-BCC2EEC8A1B6",
+      "platform": "browser_and_desktop",
+      "module": "search",
+      "title": "全局搜索好友群聊天记录文件",
+      "trigger": "全局搜索好友群聊天记录文件",
+      "user_expected": "完成“全局搜索好友群聊天记录文件”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/GlobalSearchModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "searchFriends",
+          "searchGroups",
+          "searchLocalMessages"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-F950A85D0F0B",
+      "platform": "browser_and_desktop",
+      "module": "moments",
+      "title": "朋友圈信息流分页",
+      "trigger": "朋友圈信息流分页",
+      "user_expected": "完成“朋友圈信息流分页”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MomentsModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "off",
+          "on"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/common/MomentsModal/"
+        ],
+        "evidence": [
+          "docs/architecture/web-moments-live.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_readonly_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-moments-live.json",
+            "result": "Actual main/preload/file:// feed, author, multiline full detail, existing one like/comment, notification AX and notification→detail; mutations and complete paging remain pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-A8309B9352C9",
+      "platform": "browser_and_desktop",
+      "module": "moments",
+      "title": "发布图文视频朋友圈",
+      "trigger": "发布图文视频朋友圈",
+      "user_expected": "完成“发布图文视频朋友圈”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MomentsModal/PublishModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-C56A9AAD14DD",
+      "platform": "browser_and_desktop",
+      "module": "moments",
+      "title": "动态可见范围与@提醒",
+      "trigger": "动态可见范围与@提醒",
+      "user_expected": "完成“动态可见范围与@提醒”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MomentsModal/PublishModal/PermissionSelect.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-959F1468047E",
+      "platform": "browser_and_desktop",
+      "module": "moments",
+      "title": "朋友圈点赞取消点赞",
+      "trigger": "朋友圈点赞取消点赞",
+      "user_expected": "完成“朋友圈点赞取消点赞”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MomentsModal/MomentsItemRender/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/common/MomentsModal/"
+        ],
+        "evidence": [
+          "docs/architecture/web-moments-live.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_readonly_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-moments-live.json",
+            "result": "Actual main/preload/file:// feed, author, multiline full detail, existing one like/comment, notification AX and notification→detail; mutations and complete paging remain pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-2CF8B4B67E91",
+      "platform": "browser_and_desktop",
+      "module": "moments",
+      "title": "评论回复删除动态评论",
+      "trigger": "评论回复删除动态评论",
+      "user_expected": "完成“评论回复删除动态评论”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MomentsModal/MomentsItemRender/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/common/MomentsModal/"
+        ],
+        "evidence": [
+          "docs/architecture/web-moments-live.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_readonly_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-moments-live.json",
+            "result": "Actual main/preload/file:// feed, author, multiline full detail, existing one like/comment, notification AX and notification→detail; mutations and complete paging remain pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-EFEC39AED5F3",
+      "platform": "browser_and_desktop",
+      "module": "moments",
+      "title": "朋友圈互动未读列表清空",
+      "trigger": "朋友圈互动未读列表清空",
+      "user_expected": "完成“朋友圈互动未读列表清空”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MomentsModal/MomentsHeader/MomentsMessageList.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/common/MomentsModal/"
+        ],
+        "evidence": [
+          "docs/architecture/web-moments-live.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_readonly_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-moments-live.json",
+            "result": "Actual main/preload/file:// feed, author, multiline full detail, existing one like/comment, notification AX and notification→detail; mutations and complete paging remain pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-D52948E53E5B",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "语音视频发起邀请",
+      "trigger": "语音视频发起邀请",
+      "user_expected": "完成“语音视频发起邀请”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/RtcCallModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-BA642F1555E3",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "接听拒绝取消挂断",
+      "trigger": "接听拒绝取消挂断",
+      "user_expected": "完成“接听拒绝取消挂断”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/RtcCallModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-538F719EA9C1",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "多端处理与超时",
+      "trigger": "多端处理与超时",
+      "user_expected": "完成“多端处理与超时”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/RtcCallModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-5FA72D3CD051",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "群通话加入",
+      "trigger": "群通话加入",
+      "user_expected": "完成“群通话加入”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/RtcCallModal/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-97CCD0F81725",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "通话麦克风扬声器摄像头控制",
+      "trigger": "通话麦克风扬声器摄像头控制",
+      "user_expected": "完成“通话麦克风扬声器摄像头控制”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/RtcCallModal/RtcControl.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createCustomMessage",
+          "off",
+          "on",
+          "signalingCancel",
+          "signalingHungUp"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-4243C74310FA",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "通话屏幕共享",
+      "trigger": "通话屏幕共享",
+      "user_expected": "完成“通话屏幕共享”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/RtcCallModal/RtcControl.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "createCustomMessage",
+          "off",
+          "on",
+          "signalingCancel",
+          "signalingHungUp"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-299B2AA23CAC",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "预约快速创建会议",
+      "trigger": "预约快速创建会议",
+      "user_expected": "完成“预约快速创建会议”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MeetingManageModal/OrderOrJoinMeeting.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "signalingUpdateMeetingInfo"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-0E2ABB448944",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "按会议号加入",
+      "trigger": "按会议号加入",
+      "user_expected": "完成“按会议号加入”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MeetingManageModal/OrderOrJoinMeeting.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "signalingUpdateMeetingInfo"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-68D3661E0765",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "会议列表详情与邀请",
+      "trigger": "会议列表详情与邀请",
+      "user_expected": "完成“会议列表详情与邀请”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MeetingManageModal/MeetingDisplay.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      },
+      "entryAudit": {
+        "state": "confirmed_source_defect_fixed_focused_tests_passed_runtime_pending",
+        "findings": [
+          "ENTRY-WEB-FORWARD-ACK"
+        ],
+        "evidence": "docs/parity/web-admin-entry-findings.json",
+        "actualBrowserAcceptance": "pending"
+      }
+    },
+    {
+      "id": "WEB-73C9DAE44F65",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "会议静音视频屏幕共享",
+      "trigger": "会议静音视频屏幕共享",
+      "user_expected": "完成“会议静音视频屏幕共享”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MeetingModal/MeetingMain/MeetingActionRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "off",
+          "on",
+          "signalingUpdateMeetingInfo"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-D95A9FEFA221",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "会议成员主持人管理",
+      "trigger": "会议成员主持人管理",
+      "user_expected": "完成“会议成员主持人管理”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MeetingModal/MeetingMain/MeetingActionRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "off",
+          "on",
+          "signalingUpdateMeetingInfo"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-5763632E970C",
+      "platform": "browser_and_desktop",
+      "module": "rtc",
+      "title": "离开结束会议",
+      "trigger": "离开结束会议",
+      "user_expected": "完成“离开结束会议”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/MeetingModal/MeetingMain/MeetingActionRow.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "off",
+          "on",
+          "signalingUpdateMeetingInfo"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-60F7946DD771",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "个人消息提示音振动设置",
+      "trigger": "个人消息提示音振动设置",
+      "user_expected": "完成“个人消息提示音振动设置”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/personalSettings/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-038AE1FE4CBA",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "全局免打扰",
+      "trigger": "全局免打扰",
+      "user_expected": "完成“全局免打扰”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/personalSettings/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-86B36ACB1AB8",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "允许他人添加好友",
+      "trigger": "允许他人添加好友",
+      "user_expected": "完成“允许他人添加好友”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/personalSettings/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-BE65A060AB35",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "语言设置",
+      "trigger": "语言设置",
+      "user_expected": "完成“语言设置”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/personalSettings/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-F8093E30C236",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "退出登录",
+      "trigger": "退出登录",
+      "user_expected": "完成“退出登录”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/personalSettings/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_real_service_partial_verified",
+        "paths": [
+          "web/src/core/session/logout.ts"
+        ],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "partial_real_service_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-logout-live.json",
+            "result": "real Web exact logoutPOST200→local credentials cleared→new document/login; independent HTTP authority proves target dual revocation and other session retained"
+          }
+        ]
+      },
+      "currentControlledSDKCheckpoint": {
+        "state": "scoped_actual_browser_PASS",
+        "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+        "covered": "both actual normal UI logout and platform5 offline after scoped flow",
+        "fullFeatureAcceptance": false
+      }
+    },
+    {
+      "id": "WEB-0EC1B8305317",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "修改当前账号密码",
+      "trigger": "修改当前账号密码",
+      "user_expected": "完成“修改当前账号密码”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/changePassword/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-BBE7B17D0BA5",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "黑名单列表与移除",
+      "trigger": "黑名单列表与移除",
+      "user_expected": "完成“黑名单列表与移除”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/blackList/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/store/contact.ts",
+          "web/src/layout/LeftNavBar/BlackList.tsx",
+          "web/src/core/session/desktopBridge.ts",
+          "web/electron/main/sessionBridge.ts"
+        ],
+        "evidence": [
+          "docs/architecture/web-group-blacklist-actual-adoption-root-verification.json",
+          "docs/security/web-blacklist-read-state-actual-independent-review.json"
+        ]
+      },
+      "acceptance": {
+        "status": "component_pass_browser_native_pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/web-group-blacklist-actual-adoption-root-verification.json",
+            "source_digest": "9e4a79a8971361731eeefc6f2faae0b87a76db40a652ff718a2e93ec0cd9a7ef",
+            "result": "Actual43 targetPASS included currentfull420; loading/error/retry/confirmedempty/normalremove+owner guards andrealmain-renderer classes under mockednative. No actualauthenticatedblacklistbrowser/native orservermutation acceptance."
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-5559EAE183D6",
+      "platform": "browser_and_desktop",
+      "module": "account",
+      "title": "关于品牌版本与诊断",
+      "trigger": "关于品牌版本与诊断",
+      "user_expected": "完成“关于品牌版本与诊断”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/third/about/index.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": []
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-E61D0F3895C8",
+      "platform": "desktop_only",
+      "module": "desktop",
+      "title": "桌面自动检查下载安装更新",
+      "trigger": "桌面自动检查下载安装更新",
+      "user_expected": "完成“桌面自动检查下载安装更新”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/layout/useAutoUpdate.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": [
+          "docs/architecture/web-verification.json: desktop hardening; source restored; native operation still pending"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e",
+          "desktop_runtime"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-FE0589FBBEAE",
+      "platform": "desktop_only",
+      "module": "desktop",
+      "title": "桌面截图隐藏主窗口与截图发送",
+      "trigger": "桌面截图隐藏主窗口与截图发送",
+      "user_expected": "完成“桌面截图隐藏主窗口与截图发送”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/chat/queryChat/ChatFooter/SendActionBar/CutPopContent.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": [
+          "docs/architecture/web-verification.json: desktop hardening; source restored; native operation still pending"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e",
+          "desktop_runtime"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    },
+    {
+      "id": "WEB-CD4BA6E7ED6B",
+      "platform": "desktop_only",
+      "module": "desktop",
+      "title": "桌面文件所在目录与本地缓存",
+      "trigger": "桌面文件所在目录与本地缓存",
+      "user_expected": "完成“桌面文件所在目录与本地缓存”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/pages/common/GlobalSearchModal/ViewFileInFinder.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/chat/queryChat/MessageItem/",
+          "web/src/hooks/useMessageFileDownloadState.tsx",
+          "web/electron/main/downloadManage.ts",
+          "web/electron/security/attachmentExport.ts"
+        ],
+        "evidence": [
+          "docs/architecture/electron-native-live.json",
+          "docs/architecture/object-upload-recovery.json"
+        ]
+      },
+      "acceptance": {
+        "status": "partial_actual_native_verified",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e",
+          "desktop_runtime"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": [
+          {
+            "source": "docs/architecture/electron-native-live.json",
+            "result": "actual product main/preload file:// login and system picker/cache bytes pass; first object PUT507, failed bubble and authority marker0; upload/download acceptance remains incomplete"
+          },
+          {
+            "source": "docs/architecture/electron-native-live.json",
+            "result": "Actual86B file picker/cache/upload/recovery/single authoritative commit; native peer download/restart/open/system save-dialog export equal; large files/media/cancel and otherOS pending"
+          }
+        ]
+      }
+    },
+    {
+      "id": "WEB-E8A795CBD871",
+      "platform": "desktop_only",
+      "module": "desktop",
+      "title": "桌面下载取消进度及子窗口同步",
+      "trigger": "桌面下载取消进度及子窗口同步",
+      "user_expected": "完成“桌面下载取消进度及子窗口同步”并在刷新/重新进入后保持结果一致。",
+      "source": [
+        {
+          "root": "references/web-more",
+          "path": "src/layout/useGlobalEvents.tsx",
+          "line": 1
+        }
+      ],
+      "dependencies": {
+        "sdk_methods_in_file": [
+          "getOneConversation",
+          "login",
+          "off",
+          "on",
+          "setMessageLocalEx"
+        ],
+        "http": "see web-source-evidence.json API exports and source"
+      },
+      "legacy_status": "source_present",
+      "implementation": {
+        "status": "not_verified",
+        "paths": [],
+        "evidence": [
+          "docs/architecture/web-verification.json: desktop hardening; source restored; native operation still pending"
+        ]
+      },
+      "acceptance": {
+        "status": "pending",
+        "test_levels": [
+          "unit",
+          "component",
+          "browser_e2e",
+          "desktop_runtime"
+        ],
+        "required_cases": [
+          "正常/加载/空/错误/断线/权限拒绝状态可操作",
+          "按租户和账号隔离数据与事件",
+          "不能用toast成功替代实际API受理或媒体连接",
+          "角色/资源权限由服务端校验"
+        ],
+        "evidence": []
+      }
+    }
+  ],
+  "real_service_evidence": "docs/architecture/web-live-integration.json",
+  "real_service_follow_up": [
+    "docs/architecture/web-cross-tenant-live.json",
+    "docs/architecture/web-logout-live.json",
+    "docs/architecture/electron-native-live.json",
+    "docs/verification/exact-logout-http-probe.json",
+    "docs/architecture/web-moments-live.json"
+  ],
+  "sourceEntryInventory": {
+    "path": "docs/parity/web-admin-entry-audit.json",
+    "manualFindings": "docs/parity/web-admin-entry-findings.json",
+    "state": "module_inventory_and_manual_defects_runtime_acceptance_unchanged"
+  },
+  "latest_defensive_privacy_evidence": {
+    "implementation": "docs/architecture/web-message-privacy.json",
+    "unitAndTypecheck": "142 tests/30files and tsc0; frozen source",
+    "componentBrowser": "docs/architecture/web-privacy-component-browser.json",
+    "registrationPending500": "docs/architecture/frontend-privacy-browser-live.json",
+    "actualWasmAcceptance": "pending; no privacy real chat/search/forward attempted in this round",
+    "all107Accepted": false,
+    "componentBrowserSupplement": "docs/architecture/web-privacy-component-browser-v2.json"
+  },
+  "last_evidence_update_utc": "2026-10-17T07:47:37.714647+00:00",
+  "latest_update_scope": "scoped actual browser image/file+preview/download and config ordering new4/strict/bundle; full107 not closed",
+  "controlledSDKPrivateMessageCheckpoint": {
+    "state": "actual_both_countdown_expiry_and_reentry_PASS",
+    "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+    "oldConsumedIntentsReplayed": false,
+    "mediaAcceptance": "scoped image/file browser PASS; all media variants pending",
+    "fullRegression": false
+  },
+  "controlledConfigPublicationCheckpoint": {
+    "state": "new4_strict_bundle_and_current_login_config_PASS",
+    "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",
+    "oldActualWarningRootCauseProven": false,
+    "fullFeatureAcceptance": false
+  }
+}

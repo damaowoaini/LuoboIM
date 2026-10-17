@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "product": "萝卜对话",
+  "atUTC": "2026-10-17T07:47:37.714647+00:00",
+  "scope": "controlled SDK actual normal/private messaging plus image/file picker and receiver preview/download",
+  "initializationFix": "Forward validated local development opt-in and stop login unless Go InitSDK returns exactly [true]. Production keeps HTTPS/WSS requirements.",
+  "localChecks": {
+    "new": 5,
+    "directlyAffected": 1,
+    "strictWeb": true,
+    "singleBundle": true
+  },
+  "actualBrowser": {
+    "newIsolatedOrigins": true,
+    "passwordLoginBoth": true,
+    "normalSendOnceBothRowsAndRead": true,
+    "privateSendOnceBothCountdownAndExpiredBodyAbsent": true,
+    "reenterBothPrivateBodyStillAbsent": true,
+    "settingsRestored": true,
+    "bothLoggedOut": true,
+    "temporaryTabsAndServersClosed": true
+  },
+  "core": {
+    "WASM_SHA256": "43a4a8929e01415ec9c03b6297137878c7ddab0fe03da31a90d686016396cea7",
+    "shim_SHA256": "0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14",
+    "SDKFilesPinned": 8,
+    "unchangedValidChecksReused": [
+      "actual startup ABI145",
+      "own-read-time2top17sub",
+      "wrapper6top3sub",
+      "fallback SQL/IDB22"
+    ]
+  },
+  "notAcceptedHere": [
+    "video/large media/cancel/retry/drag/paste and all media variants",
+    "sendMessageByBuffer semantic API",
+    "all registration and authentication variants",
+    "all Web107 workflows",
+    "native Android/Apple application",
+    "new backend deployment",
+    "full project regression"
+  ],
+  "fullRegression": false,
+  "localRootReceipt": ".qa/web-controlled-fresh-ui-r5-1/root-acceptance.json",
+  "initialProductCommit": "6056ad6e93ced83f8a0e646fc475f4c5bd52198c",
+  "media": {
+    "ACKSingleLayerDecode": "actual modern/legacy worker envelope validated across three facades",
+    "newNodeControlPassed": 1,
+    "offlineInstallAndIdempotentVerify": true,
+    "singleBundleFiles": 47,
+    "imageSendOnceBothRowsReadServerCount1": true,
+    "fileSendOnceBothRowsReadServerCount1": true,
+    "peerActualImage40x40AndOriginalPreview": true,
+    "fileDownloadBytes": 35149,
+    "downloadMatchesOriginalSHA256": true,
+    "bothLogoutOfflineSettingsUnchanged": true,
+    "oldIntentsReplayed": false,
+    "rootReceipt": ".qa/web-controlled-media-ack-r3-1/root-acceptance.json",
+    "current7778Updated": true
+  },
+  "mediaAndInitPublicCommit": "fb5ab0ab989a3641b935f37236cd73b3e8a36331",
+  "configurationPublication": {
+    "sourceRace": "older same-generation response could overwrite newer config success or failure",
+    "fix": "monotonic request ticket plus original issuer and session generation before both success/error publication",
+    "newTestsPassed": 4,
+    "strictWebPASS": true,
+    "singleBundleFiles": 47,
+    "sourceCount": 646,
+    "sourceManifestSHA256": "543fa378d5e4fffffa48eec38c23a6824d8f6beb7576bf417982f4db6fe3f383",
+    "candidateSHA256": "b129e84dff7c29e8be5798eab2d6060bad6d571226b06b130ca0c6b9bc16aa35",
+    "current7778Updated": true,
+    "actualConfigHTTP": 200,
+    "actualConfigErrCode": 0,
+    "reloadedLoginWarningAbsent": true,
+    "historicalUserWarningRootCauseProven": false,
+    "rootReceipt": ".qa/web-app-config-request-scope-new4-types-bundle-1/root-acceptance.json"
+  }
+}

@@ -1,5 +1,6 @@
 import { StaleSessionError } from "@/core/session/session";
 import { sessionCoordinator } from "@/core/session/browser";
+import { getRouteUrl } from "@/core/session/route";
 import { createSessionLogout, revokeCurrentSession } from "@/core/session/logout";
 import { t } from "i18next";
 import { create } from "zustand";
@@ -19,6 +20,9 @@ import { clearIMProfile, getLocale, setImageCache, setLocale } from "@/utils/sto
 import { useContactStore } from "./contact";
 import { useConversationStore } from "./conversation";
 import { AppConfig, AppSettings, UserStore } from "./type";
+
+// Shared across calls, including automatic hydration and explicit retry.
+let appConfigRequestTicket = 0;
 
 export const useUserStore = create<UserStore>()((set, get) => ({
   selfInfo: {} as BusinessUserInfo,
@@ -48,12 +52,17 @@ export const useUserStore = create<UserStore>()((set, get) => ({
     set((state) => ({ selfInfo: { ...state.selfInfo, ...info } }));
   },
   getAppConfigByReq: async () => {
+    const ticket = ++appConfigRequestTicket;
+    const issuer = getRouteUrl(), generation = sessionCoordinator.generation;
+    const current = () => ticket === appConfigRequestTicket &&
+      issuer === getRouteUrl() && generation === sessionCoordinator.generation;
     set({appConfigStatus:"loading"});
     try {
       const { data } = await getAppConfig();
+      if (!current()) return;
       set({appConfig:data.config ?? {} as AppConfig,appConfigStatus:"ready"});
     } catch (error) {
-      if (error instanceof StaleSessionError) return;
+      if (!current() || error instanceof StaleSessionError) return;
       set({appConfigStatus:"error"});
     }
   },

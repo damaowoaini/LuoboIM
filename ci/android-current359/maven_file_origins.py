@@ -259,7 +259,8 @@ class PublishedFiles:
         entry = files[0]
         relative_url = entry.get('url')
         if (not isinstance(relative_url, str) or not relative_url or relative_url in ('.', '..')
-                or type(entry.get('size')) is not int or entry['size'] != size):
+                or (acquisition is None or 'size' in entry)
+                and (type(entry.get('size')) is not int or entry['size'] != size)):
             raise ValueError('published file URL or size differs')
         if re.fullmatch(r'[A-Za-z0-9_.+\-]+', relative_url):
             url = repository + _suffix(coordinate, relative_url)
@@ -280,19 +281,30 @@ class PublishedFiles:
             raise ValueError('production published file URL must retain its original contract')
         if url not in self.downloads:
             raise ValueError('actual published artifact download missing')
-        strong = False
-        for name in ('sha256', 'sha512'):
-            expected = entry.get(name)
-            if expected is None:
-                continue
-            if not isinstance(expected, str) or not re.fullmatch('[0-9a-f]{' + str(hashlib.new(name).digest_size * 2) + '}', expected):
-                raise ValueError('strong published file hash malformed')
-            actual = digest if name == 'sha256' else _hash(path, name)
-            if actual != expected:
-                raise ValueError('published file strong hash differs')
-            strong = True
-        if not strong:
-            raise ValueError('strong published file hash required')
+        acquired_target = None
+        if acquisition is None:
+            # Existing production-consumed admission is unchanged.
+            strong = False
+            for name in ('sha256', 'sha512'):
+                expected = entry.get(name)
+                if expected is None:
+                    continue
+                if not isinstance(expected, str) or not re.fullmatch('[0-9a-f]{' + str(hashlib.new(name).digest_size * 2) + '}', expected):
+                    raise ValueError('strong published file hash malformed')
+                actual = digest if name == 'sha256' else _hash(path, name)
+                if actual != expected:
+                    raise ValueError('published file strong hash differs')
+                strong = True
+            if not strong:
+                raise ValueError('strong published file hash required')
+        else:
+            # Gradle's actual typed XML already binds this artifact and module
+            # by SHA256. Missing publisher fields are recorded as missing.
+            provided = {name: entry[name] for name in ('sha256', 'sha512', 'sha1', 'md5') if name in entry}
+            for name, expected in provided.items():
+                if not isinstance(expected, str) or not re.fullmatch('[0-9a-f]{' + str(hashlib.new(name).digest_size * 2) + '}', expected):
+                    raise ValueError('published acquired file hash malformed')
+            acquired_target = _acquired_target(path, self.work, size, digest, provided)
         result = {'resolved_report_sha256': self.report_sha, 'resolved_coordinate': ':'.join(coordinate),
                        'cached_filename': filename, 'published_relative_url': relative_url,
                        'metadata': proofs, 'target_bytes': size, 'target_sha256': digest,
@@ -304,7 +316,39 @@ class PublishedFiles:
             result['acquisition_identity'] = acquisition
             result['resolved_report_matching_rows'] = 0
             result['not_a_production_consumed_component_grant'] = True
+            result['acquired_target'] = acquired_target
+            result['publisher_size_present'] = 'size' in entry
+            result['publisher_hashes_present_and_checked'] = sorted(provided)
+            result['strong_body_identity_source'] = 'actual Gradle acquisition XML SHA256 plus stable target FD'
         return [url], result
+
+
+def _acquired_target(path, work, size, digest, publisher_hashes):
+    """Recheck acquisition bytes once, bounded by the already observed size."""
+    if path.resolve(strict=True) != path or not path.is_relative_to(work):
+        raise ValueError('canonical acquired target required')
+    hashes = {name: hashlib.new(name) for name in {'sha256', *publisher_hashes}}
+    fields = lambda s: (s.st_dev, s.st_ino, s.st_mode, s.st_uid, s.st_nlink,
+                        s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+    with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as stream:
+        before = os.fstat(stream.fileno())
+        if (not stat.S_ISREG(before.st_mode) or before.st_uid != os.getuid()
+                or before.st_nlink != 1 or before.st_size != size or size < 0):
+            raise ValueError('owned acquired target size differs')
+        total = 0
+        while block := stream.read(min(65536, size + 1 - total)):
+            total += len(block)
+            if total > size: raise ValueError('acquired target grew during read')
+            for h in hashes.values(): h.update(block)
+        after = os.fstat(stream.fileno())
+    if (fields(before) != fields(after) or fields(after) != fields(path.lstat())
+            or path.resolve(strict=True) != path or total != size
+            or hashes['sha256'].hexdigest() != digest):
+        raise ValueError('acquired target changed after XML binding')
+    if any(hashes[name].hexdigest() != expected for name, expected in publisher_hashes.items()):
+        raise ValueError('published acquired file hash differs')
+    return {'bytes': total, 'sha256': hashes['sha256'].hexdigest(), 'stableFD': True,
+            'observed_size_limit_enforced': True, 'publisher_fields_synthesized': False}
 
 
 def _hash(path, name='sha256'):
