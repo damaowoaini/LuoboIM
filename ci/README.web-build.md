@@ -33,3 +33,25 @@ Root reported new8, affected logout2 and Web strict types passed; this candidate
 Only `web4308-build-only-v2` is accepted now, with digest `64461c97a9402dae4328c583b7200160015f0ce0da90ec0c8c0b106eba9ba9e9`. The earlier4308-v1/7237031f source and accepted local bundle remain separate historical evidence at b551773. Only the two existing privacy source/test bodies from e4db439d are replaced; no authored path, package lock, SDK patch, public13/WASM, CSP, parser or resource/network rule changes. V1 is rejected rather than silently mapped to V2.
 
 This candidate is source-only. The four appended privacy cases plus two directly affected old cases and strict Web types passed in Root's independent local window; seven unselected old cases were not rerun. Those accepted results are reused; neither old loopback8/types/build nor any full796 is requested again. Any actual new bundle is a single controlled local build decided by Root. This future manual build-only option does not schedule a duplicate cloud run or accept browser/business behavior.
+
+## Source4315 read-receipt/UI R2 successor (prepared only)
+
+The explicit build identity is `web4315-build-only-v1` with4315 source digest `3220978766ab7c05000cfec711423d9cb3a8518c1e802b7faf4f8921660995f2`. The current4308v2 vector receives six existing-product replacements, three new products and four normal test/fixture files (original8 unchanged, new UI4). Historical4308 evidence and unexecuted4312 preparation are not a4315 bundle. Node/npm/SDK/public13/CSP, real build network/resource/output/failed-capture contracts remain unchanged. Only the descriptor helper is affected; its check is prepared, not executed. Full808/types/targeted12+3 and bundle remain unrun here; no automatic build or deployment is added.
+
+## Source4315 fixture-only v2 successor (prepared, unbuilt)
+
+`web4315-build-only-v2` requires digest `886fc3d49d0add957c595d5e12de1802cb3720190d2c0c03e5afc8431e331ebc` and changes only the receipt test's post-clear arrangement. All9 product bodies, source count4315, public13/SDK/CSP and resource/network contracts are unchanged. The prior4315v1 cohort cannot build this source. No prior build is relabelled; no build, type check, full808 or repeat of14 passing selected cases ran here.
+
+## Source4315 type-only v3 successor (prepared, unbuilt)
+
+`web4315-build-only-v3` requires digest `ca7cca7adfcc0ab2e66f15b58c080cc1e3c212233fa866d7277847856fb2f026`. Exactly two source rows change: test component typing and the hook's explicit undefined ref/safe state narrowing. Source count4315, public13/SDK/CSP, all test names/assertions and every resource/network gate are unchanged. Prior v1/v2 descriptors are historical; no build/type pass is inferred from the reused15 targeted cases. The failed strict check alone remains next.
+
+## Source4316 live-read successor (prepared, unbuilt)
+
+`web4316-build-only-v1` requires4316 digest `5d9912e4272b313e953ae2c77ea6f6ad713da43ecc4691f9d99f3a86279fb4be`. Only two production rows change and one new hook suite is added. The4315 actual bundle remains historical and cannot prove these bytes. All Node/npm/SDK/public13/CSP/resource/network gates remain. Targeted3new+3affected and final full811 are prepared, not run here; no duplicate prior15/full/build is requested by source preparation.
+
+### Source4316 ACK-aware v2 correction (prepared)
+
+Only `web4316-build-only-v2` with digest `5b6f98ffb156f5b7dcb4a74ff3417c3324c83865406a2fa6b5fda76a23d7b945` describes the final ACK-aware admission. The prior unexecuted R5 v1 source is immutable. Source count, names, original811 expected-only full and all build/SDK/CSP/resource limits remain. No test/type/build ran here.
+
+Final completion snapshot source requires `web4316-build-only-v3` / `245588d7977b71c86d1b33835dfbeef9d42b21a618267769895f1d3645d08780`. Earlier unexecuted admission-only sources remain immutable; no new build or test is claimed.

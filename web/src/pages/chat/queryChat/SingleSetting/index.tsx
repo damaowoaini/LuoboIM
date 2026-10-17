@@ -173,7 +173,7 @@ const SingleSetting: ForwardRefRenderFunction<OverlayVisibleHandle, unknown> = (
         >
           <div className="flex items-center">
             <span className="mr-1 text-xs text-[var(--sub-text)]">
-              {burnDurationMap[currentConversation?.burnDuration ?? 30]}
+              {burnDurationMap[currentConversation?.burnDuration === 0 ? 30 : currentConversation?.burnDuration ?? 30]}
             </span>
             <RightOutlined rev={undefined} />
           </div>

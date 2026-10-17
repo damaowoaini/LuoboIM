@@ -65,6 +65,30 @@ export function webCohort(value = "full-regression") {
   return value;
 }
 
+export function readReceiptExpiryInputs(adoption) {
+  assert(adoption?.originManifestSHA256 === "53e4d951431a9a2aad085783817577119408687210c58eac1309cbd8f18d5e2d" && adoption.uiSuccessorRevision === "read-time-barrier-r2" && adoption.supersedesNormalCIManifestSHA256 === "06c7e362dc03f1a36038052519e35e9d22c0ef3146b9f16b290719b8744c61c1", "Reviewed read-receipt expiry R2 lineage required");
+  const before = [{"path":"web/src/core/messagePrivacyRuntime.ts","bytes":3597,"sha256":"90e02b9e841393c2f4f5cda67ff5f6d90570e3fb846e3f7b9c2770d3d162b193"},{"path":"web/src/pages/chat/queryChat/MessageItem/index.tsx","bytes":12110,"sha256":"f6ff9fd4c6b0c3334ececd31450ad01d449560427c754245c687946bf10fd372"},{"path":"web/src/pages/chat/queryChat/SingleSetting/index.tsx","bytes":13140,"sha256":"f68b80fb2a41ede12ee0db3d5d6e69330037ffb9708f7c7746f62d21ca96ae5c"},{"path":"web/src/pages/chat/queryChat/index.tsx","bytes":3919,"sha256":"b06174b10c41cd1e362d2e516a2f386a59f547acbb017cd57571f8cf576c0a10"},{"path":"web/src/pages/chat/queryChat/useConversationState.ts","bytes":4041,"sha256":"62575e5e93f435c87b2f24194501ff79c68da760a585898b282a6387ccac4aef"},{"path":"web/src/pages/chat/queryChat/useMessageReceipt.ts","bytes":2430,"sha256":"38cf319765cf22ca575e5d29f29da15c6d44cd089a1da357eaa7c818237f4b13"}];
+  const current = [{"path":"web/src/core/messagePrivacyRuntime.ts","bytes":4733,"sha256":"30b8715650c716a850e0a6bb87ecee7df141d7be0d6d53ae3165efa1d20d8a38"},{"path":"web/src/core/messageReadBarrier.ts","bytes":2305,"sha256":"64875db9d9249f78d04d1d0622ae7d8a92f392d9a5bb8392a672072310be7cfa"},{"path":"web/src/core/messageReadReceipt.ts","bytes":13071,"sha256":"7f13a1f7c7f0f6858536d48c8dc02eff6bff547265eae41a20798443048ac2db"},{"path":"web/src/pages/chat/queryChat/MessageItem/index.tsx","bytes":12396,"sha256":"f3a744d43ec365d9e1a5cc8134065861c62091d50e8d57927780c2e8f00f5bdd"},{"path":"web/src/pages/chat/queryChat/ReadSyncStatus.tsx","bytes":1924,"sha256":"51b2ced626577765ea2017cf32d12f91ad87987f83d54cee5aa02ac756344691"},{"path":"web/src/pages/chat/queryChat/SingleSetting/index.tsx","bytes":13187,"sha256":"0f54d79c5753ae441f0bb7d5b29d49f710b61fee30d1ebdd2eef07e17f1c506a"},{"path":"web/src/pages/chat/queryChat/index.tsx","bytes":4197,"sha256":"0501647e1ccb927a42e426bda500f2a21536dc9920f5fee546eced83109757c7"},{"path":"web/src/pages/chat/queryChat/useConversationState.ts","bytes":9553,"sha256":"b02c919dff26e53a73dc91dd0b9d4b0ba28e6cca74938cc4eb87083666bc15a9"},{"path":"web/src/pages/chat/queryChat/useMessageReceipt.ts","bytes":2177,"sha256":"76943dcf669079d32896a49e735aebfec8773ca8be4ccda7af9cd65129402e93"}];
+  const adopted = [{"path":"web/src/core/messageReadReceipt/harness.ts","bytes":5436,"sha256":"d8cf3d29b7de771a01ac327fe8e83da06e10677d3e5d2239e9c032a6bc0f5ff3"},{"path":"web/src/core/messageReadReceipt/read-receipt-hooks.test.tsx","bytes":9678,"sha256":"8941ad682d21a105d744761c4b3f023217896a8616f57054bc707b6745ee51c9"},{"path":"web/src/core/messageReadReceipt/zero-duration.test.tsx","bytes":2745,"sha256":"e708e54915291174b190d377b88373c9e35dff0676ce5b9efca45ce717828e64"},{"path":"web/src/core/messageReadReceipt/read-sync-ui.test.tsx","bytes":7717,"sha256":"e554c1933d473428df150ac21432fd3012ffd15b63ab07195610c3d45b728492"},{"path":"web/src/core/messageReadReceipt/live-read-admission.test.tsx","bytes":5259,"sha256":"e4ef2b921f9aaf47005ff7f8172a65980bf3693759560cbf1bd65e6ad8d0dd70"}];
+  assert(JSON.stringify(adoption.before) === JSON.stringify(before) && JSON.stringify(adoption.currentAfter) === JSON.stringify(current) && JSON.stringify(adoption.adoptedTests) === JSON.stringify(adopted), "Exact read-receipt product and normal test/fixture lineage required");
+  assert(JSON.stringify(adoption.testPaths) === JSON.stringify(["src/core/messageReadReceipt/read-receipt-hooks.test.tsx","src/core/messageReadReceipt/zero-duration.test.tsx","src/core/messageReadReceipt/read-sync-ui.test.tsx","src/core/messageReadReceipt/live-read-admission.test.tsx"]), "Exact normal read-receipt test paths required");
+  assert(adoption.newTests === 15 && adoption.requiredNames?.length === 15 && new Set(adoption.requiredNames).size === 15 && hash(Buffer.from(JSON.stringify(adoption.requiredNames))) === "b268e741877f020f789f0e6d443b92e6e485ce6f27dfa0e5b1fd86b5c0fc1cab", "Exact15 read-receipt names required");
+  assert(JSON.stringify(adoption.normalInputs) === JSON.stringify([{"path":"web/vitest.config.mts","bytes":430,"sha256":"8b51040e3c72c6d53f5247f8c70522866cb763c8311dd42912dcb913eca9ee62"},{"path":"web/tsconfig.json","bytes":758,"sha256":"d2c545c69816fe22cfdf11f25a3a7a01ce3e99f69a93e0a6a2e25bab47a3c92d"},{"path":"web/tsconfig.desktop.json","bytes":158,"sha256":"3897e9726f17e81d163e1d38c72f2237f510d7defbdba160d65210bbf51a355f"}]) && JSON.stringify(adoption.directAffectedInputs) === JSON.stringify([{"path":"web/src/core/currentGroupState/current-group-hook.test.tsx","bytes":10066,"sha256":"8883e84e4aa6168a848de6908e6ba7c62d74b608031a1d64304b105844688c78"},{"path":"web/src/core/currentGroupState/harness.ts","bytes":4731,"sha256":"9fe7b48b9ae913da969895087a04c3abcd0a1a5228a8bd879dec7539297a9c7e"}]), "Unchanged normal config/types and affected3 source context required");
+  assert(adoption.previousExpectedFullTests === 796 && adoption.expectedFullTests === 811 && adoption.focusedManualModeAdded === false, "Explicit796+15 expected-only lineage required");
+  assert(adoption.liveIncomingAdmission?.parentR4ManifestSHA256 === "42da00f60d3c1e6c68b46513134b8e0785ac91b1530d3a70e77796f3227a708b" && adoption.liveIncomingAdmission.previousExpectedFull === 808 && adoption.liveIncomingAdmission.newExpectedFull === 811, "Reviewed live incoming admission successor required");
+  assert(adoption.liveIncomingAdmission.ackBarrierSuccessor?.parentR5ManifestSHA256 === "38775c8829ebadea894214af7d5617e8042792f3e3c0a9d9ebae4775b05abf16", "Reviewed ACK-aware incoming admission required");
+  return { newTests: adoption.newTests, requiredNames: adoption.requiredNames, expectedFullTests: adoption.expectedFullTests };
+}
+
+export function currentReadReceiptInput(previous, adoption) {
+  readReceiptExpiryInputs(adoption);
+  const current = adoption.currentAfter.find(entry => entry.path === previous.path);
+  if (!current) return previous;
+  const before = adoption.before.find(entry => entry.path === previous.path);
+  assert(before?.bytes === previous.bytes && before?.sha256 === previous.sha256, "Read-receipt predecessor differs");
+  return current;
+}
+
 export function attachedInfoNullInputs(adoption) {
   assert(adoption?.originManifestSHA256 === "e4db439d130bebc6ff8a167569f11f1740f421c9ac4456c4f22065a5681ca72a", "Reviewed attached-info null lineage required");
   const before = [{"path":"web/src/core/messagePrivacy.ts","bytes":8398,"sha256":"75b464cbaeea1fc76164878672338ab041ad3eb5f2dc9ffc84d1186537d437f5"},{"path":"web/src/core/messagePrivacy.test.ts","bytes":5861,"sha256":"3a42f63f5372c8e6444042113739f5b0d3d8eeff31b4dcfde4fea800b4a14f1a"}];
@@ -201,6 +225,9 @@ export function verifyInputs() {
   const individual = inputs.individualForwardAdoption;
   const announcement = inputs.announcementReadAdoption;
   const loopback = inputs.loopbackDevEndpointsAdoption;
+  const readReceipt = inputs.readReceiptExpiryAdoption;
+  readReceiptExpiryInputs(readReceipt);
+  for (const entry of [...readReceipt.currentAfter, ...readReceipt.adoptedTests, ...readReceipt.normalInputs, ...readReceipt.directAffectedInputs]) verifyFile(repo, entry);
   const attachedNull = inputs.attachedInfoNullAdoption;
   attachedInfoNullInputs(attachedNull);
   for (const entry of attachedNull.currentAfter) verifyFile(repo, entry);
@@ -210,7 +237,7 @@ export function verifyInputs() {
   announcementReadCohort(announcement);
   for (const entry of [...announcement.currentAfter, ...announcement.adoptedTests]) verifyFile(repo, entry);
   assert(card?.originManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a" && card.before.length === 13 && card.currentAfter.length === 15 && card.adoptedTests.length === 4, "Complete chat-card source/test lineage required");
-  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === attachedNull.expectedFullTests && attachedNull.previousExpectedFullTests === loopback.expectedFullTests && loopback.previousExpectedFullTests === announcement.expectedFullTests && announcement.previousExpectedFullTests === individual.expectedFullTests, "Explicit pending689+37+5+32+21+8+4 regression cohort required");
+  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === readReceipt.expectedFullTests && readReceipt.previousExpectedFullTests === attachedNull.expectedFullTests && attachedNull.previousExpectedFullTests === loopback.expectedFullTests && loopback.previousExpectedFullTests === announcement.expectedFullTests && announcement.previousExpectedFullTests === individual.expectedFullTests, "Explicit pending689+37+5+32+21+8+4+15 regression cohort required");
   assert(card.requiredNames.length === 37 && new Set(card.requiredNames).size === 37, "Complete unique chat-card names required");
   assert(copy.requiredNames.length === 5 && new Set([...card.requiredNames, ...copy.requiredNames]).size === 42, "Complete unique copy-retention names required");
   assert(new Set([...card.requiredNames, ...copy.requiredNames, ...individual.requiredNames]).size === 74, "Complete unique 42+32 current names required");
@@ -226,7 +253,7 @@ export function verifyInputs() {
   assert(originalPicker?.bytes === 18464 && originalPicker?.sha256 === "9d856011a50f95c81b3f841224a79f26c77c923128e70861c24794d65b335b44", "Exact original card picker identity required");
   currentIndividualForwardInput(originalPicker, individual);
   for (const entry of [...individual.currentAfter, ...individual.adoptedTests]) verifyFile(repo, entry);
-  for (const entry of card.currentAfter) { assert(entry.path.startsWith("web/src/"), "Unsafe chat-card source path"); verifyFile(repo, currentIndividualForwardInput(currentCardCopyInput(entry, copy), individual)); }
+  for (const entry of card.currentAfter) { assert(entry.path.startsWith("web/src/"), "Unsafe chat-card source path"); verifyFile(repo, currentReadReceiptInput(currentIndividualForwardInput(currentCardCopyInput(entry, copy), individual), readReceipt)); }
   assert(card.adoptedTests.every((entry) => entry.path.startsWith("web/src/core/messageCard/")), "Unsafe adopted card test path");
   for (const entry of card.adoptedTests) verifyFile(repo, entry);
   const same = (a, b) => a?.path === b?.path && a?.bytes === b?.bytes && a?.sha256 === b?.sha256;
@@ -285,7 +312,7 @@ export function verifyInputs() {
     else if (previous.path === "web/src/pages/chat/queryChat/ChatHeader/index.tsx") verifyStyleCaller(previous, now, inputs.mobileStyleAdoption);
     else assert(same(previous, now), "Unrelated caller/SDK pin changed");
   }
-  for (const entry of direct.realCallers) verifyFile(repo, currentIndividualForwardInput(currentChatCardInput(entry, card), individual));
+  for (const entry of direct.realCallers) verifyFile(repo, currentReadReceiptInput(currentIndividualForwardInput(currentChatCardInput(entry, card), individual), readReceipt));
   const style = inputs.mobileStyleAdoption;
   assert(style.fullMinimumTests === 689 && inputs.fullMinimumTests >= style.fullMinimumTests && style.newTests === 6 && style.requiredInputs.length === 3, "Complete mobile style regression context required");
   verifyFile(repo, style.frozenBefore);
@@ -331,7 +358,7 @@ async function main() {
       announcementReadCohort(inputs.announcementReadAdoption), inputs.announcementReadAdoption.testPaths));
     else if (cohort === "loopback-dev-endpoints-8") await phase("loopback-dev-endpoints-8", () => runTests("loopback-dev-endpoints-8",
       loopbackDevEndpointsCohort(inputs.loopbackDevEndpointsAdoption), inputs.loopbackDevEndpointsAdoption.testPaths));
-    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames, ...inputs.announcementReadAdoption.requiredNames, ...inputs.loopbackDevEndpointsAdoption.requiredNames, ...inputs.attachedInfoNullAdoption.requiredNames] }));
+    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames, ...inputs.announcementReadAdoption.requiredNames, ...inputs.loopbackDevEndpointsAdoption.requiredNames, ...inputs.attachedInfoNullAdoption.requiredNames, ...inputs.readReceiptExpiryAdoption.requiredNames] }));
     await phase("types-web-strict", async () => checkedProcess(await execute("types-web-strict", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"])));
     await phase("types-desktop-original", async () => checkedProcess(await execute("types-desktop-original", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.desktop.json"])));
     if (cohort === "full-regression") {

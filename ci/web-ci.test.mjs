@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput, announcementReadCohort, loopbackDevEndpointsCohort, attachedInfoNullInputs } from "./web-ci.mjs";
+import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput, announcementReadCohort, loopbackDevEndpointsCohort, attachedInfoNullInputs, readReceiptExpiryInputs, currentReadReceiptInput } from "./web-ci.mjs";
 
 function runFixture(callback) {
   const root = mkdtempSync(path.join(os.tmpdir(), "luobo-web-ci-"));
@@ -164,7 +164,9 @@ test("announcement successor rejects wrong source and keeps card individual hist
   const input = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8"));
   assert.equal(input.loopbackDevEndpointsAdoption.previousExpectedFullTests, 784);
   assert.equal(input.attachedInfoNullAdoption.previousExpectedFullTests, 792);
-  assert.equal(input.fullMinimumTests, 796);
+  assert.equal(input.attachedInfoNullAdoption.expectedFullTests, 796);
+  assert.equal(input.readReceiptExpiryAdoption.previousExpectedFullTests, 796);
+  assert.equal(input.fullMinimumTests, 811);
   assert.equal(input.announcementReadAdoption.previousExpectedFullTests, input.individualForwardAdoption.expectedFullTests);
   assert.equal(new Set([...input.chatCardAdoption.requiredNames, ...input.chatCardAdoption.copyRetention.requiredNames, ...input.individualForwardAdoption.requiredNames, ...announcement.requiredNames]).size, 95);
 });
@@ -209,4 +211,41 @@ test("attached-info null source successor preserves exact new4 and rejects chang
   ]) { const changed = structuredClone(attachedNull); mutate(changed); assert.throws(() => attachedInfoNullInputs(changed)); }
   assert.throws(() => webCohort("attached-info-null-4"), /Explicit/);
   assert.equal(webCohort("loopback-dev-endpoints-8"), "loopback-dev-endpoints-8");
+});
+
+const readReceipt = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8")).readReceiptExpiryAdoption;
+test("read-receipt successor requires exact normal15 source names and preserves historical796", () => {
+  const proof = readReceiptExpiryInputs(readReceipt);
+  assert.equal(proof.newTests, 15); assert.equal(proof.expectedFullTests, 811);
+  const data = reports(Array(15).fill("passed"));
+  data.audit.tests.forEach((entry, index) => { entry.name = readReceipt.requiredNames[index]; });
+  assert.equal(checked(data, 0, { exact: 15, requiredNames: proof.requiredNames }).passed, 15);
+  data.audit.tests[0].name = "unreviewed read-receipt name";
+  assert.throws(() => checked(data, 0, { exact: 15, requiredNames: proof.requiredNames }), /Required test/);
+  for (const mutate of [
+    (x) => { x.originManifestSHA256 = "0".repeat(64); },
+    (x) => { x.uiSuccessorRevision = "unreviewed"; },
+    (x) => { x.liveIncomingAdmission.parentR4ManifestSHA256 = "0".repeat(64); },
+    (x) => { x.liveIncomingAdmission.ackBarrierSuccessor.parentR5ManifestSHA256 = "0".repeat(64); },
+    (x) => { x.supersedesNormalCIManifestSHA256 = "0".repeat(64); },
+    (x) => { x.before[0].sha256 = "0".repeat(64); },
+    (x) => { x.currentAfter[0].bytes++; },
+    (x) => { x.adoptedTests[0].sha256 = "0".repeat(64); },
+    (x) => { x.requiredNames[0] = "unreviewed name"; },
+    (x) => { x.testPaths[0] = "refs/unlisted.test.tsx"; },
+    (x) => { x.normalInputs[0].sha256 = "0".repeat(64); },
+    (x) => { x.directAffectedInputs[0].bytes++; },
+    (x) => { x.expectedFullTests = 796; },
+    (x) => { x.focusedManualModeAdded = true; },
+  ]) { const changed = structuredClone(readReceipt); mutate(changed); assert.throws(() => readReceiptExpiryInputs(changed)); }
+  for (const name of ["read-receipt-8", "read-receipt-12"]) assert.throws(() => webCohort(name), /Explicit/);
+  const oldCaller = readReceipt.before.find(entry => entry.path === "web/src/pages/chat/queryChat/index.tsx");
+  assert.deepEqual(currentReadReceiptInput(oldCaller, readReceipt), readReceipt.currentAfter.find(entry => entry.path === oldCaller.path));
+  assert.throws(() => currentReadReceiptInput({ ...oldCaller, sha256: "0".repeat(64) }, readReceipt), /predecessor differs/);
+  const unrelated = { path: "web/src/unchanged.ts", bytes: 1, sha256: "0".repeat(64) };
+  assert.equal(currentReadReceiptInput(unrelated, readReceipt), unrelated);
+  const input = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8"));
+  assert.equal(input.attachedInfoNullAdoption.expectedFullTests, 796);
+  assert.equal(input.readReceiptExpiryAdoption.previousExpectedFullTests, 796);
+  assert.equal(input.fullMinimumTests, 811);
 });

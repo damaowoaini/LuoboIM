@@ -16,6 +16,7 @@ import { ExMessageItem, useMessageStore, useUserStore } from "@/store";
 import emitter from "@/utils/events";
 import { formatMessageTime } from "@/utils/imCommon";
 
+import { MessageReadBoundary } from "../ReadSyncStatus";
 import AnnouncementRenderer from "./AnnouncementRender";
 import CardMessageRenderer from "./CardMessageRenderer";
 import CatchMessageRender from "./CatchMsgRenderer";
@@ -125,14 +126,16 @@ const MessageItem: FC<IMessageItemProps> = ({
       clientMsgID: message.clientMsgID,
       isAppend: false,
     } as ExMessageItem;
-    if (message.sessionType === SessionType.Single) {
-      updateFields.isRead = true;
-    }
+    // C2C isRead is projected only after the actual conversation read ACK;
+    // clearing a visual append marker must not erase that admission evidence.
     updateMessage(updateFields);
     updateAppendCount?.();
   };
 
   const updateMessageReadState = () => {
+    // The conversation hook owns C2C read ACK/time. Keep the existing group
+    // receipt path below; rendering a single-chat row is not a server ACK.
+    if (message.sessionType === SessionType.Single) return;
     if (
       markGroupMessageAsReadLoading ||
       message.isRead ||
@@ -254,14 +257,14 @@ const MessageItem: FC<IMessageItemProps> = ({
             onOpenChange={(vis) => setShowMessageMenu(vis)}
           >
             <MessageItemErrorBoundary message={message}>
-              {privacy.expired ? <span role="status" className="rounded bg-slate-100 p-2 text-xs text-slate-500">消息已过期或已移除</span> : <MessageRenderComponent
+              <MessageReadBoundary message={message} conversationID={conversationID}><MessageRenderComponent
                 message={message}
                 isSender={isSender}
                 disabled={disabled}
                 showAlbum={showAlbum}
                 showMergeModal={showMergeModal}
                 conversationID={conversationID}
-              />} 
+              /></MessageReadBoundary>
             </MessageItemErrorBoundary>
 
             <MessageSuffix

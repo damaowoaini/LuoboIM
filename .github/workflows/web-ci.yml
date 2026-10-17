@@ -1,6 +1,7 @@
 name: Web CI
 
 # Run full regression once after the known issues are fixed and targeted checks pass.
+# Current minimum811 is expected only; read-receipt15 uses normal paths, no new focused mode.
 on:
   workflow_dispatch:
     inputs:

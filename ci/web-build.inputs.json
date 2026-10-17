@@ -1,38 +1,38 @@
 {
   "schema": "luobo.web.build-only.v1",
-  "cohort": "web4308-build-only-v2",
+  "cohort": "web4316-build-only-v3",
   "node": "24.21.0",
-  "sourceFiles": 4308,
-  "sourceDigest": "64461c97a9402dae4328c583b7200160015f0ce0da90ec0c8c0b106eba9ba9e9",
+  "sourceFiles": 4316,
+  "sourceDigest": "245588d7977b71c86d1b33835dfbeef9d42b21a618267769895f1d3645d08780",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
   "sourceDeclaration": {
-    "path": "references/integration/web-attached-info-null-formal-ci-candidate-20261017/final-web-source-vector.json",
-    "bytes": 807485,
-    "sha256": "31de9d41be0ed489e37b329d6b8ee2e3fd8626d0ea9954bfc42bab7e9d385bb4"
+    "path": "references/integration/web-live-c2c-read-admission-r6-ack-completion-r1-candidate-20261017/final-web-source-vector.json",
+    "bytes": 810964,
+    "sha256": "35c221c1a162fb3f5709b7469efd0410ddbb7248384e8e9a70c3a6dd040e9d04"
   },
   "sourceOriginRef": null,
   "sourceObservedAtPublicRef": null,
-  "checkoutRule": "actual GITHUB_SHA must equal git HEAD; all4308 source rows exact; controller commit may be later without changing source identity",
+  "checkoutRule": "actual GITHUB_SHA must equal git HEAD; all4316 rows exact; controller commit may be later without changing source identity",
   "controllerInputs": [
     {
       "path": ".github/workflows/web-build-only.yml",
       "bytes": 4117,
-      "sha256": "fb8aec5d6efaf78e061f1434bf01c9a9acb7ba921169fadb546c954e11aff4b2"
+      "sha256": "9838c483572ef7567543db06eaf675a2b1287fcefe3667bf4b51dd8a453c9575"
     },
     {
       "path": "ci/README.web-build.md",
-      "bytes": 8033,
-      "sha256": "bf0d22b393cc142590ee72d83c2bb5a8cdb33697f1508d77ee4fc98cc9f1f1fc"
+      "bytes": 10889,
+      "sha256": "3a58ed1860ac1d4968a7aea4a546da2a4a8ae7b63a1452ebb55378f56462ba38"
     },
     {
       "path": "ci/web-build.mjs",
       "bytes": 18145,
-      "sha256": "d70b4f4755c1d8a61cb88e7ddef5342c7c016ed69afed7af499eb42cc3d981ea"
+      "sha256": "9ee8e9a5f2166c26db3dc22a94a0ce2cd3220d01b26106f5fa7a7bd013229e35"
     },
     {
       "path": "ci/web-build.test.mjs",
-      "bytes": 3929,
-      "sha256": "8c0148446e1a3bd82b2389698ed63fad006e062972885c0e8933d96f21752d40"
+      "bytes": 4085,
+      "sha256": "cc7088c9e5153cc9341e290eafc76a58fdcbf21e22dd763d9350423ffb4c14a2"
     },
     {
       "path": "ci/web-build.csp.test.mjs",
@@ -43,13 +43,13 @@
   "borrowedInputs": [
     {
       "path": "ci/web-ci.mjs",
-      "bytes": 36482,
-      "sha256": "a702ee9360125f790c1e31f52fc4e9f7df28eb15a4300778d1e6058e383a3207"
+      "bytes": 43436,
+      "sha256": "3a00dc4e78b19c9ccf8dfb83ed37a90384603e69e56f5061459831404f0c37db"
     },
     {
       "path": "ci/web-ci.inputs.json",
-      "bytes": 70870,
-      "sha256": "13e2deb8788a3625f61a320f495130e662497be883aa5f10dce1f50b2ac61967"
+      "bytes": 84455,
+      "sha256": "bdfbb35a0ec16b4f2b6cbdfbacb3ff3be9e0bb9cee4201410728d6c77e93f86c"
     },
     {
       "path": "ci/group-effects/resource_guard.py",
@@ -20196,13 +20196,48 @@
     },
     {
       "path": "src/core/messagePrivacyRuntime.ts",
-      "bytes": 3597,
-      "sha256": "90e02b9e841393c2f4f5cda67ff5f6d90570e3fb846e3f7b9c2770d3d162b193"
+      "bytes": 4733,
+      "sha256": "30b8715650c716a850e0a6bb87ecee7df141d7be0d6d53ae3165efa1d20d8a38"
     },
     {
       "path": "src/core/messagePrivacyStore.test.ts",
       "bytes": 4094,
       "sha256": "cd2b73fbfb237b45deb07e03a078b317ee9e2abb105ad9dc3c38caf84ab40dd7"
+    },
+    {
+      "path": "src/core/messageReadBarrier.ts",
+      "bytes": 2305,
+      "sha256": "64875db9d9249f78d04d1d0622ae7d8a92f392d9a5bb8392a672072310be7cfa"
+    },
+    {
+      "path": "src/core/messageReadReceipt.ts",
+      "bytes": 13071,
+      "sha256": "7f13a1f7c7f0f6858536d48c8dc02eff6bff547265eae41a20798443048ac2db"
+    },
+    {
+      "path": "src/core/messageReadReceipt/harness.ts",
+      "bytes": 5436,
+      "sha256": "d8cf3d29b7de771a01ac327fe8e83da06e10677d3e5d2239e9c032a6bc0f5ff3"
+    },
+    {
+      "path": "src/core/messageReadReceipt/live-read-admission.test.tsx",
+      "bytes": 5259,
+      "sha256": "e4ef2b921f9aaf47005ff7f8172a65980bf3693759560cbf1bd65e6ad8d0dd70"
+    },
+    {
+      "path": "src/core/messageReadReceipt/read-receipt-hooks.test.tsx",
+      "bytes": 9678,
+      "sha256": "8941ad682d21a105d744761c4b3f023217896a8616f57054bc707b6745ee51c9"
+    },
+    {
+      "path": "src/core/messageReadReceipt/read-sync-ui.test.tsx",
+      "bytes": 7717,
+      "sha256": "e554c1933d473428df150ac21432fd3012ffd15b63ab07195610c3d45b728492"
+    },
+    {
+      "path": "src/core/messageReadReceipt/zero-duration.test.tsx",
+      "bytes": 2745,
+      "sha256": "e708e54915291174b190d377b88373c9e35dff0676ce5b9efca45ce717828e64"
     },
     {
       "path": "src/core/messageSelection.test.ts",
@@ -20861,8 +20896,8 @@
     },
     {
       "path": "src/pages/chat/queryChat/MessageItem/index.tsx",
-      "bytes": 12110,
-      "sha256": "f6ff9fd4c6b0c3334ececd31450ad01d449560427c754245c687946bf10fd372"
+      "bytes": 12396,
+      "sha256": "f3a744d43ec365d9e1a5cc8134065861c62091d50e8d57927780c2e8f00f5bdd"
     },
     {
       "path": "src/pages/chat/queryChat/MessageItem/message-item.module.scss",
@@ -20883,6 +20918,11 @@
       "path": "src/pages/chat/queryChat/NotificationMessage.tsx",
       "bytes": 2050,
       "sha256": "86c39c0672ef1272ea556c51e54df85e2d247e5af8442965e3aa3706412cef2d"
+    },
+    {
+      "path": "src/pages/chat/queryChat/ReadSyncStatus.tsx",
+      "bytes": 1924,
+      "sha256": "51b2ced626577765ea2017cf32d12f91ad87987f83d54cee5aa02ac756344691"
     },
     {
       "path": "src/pages/chat/queryChat/SearchMessageDrawer/FileMessagePane.tsx",
@@ -20911,8 +20951,8 @@
     },
     {
       "path": "src/pages/chat/queryChat/SingleSetting/index.tsx",
-      "bytes": 13140,
-      "sha256": "f68b80fb2a41ede12ee0db3d5d6e69330037ffb9708f7c7746f62d21ca96ae5c"
+      "bytes": 13187,
+      "sha256": "0f54d79c5753ae441f0bb7d5b29d49f710b61fee30d1ebdd2eef07e17f1c506a"
     },
     {
       "path": "src/pages/chat/queryChat/SystemNotification.tsx",
@@ -20926,13 +20966,13 @@
     },
     {
       "path": "src/pages/chat/queryChat/index.tsx",
-      "bytes": 3919,
-      "sha256": "b06174b10c41cd1e362d2e516a2f386a59f547acbb017cd57571f8cf576c0a10"
+      "bytes": 4197,
+      "sha256": "0501647e1ccb927a42e426bda500f2a21536dc9920f5fee546eced83109757c7"
     },
     {
       "path": "src/pages/chat/queryChat/useConversationState.ts",
-      "bytes": 4041,
-      "sha256": "62575e5e93f435c87b2f24194501ff79c68da760a585898b282a6387ccac4aef"
+      "bytes": 9553,
+      "sha256": "b02c919dff26e53a73dc91dd0b9d4b0ba28e6cca74938cc4eb87083666bc15a9"
     },
     {
       "path": "src/pages/chat/queryChat/useDropAndPaste.tsx",
@@ -20941,8 +20981,8 @@
     },
     {
       "path": "src/pages/chat/queryChat/useMessageReceipt.ts",
-      "bytes": 2430,
-      "sha256": "38cf319765cf22ca575e5d29f29da15c6d44cd089a1da357eaa7c818237f4b13"
+      "bytes": 2177,
+      "sha256": "76943dcf669079d32896a49e735aebfec8773ca8be4ccda7af9cd65129402e93"
     },
     {
       "path": "src/pages/common/ChooseModal/ChooseBox/CheckItem.tsx",
@@ -21620,45 +21660,61 @@
     ]
   },
   "predecessorSource": {
-    "cohort": "web4308-build-only-v1",
-    "sourceFiles": 4308,
-    "sourceDigest": "7237031f2619f82424daab766d0f3d450b0de66de27ddc1207c83ec460892929",
+    "cohort": "web4315-build-only-v3",
+    "sourceFiles": 4315,
+    "sourceDigest": "ca7cca7adfcc0ab2e66f15b58c080cc1e3c212233fa866d7277847856fb2f026",
     "sourceDeclaration": {
-      "path": "references/integration/web-loopback-formal-ci-candidate-20261017/final-web-source-vector.json",
-      "bytes": 807329,
-      "sha256": "0d31f2391f6f7a7e81509d0dfec25f0cf49c42aa748b4ea488267853b3f47871"
+      "path": "references/integration/web-read-receipt-types-r4-candidate-20261017/final-web-source-vector.json",
+      "bytes": 809837,
+      "sha256": "112601fabb7bf5e18b2d74cabe527201c6926c7cf0b97ae28e380016d975f95c"
     },
     "sourceOriginRef": null,
     "sourceObservedAtPublicRef": null
   },
   "sourceOverlay": {
-    "candidateManifestSHA256": "e4db439d130bebc6ff8a167569f11f1740f421c9ac4456c4f22065a5681ca72a",
+    "parentR4ManifestSHA256": "42da00f60d3c1e6c68b46513134b8e0785ac91b1530d3a70e77796f3227a708b",
     "before": [
       {
-        "path": "web/src/core/messagePrivacy.ts",
-        "bytes": 8398,
-        "sha256": "75b464cbaeea1fc76164878672338ab041ad3eb5f2dc9ffc84d1186537d437f5"
+        "path": "web/src/pages/chat/queryChat/useConversationState.ts",
+        "bytes": 7557,
+        "sha256": "73ef7de6e2f350543bb8344a07b8b4af4a56c366d1c724ef026628357d321182"
       },
       {
-        "path": "web/src/core/messagePrivacy.test.ts",
-        "bytes": 5861,
-        "sha256": "3a42f63f5372c8e6444042113739f5b0d3d8eeff31b4dcfde4fea800b4a14f1a"
+        "path": "web/src/pages/chat/queryChat/MessageItem/index.tsx",
+        "bytes": 12122,
+        "sha256": "04d6421b710ef82ca51c08a21ceedfe52bbf6dc35d87d1b59d0ef196f7179154"
       }
     ],
     "after": [
       {
-        "path": "web/src/core/messagePrivacy.ts",
-        "bytes": 8417,
-        "sha256": "84c2aee8072ad73ac3ad1ddbf8d00862906cf3fd6a20b4212337fd1f0b798ecc"
+        "path": "web/src/pages/chat/queryChat/useConversationState.ts",
+        "bytes": 9553,
+        "sha256": "b02c919dff26e53a73dc91dd0b9d4b0ba28e6cca74938cc4eb87083666bc15a9"
       },
       {
-        "path": "web/src/core/messagePrivacy.test.ts",
-        "bytes": 9345,
-        "sha256": "3f6fce50b1b6caa9cda4c91948ba4aa166f7488ee45e95c30df03aae7c57fab2"
+        "path": "web/src/pages/chat/queryChat/MessageItem/index.tsx",
+        "bytes": 12396,
+        "sha256": "f3a744d43ec365d9e1a5cc8134065861c62091d50e8d57927780c2e8f00f5bdd"
+      },
+      {
+        "path": "web/src/core/messageReadReceipt/live-read-admission.test.tsx",
+        "bytes": 5259,
+        "sha256": "e4ef2b921f9aaf47005ff7f8172a65980bf3693759560cbf1bd65e6ad8d0dd70"
       }
     ],
     "replacements": 2,
-    "additions": 0,
-    "state": "source-only CI preparation; runtime targeted evidence and any one local bundle are independent"
+    "additions": 1,
+    "kind": "live C2C loaded-ID read admission without optimistic isRead",
+    "state": "targeted/strict/build/full811 all unexecuted in this source preparation",
+    "ackBarrierSuccessorParent": {
+      "path": "references/integration/web-live-c2c-read-admission-r5-candidate-20261017/candidate-manifest.json",
+      "bytes": 8840,
+      "sha256": "38775c8829ebadea894214af7d5617e8042792f3e3c0a9d9ebae4775b05abf16"
+    },
+    "completionSnapshotParent": {
+      "path": "references/integration/web-live-c2c-read-admission-r6-candidate-20261017/candidate-manifest.json",
+      "bytes": 8879,
+      "sha256": "c071f5d2b065812335d64d73cd643b8e1efeac71a6dce053f75cc675e17cbeaf"
+    }
   }
 }

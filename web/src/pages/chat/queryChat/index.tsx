@@ -13,6 +13,7 @@ import ChatContent from "./ChatContent";
 import ChatFooter from "./ChatFooter";
 import MultipleActionBar from "./ChatFooter/MultipleActionBar";
 import ChatHeader from "./ChatHeader";
+import ReadSyncStatus from "./ReadSyncStatus";
 import useConversationState from "./useConversationState";
 import { useDropAndPaste } from "./useDropAndPaste";
 import { useMessageReceipt } from "./useMessageReceipt";
@@ -42,7 +43,8 @@ export const QueryChat = () => {
     manual: true,
   });
 
-  const { getIsCanSendMessage, isMutedGroup, currentIsMuted, currentConversation } =
+  const { getIsCanSendMessage, isMutedGroup, currentIsMuted, currentConversation,
+    readSync, readTimePending, canRecoverReadTime, readRetryBusy, recoverReadTime } =
     useConversationState();
   useMessageReceipt();
 
@@ -102,6 +104,7 @@ export const QueryChat = () => {
   return (
     <Layout id="chat-container" className="relative overflow-hidden">
       <ChatHeader />
+      <ReadSyncStatus result={readSync} pending={readTimePending} canRecover={canRecoverReadTime} busy={readRetryBusy} recover={recoverReadTime} />
       {loading || jumpLoading ? (
         <div className="flex h-full items-center justify-center bg-white pt-1">
           <Spin spinning />

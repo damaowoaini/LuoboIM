@@ -1,3 +1,4 @@
+import { readBarrier, readIdentity } from "./messageReadBarrier";
 import { sessionCoordinator } from "./session/browser";
 import { MessageHistoryFence, PrivateMessageLedger, type PrivacyState } from "./messagePrivacy";
 
@@ -27,16 +28,27 @@ export function subscribeMessagePrivacy(listener: () => void) {
   };
 }
 messageHistoryFence.subscribe(publish);
+readBarrier.subscribe(publish);
 let observedOwner = messageOwner();
 sessionCoordinator.onChange?.(() => {
   const owner = messageOwner();
-  if (owner !== observedOwner) { observedOwner = owner; messagePrivacyLedger.clear(); }
+  if (owner !== observedOwner) { observedOwner = owner; messagePrivacyLedger.clear(); readBarrier.clear(); }
   messageHistoryFence.invalidate();
 });
 
-export function messagePrivacyState(message: unknown, conversationID = "", owner = messageOwner()): PrivacyState {
+export function messagePrivacyState(message: unknown, conversationID = "", owner = messageOwner()): PrivacyState & { readTimePending?: boolean } {
   if (!owner || owner !== messageOwner()) return { containsPrivate:false,rootPrivate:false,inspectionComplete:false,expired:true,allowsRetention:false };
-  return messagePrivacyLedger.observe(owner, conversationID, message);
+  const state = messagePrivacyLedger.observe(owner, conversationID, message);
+  const identity = readIdentity(owner, conversationID, message);
+  const row = message as { isRead?: unknown; sessionType?: unknown; sendID?: unknown; recvID?: unknown } | null;
+  const actor = sessionCoordinator.current?.userID;
+  // SDK isRead can establish a conservative view hold on re-entry, never a
+  // fabricated deadline or permission to recover. Only a real observed ACK
+  // stored below authorizes a recovery lookup. Group/ordinary policy is intact.
+  const pending = !!actor && row?.sessionType === 1 && (row.sendID === actor || row.recvID === actor) &&
+    state.containsPrivate && !state.expired && state.expiresAt === undefined &&
+    (row.isRead === true || !!identity && readBarrier.acknowledged(identity));
+  return pending ? { ...state, expired: true, allowsRetention: false, readTimePending: true } : state;
 }
 export function captureMessageAccess(conversationID = "", owner = messageOwner()) {
   const ticket = messageHistoryFence.capture(owner, conversationID);
@@ -62,5 +74,9 @@ export function forgetMessage(conversationID: string, id: string) {
   messagePrivacyLedger.forget(messageOwner(), conversationID, id); publish();
 }
 export function visibleMessages<T>(messages: T[], conversationID = "") {
-  return messages.filter(message => !messagePrivacyState(message, conversationID).expired);
+  return messages.filter(message => {
+    const state = messagePrivacyState(message, conversationID);
+    // Keep a placeholder in history; it cannot render/download/copy plaintext.
+    return !state.expired || state.readTimePending;
+  });
 }
