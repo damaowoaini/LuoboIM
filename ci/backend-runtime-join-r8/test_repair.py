@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Controller-only CPU diagnostic controls; no Go, service or fixture execution."""
+"""Commit repair11 and original-controller-only CPU diagnostic controls; no Go, service or fixture execution."""
 import copy, importlib.util, json, tempfile, unittest
 from pathlib import Path
 from unittest import mock
@@ -18,7 +18,7 @@ class RepairControls(unittest.TestCase):
             with self.subTest(field=field),self.assertRaises(ValueError):runner.check_repair(c,bad)
         self.assertEqual(len(runner.pairs(p['directlyAffectedCommitTargets'])),11)
         self.assertEqual(len(runner.pairs(p['newImageTargets'])),1)
-        self.assertEqual(sum(r['retainedTopCount'] for r in p['sourceReuse']),88)
+        self.assertEqual(sum(r['retainedTopCount'] for r in p['sourceReuse']),78)
         bad=copy.deepcopy(p);bad['repairTargets'].setdefault('pkg/common/startrpc',[]).append(runner.PENDING_POSITIVE[1])
         with self.assertRaises(ValueError):runner.check_repair(c,bad)
         for key,value in (('currentMainBuilds',14),('newBinaries',True),('runtimeGraphAccepted',True),('fullRegression',True)):
@@ -43,7 +43,7 @@ class RepairControls(unittest.TestCase):
 
     def test_actual_repair_plan_has_no_build_rejects_partial_events_and_retains_primary_post_failure(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),1)
+        self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),11)
         self.assertFalse(runner.pairs(active['targets']) & runner.pairs(p['actualPassedTargets']))
         audited=copy.deepcopy(active)
         first_package=next(iter(active['targets']));first_top=active['targets'][first_package][0]
@@ -59,7 +59,7 @@ class RepairControls(unittest.TestCase):
                 events.append({'Action':'pass','Package':pkg,'Test':top})
             events.append({'Action':'pass','Package':pkg})
         result=runner.require_children(runner.audit(events,0,active['targets']),audited)
-        self.assertEqual(result['topPASS'],1)
+        self.assertEqual(result['topPASS'],11)
         with self.assertRaises(ValueError):runner.audit(events,1,active['targets'])
         result['namedCompletions']=[r for r in result['namedCompletions'] if '/' not in r['name']]
         with self.assertRaises(ValueError):runner.require_children(result,audited)
@@ -84,11 +84,11 @@ class RepairControls(unittest.TestCase):
 
     def test_split_process_dispatch_keeps_md_failure_and_missing_child_failed_but_runs_both_owned_scopes(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1])
-        self.assertEqual([list(scope['targets']) for scope in active['scopes']],[['internal/namespaceimport/ownedcontrol']])
+        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,5,5])
+        self.assertEqual([list(scope['targets']) for scope in active['scopes']],[['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol'],['internal/namespaceinventory']])
         real_child='real_commit_custody_failure_never_becomes_normal_capture_pending'
         self.assertIn(real_child,c['requiredSubtests']['internal/namespaceimport/ownedcontrol']['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'])
-        self.assertTrue(runner.pairs(p['directlyAffectedCaptureFixtureTargets']) <= runner.pairs(p['actualPassedTargets']))
+        self.assertTrue(runner.pairs(p['directlyAffectedCaptureFixtureTargets']) <= runner.pairs(p['repairTargets']))
         active=copy.deepcopy(active);first=active['scopes'][0];package=next(iter(first['targets']));top=first['targets'][package][0]
         child='control-required-descendant';first['requiredSubtests']={package:{top:[child]}}
         diagnostic={'schema':'historical-controller-finite-diagnostic-v2','wall_micros':5,'cpu_available':True,'user_cpu_micros':2,'system_cpu_micros':1,'context':'active','final_phase':'published','final_next_page':1,'trace':{'calls':{'controller.step':{'calls':1,'wall_micros':3,'max_wall_micros':3,'error_tags':{'ok':1}}},'events':[{'operation':'controller.step','call':1,'phase':'published','next_page':1,'wall_micros':3,'elapsed_micros':5,'error_tags':['ok'],'context':'active'}],'event_overflow':0,'progress_samples':[]}}
@@ -101,6 +101,8 @@ class RepairControls(unittest.TestCase):
                     index=len(calls);scope=active['scopes'][index]
                     self.assertEqual(label,scope['label']);self.assertEqual(timeout,2249-index)
                     for flag in ('-timeout=180s','-race','-mod=readonly'):self.assertIn(flag,argv)
+                    self.assertEqual('-cpuprofile' in argv,index==0)
+                    self.assertEqual('-o' in argv,index==0)
                     scope_package=next(iter(scope['targets']))
                     self.assertEqual([arg for arg in argv if arg.startswith('./')],['./'+scope_package])
                     self.assertEqual(argv[:2],['env','-i']);self.assertIn('GOAUTH=off',argv)
@@ -118,10 +120,12 @@ class RepairControls(unittest.TestCase):
                     events.append({'Action':'pass','Package':pkg})
                     (folder/'stdout.jsonl').write_text('\n'.join(json.dumps(e) for e in events)+'\n')
                     return folder,1 if mode=='first-nonzero' and index==0 else 0
-                with mock.patch.object(runner.time,'monotonic',side_effect=[10.,11.,12.,13.]):result=runner.execute_repair_scopes(active,command,{'GOAUTH':'off'},output)
+                with mock.patch.object(runner.time,'monotonic',side_effect=[10.,11.,11.,12.,13.]), mock.patch.object(runner,'collect_controller_cpu',return_value={'state':'input-rejected'}) as cpu:
+                    result=runner.execute_repair_scopes(active,command,{'GOAUTH':'off'},output,output/'private-profile')
+                self.assertEqual(cpu.call_count,1)
                 self.assertEqual(calls,[x['label'] for x in active['scopes']]);self.assertEqual(result['accepted'],mode=='all-pass')
                 self.assertTrue(all(x['accepted'] and not x['diagnosticRequired'] for x in result['processes'][1:]))
-                self.assertEqual(len(result['processes']),1)
+                self.assertEqual(len(result['processes']),3)
                 self.assertEqual(json.loads((output/'targeted-tests-union.json').read_bytes()),result)
                 record=json.loads((output/first['label']/'controller-diagnostic.json').read_bytes());self.assertEqual(record['accepted'],mode!='missing-diagnostic')
                 if mode=='first-nonzero':self.assertTrue(record['accepted']);self.assertFalse(result['accepted'])
@@ -188,7 +192,7 @@ class RepairControls(unittest.TestCase):
                 self.assertFalse(result['rawProfileUploaded']);self.assertFalse(result['testELFUploaded'])
                 self.assertTrue(result['mainResultPreserved']);self.assertNotIn('never-export',json.dumps(result));self.assertNotIn(str(private),json.dumps(result))
                 self.assertEqual(sorted(p.name for p in output.iterdir()),['cpu-top30.json','result.json'])
-        c,p=self.contract();active=runner.repair_execution_plan(c,p)
+        c,p=self.contract();active=runner.repair_execution_plan(c,p);active['scopes']=active['scopes'][:1]
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary).resolve();private=root/'private';private.mkdir();output=root/'output';output.mkdir()
             def command(label,argv,timeout):

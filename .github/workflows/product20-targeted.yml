@@ -1,0 +1,60 @@
+name: Product20 fresh HTTP registration password dual-token and real WS ordinary
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: product20-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  fresh-http-ws:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 210
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Verify source only and refuse unbound or failed core14 artifact
+        run: |
+          umask 077
+          python3 -B ci/product20/run.py --verify
+          python3 -B ci/product20/run.py --admit
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Reuse20 ELFs; prepare fresh task fixtures; actual HTTP then WS once
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          umask 077
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$RUNNER_TEMP/product20-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/controller-private.log" \
+            --record "$GITHUB_WORKSPACE/ci-results/product20-controller.resource.json" \
+            --min-free-mib 1024 --poll-interval .2 --timeout 10800 \
+            --allocated-root "$RUNNER_TEMP/product20-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --max-allocated-mib 16384 \
+            -- python3 -B ci/product20/run.py
+      - name: Always exact fresh-resource cleanup and independent twenty PID absence
+        if: always()
+        run: |
+          umask 077
+          python3 -B ci/product20/run.py --collect
+      - name: Finite receipts only; no ELF credentials source or private logs
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: product20-finite-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-results/product20/*.json
+            ci-results/product20-controller.resource.json
+          if-no-files-found: warn
+          compression-level: 1
+          retention-days: 14
