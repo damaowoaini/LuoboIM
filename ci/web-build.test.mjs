@@ -20,13 +20,14 @@ test("build-only plan contains locked install, exact patch and Vite without any 
   assert.equal(plan.some((p) => p.args.some((v) => /vitest|tsc|--noEmit/.test(v))), false);
 });
 
-test("reviewed4304 descriptor refuses changed source, duplicate paths and historical identity", () => {
-  assert.equal(validateDescriptor(input).sourceFiles, 4304);
+test("reviewed4308 descriptor refuses changed source, duplicate paths and historical identity", () => {
+  assert.equal(validateDescriptor(input).sourceFiles, 4308);
   for (const mutate of [
     (x) => { x.files[0].sha256 = "0".repeat(64); },
     (x) => { x.files[1].path = x.files[0].path; },
     (x) => { x.cohort = "web4290-build-only-v1"; },
     (x) => { x.cohort = "web4301-build-only-v1"; },
+    (x) => { x.cohort = "web4304-build-only-v1"; },
   ]) { const changed = structuredClone(input); mutate(changed); assert.throws(() => validateDescriptor(changed)); }
 });
 

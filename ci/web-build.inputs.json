@@ -1,38 +1,38 @@
 {
   "schema": "luobo.web.build-only.v1",
-  "cohort": "web4304-build-only-v1",
+  "cohort": "web4308-build-only-v1",
   "node": "24.21.0",
-  "sourceFiles": 4304,
-  "sourceDigest": "0caf95814993ac8936c1de386b2259d1f2bab5adda217436fc411af45907aa90",
+  "sourceFiles": 4308,
+  "sourceDigest": "7237031f2619f82424daab766d0f3d450b0de66de27ddc1207c83ec460892929",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
   "sourceDeclaration": {
-    "path": "references/integration/web-announcement-formal-ci-candidate-20261017/final-web-source-vector.json",
-    "bytes": 806659,
-    "sha256": "057ce2fea53b4bcaeb70e456c9337e2b0fbaf8576f788deb998a3be89de46f0c"
+    "path": "references/integration/web-loopback-formal-ci-candidate-20261017/final-web-source-vector.json",
+    "bytes": 807329,
+    "sha256": "0d31f2391f6f7a7e81509d0dfec25f0cf49c42aa748b4ea488267853b3f47871"
   },
   "sourceOriginRef": null,
   "sourceObservedAtPublicRef": null,
-  "checkoutRule": "actual GITHUB_SHA must equal git HEAD; all4304 source rows exact; CI controller commit may be later without changing source identity",
+  "checkoutRule": "actual GITHUB_SHA must equal git HEAD; all4308 source rows exact; controller commit may be later without changing source identity",
   "controllerInputs": [
     {
       "path": ".github/workflows/web-build-only.yml",
       "bytes": 4114,
-      "sha256": "be57de542654afc8535378150017d512471bf78e67edf71646b101e72460ee29"
+      "sha256": "007c55b0febae433de22cf96e6ab105548c5101fd8010851d7ca3e4e5d028bf2"
     },
     {
       "path": "ci/README.web-build.md",
-      "bytes": 5930,
-      "sha256": "3c6add6bee697e5409a71704881f2363558def33b7b902575585b641c07cb854"
+      "bytes": 7012,
+      "sha256": "fc183b443f4aab1a1a61be4ee107bb5de6e6d6c83fcf82aae8184d4229b32c72"
     },
     {
       "path": "ci/web-build.mjs",
       "bytes": 18145,
-      "sha256": "4269afc5535e2e336424422b3032f53f925a96dfe0efb4644b1c89dbaac2a78d"
+      "sha256": "c1c7e98a02071c68ebcdbc883b45d53e65c4326a4504b7ffc791158011a98533"
     },
     {
       "path": "ci/web-build.test.mjs",
-      "bytes": 3825,
-      "sha256": "48e3cf7c3b42cc896a5e107e3ae13d64afddccd981842a434ade41ada451c599"
+      "bytes": 3877,
+      "sha256": "225d84ffd3e729f23435d8f0738999d386a4f5244595353520739f57ab607f84"
     },
     {
       "path": "ci/web-build.csp.test.mjs",
@@ -43,13 +43,13 @@
   "borrowedInputs": [
     {
       "path": "ci/web-ci.mjs",
-      "bytes": 31138,
-      "sha256": "3367c96c42cf218fec624a74282679e1838e18971976e4b2cb700ce918e5dddd"
+      "bytes": 34510,
+      "sha256": "335c7926f2b367f403536ce95fafb9f5eaeea893fc48614d60c989938eb27e1c"
     },
     {
       "path": "ci/web-ci.inputs.json",
-      "bytes": 62109,
-      "sha256": "040c42f75750f922d38e65f2f76ab35d3172eec357f1e022bef4c6ff1339cd23"
+      "bytes": 67294,
+      "sha256": "ba24050e614a1650e45d02ec26fecbe4269cef5a637a0b0996f355caf0e1c61d"
     },
     {
       "path": "ci/group-effects/resource_guard.py",
@@ -18891,8 +18891,8 @@
     },
     {
       "path": "src/api/login.ts",
-      "bytes": 7929,
-      "sha256": "34fe2ed0c4f6ca9fd61b6f32633b105d0c19dfb02ed799d1f435fd88c7c4a42d"
+      "bytes": 8437,
+      "sha256": "b5db2f5ca82a6750df0a794abce7bb758c96a3490aaad7497023815c3adfa3c4"
     },
     {
       "path": "src/api/moments.test.ts",
@@ -19896,8 +19896,8 @@
     },
     {
       "path": "src/config/index.ts",
-      "bytes": 994,
-      "sha256": "1a6544cf6efaf6ee45b8eb31b67256d1b2ed1aa4ff3e233773d9bd6c6b397059"
+      "bytes": 1027,
+      "sha256": "10fda6ffb430a2da7d75626bc842283e3579d55ae04cb109f62817715abad511"
     },
     {
       "path": "src/constants/errcode.ts",
@@ -19918,6 +19918,16 @@
       "path": "src/constants/moments.ts",
       "bytes": 70,
       "sha256": "50543c5f72847c3911438d379c0bba62379dde7e78da318c765fe1e888edc9a4"
+    },
+    {
+      "path": "src/core/appConfig.test.ts",
+      "bytes": 2431,
+      "sha256": "5e354dee761560f933f8782cd50ee39ba6c6a0982af4ac5de740c431397c9d14"
+    },
+    {
+      "path": "src/core/appConfig.ts",
+      "bytes": 702,
+      "sha256": "5cfd0226bddce023b693f5fc155e5ecdbd1cd826c81d32f14be9068f79ac4f4a"
     },
     {
       "path": "src/core/applicationEventBootstrap.test.ts",
@@ -20330,14 +20340,24 @@
       "sha256": "367d473000c356360490688ae21481aefffd53544eafa41e34ec96b024e2ea39"
     },
     {
+      "path": "src/core/session/devEndpoints.test.ts",
+      "bytes": 8874,
+      "sha256": "6e476df43b0aafaf00c9cbba3c6262df19fbdf24c90ae4c2b856d89fa459cc78"
+    },
+    {
+      "path": "src/core/session/devEndpoints.ts",
+      "bytes": 4794,
+      "sha256": "58529eb378b2bec89ac9277666bc43318a9003494a46e2efb6273b8f64220b89"
+    },
+    {
       "path": "src/core/session/logout.test.ts",
       "bytes": 4430,
       "sha256": "15d08dfb35a09982f7763c2331116f7670f3ff66beaf009140d619d790e81648"
     },
     {
       "path": "src/core/session/logout.ts",
-      "bytes": 3296,
-      "sha256": "c1b750b285e6feb6bc64b2a7b0238c992096b839b56aa55485f5d319da60d1ad"
+      "bytes": 3343,
+      "sha256": "d23cbe06bda6d36c36dd959bfdf0e41a2ee9c9e68e0936922b82b5c7a101e985"
     },
     {
       "path": "src/core/session/route.test.ts",
@@ -20571,8 +20591,8 @@
     },
     {
       "path": "src/main.tsx",
-      "bytes": 681,
-      "sha256": "ff759b0f45f7b2399b73a7f9c10803cc721186cdfbcd4931e89236cf35dd3b83"
+      "bytes": 801,
+      "sha256": "9074b47cfa4d3cd523b77370fe304d197aa73d20e1a494c673940e9377c99a63"
     },
     {
       "path": "src/pages/chat/ConversationSider/ConversationItem.tsx",
@@ -21600,48 +21620,83 @@
     ]
   },
   "predecessorSource": {
-    "cohort": "web4301-build-only-v1",
-    "sourceFiles": 4301,
-    "sourceDigest": "dcbebe0d5d014533a25b7d4d1d0cfae603a1467d5fd924cb06aa6ce6f81270e6",
+    "cohort": "web4304-build-only-v1",
+    "sourceFiles": 4304,
+    "sourceDigest": "0caf95814993ac8936c1de386b2259d1f2bab5adda217436fc411af45907aa90",
     "sourceDeclaration": {
-      "path": "references/integration/forward-seed-host-batch-20261017/final-web-source-vector.json",
-      "bytes": 828123,
-      "sha256": "5dd0471a2cd73c1c193ac008c7c3d593ed589d39cba45c6fceab75de982de6f0"
+      "path": "references/integration/web-announcement-formal-ci-candidate-20261017/final-web-source-vector.json",
+      "bytes": 806659,
+      "sha256": "057ce2fea53b4bcaeb70e456c9337e2b0fbaf8576f788deb998a3be89de46f0c"
     },
-    "sourceOriginRef": "87a4f0b979cab6cde4518fb50e58379bff92bf60",
-    "sourceObservedAtPublicRef": "f348ae881a7462d0f53643c1c05a6d8d222c7a1c"
+    "sourceOriginRef": null,
+    "sourceObservedAtPublicRef": null
   },
   "sourceOverlay": {
-    "candidateManifestSHA256": "012853b3d517e34c97db227b932e91afcff2895783df16e5bfc71effcbd6cd3c",
+    "candidateManifestSHA256": "617d484a27b27c08e6b5c931ed3b4706d4f2bd62b033e4261f4e035c52b12d33",
     "before": [
       {
-        "bytes": 2721,
-        "path": "web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx",
-        "sha256": "98c055ade4188e56fe51775dd08cbd4449fef3d7c942b658cfe605c594702ed0"
+        "path": "web/src/main.tsx",
+        "bytes": 681,
+        "sha256": "ff759b0f45f7b2399b73a7f9c10803cc721186cdfbcd4931e89236cf35dd3b83"
+      },
+      {
+        "path": "web/src/config/index.ts",
+        "bytes": 994,
+        "sha256": "1a6544cf6efaf6ee45b8eb31b67256d1b2ed1aa4ff3e233773d9bd6c6b397059"
+      },
+      {
+        "path": "web/src/core/session/logout.ts",
+        "bytes": 3296,
+        "sha256": "c1b750b285e6feb6bc64b2a7b0238c992096b839b56aa55485f5d319da60d1ad"
+      },
+      {
+        "path": "web/src/api/login.ts",
+        "bytes": 7929,
+        "sha256": "34fe2ed0c4f6ca9fd61b6f32633b105d0c19dfb02ed799d1f435fd88c7c4a42d"
       }
     ],
     "after": [
       {
-        "bytes": 4316,
-        "path": "web/src/core/groupAnnouncementAck.test.ts",
-        "sha256": "c1ab5310630769983491b8f6c7bb74b4da1dcdc4dfd7f302c46af918b661c917"
+        "path": "web/src/main.tsx",
+        "bytes": 801,
+        "sha256": "9074b47cfa4d3cd523b77370fe304d197aa73d20e1a494c673940e9377c99a63"
       },
       {
-        "bytes": 5142,
-        "path": "web/src/core/groupAnnouncementAck.ts",
-        "sha256": "2e1bb5b626b239a97ec95220c8bc56872d4ce23149371ef8f48bc1492ffd582f"
+        "path": "web/src/config/index.ts",
+        "bytes": 1027,
+        "sha256": "10fda6ffb430a2da7d75626bc842283e3579d55ae04cb109f62817715abad511"
       },
       {
-        "bytes": 12381,
-        "path": "web/src/core/groupAnnouncementScope/announcement-read.test.tsx",
-        "sha256": "2f222fa1fae29bf23ba06ab375f677ff0252ae39ff7ab814b91b8daa88197ce3"
+        "path": "web/src/core/session/logout.ts",
+        "bytes": 3343,
+        "sha256": "d23cbe06bda6d36c36dd959bfdf0e41a2ee9c9e68e0936922b82b5c7a101e985"
       },
       {
-        "bytes": 11272,
-        "path": "web/src/pages/chat/queryChat/ChatHeader/GroupAnnouncementCard.tsx",
-        "sha256": "57d1849f58f95f43d3e2935082392cb1d064c8208ef83c3836b2f010aee26eb7"
+        "path": "web/src/api/login.ts",
+        "bytes": 8437,
+        "sha256": "b5db2f5ca82a6750df0a794abce7bb758c96a3490aaad7497023815c3adfa3c4"
+      },
+      {
+        "path": "web/src/core/session/devEndpoints.ts",
+        "bytes": 4794,
+        "sha256": "58529eb378b2bec89ac9277666bc43318a9003494a46e2efb6273b8f64220b89"
+      },
+      {
+        "path": "web/src/core/appConfig.ts",
+        "bytes": 702,
+        "sha256": "5cfd0226bddce023b693f5fc155e5ecdbd1cd826c81d32f14be9068f79ac4f4a"
+      },
+      {
+        "path": "web/src/core/session/devEndpoints.test.ts",
+        "bytes": 8874,
+        "sha256": "6e476df43b0aafaf00c9cbba3c6262df19fbdf24c90ae4c2b856d89fa459cc78"
+      },
+      {
+        "path": "web/src/core/appConfig.test.ts",
+        "bytes": 2431,
+        "sha256": "5e354dee761560f933f8782cd50ee39ba6c6a0982af4ac5de740c431397c9d14"
       }
     ],
-    "state": "not adopted or built by this preparation; Root targeted21/types result only"
+    "state": "Root adopted selected8 locally; targeted8/logout2/Web strict PASS reported; no build result inferred"
   }
 }

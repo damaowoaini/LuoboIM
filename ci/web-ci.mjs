@@ -61,8 +61,20 @@ export function validateReport(report, audit, exit, { minimum, exact, before = f
 }
 
 export function webCohort(value = "full-regression") {
-  assert(["chat-card-42", "individual-forward-32", "announcement-read-21", "full-regression"].includes(value), "Explicit chat-card-42, individual-forward-32, announcement-read-21 or full-regression cohort required");
+  assert(["chat-card-42", "individual-forward-32", "announcement-read-21", "loopback-dev-endpoints-8", "full-regression"].includes(value), "Explicit chat-card-42, individual-forward-32, announcement-read-21, loopback-dev-endpoints-8 or full-regression cohort required");
   return value;
+}
+
+export function loopbackDevEndpointsCohort(loopback) {
+  assert(loopback?.originManifestSHA256 === "617d484a27b27c08e6b5c931ed3b4706d4f2bd62b033e4261f4e035c52b12d33", "Reviewed loopback transport lineage required");
+  const before = [{"path":"web/src/main.tsx","bytes":681,"sha256":"ff759b0f45f7b2399b73a7f9c10803cc721186cdfbcd4931e89236cf35dd3b83"},{"path":"web/src/config/index.ts","bytes":994,"sha256":"1a6544cf6efaf6ee45b8eb31b67256d1b2ed1aa4ff3e233773d9bd6c6b397059"},{"path":"web/src/core/session/logout.ts","bytes":3296,"sha256":"c1b750b285e6feb6bc64b2a7b0238c992096b839b56aa55485f5d319da60d1ad"},{"path":"web/src/api/login.ts","bytes":7929,"sha256":"34fe2ed0c4f6ca9fd61b6f32633b105d0c19dfb02ed799d1f435fd88c7c4a42d"}];
+  const current = [{"path":"web/src/main.tsx","bytes":801,"sha256":"9074b47cfa4d3cd523b77370fe304d197aa73d20e1a494c673940e9377c99a63"},{"path":"web/src/config/index.ts","bytes":1027,"sha256":"10fda6ffb430a2da7d75626bc842283e3579d55ae04cb109f62817715abad511"},{"path":"web/src/core/session/logout.ts","bytes":3343,"sha256":"d23cbe06bda6d36c36dd959bfdf0e41a2ee9c9e68e0936922b82b5c7a101e985"},{"path":"web/src/api/login.ts","bytes":8437,"sha256":"b5db2f5ca82a6750df0a794abce7bb758c96a3490aaad7497023815c3adfa3c4"},{"path":"web/src/core/session/devEndpoints.ts","bytes":4794,"sha256":"58529eb378b2bec89ac9277666bc43318a9003494a46e2efb6273b8f64220b89"},{"path":"web/src/core/appConfig.ts","bytes":702,"sha256":"5cfd0226bddce023b693f5fc155e5ecdbd1cd826c81d32f14be9068f79ac4f4a"}];
+  const adopted = [{"path":"web/src/core/session/devEndpoints.test.ts","bytes":8874,"sha256":"6e476df43b0aafaf00c9cbba3c6262df19fbdf24c90ae4c2b856d89fa459cc78"},{"path":"web/src/core/appConfig.test.ts","bytes":2431,"sha256":"5e354dee761560f933f8782cd50ee39ba6c6a0982af4ac5de740c431397c9d14"}];
+  assert(JSON.stringify(loopback.before) === JSON.stringify(before) && JSON.stringify(loopback.currentAfter) === JSON.stringify(current) && JSON.stringify(loopback.adoptedTests) === JSON.stringify(adopted), "Exact loopback source/test lineage required");
+  assert(JSON.stringify(loopback.testPaths) === JSON.stringify(["src/core/session/devEndpoints.test.ts","src/core/appConfig.test.ts"]), "Exact normal loopback test paths required");
+  assert(loopback.tests === 8 && loopback.requiredNames?.length === 8 && new Set(loopback.requiredNames).size === 8 && hash(Buffer.from(JSON.stringify(loopback.requiredNames))) === "4b28c318c911416bfcd5be1b802b5c73f6a43b07f3f94534f141a20eb595d294", "Exact8 loopback names required");
+  assert(loopback.previousExpectedFullTests === 784 && loopback.expectedFullTests === 792, "Explicit784+8 loopback regression lineage required");
+  return { exact: loopback.tests, requiredNames: loopback.requiredNames };
 }
 
 export function announcementReadCohort(announcement) {
@@ -178,11 +190,14 @@ export function verifyInputs() {
   const copy = card?.copyRetention;
   const individual = inputs.individualForwardAdoption;
   const announcement = inputs.announcementReadAdoption;
+  const loopback = inputs.loopbackDevEndpointsAdoption;
+  loopbackDevEndpointsCohort(loopback);
+  for (const entry of [...loopback.currentAfter, ...loopback.adoptedTests]) verifyFile(repo, entry);
   individualForwardCohort(individual);
   announcementReadCohort(announcement);
   for (const entry of [...announcement.currentAfter, ...announcement.adoptedTests]) verifyFile(repo, entry);
   assert(card?.originManifestSHA256 === "d6404ca1d66bd5c972cbd9369eca309ef92c259478ca3b94204f4d938d41d48a" && card.before.length === 13 && card.currentAfter.length === 15 && card.adoptedTests.length === 4, "Complete chat-card source/test lineage required");
-  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === announcement.expectedFullTests && announcement.previousExpectedFullTests === individual.expectedFullTests, "Explicit pending689+37+5+32+21 regression cohort required");
+  assert(card.tests === 37 && card.priorFullPassed === 689 && card.expectedFullTests === 726 && copy?.newTests === 5 && copy.expectedFullTests === 731 && inputs.fullMinimumTests === loopback.expectedFullTests && loopback.previousExpectedFullTests === announcement.expectedFullTests && announcement.previousExpectedFullTests === individual.expectedFullTests, "Explicit pending689+37+5+32+21+8 regression cohort required");
   assert(card.requiredNames.length === 37 && new Set(card.requiredNames).size === 37, "Complete unique chat-card names required");
   assert(copy.requiredNames.length === 5 && new Set([...card.requiredNames, ...copy.requiredNames]).size === 42, "Complete unique copy-retention names required");
   assert(new Set([...card.requiredNames, ...copy.requiredNames, ...individual.requiredNames]).size === 74, "Complete unique 42+32 current names required");
@@ -301,7 +316,9 @@ async function main() {
       individualForwardCohort(individual), individual.testPaths));
     else if (cohort === "announcement-read-21") await phase("announcement-read-21", () => runTests("announcement-read-21",
       announcementReadCohort(inputs.announcementReadAdoption), inputs.announcementReadAdoption.testPaths));
-    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames, ...inputs.announcementReadAdoption.requiredNames] }));
+    else if (cohort === "loopback-dev-endpoints-8") await phase("loopback-dev-endpoints-8", () => runTests("loopback-dev-endpoints-8",
+      loopbackDevEndpointsCohort(inputs.loopbackDevEndpointsAdoption), inputs.loopbackDevEndpointsAdoption.testPaths));
+    else await phase("full-web", () => runTests("full-web", { minimum: inputs.fullMinimumTests, requiredNames: [...cardNames, ...individual.requiredNames, ...inputs.announcementReadAdoption.requiredNames, ...inputs.loopbackDevEndpointsAdoption.requiredNames] }));
     await phase("types-web-strict", async () => checkedProcess(await execute("types-web-strict", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit"])));
     await phase("types-desktop-original", async () => checkedProcess(await execute("types-desktop-original", process.execPath, ["node_modules/typescript/bin/tsc", "--noEmit", "-p", "tsconfig.desktop.json"])));
     if (cohort === "full-regression") {

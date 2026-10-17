@@ -1,4 +1,5 @@
-import { endpoints, Session, SessionCoordinator } from "./session";
+import { Session, SessionCoordinator } from "./session";
+import { browserEndpoints } from "./devEndpoints";
 
 export type LogoutState = "closed" | "pending" | "failed" | "local";
 export interface LogoutResult { state: LogoutState; cleared: boolean }
@@ -54,7 +55,7 @@ export async function revokeCurrentSession(
   if (signal.aborted) abort();
   const timeout = setTimeout(abort, timeoutMs);
   try {
-    const response = await send(`${endpoints(session).chat}/account/logout`, {
+    const response = await send(`${browserEndpoints(session).chat}/account/logout`, {
       method: "POST",
       headers: { "Content-Type": "application/json", token: session.chatToken, operationID: crypto.randomUUID() },
       body: JSON.stringify({ imToken: session.imToken }),

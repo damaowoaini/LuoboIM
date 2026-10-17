@@ -5,12 +5,13 @@ on:
   workflow_dispatch:
     inputs:
       cohort:
-        description: 'Focused card/individual forwarding/announcement reading, or the final combined regression'
+        description: 'Focused card/individual forwarding/announcement reading/loopback transport, or the final combined regression'
         type: choice
         options:
           - chat-card-42
           - individual-forward-32
           - announcement-read-21
+          - loopback-dev-endpoints-8
           - full-regression
         default: chat-card-42
         required: true

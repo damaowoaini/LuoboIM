@@ -7,6 +7,7 @@ import ReactDOM from "react-dom/client";
 
 import App from "./App";
 import { isSaveLog } from "./config";
+import { initializeDevEndpoints } from "./core/session/devEndpoints";
 
 if (window.electronAPI && isSaveLog) {
   const sdkLogger = log.scope("openim-sdk-core");
@@ -16,6 +17,7 @@ if (window.electronAPI && isSaveLog) {
   console.error = rendererLogger.error.bind(rendererLogger);
 }
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<App />);
-
-postMessage({ payload: "removeLoading" }, "*");
+void initializeDevEndpoints().then(() => {
+  ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<App />);
+  postMessage({ payload: "removeLoading" }, "*");
+});

@@ -1,7 +1,7 @@
 {
   "version": 3,
   "node": "24.21.0",
-  "fullMinimumTests": 784,
+  "fullMinimumTests": 792,
   "requiredInputs": [
     {
       "path": "web/package.json",
@@ -1204,5 +1204,111 @@
       "behaviorNotRerunAfterErasedReferenceCorrection": true
     },
     "sourceMeaning": "Only these4 rows succeed exact4301. Pure local announcement acknowledgement never clears native personal/all-member mentions. No prior4301 build47 or full763 reused as a new4304 execution."
+  },
+  "loopbackDevEndpointsAdoption": {
+    "originManifestSHA256": "617d484a27b27c08e6b5c931ed3b4706d4f2bd62b033e4261f4e035c52b12d33",
+    "before": [
+      {
+        "path": "web/src/main.tsx",
+        "bytes": 681,
+        "sha256": "ff759b0f45f7b2399b73a7f9c10803cc721186cdfbcd4931e89236cf35dd3b83"
+      },
+      {
+        "path": "web/src/config/index.ts",
+        "bytes": 994,
+        "sha256": "1a6544cf6efaf6ee45b8eb31b67256d1b2ed1aa4ff3e233773d9bd6c6b397059"
+      },
+      {
+        "path": "web/src/core/session/logout.ts",
+        "bytes": 3296,
+        "sha256": "c1b750b285e6feb6bc64b2a7b0238c992096b839b56aa55485f5d319da60d1ad"
+      },
+      {
+        "path": "web/src/api/login.ts",
+        "bytes": 7929,
+        "sha256": "34fe2ed0c4f6ca9fd61b6f32633b105d0c19dfb02ed799d1f435fd88c7c4a42d"
+      }
+    ],
+    "currentAfter": [
+      {
+        "path": "web/src/main.tsx",
+        "bytes": 801,
+        "sha256": "9074b47cfa4d3cd523b77370fe304d197aa73d20e1a494c673940e9377c99a63"
+      },
+      {
+        "path": "web/src/config/index.ts",
+        "bytes": 1027,
+        "sha256": "10fda6ffb430a2da7d75626bc842283e3579d55ae04cb109f62817715abad511"
+      },
+      {
+        "path": "web/src/core/session/logout.ts",
+        "bytes": 3343,
+        "sha256": "d23cbe06bda6d36c36dd959bfdf0e41a2ee9c9e68e0936922b82b5c7a101e985"
+      },
+      {
+        "path": "web/src/api/login.ts",
+        "bytes": 8437,
+        "sha256": "b5db2f5ca82a6750df0a794abce7bb758c96a3490aaad7497023815c3adfa3c4"
+      },
+      {
+        "path": "web/src/core/session/devEndpoints.ts",
+        "bytes": 4794,
+        "sha256": "58529eb378b2bec89ac9277666bc43318a9003494a46e2efb6273b8f64220b89"
+      },
+      {
+        "path": "web/src/core/appConfig.ts",
+        "bytes": 702,
+        "sha256": "5cfd0226bddce023b693f5fc155e5ecdbd1cd826c81d32f14be9068f79ac4f4a"
+      }
+    ],
+    "adoptedTests": [
+      {
+        "path": "web/src/core/session/devEndpoints.test.ts",
+        "bytes": 8874,
+        "sha256": "6e476df43b0aafaf00c9cbba3c6262df19fbdf24c90ae4c2b856d89fa459cc78"
+      },
+      {
+        "path": "web/src/core/appConfig.test.ts",
+        "bytes": 2431,
+        "sha256": "5e354dee761560f933f8782cd50ee39ba6c6a0982af4ac5de740c431397c9d14"
+      }
+    ],
+    "testPaths": [
+      "src/core/session/devEndpoints.test.ts",
+      "src/core/appConfig.test.ts"
+    ],
+    "tests": 8,
+    "requiredNames": [
+      "keeps ordinary HTTPS/443 endpoints and avoids bootstrap requests outside its exact loopback issuer",
+      "maps only the original issuer, tenant and active raw domain without changing persisted ownership",
+      "fetches only bounded anonymous same-origin deployment data and rejects malformed mappings",
+      "does not install an old bootstrap response after a service-setting change",
+      "uses the real HTTP token and lease boundary across a different tenant while retaining SDK endpoint getters",
+      "revokes the captured tenant through the same adapter without using a replacement account token",
+      "normalizes the real omitted protobuf map and retains string policy without disabling default verification",
+      "rejects malformed successful data and preserves transport or business rejection instead of inventing empty success"
+    ],
+    "acceptedFullNames": [
+      "explicit loopback tenant transport > keeps ordinary HTTPS/443 endpoints and avoids bootstrap requests outside its exact loopback issuer",
+      "explicit loopback tenant transport > maps only the original issuer, tenant and active raw domain without changing persisted ownership",
+      "explicit loopback tenant transport > fetches only bounded anonymous same-origin deployment data and rejects malformed mappings",
+      "explicit loopback tenant transport > does not install an old bootstrap response after a service-setting change",
+      "explicit loopback tenant transport > uses the real HTTP token and lease boundary across a different tenant while retaining SDK endpoint getters",
+      "explicit loopback tenant transport > revokes the captured tenant through the same adapter without using a replacement account token",
+      "successful client config wire data > normalizes the real omitted protobuf map and retains string policy without disabling default verification",
+      "successful client config wire data > rejects malformed successful data and preserves transport or business rejection instead of inventing empty success"
+    ],
+    "previousExpectedFullTests": 784,
+    "expectedFullTests": 792,
+    "fullState": "expected_only_not_executed",
+    "localResult": {
+      "reportedBy": "Root; .qa/web-loopback-new8-affected2-1/root-acceptance.json",
+      "new8": "PASS_Root_reported",
+      "directAffectedLogout2": "PASS_Root_reported",
+      "WebStrictNoEmit": "PASS_Root_reported",
+      "DesktopNoEmit": "prior valid result reused; only electron and unchanged src declarations included",
+      "independent_execution_in_this_CI_preparation": false
+    },
+    "sourceMeaning": "Explicit loopback deployment transport only; original session ownership, ordinary HTTPS443, SDK/WASM and production CSP unchanged. No actual browser or login acceptance inferred."
   }
 }

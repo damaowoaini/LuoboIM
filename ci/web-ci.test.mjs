@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput, announcementReadCohort } from "./web-ci.mjs";
+import { validateReport, verifyFile, verifyLinuxBindings, verifyStyleCaller, currentChatCardInput, currentCardCopyInput, webCohort, individualForwardCohort, currentIndividualForwardInput, announcementReadCohort, loopbackDevEndpointsCohort } from "./web-ci.mjs";
 
 function runFixture(callback) {
   const root = mkdtempSync(path.join(os.tmpdir(), "luobo-web-ci-"));
@@ -100,6 +100,7 @@ test("chat-card report requires each exact name once rather than accepting a mat
 });
 test("chat-card manual cohort rejects unknown modes and preserves explicit full regression", () => {
   assert.equal(webCohort("chat-card-42"), "chat-card-42");
+  assert.equal(webCohort("loopback-dev-endpoints-8"), "loopback-dev-endpoints-8");
   assert.equal(webCohort("full-regression"), "full-regression");
   assert.equal(webCohort(), "full-regression");
   for (const unknown of ["", "card", "full", "chat-card-37", "chat-card-42 --extra"]) assert.throws(() => webCohort(unknown), /Explicit/);
@@ -161,7 +162,28 @@ test("announcement successor rejects wrong source and keeps card individual hist
   const before = structuredClone(announcement.before); before[0].bytes++;
   assert.throws(() => announcementReadCohort({ ...announcement, before }), /source\/test lineage/);
   const input = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8"));
-  assert.equal(input.fullMinimumTests, 784);
+  assert.equal(input.loopbackDevEndpointsAdoption.previousExpectedFullTests, 784);
+  assert.equal(input.fullMinimumTests, 792);
   assert.equal(input.announcementReadAdoption.previousExpectedFullTests, input.individualForwardAdoption.expectedFullTests);
   assert.equal(new Set([...input.chatCardAdoption.requiredNames, ...input.chatCardAdoption.copyRetention.requiredNames, ...input.individualForwardAdoption.requiredNames, ...announcement.requiredNames]).size, 95);
+});
+
+const loopback = JSON.parse(readFileSync(new URL("./web-ci.inputs.json", import.meta.url), "utf8")).loopbackDevEndpointsAdoption;
+test("loopback transport cohort keeps exact8 names source lineage and production contracts", () => {
+  assert.equal(webCohort("loopback-dev-endpoints-8"), "loopback-dev-endpoints-8");
+  const options = loopbackDevEndpointsCohort(loopback);
+  assert.equal(options.exact, 8);
+  const data = reports(Array(8).fill("passed"));
+  data.audit.tests.forEach((entry, index) => { entry.name = loopback.requiredNames[index]; });
+  assert.equal(checked(data, 0, options).passed, 8);
+  data.audit.tests[0].name = "unreviewed loopback name";
+  assert.throws(() => checked(data, 0, options), /Required test/);
+  for (const mutate of [
+    (x) => { x.originManifestSHA256 = "0".repeat(64); },
+    (x) => { x.currentAfter[0].sha256 = "0".repeat(64); },
+    (x) => { x.before[0].bytes++; },
+    (x) => { x.requiredNames[0] = "unreviewed name"; },
+    (x) => { x.testPaths.push("src/unrelated.test.ts"); },
+    (x) => { x.expectedFullTests = 784; },
+  ]) { const changed = structuredClone(loopback); mutate(changed); assert.throws(() => loopbackDevEndpointsCohort(changed)); }
 });

@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getChatUrl, getRouteUrl } from "@/config";
 import { useUserStore } from "@/store";
 import { AppConfig } from "@/store/type";
+import { decodeAppConfigData } from "@/core/appConfig";
 import createAxiosInstance from "@/utils/request";
 import { getChatToken } from "@/utils/storage";
 
@@ -274,7 +275,7 @@ params: Partial<UpdateBusinessUserInfoParams>) =>
 
 export const getAppConfig = async (invitationCode?: string) => {
   await sessionCoordinator.restore().catch(() => undefined);
-  return (sessionCoordinator.current ? request : routeRequest).post<{config: AppConfig;}>(
+  const response = await (sessionCoordinator.current ? request : routeRequest).post<unknown>(
     sessionCoordinator.current ? "/client_config/get" : "/api/client_config/get",
     { invitationCode },
     {
@@ -283,6 +284,12 @@ export const getAppConfig = async (invitationCode?: string) => {
       }
     }
   );
+  // The protobuf string map is omitted for an empty successful config. Keep
+  // transport/business failures rejected and validate the successful data here.
+  const data = decodeAppConfigData(response.data);
+  // Preserve the existing UI-facing type; the wire values themselves are all
+  // strings, and existing policy consumers perform their own Number/String conversion.
+  return { ...response, data: data as unknown as { config: AppConfig } };
 };
 
 // 获取用户最新登录记录
