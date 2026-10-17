@@ -28,6 +28,8 @@ final class ChatLocationFixture {
     writeDouble: (_, _) async {},
   );
   bool started = false;
+  bool traceActual = false;
+  void Function(String)? _actualFrameTrace;
   static const cid = 'single-alice-bob';
 
   Map<String, dynamic> wire({
@@ -54,10 +56,15 @@ final class ChatLocationFixture {
   };
 
   Future<void> frame(WidgetTester tester) async {
+    final trace = _actualFrameTrace;
+    trace?.call('frame.runAsync.before');
     await tester.runAsync(() async {
       await Future<void>.delayed(Duration.zero);
     });
+    trace?.call('frame.runAsync.after');
+    trace?.call('frame.pump.before');
     await tester.pump(const Duration(milliseconds: 20));
+    trace?.call('frame.pump.after');
   }
 
   Future<void> until(WidgetTester tester, bool Function() ready) async {
@@ -92,25 +99,57 @@ final class ChatLocationFixture {
     Object? error;
     StackTrace? stack;
     var done = false;
+    final tracing = traceActual;
+    void note(String step) {
+      if (tracing) {
+        debugPrintSynchronously('chat_input_actual $step');
+      }
+    }
+
+    note('enter');
     await tester.runAsync(() async {
+      note('start');
       unawaited(
         Future<T>.sync(action).then<void>(
           (result) {
             value = result;
             done = true;
+            note('observed.done');
           },
           onError: (Object caught, StackTrace trace) {
             error = caught;
             stack = trace;
             done = true;
+            note('observed.error');
           },
         ),
       );
     });
-    await until(tester, () => done);
+    note('start.returned');
+    final priorTrace = _actualFrameTrace;
+    if (tracing) {
+      var frameMarkers = 0;
+      _actualFrameTrace = (step) {
+        // Only the first two original frames: no added timer or polling turn.
+        if (frameMarkers < 8) {
+          ++frameMarkers;
+          note(step);
+        }
+      };
+    }
+    try {
+      note('until.enter');
+      await until(tester, () => done);
+      note('until.returned');
+    } finally {
+      if (tracing) {
+        _actualFrameTrace = priorTrace;
+      }
+    }
     if (error != null) {
       Error.throwWithStackTrace(error!, stack!);
     }
+    note('return');
     return value as T;
   }
 

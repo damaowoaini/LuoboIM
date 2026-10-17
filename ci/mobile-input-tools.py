@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Only three directly affected controls and two new failure/postproof controls."""
+"""Four directly affected scope controls; original failure/postproof control is reused."""
 import copy
 import importlib.util
 import json
@@ -41,19 +41,19 @@ def machine_text(events):
 
 
 class ChatInput363Tests(unittest.TestCase):
-    # Original three method names stay stable; assertions now cover R3's
-    # exact six replacements/four new files and nine-then-one continuation.
+    # Original method names stay stable; R4 has exact9 replacements/4 new
+    # and phase2 then isolated1. Failure/postproof control body stays exact.
     def test_current363_vector_reverses_only_exact_five_before_and_four_new_without_historical_alias(self):
         cfg, old = lane.descriptor()
         lane.validate_inventory(cfg, cfg['source_rows'], old)
-        self.assertEqual(len(cfg['delta10']), 10)
-        self.assertEqual(sum(r['before'] is not None for r in cfg['delta10']), 6)
+        self.assertEqual(len(cfg['delta13']), 13)
+        self.assertEqual(sum(r['before'] is not None for r in cfg['delta13']), 9)
         self.assertNotEqual(lane.FINAL_SOURCE, lane.BASE_SOURCE)
         lane.validate_local_reuse(cfg)
         lane.validate_cloud_reuse(cfg)
         for key, operation, pattern in [
-            ('local_validation_reuse', lane.validate_local_reuse, 'local analysis10/gateway1 proof'),
-            ('cloud_validation_reuse', lane.validate_cloud_reuse, 'prior cloud15 proof')]:
+            ('local_validation_reuse', lane.validate_local_reuse, 'local analysis13/gateway1 proof'),
+            ('cloud_validation_reuse', lane.validate_cloud_reuse, 'prior cloud23 proof')]:
             changed = copy.deepcopy(cfg)
             changed[key]['forged'] = True
             with self.assertRaisesRegex(ValueError, pattern):
@@ -63,21 +63,21 @@ class ChatInput363Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'current363 source inventory'):
             lane.validate_inventory(cfg, wrong, old)
         wrong_cfg = copy.deepcopy(cfg)
-        next(r for r in wrong_cfg['delta10'] if r['before'] is not None)['before']['sha256'] = '0'*64
-        with self.assertRaisesRegex(ValueError, 'historical359 reverse6'):
+        next(r for r in wrong_cfg['delta13'] if r['before'] is not None)['before']['sha256'] = '0'*64
+        with self.assertRaisesRegex(ValueError, 'historical359 reverse9'):
             lane.validate_inventory(wrong_cfg, wrong_cfg['source_rows'], old)
         extra = copy.deepcopy(cfg['source_rows'])
         extra.append({'path': 'app/tool/check.sh', 'bytes': 1, 'sha256': '0'*64})
         with self.assertRaisesRegex(ValueError, 'current363 source inventory'):
             lane.validate_inventory(cfg, extra, old)
         self.assertFalse(cfg['cloud_validation_reuse']['prior_source_post_exact_recorded'])
-        self.assertEqual(len(cfg['local_validation_reuse']['analyses10']), 10)
+        self.assertEqual(len(cfg['local_validation_reuse']['analyses13']), 13)
 
     def test_actual_dispatch_selects_only_unstarted25_with_exact_local9_plus1_and_preserves_manual_old359(self):
         cfg, _ = lane.descriptor()
         phases = lane.phase_commands(Path('/tmp/fresh-input363'), cfg)
-        self.assertEqual([p['expected'] for p in phases], [9, 1])
-        self.assertEqual(phases[0]['command'][-4:], lane.PHASE9_PATHS)
+        self.assertEqual([p['expected'] for p in phases], [2, 1])
+        self.assertEqual(phases[0]['command'][-1:], lane.PHASE2_PATHS)
         self.assertEqual(phases[1]['command'][-1:], lane.PHASE1_PATHS)
         selected = []
         for phase in phases:
@@ -85,13 +85,13 @@ class ChatInput363Tests(unittest.TestCase):
             self.assertEqual(command[1:6], ['test', '--no-pub', '--machine', '--concurrency=1', '--no-enable-vmservice'])
             pattern = re.compile(command[command.index('--name')+1])
             self.assertTrue(all(pattern.fullmatch(n) for n in phase['names']))
-            self.assertTrue(all(pattern.fullmatch(n) is None for n in lane.REUSED15+[lane.OLD5[-1]]))
+            self.assertTrue(all(pattern.fullmatch(n) is None for n in lane.REUSED23+[lane.OLD5[-1]]))
             selected += phase['names']
         first = re.compile(phases[0]['command'][phases[0]['command'].index('--name')+1])
         self.assertIsNone(first.fullmatch(lane.PHASE1[0]))
-        self.assertEqual(set(selected+lane.REUSED15), set(lane.NAMES25))
-        self.assertEqual(len(set(selected)), 10)
-        self.assertEqual([len(lane.phase_cleanup(cfg, p)['widget_names']) for p in phases], [8, 1])
+        self.assertEqual(set(selected+lane.REUSED23+[lane.OLD5[-1]]), set(lane.UNIVERSE27))
+        self.assertEqual(len(set(selected)), 3)
+        self.assertEqual([len(lane.phase_cleanup(cfg, p)['widget_names']) for p in phases], [2, 1])
         workflow = (ROOT/'.github/workflows/mobile-input.yml').read_text()
         self.assertIn('  workflow_dispatch:', workflow)
         for forbidden in ['  push:', '  pull_request:', '  schedule:', 'full-regression']:
@@ -110,14 +110,14 @@ class ChatInput363Tests(unittest.TestCase):
 
     def test_exact_machine25_and_real_fixture24_reject_reused_name_skip_missing_cleanup_and_ui_warning(self):
         cfg, _ = lane.descriptor()
-        for phase, fixtures in zip(lane.phase_commands(Path('/tmp/fresh-input363'), cfg), [8, 1]):
+        for phase, fixtures in zip(lane.phase_commands(Path('/tmp/fresh-input363'), cfg), [2, 1]):
             with self.subTest(phase=phase['label']):
                 events = events_for(cfg, phase)
                 result = lane.result_summary(machine_text(events), cfg, phase)
                 self.assertEqual(result['tests']['passed'], phase['expected'])
                 self.assertEqual(result['cleanup']['widget_names'], fixtures)
                 wrong = copy.deepcopy(events)
-                wrong[0]['test']['name'] = lane.REUSED15[0]
+                wrong[0]['test']['name'] = lane.REUSED23[0]
                 with self.assertRaisesRegex(ValueError, 'name multiset'):
                     lane.result_summary(machine_text(wrong), cfg, phase)
                 wrong = copy.deepcopy(events)
@@ -206,10 +206,10 @@ class ChatInput363Tests(unittest.TestCase):
                     self.assertEqual(json.loads((work/'evidence/input-failed.json').read_text())['latched_failure'], 'phase_timeout')
                 if passed:
                     result = json.loads((work/'evidence/input-scoped-passed.json').read_text())
-                    self.assertEqual(result['cloud_tests_executed'], 10)
-                    self.assertEqual(result['cleanup']['prior_cloud_reused_markers'], 60)
-                    self.assertEqual(result['cleanup']['new_markers'], 36)
-                    self.assertFalse(result['cleanup']['newly_executed_24_fixtures'])
+                    self.assertEqual(result['cloud_tests_executed'], 3)
+                    self.assertEqual(result['cleanup']['prior_cloud_reused_markers'], 88)
+                    self.assertEqual(result['cleanup']['new_markers'], 12)
+                    self.assertFalse(result['cleanup']['newly_executed_25_fixtures'])
 
 
 if __name__ == '__main__':

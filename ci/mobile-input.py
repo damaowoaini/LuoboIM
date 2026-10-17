@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manual current363/415 failed AT + unstarted8, then diagnostic typing1; prior15 reused."""
+"""Manual current363/415 failed moderation and affected retry (2), then typing1; prior23 reused."""
 import argparse
 import importlib.util
 import json
@@ -26,10 +26,11 @@ SOURCE = CHECK.source
 ANALYSIS = module('input_inherited_analysis', REPO/'ci/mobile-announcement.py')
 BASE_SOURCE = '633e257bcc0c161eb9ad109b61ca689acfcf5fc454472d02f38b942b69f0d199'
 BASE_PORTABLE = '66f60a7c2f93618b0f2eff179e545694f5978cdbd19ae8cd223f86d1333fa8cb'
-FINAL_SOURCE = '2820dddc3f7213871c9d14a566eb4ca9f267f8010f6d5bd2d9443e0855bac393'
-FINAL_PORTABLE = '02b8360346ae1f7bb9cfd2af03dc85d873681507e7a043e3cf60b3961b1f6979'
-LOCAL_REUSE_SHA = '7cd03536735a0431451a93a4e7647746cfd2fda214fcafbf31fffb2eb14a7a6f'
-CLOUD_REUSE_SHA = 'b2438f78ab68b2e34c111cc8052e85e1563c3fcc0c136a397acb80bcc87387ba'
+FINAL_SOURCE = '301ffb559964674e6fcfae5aa58cf814b0e7587d1d58ff939e7ba7155054d321'
+FINAL_PORTABLE = '4a5584b1144e40399e08e8ca656dc204706c983cea01ccacd9cbff9605fa6b93'
+LOCAL_REUSE_SHA = '570d6ac3409aaabce584f212f8702dd3ee263ed7e17a2d442daf805a197da59e'
+ORIGINAL_CLOUD15_SHA = 'b2438f78ab68b2e34c111cc8052e85e1563c3fcc0c136a397acb80bcc87387ba'
+CLOUD_REUSE_SHA = 'f8f67e7874a32900452959a3833c28135b8c48f3128ea0508314c810c746d6f5'
 SOURCE_POST_SECONDS = 30
 RESOURCE = {'initial_bytes': 4294967296, 'floor_bytes': 1073741824,
             'allocated_cap_bytes': 805306368, 'poll_seconds': .2, 'phase_seconds': 120}
@@ -41,12 +42,18 @@ OLD5 = ['actual self message menu keeps ordinary single chat revoke usable', 'ac
 NAMES26 = NEW21 + OLD5
 NAMES25 = NAMES26[:-1]
 ANALYSIS_PATHS10 = ANALYSIS_PATHS9[:6] + ['test/core/im/sdk_harness.dart'] + ANALYSIS_PATHS9[6:]
-CHANGED_ANALYSIS3 = ['test/core/im/sdk_harness.dart', 'test/features/chat/chat_input_fixture.dart', 'test/features/chat/chat_typing_workflow_test.dart']
-REUSED_ANALYSIS7 = [p for p in ANALYSIS_PATHS9 if p not in CHANGED_ANALYSIS3]
-PHASE9 = [OLD5[0], OLD5[1], OLD5[2], OLD5[3], NEW21[1], *NEW21[17:]]
+REUSED_ANALYSIS9 = [p for p in ANALYSIS_PATHS10 if p != 'test/features/chat/chat_typing_workflow_test.dart']
+CHANGED_ANALYSIS4 = ['test/features/chat/chat_location_fixture.dart', 'test/features/chat/chat_typing_workflow_test.dart', 'test/features/chat/group_revoke_fixture.dart', 'test/features/chat/group_revoke_workflow_test.dart']
+ANALYSIS_PATHS13 = ['lib/core/im/im_event.dart', 'lib/core/im/open_im_gateway.dart', 'lib/features/chat/data/chat_repository.dart', 'lib/features/chat/presentation/chat_page.dart', 'lib/features/chat/presentation/chat_typing_controller.dart', 'lib/features/chat/presentation/mention_text_controller.dart', 'test/core/im/sdk_harness.dart', 'test/features/chat/chat_input_fixture.dart', 'test/features/chat/chat_location_fixture.dart', 'test/features/chat/chat_reedit_workflow_test.dart', 'test/features/chat/chat_typing_workflow_test.dart', 'test/features/chat/group_revoke_fixture.dart', 'test/features/chat/group_revoke_workflow_test.dart']
+ORIGINAL_PHASE9 = [OLD5[0], OLD5[1], OLD5[2], OLD5[3], NEW21[1], *NEW21[17:]]
 PHASE1 = [NEW21[16]]
-REUSED15 = [name for name in NAMES25 if name not in PHASE9 + PHASE1]
-PHASE9_PATHS = ['test/features/chat/group_revoke_workflow_test.dart', 'test/features/chat/chat_page_test.dart', 'test/features/chat/chat_reedit_workflow_test.dart', 'test/features/chat/chat_typing_workflow_test.dart']
+REUSED15 = [name for name in NAMES25 if name not in ORIGINAL_PHASE9 + PHASE1]
+RETRY = 'actual role read failure stays an error and explicit retry remains read only until confirmation'
+PHASE2 = [OLD5[1], RETRY]
+PHASE2_PATHS = ['test/features/chat/group_revoke_workflow_test.dart']
+UNIVERSE27 = NAMES26 + [RETRY]
+REUSED23 = [n for n in NAMES25 if n not in [OLD5[1], PHASE1[0]]]
+REUSED_WIDGET22 = [n for n in REUSED23 if n != OLD5[3]]
 PHASE1_PATHS = ['test/features/chat/chat_typing_workflow_test.dart']
 HELPERS = ['ci/mobile-source.py', 'ci/mobile-check.py', 'ci/mobile-announcement.py', 'ci/mobile/inputs.json', 'ci/mobile/required-test-names.json', 'ci/mobile-setup.sh', 'ci/mobile-input-setup.sh', '.github/workflows/mobile-input.yml', '.github/workflows/mobile-ci.yml', 'ci/mobile-input.py']
 
@@ -67,9 +74,9 @@ def validate_inventory(cfg, actual_rows, old_plan):
     if actual_rows != cfg['source_rows'] or len(actual_rows) != 363 or inventory_digest(actual_rows) != FINAL_SOURCE:
         raise ValueError('current363 source inventory differs')
     previous = {r['path']: r for r in actual_rows}
-    selected = cfg['delta10']
-    if len(selected) != 10 or len({r['path'] for r in selected}) != 10:
-        raise ValueError('exact delta10 required')
+    selected = cfg['delta13']
+    if len(selected) != 13 or len({r['path'] for r in selected}) != 13:
+        raise ValueError('exact delta13 required')
     replaced = added = 0
     for row in selected:
         if previous.get(row['path']) != row['after']:
@@ -82,41 +89,40 @@ def validate_inventory(cfg, actual_rows, old_plan):
                 raise ValueError('delta before target differs')
             previous[row['path']] = row['before']
             replaced += 1
-    if (replaced, added) != (6, 4) or list(sorted(previous.values(), key=lambda r: r['path'])) != old_plan['current359']['files']:
-        raise ValueError('historical359 reverse6/remove4 differs')
+    if (replaced, added) != (9, 4) or list(sorted(previous.values(), key=lambda r: r['path'])) != old_plan['current359']['files']:
+        raise ValueError('historical359 reverse9/remove4 differs')
     if inventory_digest(list(previous.values())) != BASE_SOURCE:
         raise ValueError('historical359 digest differs')
 
 
 def validate_local_reuse(cfg):
-    # Reuse is per exact authored body, not a fresh analysis of the old failed
-    # invocation. Seven unchanged analyses + Root's new three form ten paths.
+    # Nine exact previous analyses plus Root's current four, not new cloud
+    # analysis. Old15's missing source-post is never backfilled by later runs.
     proof = cfg['local_validation_reuse']
     canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
     if SOURCE.sha(canonical) != LOCAL_REUSE_SHA:
-        raise ValueError('local analysis10/gateway1 proof differs')
+        raise ValueError('local analysis13/gateway1 proof differs')
     rows = {r['path']: r for r in cfg['source_rows']}
     if (proof['source363'] != FINAL_SOURCE or proof['portable415'] != FINAL_PORTABLE
             or proof['all415AuthoredSourcesPostExact'] is not True
             or proof['cloud15SourcePostExactClaimed'] is not False
-            or [r['path'] for r in proof['analyses10']] != ANALYSIS_PATHS10
-            or proof['reused_analysis_paths7'] != REUSED_ANALYSIS7
-            or proof['new_analysis_paths3'] != CHANGED_ANALYSIS3
-            or len(proof['analyses10']) != 10
+            or [r['path'] for r in proof['analyses13']] != ANALYSIS_PATHS13
+            or proof['reused_analysis_paths9'] != REUSED_ANALYSIS9
+            or proof['new_analysis_paths4'] != CHANGED_ANALYSIS4
+            or len(proof['analyses13']) != 13
             or proof['gateway1']['name'] != OLD5[-1]
             or proof['gateway1']['source'] != rows['app/test/core/im/open_im_gateway_test.dart']
-            or proof['cloudReexecution'] != {'analysis': 0, 'gateway1': False, 'tests': 10}):
+            or proof['cloudReexecution'] != {'analysis': 0, 'gateway1': False, 'tests': 3}):
         raise ValueError('local analysis union scope/source differs')
-    for entry in proof['analyses10']:
+    for entry in proof['analyses13']:
         if (entry['source'] != rows['app/'+entry['path']]
                 or entry['result'] != {'path': entry['path'], 'exitCode': 0, 'noIssues': True}):
             raise ValueError('local analysis body/result differs')
 
-
-def validate_cloud_reuse(cfg):
+def validate_original_cloud15_reuse(cfg):
     proof = cfg['cloud_validation_reuse']
     canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
-    if SOURCE.sha(canonical) != CLOUD_REUSE_SHA:
+    if SOURCE.sha(canonical) != ORIGINAL_CLOUD15_SHA:
         raise ValueError('prior cloud15 proof differs')
     if (proof['run'] != 39034473775 or proof['job'] != 117401417624
             or proof['head'] != '6e1449c6027d4d768999a85afd9e9d027697ba22'
@@ -137,26 +143,56 @@ def validate_cloud_reuse(cfg):
             raise ValueError('prior cloud15 cleanup sequence differs')
 
 
+def validate_cloud_reuse(cfg):
+    proof = cfg['cloud_validation_reuse']
+    canonical = json.dumps(proof, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    if SOURCE.sha(canonical) != CLOUD_REUSE_SHA:
+        raise ValueError('prior cloud23 proof differs')
+    validate_original_cloud15_reuse({'cloud_validation_reuse': proof['original_cloud15'], 'cleanup': cfg['cleanup']})
+    r3 = proof['continuation_cloud8']
+    if (r3['run'] != 39036060511 or r3['job'] != 117405946599 or r3['attempt'] != 1
+            or r3['head'] != '992b7447bb1177e44d3407c11853f3e6f5ab578d'
+            or r3['actual_passed_names8'] != [n for n in REUSED23 if n not in REUSED15]
+            or r3['accepted_cleanup_fixtures'] != 7 or r3['accepted_cleanup_markers'] != 28
+            or [r['name'] for r in r3['actual_cleanup7']] != [n for n in REUSED_WIDGET22 if n not in REUSED15]
+            or r3['passed_draft_names1'] != [OLD5[3]]
+            or r3['source363_at_gate_and_post'] != '2820dddc3f7213871c9d14a566eb4ca9f267f8010f6d5bd2d9443e0855bac393'
+            or r3['portable415_at_gate_and_post'] != '02b8360346ae1f7bb9cfd2af03dc85d873681507e7a043e3cf60b3961b1f6979'
+            or r3['both_phase_source_post_exact'] is not True
+            or r3['failed_group_complete_cleanup_counted_as_pass'] is not False
+            or proof['actual_passed_names23'] != REUSED23
+            or [r['name'] for r in proof['actual_cleanup22']] != REUSED_WIDGET22
+            or proof['accepted_cleanup_fixtures'] != 22 or proof['accepted_cleanup_markers'] != 88
+            or proof['prior_source_post_exact_recorded'] is not False
+            or proof['new_execution_claimed'] is not False):
+        raise ValueError('prior cloud23 scope/source/cleanup lineage differs')
+    for row in [*r3['actual_cleanup7'], *proof['actual_cleanup22']]:
+        if row['markers'] != cfg['cleanup']['widget_markers']:
+            raise ValueError('prior cloud23 cleanup sequence differs')
+
+
 def descriptor():
     cfg = json.loads(SOURCE.regular(INPUTS))
-    if (cfg['schema'] != 'luobo.mobile.input.current363.failed9.then.diagnostic1.reuse15.v3'
+    if (cfg['schema'] != 'luobo.mobile.input.current363.failed2.then.diagnostic1.reuse23.v4'
             or cfg['cohort'] != 'current363' or cfg['resource'] != RESOURCE
             or cfg['source_digest'] != FINAL_SOURCE or cfg['portable_digest'] != FINAL_PORTABLE
             or cfg['source_members'] != 363 or cfg['portable_members'] != 415
-            or cfg['analysis_paths'] != ANALYSIS_PATHS10 or cfg['test_paths'] != TEST_PATHS4
+            or cfg['analysis_paths'] != ANALYSIS_PATHS13 or cfg['test_paths'] != TEST_PATHS4
             or cfg['new_names21'] != NEW21 or cfg['old_names5'] != OLD5
             or cfg['names26'] != NAMES26
+            or cfg['universe_names27'] != UNIVERSE27
+            or len(set(cfg['universe_names27'])) != 27
             or cfg['names25'] != NAMES25 or cfg['reused_names1'] != [OLD5[-1]]
-            or cfg['phase9_names'] != PHASE9 or cfg['phase1_names'] != PHASE1
-            or cfg['reused_cloud_names15'] != REUSED15
-            or cfg['phase9_paths'] != PHASE9_PATHS or cfg['phase1_paths'] != PHASE1_PATHS
+            or cfg['phase2_names'] != PHASE2 or cfg['phase1_names'] != PHASE1
+            or cfg['reused_cloud_names23'] != REUSED23
+            or cfg['phase2_paths'] != PHASE2_PATHS or cfg['phase1_paths'] != PHASE1_PATHS
             or cfg['cloud_analysis_paths'] != []
             or len(cfg['names25']) != 25 or len(set(cfg['names25'])) != 25
             or [r['path'] for r in cfg['helper_pins']] != HELPERS
             or len(cfg['names26']) != 26 or len(set(cfg['names26'])) != 26
             or len(cfg['new_names21']) != 21 or len(cfg['old_names5']) != 5
             or cfg['names26'] != cfg['new_names21'] + cfg['old_names5']
-            or cfg['cleanup']['widget_names'] != cfg['new_names21'] + cfg['old_names5'][:3]
+            or cfg['cleanup']['widget_names'] != cfg['new_names21'] + cfg['old_names5'][:3] + [RETRY]
             or cfg['cleanup']['repository_names'] != []
             or cfg['cleanup']['widget_markers'] != ['sdk.begin', 'sdk.end', 'unmount.begin', 'unmount.end']
             or cfg['cleanup']['repository_markers'] != ['sdk.begin', 'sdk.end', 'storage.begin', 'storage.end']):
@@ -207,8 +243,8 @@ def sources(cfg, old):
         files[row['path']] = pin(SOURCE.regular(REPO/SOURCE.safe_name(row['path'])), row)
     if len(files) != 415 or SOURCE.source_digest(files) != FINAL_PORTABLE:
         raise ValueError('current363 portable415 differs')
-    if cfg['analysis_paths'] != [r['path'][4:] for r in cfg['delta10']]:
-        raise ValueError('changed analysis ten differs')
+    if cfg['analysis_paths'] != [r['path'][4:] for r in cfg['delta13']]:
+        raise ValueError('changed analysis thirteen differs')
     for row in cfg['old_test_source_pins']:
         pin(files[row['path']], row)
     return files
@@ -282,7 +318,7 @@ def phase_commands(work, cfg):
     validate_local_reuse(cfg)
     validate_cloud_reuse(cfg)
     phases = []
-    for label, names, paths in [('input-repair9', PHASE9, PHASE9_PATHS),
+    for label, names, paths in [('input-repair2', PHASE2, PHASE2_PATHS),
                                 ('input-typing-diagnostic1', PHASE1, PHASE1_PATHS)]:
         command = [str(work/'flutter/bin/flutter'), 'test', '--no-pub', '--machine', '--concurrency=1',
                    '--no-enable-vmservice', '--name', '^(?:'+'|'.join(map(re.escape, names))+')$'] + paths
@@ -484,8 +520,8 @@ def run(work):
     monitor.start()
     phases, primary = [], None
     try:
-        CHECK.write_json(work/'evidence/input-local-reuse10-plus1.json', cfg['local_validation_reuse'])
-        CHECK.write_json(work/'evidence/input-prior-cloud15.json', cfg['cloud_validation_reuse'])
+        CHECK.write_json(work/'evidence/input-local-reuse13-plus1.json', cfg['local_validation_reuse'])
+        CHECK.write_json(work/'evidence/input-prior-cloud23.json', cfg['cloud_validation_reuse'])
         for phase in phase_commands(work, cfg):
             result, error = run_phase(work, cfg, old, guard, phase)
             phases.append(result)
@@ -519,14 +555,15 @@ def run(work):
                 raise primary
             raise ValueError('targeted continuation failed')
     CHECK.write_json(work/'evidence/input-scoped-passed.json',
-                     {'state': 'current363_repair9_then_diagnostic1_with_explicit_prior15', 'phases': phases,
-                      'cloud_analysis_executed': 0, 'cloud_tests_executed': 10,
+                     {'state': 'current363_repair2_then_diagnostic1_with_explicit_prior23', 'phases': phases,
+                      'cloud_analysis_executed': 0, 'cloud_tests_executed': 3,
                       'local_reuse_sha256': LOCAL_REUSE_SHA, 'prior_cloud_reuse_sha256': CLOUD_REUSE_SHA,
                       'source363': FINAL_SOURCE, 'portable415': FINAL_PORTABLE,
-                      'cleanup': {'new_fixture_sequences': 9, 'new_markers': 36,
-                                  'prior_cloud_reused_fixtures': 15, 'prior_cloud_reused_markers': 60,
-                                  'combined_fixture_sequences': 24, 'combined_markers': 96,
-                                  'newly_executed_24_fixtures': False},
+                      'cleanup': {'new_fixture_sequences': 3, 'new_markers': 12,
+                                  'prior_cloud_reused_fixtures': 22, 'prior_cloud_reused_markers': 88,
+                                  'combined_fixture_sequences': 25, 'combined_markers': 100,
+                                  'newly_executed_25_fixtures': False,
+                                  'cloud_named_union27_includes_local_gateway1': True},
                       'full1329_executed': False, 'native_device_service_acceptance': False})
 
 

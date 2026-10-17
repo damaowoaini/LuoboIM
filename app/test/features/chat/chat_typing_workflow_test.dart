@@ -145,6 +145,7 @@ void main() {
         );
         await events?.cancel();
         debugPrintSynchronously('chat_input_typing_negative events.cancel.end');
+        f.revoke.base.traceActual = true;
         await f.close(tester);
       }
     },

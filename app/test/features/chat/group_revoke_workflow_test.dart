@@ -17,6 +17,20 @@ void main() {
         await f.open(tester);
         await f.readyConfirm(tester);
         expect(f.roleReads, 1);
+        expect(
+          f.allRoleReadRequests,
+          contains({
+            'groupID': 'group-a',
+            'userIDList': ['alice'],
+          }),
+        );
+        expect(
+          f.allRoleReadRequests,
+          contains({
+            'groupID': 'group-a',
+            'userIDList': ['alice', 'bob'],
+          }),
+        );
         expect(f.revokes, 0);
         await tester.tap(f.confirm.hitTestable());
         await f.base.until(
@@ -455,16 +469,17 @@ void main() {
         await f.open(tester);
         await f.readyConfirm(tester);
         final old = tester.widget<TextButton>(f.confirm).onPressed!;
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.inactive,
+        );
         old();
         expect(f.revokes, 0);
         await tester.pump();
         expect(f.confirm, findsNothing);
-        expect(
-          find.text('会话或消息已变化，请关闭后重新核对。'),
-          findsOneWidget,
+        expect(find.text('会话或消息已变化，请关闭后重新核对。'), findsOneWidget);
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
         );
-        tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
         old();
         await tester.pump();
         expect(f.revokes, 0);
@@ -472,7 +487,9 @@ void main() {
         await f.closeDialog(tester);
       } finally {
         if (tester.binding.lifecycleState == AppLifecycleState.inactive) {
-          tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+          tester.binding.handleAppLifecycleStateChanged(
+            AppLifecycleState.resumed,
+          );
         }
         await f.close(tester);
       }

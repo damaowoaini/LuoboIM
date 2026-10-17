@@ -35,6 +35,36 @@ final class GroupRevokeFixture {
       committedBeforeFailure = false,
       actorMuted = false;
   int actorRole = 60, senderRole = 20, revokes = 0, roleReads = 0, finds = 0;
+  int announcementSelfReads = 0, ambiguousSelfReads = 0;
+  final allRoleReadRequests = <Map<String, Object?>>[];
+  late String _roleActor, _roleSender, _roleGroup;
+
+  void _recordRoleRead(Map args) {
+    final ids = args['userIDList'];
+    allRoleReadRequests.add({
+      'groupID': args['groupID'],
+      'userIDList': ids is List ? List<Object?>.unmodifiable(ids) : ids,
+    });
+    final exactSelf =
+        _roleGroup.isNotEmpty &&
+        args['groupID'] == _roleGroup &&
+        ids is List &&
+        ids.length == 1 &&
+        ids.single == _roleActor;
+    if (exactSelf && _roleSender != _roleActor) {
+      // The announcement profile reads only this actor. A non-self revoke
+      // requires both original identities, so this request is unambiguous.
+      ++announcementSelfReads;
+    } else {
+      // Keep every duplicate, malformed or other request in the original
+      // counter. A self-group single-ID read is ambiguous and is NOT excluded.
+      ++roleReads;
+      if (exactSelf && _roleSender == _roleActor) {
+        ++ambiguousSelfReads;
+      }
+    }
+  }
+
   List<Map<String, dynamic>>? members, findRows, conversationRows;
   String? findCid;
   Future<void> Function()? beforeRoles,
@@ -81,6 +111,9 @@ final class GroupRevokeFixture {
       if (private)
         'attachedInfoElem': {'isPrivateChat': true, 'burnDuration': 1},
     };
+    _roleActor = sdk.userId;
+    _roleSender = raw['sendID'] as String;
+    _roleGroup = raw['groupID'] as String;
     metadata = {
       ...SdkHarness.conversation(id: cid, title: '原群会话', group: group),
       'conversationType': group ? sessionType : 1,
@@ -132,7 +165,7 @@ final class GroupRevokeFixture {
         case 'isJoinGroup':
           return '$joined';
         case 'getGroupMembersInfo':
-          ++roleReads;
+          _recordRoleRead(args);
           await beforeRoles?.call();
           if (roleFailure) throw PlatformException(code: '1002');
           return jsonEncode(
@@ -313,6 +346,9 @@ final class GroupRevokeFixture {
       await base.actual(tester, () async {
         if (base.started) {
           await sdk.dispose().timeout(const Duration(seconds: 20));
+          if (base.traceActual) {
+            debugPrintSynchronously('chat_input_actual sdk.wrapper.end');
+          }
         }
       });
       debugPrintSynchronously('group_revoke_cleanup sdk.end');
