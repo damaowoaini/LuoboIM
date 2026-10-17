@@ -126,6 +126,40 @@ class PublishedFileOrigins(unittest.TestCase):
                 self.assertEqual(len(selected['published_file_alias']['metadata']), 2)
                 self.assertTrue(selected['published_file_alias']['KMP_relation_grants_no_new_component_or_repository'])
 
+    def test_alias_refusal_records_public_stable_metadata_without_granting_identity(self):
+        for case in ['missing-selected-path', 'wrong-selected-coordinate']:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as temp:
+                work = Path(temp).resolve()
+                log, _url, coordinate = self.fixture(work, 'opaque-cache-keys')
+                report = work/'evidence/gradle-resolved-artifacts.json'
+                rows = json.loads(report.read_text()); target = work/rows[0]['path']
+                actual_body = target.read_bytes()
+                if case == 'missing-selected-path':
+                    rows = []; expected_count = 0; message = 'file alias lacks actual resolved component'
+                else:
+                    for row in rows: row['coordinate'] = 'foreign:coordinate:1'
+                    expected_count = 2; message = 'file alias resolved identity or body differs'
+                report.write_text(json.dumps(rows))
+                with self.assertRaisesRegex(ValueError, message):
+                    origins.audit(work, log)
+                path = work/'evidence/maven-file-alias-refusal.json'
+                proof = json.loads(path.read_text())
+                self.assertTrue(proof['originalGateStillRefused'])
+                self.assertTrue(proof['metadataAvailable'])
+                self.assertTrue(proof['stableFD'])
+                self.assertTrue(proof['auditObservedBodyStillMatches'])
+                self.assertEqual(proof['observedCoordinate'], coordinate)
+                self.assertEqual(proof['publicRelativePath'], str(target.relative_to(work)))
+                self.assertEqual(proof['cacheKey'], 'opaque-artifact-cache-key')
+                self.assertEqual(proof['filename'], target.name)
+                self.assertEqual(proof['matchedResolvedRows'], expected_count)
+                self.assertEqual(proof['bytes'], len(actual_body))
+                self.assertEqual(proof['sha256'], hashlib.sha256(actual_body).hexdigest())
+                self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+                self.assertNotIn(str(work), path.read_text())
+                self.assertNotIn(actual_body.decode(), path.read_text())
+                self.assertFalse(proof['sourceContentsAbsolutePathsOrURLsRecorded'])
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

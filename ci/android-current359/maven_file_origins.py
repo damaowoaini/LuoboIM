@@ -218,6 +218,57 @@ def _hash(path, name='sha256'):
     return result.hexdigest()
 
 
+def _record_alias_refusal(work, path, resolved_rows, observed_size, observed_sha):
+    """Public Maven metadata only; diagnostics never replace the original refusal."""
+    work = Path(work)
+    if work.resolve(strict=True) != work or not work.is_dir():
+        return
+    proof = {'schema': 1, 'originalGateStillRefused': True,
+             'sourceContentsAbsolutePathsOrURLsRecorded': False, 'metadataAvailable': False}
+    try:
+        cache = work/'gradle-cache/caches/modules-2/files-2.1'
+        if path.resolve(strict=True) != path or not path.is_relative_to(cache):
+            raise ValueError('canonical public cache file required')
+        parts = path.relative_to(cache).parts
+        if len(parts) != 5 or any(not re.fullmatch(r'[A-Za-z0-9_.+\-]{1,255}', value) for value in parts):
+            raise ValueError('bounded public cache components required')
+        group, module, version, cache_key, filename = parts
+        coordinate = _coordinate((group, module, version))
+        with os.fdopen(os.open(path, os.O_RDONLY | os.O_NOFOLLOW), 'rb') as stream:
+            before = os.fstat(stream.fileno())
+            if (not stat.S_ISREG(before.st_mode) or before.st_uid != os.getuid()
+                    or before.st_nlink != 1 or not 0 <= before.st_size <= 128*1024**2):
+                raise ValueError('bounded owned public cache file required')
+            digest = hashlib.sha256(); total = 0
+            for block in iter(lambda: stream.read(65536), b''):
+                total += len(block)
+                if total > 128*1024**2:
+                    raise ValueError('public diagnostic limit')
+                digest.update(block)
+            after = os.fstat(stream.fileno())
+        identity = lambda s: (s.st_dev, s.st_ino, s.st_mode, s.st_uid, s.st_nlink,
+                              s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+        if identity(before) != identity(after) or identity(after) != identity(path.lstat()) or total != before.st_size:
+            raise ValueError('public cache changed during diagnostic')
+        relative = str(path.relative_to(work))
+        proof.update(metadataAvailable=True, publicRelativePath=relative,
+                     observedCoordinate=':'.join(coordinate), cacheKey=cache_key, filename=filename,
+                     bytes=total, sha256=digest.hexdigest(), stableFD=True,
+                     matchedResolvedRows=sum(isinstance(row, dict) and row.get('path') == relative for row in resolved_rows),
+                     auditObservedBodyStillMatches=total == observed_size and digest.hexdigest() == observed_sha)
+    except (ValueError, OSError) as error:
+        proof['unavailableReason'] = type(error).__name__
+    try:
+        evidence = work/'evidence'
+        if evidence.resolve(strict=True) != evidence or not evidence.is_dir():
+            return
+        fd = os.open(evidence/'maven-file-alias-refusal.json', os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(fd, 'w') as output:
+            json.dump(proof, output, sort_keys=True, indent=2); output.write('\n'); output.flush(); os.fsync(output.fileno())
+    except (ValueError, OSError):
+        return
+
+
 def audit(work, log):
     """Retain the original ordinary-source audit; use strict metadata only for aliases."""
     roots = Path(work) / 'gradle-cache/caches/modules-2/files-2.1'
@@ -249,7 +300,14 @@ def audit(work, log):
             if not origin:
                 if aliases is None:
                     aliases = PublishedFiles(Path(work), downloads)
-                origin, proof = aliases.alias(coordinate, filename, path, size, digest)
+                try:
+                    origin, proof = aliases.alias(coordinate, filename, path, size, digest)
+                except ValueError:
+                    try:
+                        _record_alias_refusal(Path(work), path, aliases.rows, size, digest)
+                    except (ValueError, OSError):
+                        pass
+                    raise
         row = {'coordinate': ':'.join(coordinate), 'filename': filename, 'sha256': digest,
                'bytes': size, 'observed_sources': origin}
         if proof is not None:

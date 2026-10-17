@@ -304,7 +304,64 @@ def check_public_plugin_source(work, declaration, root, row):
         raise
 
 
-def packages(work, plugins, e):
+def check_plugin_sources(work, plugins, roots, spec, phase):
+    """Keep fixed plugin sources, but bind the intentional core replacement to R7."""
+    if phase not in {'packages', 'resolve'}:
+        raise ValueError('explicit core source check phase required')
+    work = Path(work)
+    sdk = work/'source/packages/flutter_openim_sdk'
+    if work.resolve(strict=True) != work or roots.get('flutter_openim_sdk') != sdk:
+        raise ValueError('exact owned local SDK package root required')
+    prefix = 'ios/Framework/OpenIMCore.xcframework/'
+    historical = []
+    for declaration in plugins['declarations']:
+        for row in declaration['native_files'] + [declaration['pubspec']]:
+            if declaration['name'] == 'flutter_openim_sdk' and row['path'].startswith(prefix):
+                historical.append(row)
+            else:
+                check_public_plugin_source(work, declaration, roots[declaration['name']], row)
+    if len(historical) != 17 or len({r['path'] for r in historical}) != 17:
+        raise ValueError('sealed historical SDK framework17 declaration required')
+    original = work/'products/.qa/apple-cloud-1/OpenIMCore.xcframework'
+    target = sdk/prefix
+    if target.resolve(strict=True) != target or not target.is_dir():
+        raise ValueError('canonical staged current framework required')
+    rows = spec['core17']
+    if len(rows) != 17 or len({r['path'] for r in rows}) != 17:
+        raise ValueError('exact current accepted core17 required')
+    expected_names = {consume.safe_name(r['path']) for r in rows}
+    observed = set()
+    for path in target.rglob('*'):
+        if path.is_symlink():
+            raise ValueError('staged framework symlink refused')
+        if path.is_file():
+            observed.add(path.relative_to(target).as_posix())
+            if len(observed) > 17:
+                raise ValueError('unexpected staged framework file')
+        elif not path.is_dir():
+            raise ValueError('nonregular staged framework member refused')
+    if observed != expected_names:
+        raise ValueError('staged current framework17 file set differs')
+    adapted = {'ios-arm64/OpenIMCore.framework/Info.plist',
+               'ios-arm64-simulator/OpenIMCore.framework/Info.plist'}
+    if not adapted <= expected_names:
+        raise ValueError('both fixed current wrapper plists required')
+    proof = []
+    for row in rows:
+        before = consume.read_file(original, row)
+        after = packaging.derived_plist(before) if row['path'] in adapted else before
+        expected = {'path': prefix + row['path'], 'bytes': len(after), 'sha256': consume.digest(after)}
+        check_public_plugin_source(work, {'name': 'flutter_openim_sdk'}, sdk, expected)
+        proof.append({'path': row['path'], 'bytes': len(after), 'sha256': expected['sha256'],
+                      'accepted_original_sha256': row['sha256'], 'wrapper_only_changed': row['path'] in adapted})
+    record(work/'evidence'/('current359-plugin-core17-'+phase+'.json'), {
+        'phase': phase, 'historical_framework17_pins_unchanged': True,
+        'current17_from_accepted_originals_and_exact_two_plist_derivations': proof,
+        'all_other_plugin_native_pubspec_pins_checked': True,
+        'no_binary_or_App_source_changed': True})
+
+
+def packages(work, plugins, e, spec):
     command(work, 'pub-get', [work/'flutter/bin/flutter', 'pub', 'get', '--enforce-lockfile'], work/'source/app', e)
     config = json.loads(packaging.regular(work/'source/app/.dart_tool/package_config.json'))
     roots = {}
@@ -316,9 +373,7 @@ def packages(work, plugins, e):
         root = Path(urllib.parse.unquote(uri.path)).resolve(strict=True)
         if not root.is_relative_to(work): raise ValueError('package path outside owned closure')
         roots[row['name']] = root
-    for declaration in plugins['declarations']:
-        for row in declaration['native_files'] + [declaration['pubspec']]:
-            check_public_plugin_source(work, declaration, roots[declaration['name']], row)
+    check_plugin_sources(work, plugins, roots, spec, 'packages')
     for hook in plugins['hooks']:
         consume.read_file(roots[hook['name']], hook['hook'])
     lane = json.loads((HERE/'lane.json').read_bytes())
@@ -437,7 +492,7 @@ def acquire(work, lane, spec, plugins):
     host.strict_version(0, (work/'evidence/host-version.stdout.log').read_bytes(),
                         (work/'evidence/host-version.stderr.log').read_bytes(), 'Xcode 16.4\nBuild version 16F6')
     flutter_setup(work, lane, e)
-    packages(work, plugins, e)
+    packages(work, plugins, e, spec)
     origins = []
     for row in lane['native_origins']:
         target = work/'origins'/row['filename']
@@ -497,9 +552,7 @@ def resolve(work, lane, spec, plugins):
         after = capture(work, 'after-resolution')  # failures retain real locks/partial generated sources
     graph = json.loads(packaging.regular(work/'source/app/.flutter-plugins-dependencies'))
     graph_proof = consume.verify_plugin_graph(graph, plugins, roots)
-    for declaration in plugins['declarations']:
-        for row in declaration['native_files'] + [declaration['pubspec']]:
-            consume.read_file(roots[declaration['name']], row)
+    check_plugin_sources(work, plugins, roots, spec, 'resolve')
     frameworks = list((work/'source/app/build/ios/SourcePackages').rglob('WebRTC.xcframework'))
     if len(frameworks) != 1:
         raise ValueError('one actual resolved WebRTC binary target required')
