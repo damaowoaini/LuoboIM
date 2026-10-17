@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
@@ -332,5 +333,172 @@ func TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume(t *testing.T) {
 		if _, e = w.StepMerkle(ctx, tree); e != nil {
 			t.Fatal("failed invocation left a reusable cache or damaged the private journal", e)
 		}
+	})
+
+	leafFixture := func(t *testing.T, bodies []json.RawMessage) (*ImportWorkspace, string, string, []string) {
+		t.Helper()
+		source, _, snapshot := importSnapshotFixture(t)
+		ctx := context.Background()
+		w, e := OpenImportWorkspace(ctx, snapshot, source, filepath.Join(privateFixtureDir(t), "leaf-batch"), jsonSHA("header"), jsonSHA("policy"), false)
+		if e != nil {
+			t.Fatal(e)
+		}
+		set, tree := DerivedSetID("leaf-batch", "actual-values"), jsonSHA("leaf-batch-tree")
+		keys := []string{}
+		for start := 0; start < len(bodies); start += 16 {
+			changes := []DerivedMutation{}
+			for n := start; n < min(start+16, len(bodies)); n++ {
+				key := merkleNodeKey(uint64(n))
+				keys = append(keys, key)
+				changes = append(changes, DerivedMutation{SetID: set, Key: key, Value: bodies[n]})
+			}
+			st, expected, e := w.Checkpoint(ctx)
+			if e != nil {
+				t.Fatal(e)
+			}
+			if _, _, e = w.Commit(ctx, expected, st.Phase, st.Cursor, st.Subcursor, changes); e != nil {
+				t.Fatal(e)
+			}
+		}
+		if state, e := w.BeginMerkle(ctx, tree, set, "set"); e != nil || state.Phase != "leaves" {
+			t.Fatal("actual leaf job not prepared", e)
+		}
+		return w, tree, set, keys
+	}
+	finishLeafRoot := func(t *testing.T, w *ImportWorkspace, tree string, state DerivedMerkleState, keys []string) {
+		t.Helper()
+		for n := 0; state.Phase != "complete" && n < 128; n++ {
+			var e error
+			state, e = w.StepMerkle(context.Background(), tree)
+			if e != nil {
+				t.Fatal(e)
+			}
+		}
+		want, e := namespaceimport.SortedSetRoot(keys)
+		if e != nil || state.Phase != "complete" || state.RootSHA256 != want {
+			t.Fatal("actual leaf traversal changed canonical root", e)
+		}
+	}
+	t.Run("leaves batch matches original cursor thirty and EOF across reopen", func(t *testing.T) {
+		for _, count := range []int{30, 31} {
+			bodies := []json.RawMessage{}
+			for n := 0; n < count; n++ {
+				bodies = append(bodies, json.RawMessage(fmt.Sprintf(`{"leaf":%d}`, n)))
+			}
+			w, tree, set, keys := leafFixture(t, bodies)
+			ctx := context.Background()
+			oracle, cursor, done, total, e := w.ReadEntries(ctx, set, "", 30)
+			if e != nil || len(oracle) != 30 || done || total != uint64(count) || cursor != keys[29] {
+				t.Fatal("original disk oracle did not retain full-thirty boundary", e)
+			}
+			before, _, e := w.Checkpoint(ctx)
+			if e != nil {
+				t.Fatal(e)
+			}
+			state, e := w.StepMerkle(ctx, tree)
+			if e != nil || state.Phase != "leaves" || state.LeavesBuilt != 30 || state.Cursor != cursor {
+				t.Fatal("exactly thirty incorrectly claimed EOF", e)
+			}
+			after, _, e := w.Checkpoint(ctx)
+			if e != nil || after.Sequence != before.Sequence+1 {
+				t.Fatal("leaf read advanced extra private checkpoints", e)
+			}
+			w, e = OpenImportWorkspace(ctx, w.snapshot, w.live, w.dir, w.header, w.policy, true)
+			if e != nil {
+				t.Fatal(e)
+			}
+			oracle, cursor, done, total, e = w.ReadEntries(ctx, set, cursor, 30)
+			if e != nil || !done || len(oracle) != count-30 || total != uint64(count) {
+				t.Fatal("original EOF oracle changed after reopen", e)
+			}
+			state, e = w.StepMerkle(ctx, tree)
+			if e != nil || state.Phase != "parents" || state.LeavesBuilt != uint64(count) || state.Cursor != cursor {
+				t.Fatal("reopened leaf step changed true EOF or cursor", e)
+			}
+			finishLeafRoot(t, w, tree, state, keys)
+		}
+	})
+	t.Run("leaves byte boundary checks excluded body before cursor or head advances", func(t *testing.T) {
+		// Arbitrary JSON strings, booleans and arrays remain valid leaf values.
+		// Each private large body is exactly64KiB after the original writer's LF.
+		large := json.RawMessage(`"` + strings.Repeat("x", (64<<10)-3) + `"`)
+		w, tree, set, keys := leafFixture(t, []json.RawMessage{large, large, large, large, json.RawMessage(`true`), json.RawMessage(`[1,2]`)})
+		ctx := context.Background()
+		before, expected, e := w.Checkpoint(ctx)
+		if e != nil {
+			t.Fatal(e)
+		}
+		unchanged := func() {
+			t.Helper()
+			after, got, e := w.Checkpoint(ctx)
+			if e != nil || after != before || got != expected {
+				t.Fatal("excluded bad body advanced original head", e)
+			}
+		}
+		excluded, found, e := w.ReadEntry(ctx, set, keys[4])
+		if e != nil || !found {
+			t.Fatal("actual excluded candidate missing", e)
+		}
+		path := (progressStore{w.dir}).objectPath("derived-value", excluded.SHA256)
+		body, e := ReadPrivateDocument(path, (64<<10)+1)
+		if e != nil {
+			t.Fatal(e)
+		}
+		defer func() {
+			if e := os.Chmod(path, 0600); e != nil {
+				t.Error(e)
+			}
+			if e := os.WriteFile(path, body, 0600); e != nil {
+				t.Error(e)
+			}
+		}()
+		if e = os.Chmod(path, 0644); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = w.StepMerkle(ctx, tree); e == nil {
+			t.Fatal("byte-excluded nonprivate body was skipped")
+		}
+		if e = os.Chmod(path, 0600); e != nil {
+			t.Fatal(e)
+		}
+		unchanged()
+		if e = os.WriteFile(path, []byte(`false`), 0600); e != nil {
+			t.Fatal(e)
+		}
+		if _, e = w.StepMerkle(ctx, tree); e == nil {
+			t.Fatal("byte-excluded body hash was not rechecked")
+		}
+		if e = os.WriteFile(path, body, 0600); e != nil {
+			t.Fatal(e)
+		}
+		unchanged()
+		oracle, cursor, done, total, e := w.ReadEntries(ctx, set, "", 30)
+		if e != nil || len(oracle) != 4 || done || total != 6 || cursor != keys[3] {
+			t.Fatal("original byte-boundary disk oracle differs", e)
+		}
+		bytesRead := 0
+		for _, entry := range oracle {
+			bytesRead += len(entry.Value)
+		}
+		if bytesRead != 256<<10 {
+			t.Fatal("fixture did not exercise exact byte boundary")
+		}
+		state, e := w.StepMerkle(ctx, tree)
+		if e != nil || state.Phase != "leaves" || state.LeavesBuilt != 4 || state.Cursor != cursor {
+			t.Fatal("byte-excluded candidate advanced the leaf cursor", e)
+		}
+		w, e = OpenImportWorkspace(ctx, w.snapshot, w.live, w.dir, w.header, w.policy, true)
+		if e != nil {
+			t.Fatal(e)
+		}
+		oracle, cursor, done, total, e = w.ReadEntries(ctx, set, cursor, 30)
+		if e != nil || len(oracle) != 2 || !done || total != 6 {
+			t.Fatal("restored excluded values missing after reopen", e)
+		}
+		state, e = w.StepMerkle(ctx, tree)
+		if e != nil || state.Phase != "parents" || state.LeavesBuilt != 6 || state.Cursor != cursor {
+			t.Fatal("reopened byte-limited batch changed original EOF", e)
+		}
+		finishLeafRoot(t, w, tree, state, keys)
 	})
 }

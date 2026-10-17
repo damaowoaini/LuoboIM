@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Merkle parent repair5: original controller CPU plus direct3+1; original-source84 retained."""
+"""Merkle leaf repair5: original controller CPU plus direct3+1; original-source84 retained."""
 import argparse
 from collections import Counter
 from contextlib import contextmanager
@@ -10,11 +10,11 @@ from decimal import Decimal, InvalidOperation
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
-SCOPE = 'backend_history_merkle_parent5_reuse84_no_deployment'
+SCOPE = 'backend_history_merkle_leaf5_reuse84_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
-FINAL = {'members': 1557, 'digest': '423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09'}
+FINAL = {'members': 1557, 'digest': 'a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
-SELECTION_SHA = '2362eda9a13acc9ae2b887406e4d54e9baeb6f4da4e328920dcb530f16007ca7'
+SELECTION_SHA = 'fa595c581e2fe6e7d8c64c47d1a8840fa7c523c6cc0703ac01f3f8989a0eb844'
 RESOURCE = {'initialBytes': 4294967296, 'floorMiB': 1024, 'allocatedMiB': 16384, 'pollSeconds': .2, 'controllerSeconds': 3000, 'compileTotalSeconds': 1200, 'testPhaseSeconds': 2250, 'testGoTimeoutSeconds': 180}
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 
@@ -22,7 +22,7 @@ REUSE_PROOF_SHA = 'a2273b8d18c15fc98fb65317067d89584a44c4570b899e619672f6ea47826
 PENDING_POSITIVE = ('pkg/common/startrpc','TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence')
 PENDING_TOKEN = ('pkg/common/startrpc','TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit')
 PREVIOUS_REPAIR_PROOF_SHA = '096dadcfbd249cc64e36f90e0361a13577908e1fc1a778543a8cc4023b2fe543'
-REPAIR_DELTA_SHA = 'c3e46c6d3b2468ead2c386ea3f2e280e06864ee4f9004599520352f021b03fe0'
+REPAIR_DELTA_SHA = '3f42068258e4dc9cde3eb1ea9700fdcb9b4c80938d85f41dbe49e71215d2f9ab'
 DIRECT_PRIOR = {('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient')}
 DIRECT_CURRENT = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish')}
 LATEST_REPAIR_PROOF_SHA = '2b6e93f014f13bf8e0a7830b7b94f15b02149f78c24229066b03629c3bbae3ff'
@@ -40,6 +40,8 @@ REPAIR_DELTA_TARGETS = frozenset(['server/internal/namespaceinventory/import_mer
 MERKLE_DIRECT = frozenset([('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceinventory', 'TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume')])
 NEW_MERKLE_CHILDREN = frozenset(['parents_range_matches_per-key_disk_oracle_across_odd_tail_and_reopen', 'parents_range_rejects_middle_tamper_cancellation_source_change_and_stale_head'])
 LAST_DESCRIPTOR_SHA = '26210362badea7d37ec7632c4f2b454eab64a1840b4c328e80a080258753310c'
+NEW_MERKLE_LEAF_CHILDREN = frozenset(['leaves_batch_matches_original_cursor_thirty_and_EOF_across_reopen', 'leaves_byte_boundary_checks_excluded_body_before_cursor_or_head_advances'])
+LAST_MERKLE_PARENT_SHA = '88e888a106382c977ce79b3c491aebaccc151312cb7d8a1b498280139efc3af8'
 NEW_COMMIT_CHILDREN = frozenset(['coalesced_descriptors_match_sequential_disk_oracle_for_interleaved_updates', 'later_mutation_private_write_failure_retains_earlier_raw_and_original_head'])
 LAST_CONTROLLER_CPU_SHA = 'c0bb5829546f7fe24c27abf4808b9ddf54df6709ae57cbcf3c03d29140472581'
 
@@ -257,7 +259,7 @@ def check_repair(c, p):
     proof = p['acceptedPreviousRun']; current = p['previousRepairRun']; latest = p['latestRepairRun']; split = p['previousSplitRepairRun']; stamp = p['lastCaptureStampRun']
     old = {'members':1555,'digest':'686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
     before = {'members':1555,'digest':'68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
-    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_MERKLE_PARENT5_REUSE84' or p.get('source') != c['source']
+    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_MERKLE_LEAF5_REUSE84' or p.get('source') != c['source']
             or sha(canonical(proof)) != REUSE_PROOF_SHA or p['reuseProofSHA256'] != REUSE_PROOF_SHA
             or proof['source'] != old or proof['run'] != 39041607488 or proof['attempt'] != 1
             or proof['head'] != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
@@ -339,7 +341,7 @@ def check_repair(c, p):
         raise ValueError('actual same-source12 PASS and failed controller/profile contract required')
     recent_named = {(r['package'],r['name']) for r in recent['namedPASS']}
     recent_pass = pairs(p['lastCommitImagePassedTargets'])
-    expected_named = recent_pass | {(package,top+'/'+child) for package,top in recent_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_COMMIT_CHILDREN | NEW_MERKLE_CHILDREN}
+    expected_named = recent_pass | {(package,top+'/'+child) for package,top in recent_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_COMMIT_CHILDREN | NEW_MERKLE_CHILDREN | NEW_MERKLE_LEAF_CHILDREN}
     if (len(recent_named) != 61 or len(recent['namedPASS']) != 61 or not expected_named <= recent_named
             or {(package,name) for package,name in recent_named if '/' not in name} != recent_pass
             or any((package,name.split('/')[0]) not in recent_pass for package,name in recent_named)
@@ -366,12 +368,23 @@ def check_repair(c, p):
         raise ValueError('actual descriptor10 PASS and failed controller bind only original source')
     descriptor_pass = pairs(p['lastDescriptorPassedTargets'])
     descriptor_named = {(r['package'],r['name']) for r in descriptor['namedPASS']}
-    expected_descriptor = descriptor_pass | {(package,top+'/'+child) for package,top in descriptor_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_MERKLE_CHILDREN}
+    expected_descriptor = descriptor_pass | {(package,top+'/'+child) for package,top in descriptor_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_MERKLE_CHILDREN | NEW_MERKLE_LEAF_CHILDREN}
     if (len(descriptor_named) != 56 or len(descriptor['namedPASS']) != 56 or not expected_descriptor <= descriptor_named
             or descriptor_pass != COMMIT_DIRECT - pairs(recent['failedTargets'])
             or {(package,name) for package,name in descriptor_named if '/' not in name} != descriptor_pass
             or any((package,name.split('/')[0]) not in descriptor_pass for package,name in descriptor_named)):
         raise ValueError('descriptor ten parents require exact original46 children')
+    parent_run = p['lastMerkleParentRun']
+    if (NEW_MERKLE_LEAF_CHILDREN is None or sha(canonical(parent_run)) != LAST_MERKLE_PARENT_SHA
+            or p['lastMerkleParentRunSHA256'] != LAST_MERKLE_PARENT_SHA
+            or parent_run['source'] != {'members':1557,'digest':'423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09'}
+            or (parent_run['run'],parent_run['job'],parent_run['head']) != (39066582339,117495422795,'dcaf0eca51fd06954038dc8fdad782641ec1537d')
+            or (parent_run['actualTopPASS'],parent_run['actualSubPASS'],parent_run['actualTopFAIL'],parent_run['actualSubFAIL'],parent_run['actualSkip']) != (4,17,1,0,0)
+            or not parent_run['sourceModesLocksConfigAndControllersPostExact'] or parent_run['wholeAccepted'] is not False
+            or parent_run['rootReceipt']['sha256'] != '373baf8366c5b1c1f0c56d7a93af082770989c5d8ff0d95d0d6bda6e9cfaa3d5'
+            or p['newMerkleLeafRequiredChildren'] != sorted(NEW_MERKLE_LEAF_CHILDREN)
+            or not NEW_MERKLE_LEAF_CHILDREN <= set(c['requiredSubtests']['internal/namespaceinventory']['TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume'])):
+        raise ValueError('parent four PASS retain only original source; all leaf callers require fresh execution')
     universe = pairs(c['targets'])
     passed, failed = pairs(proof['passedTargets']), pairs(proof['failedTargets'])
     current_pass, current_fail, current_incomplete = pairs(current['passedTargets']), pairs(current['failedTargets']), pairs(current['incompleteTargets'])
@@ -781,7 +794,7 @@ def run():
         profile_root = work/'private-profile'
         profile_root.mkdir(mode=0o700)
         result = execute_repair_scopes(active, command, testenv, output, profile_root)
-    write(output / 'summary.json', {'state': 'merkle_parent5_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 65, 'previousRepairTopPASSReused': 5, 'latestRepairTopPASSReused': 2, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 0, 'originalCommitImageSourceTopPASSReused': 2, 'originalDescriptorSourceTopPASSReused': 6, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
+    write(output / 'summary.json', {'state': 'merkle_leaf5_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 65, 'previousRepairTopPASSReused': 5, 'latestRepairTopPASSReused': 2, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 0, 'originalCommitImageSourceTopPASSReused': 2, 'originalDescriptorSourceTopPASSReused': 6, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
     return 0 if result['accepted'] else 1
 
 if __name__ == '__main__':

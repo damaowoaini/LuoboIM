@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "state": "FROZEN_MERKLE_PARENT5_REUSE84",
+  "state": "FROZEN_MERKLE_LEAF5_REUSE84",
   "source": {
     "members": 1557,
-    "digest": "423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09"
+    "digest": "a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84"
   },
   "repairTargets": {
     "internal/namespaceimport/ownedcontrol": [
@@ -433,17 +433,17 @@
   "sourceDelta": [
     {
       "target": "server/internal/namespaceinventory/import_merkle.go",
-      "beforeSHA256": "3b3398a881ae5cf4df98e8cfa5b1bd50598c003fb37d189c3fecb1c5859186c5",
-      "afterSHA256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
-      "afterBytes": 13768,
+      "beforeSHA256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
+      "afterSHA256": "1cc6ead7b5c9c021f5f2ba8a7f6430983b040dbe8029ed18e0b166404f1f598f",
+      "afterBytes": 16870,
       "mode": 420,
       "production": true
     },
     {
       "target": "server/internal/namespaceinventory/import_merkle_test.go",
-      "beforeSHA256": "7f723d5f0b3f2111369de403b6a0291a206780b2ebdd5d6f634f291dee04c637",
-      "afterSHA256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
-      "afterBytes": 12011,
+      "beforeSHA256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
+      "afterSHA256": "3e50c0e6b3dd3918813b148b0b1ff4f52bfdc2a1cf6a2ea3fdb29c026dd63875",
+      "afterBytes": 18223,
       "mode": 420,
       "production": false
     }
@@ -638,7 +638,7 @@
       "derivation": "lastDescriptorRun exact named PASS minus directlyAffectedMerkleTargets; original ae5 source only"
     }
   ],
-  "sourceDeltaSHA256": "c3e46c6d3b2468ead2c386ea3f2e280e06864ee4f9004599520352f021b03fe0",
+  "sourceDeltaSHA256": "3f42068258e4dc9cde3eb1ea9700fdcb9b4c80938d85f41dbe49e71215d2f9ab",
   "latestRepairRun": {
     "schema": 1,
     "head": "1dbe0412baa8a3a04199a5ab80a559dcdf126e65",
@@ -1901,5 +1901,42 @@
       "TestOriginalHistorySequenceIndexBindsWholeSealedSourceAndRejectsConflicts",
       "TestOriginalMongoCatalogRetainsCompleteSealedRawCustody"
     ]
-  }
+  },
+  "lastMerkleParentRun": {
+    "head": "dcaf0eca51fd06954038dc8fdad782641ec1537d",
+    "run": 39066582339,
+    "job": 117495422795,
+    "source": {
+      "members": 1557,
+      "digest": "423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09"
+    },
+    "sourceModesLocksConfigAndControllersPostExact": true,
+    "actualTopPASS": 4,
+    "actualSubPASS": 17,
+    "actualTopFAIL": 1,
+    "actualSubFAIL": 0,
+    "actualSkip": 0,
+    "captureCompleted": true,
+    "captureCompletedAtMicros": 143545658,
+    "actualWriterInspectedPages": 9,
+    "finalPendingPage": 9,
+    "originalContextMicros": 159992795,
+    "originalSourceTopPASSReused": 84,
+    "fixtureResidualZero": true,
+    "ownedCleanupExit": 0,
+    "actualMainBuilds": 0,
+    "runtimeDeployed": false,
+    "wholeAccepted": false,
+    "fullRegression": false,
+    "rootReceipt": {
+      "path": ".qa/backend-merkle-parent-range-batch-1/root-backend-merkle4-pass-controller-pending-page9-review.json",
+      "bytes": 17529,
+      "sha256": "373baf8366c5b1c1f0c56d7a93af082770989c5d8ff0d95d0d6bda6e9cfaa3d5"
+    }
+  },
+  "lastMerkleParentRunSHA256": "88e888a106382c977ce79b3c491aebaccc151312cb7d8a1b498280139efc3af8",
+  "newMerkleLeafRequiredChildren": [
+    "leaves_batch_matches_original_cursor_thirty_and_EOF_across_reopen",
+    "leaves_byte_boundary_checks_excluded_body_before_cursor_or_head_advances"
+  ]
 }

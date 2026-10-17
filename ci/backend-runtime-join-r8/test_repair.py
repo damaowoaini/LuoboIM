@@ -19,6 +19,12 @@ class RepairControls(unittest.TestCase):
         self.assertEqual(len(runner.pairs(p['directlyAffectedCommitTargets'])),11)
         self.assertEqual(len(runner.pairs(p['newImageTargets'])),1)
         self.assertEqual(sum(r['retainedTopCount'] for r in p['sourceReuse']),84)
+        self.assertEqual(p['lastMerkleParentRun']['actualTopPASS'],4)
+        self.assertEqual(p['lastMerkleParentRun']['source']['digest'],'423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09')
+        self.assertFalse(runner.pairs(p['directlyAffectedMerkleTargets']) & runner.pairs(p['actualPassedTargets']))
+        for key,value in (('actualTopPASS',5),('wholeAccepted',True),('source',c['source'])):
+            bad=copy.deepcopy(p);bad['lastMerkleParentRun'][key]=value
+            with self.subTest(parentOnly=key),self.assertRaises(ValueError):runner.check_repair(c,bad)
         bad=copy.deepcopy(p);bad['repairTargets'].setdefault('pkg/common/startrpc',[]).append(runner.PENDING_POSITIVE[1])
         with self.assertRaises(ValueError):runner.check_repair(c,bad)
         for key,value in (('currentMainBuilds',14),('newBinaries',True),('runtimeGraphAccepted',True),('fullRegression',True)):
@@ -60,6 +66,12 @@ class RepairControls(unittest.TestCase):
             events.append({'Action':'pass','Package':pkg})
         result=runner.require_children(runner.audit(events,0,active['targets']),audited)
         self.assertEqual(result['topPASS'],5)
+        leaf_top='TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume'
+        leaf_package='internal/namespaceinventory'
+        for leaf_child in runner.NEW_MERKLE_LEAF_CHILDREN:
+            missing=[e for e in events if not (e.get('Package')==runner.PREFIX+leaf_package and e.get('Test')==leaf_top+'/'+leaf_child)]
+            with self.subTest(leafChild=leaf_child),self.assertRaises(ValueError):
+                runner.require_children(runner.audit(missing,0,active['targets']),audited)
         with self.assertRaises(ValueError):runner.audit(events,1,active['targets'])
         result['namedCompletions']=[r for r in result['namedCompletions'] if '/' not in r['name']]
         with self.assertRaises(ValueError):runner.require_children(result,audited)
@@ -85,6 +97,9 @@ class RepairControls(unittest.TestCase):
     def test_split_process_dispatch_keeps_md_failure_and_missing_child_failed_but_runs_both_owned_scopes(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
         self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,3,1])
+        merkle_children=set(c['requiredSubtests']['internal/namespaceinventory']['TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume'])
+        self.assertTrue(runner.NEW_MERKLE_CHILDREN | runner.NEW_MERKLE_LEAF_CHILDREN <= merkle_children)
+        self.assertEqual(p['newMerkleLeafRequiredChildren'],sorted(runner.NEW_MERKLE_LEAF_CHILDREN))
         self.assertEqual([list(scope['targets']) for scope in active['scopes']],[['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol'],['internal/namespaceinventory']])
         real_child='real_commit_custody_failure_never_becomes_normal_capture_pending'
         self.assertIn(real_child,c['requiredSubtests']['internal/namespaceimport/ownedcontrol']['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'])

@@ -255,6 +255,112 @@ func (w *ImportWorkspace) readMerkleParentRange(ctx context.Context, expected st
 	return nodes, nil
 }
 
+// Only one bounded leaf-step traversal is shared. Values remain arbitrary
+// JSON; even the over-byte candidate retains its actual private read and SHA.
+func (w *ImportWorkspace) readMerkleLeafBatch(ctx context.Context, expected string, value DerivedMerkleState) (keys []string, next string, done bool, resultErr error) {
+	if e := w.check(ctx); e != nil {
+		return nil, "", false, e
+	}
+	if !hexText(expected, 64) || !hexText(value.SetID, 64) || !hexText(value.SetRoot, 64) || value.Count == 0 || value.Phase != "leaves" || value.Cursor != "" && !hexText(value.Cursor, 64) {
+		return nil, "", false, ErrChanged
+	}
+	lock, e := lockJournal(w.dir)
+	if e != nil {
+		return nil, "", false, e
+	}
+	defer func() {
+		if e := w.check(ctx); e != nil {
+			keys, next, done = nil, "", false
+			resultErr = errors.Join(resultErr, e)
+		}
+		if lock.Close() != nil {
+			keys, next, done = nil, "", false
+			resultErr = ErrPrivate
+		}
+	}()
+	state, actual, e := w.load()
+	if e != nil || actual != expected {
+		return nil, "", false, ErrChanged
+	}
+	store := progressStore{w.dir}
+	var set derivedSet
+	present, e := store.get(ctx, state.SetsRoot, value.SetID, &set)
+	if e != nil || !present || set.Root != value.SetRoot || set.Count != value.Count {
+		return nil, "", false, ErrChanged
+	}
+	next = value.Cursor
+	bytesRead, visited, stopped := 0, 0, false
+	// A producer trie has no empty child subtrees. Thirty result paths, one
+	// over-byte candidate and one cursor-boundary path each have <=64 ancestors.
+	// A malicious tree with extra empty subtrees cannot extend this disk walk.
+	const maximumNodes = 1 + 64*(30+2)
+	var visit func(string, string) error
+	visit = func(h, prefix string) error {
+		if stopped {
+			return nil
+		}
+		if e := ctx.Err(); e != nil {
+			return e
+		}
+		if len(prefix) > 64 {
+			return ErrChanged
+		}
+		if value.Cursor != "" && prefix+strings.Repeat("f", 64-len(prefix)) <= value.Cursor {
+			return nil
+		}
+		if visited >= maximumNodes {
+			return ErrLimit
+		}
+		visited++
+		node, e := store.node(h, prefix)
+		if e != nil {
+			return e
+		}
+		for _, item := range node.Items {
+			if e := ctx.Err(); e != nil {
+				return e
+			}
+			if item.Key <= value.Cursor {
+				continue
+			}
+			if item.Key <= next {
+				return ErrChanged
+			}
+			var ref derivedValue
+			if DecodeStrict(item.Value, &ref) != nil || !hexText(ref.SHA256, 64) {
+				return ErrChanged
+			}
+			body, e := ReadPrivateDocument(store.objectPath("derived-value", ref.SHA256), (64<<10)+1)
+			if e != nil || digest(body) != ref.SHA256 || !json.Valid(body) {
+				return ErrChanged
+			}
+			// Exactly like ReadEntries, authenticate the excluded candidate BEFORE
+			// checking the byte budget, without moving the cursor or claiming EOF.
+			if bytesRead+len(body) > 256<<10 {
+				stopped = true
+				return nil
+			}
+			bytesRead += len(body)
+			keys = append(keys, item.Key)
+			next = item.Key
+			if len(keys) == 30 {
+				stopped = true
+				return nil
+			}
+		}
+		for _, child := range node.Children {
+			if e := visit(child.SHA, prefix+child.Digit); e != nil {
+				return e
+			}
+		}
+		return nil
+	}
+	if e = visit(set.Root, ""); e != nil {
+		return nil, "", false, e
+	}
+	return keys, next, !stopped, nil
+}
+
 // StepMerkle preserves the input set identity, original snapshot and every
 // private object's SHA. It never memoizes a decoded object across invocations.
 func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedMerkleState, error) {
@@ -282,21 +388,21 @@ func (w *ImportWorkspace) StepMerkle(ctx context.Context, tree string) (DerivedM
 	}
 	changes := []DerivedMutation{}
 	if value.Phase == "leaves" {
-		entries, next, done, total, e := w.ReadEntries(ctx, value.SetID, value.Cursor, 30)
-		if e != nil || total != value.Count {
+		keys, next, done, e := w.readMerkleLeafBatch(ctx, expected, value)
+		if e != nil {
 			return value, ErrChanged
 		}
-		for _, entry := range entries {
+		for _, key := range keys {
 			if value.LeavesBuilt == ^uint64(0) {
 				return value, ErrLimit
 			}
-			node := DerivedMerkleNode{Index: value.LeavesBuilt, ValueSHA256: entry.Key, NodeSHA256: jsonSHA([]string{leafDomain, entry.Key})}
+			node := DerivedMerkleNode{Index: value.LeavesBuilt, ValueSHA256: key, NodeSHA256: jsonSHA([]string{leafDomain, key})}
 			a, e := merkleMutation(merkleNodeSet(tree, 0), merkleNodeKey(node.Index), DerivedEntry{}, node)
 			if e != nil {
 				return value, e
 			}
 			changes = append(changes, a)
-			a, e = merkleMutation(DerivedSetID("merkle-positions", tree), entry.Key, DerivedEntry{}, DerivedMerklePosition{node.Index})
+			a, e = merkleMutation(DerivedSetID("merkle-positions", tree), key, DerivedEntry{}, DerivedMerklePosition{node.Index})
 			if e != nil {
 				return value, e
 			}
