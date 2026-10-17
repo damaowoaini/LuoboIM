@@ -15,6 +15,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/google/uuid"
 	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
 	"github.com/openimsdk/open-im-server/v3/internal/msgtransfer"
@@ -207,7 +208,7 @@ func newServiceSpec(base, role string, artifact BinaryArtifact, configDirectory 
 	if e := os.Mkdir(work, 0700); e != nil {
 		return s, e
 	}
-	s = ownedcontrol.ServiceSpec{Role: role, BinaryPath: artifact.Path, BinarySHA256: artifact.SHA256, SourceSHA256: artifact.SourceSHA256, BuildReceiptPath: artifact.ReceiptPath, BuildReceiptSHA256: artifact.ReceiptSHA256, Work: work, Args: []string{"--config", configDirectory}, BootstrapPath: filepath.Join(work, "bootstrap.json"), BootstrapEnvironmentKey: startrpc.OwnedRPCBootstrapEnv, BootstrapSHAEnvironmentKey: startrpc.OwnedRPCBootstrapSHAEnv}
+	s = ownedcontrol.ServiceSpec{Role: role, BinaryPath: artifact.Path, BinarySHA256: artifact.SHA256, SourceSHA256: artifact.SourceSHA256, BuildReceiptPath: artifact.ReceiptPath, BuildReceiptSHA256: artifact.ReceiptSHA256, Work: work, Args: []string{"--" + constant.FlagConf, configDirectory}, BootstrapPath: filepath.Join(work, "bootstrap.json"), BootstrapEnvironmentKey: startrpc.OwnedRPCBootstrapEnv, BootstrapSHAEnvironmentKey: startrpc.OwnedRPCBootstrapSHAEnv}
 	return s, nil
 }
 func setPrivateEnvironment(s *ownedcontrol.ServiceSpec, extra map[string]string) error {

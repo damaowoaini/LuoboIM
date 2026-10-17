@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE={'members': 1575, 'digest': '854097abc5dbc2fe549bb845c232083c625488112f879cc11ad3ce67cbf87d2d'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
+FINAL_SOURCE={'members': 1575, 'digest': '384bd358980d66cbdc2cd037a41bdce3637394383efa301b5719047098e857ca'}  # Root approved the exact core4 safety subset plus Kafka wait; whole R8 controller remains failed.
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
