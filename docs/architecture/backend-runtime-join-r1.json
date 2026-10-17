@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "state": "incremental_cloud_validation_prepared_not_deployed",
+  "source": {
+    "members": 1324,
+    "digest": "2a793e505b4fc9b4c7232acd3230df852f3740a0e7feb056d014a51f89da5e58"
+  },
+  "baseline": {
+    "members": 1206,
+    "digest": "d2381614af1f02a2dc9f49e4fb4ed059e10f93aed09686f93150a1305beda460"
+  },
+  "overlayFiles": 157,
+  "format": {
+    "selected": 157,
+    "reusedExactBodies": 27,
+    "firstBatchCleanFiles": 129,
+    "firstBatchExit": 2,
+    "repairedFailedFiles": 1,
+    "repairExit": 0,
+    "originalFailureRetained": true
+  },
+  "sourceFix": {
+    "target": "server/internal/namespaceimport/coverage.go",
+    "reason": "SortedSetRoot missing reduction-loop closure and values=next; repaired actual reduction, not formatting only",
+    "originalFrozenInputPreserved": true
+  },
+  "tests": {
+    "newTops": 83,
+    "affectedOriginalTops": 16,
+    "packages": 12,
+    "localPythonAuditControls": "4 PASS",
+    "GoExecutedLocally": 0,
+    "databaseExecutedLocally": 0,
+    "fullRegression": false
+  },
+  "workflow": ".github/workflows/backend-runtime-join-r1-targeted.yml",
+  "currentRuntime": "Web localhost7778 accepted646 preview plus existing906 backend; complete reconstructed backend not deployed",
+  "limits": [
+    "Not full backend acceptance",
+    "Not an import/cutover approval",
+    "No production readiness granted",
+    "Whole graph and historical/prospective reader work continues separately"
+  ],
+  "candidateSHA256": "1e643b4785a9721c7c3b0f73c1de069a5b416f496cfc61624a617a134beddfe9"
+}
