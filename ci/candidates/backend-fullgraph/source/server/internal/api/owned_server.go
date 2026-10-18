@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/OpenIMSDK/protocol/constant"
+	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/config"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/db/cache"
@@ -52,7 +53,7 @@ func RunOwnedServer(lifetime context.Context, port, metricsPort int) error {
 		resources, err := assembleOwnedAPI(bound, owner.CheckDatabase, source)
 		if resources != nil {
 			resources.awaitNamespace = func(ctx context.Context, steps []string) error {
-				return owner.AwaitNamespaceRuntimeAdmission(ctx, steps, nil, []string{"exact-logout-recovery", "http-handlers", "http-validator", "sensitive-word-workers", "source-ownership"}, nil)
+				return owner.AwaitNamespaceRuntimeAdmission(ctx, steps, nil, []string{"exact-logout-recovery", "history-reader", "http-handlers", "http-validator", "sensitive-word-workers", "source-ownership"}, resources.namespaceBinding)
 			}
 		}
 		return resources, err
@@ -71,6 +72,7 @@ type ownedAPIAssembly struct {
 	source                                                                                 *ownedMongoSource
 	activate                                                                               func() error
 	awaitNamespace                                                                         func(context.Context, []string) error
+	namespaceBinding                                                                       startrpc.OwnedNamespaceRuntimeBinding
 	address                                                                                string // actual listener address, set before the ready announcement
 }
 
@@ -134,6 +136,26 @@ func assembleOwnedAPI(parent context.Context, checkDatabase func(string) error, 
 	}
 	out.stopLogout, out.stopSensitive = scope.stopLogout, scope.stopSensitive
 	out.closeValidationHTTP = scope.closeValidationHTTP
+	namespaceBinding, err := messagedelivery.NewNamespaceRuntimeBindingForOwnedContext(scope.ctx, database)
+	if err != nil {
+		return out, err
+	}
+	if namespaceBinding != nil {
+		historyReader, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(database)
+		if err != nil {
+			return out, err
+		}
+		if err := namespaceBinding.BindOriginalReader(historyReader, "api-history"); err != nil {
+			return out, err
+		}
+		if err := namespaceBinding.CheckPreparedCatalog(scope.ctx); err != nil {
+			return out, err
+		}
+		// Both route constructors retain this exact original reader. Preparation
+		// does not permit reads; the same Store still waits for runtime admission.
+		scope.historyReader = historyReader
+		out.namespaceBinding = namespaceBinding
+	}
 	if config.Config.Prometheus.Enable {
 		metrics, handler, err := ginProm.NewOwnedPrometheus("app", prommetrics.GetGinCusMetrics("Api"))
 		if err != nil {

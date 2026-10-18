@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_and_four_planes_redis122c1top3sub_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1576,
-    "digest": "df4a7fa81384a0985937751553bbca5363630343690b8c2cb8f09838b54c10f8"
+    "digest": "29572ab9c13f622d3a84affc0ea18547e19bcd8249a203e171c11e807e48c98d"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -43,7 +43,7 @@
     {
       "path": "ci/backend-fullgraph/run.py",
       "bytes": 59659,
-      "sha256": "1e0f1b4001f464ab6695237d83711c9ebdd073fecef0590ea5a3f5d07a5629c2"
+      "sha256": "9ca790983facb6ea7c98d63f0734d6b9c26130dbb5f274ef118e745b5594ae74"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -67,8 +67,8 @@
     },
     {
       "path": "ci/backend-fullgraph/service_selectors.py",
-      "bytes": 2076,
-      "sha256": "bb0b833b952529603c5c78e457b0434f0e258ca00a5bd190d755ca33ac1adc4e"
+      "bytes": 2093,
+      "sha256": "ab233d389211e7eab830789475ccb1d7ae8c87bb22e62e5e4296d2ca090e62c6"
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",
@@ -85,6 +85,20 @@
       "beforeSHA256": null
     },
     {
+      "target": "server/internal/api/admin_preview.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/api/admin_preview.go",
+      "bytes": 4065,
+      "sha256": "919e63fea9ed107620a64801550111b83bf43e6d34f8bb5ffbd3b18328c863ef",
+      "beforeSHA256": "3c3a0db9de381cd07d6a1c4985f8525ddb870b213df43371e3dfe9ecd36a78d4"
+    },
+    {
+      "target": "server/internal/api/favorite.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/api/favorite.go",
+      "bytes": 3697,
+      "sha256": "10fa2552e9ced374f10b1fa6a5883eca0140266e6097be3593acdedbfeca827d",
+      "beforeSHA256": "35d1c1bd38345d687228a2d7a1b61f6dea68575a4be92e6ddeb2f2c838782b3d"
+    },
+    {
       "target": "server/internal/api/owned_namespace_activation_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/api/owned_namespace_activation_test.go",
       "bytes": 2925,
@@ -94,16 +108,23 @@
     {
       "target": "server/internal/api/owned_routes.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/api/owned_routes.go",
-      "bytes": 3265,
-      "sha256": "7784fcdf06dd494846013215f9edd73076cc7304ec916c42c0c6ba9adb38e7c5",
+      "bytes": 3389,
+      "sha256": "106a68451d11f857708a82bffd782ec7956981a16e0cdbc9f49af30173580ab0",
       "beforeSHA256": "c48fd2365c58b61279e26f5ea0546e77234551f25679f981ced0181fa35018da"
     },
     {
       "target": "server/internal/api/owned_server.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/api/owned_server.go",
-      "bytes": 14305,
-      "sha256": "763304da3832ddc0295402048015991ce82881f8cda85920d1b25001b9db558c",
+      "bytes": 15291,
+      "sha256": "b56ea438a26b37371cfcc1e8d4a3d8aa3228679c7b7a952bdbf525856183d810",
       "beforeSHA256": "be6d97ee96bb6ab14a80e0a2fc0f782b56769a70f5013e8010793a9b163687f2"
+    },
+    {
+      "target": "server/internal/api/route.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/api/route.go",
+      "bytes": 17113,
+      "sha256": "64c3e45d5a86cde0cb37c210eb4fc4b1a112f0ed664b9dfc9cbea479d05062a1",
+      "beforeSHA256": "2ca4633d2ba197e722c29b05f629f6e98117b4d88c829a1614c82cf7b3ab3cc9"
     },
     {
       "target": "server/internal/messagedelivery/action_readiness.go",
@@ -416,8 +437,8 @@
     {
       "target": "server/internal/messagedelivery/namespace_runtime_binding_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/messagedelivery/namespace_runtime_binding_linux.go",
-      "bytes": 17584,
-      "sha256": "e6cfdd7730312020b31b334856b1579348cf059b29be8b1461c1345613f456a8",
+      "bytes": 17608,
+      "sha256": "dcd3aa25285ddc1c9b424e9947a4dce0716152b313940b6dce5a322cfcd66e3e",
       "beforeSHA256": null
     },
     {
@@ -1683,9 +1704,12 @@
   ],
   "allowedOverlayTargets": [
     "server/cmd/tools/owned-fullgraph-acceptance/main.go",
+    "server/internal/api/admin_preview.go",
+    "server/internal/api/favorite.go",
     "server/internal/api/owned_namespace_activation_test.go",
     "server/internal/api/owned_routes.go",
     "server/internal/api/owned_server.go",
+    "server/internal/api/route.go",
     "server/internal/messagedelivery/action_readiness.go",
     "server/internal/messagedelivery/catalog.go",
     "server/internal/messagedelivery/direct_history.go",
@@ -3756,14 +3780,14 @@
         "ownedOwner": {
           "target": "server/internal/api/owned_server.go",
           "source": {
-            "bytes": 14305,
-            "sha256": "763304da3832ddc0295402048015991ce82881f8cda85920d1b25001b9db558c",
+            "bytes": 15291,
+            "sha256": "b56ea438a26b37371cfcc1e8d4a3d8aa3228679c7b7a952bdbf525856183d810",
             "mode": 420
           },
           "anchors": [
             {
               "contains": "func RunOwnedServer",
-              "line": 30
+              "line": 31
             }
           ]
         }
@@ -4305,18 +4329,18 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-group-mongo-handle-name-batch-1/formatted.json",
-      "bytes": 738,
-      "sha256": "3032501632df9f72384150fa4112902bd0ecd4833caa39c5a469ef06f0a31679"
+      "path": ".qa/backend-api-history-binding-batch-1/formatted.json",
+      "bytes": 8043,
+      "sha256": "1baf0d162c557ba275332b7e17a445ab0b8286e8396613f186b73c85de99163a"
     },
     "resource": {
-      "path": ".qa/backend-group-mongo-handle-name-batch-1/format.resource.json",
-      "bytes": 889,
-      "sha256": "a39ae806d866f26a59ed28b58b649ed1b7eeb60f220e4ed5e925ca87c2fe2d8b"
+      "path": ".qa/backend-api-history-binding-batch-1/format.resource.json",
+      "bytes": 957,
+      "sha256": "3953e7bc80c88b5a61642cc747fc84abfb199f75524754a53332600551214493"
     },
     "source": {
       "members": 1576,
-      "digest": "df4a7fa81384a0985937751553bbca5363630343690b8c2cb8f09838b54c10f8"
+      "digest": "29572ab9c13f622d3a84affc0ea18547e19bcd8249a203e171c11e807e48c98d"
     },
     "GoTestsExecuted": 0,
     "RootAcceptanceRequired": true

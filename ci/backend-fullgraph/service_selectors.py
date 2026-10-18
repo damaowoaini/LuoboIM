@@ -19,7 +19,7 @@ SERVICES = {
  'rpc-user': ['OpenIMServer.user.user'],
 }
 COMPONENTS = {
- 'api': ['exact-logout-recovery','http-handlers','http-validator','sensitive-word-workers','source-ownership'],
+ 'api': ['exact-logout-recovery','history-reader','http-handlers','http-validator','sensitive-word-workers','source-ownership'],
  'crontask': ['cron-jobs','history-reader','kafka-producer','source-ownership'],
  'msggateway': ['provider-callbacks','rpc-handlers','source-ownership','websocket-admission','websocket-runtime'],
  'msgtransfer-managed': ['history-reader','kafka-consumer','namespace-writer','offline-runtime','online-runtime','provider-callbacks','source-ownership'],

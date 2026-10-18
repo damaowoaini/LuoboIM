@@ -7,9 +7,9 @@
     "path": "ci/backend-fullgraph/run.py",
     "source": {
       "members": 1576,
-      "digest": "df4a7fa81384a0985937751553bbca5363630343690b8c2cb8f09838b54c10f8"
+      "digest": "29572ab9c13f622d3a84affc0ea18547e19bcd8249a203e171c11e807e48c98d"
     },
-    "status": "formatted-exact-original-database-factory-source-only-locked-no-accepted-core14-artifact"
+    "status": "formatted-api-owned-history-binding-source-only-locked-no-accepted-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,11 +60,11 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "1e0f1b4001f464ab6695237d83711c9ebdd073fecef0590ea5a3f5d07a5629c2",
-    "ci/backend-fullgraph/inputs.json": "7014ffd8616b6edf88af5a07d75408dcb3610e66226f9d4fe6c20e0e3f70fbc0",
+    "ci/backend-fullgraph/run.py": "9ca790983facb6ea7c98d63f0734d6b9c26130dbb5f274ef118e745b5594ae74",
+    "ci/backend-fullgraph/inputs.json": "701fd2af45b4b6009f41d17df8ef5430c37c6b325ce18cbd29987b5535d7525b",
     "ci/backend-fullgraph/resources.py": "a9ac98690c116869099af8fb54f8d5b46c3c7da5d1280798c2c2a4ba067a4be2",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
-    "ci/backend-fullgraph/service_selectors.py": "bb0b833b952529603c5c78e457b0434f0e258ca00a5bd190d755ca33ac1adc4e",
+    "ci/backend-fullgraph/service_selectors.py": "ab233d389211e7eab830789475ccb1d7ae8c87bb22e62e5e4296d2ca090e62c6",
     "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
     "ci/chart-route-build/run.py": "2b6a3f66f761181fc693502f6c910ffd5b24ee3c38badabb54627b5518b1bb9d",
     "ci/chart-route-build/inputs.json": "1a4067e0bb9f6d177585af886cb2a87c366ec43b78545ecfc58017fd6d61092e",
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1578,
-    "digest": "33b9c08bd4af99732d5df8ee403d6bbe3aeeb738051f2bb26983c8139c052f59"
+    "digest": "0134e383a6518d65101a3094bb65528114ddd6da7acb455360847979dfe05488"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

@@ -346,7 +346,7 @@ func (b *NamespaceRuntimeBinding) SealNamespaceBindings(ctx context.Context, res
 
 	ticket := b.gate.Bootstrap()
 	out = ownedcontrol.NamespaceRuntimeBindings{Role: ticket.Requirement.Role, HeaderSHA256: ticket.Header.SHA256(), Resources: append([]string(nil), resources...), Source: source}
-	required := map[string][]string{"rpc-msg": {"msg-history", "msg-namespaces"}, "rpc-conversation": {"conversation-history"}, "rpc-group": {"group-history", "new-group-namespaces", "group-receiver"}, "msgtransfer-managed": {"ordinary-history", "ordinary-namespaces", "ordinary-offline", "ordinary-intake"}, "crontask": {"cron-history"}}[ticket.Requirement.Role]
+	required := map[string][]string{"api": {"api-history"}, "rpc-msg": {"msg-history", "msg-namespaces"}, "rpc-conversation": {"conversation-history"}, "rpc-group": {"group-history", "new-group-namespaces", "group-receiver"}, "msgtransfer-managed": {"ordinary-history", "ordinary-namespaces", "ordinary-offline", "ordinary-intake"}, "crontask": {"cron-history"}}[ticket.Requirement.Role]
 	if len(required) == 0 {
 		return out, ErrUnprepared
 	}

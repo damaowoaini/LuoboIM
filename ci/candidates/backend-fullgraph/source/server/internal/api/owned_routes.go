@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
 	"github.com/openimsdk/open-im-server/v3/internal/sessionlogout"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/db/mgo"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/sensitiveword"
@@ -21,6 +22,7 @@ type ownedRouteScope struct {
 	ctx                context.Context
 	cancel             context.CancelFunc
 	database           *mongo.Database
+	historyReader      *messagedelivery.HistoryWindowReader
 	logout             *sessionlogout.Service
 	sensitive          *sensitiveword.OwnedChecker
 	logoutStarted      bool
