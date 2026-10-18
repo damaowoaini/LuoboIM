@@ -6,6 +6,17 @@ HERE=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location('fullgraph_controller',HERE/'run.py')
 run=importlib.util.module_from_spec(spec);spec.loader.exec_module(run)
 
+def public_resource_preparation(raw,scenario):
+ value=json.loads(raw)
+ keys={'version','scenario','role','step','callState','errorClass','cliExitCode','rawErrorText'}
+ if set(value)!=keys or value['version']!='owned-fullgraph-resource-prepare-observation-v1' or value['scenario']!=scenario or scenario not in run.SCENARIOS or value['rawErrorText'] is not False:raise ValueError('finite original resource preparation required')
+ if value['role'] not in ('none','keeper','mongo','redis','zookeeper','kafka-format','kafka','minio') or value['step'] not in ('config','create-intent','image','volume','data','env','create','inspect','start','format-attach','format-result','final-observe','claim') or value['callState']!='returned' or value['errorClass'] not in ('none','command-nonzero','command-timeout','command-output-cap','permission','no-space','not-found','contract','other'):raise ValueError('closed resource prepare observation required')
+ code=value['cliExitCode']
+ if code is not None and (type(code) is not int or not -128<=code<=255):raise ValueError('actual bounded CLI exit required')
+ if value['step'] in ('format-attach','format-result') and value['role']!='kafka-format' or value['step']=='claim' and value['role']!='none':raise ValueError('original resource prepare role/step differs')
+ if value['errorClass']=='command-nonzero' and (code is None or code==0) or value['errorClass']=='none' and code not in (None,0):raise ValueError('original command exit/error relation differs')
+ return value
+
 def public_terminal(raw,scenario):
  value=json.loads(raw)
  if value.get('version')!='owned-fullgraph-token-v2-result-v1' or value.get('scenario')!=scenario or type(value.get('accepted')) is not bool:raise ValueError('finite actual terminal result required')
@@ -81,6 +92,14 @@ def pack(out):
 def checked_launcher_evidence(out):
  return run.check_launcher_reuse(json.loads(run.regular(out/'launcher-passed-reuse.json',65536)))
 
+def checked_kafka_acl_evidence(out):
+ receipt=run.check_kafka_acl_receipt(json.loads(run.regular(out/'kafka-acl-passed-reuse.json',65536)))
+ post=json.loads(run.regular(out/'source-post.json',4096))
+ before=json.loads(run.regular(out/'tools-before.json',65536));after=json.loads(run.regular(out/'tools-after.json',65536))
+ if post!=receipt['sourcePost']['body'] or before!=after:raise ValueError('current original source/tool post differs from Kafka ACL reuse')
+ run.check_kafka_acl_go_tool(receipt,before.get('go'))
+ return receipt
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
@@ -95,6 +114,13 @@ def collect():
    entry['resourceStarted']=True
    try:entry['resourceCleanup']=run.public_cleanup(resources.Plane.reopen(folder).cleanup())
    except Exception as error:entry['resourceCleanup']={'accepted':False,'exceptionType':type(error).__name__};failed=True
+  preparation=folder/'private'/('prepare-observation-'+scenario+'.json')
+  if preparation.exists():
+   try:
+    entry['resourcePreparation']=public_resource_preparation(run.regular(preparation,4096),scenario)
+    run.write(out/('resource-prepare-'+scenario+'.json'),entry['resourcePreparation'])
+    if entry['resourcePreparation']['errorClass']!='none':failed=True
+   except Exception as error:entry['resourcePreparationExceptionType']=type(error).__name__;failed=True
   if (work/'result.json').exists():
    try:run.write(out/('terminal-'+scenario+'.json'),public_terminal(run.regular(work/'result.json',1<<20),scenario))
    except Exception as error:entry['terminalExceptionType']=type(error).__name__;failed=True
@@ -124,6 +150,10 @@ def collect():
    run.write(out/'source-post-recovery-inspection.json',post)
   else:post=json.loads(run.regular(postpath))
   failed=failed or post.get('accepted') is not True
+ kafka_reuse_accepted=False
+ if (out/'kafka-acl-passed-reuse.json').exists():
+  try:checked_kafka_acl_evidence(out);kafka_reuse_accepted=True
+  except Exception:failed=True
  minio=root/'minio-source-build/source-post.json'
  if minio.exists():run.write(out/'source-minio-post.json',json.loads(run.regular(minio,65536)))
  controller=run.REPO/'ci-results/backend-fullgraph-controller.resource.json'
@@ -133,8 +163,8 @@ def collect():
  try:
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
- accepted=launcher_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ accepted=launcher_accepted and kafka_reuse_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'actualKafkaACLTestsDispatched':0,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  pack(out)
  return 0 if accepted else 1
 

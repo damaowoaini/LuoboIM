@@ -1549,6 +1549,50 @@ final class ChatRepository {
         );
       });
 
+  /// Freeze only ID/fingerprint and the caller's original CID lease, not a new
+  /// retained body. The separate real reread must not adopt newer source text.
+  void Function() forwardSourceCheck(
+    ChatFavoriteSnapshot snapshot, {
+    required MessageHistoryAccess access,
+  }) {
+    final id = snapshot.messageId, cid = snapshot.conversationId;
+    if (snapshot.content.length > 2 * 1024 * 1024) {
+      throw const AppFailure(FailureKind.dataChanged);
+    }
+    late final String fingerprint;
+    try {
+      final value = jsonDecode(snapshot.content);
+      if (value is! Map<String, dynamic> || value['clientMsgID'] != id) {
+        throw const FormatException();
+      }
+      fingerprint = retainedMergeFingerprint(value);
+    } catch (_) {
+      throw const AppFailure(FailureKind.dataChanged);
+    }
+    void check() {
+      access.check();
+      if (!current ||
+          cid != conversationId ||
+          access.conversationId != conversationId ||
+          isRemoved(id)) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+      final raw = _raw[id];
+      if (raw == null ||
+          raw.status != MessageStatus.succeeded ||
+          retainedMergeFingerprint(raw.toJson()) != fingerprint) {
+        throw const AppFailure(FailureKind.dataChanged);
+      }
+      final item = _map(raw);
+      if (!item.canForward || !canRetain(item)) {
+        throw const AppFailure(FailureKind.permissionDenied);
+      }
+    }
+
+    check();
+    return check;
+  }
+
   Future<ChatMessage?> findSource(String clientMsgId) async {
     if (clientMsgId.isEmpty) throw const AppFailure(FailureKind.invalidInput);
     if (isRemoved(clientMsgId)) return null;
@@ -1644,14 +1688,17 @@ final class ChatRepository {
   Future<ChatMessage> forwardMessageJson(
     String content, {
     void Function()? checkSource,
+    Future<void> Function()? revalidateSource,
+    void Function()? onDispatched,
   }) async {
     checkSource?.call();
     final lease = gateway.historyAccess(
       generation,
       conversationId: conversationId,
     );
-    if (_conversation == null ||
-        !_conversation!.canSend ||
+    final destination = _conversation;
+    if (destination == null ||
+        !destination.canSend ||
         content.length > 2 * 1024 * 1024) {
       throw const AppFailure(FailureKind.invalidInput);
     }
@@ -1739,6 +1786,11 @@ final class ChatRepository {
     }, access: lease);
     lease.check();
     checkSource?.call();
+    if (revalidateSource != null) {
+      await revalidateSource();
+      lease.check();
+      checkSource?.call();
+    }
     if (!gateway.privacyLedger
         .observe(conversationId, original.toJson(), now: now())
         .canRetainAt(now())) {
@@ -1748,9 +1800,23 @@ final class ChatRepository {
     if (id == null || id.isEmpty || id == original.clientMsgID) {
       throw const AppFailure(FailureKind.invalidResponse);
     }
+    final actual = await conversation();
+    lease.check();
+    checkSource?.call();
+    if (!actual.canSend ||
+        actual.isGroup != destination.isGroup ||
+        actual.userId != destination.userId ||
+        actual.groupId != destination.groupId) {
+      throw const AppFailure(FailureKind.dataChanged);
+    }
     _raw[id] = forwarded;
-    // A separate dispatch fence prevents a completed create from sending after exit.
-    return send(id, access: lease, checkSource: checkSource);
+    // The observer is invoked by _send only at its original physical SDK edge.
+    return send(
+      id,
+      access: lease,
+      checkSource: checkSource,
+      onDispatched: onDispatched,
+    );
   }
 
   void _checkBatchIntent(ChatBatchIntent intent) {

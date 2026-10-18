@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imapp/features/favorite/data/favorite_repository.dart';
+import 'package:imapp/features/chat/presentation/chat_page.dart';
 import 'package:imapp/features/favorite/presentation/favorite_forward_page.dart';
 import 'package:imapp/providers.dart';
 
@@ -183,6 +186,194 @@ void main() {
         final sent = sdk.calls.where((c) => c.method == 'sendMessage').toList();
         expect(sent, hasLength(1));
         expect((sent.single.arguments as Map)['userID'], 'carol');
+      } finally {
+        await close(tester);
+      }
+    },
+  );
+
+  testWidgets(
+    'favorite source route cannot revive after foreign coverage while native create waits',
+    (tester) async {
+      await mount(tester);
+      final entered = Completer<void>(), release = Completer<void>();
+      final original = sdk.overrideCall!;
+      sdk.overrideCall = (call) async {
+        if (call.method == 'createForwardMessage') {
+          if (!entered.isCompleted) {
+            entered.complete();
+          }
+          await release.future;
+        }
+        return original(call);
+      };
+      try {
+        await confirmation(tester);
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        for (var i = 0; i < 20 && !entered.isCompleted; i++) {
+          await tester.pump(const Duration(milliseconds: 50));
+        }
+        expect(entered.isCompleted, isTrue);
+        final navigator = Navigator.of(
+          tester.element(find.byType(FavoriteForwardPage)),
+        );
+        final covered = navigator.push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => const Scaffold(body: Text('另一个页面')),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        navigator.pop();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        await covered;
+        release.complete();
+        await tester.pumpAndSettle();
+        expect(find.text('此转发已失效，请重新确认收件人。'), findsOneWidget);
+        expect(
+          sdk.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(1),
+        );
+        expect(sdk.calls.where((c) => c.method == 'sendMessage'), isEmpty);
+        expect(find.textContaining('转发结果未确认'), findsNothing);
+        await confirmation(tester);
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        await tester.pumpAndSettle();
+        expect(
+          sdk.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(2),
+        );
+        expect(sdk.calls.where((c) => c.method == 'sendMessage'), hasLength(1));
+        expect(tester.takeException(), isNull);
+      } finally {
+        if (!release.isCompleted) {
+          release.complete();
+        }
+        await close(tester);
+      }
+    },
+  );
+
+  testWidgets(
+    'favorite rechecks the confirmed destination after native creation before dispatch',
+    (tester) async {
+      await mount(tester);
+      final original = sdk.overrideCall!;
+      sdk.overrideCall = (call) async {
+        final result = await original(call);
+        if (call.method == 'createForwardMessage') {
+          sdk.conversations[0]['userID'] = 'replacement-account';
+        }
+        return result;
+      };
+      try {
+        await confirmation(tester);
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        await tester.pumpAndSettle();
+        expect(
+          sdk.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(1),
+        );
+        expect(sdk.calls.where((c) => c.method == 'sendMessage'), isEmpty);
+        expect(find.textContaining('转发结果未确认'), findsNothing);
+        expect(tester.takeException(), isNull);
+      } finally {
+        await close(tester);
+      }
+    },
+  );
+
+  testWidgets(
+    'favorite unknown dispatch blocks replay and reviews only its original confirmed account',
+    (tester) async {
+      await mount(tester);
+      final original = sdk.overrideCall!;
+      sdk.overrideCall = (call) async {
+        if (call.method == 'sendMessage') {
+          throw PlatformException(code: '10005');
+        }
+        return original(call);
+      };
+      try {
+        await confirmation(tester);
+        final originalTap = tester
+            .widget<ListTile>(
+              find.ancestor(
+                of: find.text('同名收件人'),
+                matching: find.byType(ListTile),
+              ),
+            )
+            .onTap!;
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('转发结果未确认'), findsWidgets);
+        expect(
+          tester.widget<TextField>(find.byType(TextField)).enabled,
+          isFalse,
+        );
+        originalTap();
+        await tester.pumpAndSettle();
+        expect(
+          sdk.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(1),
+        );
+        expect(sdk.calls.where((c) => c.method == 'sendMessage'), hasLength(1));
+        expect(find.text('转发给 同名收件人？'), findsNothing);
+        await tester.tap(find.text('前往核对 · 账号 ID：carol'));
+        await tester.pumpAndSettle();
+        final reviewPage = tester.widget<ChatPage>(find.byType(ChatPage));
+        expect(reviewPage.conversationId, 'target');
+        expect(reviewPage.sourceCurrent, isNotNull);
+        expect(reviewPage.sourceCurrent!(), isTrue);
+        await tester.runAsync(fixture.session.signOut);
+        expect(reviewPage.sourceCurrent!(), isFalse);
+        expect(sdk.calls.where((c) => c.method == 'sendMessage'), hasLength(1));
+        expect(tester.takeException(), isNull);
+      } finally {
+        await close(tester);
+      }
+    },
+  );
+
+  testWidgets(
+    'favorite preserves a definitive friendship rejection without creating a forward hint or unknown result',
+    (tester) async {
+      await mount(tester);
+      final original = sdk.overrideCall!;
+      sdk.overrideCall = (call) async {
+        if (call.method == 'sendMessage') {
+          throw PlatformException(code: '1302');
+        }
+        return original(call);
+      };
+      try {
+        await confirmation(tester);
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        await tester.pumpAndSettle();
+        expect(sdk.calls.where((c) => c.method == 'sendMessage'), hasLength(1));
+        expect(find.textContaining('转发结果未确认'), findsNothing);
+        expect(find.textContaining('前往核对'), findsNothing);
+        expect(
+          tester
+              .widget<ListTile>(
+                find.ancestor(
+                  of: find.text('同名收件人'),
+                  matching: find.byType(ListTile),
+                ),
+              )
+              .onTap,
+          isNotNull,
+        );
+        expect(
+          sdk.calls.where(
+            (c) =>
+                c.method == 'createCustomMessage' ||
+                c.method == 'insertSingleMessageToLocalStorage',
+          ),
+          isEmpty,
+        );
+        expect(tester.takeException(), isNull);
       } finally {
         await close(tester);
       }

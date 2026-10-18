@@ -219,4 +219,161 @@ void main() {
       );
     },
   );
+
+  test('forward dispatch observation stays at the real SDK send edge for ordinary and at-text creation', () async {
+    var serial = 0, observed = 0;
+    var createPending = false;
+    harness.overrideCall = (call) async {
+      if (call.method == 'createForwardMessage' ||
+          call.method == 'createMergerMessage') {
+        createPending = true;
+        expect(observed, serial);
+        final args = call.arguments as Map;
+        final value = call.method == 'createForwardMessage'
+            ? Map<String, dynamic>.from(args['message'] as Map)
+            : <String, dynamic>{
+                ...SdkHarness.message(
+                  id: 'unused',
+                  text: '',
+                  sender: 'alice',
+                  status: 1,
+                ),
+                'contentType': 107,
+                'mergeElem': {
+                  'title': args['title'],
+                  'multiMessage': args['messageList'],
+                },
+              };
+        createPending = false;
+        return jsonEncode({
+          ...value,
+          'clientMsgID': 'edge-${++serial}',
+          'sendID': 'alice',
+        });
+      }
+      if (call.method == 'sendMessage') {
+        expect(createPending, isFalse);
+        expect(observed, serial);
+      }
+      return harness.respond(call);
+    };
+    final ordinary = SdkHarness.message(id: 'original-edge', text: 'ordinary');
+    final atText = <String, dynamic>{
+      ...SdkHarness.message(id: 'original-at-edge', text: ''),
+      'contentType': 106,
+      'atTextElem': {
+        'text': '@原账号 原文',
+        'atUserList': ['original-peer'],
+        'atUsersInfo': [
+          {'atUserID': 'original-peer', 'groupNickname': '原账号'},
+        ],
+        'isAtSelf': false,
+      },
+    };
+    for (final original in [ordinary, atText]) {
+      await repository.forwardMessageJson(
+        jsonEncode(original),
+        onDispatched: () {
+          expect(createPending, isFalse);
+          expect(harness.calls.last.method, 'getMultipleConversation');
+          ++observed;
+        },
+      );
+    }
+    expect(observed, 2);
+    expect(
+      harness.calls.where((c) => c.method == 'createForwardMessage'),
+      hasLength(1),
+    );
+    expect(
+      harness.calls.where((c) => c.method == 'createMergerMessage'),
+      hasLength(1),
+    );
+    expect(harness.calls.where((c) => c.method == 'sendMessage'), hasLength(2));
+    await expectLater(
+      repository.forwardMessageJson('not-json', onDispatched: () => ++observed),
+      throwsA(isA<AppFailure>()),
+    );
+    expect(observed, 2);
+  });
+
+  for (final boundary in ['deleted', 'replaced']) {
+    test(
+      'single forwarding real post-create reread rejects a $boundary source without adopting a new body',
+      () async {
+        final snapshot = await repository.favoriteSnapshot('full-protocol');
+        final lease = harness.gateway.historyAccess(
+          harness.session.state.generation,
+          conversationId: 'single-alice-bob',
+        );
+        final checkSource = repository.forwardSourceCheck(
+          snapshot,
+          access: lease,
+        );
+        var observed = 0;
+        harness.overrideCall = (call) async {
+          if (call.method == 'findMessageList') {
+            return jsonEncode({
+              'findResultItems': [
+                {
+                  'conversationID': 'single-alice-bob',
+                  'messageList': harness.messages,
+                },
+              ],
+            });
+          }
+          if (call.method == 'createForwardMessage') {
+            final value = Map<String, dynamic>.from(
+              (call.arguments as Map)['message'] as Map,
+            );
+            if (boundary == 'deleted') {
+              harness.messages.clear();
+            } else {
+              harness.messages.single['textElem'] = {'content': 'replacement'};
+            }
+            return jsonEncode({
+              ...value,
+              'clientMsgID': 'post-create-new-id',
+              'sendID': 'alice',
+            });
+          }
+          return harness.respond(call);
+        };
+        await expectLater(
+          repository.forwardMessageJson(
+            snapshot.content,
+            checkSource: checkSource,
+            revalidateSource: () async {
+              final actual = await repository.findSource(snapshot.messageId);
+              if (actual == null) {
+                throw const AppFailure(FailureKind.dataChanged);
+              }
+              checkSource();
+            },
+            onDispatched: () => ++observed,
+          ),
+          throwsA(
+            isA<AppFailure>().having(
+              (e) => e.kind,
+              'kind',
+              FailureKind.dataChanged,
+            ),
+          ),
+        );
+        final created = harness.calls.indexWhere(
+          (c) => c.method == 'createForwardMessage',
+        );
+        expect(created, greaterThanOrEqualTo(0));
+        expect(
+          harness.calls
+              .skip(created + 1)
+              .where((c) => c.method == 'findMessageList'),
+          hasLength(1),
+        );
+        expect(observed, 0);
+        expect(harness.calls.where((c) => c.method == 'sendMessage'), isEmpty);
+        expect(jsonDecode(snapshot.content)['textElem']['content'], '正文');
+      },
+    );
+  }
 }

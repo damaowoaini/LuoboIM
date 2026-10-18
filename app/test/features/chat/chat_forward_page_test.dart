@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imapp/features/chat/presentation/chat_page.dart';
+import 'package:imapp/features/chat/presentation/chat_forward_page.dart';
 import 'package:imapp/providers.dart';
 
 import '../../core/im/capture_theme.dart';
@@ -488,6 +491,419 @@ void main() {
         expect(jsonEncode(originalSource), originalJSON);
         expect(tester.takeException(), isNull);
       } finally {
+        await tester.runAsync(harness.dispose);
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    },
+  );
+
+  Future<void> awaitNativeCreate(
+    WidgetTester tester,
+    Completer<void> entered,
+  ) async {
+    await tester.tap(find.widgetWithText(TextButton, '发送'));
+    for (var i = 0; i < 20 && !entered.isCompleted; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(entered.isCompleted, isTrue);
+  }
+
+  for (final boundary in ['body replacement', 'CID clear', 'owner exit']) {
+    testWidgets(
+      'single forward rejects $boundary after native creation without renewing its source intent',
+      (tester) async {
+        final entered = Completer<void>(), release = Completer<void>();
+        final original = harness.overrideCall!;
+        harness.overrideCall = (call) async {
+          if (call.method == 'createForwardMessage') {
+            entered.complete();
+            await release.future;
+          }
+          return original(call);
+        };
+        await mount(tester);
+        Future<void>? exiting;
+        try {
+          await openConfirmation(tester);
+          await awaitNativeCreate(tester, entered);
+          if (boundary == 'body replacement') {
+            harness.messages.single['textElem'] = {'content': '后来替换的正文'};
+          } else if (boundary == 'CID clear') {
+            await tester.runAsync(
+              () => harness.gateway.clearConversationMessages(
+                harness.session.state.generation,
+                'single-alice-bob',
+              ),
+            );
+          } else {
+            exiting = harness.session.signOut();
+          }
+          release.complete();
+          await tester.pumpAndSettle();
+          if (exiting case final exit?) {
+            await tester.runAsync(() => exit);
+          }
+          expect(
+            harness.calls.where((c) => c.method == 'createForwardMessage'),
+            hasLength(1),
+          );
+          expect(
+            harness.calls.where((c) => c.method == 'sendMessage'),
+            isEmpty,
+          );
+          if (boundary == 'body replacement') {
+            final createIndex = harness.calls.indexWhere(
+              (c) => c.method == 'createForwardMessage',
+            );
+            expect(
+              harness.calls
+                  .skip(createIndex + 1)
+                  .where((c) => c.method == 'findMessageList'),
+              isNotEmpty,
+            );
+          }
+          expect(find.textContaining('转发结果未确认'), findsNothing);
+          expect(tester.takeException(), isNull);
+        } finally {
+          if (!release.isCompleted) {
+            release.complete();
+          }
+          await tester.runAsync(harness.dispose);
+          await tester.pumpWidget(const SizedBox.shrink());
+        }
+      },
+    );
+  }
+
+  testWidgets(
+    'single forward source route cannot revive after foreign coverage while native create waits',
+    (tester) async {
+      final entered = Completer<void>(), release = Completer<void>();
+      final original = harness.overrideCall!;
+      harness.overrideCall = (call) async {
+        if (call.method == 'createForwardMessage') {
+          if (!entered.isCompleted) {
+            entered.complete();
+          }
+          await release.future;
+        }
+        return original(call);
+      };
+      await mount(tester);
+      try {
+        await openConfirmation(tester);
+        await awaitNativeCreate(tester, entered);
+        final navigator = Navigator.of(
+          tester.element(find.byType(ChatForwardPage)),
+        );
+        final covered = navigator.push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => const Scaffold(body: Text('另一个页面')),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        navigator.pop();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        await covered;
+        release.complete();
+        await tester.pumpAndSettle();
+        expect(find.byType(ChatForwardPage), findsOneWidget);
+        expect(find.text('此转发已失效，请重新确认收件人。'), findsOneWidget);
+        expect(
+          harness.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(1),
+        );
+        expect(harness.calls.where((c) => c.method == 'sendMessage'), isEmpty);
+        expect(find.textContaining('转发结果未确认'), findsNothing);
+        // A later explicit confirmation is a new attempt, never the old continuation.
+        await tester.tap(find.text('目标会话'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        await tester.pumpAndSettle();
+        expect(
+          harness.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(2),
+        );
+        expect(
+          harness.calls.where((c) => c.method == 'sendMessage'),
+          hasLength(1),
+        );
+        expect(tester.takeException(), isNull);
+      } finally {
+        if (!release.isCompleted) {
+          release.complete();
+        }
+        await tester.runAsync(harness.dispose);
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    },
+  );
+
+  testWidgets(
+    'single unknown dispatch blocks replay and explicit review keeps the original confirmed destination',
+    (tester) async {
+      final original = harness.overrideCall!;
+      harness.overrideCall = (call) async {
+        if (call.method == 'sendMessage') {
+          throw PlatformException(code: '10005');
+        }
+        return original(call);
+      };
+      await mount(tester);
+      try {
+        await openConfirmation(tester);
+        final tile = tester.widget<ListTile>(
+          find.ancestor(of: find.text('目标会话'), matching: find.byType(ListTile)),
+        );
+        final originalTap = tile.onTap!;
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('转发结果未确认'), findsWidgets);
+        expect(
+          tester.widget<TextField>(find.byType(TextField)).enabled,
+          isFalse,
+        );
+        expect(
+          tester
+              .widget<ListTile>(
+                find.ancestor(
+                  of: find.text('目标会话'),
+                  matching: find.byType(ListTile),
+                ),
+              )
+              .onTap,
+          isNull,
+        );
+        originalTap();
+        await tester.pumpAndSettle();
+        expect(
+          harness.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(1),
+        );
+        expect(
+          harness.calls.where((c) => c.method == 'sendMessage'),
+          hasLength(1),
+        );
+        expect(find.text('转发给 目标会话？'), findsNothing);
+        final review = find.text('前往核对 · 账号 ID：carol');
+        expect(review, findsOneWidget);
+        harness.conversations[1]['userID'] = 'replacement-account';
+        await tester.tap(review);
+        await tester.pumpAndSettle();
+        expect(find.byType(ChatForwardPage), findsOneWidget);
+        expect(find.byType(ChatPage), findsNothing);
+        harness.conversations[1]['userID'] = 'carol';
+        await tester.tap(review);
+        await tester.pumpAndSettle();
+        final reviewPage = tester.widget<ChatPage>(find.byType(ChatPage));
+        expect(reviewPage.conversationId, 'target-chat');
+        expect(reviewPage.sourceCurrent, isNotNull);
+        expect(reviewPage.sourceCurrent!(), isTrue);
+        await tester.runAsync(harness.session.signOut);
+        expect(reviewPage.sourceCurrent!(), isFalse);
+        expect(
+          harness.calls.where((c) => c.method == 'sendMessage'),
+          hasLength(1),
+        );
+        expect(tester.takeException(), isNull);
+      } finally {
+        await tester.runAsync(harness.dispose);
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    },
+  );
+
+  for (final code in [1302, 1303]) {
+    testWidgets(
+      'single forward preserves definitive $code rejection without an unknown replay lock',
+      (tester) async {
+        final original = harness.overrideCall!;
+        harness.overrideCall = (call) async {
+          if (call.method == 'sendMessage') {
+            throw PlatformException(code: '$code');
+          }
+          return original(call);
+        };
+        await mount(tester);
+        try {
+          await openConfirmation(tester);
+          await tester.tap(find.widgetWithText(TextButton, '发送'));
+          await tester.pumpAndSettle();
+          expect(
+            harness.calls.where((c) => c.method == 'sendMessage'),
+            hasLength(1),
+          );
+          expect(find.textContaining('转发结果未确认'), findsNothing);
+          expect(find.textContaining('前往核对'), findsNothing);
+          expect(
+            tester
+                .widget<ListTile>(
+                  find.ancestor(
+                    of: find.text('目标会话'),
+                    matching: find.byType(ListTile),
+                  ),
+                )
+                .onTap,
+            isNotNull,
+          );
+          expect(
+            harness.calls.where(
+              (c) =>
+                  c.method == 'createCustomMessage' ||
+                  c.method == 'insertSingleMessageToLocalStorage',
+            ),
+            isEmpty,
+          );
+          expect(tester.takeException(), isNull);
+        } finally {
+          await tester.runAsync(harness.dispose);
+          await tester.pumpWidget(const SizedBox.shrink());
+        }
+      },
+    );
+  }
+
+  testWidgets(
+    'merge picker route retirement also fences the original native dispatch callback',
+    (tester) async {
+      final entered = Completer<void>(), release = Completer<void>();
+      final original = harness.overrideCall!;
+      harness.overrideCall = (call) async {
+        if (call.method == 'createMergerMessage') {
+          entered.complete();
+          await release.future;
+          final args = call.arguments as Map;
+          return jsonEncode({
+            ...SdkHarness.message(
+              id: 'new-merge',
+              text: '',
+              sender: 'alice',
+              status: 1,
+            ),
+            'contentType': 107,
+            'mergeElem': {
+              'title': args['title'],
+              'multiMessage': args['messageList'],
+            },
+          });
+        }
+        return original(call);
+      };
+      await mount(tester);
+      try {
+        await tester.longPress(find.text('可直接转发的原文'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('多选消息'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('合并转发'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('目标会话'));
+        await tester.pumpAndSettle();
+        await awaitNativeCreate(tester, entered);
+        final navigator = Navigator.of(
+          tester.element(find.byType(ChatForwardPage)),
+        );
+        final covered = navigator.push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => const Scaffold(body: Text('另一个页面')),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        navigator.pop();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 350));
+        await covered;
+        release.complete();
+        await tester.pumpAndSettle();
+        expect(
+          harness.calls.where((c) => c.method == 'createMergerMessage'),
+          hasLength(1),
+        );
+        expect(harness.calls.where((c) => c.method == 'sendMessage'), isEmpty);
+        expect(find.textContaining('转发结果未确认'), findsNothing);
+        expect(find.text('此转发已失效，请重新确认收件人。'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      } finally {
+        if (!release.isCompleted) {
+          release.complete();
+        }
+        await tester.runAsync(harness.dispose);
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
+    },
+  );
+
+  testWidgets(
+    'single review handoff rejects owner replacement after push before its first builder without new account SDK reads',
+    (tester) async {
+      final original = harness.overrideCall!;
+      harness.overrideCall = (call) async {
+        if (call.method == 'sendMessage') {
+          throw PlatformException(code: '10005');
+        }
+        return original(call);
+      };
+      await mount(tester);
+      final entered = Completer<void>(), release = Completer<void>();
+      try {
+        await openConfirmation(tester);
+        await tester.tap(find.widgetWithText(TextButton, '发送'));
+        await tester.pumpAndSettle();
+        final sourceRoute = ModalRoute.of(
+          tester.element(find.byType(ChatForwardPage)),
+        )!;
+        harness.overrideCall = (call) async {
+          if (call.method == 'getMultipleConversation') {
+            entered.complete();
+            await release.future;
+          }
+          return original(call);
+        };
+        await tester.tap(find.text('前往核对 · 账号 ID：carol'));
+        for (var i = 0; i < 20 && !entered.isCompleted; i++) {
+          await tester.pump(const Duration(milliseconds: 50));
+        }
+        expect(entered.isCompleted, isTrue);
+        release.complete();
+        // Drain the real metadata continuation/push without building a frame.
+        await tester.idle();
+        expect(sourceRoute.isCurrent, isFalse);
+        expect(find.byType(ChatPage), findsNothing);
+        await tester.runAsync(() async {
+          await harness.session.signOut();
+          harness.userId = 'replacement-owner';
+          await harness.session.signIn((_) async => harness.credentials);
+        });
+        final callsBeforeBuilder = harness.calls.length;
+        await tester.pumpAndSettle();
+        expect(find.text('原账号或会话已失效，请返回重新核对'), findsOneWidget);
+        expect(find.byType(ChatPage), findsNothing);
+        expect(
+          harness.calls
+              .skip(callsBeforeBuilder)
+              .where(
+                (c) =>
+                    c.method == 'getMultipleConversation' ||
+                    c.method == 'getAdvancedHistoryMessageList',
+              ),
+          isEmpty,
+        );
+        expect(
+          harness.calls.where((c) => c.method == 'sendMessage'),
+          hasLength(1),
+        );
+        expect(
+          harness.calls.where((c) => c.method == 'createForwardMessage'),
+          hasLength(1),
+        );
+        expect(tester.takeException(), isNull);
+      } finally {
+        if (!release.isCompleted) {
+          release.complete();
+        }
         await tester.runAsync(harness.dispose);
         await tester.pumpWidget(const SizedBox.shrink());
       }

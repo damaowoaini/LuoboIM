@@ -11,7 +11,7 @@ run=load('run');builder=load('minio_build');resources=load('resources')
 
 class FullGraphControls(unittest.TestCase):
  def test_prepare_lock_fresh_scope_and_unknown_cannot_alias_old_pass_or_canonical(self):
-  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'cleanupCompleteScopes':copy.deepcopy(run.CLEANUP_COMPLETE_SCOPES),'cleanupRecentReuse':copy.deepcopy(run.CLEANUP_RECENT_REUSE),'cleanupFixtureRepair':copy.deepcopy(run.CLEANUP_FIXTURE_REPAIR),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN),'cleanupPassedReuse':copy.deepcopy(run.CLEANUP_PASSED_REUSE),'cleanupTestsToRun':[],'targetedKafkaACLControl':copy.deepcopy(run.KAFKA_ACL_CONTROL)}
+  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'cleanupCompleteScopes':copy.deepcopy(run.CLEANUP_COMPLETE_SCOPES),'cleanupRecentReuse':copy.deepcopy(run.CLEANUP_RECENT_REUSE),'cleanupFixtureRepair':copy.deepcopy(run.CLEANUP_FIXTURE_REPAIR),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN),'cleanupPassedReuse':copy.deepcopy(run.CLEANUP_PASSED_REUSE),'cleanupTestsToRun':[],'targetedKafkaACLControl':copy.deepcopy(run.KAFKA_ACL_CONTROL),'kafkaACLPassedReuse':copy.deepcopy(run.KAFKA_ACL_PASSED_REUSE),'kafkaACLTestsToRun':[]}
   with mock.patch.object(run,'FINAL_SOURCE',None),self.assertRaises(ValueError):run.check_locked(c)
   with mock.patch.object(run,'FINAL_SOURCE',source):
    run.check_locked(c)
@@ -179,6 +179,107 @@ class FullGraphControls(unittest.TestCase):
   for change in (dict(constructorPredicate='start-service-private-path'),dict(constructorPredicate='start-complete'),dict(constructorPredicate='start-service-process-image',constructorCallState='in-progress',constructorErrorClass='in-progress')):
    bad=dict(constructor_base,**change)
    with self.subTest(start_invalid=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+
+  # Original prepare failure is latched before cleanup; no Docker or service runs.
+  with tempfile.TemporaryDirectory() as directory:
+   folder=Path(directory);private=folder/'private';private.mkdir(mode=0o700)
+   plane=object.__new__(resources.Plane);plane.private=private;plane.docker=Path('/usr/bin/docker');plane.calls=0;plane.failed=False
+   process=mock.Mock();process.wait.return_value=1
+   def fail_original_prepare():
+    plane._prepare_at('kafka-format','format-attach')
+    return plane.call(['start','--attach','a'*64],90)
+   with mock.patch.object(plane,'_prepare_body',side_effect=fail_original_prepare),mock.patch.object(resources.subprocess,'Popen',return_value=process):
+    with self.assertRaises(RuntimeError) as caught:run.prepare_resource_plane(plane,run.SCENARIOS[1])
+   original=caught.exception
+   raw=run.regular(private/('prepare-observation-'+run.SCENARIOS[1]+'.json'),4096)
+   record=collector.public_resource_preparation(raw,run.SCENARIOS[1])
+   self.assertEqual((record['role'],record['step'],record['callState'],record['errorClass'],record['cliExitCode']),('kafka-format','format-attach','returned','command-nonzero',1))
+   process.wait.return_value=0
+   with mock.patch.object(resources.subprocess,'Popen',return_value=process):plane.call(['ps','--all'])
+   self.assertEqual(plane.prepare_observation(),{k:record[k] for k in ('role','step','callState','errorClass','cliExitCode')})
+   self.assertEqual(run.regular(private/('prepare-observation-'+run.SCENARIOS[1]+'.json')),raw)
+   # The exact original exception survives a failure to write diagnostics.
+   with mock.patch.object(plane,'_prepare_body',side_effect=original),mock.patch.object(run,'write',side_effect=PermissionError('PRIVATE_PATH')):
+    with self.assertRaises(RuntimeError) as repeated:run.prepare_resource_plane(plane,run.SCENARIOS[1])
+   self.assertIs(repeated.exception,original)
+   with mock.patch.object(plane,'_prepare_body',return_value={'fixture':'same-claim'}):
+    self.assertEqual(run.prepare_resource_plane(plane,run.SCENARIOS[0]),{'fixture':'same-claim'})
+   succeeded=collector.public_resource_preparation(run.regular(private/('prepare-observation-'+run.SCENARIOS[0]+'.json')),run.SCENARIOS[0])
+   self.assertEqual(run.regular(private/('prepare-observation-'+run.SCENARIOS[1]+'.json')),raw)
+   self.assertEqual((succeeded['errorClass'],succeeded['cliExitCode']),('none',None))
+   # A later non-prepare/cleanup command cannot rewrite successful preparation.
+   process.wait.return_value=1
+   with mock.patch.object(resources.subprocess,'Popen',return_value=process),self.assertRaises(RuntimeError):plane.call(['stop','a'*64])
+   self.assertEqual(plane.prepare_observation()['errorClass'],'none')
+   self.assertIsNone(object.__new__(resources.Plane).prepare_observation())
+   for key,badvalue in [('role','PRIVATE_USER'),('role','mongo'),('step','/PRIVATE_PATH'),('callState','in-progress'),('errorClass','PRIVATE_ERROR'),('cliExitCode',True),('cliExitCode',256),('cliExitCode',0),('rawErrorText',True)]:
+    changed=dict(record);changed[key]=badvalue
+    with self.subTest(resourcePreparation=key),self.assertRaises(ValueError):collector.public_resource_preparation(json.dumps(changed).encode(),run.SCENARIOS[1])
+   changed=dict(record,privatePath='/private/not-for-upload')
+   with self.assertRaises(ValueError):collector.public_resource_preparation(json.dumps(changed).encode(),run.SCENARIOS[1])
+
+  # Use the real source command builder: a leading '-' remains one unchanged value.
+  with tempfile.TemporaryDirectory() as directory:
+   folder=Path(directory);private=folder/'private';private.mkdir(mode=0o700)
+   plane=object.__new__(resources.Plane);plane.root=folder;plane.private=private;plane.nonce='a'*32;plane.pending_roles=[];plane.ids=['b'*64]
+   image='docker.io/apache/kafka@sha256:'+'c'*64;plane.images={'kafka':image};cid='d'*64;commands=[]
+   image_row={'Id':'sha256:'+'e'*64,'RepoDigests':[image],'Config':{'Volumes':{p:{} for p in ('/var/lib/kafka/data','/etc/kafka/secrets','/mnt/shared/config')}}}
+   container_row={'Id':cid,'Config':{'Labels':{'luobo.fullgraph.owner':plane.nonce,'luobo.fullgraph.role':'kafka-format'}},'State':{'Running':False,'ExitCode':0}}
+   def original_command(argv,timeout=60):
+    commands.append(list(argv))
+    if argv[:2]==['image','inspect']:return json.dumps([image_row]).encode()
+    if argv[0]=='create':
+     (private/'kafka-format.cid').write_text(cid+'\n');return cid.encode()
+    if argv[:2]==['container','inspect']:return json.dumps([container_row]).encode()
+    if argv[:2]==['start','--attach']:return b''
+    raise AssertionError('unexpected fixture source command')
+   cluster='-ABCDEFGHIJKLMNOPQRSTU'
+   with mock.patch.object(plane,'call',side_effect=original_command):plane.format_kafka(cluster)
+   create=next(argv for argv in commands if argv[0]=='create');tail=create[create.index(image)+1:]
+   self.assertEqual(tail,['format','--cluster-id='+cluster,'--config','/task/kafka.properties'])
+   self.assertNotIn('--cluster-id',tail);self.assertEqual(tail[1].split('=',1)[1],cluster)
+   self.assertEqual(sum(argv[:2]==['start','--attach'] for argv in commands),1)
+
+  # Reuse is source/tool/reporter-bound and never dispatches the retained helper.
+  kafka=copy.deepcopy(run.KAFKA_ACL_PASSED_REUSE)
+  self.assertEqual(run.check_kafka_acl_receipt(kafka),kafka)
+  self.assertEqual((kafka['run'],kafka['job'],kafka['attempt'],kafka['head']),(39091570750,117569259635,1,'500baca44c853079ca6f06a001ec3a2bf873cf23'))
+  rejected=[dict(kafka,source={'members':1576,'digest':'f'*64}),dict(kafka,run=1),dict(kafka,job=1),dict(kafka,attempt=2),dict(kafka,head='f'*40),dict(kafka,currentFreshPASS=True),dict(kafka,runtimeAccepted=True),dict(kafka,actualCurrentTestsDispatched=1)]
+  for change in ('drop-parent','foreign-child','events','source-post','go-tool','artifact'):
+   bad=copy.deepcopy(kafka)
+   if change=='drop-parent':bad['names']['body']['namedCompletions']=bad['names']['body']['namedCompletions'][1:]
+   elif change=='foreign-child':bad['names']['body']['namedCompletions'][1]['name']='TestForeign/child'
+   elif change=='events':bad['events']['body']=[r for r in bad['events']['body'] if not(r.get('Action')=='pass' and r.get('Test'))]
+   elif change=='source-post':bad['sourcePost']['body']['accepted']=False
+   elif change=='go-tool':bad['goTool']['sha256']='f'*64
+   else:bad['artifact']['sha256']='f'*64
+   rejected.append(bad)
+  for bad in rejected:
+   with self.assertRaises(ValueError):run.check_kafka_acl_receipt(bad)
+  # Small explicit test source: the real checker must query every body hash.
+  fixture_bodies={'server/fixture.go':b'fixed source'}
+  fixture_recipe=mock.Mock()
+  fixture_recipe.rows.side_effect=lambda bodies:sorted((name,len(body),run.sha(body)) for name,body in bodies.items())
+  fixture_recipe.digest.side_effect=lambda rows:run.sha(json.dumps(rows,separators=(',',':')).encode())
+  fixture=copy.deepcopy(kafka);fixture['source']={'members':1,'digest':fixture_recipe.digest(fixture_recipe.rows(fixture_bodies))};fixture['names']['body']['source']=fixture['source'];fixture['sourcePost']['body']['source']=fixture['source']
+  for key in ('names','sourcePost'):
+   raw=(json.dumps(fixture[key]['body'],separators=(',',':'),ensure_ascii=False)+'\n').encode();fixture[key]['bytes']=len(raw);fixture[key]['sha256']=run.sha(raw)
+  with mock.patch.object(run,'KAFKA_ACL_PASSED_REUSE',fixture),mock.patch.object(collector.run,'KAFKA_ACL_PASSED_REUSE',fixture),mock.patch.object(run,'FINAL_SOURCE',fixture['source']),tempfile.TemporaryDirectory() as directory:
+   out=Path(directory).resolve()
+   with mock.patch.object(run,'run_kafka_acl_control',side_effect=AssertionError('unchanged Kafka ACL must not dispatch')) as dispatch:
+    self.assertEqual(run.load_kafka_acl_reuse(out,fixture_bodies,fixture_recipe,fixture['goTool']),fixture);dispatch.assert_not_called()
+   self.assertEqual(json.loads((out/'kafka-acl-passed-reuse.json').read_bytes()),fixture)
+   for bodies in ({},{'server/fixture.go':b'changed source'},{**fixture_bodies,'server/foreign.go':b'extra'}):
+    with self.assertRaises(ValueError):run.check_kafka_acl_reuse(fixture,bodies,fixture_recipe)
+   with self.assertRaises(ValueError):run.load_kafka_acl_reuse(out,fixture_bodies,fixture_recipe,dict(fixture['goTool'],sha256='f'*64))
+   run.write(out/'source-post.json',fixture['sourcePost']['body']);run.write(out/'tools-before.json',{'go':fixture['goTool']});run.write(out/'tools-after.json',{'go':fixture['goTool']})
+   self.assertEqual(collector.checked_kafka_acl_evidence(out),fixture)
+   (out/'source-post.json').write_text(json.dumps({'accepted':False,'source':fixture['source']}))
+   with self.assertRaises(ValueError):collector.checked_kafka_acl_evidence(out)
+  with mock.patch.object(run,'FINAL_SOURCE',source):
+   for key,value in [('kafkaACLTestsToRun',['changed']),('kafkaACLPassedReuse',dict(kafka,actualCurrentTestsDispatched=1))]:
+    bad=copy.deepcopy(c);bad[key]=value
+    with self.assertRaises(ValueError):run.check_locked(bad)
 
  def test_real_tracked_git_bodies_symlink_bounds_static_elf_and_strict_receipt(self):
   with tempfile.TemporaryDirectory() as directory:
@@ -489,9 +590,10 @@ class FullGraphControls(unittest.TestCase):
   # This exact source-only ACL top reuses the same owned Go cache/environment.
   control=run.KAFKA_ACL_CONTROL;package='internal/namespaceimport/ownedcontrol';top='TestOwnedKafkaExclusionRequiresEveryWildcardDeny'
   self.assertEqual(control,{'phase':'kafka-acl-response','targets':{package:[top]},'requiredSubtests':{package:{top:['create-reply-error-and-shape-cannot-be-a-success','describe-reply-error-and-shape-cannot-replace-exact-deny']}},'goTimeoutSeconds':180,'phaseGuardSeconds':240,'newDatabaseFixtures':0,'otherKafkaOrRedisTestsDispatched':False})
-  kafka_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='run_kafka_acl_control')
+  kafka_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='load_kafka_acl_reuse')
   self.assertLess(cleanup_line,kafka_line);self.assertLess(kafka_line,compile_line)
-  self.assertEqual(ast.literal_eval(summary_fields['actualKafkaACLTestsDispatched']),1)
+  self.assertFalse(any(isinstance(node.func,ast.Name) and node.func.id=='run_kafka_acl_control' for node in calls))
+  self.assertEqual(ast.literal_eval(summary_fields['actualKafkaACLTestsDispatched']),0)
   locked=json.loads(run.INPUTS.read_bytes());run.check_locked(locked)
   changed=copy.deepcopy(locked);changed['targetedKafkaACLControl']['requiredSubtests'][package][top]=[]
   with self.assertRaises(ValueError):run.check_locked(changed)

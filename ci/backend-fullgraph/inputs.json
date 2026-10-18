@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 61578,
-      "sha256": "987e788bec986f74dd765e1e6b5e5c07849f3ff0b7a03df3e012766afe77875d"
+      "bytes": 71736,
+      "sha256": "8afce7afeb2f4be7081b5e0bd6a4e38cd59f8f7558b4bd0390d599ed6d23665c"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 42241,
-      "sha256": "5798214b4b834f9b7654840046c55bb5f4fe2b58f6be5821df93865965583489"
+      "bytes": 45031,
+      "sha256": "32bb5cb5a9b12fc3103759b960d9b1eacd0ca116270c68ca7bb72b6d8e486759"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,13 +57,13 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 74816,
-      "sha256": "3852fc7cbbabec8524254515258f4dc620fe1a7043ca28200d974805e3a807e7"
+      "bytes": 84029,
+      "sha256": "0fd18407888c3dac3cec6a536e82777d4c1b740aba59f492ca2a5f27bf9ce985"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
-      "bytes": 29111,
-      "sha256": "a9ac98690c116869099af8fb54f8d5b46c3c7da5d1280798c2c2a4ba067a4be2"
+      "bytes": 32063,
+      "sha256": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed"
     },
     {
       "path": "ci/backend-fullgraph/service_selectors.py",
@@ -4484,5 +4484,198 @@
     "phaseGuardSeconds": 240,
     "newDatabaseFixtures": 0,
     "otherKafkaOrRedisTestsDispatched": false
-  }
+  },
+  "kafkaACLPassedReuse": {
+    "schema": 1,
+    "kind": "root-accepted-kafka-acl-source-bound-reuse-v1",
+    "run": 39091570750,
+    "job": 117569259635,
+    "attempt": 1,
+    "head": "500baca44c853079ca6f06a001ec3a2bf873cf23",
+    "source": {
+      "members": 1576,
+      "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
+    },
+    "artifact": {
+      "artifact": 12122902662,
+      "run": 39091570750,
+      "attempt": 1,
+      "head": "500baca44c853079ca6f06a001ec3a2bf873cf23",
+      "sha256": "7ed1b07f467037c4a148cc5de413232f161101af65b5eba8cde53d638fbd07d4",
+      "bytes": 44383,
+      "exactAPIDigest": true,
+      "files": 59,
+      "binariesDownloaded": false
+    },
+    "rootReviewSHA256": "308412b715bdf1bc5b3a60e9abd2b4122d7e3a082353af444ae1c94a93110a02",
+    "compactCustody": {
+      "bytes": 7234,
+      "sha256": "1f227f154cda907d61e8b48ce6253a3d5032aff001823414da3621a5cd5370f9"
+    },
+    "events": {
+      "bytes": 3537,
+      "sha256": "300357fa4c07a8c840f538cb5ed0422bcc84fb5e888f98b0a6366f5e539bbd59",
+      "body": [
+        {
+          "Time": "2026-10-18T02:54:25.312427428Z",
+          "Action": "start",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339692637Z",
+          "Action": "run",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339752753Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339777823Z",
+          "Action": "run",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339781401Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339909226Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339922815Z",
+          "Action": "pass",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success",
+          "Elapsed": 0
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339959837Z",
+          "Action": "run",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.339962892Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.34002031Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.3400262Z",
+          "Action": "pass",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny",
+          "Elapsed": 0
+        },
+        {
+          "Time": "2026-10-18T02:54:25.340075932Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+        },
+        {
+          "Time": "2026-10-18T02:54:25.340100894Z",
+          "Action": "pass",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny",
+          "Elapsed": 0
+        },
+        {
+          "Time": "2026-10-18T02:54:25.340196573Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+        },
+        {
+          "Time": "2026-10-18T02:54:26.341379184Z",
+          "Action": "output",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+        },
+        {
+          "Time": "2026-10-18T02:54:26.341443904Z",
+          "Action": "pass",
+          "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+          "Elapsed": 1.029
+        }
+      ]
+    },
+    "names": {
+      "bytes": 697,
+      "sha256": "a8fffe53ed002f65add20e337716c2c3b56cf3c30dbc44ac0640f5de1709f701",
+      "body": {
+        "topPASS": 1,
+        "subPASS": 2,
+        "skip": 0,
+        "fail": 0,
+        "packages": 1,
+        "namedCompletions": [
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+          }
+        ],
+        "source": {
+          "members": 1576,
+          "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
+        },
+        "accepted": true,
+        "newDatabaseFixtures": 0,
+        "otherKafkaOrRedisTestsDispatched": false
+      }
+    },
+    "sourcePost": {
+      "bytes": 120,
+      "sha256": "ffb5c0c82e5318493612eaf60150fdd2ed6ec6d5856a9e259bb20b5390671a2d",
+      "body": {
+        "accepted": true,
+        "source": {
+          "members": 1576,
+          "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
+        }
+      }
+    },
+    "toolsBefore": {
+      "bytes": 1277,
+      "sha256": "c524b97c60b95cb63416089a921e4459e3738ca77cc04730dcf52c3cd501b740"
+    },
+    "toolsAfter": {
+      "bytes": 1277,
+      "sha256": "c524b97c60b95cb63416089a921e4459e3738ca77cc04730dcf52c3cd501b740"
+    },
+    "goTool": {
+      "bytes": 17164055,
+      "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "mode": 493
+    },
+    "historicalTopPASS": 1,
+    "historicalSubPASS": 2,
+    "actualCurrentTestsDispatched": 0,
+    "sourceBoundReuse": true,
+    "currentFreshPASS": false,
+    "runtimeAccepted": false
+  },
+  "kafkaACLTestsToRun": []
 }

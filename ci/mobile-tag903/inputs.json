@@ -12,24 +12,29 @@
   },
   "source": {
     "members": 363,
-    "digest": "b981685961f1b866679e48541e82a9e01cab7d39b084d300838458863ebaadac"
+    "digest": "fad51ad218053ea2cc147c0e7120548528fa0c5dc8cc2cbea74983cb8a50c0e9"
   },
   "portable": {
     "members": 415,
-    "digest": "163f69efd5827efebfc4c3d75e5fb16ebeed08ebb50f1e18a1827ebe494c6eba"
+    "digest": "8244ea62ad19aa7bb2ff1eade899d47e015b93ba113b68e903a500375e8fb367"
   },
   "analysis_paths": [
     "lib/features/chat/data/chat_repository.dart",
-    "lib/features/chat/presentation/chat_controller.dart",
-    "lib/features/chat/presentation/chat_page.dart",
-    "lib/features/contacts/presentation/user_profile_page.dart",
-    "test/features/chat/legacy_custom_summary_test.dart"
+    "lib/features/chat/presentation/chat_forward_page.dart",
+    "lib/features/favorite/presentation/favorite_forward_page.dart",
+    "test/features/chat/chat_forward_page_test.dart",
+    "test/features/favorite/favorite_forward_privacy_test.dart",
+    "test/features/chat/chat_favorite_test.dart"
   ],
   "test_paths": [
-    "test/features/chat/legacy_custom_summary_test.dart",
     "test/features/chat/chat_forward_page_test.dart",
-    "test/features/chat/batch_media_access_test.dart",
-    "test/features/chat/chat_card_workflow_test.dart"
+    "test/features/favorite/favorite_forward_privacy_test.dart",
+    "test/features/chat/chat_favorite_test.dart",
+    "test/features/chat/batch_page_test.dart",
+    "test/features/favorite/favorite_pages_test.dart",
+    "test/features/chat/global_history_clear_test.dart",
+    "test/features/chat/mention_forward_test.dart",
+    "test/features/chat/legacy_custom_summary_test.dart"
   ],
   "names8": [
     "tag903 sound has a restricted audio projection without changing custom identity",
@@ -41,7 +46,7 @@
     "nested audio active playback stops after root expiry",
     "nested audio late setUrl cannot start after root exit"
   ],
-  "expected_full_tests_only": 1363,
+  "expected_full_tests_only": 1379,
   "whole_codec_completed": false,
   "resource": {
     "initial_bytes": 4294967296,
@@ -125,13 +130,13 @@
   "controllers": [
     {
       "path": "ci/mobile-tag903.py",
-      "bytes": 34016,
-      "sha256": "7a547899c23a232f6182bbf8208e81918666870bc66f2efae823b9ecbcb3c5d2"
+      "bytes": 44299,
+      "sha256": "a95b5b140d371f0f41d0d75c902d33812de3daf11e4d1b0cca4431b47c7b1fbc"
     },
     {
       "path": ".github/workflows/mobile-tag903.yml",
-      "bytes": 2676,
-      "sha256": "7f95683f6547b4256e70ed6704f146d0f11b2c465f52b663f84ae234091df775"
+      "bytes": 2704,
+      "sha256": "e7cc7fb1fdd4f43e125a0662df012cfc50e701009874b34c950ebd05949045da"
     }
   ],
   "provenance": {
@@ -230,6 +235,31 @@
       "prior35OmittedHistoricalSuccess26": 26,
       "priorParentWholePass": false,
       "currentSourceAnalysisOrTestsExecutedByCandidate": 0
+    },
+    "RootFormattedForward6": {
+      "path": ".qa/mobile-forward-lifetime-batch-1/formatted-r3.json",
+      "bytes": 6760,
+      "sha256": "636050e9bffa3e3e4472dd5109bb05a921e02dbb647a83ad3090267bb3555d5a"
+    },
+    "RootFormat6Resource": {
+      "path": ".qa/mobile-forward-lifetime-batch-1/format.resource.json",
+      "bytes": 1159,
+      "sha256": "89f4c7ea90b4f7ec765c8e5da85e528eb2e5073ce263afa50d1de238d48894ec"
+    },
+    "RootEquivalentMountedFormat1Resource": {
+      "path": ".qa/mobile-forward-lifetime-batch-1/repair-format.resource.json",
+      "bytes": 998,
+      "sha256": "8a498fda6811ae610fdc0cff05902dd4a7dbf30aee297d4134256726a955cd6b"
+    },
+    "SDKForwardSource": {
+      "path": "references/integration/mobile363-forward-lifetime-r2-candidate-20261018/candidate-manifest.json",
+      "bytes": 7382,
+      "sha256": "6f629581eb4c990d3e9b69c661e6c7efefab0e72ddf20e68438373d5deb6b576"
+    },
+    "RootPrior15Pass": {
+      "path": ".qa/relationship-kafka-combined-publish-1/root-500baca-mobile15-pass-review.json",
+      "bytes": 2987,
+      "sha256": "170ca0e9843de6e2aa1bc9f85af72641eb23c78bceddeb4931c3fa1692d9b0db"
     }
   },
   "historical_partial5": {
@@ -275,7 +305,141 @@
     "wholeProcessPASS": false,
     "newSourcePASS": false
   },
-  "delta10": [
+  "selection_counts": {
+    "new": 24,
+    "directExisting": 11,
+    "selected": 35
+  },
+  "selected_new_names24": [
+    "tag903 voice and malformed text cannot bypass the native forwarding gate",
+    "tag903 forwarding retains original owner and privacy fences while native creation waits",
+    "tag903 text metadata forwards through the actual menu and preserves custom JSON",
+    "meeting905 malformed fields cannot gain native forwarding authority",
+    "meeting905 retains original owner and privacy fences while native creation waits",
+    "meeting905 card displays original fields and forwards the unchanged custom invitation",
+    "mixed tag903 text keeps copy and reply while raw voice still prevents forwarding",
+    "real send 1302 keeps the failed row and original error while inserting only one read local hint",
+    "real send 1303 keeps the failed row and original error while inserting only one read local hint",
+    "ordinary unopted send and non-relationship failure never create a local side effect",
+    "local hint create failure is observable and never replaces or replays the original failure",
+    "local hint unknown is observable and never replaces or replays the original failure",
+    "CID clear during native local insert retires the original timeline before its late ACK",
+    "source expiry while create is pending prevents LOCAL insert and never renews the original burn window",
+    "private source keeps its original privacy and suppresses a persistent hint without a new burn window",
+    "911 hint opens the actual reason dialog once and confirms only the current single peer with no message send",
+    "911 retained reason cannot apply after original clear invalidation",
+    "911 retained reason cannot apply after original owner invalidation",
+    "911 retained reason cannot apply after original issuer invalidation",
+    "911 reason retained after its owned profile exits cannot dispatch a friend request",
+    "910 has no friend-request action or ordinary message menu",
+    "stricter ledger facts than the raw send suppress durable hints without rewriting the original failure",
+    "damaged LOCAL ACK remains unknown and the already stored native hint is hidden after remount without replay",
+    "late stricter source facts never upgrade a pending hint and remain effective for a known hint after remount"
+  ],
+  "selected_direct_names11": [
+    "tag903 text uses the actual legacy textElem payload",
+    "tag903 sound has a restricted audio projection without changing custom identity",
+    "tag903 keeps text priority and rejects unsafe or malformed audio projections",
+    "real private root still masks every known custom conversation preview",
+    "standard107 nested custom summaries keep the original joint privacy",
+    "meeting905 is readable without manufacturing a join action or URL",
+    "wrong typed known payload fields fall back without string coercion",
+    "tag903 audio starts only on tap and keeps the custom message menu",
+    "ordinary contact profile without a message source keeps its normal friend request and dialog behavior",
+    "clear during the requestFriend inner profile await prevents the real final addFriend dispatch",
+    "foreign coverage of the owned friend-reason dialog retires its retained submit without a new action"
+  ],
+  "omitted_unchanged_audio_exit_names2": [
+    "tag903 pending audio cannot start after expiry",
+    "tag903 pending audio cannot start after route-exit"
+  ],
+  "historical_partial_overlap_explicitly_reselected3": [
+    "tag903 sound has a restricted audio projection without changing custom identity",
+    "tag903 keeps text priority and rejects unsafe or malformed audio projections",
+    "wrong typed known payload fields fall back without string coercion"
+  ],
+  "historical_partial26": {
+    "status": "historical-visible-testDone-only-parent-failed",
+    "run": 39090130182,
+    "job": 117564932427,
+    "head": "cfc194fef4a69bb15be1a31b78fcead10cd21f1a",
+    "source": {
+      "digest": "481546066d6bada56c6e46498eea0dfb39cec580878546c29ea772e92dc0adbc",
+      "members": 363
+    },
+    "portable": {
+      "digest": "a3a88bb8da2de8dd6853fe4cea3c1653b1aa5857a32e1bdd3f22ed864983fa94",
+      "members": 415
+    },
+    "compactArtifact": {
+      "artifact": 12122341798,
+      "run": 39090130182,
+      "attempt": 1,
+      "head": "cfc194fef4a69bb15be1a31b78fcead10cd21f1a",
+      "sha256": "db9836736e01b2fdd7104dfe39b9e6fbe8bc61d48f5ccb59056cbe6da5c19a73",
+      "bytes": 42464,
+      "exactAPIDigest": true,
+      "files": 29,
+      "binariesDownloaded": false
+    },
+    "RootReview": {
+      "path": ".qa/mobile363-codec-lint-batch-1/root-cfc194-mobile35-34-pass-clear-late-ack-failure-review.json",
+      "bytes": 1622,
+      "sha256": "4c8c93f49189c30a560df448043184641dedf06ec009ae65025423e3f372e344"
+    },
+    "machineLog": {
+      "path": ".qa/mobile363-codec-lint-batch-1/mobile-artifact/tag903-target35.log",
+      "bytes": 26660,
+      "sha256": "c9c4f5280aebd0d263b127e98ca6c9874e61c335057201091364e7278d77e361"
+    },
+    "resource": {
+      "path": ".qa/mobile363-codec-lint-batch-1/mobile-artifact/tag903-target35.resource.json",
+      "bytes": 4453,
+      "sha256": "cae5211702b8053cb1f413b26c2c990b85ad4e73cd1326e1ff650df5350183c7"
+    },
+    "sourcePost": {
+      "path": ".qa/mobile363-codec-lint-batch-1/mobile-artifact/tag903-source-post.json",
+      "bytes": 373,
+      "sha256": "969bf09560d4d4111cb15617e15a8702c4cf42f3baad951f88a8ed51298b3429"
+    },
+    "names26": [
+      "tag903 voice and malformed text cannot bypass the native forwarding gate",
+      "tag903 forwarding retains original owner and privacy fences while native creation waits",
+      "meeting905 malformed fields cannot gain native forwarding authority",
+      "meeting905 retains original owner and privacy fences while native creation waits",
+      "tag903 text uses the actual legacy textElem payload",
+      "tag903 sound has a restricted audio projection without changing custom identity",
+      "tag903 keeps text priority and rejects unsafe or malformed audio projections",
+      "real private root still masks every known custom conversation preview",
+      "standard107 nested custom summaries keep the original joint privacy",
+      "meeting905 is readable without manufacturing a join action or URL",
+      "wrong typed known payload fields fall back without string coercion",
+      "real send 1302 keeps the failed row and original error while inserting only one read local hint",
+      "real send 1303 keeps the failed row and original error while inserting only one read local hint",
+      "ordinary unopted send and non-relationship failure never create a local side effect",
+      "local hint create failure is observable and never replaces or replays the original failure",
+      "local hint unknown is observable and never replaces or replays the original failure",
+      "source expiry while create is pending prevents LOCAL insert and never renews the original burn window",
+      "private source keeps its original privacy and suppresses a persistent hint without a new burn window",
+      "911 retained reason cannot apply after original clear invalidation",
+      "911 retained reason cannot apply after original owner invalidation",
+      "911 retained reason cannot apply after original issuer invalidation",
+      "911 reason retained after its owned profile exits cannot dispatch a friend request",
+      "910 has no friend-request action or ordinary message menu",
+      "stricter ledger facts than the raw send suppress durable hints without rewriting the original failure",
+      "damaged LOCAL ACK remains unknown and the already stored native hint is hidden after remount without replay",
+      "late stricter source facts never upgrade a pending hint and remain effective for a known hint after remount"
+    ],
+    "parentStarted35": 35,
+    "parentTestDoneSuccess34": 34,
+    "parentFailed1": [
+      "CID clear during native local insert retires the original timeline before its late ACK"
+    ],
+    "wholeProcessPASS": false,
+    "currentSourcePASS": false,
+    "nativeAcceptance": false
+  },
+  "delta14": [
     {
       "path": "app/lib/features/chat/domain/chat_message.dart",
       "before": {
@@ -363,8 +527,8 @@
       },
       "after": {
         "path": "app/lib/features/chat/data/chat_repository.dart",
-        "bytes": 81509,
-        "sha256": "afadac6fa264275c8ba4b8daf87072d51e64f28b997d59cd0c2d908d7ba7b3af"
+        "bytes": 83600,
+        "sha256": "5fcf00dc9c4c750a69a6ba6b89212345beff4119d97f2ac784f4c7abf6b896e4"
       }
     },
     {
@@ -402,113 +566,163 @@
       },
       "after": {
         "path": "app/test/features/chat/chat_forward_page_test.dart",
-        "bytes": 18698,
-        "sha256": "ff98f642c331c2dc83cbc0328ecd8d8557b3a90ddba047035ff605a76f1ec7b8"
+        "bytes": 33705,
+        "sha256": "6f97802e08cabf17bcc882e32143ced1d0bfec54532f70ef0e2725b373a40d19"
+      }
+    },
+    {
+      "path": "app/lib/features/chat/presentation/chat_forward_page.dart",
+      "before": {
+        "path": "app/lib/features/chat/presentation/chat_forward_page.dart",
+        "bytes": 8761,
+        "sha256": "521cc19051eaf9ca2b67d01ef23a6c30dab328c3acfa4a0adb707dedda82ce4c"
+      },
+      "after": {
+        "path": "app/lib/features/chat/presentation/chat_forward_page.dart",
+        "bytes": 17960,
+        "sha256": "8bac068110322ec5d8c1d6abd87d8011ee8bbb7c020b335fb49ae981ed181313"
+      }
+    },
+    {
+      "path": "app/lib/features/favorite/presentation/favorite_forward_page.dart",
+      "before": {
+        "path": "app/lib/features/favorite/presentation/favorite_forward_page.dart",
+        "bytes": 8755,
+        "sha256": "4d575eaab5ad26d72ab6de4b6b468854537a082f9cf849664d07eb7d2827f1f3"
+      },
+      "after": {
+        "path": "app/lib/features/favorite/presentation/favorite_forward_page.dart",
+        "bytes": 17179,
+        "sha256": "5e6759d40a0e41e604b66326a721c4e87dea75dc4a4b1eb5b8d47358da4c9bb2"
+      }
+    },
+    {
+      "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+      "before": {
+        "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+        "bytes": 6186,
+        "sha256": "7e8a98c9386e2a0c83b765de6cddd9be8d382866b8840ace92decf2a793b4a61"
+      },
+      "after": {
+        "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+        "bytes": 12980,
+        "sha256": "263e265fbff2e8a41159dabe36e9f40bad3a1c472e42efd44821b9f57bb6823b"
+      }
+    },
+    {
+      "path": "app/test/features/chat/chat_favorite_test.dart",
+      "before": {
+        "path": "app/test/features/chat/chat_favorite_test.dart",
+        "bytes": 7363,
+        "sha256": "f7fcd841c389bbaeac2806f0920742697b714dfd4319b002d805c2e40f9b7f88"
+      },
+      "after": {
+        "path": "app/test/features/chat/chat_favorite_test.dart",
+        "bytes": 12646,
+        "sha256": "e89b0857128a6b347f70f854280f731f612c69a2eef6c53c4a715965a57278e7"
       }
     }
   ],
-  "selection_counts": {
-    "new": 24,
-    "directExisting": 11,
-    "selected": 35
-  },
-  "selected_new_names24": [
-    "tag903 voice and malformed text cannot bypass the native forwarding gate",
-    "tag903 forwarding retains original owner and privacy fences while native creation waits",
-    "tag903 text metadata forwards through the actual menu and preserves custom JSON",
-    "meeting905 malformed fields cannot gain native forwarding authority",
-    "meeting905 retains original owner and privacy fences while native creation waits",
-    "meeting905 card displays original fields and forwards the unchanged custom invitation",
-    "mixed tag903 text keeps copy and reply while raw voice still prevents forwarding",
-    "real send 1302 keeps the failed row and original error while inserting only one read local hint",
-    "real send 1303 keeps the failed row and original error while inserting only one read local hint",
-    "ordinary unopted send and non-relationship failure never create a local side effect",
-    "local hint create failure is observable and never replaces or replays the original failure",
-    "local hint unknown is observable and never replaces or replays the original failure",
-    "CID clear during native local insert retires the original timeline before its late ACK",
-    "source expiry while create is pending prevents LOCAL insert and never renews the original burn window",
-    "private source keeps its original privacy and suppresses a persistent hint without a new burn window",
-    "911 hint opens the actual reason dialog once and confirms only the current single peer with no message send",
-    "911 retained reason cannot apply after original clear invalidation",
-    "911 retained reason cannot apply after original owner invalidation",
-    "911 retained reason cannot apply after original issuer invalidation",
-    "911 reason retained after its owned profile exits cannot dispatch a friend request",
-    "910 has no friend-request action or ordinary message menu",
-    "stricter ledger facts than the raw send suppress durable hints without rewriting the original failure",
-    "damaged LOCAL ACK remains unknown and the already stored native hint is hidden after remount without replay",
-    "late stricter source facts never upgrade a pending hint and remain effective for a known hint after remount"
-  ],
-  "selected_direct_names11": [
-    "tag903 text uses the actual legacy textElem payload",
-    "tag903 sound has a restricted audio projection without changing custom identity",
-    "tag903 keeps text priority and rejects unsafe or malformed audio projections",
-    "real private root still masks every known custom conversation preview",
-    "standard107 nested custom summaries keep the original joint privacy",
-    "meeting905 is readable without manufacturing a join action or URL",
-    "wrong typed known payload fields fall back without string coercion",
-    "tag903 audio starts only on tap and keeps the custom message menu",
-    "ordinary contact profile without a message source keeps its normal friend request and dialog behavior",
-    "clear during the requestFriend inner profile await prevents the real final addFriend dispatch",
-    "foreign coverage of the owned friend-reason dialog retires its retained submit without a new action"
-  ],
-  "omitted_unchanged_audio_exit_names2": [
-    "tag903 pending audio cannot start after expiry",
-    "tag903 pending audio cannot start after route-exit"
-  ],
-  "historical_partial_overlap_explicitly_reselected3": [
-    "tag903 sound has a restricted audio projection without changing custom identity",
-    "tag903 keeps text priority and rejects unsafe or malformed audio projections",
-    "wrong typed known payload fields fall back without string coercion"
-  ],
-  "analysis_reuse4": {
+  "analysis_reuse7": {
     "status": "same-body-old-source-analysis-pass-only",
-    "source": {
-      "members": 363,
-      "digest": "e05419bfbd52e3c27a80c192bc9d3856569cc112b1899afcf2099ebf4d5c81e4"
-    },
-    "portable": {
-      "members": 415,
-      "digest": "d4fb9703b093fa7134e198bca1052d6e39e4854e9eaabf3382bd9eae54d0ab8a"
-    },
-    "head": "1ad378b0367dfe22fe1ef884cbf54def5dfe0218",
-    "run": 39089287566,
-    "job": 117562354285,
-    "compactArtifact": {
-      "artifact": 12122335814,
-      "run": 39089287566,
-      "attempt": 1,
-      "head": "1ad378b0367dfe22fe1ef884cbf54def5dfe0218",
-      "sha256": "6e2ad33b192634e0d6276998646f369a1fea29c4cd14fe47179cb32e3e97227b",
-      "bytes": 40926,
-      "exactAPIDigest": true,
-      "files": 44,
-      "binariesDownloaded": false
-    },
-    "RootReview": {
-      "path": ".qa/mobile363-codec-combined-batch-1/root-1ad378-format9-analysis6-pass-3-lint-failure-review.json",
-      "bytes": 16578,
-      "sha256": "34047d8f714d47756b707023128927c068b8384c8ed37a36cd22097b87bc9e71"
-    },
-    "oldParentWholeAccepted": false,
-    "oldParentAnalysisFailed3": 3,
-    "oldParent35TestsDispatched": 0,
-    "originalSourceToolsPostExact": true,
-    "originalResourceHealthy": true,
-    "originalToolsBefore": {
-      "path": "tag903-tools-before.json",
-      "bytes": 477,
-      "sha256": "ec3c14ec1cc96197a2500e88d7b7329b2316a43b6f520ead4f36152ac44469ae"
-    },
-    "originalToolsAfter": {
-      "path": "tag903-tools-after.json",
-      "bytes": 477,
-      "sha256": "ec3c14ec1cc96197a2500e88d7b7329b2316a43b6f520ead4f36152ac44469ae"
-    },
-    "originalSourcePost": {
-      "path": "tag903-source-post.json",
-      "bytes": 373,
-      "sha256": "25912e854941a13ada0d0e586782f15bc1a8aea0ba3e022281357f80df3defb0"
-    },
+    "origins": [
+      {
+        "status": "same-body-old-source-analysis-pass-only",
+        "source": {
+          "members": 363,
+          "digest": "e05419bfbd52e3c27a80c192bc9d3856569cc112b1899afcf2099ebf4d5c81e4"
+        },
+        "portable": {
+          "members": 415,
+          "digest": "d4fb9703b093fa7134e198bca1052d6e39e4854e9eaabf3382bd9eae54d0ab8a"
+        },
+        "head": "1ad378b0367dfe22fe1ef884cbf54def5dfe0218",
+        "run": 39089287566,
+        "job": 117562354285,
+        "compactArtifact": {
+          "artifact": 12122335814,
+          "run": 39089287566,
+          "attempt": 1,
+          "head": "1ad378b0367dfe22fe1ef884cbf54def5dfe0218",
+          "sha256": "6e2ad33b192634e0d6276998646f369a1fea29c4cd14fe47179cb32e3e97227b",
+          "bytes": 40926,
+          "exactAPIDigest": true,
+          "files": 44,
+          "binariesDownloaded": false
+        },
+        "RootReview": {
+          "path": ".qa/mobile363-codec-combined-batch-1/root-1ad378-format9-analysis6-pass-3-lint-failure-review.json",
+          "bytes": 16578,
+          "sha256": "34047d8f714d47756b707023128927c068b8384c8ed37a36cd22097b87bc9e71"
+        },
+        "oldParentWholeAccepted": false,
+        "oldParentAnalysisFailed3": 3,
+        "oldParent35TestsDispatched": 0,
+        "originalSourceToolsPostExact": true,
+        "originalResourceHealthy": true,
+        "originalToolsBefore": {
+          "path": "tag903-tools-before.json",
+          "bytes": 477,
+          "sha256": "ec3c14ec1cc96197a2500e88d7b7329b2316a43b6f520ead4f36152ac44469ae"
+        },
+        "originalToolsAfter": {
+          "path": "tag903-tools-after.json",
+          "bytes": 477,
+          "sha256": "ec3c14ec1cc96197a2500e88d7b7329b2316a43b6f520ead4f36152ac44469ae"
+        },
+        "originalSourcePost": {
+          "path": "tag903-source-post.json",
+          "bytes": 373,
+          "sha256": "25912e854941a13ada0d0e586782f15bc1a8aea0ba3e022281357f80df3defb0"
+        },
+        "freshAnalysisOnCurrentSource": 0
+      },
+      {
+        "source": {
+          "digest": "b981685961f1b866679e48541e82a9e01cab7d39b084d300838458863ebaadac",
+          "members": 363
+        },
+        "portable": {
+          "digest": "163f69efd5827efebfc4c3d75e5fb16ebeed08ebb50f1e18a1827ebe494c6eba",
+          "members": 415
+        },
+        "head": "500baca44c853079ca6f06a001ec3a2bf873cf23",
+        "run": 39091580404,
+        "job": 117569288689,
+        "compactArtifact": {
+          "artifact": 12122328765,
+          "run": 39091580404,
+          "attempt": 1,
+          "head": "500baca44c853079ca6f06a001ec3a2bf873cf23",
+          "sha256": "3dc5a7a9dc3447ec6cf62bbe72bbb866ec81f3d96969df13df88ee9e0bbddda8",
+          "bytes": 46899,
+          "exactAPIDigest": true,
+          "files": 37,
+          "binariesDownloaded": false
+        },
+        "RootReview": {
+          "path": ".qa/relationship-kafka-combined-publish-1/root-500baca-mobile15-pass-review.json",
+          "bytes": 2987,
+          "sha256": "170ca0e9843de6e2aa1bc9f85af72641eb23c78bceddeb4931c3fa1692d9b0db"
+        },
+        "originalSourceToolsPostExact": true,
+        "originalToolsBefore": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-tools-before.json",
+          "bytes": 477,
+          "sha256": "df6a09032021c3b8316d362be659e95cb63b4b14d022523f5313981d8b428665"
+        },
+        "originalToolsAfter": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-tools-after.json",
+          "bytes": 477,
+          "sha256": "df6a09032021c3b8316d362be659e95cb63b4b14d022523f5313981d8b428665"
+        },
+        "originalSourcePost": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-source-post.json",
+          "bytes": 373,
+          "sha256": "d5ae5bb6feadd0ed87436df28c9c309c9f49f7ffa717849e74c6c1dab72690cc"
+        }
+      }
+    ],
     "freshAnalysisOnCurrentSource": 0,
     "rows": [
       {
@@ -535,7 +749,8 @@
           "path": "tag903-analyze-2.resource.json",
           "bytes": 484,
           "sha256": "b8e0ed3b5c47c8c1d5a363b99aba2fe159ebe9898b5d349f5e099d8a1fe1e8f3"
-        }
+        },
+        "origin": 0
       },
       {
         "path": "lib/features/chat/domain/chat_message.dart",
@@ -561,7 +776,8 @@
           "path": "tag903-analyze-3.resource.json",
           "bytes": 484,
           "sha256": "36393ddf75677128017d442b1b133ab9f81144bca850edaed848709fb4a9d6ad"
-        }
+        },
+        "origin": 0
       },
       {
         "path": "test/features/chat/batch_media_access_test.dart",
@@ -587,132 +803,220 @@
           "path": "tag903-analyze-7.resource.json",
           "bytes": 489,
           "sha256": "2f0aa9fbb92f03df49ead4feaf68df213a47542d63ee29ba73bfea050ad36092"
-        }
+        },
+        "origin": 0
       },
       {
-        "path": "test/features/chat/chat_forward_page_test.dart",
-        "originalPhase": "tag903-analyze-8",
+        "path": "lib/features/chat/presentation/chat_controller.dart",
+        "origin": 1,
+        "originalPhase": "tag903-analyze-2",
         "source": {
-          "path": "app/test/features/chat/chat_forward_page_test.dart",
-          "bytes": 18698,
-          "sha256": "ff98f642c331c2dc83cbc0328ecd8d8557b3a90ddba047035ff605a76f1ec7b8"
+          "path": "app/lib/features/chat/presentation/chat_controller.dart",
+          "bytes": 27119,
+          "sha256": "095bdf3cf44414ee5795353046d5843fc79429d7f67ba43547b36da682db486d"
         },
         "passed": true,
         "diagnostics": 0,
         "summary": {
-          "path": "tag903-analyze-8.summary.json",
-          "bytes": 132,
-          "sha256": "8082563d716c11a29227ce76fa543e62b45b8eccf96f402af9948f706c1ac8ce"
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-2.summary.json",
+          "bytes": 137,
+          "sha256": "8d2347b7352e7cde46292f272ccbd6fe21affb4d3a56907beb037962e45d5cee"
         },
         "log": {
-          "path": "tag903-analyze-8.log",
-          "bytes": 58,
-          "sha256": "0b017247a75853c9952d6376e0816dbb6ef545317915f1a017927edf8f79b87c"
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-2.log",
+          "bytes": 51,
+          "sha256": "f2b8bd685f8e059b09b172fbbc2402c76ac859e8cab009608bc8c2bff7784834"
         },
         "resource": {
-          "path": "tag903-analyze-8.resource.json",
-          "bytes": 489,
-          "sha256": "9422a38f1f75262b9ce50adf2c86c029ce26a51c473c1380cc941560a86ce001"
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-2.resource.json",
+          "bytes": 493,
+          "sha256": "03fb88a0ff7cbdf7e1cd547d0c8c16f1a0664d778edc6b8e0d880540c11c1b9a"
+        }
+      },
+      {
+        "path": "lib/features/chat/presentation/chat_page.dart",
+        "origin": 1,
+        "originalPhase": "tag903-analyze-3",
+        "source": {
+          "path": "app/lib/features/chat/presentation/chat_page.dart",
+          "bytes": 114036,
+          "sha256": "f8a4b0d6544cd2516da8967d93372e6656be8a2db12eef7feaf619e74011468d"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-3.summary.json",
+          "bytes": 131,
+          "sha256": "667c779b3eb6d982e2af3d267c9f7ded54e7817828554bb5866df0f380d908e3"
+        },
+        "log": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-3.log",
+          "bytes": 45,
+          "sha256": "ee013d51a98c383aaeef5a9d30dd360e41b03e39bbf831cc58a28a83be608aa0"
+        },
+        "resource": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-3.resource.json",
+          "bytes": 488,
+          "sha256": "9521f9f1a96b82c023be7ea2dbc8618164cc7db7782d4dd78fa1a03545c8c962"
+        }
+      },
+      {
+        "path": "lib/features/contacts/presentation/user_profile_page.dart",
+        "origin": 1,
+        "originalPhase": "tag903-analyze-4",
+        "source": {
+          "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
+          "bytes": 36507,
+          "sha256": "75f2ef9d6a987b7025d843e5a0c1d91e706608ed8d2068750e240267aa1d4dd1"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-4.summary.json",
+          "bytes": 143,
+          "sha256": "411a8c6eed6ffa88240cb74125d85965e2b22533a97256c5b58e3bf67510be10"
+        },
+        "log": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-4.log",
+          "bytes": 53,
+          "sha256": "01dabf6a52cad89c9fe161e19f7b77fb956d2abe5c3663d7069811f62ab57c24"
+        },
+        "resource": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-4.resource.json",
+          "bytes": 499,
+          "sha256": "01e7956d7fc5b0f79cf3c03306f2891cb6fbd20e9593327a3265094a49d61744"
+        }
+      },
+      {
+        "path": "test/features/chat/legacy_custom_summary_test.dart",
+        "origin": 1,
+        "originalPhase": "tag903-analyze-5",
+        "source": {
+          "path": "app/test/features/chat/legacy_custom_summary_test.dart",
+          "bytes": 66470,
+          "sha256": "0cd58e9eeb28d5a042fef5e99f563cb7cfcf983a7cc43d4261bea5ad1bab5449"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-5.summary.json",
+          "bytes": 136,
+          "sha256": "9376e64f7e776c23ba2832848c8fc3fea6f74d74ea9b9324c2f49d82089cdee7"
+        },
+        "log": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-5.log",
+          "bytes": 62,
+          "sha256": "a11c26da407c97d34d62403b561d4bb07c3965b3dabb48fd8c7cf05cc474922d"
+        },
+        "resource": {
+          "path": ".qa/relationship-kafka-combined-publish-1/mobile-artifact/tag903-analyze-5.resource.json",
+          "bytes": 493,
+          "sha256": "492630a2effc3e3f56355f27e90ac069d132a772342d7959e3d01ee03526e1cf"
         }
       }
     ]
   },
-  "selected_names15": [
-    "CID clear during native local insert retires the original timeline before its late ACK",
-    "view-only private relationship failures preserve the failed source without native hints or remount reconstruction",
-    "view-only inspection-unknown relationship failures preserve the failed source without native hints or remount reconstruction",
-    "view-only relationship hints retire on deletion clear expiry logout and route loss without renewed authority",
-    "private view-only 911 opens only the original reason flow and confirms the current peer without native hint storage",
-    "private view-only 911 retained reason cannot apply after clear issuer expiry or its owned route exits",
-    "private send failure arriving under another route cannot create a late view hint when the chat returns",
-    "tag903 text metadata forwards through the actual menu and preserves custom JSON",
-    "meeting905 card displays original fields and forwards the unchanged custom invitation",
-    "mixed tag903 text keeps copy and reply while raw voice still prevents forwarding",
-    "tag903 audio starts only on tap and keeps the custom message menu",
-    "ordinary contact profile without a message source keeps its normal friend request and dialog behavior",
-    "clear during the requestFriend inner profile await prevents the real final addFriend dispatch",
-    "foreign coverage of the owned friend-reason dialog retires its retained submit without a new action",
-    "911 hint opens the actual reason dialog once and confirms only the current single peer with no message send"
-  ],
-  "historical_partial26": {
-    "status": "historical-visible-testDone-only-parent-failed",
-    "run": 39090130182,
-    "job": 117564932427,
-    "head": "cfc194fef4a69bb15be1a31b78fcead10cd21f1a",
+  "historical_prior15": {
+    "status": "historical-selected15-pass-only",
     "source": {
-      "digest": "481546066d6bada56c6e46498eea0dfb39cec580878546c29ea772e92dc0adbc",
+      "digest": "b981685961f1b866679e48541e82a9e01cab7d39b084d300838458863ebaadac",
       "members": 363
     },
     "portable": {
-      "digest": "a3a88bb8da2de8dd6853fe4cea3c1653b1aa5857a32e1bdd3f22ed864983fa94",
+      "digest": "163f69efd5827efebfc4c3d75e5fb16ebeed08ebb50f1e18a1827ebe494c6eba",
       "members": 415
     },
+    "head": "500baca44c853079ca6f06a001ec3a2bf873cf23",
+    "run": 39091580404,
+    "job": 117569288689,
     "compactArtifact": {
-      "artifact": 12122341798,
-      "run": 39090130182,
+      "artifact": 12122328765,
+      "run": 39091580404,
       "attempt": 1,
-      "head": "cfc194fef4a69bb15be1a31b78fcead10cd21f1a",
-      "sha256": "db9836736e01b2fdd7104dfe39b9e6fbe8bc61d48f5ccb59056cbe6da5c19a73",
-      "bytes": 42464,
+      "head": "500baca44c853079ca6f06a001ec3a2bf873cf23",
+      "sha256": "3dc5a7a9dc3447ec6cf62bbe72bbb866ec81f3d96969df13df88ee9e0bbddda8",
+      "bytes": 46899,
       "exactAPIDigest": true,
-      "files": 29,
+      "files": 37,
       "binariesDownloaded": false
     },
     "RootReview": {
-      "path": ".qa/mobile363-codec-lint-batch-1/root-cfc194-mobile35-34-pass-clear-late-ack-failure-review.json",
-      "bytes": 1622,
-      "sha256": "4c8c93f49189c30a560df448043184641dedf06ec009ae65025423e3f372e344"
+      "path": ".qa/relationship-kafka-combined-publish-1/root-500baca-mobile15-pass-review.json",
+      "bytes": 2987,
+      "sha256": "170ca0e9843de6e2aa1bc9f85af72641eb23c78bceddeb4931c3fa1692d9b0db"
     },
-    "machineLog": {
-      "path": ".qa/mobile363-codec-lint-batch-1/mobile-artifact/tag903-target35.log",
-      "bytes": 26660,
-      "sha256": "c9c4f5280aebd0d263b127e98ca6c9874e61c335057201091364e7278d77e361"
-    },
-    "resource": {
-      "path": ".qa/mobile363-codec-lint-batch-1/mobile-artifact/tag903-target35.resource.json",
-      "bytes": 4453,
-      "sha256": "cae5211702b8053cb1f413b26c2c990b85ad4e73cd1326e1ff650df5350183c7"
-    },
-    "sourcePost": {
-      "path": ".qa/mobile363-codec-lint-batch-1/mobile-artifact/tag903-source-post.json",
-      "bytes": 373,
-      "sha256": "969bf09560d4d4111cb15617e15a8702c4cf42f3baad951f88a8ed51298b3429"
-    },
-    "names26": [
-      "tag903 voice and malformed text cannot bypass the native forwarding gate",
-      "tag903 forwarding retains original owner and privacy fences while native creation waits",
-      "meeting905 malformed fields cannot gain native forwarding authority",
-      "meeting905 retains original owner and privacy fences while native creation waits",
-      "tag903 text uses the actual legacy textElem payload",
-      "tag903 sound has a restricted audio projection without changing custom identity",
-      "tag903 keeps text priority and rejects unsafe or malformed audio projections",
-      "real private root still masks every known custom conversation preview",
-      "standard107 nested custom summaries keep the original joint privacy",
-      "meeting905 is readable without manufacturing a join action or URL",
-      "wrong typed known payload fields fall back without string coercion",
-      "real send 1302 keeps the failed row and original error while inserting only one read local hint",
-      "real send 1303 keeps the failed row and original error while inserting only one read local hint",
-      "ordinary unopted send and non-relationship failure never create a local side effect",
-      "local hint create failure is observable and never replaces or replays the original failure",
-      "local hint unknown is observable and never replaces or replays the original failure",
-      "source expiry while create is pending prevents LOCAL insert and never renews the original burn window",
-      "private source keeps its original privacy and suppresses a persistent hint without a new burn window",
-      "911 retained reason cannot apply after original clear invalidation",
-      "911 retained reason cannot apply after original owner invalidation",
-      "911 retained reason cannot apply after original issuer invalidation",
-      "911 reason retained after its owned profile exits cannot dispatch a friend request",
-      "910 has no friend-request action or ordinary message menu",
-      "stricter ledger facts than the raw send suppress durable hints without rewriting the original failure",
-      "damaged LOCAL ACK remains unknown and the already stored native hint is hidden after remount without replay",
-      "late stricter source facts never upgrade a pending hint and remain effective for a known hint after remount"
+    "names15": [
+      "911 hint opens the actual reason dialog once and confirms only the current single peer with no message send",
+      "CID clear during native local insert retires the original timeline before its late ACK",
+      "clear during the requestFriend inner profile await prevents the real final addFriend dispatch",
+      "foreign coverage of the owned friend-reason dialog retires its retained submit without a new action",
+      "meeting905 card displays original fields and forwards the unchanged custom invitation",
+      "mixed tag903 text keeps copy and reply while raw voice still prevents forwarding",
+      "ordinary contact profile without a message source keeps its normal friend request and dialog behavior",
+      "private send failure arriving under another route cannot create a late view hint when the chat returns",
+      "private view-only 911 opens only the original reason flow and confirms the current peer without native hint storage",
+      "private view-only 911 retained reason cannot apply after clear issuer expiry or its owned route exits",
+      "tag903 audio starts only on tap and keeps the custom message menu",
+      "tag903 text metadata forwards through the actual menu and preserves custom JSON",
+      "view-only inspection-unknown relationship failures preserve the failed source without native hints or remount reconstruction",
+      "view-only private relationship failures preserve the failed source without native hints or remount reconstruction",
+      "view-only relationship hints retire on deletion clear expiry logout and route loss without renewed authority"
     ],
-    "parentStarted35": 35,
-    "parentTestDoneSuccess34": 34,
-    "parentFailed1": [
-      "CID clear during native local insert retires the original timeline before its late ACK"
-    ],
-    "wholeProcessPASS": false,
-    "currentSourcePASS": false,
-    "nativeAcceptance": false
-  }
+    "originalSelected15PASS": true,
+    "newSourcePASS": false,
+    "fullMobileAcceptance": false,
+    "actualNativeOrRealServiceAcceptance": false
+  },
+  "expected_full_tests_derivation": {
+    "parentExpectedUnexecuted": 1363,
+    "parentSource": {
+      "members": 363,
+      "digest": "b981685961f1b866679e48541e82a9e01cab7d39b084d300838458863ebaadac"
+    },
+    "newExactNames": 16,
+    "derivedExpectedUnexecuted": 1379,
+    "fullExecuted": false,
+    "currentSelectedOnly": 39
+  },
+  "selected_names39": [
+    "forward dispatch observation stays at the real SDK send edge for ordinary and at-text creation",
+    "single forwarding real post-create reread rejects a deleted source without adopting a new body",
+    "single forwarding real post-create reread rejects a replaced source without adopting a new body",
+    "single forward rejects body replacement after native creation without renewing its source intent",
+    "single forward rejects CID clear after native creation without renewing its source intent",
+    "single forward rejects owner exit after native creation without renewing its source intent",
+    "single forward source route cannot revive after foreign coverage while native create waits",
+    "single unknown dispatch blocks replay and explicit review keeps the original confirmed destination",
+    "single forward preserves definitive 1302 rejection without an unknown replay lock",
+    "single forward preserves definitive 1303 rejection without an unknown replay lock",
+    "merge picker route retirement also fences the original native dispatch callback",
+    "single review handoff rejects owner replacement after push before its first builder without new account SDK reads",
+    "favorite source route cannot revive after foreign coverage while native create waits",
+    "favorite rechecks the confirmed destination after native creation before dispatch",
+    "favorite unknown dispatch blocks replay and reviews only its original confirmed account",
+    "favorite preserves a definitive friendship rejection without creating a forward hint or unknown result",
+    "forwarding stops when refreshed destination identity differs from the confirmed account",
+    "chat long press forwards one original message after explicit destination confirmation",
+    "source changing to private during confirmation is rejected before native creation or send",
+    "account exit while selecting a destination cancels forwarding before any write dispatch",
+    "tag903 text metadata forwards through the actual menu and preserves custom JSON",
+    "meeting905 card displays original fields and forwards the unchanged custom invitation",
+    "merge reuses one stable-ID destination picker and generic count confirmation without copying bodies into its dialog",
+    "a merge send with unknown ACK is terminal in the picker and a second tap cannot repeat it",
+    "favorite forwarding refuses target identity changes after the confirmed lease",
+    "favorite forwarding refuses source denial changes after the confirmed lease",
+    "favorite forwarding refuses history clear changes after the confirmed lease",
+    "favorite forwarding refuses during create changes after the confirmed lease",
+    "ordinary favorite forwarding still reaches exactly the confirmed account once",
+    "opening an old private favorite forwarding screen cannot list recipients or dispatch SDK work",
+    "opening an old forwarding screen after account switch never initializes or lists the new account SDK",
+    "forward strips local paths, retains extensions and sends a new native identity",
+    "exit during native forward creation fences the later send dispatch",
+    "forward creation cannot renew its lease and send an old snapshot after clear",
+    "forwarding at-text to a singlechat preserves original metadata in a standard non-pinging single merge",
+    "forwarding at-text to a different-membership group preserves original metadata in a standard non-pinging single merge",
+    "private facts learned while the at-forward merge is created still block final send",
+    "tag903 forwarding retains original owner and privacy fences while native creation waits",
+    "meeting905 retains original owner and privacy fences while native creation waits"
+  ]
 }

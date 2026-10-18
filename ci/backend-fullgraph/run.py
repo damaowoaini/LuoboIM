@@ -25,6 +25,8 @@ KAFKA_ACL_CONTROL = {'phase': 'kafka-acl-response', 'targets': {'internal/namesp
 GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
 
 
+KAFKA_ACL_PASSED_REUSE = {'schema': 1, 'kind': 'root-accepted-kafka-acl-source-bound-reuse-v1', 'run': 39091570750, 'job': 117569259635, 'attempt': 1, 'head': '500baca44c853079ca6f06a001ec3a2bf873cf23', 'source': {'members': 1576, 'digest': 'a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371'}, 'artifact': {'artifact': 12122902662, 'run': 39091570750, 'attempt': 1, 'head': '500baca44c853079ca6f06a001ec3a2bf873cf23', 'sha256': '7ed1b07f467037c4a148cc5de413232f161101af65b5eba8cde53d638fbd07d4', 'bytes': 44383, 'exactAPIDigest': True, 'files': 59, 'binariesDownloaded': False}, 'rootReviewSHA256': '308412b715bdf1bc5b3a60e9abd2b4122d7e3a082353af444ae1c94a93110a02', 'compactCustody': {'bytes': 7234, 'sha256': '1f227f154cda907d61e8b48ce6253a3d5032aff001823414da3621a5cd5370f9'}, 'events': {'bytes': 3537, 'sha256': '300357fa4c07a8c840f538cb5ed0422bcc84fb5e888f98b0a6366f5e539bbd59', 'body': [{'Time': '2026-10-18T02:54:25.312427428Z', 'Action': 'start', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol'}, {'Time': '2026-10-18T02:54:25.339692637Z', 'Action': 'run', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny'}, {'Time': '2026-10-18T02:54:25.339752753Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny'}, {'Time': '2026-10-18T02:54:25.339777823Z', 'Action': 'run', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success'}, {'Time': '2026-10-18T02:54:25.339781401Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success'}, {'Time': '2026-10-18T02:54:25.339909226Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success'}, {'Time': '2026-10-18T02:54:25.339922815Z', 'Action': 'pass', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success', 'Elapsed': 0}, {'Time': '2026-10-18T02:54:25.339959837Z', 'Action': 'run', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny'}, {'Time': '2026-10-18T02:54:25.339962892Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny'}, {'Time': '2026-10-18T02:54:25.34002031Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny'}, {'Time': '2026-10-18T02:54:25.3400262Z', 'Action': 'pass', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny', 'Elapsed': 0}, {'Time': '2026-10-18T02:54:25.340075932Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny'}, {'Time': '2026-10-18T02:54:25.340100894Z', 'Action': 'pass', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Test': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny', 'Elapsed': 0}, {'Time': '2026-10-18T02:54:25.340196573Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol'}, {'Time': '2026-10-18T02:54:26.341379184Z', 'Action': 'output', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol'}, {'Time': '2026-10-18T02:54:26.341443904Z', 'Action': 'pass', 'Package': 'github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol', 'Elapsed': 1.029}]}, 'names': {'bytes': 697, 'sha256': 'a8fffe53ed002f65add20e337716c2c3b56cf3c30dbc44ac0640f5de1709f701', 'body': {'topPASS': 1, 'subPASS': 2, 'skip': 0, 'fail': 0, 'packages': 1, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny'}], 'source': {'members': 1576, 'digest': 'a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371'}, 'accepted': True, 'newDatabaseFixtures': 0, 'otherKafkaOrRedisTestsDispatched': False}}, 'sourcePost': {'bytes': 120, 'sha256': 'ffb5c0c82e5318493612eaf60150fdd2ed6ec6d5856a9e259bb20b5390671a2d', 'body': {'accepted': True, 'source': {'members': 1576, 'digest': 'a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371'}}}, 'toolsBefore': {'bytes': 1277, 'sha256': 'c524b97c60b95cb63416089a921e4459e3738ca77cc04730dcf52c3cd501b740'}, 'toolsAfter': {'bytes': 1277, 'sha256': 'c524b97c60b95cb63416089a921e4459e3738ca77cc04730dcf52c3cd501b740'}, 'goTool': {'bytes': 17164055, 'sha256': '548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0', 'mode': 493}, 'historicalTopPASS': 1, 'historicalSubPASS': 2, 'actualCurrentTestsDispatched': 0, 'sourceBoundReuse': True, 'currentFreshPASS': False, 'runtimeAccepted': False}
+
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def regular(p,maximum=128<<20):
  p=Path(p)
@@ -65,6 +67,7 @@ def check_locked(c):
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
  if c.get('targetedKafkaACLControl')!=KAFKA_ACL_CONTROL:raise ValueError('exact original Kafka ACL parent and two new children required')
+ if c.get('kafkaACLTestsToRun')!=[] or json.dumps(c.get('kafkaACLPassedReuse'),sort_keys=True,separators=(',',':'))!=json.dumps(KAFKA_ACL_PASSED_REUSE,sort_keys=True,separators=(',',':')):raise ValueError('exact Root accepted Kafka ACL reuse without redispatch required')
  if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('cleanupCompleteScopes')!=CLEANUP_COMPLETE_SCOPES or c.get('cleanupRecentReuse')!=CLEANUP_RECENT_REUSE or c.get('cleanupFixtureRepair')!=CLEANUP_FIXTURE_REPAIR or c.get('cleanupReuse')!=CLEANUP_REUSE or 'ownedcontrolReuse' in c or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN or c.get('cleanupPassedReuse')!=CLEANUP_PASSED_REUSE or c.get('cleanupTestsToRun')!=[]:raise ValueError('exact fresh local1/runtime2/graph2+3 with original3top9sub and unbound1 reuse required')
 def validate_entries(bodies,c):
     rows = c['entrypoints']
@@ -114,6 +117,7 @@ def verify():
  for row in c['controllerPins']:pin(row)
  check_redis_parser_reuse(c.get('redisParserPassedReuse'),bodies)
  if c.get('redisParserTestsToRun')!=[]:raise ValueError('unchanged Redis parser must not be redispatched')
+ check_kafka_acl_reuse(c.get('kafkaACLPassedReuse'),bodies,recipe)
  if catalog['scope']!='fresh_owned_fullgraph_compatibility_fixture_only_no_production_default' or catalog['minio']['mode']!='source-elf' or catalog['minio']['status']!='historical_unmaintained_test_only':raise ValueError('explicit source-MinIO fixture required')
  if catalog['images']['minio']!=catalog['images']['redis'] or catalog['images']['keeper']!=catalog['images']['redis']:raise ValueError('known Redis base must remain explicit')
  module('ci/backend-fullgraph/minio_build.py','fullgraph_fixed_fixture_policy').fixture_policy(c)
@@ -194,6 +198,39 @@ def run_redis_parser_control(go,environment,command,parent,out):
   raise ValueError('exact Redis parser parent and all three children required')
  receipt=dict(result,source=FINAL_SOURCE,accepted=True,newDatabaseFixtures=0,otherR8TargetsDispatched=False)
  write(out/'redis-parser-names.json',receipt)
+ return receipt
+
+def check_kafka_acl_receipt(value):
+ # Original complete reporter events and post evidence, not a child-only claim.
+ if not isinstance(value,dict) or json.dumps(value,sort_keys=True,separators=(',',':'))!=json.dumps(KAFKA_ACL_PASSED_REUSE,sort_keys=True,separators=(',',':')):raise ValueError('exact Root accepted historical Kafka ACL evidence required')
+ for name in ('events','names','sourcePost'):
+  record=value[name];raw=(json.dumps(record['body'],separators=(',',':'),ensure_ascii=False)+'\n').encode()
+  if len(raw)!=record['bytes'] or sha(raw)!=record['sha256']:raise ValueError('original Kafka ACL evidence body differs')
+ control=KAFKA_ACL_CONTROL;package=next(iter(control['targets']));top=control['targets'][package][0]
+ expected={(package,top)}|{(package,top+'/'+child) for child in control['requiredSubtests'][package][top]}
+ names=value['names']['body'];actual=[(r['package'],r['name']) for r in names['namedCompletions']]
+ if names['source']!=value['source'] or names['accepted'] is not True or names['topPASS']!=1 or names['subPASS']!=2 or names['skip']!=0 or names['fail']!=0 or len(actual)!=3 or set(actual)!=expected:raise ValueError('complete original Kafka ACL parent and both children required')
+ events=value['events']['body'];prefix='github.com/openimsdk/open-im-server/v3/'
+ if any(r.get('Action') in ('fail','skip') for r in events) or any(r.get('Package')!=prefix+package for r in events):raise ValueError('original Kafka ACL event package or result differs')
+ for action in ('run','pass'):
+  actual=[(package,r['Test']) for r in events if r.get('Test') and r.get('Action')==action]
+  if len(actual)!=3 or set(actual)!=expected:raise ValueError('every original Kafka ACL run/pass event required')
+ if len([r for r in events if r.get('Action')=='pass' and not r.get('Test')])!=1:raise ValueError('original Kafka ACL package completion required')
+ if value['sourcePost']['body']!={'accepted':True,'source':value['source']} or value['toolsBefore']!=value['toolsAfter']:raise ValueError('original source and tool post required')
+ return value
+
+def check_kafka_acl_go_tool(value,current_go):
+ if not isinstance(current_go,dict) or json.dumps({k:current_go.get(k) for k in ('bytes','sha256','mode')},sort_keys=True,separators=(',',':'))!=json.dumps(value['goTool'],sort_keys=True,separators=(',',':')):raise ValueError('same original Kafka ACL Go executable required')
+
+def check_kafka_acl_reuse(value,bodies,recipe):
+ receipt=check_kafka_acl_receipt(value)
+ if FINAL_SOURCE!=receipt['source'] or len(bodies)!=receipt['source']['members'] or recipe.digest(recipe.rows(bodies))!=receipt['source']['digest']:raise ValueError('complete unchanged Kafka ACL whole source required')
+ return receipt
+
+def load_kafka_acl_reuse(out,bodies,recipe,current_go):
+ receipt=check_kafka_acl_reuse(dict(KAFKA_ACL_PASSED_REUSE),bodies,recipe)
+ check_kafka_acl_go_tool(receipt,current_go)
+ write(out/'kafka-acl-passed-reuse.json',receipt)
  return receipt
 
 def run_kafka_acl_control(go,environment,command,parent,out):
@@ -390,6 +427,23 @@ def source_post(root,bodies,c,template):
  except Exception as error:post['exceptionType']=type(error).__name__
  return post
 
+def prepare_resource_plane(plane,scenario):
+ primary=None
+ try:
+  return plane.prepare()
+ except BaseException as error:
+  primary=error
+  raise
+ finally:
+  # Snapshot only this original synchronous prepare call, before any cleanup.
+  # An observation failure must never replace its original prepare exception.
+  try:
+   observation=plane.prepare_observation()
+   if observation is not None:
+    write(plane.private/('prepare-observation-'+scenario+'.json'),dict(version='owned-fullgraph-resource-prepare-observation-v1',scenario=scenario,**observation,rawErrorText=False))
+  except BaseException:
+   if primary is None:raise
+
 def run():
  fixture_token=os.environ.pop('GH_TOKEN',None)  # API-only; never inherited by Go/Docker/operator children.
  if any(os.environ.get(k)!=v for k,v in {'GITHUB_ACTIONS':'true','RUNNER_ENVIRONMENT':'github-hosted','RUNNER_OS':'Linux','GOTOOLCHAIN':'local','GOWORK':'off'}.items()) or os.getuid()==0:raise ValueError('disposable hosted nonroot Linux only')
@@ -457,7 +511,7 @@ def run():
   redis_parser_reuse=load_redis_parser_reuse(out,bodies)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
-  kafka_acl_audit=run_kafka_acl_control(go,offline,command,parent,out)
+  kafka_acl_reuse=load_kafka_acl_reuse(out,bodies,recipe,tools['go'])
   binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
   entries=[{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]+c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'}]
   for entry in entries:
@@ -483,7 +537,7 @@ def run():
    plane=None;scenario_error=None
    try:
     plane=resources.Plane(root/('plane-'+scenario),catalog['images'],minio_source=minio)
-    claim=plane.prepare();plane_path=plane.private/'plane.json';cred=plane.private/'credentials.json';work=root/('scenario-'+scenario);work.mkdir(mode=0o700)
+    claim=prepare_resource_plane(plane,scenario);plane_path=plane.private/'plane.json';cred=plane.private/'credentials.json';work=root/('scenario-'+scenario);work.mkdir(mode=0o700)
     p={'version':'owned-fullgraph-acceptance-v1','scenario':scenario,'work':str(work),'planePath':str(plane_path),'planeSHA256':sha(regular(plane_path)),'credentialsPath':str(cred),'credentialsSHA256':sha(regular(cred)),'buildsPath':str(buildpath),'buildsSHA256':buildsha};pp=private/(scenario+'-input.json');psha=write(pp,p)
     keeper=next(r for r in claim['observations'] if r['role']=='keeper');groups=','.join(str(g) for g in sorted(set(os.getgroups()+[os.getgid()])))
     args=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--','/usr/bin/setpriv','--reuid',str(os.getuid()),'--regid',str(os.getgid()),'--groups',groups,'--no-new-privs','--','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+os.environ['HOME'],'TMPDIR='+str(work),operator,'--private-input',str(pp),'--private-input-sha256',psha]
@@ -521,7 +575,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'kafkaACLTopPASS':kafka_acl_audit['topPASS'],'kafkaACLSubPASS':kafka_acl_audit['subPASS'],'actualKafkaACLTestsDispatched':1,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'kafkaACLTopPASS':0,'kafkaACLSubPASS':0,'kafkaACLHistoricalTopPASS':1,'kafkaACLHistoricalSubPASS':2,'actualKafkaACLTestsDispatched':0,'kafkaACLPassedReuse':kafka_acl_reuse,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':
