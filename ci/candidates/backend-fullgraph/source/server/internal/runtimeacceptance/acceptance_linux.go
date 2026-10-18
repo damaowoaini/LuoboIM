@@ -65,6 +65,10 @@ type AcceptanceResult struct {
 	AcquireAttempted         bool                       `json:"acquireAttempted"`
 	AcquireReturned          bool                       `json:"acquireReturned"`
 	AcquireErrorClass        string                     `json:"acquireErrorClass,omitempty"`
+	PrimaryRunErrorClass     string                     `json:"primaryRunErrorClass,omitempty"`
+	ReaderStage              string                     `json:"readerStage,omitempty"`
+	ReaderCallState          string                     `json:"readerCallState,omitempty"`
+	ReaderErrorClass         string                     `json:"readerErrorClass,omitempty"`
 	LocalCleanupObserved     bool                       `json:"localCleanupObserved"`
 	LocalCleanupState        string                     `json:"localCleanupState,omitempty"`
 	LocalCleanupFailureClass string                     `json:"localCleanupFailureClass,omitempty"`
@@ -178,6 +182,8 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	}
 	var session *Session
 	defer func() {
+		// Observe the original named return before any cleanup or boot.Close joins.
+		result.PrimaryRunErrorClass = graphOperationErrorClass(runErr)
 		cleanup, stop := context.WithTimeout(context.Background(), 120*time.Second)
 		defer stop()
 		localCleanupErr := cleanupAcceptanceSession(cleanup, session)
@@ -233,6 +239,9 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 		result.AcquireAttempted = session.acquireObservation.Attempted
 		result.AcquireReturned = session.acquireObservation.Returned
 		result.AcquireErrorClass = session.acquireObservation.ErrorClass
+		result.ReaderStage = session.readerObservation.Stage
+		result.ReaderCallState = session.readerObservation.State
+		result.ReaderErrorClass = session.readerObservation.ErrorClass
 	}
 	if e != nil {
 		if session != nil {

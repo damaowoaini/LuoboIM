@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE = {'members': 1576, 'digest': '9eea825eb4661186f0f545b754da36db598c2f5cedb69bbb6e804f759c2355db'}
+FINAL_SOURCE = {'members': 1576, 'digest': '122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48'}
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -19,6 +19,7 @@ CLEANUP_FIXTURE_REPAIR={'target': 'server/internal/namespaceimport/ownedcontrol/
 CLEANUP_REUSE={'run': 39053868483, 'head': 'ce7964a0c7aa474cbc83c32dd71c1bfcfb83cfec', 'source': {'members': 1573, 'digest': 'f6f1568c3dbc12b36441108f36bb771153f134fd5907a056a5532b0ee773d7f2'}, 'reviewSHA256': '48c619c7b7c19ad33b5bb5b9bfa38f655de918c01ad19a6784fed4d9ccc1efbf', 'package': 'internal/namespaceimport/ownedcontrol', 'subtests': {'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths': ['unbound_start_failure_only_waits_original_done']}}
 LAUNCHER_PASSED_REUSE={'run': 39075035152, 'job': 117520306290, 'head': 'a6d9276c53a75e8ca19e351cab1d34b419b560e7', 'source': {'members': 1575, 'digest': '868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717'}, 'reviewSHA256': '412fdacae0a1a8ff842d92269d2bf00fb0a578b3ed1eab928ee86d2e56ac1f38', 'artifact': {'artifact': 12115839677, 'run': 39075035152, 'attempt': 1, 'head': 'a6d9276c53a75e8ca19e351cab1d34b419b560e7', 'sha256': '674eadc00436aa018a1fe7828be0568f3ce80f499ef53b487deacfcb5709099a', 'bytes': 52320, 'exactAPIDigest': True, 'files': 66, 'binariesDownloaded': False}, 'launcherNamesSHA256': '6471ec2f43ce64c92e2c399c7a0630e1d86740c9e2ee2a69352573e14b61c932', 'topPASS': 1, 'subPASS': 0, 'skip': 0, 'fail': 0, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedLauncherHoldPersistsAndCannotPrepareMetadata'}], 'sourceToolsPostExact': True, 'currentSourcePASS': False, 'runtimeAccepted': False}
 GRAPH_TARGETS={'pkg/common/startrpc': ['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence', 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']}
+REDIS_PARSER_CONTROL = {'phase': 'redis-parser', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof': ['equivalent-protocols-complete-summary-and-real-disabled-state', 'malformed-fields-and-nil-first-duplicate-reject', 'disabled-check-keeps-off-allcommands-and-empty-passwords']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 240, 'newDatabaseFixtures': 0, 'otherR8TargetsDispatched': False}
 GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
 
 
@@ -114,7 +115,7 @@ def verify():
  return c,bodies,recipe,parent,old,catalog
 
 def project_go_test_events(raw,phase):
- if phase not in {'pending-two-original-oracles','launcher-ownedcontrol'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
+ if phase not in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
  events=[];digest=hashlib.sha256();total=0;head=bytearray()
  for line in raw.splitlines():
   event=json.loads(line)
@@ -158,6 +159,21 @@ def runtime_cleanup_observations(raw,phase):
   except (ValueError,TypeError,KeyError,UnicodeError):rejected+=1;continue
   rows[value['kind']]=value
  return {'version':'runtime-cleanup-fixture-observations-v1','diagnosticsComplete':set(rows)==kinds and rejected==0,'rejectedMarkers':min(rejected,4096),'observations':[rows[key] for key in sorted(rows)]}
+
+def run_redis_parser_control(go,environment,command,parent,out):
+ # This pure parser test needs no plane, DB fixture or product process. Its
+ # original Go reporter is audited before any success receipt is written.
+ control=REDIS_PARSER_CONTROL;targets=control['targets'];package=next(iter(targets));top=targets[package][0]
+ raw=command(control['phase'],[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run','^'+top+'$','./'+package],control['phaseGuardSeconds'],environment)
+ events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()]
+ result=parent.audit(events,0,targets)
+ expected={(package,top)}|{(package,top+'/'+child) for child in control['requiredSubtests'][package][top]}
+ names=[(row['package'],row['name']) for row in result['namedCompletions']]
+ if result['topPASS']!=1 or result['subPASS']!=3 or len(names)!=4 or set(names)!=expected:
+  raise ValueError('exact Redis parser parent and all three children required')
+ receipt=dict(result,source=FINAL_SOURCE,accepted=True,newDatabaseFixtures=0,otherR8TargetsDispatched=False)
+ write(out/'redis-parser-names.json',receipt)
+ return receipt
 
 def run_cleanup_controls(go,environment,command,parent,out):
  results=[]
@@ -381,7 +397,7 @@ def run():
     raw=regular(folder/'stderr',32<<20) if (folder/'stderr').exists() else b''
     write(out/(f'compile-failure-{command_index:04d}.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
    fixture_observations=None
-   if label in {'pending-two-original-oracles','launcher-ownedcontrol'} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
+   if label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser'} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
     raw_events=regular(folder/'stdout',32<<20)
     if label=='cleanup-runtimeacceptance':
      fixture_observations=runtime_cleanup_observations(raw_events,label)
@@ -405,6 +421,7 @@ def run():
   fixture_token=None
   command('app-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off')
+  redis_parser=run_redis_parser_control(go,offline,command,parent,out)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
   binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
@@ -470,7 +487,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'redisParserTopPASS':redis_parser['topPASS'],'redisParserSubPASS':redis_parser['subPASS'],'additionalPureRedisControl':True,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

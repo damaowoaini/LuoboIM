@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_and_four_planes_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1576,
-    "digest": "9eea825eb4661186f0f545b754da36db598c2f5cedb69bbb6e804f759c2355db"
+    "digest": "122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 53878,
-      "sha256": "b596f06897b5083cabb533d73d6060756c4d0a793efda785792f6fe992fe3400"
+      "bytes": 55892,
+      "sha256": "4989735355b99f473f4ed6043a428a2f522fe1485665b2a4dd05535482f3b78c"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 33119,
-      "sha256": "bb583e49e1a194fb35053fd0db939011e224146774cc0e976dbde635949eb85a"
+      "bytes": 35439,
+      "sha256": "2ff21edff691151e41089f32f15f3b67e406bd41fc431862a46a9ba9d03be225"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 52198,
-      "sha256": "2ddb28d2466d26b42c139be106bb5228b0987dda333389e403b88aa2c421d629"
+      "bytes": 58600,
+      "sha256": "23e9cd517d4e19c2c31fb45a9b68d28f43e0a36be3ac0f01f48dbbe1102b5fdf"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -72,8 +72,8 @@
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",
-      "bytes": 10573,
-      "sha256": "fb4e2505ce204c32ec9668c1dc762d664c4a46dae2ab934ebf641a26beff359c"
+      "bytes": 10618,
+      "sha256": "f75f87f95eabd3b814936b3d2666af76816e8293d57f74892af16b456a04a4cf"
     }
   ],
   "overlay": [
@@ -1102,8 +1102,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
-      "bytes": 5512,
-      "sha256": "385ac7680cb53707ba3ef7fabc3688fc9e67215058e53ca3bcdb638f166e98d9",
+      "bytes": 5522,
+      "sha256": "d9c8471dd01df8dcd9b746edb179a751dbf6444d756eab83d5eea4e3e731867d",
       "beforeSHA256": null
     },
     {
@@ -1382,8 +1382,8 @@
     {
       "target": "server/internal/runtimeacceptance/acceptance_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/acceptance_linux.go",
-      "bytes": 20227,
-      "sha256": "759db1f8347a4151ddf8ff7f2a1dea9b08365b211e463221e4d6f783f9a5054c",
+      "bytes": 20904,
+      "sha256": "3114a92c544969e822a6bfccb00e814475990793bff62d98086425d2f58860c3",
       "beforeSHA256": null
     },
     {
@@ -1410,15 +1410,15 @@
     {
       "target": "server/internal/runtimeacceptance/flow_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/flow_linux.go",
-      "bytes": 12231,
-      "sha256": "06151ae4c038ee98dffea7898c725efd5984216f764c7b39d9d852f875d6713a",
+      "bytes": 12284,
+      "sha256": "da1b94c42a1fcfa03bf93d9c403a80f5bc136976a273b00e7fa94bd1c7e75468",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/runtimeacceptance/graph_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/graph_linux.go",
-      "bytes": 8874,
-      "sha256": "f42cbf865cdf28e8bac53721e542b6a4e14148d694a9ff5a824030fc8ca307b0",
+      "bytes": 11410,
+      "sha256": "d1f7afd01d4531c4cd618234ff53fda93357d42d475898a0e51bbf79811d3b6e",
       "beforeSHA256": null
     },
     {
@@ -4305,15 +4305,36 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted.json",
-      "bytes": 15753,
-      "sha256": "7070733af6158562d9bcc972ce020a5df0b560a826435c16ead29597723326ad"
+      "path": ".qa/backend-reader-boundary-and-redis-golden-batch-1/formatted.json",
+      "bytes": 6431,
+      "sha256": "7085ba34e42fc567c5212d5101c02372ffe4c9398574f7f58ba1d43c37a773ed"
     },
     "source": {
       "members": 1576,
-      "digest": "9eea825eb4661186f0f545b754da36db598c2f5cedb69bbb6e804f759c2355db"
+      "digest": "122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48"
     },
     "GoTestsExecuted": 0,
     "RootAcceptanceRequired": true
+  },
+  "targetedRedisParser": {
+    "phase": "redis-parser",
+    "targets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof"
+      ]
+    },
+    "requiredSubtests": {
+      "internal/namespaceimport/ownedcontrol": {
+        "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof": [
+          "equivalent-protocols-complete-summary-and-real-disabled-state",
+          "malformed-fields-and-nil-first-duplicate-reject",
+          "disabled-check-keeps-off-allcommands-and-empty-passwords"
+        ]
+      }
+    },
+    "goTimeoutSeconds": 180,
+    "phaseGuardSeconds": 240,
+    "newDatabaseFixtures": 0,
+    "otherR8TargetsDispatched": false
   }
 }

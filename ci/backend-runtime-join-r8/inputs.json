@@ -8,7 +8,7 @@
   },
   "source": {
     "members": 1558,
-    "digest": "4d8d2511b6726abb1334efe54a71dec22d28e46bc8c03d856db89725f6861246"
+    "digest": "ccd3c80785d54dce3f3a6d1fd47bbc4d038b4487e3fe96d7f666330df0850c21"
   },
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -2593,8 +2593,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
       "path": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
-      "bytes": 5512,
-      "sha256": "385ac7680cb53707ba3ef7fabc3688fc9e67215058e53ca3bcdb638f166e98d9",
+      "bytes": 5522,
+      "sha256": "d9c8471dd01df8dcd9b746edb179a751dbf6444d756eab83d5eea4e3e731867d",
       "beforeSHA256": null
     },
     {
@@ -3281,239 +3281,214 @@
   ],
   "finalFormatProof": {
     "parentFormattedSource": {
-      "members": 1557,
-      "digest": "ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101"
-    },
-    "formattedSource": {
       "members": 1558,
       "digest": "4d8d2511b6726abb1334efe54a71dec22d28e46bc8c03d856db89725f6861246"
     },
-    "incrementalUniqueFormattedParsedGo": 7,
-    "physicalGoRows": 12,
-    "GoCompilationOrTests": 0,
-    "rootFormatReceipt": {
-      "path": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted.json",
-      "bytes": 15753,
-      "sha256": "7070733af6158562d9bcc972ce020a5df0b560a826435c16ead29597723326ad"
+    "formattedSource": {
+      "members": 1558,
+      "digest": "ccd3c80785d54dce3f3a6d1fd47bbc4d038b4487e3fe96d7f666330df0850c21"
     },
-    "selectedLeaves": [
-      {
-        "capsule": "r8",
-        "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-        "beforeSourceSHA256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
-        "beforeExportSHA256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
-        "rawSourcePath": "references/integration/backend-history-final-inventory-scope-r3-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-        "adoptMode": 420,
-        "overlayBeforeSHA256": null,
-        "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/01-historical_capture_source_linux.go",
-        "bytes": 14855,
-        "sha256": "6e49afad48e9ea4028d4a535fb3b5685a875b88d7d8ec7536279831622c29579",
-        "rawSHA256": "6e49afad48e9ea4028d4a535fb3b5685a875b88d7d8ec7536279831622c29579"
-      },
-      {
-        "capsule": "r8",
-        "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-        "beforeSourceSHA256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
-        "beforeExportSHA256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
-        "rawSourcePath": "references/integration/backend-history-final-inventory-scope-r3-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-        "adoptMode": 420,
-        "overlayBeforeSHA256": null,
-        "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/02-historical_capture_source_linux_test.go",
-        "bytes": 28325,
-        "sha256": "fab8077cf6f90c259b88a36ce37e7351fbe5aede47aa21c834bfae190b37b1a2",
-        "rawSHA256": "fab8077cf6f90c259b88a36ce37e7351fbe5aede47aa21c834bfae190b37b1a2"
-      },
-      {
-        "capsule": "r8",
-        "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/redis_credential.go",
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/redis_credential.go",
-        "beforeSourceSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
-        "beforeExportSHA256": null,
-        "rawSourcePath": "references/integration/backend1575-redis-mongo-exclusion-r2-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/redis_credential.go",
-        "adoptMode": 420,
-        "candidateOverlayBeforeSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
-        "overlayBeforeSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
-        "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/03-redis_credential.go",
-        "bytes": 6107,
-        "sha256": "26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6",
-        "rawSHA256": "26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6"
-      },
-      {
-        "capsule": "r8",
-        "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
-        "beforeSourceSHA256": null,
-        "beforeExportSHA256": null,
-        "rawSourcePath": "references/integration/backend1575-redis-mongo-exclusion-r3-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
-        "adoptMode": 420,
-        "candidateOverlayBeforeSHA256": null,
-        "overlayBeforeSHA256": null,
-        "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/04-redis_credential_test.go",
-        "bytes": 5512,
-        "sha256": "385ac7680cb53707ba3ef7fabc3688fc9e67215058e53ca3bcdb638f166e98d9",
-        "rawSHA256": "937f7a16fd12e2ce27c8769c4e702e81f7562dc513aa40bc6a394c3b2dd061ac"
-      },
-      {
-        "capsule": "r8",
-        "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
-        "beforeSourceSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
-        "beforeExportSHA256": null,
-        "rawSourcePath": "references/integration/backend1575-mongo-probe-cursor-r4-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
-        "adoptMode": 420,
-        "candidateOverlayBeforeSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
-        "overlayBeforeSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
-        "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/05-mongo_credential.go",
-        "bytes": 6959,
-        "sha256": "74e3bf27916a75e72d027c031a5a4eba0ab341fdc8217ba4e72642467ededce1",
-        "rawSHA256": "74e3bf27916a75e72d027c031a5a4eba0ab341fdc8217ba4e72642467ededce1"
-      },
-      {
-        "capsule": "r8",
-        "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/agent_linux.go",
-        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/agent_linux.go",
-        "beforeSourceSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab",
-        "beforeExportSHA256": null,
-        "rawSourcePath": "references/integration/backend1575-redis-mongo-exclusion-r2-candidate-20261018/after/r8/server/internal/namespaceimport/ownedcontrol/agent_linux.go",
-        "adoptMode": 420,
-        "overlayBeforeSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab",
-        "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/07-agent_linux.go",
-        "bytes": 12336,
-        "sha256": "431870a578a8b5129acfc56e965a022673a6114f75bcea151ef454a514a8cc99",
-        "rawSHA256": "431870a578a8b5129acfc56e965a022673a6114f75bcea151ef454a514a8cc99"
-      }
-    ],
+    "rootFormatReceipt": {
+      "path": ".qa/backend-reader-boundary-and-redis-golden-batch-1/formatted.json",
+      "bytes": 6431,
+      "sha256": "7085ba34e42fc567c5212d5101c02372ffe4c9398574f7f58ba1d43c37a773ed"
+    },
+    "GoCompilationOrTests": 0,
     "unchangedParentFormatProof": {
       "parentFormattedSource": {
         "members": 1557,
-        "digest": "4685c041c9c3775e3287b98768c99f4c7a86d6ea52c32115c13621f5b0c899af"
-      },
-      "formattedSource": {
-        "members": 1557,
         "digest": "ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101"
       },
-      "incrementalFormattedParsedGo": 1,
+      "formattedSource": {
+        "members": 1558,
+        "digest": "4d8d2511b6726abb1334efe54a71dec22d28e46bc8c03d856db89725f6861246"
+      },
+      "incrementalUniqueFormattedParsedGo": 7,
+      "physicalGoRows": 12,
       "GoCompilationOrTests": 0,
       "rootFormatReceipt": {
-        "path": ".qa/backend-proof-readscope-and-begin-batch-1/formatted-proof.json",
-        "bytes": 2316,
-        "sha256": "497885860087561d8b6d4a074727654ab71002557552300a1e946a333043774e"
+        "path": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted.json",
+        "bytes": 15753,
+        "sha256": "7070733af6158562d9bcc972ce020a5df0b560a826435c16ead29597723326ad"
       },
       "selectedLeaves": [
         {
-          "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle.go",
-          "beforeSHA256": "91b7615c0143c50170d21d5e9cb3ae173e8680f1e9627e7ceadfc09e1e92608c",
-          "sourcePath": ".qa/backend-proof-readscope-and-begin-batch-1/formatted/r8/server/internal/namespaceinventory/import_merkle.go",
-          "bytes": 24569,
-          "sha256": "e34e34387dff887f4d400166f223f2c6346d29cd68a8d7fbbbeaae6f8909c566",
-          "adoptMode": 420
+          "capsule": "r8",
+          "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
+          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
+          "beforeSourceSHA256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
+          "beforeExportSHA256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
+          "rawSourcePath": "references/integration/backend-history-final-inventory-scope-r3-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
+          "adoptMode": 420,
+          "overlayBeforeSHA256": null,
+          "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/01-historical_capture_source_linux.go",
+          "bytes": 14855,
+          "sha256": "6e49afad48e9ea4028d4a535fb3b5685a875b88d7d8ec7536279831622c29579",
+          "rawSHA256": "6e49afad48e9ea4028d4a535fb3b5685a875b88d7d8ec7536279831622c29579"
+        },
+        {
+          "capsule": "r8",
+          "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
+          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
+          "beforeSourceSHA256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
+          "beforeExportSHA256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
+          "rawSourcePath": "references/integration/backend-history-final-inventory-scope-r3-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
+          "adoptMode": 420,
+          "overlayBeforeSHA256": null,
+          "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/02-historical_capture_source_linux_test.go",
+          "bytes": 28325,
+          "sha256": "fab8077cf6f90c259b88a36ce37e7351fbe5aede47aa21c834bfae190b37b1a2",
+          "rawSHA256": "fab8077cf6f90c259b88a36ce37e7351fbe5aede47aa21c834bfae190b37b1a2"
+        },
+        {
+          "capsule": "r8",
+          "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+          "beforeSourceSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
+          "beforeExportSHA256": null,
+          "rawSourcePath": "references/integration/backend1575-redis-mongo-exclusion-r2-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+          "adoptMode": 420,
+          "candidateOverlayBeforeSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
+          "overlayBeforeSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
+          "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/03-redis_credential.go",
+          "bytes": 6107,
+          "sha256": "26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6",
+          "rawSHA256": "26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6"
+        },
+        {
+          "capsule": "r8",
+          "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+          "beforeSourceSHA256": null,
+          "beforeExportSHA256": null,
+          "rawSourcePath": "references/integration/backend1575-redis-mongo-exclusion-r3-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+          "adoptMode": 420,
+          "candidateOverlayBeforeSHA256": null,
+          "overlayBeforeSHA256": null,
+          "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/04-redis_credential_test.go",
+          "bytes": 5512,
+          "sha256": "385ac7680cb53707ba3ef7fabc3688fc9e67215058e53ca3bcdb638f166e98d9",
+          "rawSHA256": "937f7a16fd12e2ce27c8769c4e702e81f7562dc513aa40bc6a394c3b2dd061ac"
+        },
+        {
+          "capsule": "r8",
+          "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
+          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
+          "beforeSourceSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
+          "beforeExportSHA256": null,
+          "rawSourcePath": "references/integration/backend1575-mongo-probe-cursor-r4-candidate-20261018/after/server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
+          "adoptMode": 420,
+          "candidateOverlayBeforeSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
+          "overlayBeforeSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
+          "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/05-mongo_credential.go",
+          "bytes": 6959,
+          "sha256": "74e3bf27916a75e72d027c031a5a4eba0ab341fdc8217ba4e72642467ededce1",
+          "rawSHA256": "74e3bf27916a75e72d027c031a5a4eba0ab341fdc8217ba4e72642467ededce1"
+        },
+        {
+          "capsule": "r8",
+          "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceimport/ownedcontrol/agent_linux.go",
+          "sourceTarget": "server/internal/namespaceimport/ownedcontrol/agent_linux.go",
+          "beforeSourceSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab",
+          "beforeExportSHA256": null,
+          "rawSourcePath": "references/integration/backend1575-redis-mongo-exclusion-r2-candidate-20261018/after/r8/server/internal/namespaceimport/ownedcontrol/agent_linux.go",
+          "adoptMode": 420,
+          "overlayBeforeSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab",
+          "sourcePath": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted/07-agent_linux.go",
+          "bytes": 12336,
+          "sha256": "431870a578a8b5129acfc56e965a022673a6114f75bcea151ef454a514a8cc99",
+          "rawSHA256": "431870a578a8b5129acfc56e965a022673a6114f75bcea151ef454a514a8cc99"
         }
       ],
       "unchangedParentFormatProof": {
         "parentFormattedSource": {
           "members": 1557,
-          "digest": "0a40ff1203ac2ed44e9342fdf19b18b49dde298b5906b6687d6f299ac8971b44"
+          "digest": "4685c041c9c3775e3287b98768c99f4c7a86d6ea52c32115c13621f5b0c899af"
         },
         "formattedSource": {
           "members": 1557,
-          "digest": "4685c041c9c3775e3287b98768c99f4c7a86d6ea52c32115c13621f5b0c899af"
+          "digest": "ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101"
         },
         "incrementalFormattedParsedGo": 1,
         "GoCompilationOrTests": 0,
         "rootFormatReceipt": {
-          "path": ".qa/backend-runtime-startup-and-io-batch-1/formatted-quantum.json",
-          "bytes": 2026,
-          "sha256": "9db402e244375086277eb86fa07ef9ab812736982c9559f6c2d64fa8aea3576f"
+          "path": ".qa/backend-proof-readscope-and-begin-batch-1/formatted-proof.json",
+          "bytes": 2316,
+          "sha256": "497885860087561d8b6d4a074727654ab71002557552300a1e946a333043774e"
         },
         "selectedLeaves": [
           {
-            "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_workspace.go",
-            "sourceTarget": "server/internal/namespaceinventory/import_workspace.go",
-            "beforeSHA256": "52b567b233fb3b78b06beb1c2b67eb4045146cb629b0bf38816d082b70c3a88f",
-            "sourcePath": ".qa/backend-runtime-startup-and-io-batch-1/formatted-shared/server/internal/namespaceinventory/import_workspace.go",
-            "sha256": "c46bbac326fae9e5c7706376de8f44caa5c8753022813b765c096557b7187593",
-            "bytes": 16322,
+            "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle.go",
+            "beforeSHA256": "91b7615c0143c50170d21d5e9cb3ae173e8680f1e9627e7ceadfc09e1e92608c",
+            "sourcePath": ".qa/backend-proof-readscope-and-begin-batch-1/formatted/r8/server/internal/namespaceinventory/import_merkle.go",
+            "bytes": 24569,
+            "sha256": "e34e34387dff887f4d400166f223f2c6346d29cd68a8d7fbbbeaae6f8909c566",
             "adoptMode": 420
           }
         ],
         "unchangedParentFormatProof": {
           "parentFormattedSource": {
             "members": 1557,
-            "digest": "a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84"
+            "digest": "0a40ff1203ac2ed44e9342fdf19b18b49dde298b5906b6687d6f299ac8971b44"
           },
           "formattedSource": {
             "members": 1557,
-            "digest": "0a40ff1203ac2ed44e9342fdf19b18b49dde298b5906b6687d6f299ac8971b44"
+            "digest": "4685c041c9c3775e3287b98768c99f4c7a86d6ea52c32115c13621f5b0c899af"
           },
-          "incrementalFormattedParsedGo": 2,
+          "incrementalFormattedParsedGo": 1,
           "GoCompilationOrTests": 0,
           "rootFormatReceipt": {
-            "path": ".qa/backend-merkle-step-read-batch-1/formatted-step-read.json",
-            "bytes": 2060,
-            "sha256": "766bce2197e05f1b5545fbb87f67f99d45020359564d72001d32dc5e2d5f209b"
+            "path": ".qa/backend-runtime-startup-and-io-batch-1/formatted-quantum.json",
+            "bytes": 2026,
+            "sha256": "9db402e244375086277eb86fa07ef9ab812736982c9559f6c2d64fa8aea3576f"
           },
           "selectedLeaves": [
             {
-              "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle.go",
-              "sourceTarget": "server/internal/namespaceinventory/import_merkle.go",
-              "beforeSHA256": "1cc6ead7b5c9c021f5f2ba8a7f6430983b040dbe8029ed18e0b166404f1f598f",
-              "beforeSourceSHA256": "1cc6ead7b5c9c021f5f2ba8a7f6430983b040dbe8029ed18e0b166404f1f598f",
-              "sourcePath": ".qa/backend-merkle-step-read-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle.go",
-              "bytes": 21229,
-              "sha256": "91b7615c0143c50170d21d5e9cb3ae173e8680f1e9627e7ceadfc09e1e92608c",
-              "adoptMode": 420,
-              "formatChanged": false
-            },
-            {
-              "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle_test.go",
-              "sourceTarget": "server/internal/namespaceinventory/import_merkle_test.go",
-              "beforeSHA256": "3e50c0e6b3dd3918813b148b0b1ff4f52bfdc2a1cf6a2ea3fdb29c026dd63875",
-              "beforeSourceSHA256": "3e50c0e6b3dd3918813b148b0b1ff4f52bfdc2a1cf6a2ea3fdb29c026dd63875",
-              "sourcePath": ".qa/backend-merkle-step-read-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle_test.go",
-              "bytes": 23237,
-              "sha256": "1d6a3accb5a4c55383402bdd16fc5091083d8c8fa96569207a156ebed348b428",
-              "adoptMode": 420,
-              "formatChanged": false
+              "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_workspace.go",
+              "sourceTarget": "server/internal/namespaceinventory/import_workspace.go",
+              "beforeSHA256": "52b567b233fb3b78b06beb1c2b67eb4045146cb629b0bf38816d082b70c3a88f",
+              "sourcePath": ".qa/backend-runtime-startup-and-io-batch-1/formatted-shared/server/internal/namespaceinventory/import_workspace.go",
+              "sha256": "c46bbac326fae9e5c7706376de8f44caa5c8753022813b765c096557b7187593",
+              "bytes": 16322,
+              "adoptMode": 420
             }
           ],
           "unchangedParentFormatProof": {
             "parentFormattedSource": {
               "members": 1557,
-              "digest": "423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09"
+              "digest": "a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84"
             },
             "formattedSource": {
               "members": 1557,
-              "digest": "a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84"
+              "digest": "0a40ff1203ac2ed44e9342fdf19b18b49dde298b5906b6687d6f299ac8971b44"
             },
             "incrementalFormattedParsedGo": 2,
             "GoCompilationOrTests": 0,
             "rootFormatReceipt": {
-              "path": ".qa/backend-merkle-leaf-batch-1/formatted-leaf-batch.json",
-              "bytes": 2004,
-              "sha256": "8d9442bf3f25d6e3d21a9d58818920302e74554470f9f4d345677f4a2c1f237a"
+              "path": ".qa/backend-merkle-step-read-batch-1/formatted-step-read.json",
+              "bytes": 2060,
+              "sha256": "766bce2197e05f1b5545fbb87f67f99d45020359564d72001d32dc5e2d5f209b"
             },
             "selectedLeaves": [
               {
                 "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle.go",
                 "sourceTarget": "server/internal/namespaceinventory/import_merkle.go",
-                "beforeSHA256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
-                "beforeSourceSHA256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
-                "sourcePath": ".qa/backend-merkle-leaf-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle.go",
-                "bytes": 16870,
-                "sha256": "1cc6ead7b5c9c021f5f2ba8a7f6430983b040dbe8029ed18e0b166404f1f598f",
+                "beforeSHA256": "1cc6ead7b5c9c021f5f2ba8a7f6430983b040dbe8029ed18e0b166404f1f598f",
+                "beforeSourceSHA256": "1cc6ead7b5c9c021f5f2ba8a7f6430983b040dbe8029ed18e0b166404f1f598f",
+                "sourcePath": ".qa/backend-merkle-step-read-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle.go",
+                "bytes": 21229,
+                "sha256": "91b7615c0143c50170d21d5e9cb3ae173e8680f1e9627e7ceadfc09e1e92608c",
                 "adoptMode": 420,
                 "formatChanged": false
               },
               {
                 "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle_test.go",
                 "sourceTarget": "server/internal/namespaceinventory/import_merkle_test.go",
-                "beforeSHA256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
-                "beforeSourceSHA256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
-                "sourcePath": ".qa/backend-merkle-leaf-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle_test.go",
-                "bytes": 18223,
-                "sha256": "3e50c0e6b3dd3918813b148b0b1ff4f52bfdc2a1cf6a2ea3fdb29c026dd63875",
+                "beforeSHA256": "3e50c0e6b3dd3918813b148b0b1ff4f52bfdc2a1cf6a2ea3fdb29c026dd63875",
+                "beforeSourceSHA256": "3e50c0e6b3dd3918813b148b0b1ff4f52bfdc2a1cf6a2ea3fdb29c026dd63875",
+                "sourcePath": ".qa/backend-merkle-step-read-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle_test.go",
+                "bytes": 23237,
+                "sha256": "1d6a3accb5a4c55383402bdd16fc5091083d8c8fa96569207a156ebed348b428",
                 "adoptMode": 420,
                 "formatChanged": false
               }
@@ -3521,39 +3496,39 @@
             "unchangedParentFormatProof": {
               "parentFormattedSource": {
                 "members": 1557,
-                "digest": "ae5ae1755b3407898c173020e30bf4b12ab0a3ccb4cd6a434926fdc6e4865de5"
+                "digest": "423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09"
               },
               "formattedSource": {
                 "members": 1557,
-                "digest": "423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09"
+                "digest": "a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84"
               },
               "incrementalFormattedParsedGo": 2,
               "GoCompilationOrTests": 0,
               "rootFormatReceipt": {
-                "path": ".qa/backend-merkle-parent-range-batch-1/formatted-parent-range.json",
-                "bytes": 2022,
-                "sha256": "fa09ce80e42f8aad1b4b398ebce60a1a9f4a0f5cc364aefab6478af4ffd514f3"
+                "path": ".qa/backend-merkle-leaf-batch-1/formatted-leaf-batch.json",
+                "bytes": 2004,
+                "sha256": "8d9442bf3f25d6e3d21a9d58818920302e74554470f9f4d345677f4a2c1f237a"
               },
               "selectedLeaves": [
                 {
                   "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle.go",
                   "sourceTarget": "server/internal/namespaceinventory/import_merkle.go",
-                  "beforeSHA256": "3b3398a881ae5cf4df98e8cfa5b1bd50598c003fb37d189c3fecb1c5859186c5",
-                  "beforeSourceSHA256": "3b3398a881ae5cf4df98e8cfa5b1bd50598c003fb37d189c3fecb1c5859186c5",
-                  "sourcePath": ".qa/backend-merkle-parent-range-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle.go",
-                  "bytes": 13768,
-                  "sha256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
+                  "beforeSHA256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
+                  "beforeSourceSHA256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
+                  "sourcePath": ".qa/backend-merkle-leaf-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle.go",
+                  "bytes": 16870,
+                  "sha256": "1cc6ead7b5c9c021f5f2ba8a7f6430983b040dbe8029ed18e0b166404f1f598f",
                   "adoptMode": 420,
                   "formatChanged": false
                 },
                 {
                   "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle_test.go",
                   "sourceTarget": "server/internal/namespaceinventory/import_merkle_test.go",
-                  "beforeSHA256": "7f723d5f0b3f2111369de403b6a0291a206780b2ebdd5d6f634f291dee04c637",
-                  "beforeSourceSHA256": "7f723d5f0b3f2111369de403b6a0291a206780b2ebdd5d6f634f291dee04c637",
-                  "sourcePath": ".qa/backend-merkle-parent-range-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle_test.go",
-                  "bytes": 12011,
-                  "sha256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
+                  "beforeSHA256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
+                  "beforeSourceSHA256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
+                  "sourcePath": ".qa/backend-merkle-leaf-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle_test.go",
+                  "bytes": 18223,
+                  "sha256": "3e50c0e6b3dd3918813b148b0b1ff4f52bfdc2a1cf6a2ea3fdb29c026dd63875",
                   "adoptMode": 420,
                   "formatChanged": false
                 }
@@ -3561,118 +3536,159 @@
               "unchangedParentFormatProof": {
                 "parentFormattedSource": {
                   "members": 1557,
-                  "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
+                  "digest": "ae5ae1755b3407898c173020e30bf4b12ab0a3ccb4cd6a434926fdc6e4865de5"
                 },
                 "formattedSource": {
                   "members": 1557,
-                  "digest": "ae5ae1755b3407898c173020e30bf4b12ab0a3ccb4cd6a434926fdc6e4865de5"
+                  "digest": "423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09"
                 },
                 "incrementalFormattedParsedGo": 2,
                 "GoCompilationOrTests": 0,
                 "rootFormatReceipt": {
-                  "path": ".qa/backend-descriptor-product20-batch-1/formatted-descriptors.json",
-                  "bytes": 1996,
-                  "sha256": "21c9c3d7a4099741d8984eaee7cd2b660f27a545e2e846fcb59b78b5321037c9"
+                  "path": ".qa/backend-merkle-parent-range-batch-1/formatted-parent-range.json",
+                  "bytes": 2022,
+                  "sha256": "fa09ce80e42f8aad1b4b398ebce60a1a9f4a0f5cc364aefab6478af4ffd514f3"
                 },
                 "selectedLeaves": [
                   {
-                    "sourceTarget": "server/internal/namespaceinventory/import_workspace.go",
-                    "bytes": 16097,
-                    "sha256": "52b567b233fb3b78b06beb1c2b67eb4045146cb629b0bf38816d082b70c3a88f",
-                    "formatChanged": false,
-                    "beforeSourceSHA256": "1897772ead76e68c3e3023ace6523d9c998a34c6283325e75a260d22366ceb6f"
+                    "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle.go",
+                    "sourceTarget": "server/internal/namespaceinventory/import_merkle.go",
+                    "beforeSHA256": "3b3398a881ae5cf4df98e8cfa5b1bd50598c003fb37d189c3fecb1c5859186c5",
+                    "beforeSourceSHA256": "3b3398a881ae5cf4df98e8cfa5b1bd50598c003fb37d189c3fecb1c5859186c5",
+                    "sourcePath": ".qa/backend-merkle-parent-range-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle.go",
+                    "bytes": 13768,
+                    "sha256": "f8f0a430c31e40764a58741a25c0673e4ba469bd37d39ad3f7c2f9e79a9260c0",
+                    "adoptMode": 420,
+                    "formatChanged": false
                   },
                   {
-                    "sourceTarget": "server/internal/namespaceinventory/import_workspace_test.go",
-                    "bytes": 17742,
-                    "sha256": "4d4cbf86ee05837c1ab0391668f82d964da0fe8931e21366c78a8a77e00fd394",
-                    "formatChanged": true,
-                    "beforeSourceSHA256": "7783acda4bcfc70362ddbf313caee34f9b7845d2568d3bd3d4bd5e0b741df681"
+                    "target": "ci/candidates/backend-runtime-join-r8/source/server/internal/namespaceinventory/import_merkle_test.go",
+                    "sourceTarget": "server/internal/namespaceinventory/import_merkle_test.go",
+                    "beforeSHA256": "7f723d5f0b3f2111369de403b6a0291a206780b2ebdd5d6f634f291dee04c637",
+                    "beforeSourceSHA256": "7f723d5f0b3f2111369de403b6a0291a206780b2ebdd5d6f634f291dee04c637",
+                    "sourcePath": ".qa/backend-merkle-parent-range-batch-1/formatted-source/server/internal/namespaceinventory/import_merkle_test.go",
+                    "bytes": 12011,
+                    "sha256": "2f5c6b918ce8d39a5f8e9586c3d4dd6f674578b898aa2240e2da3bc41fc66e7c",
+                    "adoptMode": 420,
+                    "formatChanged": false
                   }
                 ],
                 "unchangedParentFormatProof": {
                   "parentFormattedSource": {
-                    "members": 1556,
-                    "digest": "fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a"
-                  },
-                  "formattedSource": {
                     "members": 1557,
                     "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
                   },
-                  "incrementalFormattedParsedGo": 5,
+                  "formattedSource": {
+                    "members": 1557,
+                    "digest": "ae5ae1755b3407898c173020e30bf4b12ab0a3ccb4cd6a434926fdc6e4865de5"
+                  },
+                  "incrementalFormattedParsedGo": 2,
                   "GoCompilationOrTests": 0,
                   "rootFormatReceipt": {
-                    "path": ".qa/backend-index-batch-owned-image-repair-batch-1/formatted-all.json",
-                    "bytes": 8609,
-                    "sha256": "880bc840e258969d75f70a495f7c7afd147470c1f633bca31361f8214bf203e5"
-                  },
-                  "rootFinalSources": {
-                    "path": ".qa/backend-index-batch-owned-image-repair-batch-1/final-formatted-sources.json",
-                    "bytes": 610,
-                    "sha256": "e16f95ec915742554bdc1f582a1a4995fe7119fe79e4f2b7fb7ba6fbd7582e0a"
+                    "path": ".qa/backend-descriptor-product20-batch-1/formatted-descriptors.json",
+                    "bytes": 1996,
+                    "sha256": "21c9c3d7a4099741d8984eaee7cd2b660f27a545e2e846fcb59b78b5321037c9"
                   },
                   "selectedLeaves": [
                     {
                       "sourceTarget": "server/internal/namespaceinventory/import_workspace.go",
-                      "bytes": 15504,
-                      "sha256": "1897772ead76e68c3e3023ace6523d9c998a34c6283325e75a260d22366ceb6f",
+                      "bytes": 16097,
+                      "sha256": "52b567b233fb3b78b06beb1c2b67eb4045146cb629b0bf38816d082b70c3a88f",
                       "formatChanged": false,
-                      "beforeSourceSHA256": "1a9d975d2aac8fdc0745659db1f970bbb417efee5580f36304077f0cd15fda47",
-                      "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
-                    },
-                    {
-                      "sourceTarget": "server/internal/namespaceinventory/progress_batch.go",
-                      "bytes": 5971,
-                      "sha256": "0b6f15c3c93f4f3232e1145accdc04ca2f6a934488ae791529329f32caba8db5",
-                      "formatChanged": false,
-                      "beforeSourceSHA256": "275768fedbe6c8fd078f398c7a5f3f8351695a4f982db6cb18dfadd5189927cf",
-                      "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
+                      "beforeSourceSHA256": "1897772ead76e68c3e3023ace6523d9c998a34c6283325e75a260d22366ceb6f"
                     },
                     {
                       "sourceTarget": "server/internal/namespaceinventory/import_workspace_test.go",
-                      "bytes": 11176,
-                      "sha256": "7783acda4bcfc70362ddbf313caee34f9b7845d2568d3bd3d4bd5e0b741df681",
+                      "bytes": 17742,
+                      "sha256": "4d4cbf86ee05837c1ab0391668f82d964da0fe8931e21366c78a8a77e00fd394",
                       "formatChanged": true,
-                      "beforeSourceSHA256": "b2e6781274277a7a656a85c83a6360b7d5d59a6154a58ed46d8a850bf6a22877",
-                      "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
-                    },
-                    {
-                      "sourceTarget": "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go",
-                      "bytes": 3908,
-                      "sha256": "80b653eb9cf2a943bc70da2eb81751891ceade8a6258ee3b16fd9e609d79217e",
-                      "formatChanged": true,
-                      "beforeSourceSHA256": null,
-                      "manifestSHA256": "e41ac251e26ebadd539ccff6a1e1f7ba71423de6f8b9efe31d9c7ab84d38949a"
-                    },
-                    {
-                      "sourceTarget": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
-                      "bytes": 21543,
-                      "sha256": "d420ab2f5d856d44a53a972673dfa505683172b8468d4aa2cddf96cd9db514f2",
-                      "formatChanged": true,
-                      "beforeSourceSHA256": "d13d875753587f98f2852b636bf6b11ca4e43e511d0ef53eefef42cab6dadf1b",
-                      "manifestSHA256": "e41ac251e26ebadd539ccff6a1e1f7ba71423de6f8b9efe31d9c7ab84d38949a"
+                      "beforeSourceSHA256": "7783acda4bcfc70362ddbf313caee34f9b7845d2568d3bd3d4bd5e0b741df681"
                     }
                   ],
-                  "graphSourceSeparate": {
-                    "members": 1575,
-                    "digest": "52ddd8742eef822c04d14b99f6ccf47acd12f43c7df06d98fe6fe389da231b58"
-                  }
+                  "unchangedParentFormatProof": {
+                    "parentFormattedSource": {
+                      "members": 1556,
+                      "digest": "fdb96f4e12d6846716dc9c11b9589597cad23f21e06758dbce3f875bef0d044a"
+                    },
+                    "formattedSource": {
+                      "members": 1557,
+                      "digest": "7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a"
+                    },
+                    "incrementalFormattedParsedGo": 5,
+                    "GoCompilationOrTests": 0,
+                    "rootFormatReceipt": {
+                      "path": ".qa/backend-index-batch-owned-image-repair-batch-1/formatted-all.json",
+                      "bytes": 8609,
+                      "sha256": "880bc840e258969d75f70a495f7c7afd147470c1f633bca31361f8214bf203e5"
+                    },
+                    "rootFinalSources": {
+                      "path": ".qa/backend-index-batch-owned-image-repair-batch-1/final-formatted-sources.json",
+                      "bytes": 610,
+                      "sha256": "e16f95ec915742554bdc1f582a1a4995fe7119fe79e4f2b7fb7ba6fbd7582e0a"
+                    },
+                    "selectedLeaves": [
+                      {
+                        "sourceTarget": "server/internal/namespaceinventory/import_workspace.go",
+                        "bytes": 15504,
+                        "sha256": "1897772ead76e68c3e3023ace6523d9c998a34c6283325e75a260d22366ceb6f",
+                        "formatChanged": false,
+                        "beforeSourceSHA256": "1a9d975d2aac8fdc0745659db1f970bbb417efee5580f36304077f0cd15fda47",
+                        "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
+                      },
+                      {
+                        "sourceTarget": "server/internal/namespaceinventory/progress_batch.go",
+                        "bytes": 5971,
+                        "sha256": "0b6f15c3c93f4f3232e1145accdc04ca2f6a934488ae791529329f32caba8db5",
+                        "formatChanged": false,
+                        "beforeSourceSHA256": "275768fedbe6c8fd078f398c7a5f3f8351695a4f982db6cb18dfadd5189927cf",
+                        "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
+                      },
+                      {
+                        "sourceTarget": "server/internal/namespaceinventory/import_workspace_test.go",
+                        "bytes": 11176,
+                        "sha256": "7783acda4bcfc70362ddbf313caee34f9b7845d2568d3bd3d4bd5e0b741df681",
+                        "formatChanged": true,
+                        "beforeSourceSHA256": "b2e6781274277a7a656a85c83a6360b7d5d59a6154a58ed46d8a850bf6a22877",
+                        "manifestSHA256": "d93ec181d6e5badbcc38a564808d2f3583062f0e84a73fb99046968a731150fd"
+                      },
+                      {
+                        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go",
+                        "bytes": 3908,
+                        "sha256": "80b653eb9cf2a943bc70da2eb81751891ceade8a6258ee3b16fd9e609d79217e",
+                        "formatChanged": true,
+                        "beforeSourceSHA256": null,
+                        "manifestSHA256": "e41ac251e26ebadd539ccff6a1e1f7ba71423de6f8b9efe31d9c7ab84d38949a"
+                      },
+                      {
+                        "sourceTarget": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
+                        "bytes": 21543,
+                        "sha256": "d420ab2f5d856d44a53a972673dfa505683172b8468d4aa2cddf96cd9db514f2",
+                        "formatChanged": true,
+                        "beforeSourceSHA256": "d13d875753587f98f2852b636bf6b11ca4e43e511d0ef53eefef42cab6dadf1b",
+                        "manifestSHA256": "e41ac251e26ebadd539ccff6a1e1f7ba71423de6f8b9efe31d9c7ab84d38949a"
+                      }
+                    ],
+                    "graphSourceSeparate": {
+                      "members": 1575,
+                      "digest": "52ddd8742eef822c04d14b99f6ccf47acd12f43c7df06d98fe6fe389da231b58"
+                    }
+                  },
+                  "graph575Changed": false
                 },
-                "graph575Changed": false
+                "graph7e5Changed": false,
+                "Product20Changed": false
               },
-              "graph7e5Changed": false,
+              "graphA8Changed": false,
               "Product20Changed": false
             },
-            "graphA8Changed": false,
+            "graph854Changed": false,
             "Product20Changed": false
           },
-          "graph854Changed": false,
+          "graphFinalSourceNotBound": true,
           "Product20Changed": false
         },
-        "graphFinalSourceNotBound": true,
-        "Product20Changed": false
-      },
-      "noGraphOrProduct20SourceChangesInThisCandidate": true
+        "noGraphOrProduct20SourceChangesInThisCandidate": true
+      }
     }
   },
   "selectionSHA256": "fc836e600e05461884b8b04bc9d1c9abf0b6ba4615d1e6f03cddcbb4779b0db3",
@@ -4942,7 +4958,7 @@
   "repairPlan": {
     "path": "ci/backend-runtime-join-r8/repair-plan.json",
     "bytes": 121803,
-    "sha256": "dff7189c2c92876f0f76824b48ed0ccc3f946ceaa30daed811c1fd1a00ee5473",
+    "sha256": "3736d54c7c02e461140663b41f75c70438bb3dae1bf30b567cb0aa7e2c6ea0ff",
     "mode": 420
   },
   "repairControllerPins": [

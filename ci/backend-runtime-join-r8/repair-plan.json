@@ -3,7 +3,7 @@
   "state": "FROZEN_SCOPE_REDIS4_REUSE86",
   "source": {
     "members": 1558,
-    "digest": "4d8d2511b6726abb1334efe54a71dec22d28e46bc8c03d856db89725f6861246"
+    "digest": "ccd3c80785d54dce3f3a6d1fd47bbc4d038b4487e3fe96d7f666330df0850c21"
   },
   "repairTargets": {
     "internal/namespaceimport/ownedcontrol": [
@@ -461,8 +461,8 @@
       "target": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
       "beforeSHA256": null,
       "overlayBeforeSHA256": null,
-      "afterSHA256": "385ac7680cb53707ba3ef7fabc3688fc9e67215058e53ca3bcdb638f166e98d9",
-      "afterBytes": 5512,
+      "afterSHA256": "d9c8471dd01df8dcd9b746edb179a751dbf6444d756eab83d5eea4e3e731867d",
+      "afterBytes": 5522,
       "mode": 420,
       "production": false
     },
@@ -908,7 +908,7 @@
       "derivation": "lastProofReadscopeRun exact completed DiskMerkle parent and10 children only; failed controller parent and its2 PASS children are not acceptance"
     }
   ],
-  "sourceDeltaSHA256": "35c52012f4074bf647069205c21fdc8ab1a7db72b9db064407e061d35313450f",
+  "sourceDeltaSHA256": "f0b4d951057390a0a1d7aa3c2b30ceee0f43228b508511baa103dd4b95d9ecbe",
   "latestRepairRun": {
     "schema": 1,
     "head": "1dbe0412baa8a3a04199a5ab80a559dcdf126e65",

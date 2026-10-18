@@ -30,7 +30,7 @@ func TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof(t 
 		resp2, resp3 := redisACLProtocolRepliesForTest()
 		// Independent complete wire-contract oracle: selectors must not disappear
 		// and raw interface-key maps must not reach encoding/json.
-		want := `{"channels":"&sensitive_word_reload","commands":"-@all +get +ping","flags":["on"],"keys":"~USER_INFO:fixture","passwords":["private-hash"],"selectors":[{"channels":"&notice","commands":"-@all +get","keys":"~USER_INFO:other"}]}`
+		want := `{"channels":"\u0026sensitive_word_reload","commands":"-@all +get +ping","flags":["on"],"keys":"~USER_INFO:fixture","passwords":["private-hash"],"selectors":[{"channels":"\u0026notice","commands":"-@all +get","keys":"~USER_INFO:other"}]}`
 		var digest string
 		for _, reply := range []any{resp2, resp3} {
 			row, err := redisUser(reply)

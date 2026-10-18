@@ -2,14 +2,14 @@
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
   "state": "FORMATTED_SOURCE_ONLY_LOCKED_PENDING_SUCCESSFUL_CORE14_ARTIFACT",
-  "canonicalPublicParent": "64c13478ae7e619dc0810a1b736ec593507eff2e",
+  "canonicalPublicParent": "44b23e3dd1fc7270b47e37025dbdf507f766203c",
   "graphProvider": {
     "path": "ci/backend-fullgraph/run.py",
     "source": {
       "members": 1576,
-      "digest": "9eea825eb4661186f0f545b754da36db598c2f5cedb69bbb6e804f759c2355db"
+      "digest": "122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48"
     },
-    "status": "formatted-final-inventory-scope-redis-resp3-mongo-businessdb-source-only-locked-no-accepted-core14-artifact"
+    "status": "formatted-reader-stage-and-redis-golden-source-only-locked-no-accepted-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "b596f06897b5083cabb533d73d6060756c4d0a793efda785792f6fe992fe3400",
-    "ci/backend-fullgraph/inputs.json": "6273bc601a4caf4464b0631dc83f50956ebf18da9661dc284c1bbd971baf9483",
+    "ci/backend-fullgraph/run.py": "4989735355b99f473f4ed6043a428a2f522fe1485665b2a4dd05535482f3b78c",
+    "ci/backend-fullgraph/inputs.json": "cf7294e3595a5eb4c189e77e95ffd8cff8478d5d7f05b8a85a07320d8ca495a6",
     "ci/backend-fullgraph/resources.py": "a9ac98690c116869099af8fb54f8d5b46c3c7da5d1280798c2c2a4ba067a4be2",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "bb0b833b952529603c5c78e457b0434f0e258ca00a5bd190d755ca33ac1adc4e",
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1578,
-    "digest": "b3796fe5cd3365a539138f7ceba7eb9d97cffc2d2c10fffea50630c89147e2a7"
+    "digest": "d843314616a006efca740886de3ff79ed067ecd9ceb22a8100143ed8c0e413ca"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

@@ -5,12 +5,66 @@ package runtimeacceptance
 import (
 	"context"
 	"errors"
+	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
+	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+	"github.com/openimsdk/open-im-server/v3/internal/namespaceinventory"
 )
+
+// Call observations only: state encodes not-entered / attempted-not-returned / returned.
+// Stage is last-entered, not a failure predicate. Pending retains the original wait.
+type readerCallObservation struct {
+	Stage      string
+	State      string
+	ErrorClass string
+}
+
+func graphOperationErrorClass(err error) string {
+	switch {
+	case err == nil:
+		return "none"
+	case errors.Is(err, context.Canceled):
+		return "cancelled"
+	case errors.Is(err, context.DeadlineExceeded):
+		return "deadline"
+	case errors.Is(err, os.ErrPermission):
+		return "permission"
+	case errors.Is(err, os.ErrNotExist):
+		return "not-found"
+	case errors.Is(err, os.ErrExist):
+		return "already-exists"
+	case errors.Is(err, ownedcontrol.ErrHistoryReaderRegistrationPending):
+		return "registration-pending"
+	case errors.Is(err, namespaceimport.ErrCommitUnconfirmed):
+		return "commit-unconfirmed"
+	case errors.Is(err, ownedcontrol.ErrOwnedEvidence):
+		return "owned-evidence"
+	case errors.Is(err, namespaceimport.ErrUntrusted):
+		return "import-evidence"
+	case errors.Is(err, namespaceimport.ErrConflict):
+		return "import-conflict"
+	case errors.Is(err, namespaceimport.ErrInvalid):
+		return "import-invalid"
+	case errors.Is(err, messagedelivery.ErrUnprepared):
+		return "preparation-unavailable"
+	case errors.Is(err, messagedelivery.ErrConflict):
+		return "preparation-conflict"
+	case errors.Is(err, namespaceinventory.ErrPrivate):
+		return "inventory-private"
+	case errors.Is(err, namespaceinventory.ErrIdentity):
+		return "inventory-identity"
+	case errors.Is(err, namespaceinventory.ErrChanged):
+		return "inventory-changed"
+	case errors.Is(err, namespaceinventory.ErrSource):
+		return "inventory-source"
+	default:
+		return "other"
+	}
+}
 
 type ReaderPhaseObservation struct {
 	Phase                           string                               `json:"phase"`
@@ -111,7 +165,10 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 	}
 	s.Phase = "actual-two-reader-processes-and-original-registration"
 	for _, role := range []string{"rpc-conversation", "rpc-msg"} {
+		s.readerObservation = readerCallObservation{Stage: "start-" + role, State: "in-progress", ErrorClass: "in-progress"}
 		process, e := group.Start(ctx, frozen[role])
+		s.readerObservation.State = "returned"
+		s.readerObservation.ErrorClass = graphOperationErrorClass(e)
 		if process.Service != nil {
 			out.Launched = append(out.Launched, process)
 		}
@@ -127,10 +184,17 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 	}
 	var readerGraph *ownedcontrol.VerifiedHistoryReaderGraph
 	for {
-		if e = check(); e != nil {
+		s.readerObservation = readerCallObservation{Stage: "source-custody", State: "in-progress", ErrorClass: "in-progress"}
+		e = check()
+		s.readerObservation.State = "returned"
+		s.readerObservation.ErrorClass = graphOperationErrorClass(e)
+		if e != nil {
 			return out, e
 		}
+		s.readerObservation = readerCallObservation{Stage: "observe-registration", State: "in-progress", ErrorClass: "in-progress"}
 		readerGraph, e = readers.Observe(ctx)
+		s.readerObservation.State = "returned"
+		s.readerObservation.ErrorClass = graphOperationErrorClass(e)
 		if e == nil {
 			break
 		}

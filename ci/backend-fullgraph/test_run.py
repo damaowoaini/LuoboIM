@@ -77,6 +77,37 @@ class FullGraphControls(unittest.TestCase):
    bad=dict(value,**changed)
    with self.subTest(acquire=changed),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
 
+  # Original primary and local cleanup error classifications are independent.
+  reader_base=dict(valid,phase='actual-two-reader-processes-and-original-registration',primaryRunErrorClass='preparation-unavailable',readerStage='start-rpc-conversation',readerCallState='returned',readerErrorClass='preparation-unavailable')
+  observed=collector.public_terminal(json.dumps(reader_base).encode(),reader_base['scenario'])
+  self.assertEqual((observed['primaryRunErrorClass'],observed['readerErrorClass']),('preparation-unavailable','preparation-unavailable'))
+  self.assertEqual(observed['localCleanupFailureClass'],'owned-evidence')
+  self.assertFalse(observed['accepted']);self.assertNotIn('PRIVATE_',json.dumps(observed))
+  joined=dict(reader_base,failureClass='owned-evidence-rejected')
+  observed=collector.public_terminal(json.dumps(joined).encode(),joined['scenario'])
+  self.assertEqual(observed['primaryRunErrorClass'],'preparation-unavailable')
+  self.assertEqual(observed['localCleanupFailureClass'],'owned-evidence')
+  cleanup_only=dict(joined,primaryRunErrorClass='none',readerStage='observe-registration',readerErrorClass='none')
+  self.assertEqual(collector.public_terminal(json.dumps(cleanup_only).encode(),cleanup_only['scenario'])['primaryRunErrorClass'],'none')
+  for stage in (('start-rpc-conversation', 'start-rpc-msg', 'source-custody', 'observe-registration')):
+   for kind in (('none', 'cancelled', 'deadline', 'permission', 'not-found', 'already-exists', 'registration-pending', 'commit-unconfirmed', 'owned-evidence', 'import-evidence', 'import-conflict', 'import-invalid', 'preparation-unavailable', 'preparation-conflict', 'inventory-private', 'inventory-identity', 'inventory-changed', 'inventory-source', 'other')):
+    if kind=='registration-pending' and stage!='observe-registration':continue
+    value=dict(joined,readerStage=stage,readerCallState='returned',readerErrorClass=kind,primaryRunErrorClass=kind)
+    observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+    self.assertEqual((observed['readerStage'],observed['readerCallState'],observed['readerErrorClass'],observed['primaryRunErrorClass']),(stage,'returned',kind,kind))
+    self.assertFalse(observed['accepted']);self.assertNotIn('rawError',observed)
+  # A last returned pending value does not become the later terminal cause.
+  pending=dict(joined,readerStage='observe-registration',readerCallState='returned',readerErrorClass='registration-pending',primaryRunErrorClass='deadline',failureClass='deadline')
+  observed=collector.public_terminal(json.dumps(pending).encode(),pending['scenario'])
+  self.assertEqual((observed['readerErrorClass'],observed['primaryRunErrorClass']),('registration-pending','deadline'))
+  for state,stage,kind in [('not-entered','not-entered','not-entered'),('in-progress','source-custody','in-progress')]:
+   value=dict(joined,readerStage=stage,readerCallState=state,readerErrorClass=kind)
+   observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+   self.assertEqual((observed['readerStage'],observed['readerCallState'],observed['readerErrorClass']),(stage,state,kind))
+  for change in [dict(primaryRunErrorClass='PRIVATE_ERROR_USER_GROUP'),dict(primaryRunErrorClass=True),dict(readerStage='PRIVATE_ERROR_USER_GROUP'),dict(readerCallState=True),dict(readerErrorClass='private-provider-text'),dict(readerStage='not-entered'),dict(readerCallState='not-entered'),dict(readerCallState='in-progress'),dict(readerStage='start-rpc-msg',readerErrorClass='registration-pending')]:
+   bad=dict(joined,**change)
+   with self.subTest(reader=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+
  def test_real_tracked_git_bodies_symlink_bounds_static_elf_and_strict_receipt(self):
   with tempfile.TemporaryDirectory() as directory:
    root=Path(directory);source=root/'source';source.mkdir()
@@ -303,7 +334,7 @@ class FullGraphControls(unittest.TestCase):
         {'Action':'output','Test':'TestRuntime','Output':'RUNTIME_PRIVATE_TEST'},
         {'Action':'build-output','Test':'TestRuntime','Output':'NOT_A_COMPILER_EVENT'}]
   raw=('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
-  for phase in ['pending-two-original-oracles','launcher-ownedcontrol']+[scope['label'] for scope in run.CLEANUP_SCOPES]:
+  for phase in ['pending-two-original-oracles','launcher-ownedcontrol','redis-parser']+[scope['label'] for scope in run.CLEANUP_SCOPES]:
    projected,diagnostic=run.project_go_test_events(raw,phase)
    self.assertEqual(diagnostic,{'phase':phase,'publicSourceOnly':True,'selection':'go-test-build-output-without-Test-only','completeBytes':len(public.encode()),'completeSHA256':hashlib.sha256(public.encode()).hexdigest(),'diagnostic':public,'truncated':False})
    self.assertTrue(all('Output' not in row and 'ImportPath' not in row for row in projected))
@@ -383,6 +414,31 @@ class FullGraphControls(unittest.TestCase):
      rows.append({'Action':'pass','Package':full,'Test':top})
     rows.append({'Action':'pass','Package':full})
    return rows
+  # Exercise the real dispatch and original Go JSON auditor, without Go/DB.
+  for mode in ('complete','missing-child','skip','foreign-top','missing-footer','phase-error'):
+   with self.subTest(redisParser=mode),tempfile.TemporaryDirectory() as directory:
+    out=Path(directory).resolve();calls=[];environment={'GOPROXY':'off','GOSUMDB':'off','GOCACHE':'/owned/buildcache','GOMODCACHE':'/owned/modcache'}
+    def parser_command(label,argv,seconds,actual_environment):
+     calls.append(label);self.assertEqual(label,'redis-parser');self.assertEqual(seconds,240);self.assertIs(actual_environment,environment)
+     top='TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof';package='internal/namespaceimport/ownedcontrol'
+     self.assertEqual(argv,['/owned/go','test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run','^'+top+'$','./'+package])
+     if mode=='phase-error':raise ValueError('actual phase failed; private raw retained')
+     rows=events(run.REDIS_PARSER_CONTROL['targets'],run.REDIS_PARSER_CONTROL['requiredSubtests'])
+     if mode=='missing-child':rows=[row for row in rows if row.get('Test')!=top+'/equivalent-protocols-complete-summary-and-real-disabled-state']
+     if mode=='skip':
+      rows=[dict(row,Action='skip') if row.get('Test')==top+'/malformed-fields-and-nil-first-duplicate-reject' and row['Action']=='pass' else row for row in rows]
+     if mode=='foreign-top':rows.insert(1,{'Action':'run','Package':parent.PREFIX+package,'Test':'TestForeign'})
+     if mode=='missing-footer':rows=rows[:-1]
+     return ('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
+    if mode!='complete':
+     with self.assertRaises(ValueError):run.run_redis_parser_control('/owned/go',environment,parser_command,parent,out)
+     self.assertEqual(calls,['redis-parser']);self.assertFalse((out/'redis-parser-names.json').exists());continue
+    result=run.run_redis_parser_control('/owned/go',environment,parser_command,parent,out)
+    self.assertEqual(calls,['redis-parser']);self.assertEqual((result['topPASS'],result['subPASS']),(1,3));self.assertTrue(result['accepted'])
+    self.assertEqual(result['source'],run.FINAL_SOURCE);self.assertEqual(result['newDatabaseFixtures'],0);self.assertFalse(result['otherR8TargetsDispatched'])
+    self.assertEqual(json.loads((out/'redis-parser-names.json').read_bytes()),result)
+  parser_line=next(node.lineno for node in [node for node in ast.walk(orchestration) if isinstance(node,ast.Call)] if isinstance(node.func,ast.Name) and node.func.id=='run_redis_parser_control')
+  self.assertLess(parser_line,compile_line);self.assertLess(parser_line,minio_line)
   for mode in ('complete','missing-child','foreign-top'):
    with self.subTest(mode=mode),tempfile.TemporaryDirectory() as folder:
     out=Path(folder).resolve();calls=[]
