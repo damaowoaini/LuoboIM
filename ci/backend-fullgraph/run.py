@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE = {'members': 1576, 'digest': '122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48'}
+FINAL_SOURCE = {'members': 1576, 'digest': '990ba2c75a0de47d34c8801e6b95a85b4e5574354dc0801907b133febbfafda9'}
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -20,6 +20,7 @@ CLEANUP_REUSE={'run': 39053868483, 'head': 'ce7964a0c7aa474cbc83c32dd71c1bfcfb83
 LAUNCHER_PASSED_REUSE={'run': 39075035152, 'job': 117520306290, 'head': 'a6d9276c53a75e8ca19e351cab1d34b419b560e7', 'source': {'members': 1575, 'digest': '868e46b88717f80dd90e837ebd5bb64634ed5030ddd3c83a8d6c00398c749717'}, 'reviewSHA256': '412fdacae0a1a8ff842d92269d2bf00fb0a578b3ed1eab928ee86d2e56ac1f38', 'artifact': {'artifact': 12115839677, 'run': 39075035152, 'attempt': 1, 'head': 'a6d9276c53a75e8ca19e351cab1d34b419b560e7', 'sha256': '674eadc00436aa018a1fe7828be0568f3ce80f499ef53b487deacfcb5709099a', 'bytes': 52320, 'exactAPIDigest': True, 'files': 66, 'binariesDownloaded': False}, 'launcherNamesSHA256': '6471ec2f43ce64c92e2c399c7a0630e1d86740c9e2ee2a69352573e14b61c932', 'topPASS': 1, 'subPASS': 0, 'skip': 0, 'fail': 0, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedLauncherHoldPersistsAndCannotPrepareMetadata'}], 'sourceToolsPostExact': True, 'currentSourcePASS': False, 'runtimeAccepted': False}
 GRAPH_TARGETS={'pkg/common/startrpc': ['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence', 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']}
 REDIS_PARSER_CONTROL = {'phase': 'redis-parser', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof': ['equivalent-protocols-complete-summary-and-real-disabled-state', 'malformed-fields-and-nil-first-duplicate-reject', 'disabled-check-keeps-off-allcommands-and-empty-passwords']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 240, 'newDatabaseFixtures': 0, 'otherR8TargetsDispatched': False}
+REDIS_PARSER_PASSED_REUSE = {'run': 39082704756, 'job': 117542803080, 'attempt': 1, 'head': '2f17d99d2f32c4fc72b9b922f8d2a8783938b665', 'source': {'members': 1576, 'digest': '122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48'}, 'artifact': {'artifact': 12119877247, 'run': 39082704756, 'attempt': 1, 'head': '2f17d99d2f32c4fc72b9b922f8d2a8783938b665', 'sha256': 'b7bbb052d28081550d537cfb867103cf8e2e19ad84f4b90893a4157f569f7eef', 'bytes': 41738, 'exactAPIDigest': True, 'files': 56, 'binariesDownloaded': False}, 'rootReviewSHA256': 'cc2fa43abea21d6b2c305571e66eeb62e422f2a67f5965b6c71591f532c40501', 'topPASS': 1, 'subPASS': 3, 'skip': 0, 'fail': 0, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/disabled-check-keeps-off-allcommands-and-empty-passwords'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/equivalent-protocols-complete-summary-and-real-disabled-state'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/malformed-fields-and-nil-first-duplicate-reject'}], 'sourcePins': [{'target': 'server/internal/namespaceimport/ownedcontrol/redis_credential.go', 'bytes': 6107, 'sha256': '26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6'}, {'target': 'server/internal/namespaceimport/ownedcontrol/redis_credential_test.go', 'bytes': 5522, 'sha256': 'd9c8471dd01df8dcd9b746edb179a751dbf6444d756eab83d5eea4e3e731867d'}], 'sourcePostExact': True, 'currentSourcePASS': False, 'runtimeAccepted': False, 'actualRedisParserTestsDispatched': 0, 'rawEvidence': [{'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/redis-parser-names.json', 'bytes': 956, 'sha256': '94e60e18529a5f933ce070d15e0418819d19ed725929cc4e4cb8c5474bcf1c13'}, {'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/redis-parser-events.json', 'bytes': 5001, 'sha256': '1056eb00f05ca35635dca33dd667d538f1f967a329509af0ecec1ba5d9e0afd7'}, {'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/source-post.json', 'bytes': 120, 'sha256': 'd25ccb64f558e0966dbdacea71ba478c3f50330e0d3583f611165ece87aed8cc'}, {'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/phase-0004.json', 'bytes': 2509, 'sha256': 'b3594ce1d3614e16a7b91e95982b3b4aff0fc5bb6005ea33ce5167eeb423628d'}]}
 GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
 
 
@@ -109,6 +110,8 @@ def verify():
  validate_entries(bodies,c['entrypointContract'])
  catalog=json.loads(pin(c['catalog']))
  for row in c['controllerPins']:pin(row)
+ check_redis_parser_reuse(c.get('redisParserPassedReuse'),bodies)
+ if c.get('redisParserTestsToRun')!=[]:raise ValueError('unchanged Redis parser must not be redispatched')
  if catalog['scope']!='fresh_owned_fullgraph_compatibility_fixture_only_no_production_default' or catalog['minio']['mode']!='source-elf' or catalog['minio']['status']!='historical_unmaintained_test_only':raise ValueError('explicit source-MinIO fixture required')
  if catalog['images']['minio']!=catalog['images']['redis'] or catalog['images']['keeper']!=catalog['images']['redis']:raise ValueError('known Redis base must remain explicit')
  module('ci/backend-fullgraph/minio_build.py','fullgraph_fixed_fixture_policy').fixture_policy(c)
@@ -159,6 +162,22 @@ def runtime_cleanup_observations(raw,phase):
   except (ValueError,TypeError,KeyError,UnicodeError):rejected+=1;continue
   rows[value['kind']]=value
  return {'version':'runtime-cleanup-fixture-observations-v1','diagnosticsComplete':set(rows)==kinds and rejected==0,'rejectedMarkers':min(rejected,4096),'observations':[rows[key] for key in sorted(rows)]}
+
+def check_redis_parser_reuse(value,bodies):
+ # This exact 122c receipt is historical1/3, never a fresh-source PASS. JSON
+ # comparison also keeps numeric/boolean types and the complete four names.
+ if not isinstance(value,dict) or json.dumps(value,sort_keys=True,separators=(',',':'))!=json.dumps(REDIS_PARSER_PASSED_REUSE,sort_keys=True,separators=(',',':')):
+  raise ValueError('exact Root accepted historical Redis parser receipt required')
+ for row in value['sourcePins']:
+  raw=bodies.get(row['target'])
+  if raw is None or len(raw)!=row['bytes'] or sha(raw)!=row['sha256']:
+   raise ValueError('reused Redis parser production/test source changed')
+ return value
+
+def load_redis_parser_reuse(out,bodies):
+ receipt=check_redis_parser_reuse(dict(REDIS_PARSER_PASSED_REUSE),bodies)
+ write(out/'redis-parser-passed-reuse.json',receipt)
+ return receipt
 
 def run_redis_parser_control(go,environment,command,parent,out):
  # This pure parser test needs no plane, DB fixture or product process. Its
@@ -421,7 +440,7 @@ def run():
   fixture_token=None
   command('app-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off')
-  redis_parser=run_redis_parser_control(go,offline,command,parent,out)
+  redis_parser_reuse=load_redis_parser_reuse(out,bodies)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
   binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
@@ -487,7 +506,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'redisParserTopPASS':redis_parser['topPASS'],'redisParserSubPASS':redis_parser['subPASS'],'additionalPureRedisControl':True,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

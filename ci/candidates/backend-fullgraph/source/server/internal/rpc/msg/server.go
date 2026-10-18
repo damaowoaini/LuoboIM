@@ -99,6 +99,8 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		return err
 	}
 
+	database := mongo.GetDatabase()
+
 	initContext := context.Background()
 	if startrpc.IsOwnedRPC(server) {
 		initContext = startrpc.OwnedRPCContext(server)
@@ -110,12 +112,12 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	var historyReader *messagedelivery.HistoryWindowReader
 	var readerStartup *messagedelivery.HistoryReaderStartupBinding
 	if readerPath != "" {
-		historyReader, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(initContext, mongo.GetDatabase(), "rpc-msg", readerPath, readerSHA)
+		historyReader, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(initContext, database, "rpc-msg", readerPath, readerSHA)
 		if err != nil {
 			return err
 		}
 	}
-	namespaceRuntime, err := messagedelivery.NewNamespaceRuntimeBindingForOwnedContext(initContext, mongo.GetDatabase())
+	namespaceRuntime, err := messagedelivery.NewNamespaceRuntimeBindingForOwnedContext(initContext, database)
 	if err != nil {
 		return err
 	}
@@ -134,23 +136,23 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	if err := mongo.CreateMsgIndex(); err != nil {
 		return err
 	}
-	msgGroupRead, err := controller.NewPersistentMsgGroupReadDatabase(initContext, mongo.GetDatabase())
+	msgGroupRead, err := controller.NewPersistentMsgGroupReadDatabase(initContext, database)
 	if err != nil {
 		return err
 	}
 	cacheModel := cache.NewMsgCacheModel(rdb)
-	msgDocModel := unrelation.NewMsgMongoDriver(mongo.GetDatabase())
+	msgDocModel := unrelation.NewMsgMongoDriver(database)
 	conversationClient := rpcclient.NewConversationRpcClient(client)
 	userRpcClient := rpcclient.NewUserRpcClient(client)
 	groupRpcClient := rpcclient.NewGroupRpcClient(client)
 	friendRpcClient := rpcclient.NewFriendRpcClient(client)
 	if readerPath == "" {
-		historyReader, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(initContext, mongo.GetDatabase(), "rpc-msg", "", "")
+		historyReader, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(initContext, database, "rpc-msg", "", "")
 		if err != nil {
 			return err
 		}
 	}
-	namespaces, err := messagedelivery.NewMessageNamespaceAdmissionFromEnvironment(mongo.GetDatabase())
+	namespaces, err := messagedelivery.NewMessageNamespaceAdmissionFromEnvironment(database)
 	if err != nil {
 		return err
 	}
@@ -193,7 +195,7 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	var sensitiveWordChecker *sensitiveword.SensitiveWordChecker
 	if startrpc.IsOwnedRPC(server) {
 		ownedCtx := startrpc.OwnedRPCContext(server)
-		sensitiveWordDB, err := mgo.NewSensitiveWordMongoWithContext(ownedCtx, mongo.GetDatabase())
+		sensitiveWordDB, err := mgo.NewSensitiveWordMongoWithContext(ownedCtx, database)
 		if err != nil {
 			return err
 		}
@@ -214,7 +216,7 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		sensitiveWordChecker = checker.SensitiveWordChecker
 	} else {
 		// Preserve the existing default constructor and background semantics.
-		sensitiveWordDB, err := mgo.NewSensitiveWordMongo(mongo.GetDatabase())
+		sensitiveWordDB, err := mgo.NewSensitiveWordMongo(database)
 		if err != nil {
 			return err
 		}

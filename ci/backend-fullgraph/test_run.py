@@ -437,8 +437,33 @@ class FullGraphControls(unittest.TestCase):
     self.assertEqual(calls,['redis-parser']);self.assertEqual((result['topPASS'],result['subPASS']),(1,3));self.assertTrue(result['accepted'])
     self.assertEqual(result['source'],run.FINAL_SOURCE);self.assertEqual(result['newDatabaseFixtures'],0);self.assertFalse(result['otherR8TargetsDispatched'])
     self.assertEqual(json.loads((out/'redis-parser-names.json').read_bytes()),result)
-  parser_line=next(node.lineno for node in [node for node in ast.walk(orchestration) if isinstance(node,ast.Call)] if isinstance(node.func,ast.Name) and node.func.id=='run_redis_parser_control')
+  parser_line=next(node.lineno for node in [node for node in ast.walk(orchestration) if isinstance(node,ast.Call)] if isinstance(node.func,ast.Name) and node.func.id=='load_redis_parser_reuse')
+  self.assertFalse(any(isinstance(node.func,ast.Name) and node.func.id=='run_redis_parser_control' for node in ast.walk(orchestration) if isinstance(node,ast.Call)))
   self.assertLess(parser_line,compile_line);self.assertLess(parser_line,minio_line)
+  # Keep the original parser dispatch positive/negative controls above. Only
+  # runtime orchestration changes: exact old-source reuse with real body pins.
+  parser_bodies={row['target']:run.regular(run.REPO/'ci/candidates/backend-fullgraph/source'/row['target']) for row in run.REDIS_PARSER_PASSED_REUSE['sourcePins']}
+  with tempfile.TemporaryDirectory() as directory:
+   out=Path(directory).resolve()
+   with mock.patch.object(run,'run_redis_parser_control',side_effect=AssertionError('no repeated Go parser test')) as dispatch:
+    receipt=run.load_redis_parser_reuse(out,parser_bodies);dispatch.assert_not_called()
+   self.assertEqual(receipt,run.REDIS_PARSER_PASSED_REUSE);self.assertEqual((receipt['topPASS'],receipt['subPASS'],receipt['skip'],receipt['fail']),(1,3,0,0))
+   self.assertEqual(receipt['source'],{'members':1576,'digest':'122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48'})
+   self.assertFalse(receipt['currentSourcePASS']);self.assertFalse(receipt['runtimeAccepted']);self.assertEqual(receipt['actualRedisParserTestsDispatched'],0)
+   self.assertEqual(json.loads((out/'redis-parser-passed-reuse.json').read_bytes()),receipt);self.assertFalse((out/'redis-parser-names.json').exists())
+   for mode in ('source','pin','missing-name','duplicate-name','foreign-name','fresh-claim','bool-count'):
+    bad=copy.deepcopy(receipt)
+    if mode=='source':bad['source']['digest']='0'*64
+    elif mode=='pin':bad['sourcePins'][0]['sha256']='0'*64
+    elif mode=='missing-name':bad['namedCompletions'].pop()
+    elif mode=='duplicate-name':bad['namedCompletions'].append(copy.deepcopy(bad['namedCompletions'][0]))
+    elif mode=='foreign-name':bad['namedCompletions'][0]['name']='TestForeign'
+    elif mode=='fresh-claim':bad['currentSourcePASS']=True
+    else:bad['topPASS']=True
+    with self.subTest(redisReuse=mode),self.assertRaises(ValueError):run.check_redis_parser_reuse(bad,parser_bodies)
+   for target,raw in parser_bodies.items():
+    changed=dict(parser_bodies);changed[target]=raw+b'changed'
+    with self.subTest(redisSource=target),self.assertRaises(ValueError):run.check_redis_parser_reuse(receipt,changed)
   for mode in ('complete','missing-child','foreign-top'):
    with self.subTest(mode=mode),tempfile.TemporaryDirectory() as folder:
     out=Path(folder).resolve();calls=[]

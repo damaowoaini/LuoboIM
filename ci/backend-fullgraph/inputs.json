@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "state": "FROZEN_FINAL_SOURCE",
-  "scope": "original_graph2top3sub_and_four_planes_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
+  "scope": "original_graph2top3sub_and_four_planes_redis122c1top3sub_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1576,
-    "digest": "122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48"
+    "digest": "990ba2c75a0de47d34c8801e6b95a85b4e5574354dc0801907b133febbfafda9"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,8 +42,8 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 55892,
-      "sha256": "4989735355b99f473f4ed6043a428a2f522fe1485665b2a4dd05535482f3b78c"
+      "bytes": 59659,
+      "sha256": "8fad69ba692f3aacd0b17fd80f1910527c0413c24e29cac920cc606250bfe862"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 58600,
-      "sha256": "23e9cd517d4e19c2c31fb45a9b68d28f43e0a36be3ac0f01f48dbbe1102b5fdf"
+      "bytes": 60912,
+      "sha256": "55996f443f4856512aff900099c311cbd07c8642be4c63fd6fddc9bdedc7bf22"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -72,8 +72,8 @@
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",
-      "bytes": 10618,
-      "sha256": "f75f87f95eabd3b814936b3d2666af76816e8293d57f74892af16b456a04a4cf"
+      "bytes": 10621,
+      "sha256": "7c0628e3f21a2f9f8e3858b586437048b9c8f1e90c163676ef785ef6bbe776e6"
     }
   ],
   "overlay": [
@@ -1340,22 +1340,22 @@
     {
       "target": "server/internal/rpc/conversation/conversaion.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/rpc/conversation/conversaion.go",
-      "bytes": 28380,
-      "sha256": "148d7e2720c71335bdf97c86ea5a57b529bc2b2f8131e84f68f226f202285e49",
+      "bytes": 28370,
+      "sha256": "9385713653c0498e54faa9c52dcdbeae81b3e268ebfe8cde1e83bbd88ebb04b6",
       "beforeSHA256": "f3161c92cd1bf2f23044b2c2785176ac85b35144741db974a78449a7ddd0163b"
     },
     {
       "target": "server/internal/rpc/group/managed_start.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/rpc/group/managed_start.go",
-      "bytes": 12639,
-      "sha256": "bd4ac32e6c9b94d91509609d3551ececf395892f272c1380352367b3c1204dc8",
+      "bytes": 12532,
+      "sha256": "60fe751f048f8ac8a0e3727aa9039775ce3fda840fb6de4c3a97878831f58fb0",
       "beforeSHA256": "dbe5f70f18e3535315f5f323d5ae761a140f952e076bc950b71989c703a81c39"
     },
     {
       "target": "server/internal/rpc/msg/server.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/rpc/msg/server.go",
-      "bytes": 10069,
-      "sha256": "91fe0e15324699321795f43fb964bbea82569d710f6002c87fce4f9d98e2fbf6",
+      "bytes": 10015,
+      "sha256": "7ca921bf05b25d149c00fce57f8aa26d57dc8386b6685b9cd27b2be92689b743",
       "beforeSHA256": "bf65ec8662a40965e955ecc7300c79545c66791dc3ef5d5c6b344d38f72d30e5"
     },
     {
@@ -4305,13 +4305,13 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-reader-boundary-and-redis-golden-batch-1/formatted.json",
-      "bytes": 6431,
-      "sha256": "7085ba34e42fc567c5212d5101c02372ffe4c9398574f7f58ba1d43c37a773ed"
+      "path": ".qa/backend-reader-database-instance-batch-1/formatted.json",
+      "bytes": 3599,
+      "sha256": "c64699d3c0ba0cfffe34d9ade1ba67a09c7fc65f41212cf081b60d0065ec3b52"
     },
     "source": {
       "members": 1576,
-      "digest": "122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48"
+      "digest": "990ba2c75a0de47d34c8801e6b95a85b4e5574354dc0801907b133febbfafda9"
     },
     "GoTestsExecuted": 0,
     "RootAcceptanceRequired": true
@@ -4336,5 +4336,88 @@
     "phaseGuardSeconds": 240,
     "newDatabaseFixtures": 0,
     "otherR8TargetsDispatched": false
-  }
+  },
+  "redisParserPassedReuse": {
+    "run": 39082704756,
+    "job": 117542803080,
+    "attempt": 1,
+    "head": "2f17d99d2f32c4fc72b9b922f8d2a8783938b665",
+    "source": {
+      "members": 1576,
+      "digest": "122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48"
+    },
+    "artifact": {
+      "artifact": 12119877247,
+      "run": 39082704756,
+      "attempt": 1,
+      "head": "2f17d99d2f32c4fc72b9b922f8d2a8783938b665",
+      "sha256": "b7bbb052d28081550d537cfb867103cf8e2e19ad84f4b90893a4157f569f7eef",
+      "bytes": 41738,
+      "exactAPIDigest": true,
+      "files": 56,
+      "binariesDownloaded": false
+    },
+    "rootReviewSHA256": "cc2fa43abea21d6b2c305571e66eeb62e422f2a67f5965b6c71591f532c40501",
+    "topPASS": 1,
+    "subPASS": 3,
+    "skip": 0,
+    "fail": 0,
+    "namedCompletions": [
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/disabled-check-keeps-off-allcommands-and-empty-passwords"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/equivalent-protocols-complete-summary-and-real-disabled-state"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/malformed-fields-and-nil-first-duplicate-reject"
+      }
+    ],
+    "sourcePins": [
+      {
+        "target": "server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+        "bytes": 6107,
+        "sha256": "26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6"
+      },
+      {
+        "target": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+        "bytes": 5522,
+        "sha256": "d9c8471dd01df8dcd9b746edb179a751dbf6444d756eab83d5eea4e3e731867d"
+      }
+    ],
+    "sourcePostExact": true,
+    "currentSourcePASS": false,
+    "runtimeAccepted": false,
+    "actualRedisParserTestsDispatched": 0,
+    "rawEvidence": [
+      {
+        "path": ".qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/redis-parser-names.json",
+        "bytes": 956,
+        "sha256": "94e60e18529a5f933ce070d15e0418819d19ed725929cc4e4cb8c5474bcf1c13"
+      },
+      {
+        "path": ".qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/redis-parser-events.json",
+        "bytes": 5001,
+        "sha256": "1056eb00f05ca35635dca33dd667d538f1f967a329509af0ecec1ba5d9e0afd7"
+      },
+      {
+        "path": ".qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/source-post.json",
+        "bytes": 120,
+        "sha256": "d25ccb64f558e0966dbdacea71ba478c3f50330e0d3583f611165ece87aed8cc"
+      },
+      {
+        "path": ".qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/phase-0004.json",
+        "bytes": 2509,
+        "sha256": "b3594ce1d3614e16a7b91e95982b3b4aff0fc5bb6005ea33ce5167eeb423628d"
+      }
+    ]
+  },
+  "redisParserTestsToRun": []
 }

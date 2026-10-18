@@ -2,14 +2,14 @@
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
   "state": "FORMATTED_SOURCE_ONLY_LOCKED_PENDING_SUCCESSFUL_CORE14_ARTIFACT",
-  "canonicalPublicParent": "44b23e3dd1fc7270b47e37025dbdf507f766203c",
+  "canonicalPublicParent": "2f17d99d2f32c4fc72b9b922f8d2a8783938b665",
   "graphProvider": {
     "path": "ci/backend-fullgraph/run.py",
     "source": {
       "members": 1576,
-      "digest": "122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48"
+      "digest": "990ba2c75a0de47d34c8801e6b95a85b4e5574354dc0801907b133febbfafda9"
     },
-    "status": "formatted-reader-stage-and-redis-golden-source-only-locked-no-accepted-core14-artifact"
+    "status": "formatted-exact-original-database-factory-source-only-locked-no-accepted-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "4989735355b99f473f4ed6043a428a2f522fe1485665b2a4dd05535482f3b78c",
-    "ci/backend-fullgraph/inputs.json": "cf7294e3595a5eb4c189e77e95ffd8cff8478d5d7f05b8a85a07320d8ca495a6",
+    "ci/backend-fullgraph/run.py": "8fad69ba692f3aacd0b17fd80f1910527c0413c24e29cac920cc606250bfe862",
+    "ci/backend-fullgraph/inputs.json": "58bb0a9c4b3f4e73465c0652e42f849787e9c1e374fc608f4cbe17d3bfeb0ab9",
     "ci/backend-fullgraph/resources.py": "a9ac98690c116869099af8fb54f8d5b46c3c7da5d1280798c2c2a4ba067a4be2",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "bb0b833b952529603c5c78e457b0434f0e258ca00a5bd190d755ca33ac1adc4e",
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1578,
-    "digest": "d843314616a006efca740886de3ff79ed067ecd9ceb22a8100143ed8c0e413ca"
+    "digest": "fa070e25f9ebb4619035566313d753f70413848e8e5b183b5da7e665ee7030cb"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

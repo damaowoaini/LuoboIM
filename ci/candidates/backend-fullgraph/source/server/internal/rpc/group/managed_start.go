@@ -65,7 +65,9 @@ func StartManaged(parent context.Context, client discoveryregistry.SvcDiscoveryR
 		return stop, errors.New("group storage initialization failed")
 	}
 
-	binding, err := messagedelivery.NewNamespaceRuntimeBindingForOwnedContext(lifetime, mongoDB.GetDatabase())
+	database := mongoDB.GetDatabase()
+
+	binding, err := messagedelivery.NewNamespaceRuntimeBindingForOwnedContext(lifetime, database)
 	if err != nil {
 		return stop, err
 	}
@@ -85,7 +87,7 @@ func StartManaged(parent context.Context, client discoveryregistry.SvcDiscoveryR
 		return stop, errors.New("group cache recovery initialization failed")
 	}
 	runtime.closeRecovery = invalidator.Close
-	authority, err := groupauthority.NewStore(mongoDB.GetDatabase())
+	authority, err := groupauthority.NewStore(database)
 	if err != nil {
 		return stop, errors.New("group authority initialization failed")
 	}
@@ -100,15 +102,15 @@ func StartManaged(parent context.Context, client discoveryregistry.SvcDiscoveryR
 	}
 	modelsContext, modelsDone := context.WithTimeout(lifetime, 10*time.Second)
 	defer modelsDone()
-	groupDB, err := mgo.NewGroupMongoContext(modelsContext, mongoDB.GetDatabase())
+	groupDB, err := mgo.NewGroupMongoContext(modelsContext, database)
 	if err != nil {
 		return stop, errors.New("group model initialization failed")
 	}
-	memberDB, err := mgo.NewGroupMemberContext(modelsContext, mongoDB.GetDatabase())
+	memberDB, err := mgo.NewGroupMemberContext(modelsContext, database)
 	if err != nil {
 		return stop, errors.New("group member model initialization failed")
 	}
-	requestDB, err := mgo.NewGroupRequestMgoContext(modelsContext, mongoDB.GetDatabase())
+	requestDB, err := mgo.NewGroupRequestMgoContext(modelsContext, database)
 	if err != nil {
 		return stop, errors.New("group request model initialization failed")
 	}
@@ -129,14 +131,14 @@ func StartManaged(parent context.Context, client discoveryregistry.SvcDiscoveryR
 	// The service may not acknowledge a new typed source until the complete
 	// receiver/retained registry and membership reader are ready. No implicit
 	// current-config repair or legacy StartTransfer activation occurs here.
-	boot, err := msgtransfer.LoadOwnedGroupReceiverBootstrap(mongoDB.GetDatabase().Name())
+	boot, err := msgtransfer.LoadOwnedGroupReceiverBootstrap(database.Name())
 	if err != nil {
 		return stop, errors.New("owned group receiver manifest is required")
 	}
 	if os.Getenv(messagedelivery.HistoryWindowModeEnv) != "required" || os.Getenv(messagedelivery.HistoryWindowEpochEnv) != boot.Epoch || os.Getenv(messagedelivery.HistoryWindowActivationEnv) != boot.ActivationSHA256 {
 		return stop, errors.New("group membership reader activation mismatch")
 	}
-	history, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(mongoDB.GetDatabase())
+	history, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(database)
 	if err != nil {
 		return stop, errors.New("owned group membership reader unavailable")
 	}
@@ -156,7 +158,7 @@ func StartManaged(parent context.Context, client discoveryregistry.SvcDiscoveryR
 	// Base-store construction never writes reader/window Ready flags. A prior
 	// complete immutable namespace inventory+drain registration is mandatory;
 	// row absence/new GroupID alone never authorizes a zero seed.
-	newGroups, err := messagedelivery.NewStore(mongoDB.GetDatabase(), boot.Epoch, boot.ActivationSHA256)
+	newGroups, err := messagedelivery.NewStore(database, boot.Epoch, boot.ActivationSHA256)
 	if err != nil {
 		return stop, errors.New("new group namespace initializer unavailable")
 	}
@@ -188,12 +190,12 @@ func StartManaged(parent context.Context, client discoveryregistry.SvcDiscoveryR
 		}
 		return mcontext.WithOpUserIDContext(ctx, manager), nil
 	}
-	receiver, err := msgtransfer.NewOwnedGroupReceiverRuntime(lifetime, mongoDB.GetDatabase(), rdb, cache.NewMsgCacheModel(rdb), controller.NewReadOnlyMessageReader(rdb, mongoDB.GetDatabase(), history), client, config.Config.RpcRegisterName.OpenImMessageGatewayName, authorize, boot.Epoch, boot.ActivationSHA256, boot.BadgeEvidenceSHA256, msgtransfer.OwnedGroupReceiverInputs{Vendor: aliasvendor.OwnedInputFile{Path: boot.VendorPath, ExpectedSHA256: boot.VendorSHA256}, MessageCallbacks: push.OwnedKafkaCallbackFile{Path: boot.MessageCallbacksPath, ExpectedSHA256: boot.MessageCallbacksSHA256}, OfflineCallbacks: push.OwnedKafkaCallbackFile{Path: boot.OfflineCallbacksPath, ExpectedSHA256: boot.OfflineCallbacksSHA256}, RoleCallbacks: push.OwnedKafkaCallbackFile{Path: boot.RoleCallbacksPath, ExpectedSHA256: boot.RoleCallbacksSHA256}})
+	receiver, err := msgtransfer.NewOwnedGroupReceiverRuntime(lifetime, database, rdb, cache.NewMsgCacheModel(rdb), controller.NewReadOnlyMessageReader(rdb, database, history), client, config.Config.RpcRegisterName.OpenImMessageGatewayName, authorize, boot.Epoch, boot.ActivationSHA256, boot.BadgeEvidenceSHA256, msgtransfer.OwnedGroupReceiverInputs{Vendor: aliasvendor.OwnedInputFile{Path: boot.VendorPath, ExpectedSHA256: boot.VendorSHA256}, MessageCallbacks: push.OwnedKafkaCallbackFile{Path: boot.MessageCallbacksPath, ExpectedSHA256: boot.MessageCallbacksSHA256}, OfflineCallbacks: push.OwnedKafkaCallbackFile{Path: boot.OfflineCallbacksPath, ExpectedSHA256: boot.OfflineCallbacksSHA256}, RoleCallbacks: push.OwnedKafkaCallbackFile{Path: boot.RoleCallbacksPath, ExpectedSHA256: boot.RoleCallbacksSHA256}})
 	if err != nil {
 		return stop, errors.New("owned group receiver initialization failed")
 	}
 	runtime.stopReceiver = receiver.Stop
-	service.notices, err = newOwnedGroupNoticeRuntime(mongoDB.GetDatabase(), boot.Epoch, boot.ActivationSHA256, receiver.Profile().Transport.VendorBinding)
+	service.notices, err = newOwnedGroupNoticeRuntime(database, boot.Epoch, boot.ActivationSHA256, receiver.Profile().Transport.VendorBinding)
 	if err != nil {
 		return stop, errors.New("owned group source profile initialization failed")
 	}
