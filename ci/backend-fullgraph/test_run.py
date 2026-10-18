@@ -153,6 +153,26 @@ class FullGraphControls(unittest.TestCase):
    bad=dict(observe_base,**change)
    with self.subTest(observe=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
 
+  # Reuse only the original same-call Start/launcher labels; no second probe.
+  start_predicates=('start-input', 'start-hold', 'start-bootstrap', 'start-requirement', 'start-server-environment', 'start-server-bootstrap', 'start-managed-environment', 'start-managed-shape', 'start-managed-fields', 'start-reader-input', 'start-nonreader-input', 'start-intent', 'start-reader', 'start-owner-record', 'start-service-spec', 'start-service-receipt', 'start-service-binary', 'start-service-bootstrap', 'start-service-work', 'start-service-environment', 'start-service-owner-files', 'start-service-exec', 'start-service-process-identity', 'start-service-process-image')
+  for predicate in start_predicates:
+   value=dict(constructor_base,constructorRole='msggateway',constructorPredicate=predicate)
+   observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+   self.assertEqual((observed['constructorRole'],observed['constructorPredicate'],observed['constructorErrorClass']),('msggateway',predicate,'owned-evidence'))
+   self.assertEqual((observed['primaryRunErrorClass'],observed['localCleanupFailureClass']),('permission','owned-evidence'))
+   self.assertFalse(observed['accepted']);self.assertNotIn('rawOwner',observed)
+   self.assertNotIn('PRIVATE_OWNER_NONCE',json.dumps(observed))
+   for stage in ('source-custody','observe-registration'):
+    bad=dict(value,constructorStage=stage)
+    if stage=='source-custody':bad['constructorRole']='none'
+    with self.subTest(start_predicate=predicate,stage=stage),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+  value=dict(constructor_base,constructorRole='msggateway',constructorPredicate='start-complete',constructorErrorClass='none')
+  observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+  self.assertEqual((observed['constructorPredicate'],observed['primaryRunErrorClass']),('start-complete','permission'));self.assertFalse(observed['accepted'])
+  for change in (dict(constructorPredicate='start-service-private-path'),dict(constructorPredicate='start-complete'),dict(constructorPredicate='start-service-process-image',constructorCallState='in-progress',constructorErrorClass='in-progress')):
+   bad=dict(constructor_base,**change)
+   with self.subTest(start_invalid=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+
  def test_real_tracked_git_bodies_symlink_bounds_static_elf_and_strict_receipt(self):
   with tempfile.TemporaryDirectory() as directory:
    root=Path(directory);source=root/'source';source.mkdir()

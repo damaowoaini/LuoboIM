@@ -242,9 +242,10 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 	for _, role := range ownedcontrol.NamespaceRuntimeRoles() {
 		if role != "rpc-msg" && role != "rpc-conversation" {
 			s.constructorObservation = constructorCallObservation{Stage: "start", Role: role, State: "in-progress", ErrorClass: "in-progress", Predicate: "none"}
-			process, e := group.Start(ctx, frozen[role])
+			process, observation, e := group.StartWithObservation(ctx, frozen[role])
 			s.constructorObservation.State = "returned"
 			s.constructorObservation.ErrorClass = constructorOperationErrorClass(e)
+			s.constructorObservation.Predicate = observation.Predicate
 			if process.Service != nil {
 				out.Launched = append(out.Launched, process)
 			}
