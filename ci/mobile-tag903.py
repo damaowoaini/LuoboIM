@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manual legacy903 receive/play projection: format6, analysis6 and exact8 only."""
+"""Manual legacy903 receive/play projection: format1, analysis1 and exact3; historical5 is partial only."""
 import argparse, hashlib, importlib.util, json, os, re, selectors, signal, stat
 import subprocess, sys, threading, time
 from pathlib import Path, PurePosixPath
@@ -11,7 +11,10 @@ PARENT_COMMIT='2f17d99d2f32c4fc72b9b922f8d2a8783938b665'
 PARENT_SOURCE={'members':363,'digest':'ccec31d13c6e64bb4d0c9ff0b1b85baae3d50d198c743d34e9935a053d17ecd8'}
 PARENT_PORTABLE={'members':415,'digest':'30879a35431337689eced3a9b5ce9a7c528342740be0be502053100b7be24d7d'}
 PATHS6=['lib/features/chat/domain/chat_message.dart','lib/features/chat/data/message_mapper.dart','lib/features/chat/presentation/message_media.dart','lib/features/chat/presentation/chat_page.dart','test/features/chat/legacy_custom_summary_test.dart','test/features/chat/batch_media_access_test.dart']
-TEST_PATHS=['test/features/chat/legacy_custom_summary_test.dart','test/features/chat/batch_media_access_test.dart']
+CHECK_PATHS1=['test/features/chat/batch_media_access_test.dart']
+TEST_PATHS=['test/features/chat/batch_media_access_test.dart']
+NAMES3=['tag903 audio starts only on tap and keeps the custom message menu', 'tag903 pending audio cannot start after expiry', 'tag903 pending audio cannot start after route-exit']
+HISTORICAL_PARTIAL5={'status': 'historical-visible-testDone-only-parent-failed', 'run': 39084923688, 'job': 117549360631, 'head': 'bff3ba487899c485c77aaedea695be5a167a063b', 'source': {'members': 363, 'digest': 'e8ef155193d61b94942e29afc269ddf995f12b8dcba6b3253ddaa1b8a050d316'}, 'portable': {'members': 415, 'digest': '8d42e4660335bc172ab40f24369318098429410ee6318af15f25205fb10b7781'}, 'RootReview': {'path': '.qa/tag903-mobile-web-batch-1/root-bff3-mobile7-pass-route-exit-timeout-review.json', 'bytes': 4249, 'sha256': 'ce892b9dc224d426b9fcb3c3e0f10ae71658324316f1240320b9594e7502a998'}, 'compactArtifact': {'artifact': 12119744075, 'run': 39084923688, 'attempt': 1, 'head': 'bff3ba487899c485c77aaedea695be5a167a063b', 'sha256': '758cfbeaa4fe2bab416b879abc59a6e09d2d69ea359be094738e668289b2e07e', 'bytes': 40412, 'exactAPIDigest': True, 'files': 36, 'binariesDownloaded': False}, 'names5': ['tag903 sound has a restricted audio projection without changing custom identity', 'tag903 keeps text priority and rejects unsafe or malformed audio projections', 'wrong typed known payload fields fall back without string coercion', 'nested audio active playback stops after root expiry', 'nested audio late setUrl cannot start after root exit'], 'parentWholeSelected8Accepted': False, 'machineDoneSuccess': False, 'latchedFailure': 'phase_timeout', 'childExitCodeIsNotAcceptance': 0, 'wholeProcessPASS': False, 'newSourcePASS': False}
 NAMES8=['tag903 sound has a restricted audio projection without changing custom identity','tag903 keeps text priority and rejects unsafe or malformed audio projections','tag903 audio starts only on tap and keeps the custom message menu','tag903 pending audio cannot start after expiry','tag903 pending audio cannot start after route-exit','wrong typed known payload fields fall back without string coercion','nested audio active playback stops after root expiry','nested audio late setUrl cannot start after root exit']
 RESOURCE={'initial_bytes':4<<30,'floor_bytes':1<<30,'allocated_cap_bytes':768<<20,'poll_seconds':.2,'phase_seconds':120}
 sha=lambda raw:hashlib.sha256(raw).hexdigest()
@@ -47,7 +50,8 @@ def descriptor(repo=REPO):
  c=json.loads(regular(repo/INPUTS))
  if (c['schema']!=1 or c['state']!='FROZEN_FORMATTED_SOURCE' or c['parent_commit']!=PARENT_COMMIT
      or c['parent_source']!=PARENT_SOURCE or c['parent_portable']!=PARENT_PORTABLE
-     or c['analysis_paths']!=PATHS6 or c['test_paths']!=TEST_PATHS or c['names8']!=NAMES8
+     or c['analysis_paths']!=CHECK_PATHS1 or c['test_paths']!=TEST_PATHS or c['names8']!=NAMES8 or c['selected_names3']!=NAMES3
+     or json.dumps(c['historical_partial5'],sort_keys=True)!=json.dumps(HISTORICAL_PARTIAL5,sort_keys=True)
      or c['resource']!=RESOURCE or len(c['delta6'])!=6 or [r['path'][4:] for r in c['delta6']]!=PATHS6
      or c['expected_full_tests_only']!=1333 or c['whole_codec_completed'] is not False):raise ValueError('exact formatted903 scope required')
  for r in c['helpers']+c['controllers']:pinned(repo/safe(r['path']),r)
@@ -171,7 +175,7 @@ def setup(allocation):
  return {'source':c['source'],'portable':c['portable'],'setup':'original-current363-exact-parent-then-explicit6','native_or_VM_acceptance':False}
 def phase_commands(work):
  dart=str(work/'flutter/bin/cache/dart-sdk/bin/dart');flutter=str(work/'flutter/bin/flutter')
- return ([dart,'format','--output=none','--set-exit-if-changed',*PATHS6],[[dart,'analyze','--fatal-infos',p] for p in PATHS6],[flutter,'test','--no-pub','--machine','--concurrency=1','--no-enable-vmservice','--name','^(?:'+'|'.join(map(re.escape,NAMES8))+')$',*TEST_PATHS])
+ return ([dart,'format','--output=none','--set-exit-if-changed',*CHECK_PATHS1],[[dart,'analyze','--fatal-infos',p] for p in CHECK_PATHS1],[flutter,'test','--no-pub','--machine','--concurrency=1','--no-enable-vmservice','--name','^(?:'+'|'.join(map(re.escape,NAMES3))+')$',*TEST_PATHS])
 def tool_snapshot(work):
  out={}
  for name,p in [('dart',work/'flutter/bin/cache/dart-sdk/bin/dart'),('flutter',work/'flutter/bin/flutter')]:
@@ -198,18 +202,19 @@ def run(work):
  monitor=threading.Thread(target=guard.poll,daemon=True);monitor.start();primary=None;tools=None;analysis=[];tests=None
  try:
   tools=tool_snapshot(work);write(work/'evidence/tag903-tools-before.json',tools)
+  write(work/'evidence/tag903-historical-partial5.json',HISTORICAL_PARTIAL5)
   fmt,analyses,test=phase_commands(work)
-  check.guarded(fmt,work,guard,'tag903-format6',timeout=120)
+  check.guarded(fmt,work,guard,'tag903-format1',timeout=120)
   for index,command in enumerate(analyses,1):
    verify_work(work,c,parent,base);label='tag903-analyze-'+str(index)
    log=check.guarded(command,work,guard,label,timeout=120,accepted_exits=(0,1,2,3))
    record=json.loads(regular(work/'evidence'/(label+'.resource.json')))
    result=old.ANALYSIS.analysis_outcome(record,log.read_text(),label,command);analysis.append(result)
    write(work/'evidence'/(label+'.summary.json'),result);verify_work(work,c,parent,base)
-  if not all(r['passed'] for r in analysis):raise ValueError('analysis6 failed; no tests started')
-  log=check.guarded(test,work,guard,'tag903-target8',timeout=120)
-  tests=check.required_name_summary(log.read_text(),8,[{'name':n,'count':1} for n in NAMES8])
-  write(work/'evidence/tag903-target8.summary.json',tests)
+  if not all(r['passed'] for r in analysis):raise ValueError('analysis1 failed; no tests started')
+  log=check.guarded(test,work,guard,'tag903-target3',timeout=120)
+  tests=check.required_name_summary(log.read_text(),3,[{'name':n,'count':1} for n in NAMES3])
+  write(work/'evidence/tag903-target3.summary.json',tests)
  except BaseException as error:primary=error
  finally:
   post={'accepted':False,'source':c['source'],'portable':c['portable']}
@@ -235,7 +240,7 @@ def run(work):
   write(work/'evidence/tag903-failed.json',{'accepted':False,'exceptionType':type(primary).__name__ if primary is not None else 'ValueError','analysisExecuted':len(analysis),'testsAccepted':tests is not None,'latched_failure':guard.reason,'codec_completed':False})
   if primary is not None:raise primary
   raise ValueError('903 scope/post/resource failed')
- write(work/'evidence/tag903-passed.json',{'accepted':True,'source':c['source'],'portable':c['portable'],'formatPaths':6,'analysisPaths':6,'selectedTests':8,'testNames':NAMES8,'newTests':4,'changedExisting':1,'directExisting':3,'full1333Executed':False,'nativeAcceptance':False,'wholeCodecCompleted':False,'remaining':['905','910','911']})
+ write(work/'evidence/tag903-passed.json',{'accepted':True,'source':c['source'],'portable':c['portable'],'formatPaths':1,'analysisPaths':1,'selectedTests':3,'testNames':NAMES3,'newTests':0,'directExisting':3,'historicalPartial5':HISTORICAL_PARTIAL5,'wholeSelected8Accepted':False,'full1333Executed':False,'nativeAcceptance':False,'wholeCodecCompleted':False,'remaining':['905','910','911']})
  return 0
 def netns(work,run_as):
  if os.geteuid()!=0 or not run_as or run_as=='root':raise ValueError('root namespace launcher and original nonroot tester required')

@@ -12,11 +12,11 @@
   },
   "source": {
     "members": 363,
-    "digest": "e8ef155193d61b94942e29afc269ddf995f12b8dcba6b3253ddaa1b8a050d316"
+    "digest": "afcc580f28dd9b5582abb6c828e36bf4dad853955eaedf71e35eaf62375bcc64"
   },
   "portable": {
     "members": 415,
-    "digest": "8d42e4660335bc172ab40f24369318098429410ee6318af15f25205fb10b7781"
+    "digest": "78bfee790eff43a99ec4994e7246a38ca7afe3e920d108f513b5d6407a449b07"
   },
   "delta6": [
     {
@@ -93,21 +93,15 @@
       },
       "after": {
         "path": "app/test/features/chat/batch_media_access_test.dart",
-        "bytes": 14655,
-        "sha256": "619373f88a3d2e223e4d60b38b7e755e07e7192d26d51438e719f2e4548293c6"
+        "bytes": 15292,
+        "sha256": "165a20e4ae771f85823d3c644432e18cc3ff7906468781403e442709636bd42c"
       }
     }
   ],
   "analysis_paths": [
-    "lib/features/chat/domain/chat_message.dart",
-    "lib/features/chat/data/message_mapper.dart",
-    "lib/features/chat/presentation/message_media.dart",
-    "lib/features/chat/presentation/chat_page.dart",
-    "test/features/chat/legacy_custom_summary_test.dart",
     "test/features/chat/batch_media_access_test.dart"
   ],
   "test_paths": [
-    "test/features/chat/legacy_custom_summary_test.dart",
     "test/features/chat/batch_media_access_test.dart"
   ],
   "names8": [
@@ -204,13 +198,13 @@
   "controllers": [
     {
       "path": "ci/mobile-tag903.py",
-      "bytes": 20094,
-      "sha256": "534024c4a6cb3645c091ab9ed16d2dac0885e29f2dc56ae96132a41ae6d96d51"
+      "bytes": 22029,
+      "sha256": "bf7fa111117b66d088ad84f6d90202d80dcb9ec530010cf775f89d303990e5f7"
     },
     {
       "path": ".github/workflows/mobile-tag903.yml",
-      "bytes": 2623,
-      "sha256": "ca1e14f878983ea2b02052056b296398f3d263a5c36f3af792ff52f4d1adfc14"
+      "bytes": 2645,
+      "sha256": "9e7d57570a88e44536efcfd76c65bacb6531214dca7866a365c01881326a29e2"
     }
   ],
   "provenance": {
@@ -229,6 +223,60 @@
       "905",
       "910",
       "911"
-    ]
+    ],
+    "RootFormattedFixture1": {
+      "path": ".qa/mobile363-tag903-route-fixture-batch-1/formatted.json",
+      "bytes": 1313,
+      "sha256": "9844d611c281f143d046777b0467c632cc3acd8d703504ee47e727382d5aa06d"
+    },
+    "RootFormat1PASS": true
+  },
+  "selected_names3": [
+    "tag903 audio starts only on tap and keeps the custom message menu",
+    "tag903 pending audio cannot start after expiry",
+    "tag903 pending audio cannot start after route-exit"
+  ],
+  "historical_partial5": {
+    "status": "historical-visible-testDone-only-parent-failed",
+    "run": 39084923688,
+    "job": 117549360631,
+    "head": "bff3ba487899c485c77aaedea695be5a167a063b",
+    "source": {
+      "members": 363,
+      "digest": "e8ef155193d61b94942e29afc269ddf995f12b8dcba6b3253ddaa1b8a050d316"
+    },
+    "portable": {
+      "members": 415,
+      "digest": "8d42e4660335bc172ab40f24369318098429410ee6318af15f25205fb10b7781"
+    },
+    "RootReview": {
+      "path": ".qa/tag903-mobile-web-batch-1/root-bff3-mobile7-pass-route-exit-timeout-review.json",
+      "bytes": 4249,
+      "sha256": "ce892b9dc224d426b9fcb3c3e0f10ae71658324316f1240320b9594e7502a998"
+    },
+    "compactArtifact": {
+      "artifact": 12119744075,
+      "run": 39084923688,
+      "attempt": 1,
+      "head": "bff3ba487899c485c77aaedea695be5a167a063b",
+      "sha256": "758cfbeaa4fe2bab416b879abc59a6e09d2d69ea359be094738e668289b2e07e",
+      "bytes": 40412,
+      "exactAPIDigest": true,
+      "files": 36,
+      "binariesDownloaded": false
+    },
+    "names5": [
+      "tag903 sound has a restricted audio projection without changing custom identity",
+      "tag903 keeps text priority and rejects unsafe or malformed audio projections",
+      "wrong typed known payload fields fall back without string coercion",
+      "nested audio active playback stops after root expiry",
+      "nested audio late setUrl cannot start after root exit"
+    ],
+    "parentWholeSelected8Accepted": false,
+    "machineDoneSuccess": false,
+    "latchedFailure": "phase_timeout",
+    "childExitCodeIsNotAcceptance": 0,
+    "wholeProcessPASS": false,
+    "newSourcePASS": false
   }
 }

@@ -1,4 +1,4 @@
-name: Manual Mobile legacy903 receive and tap-play / format6 analysis6 exact8 only
+name: Manual Mobile legacy903 receive and tap-play / format1 analysis1 exact3 / historical5 partial only
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
           # The unchanged setup verifies the six exact git blobs before its one original setup call.
           python3 -B ci/mobile-tag903.py setup --allocation "$TAG903_ROOT"
           test "$(git -C "$GITHUB_WORKSPACE" rev-parse --verify 'HEAD^{commit}')" = "$original_head"
-      - name: Only format6 analyze6 and selected8 with no VM service or business network
+      - name: Only format1 analyze1 and selected3 with no VM service or business network
         run: |
           set -euo pipefail
           sudo unshare --net -- python3 -B "$GITHUB_WORKSPACE/ci/mobile-tag903.py" netns \

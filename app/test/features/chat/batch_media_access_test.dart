@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:imapp/features/chat/presentation/chat_page.dart';
 import 'package:imapp/features/chat/presentation/chat_content_access.dart';
@@ -333,14 +334,31 @@ void main() {
       ..clear()
       ..add(wire);
     await tester.runAsync(h.start);
+    final navigator = GlobalKey<NavigatorState>();
+    final router = GoRouter(
+      navigatorKey: navigator,
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => const Scaffold(body: SizedBox.shrink()),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           imGatewayProvider.overrideWithValue(h.sdk.gateway),
           appRuntimeProvider.overrideWith((_) => h.sdk.runtime),
         ],
-        child: MaterialApp(
-          home: ChatPage(
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+    unawaited(
+      navigator.currentState!.push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => ChatPage(
             conversationId: 'single-alice-bob',
             playbackFactory: (failure) => playback = ChatAudioPlayback(
               onFailure: failure,
@@ -408,7 +426,10 @@ void main() {
           }, now: DateTime.now());
           await tester.pump();
         } else {
-          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pageBack();
+          await tester.pumpAndSettle();
+          expect(find.byType(ChatPage), findsNothing);
+          expect(player.events.isClosed, isTrue);
         }
         player.urlRelease!.complete();
         await tester.pump();
