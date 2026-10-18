@@ -3,8 +3,8 @@
   "state": "FROZEN_FINAL_SOURCE",
   "scope": "original_graph2top3sub_and_four_planes_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
-    "members": 1575,
-    "digest": "e487c9c7d87ad34be44029bc1091bf95a0a1d96775e7dac5c0bcb191535a3191"
+    "members": 1576,
+    "digest": "9eea825eb4661186f0f545b754da36db598c2f5cedb69bbb6e804f759c2355db"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 53976,
-      "sha256": "d0297df4d215b9aeee566b0ad37f7435abf4a1e94e3c02d8082beb6232b94da4"
+      "bytes": 53878,
+      "sha256": "b596f06897b5083cabb533d73d6060756c4d0a793efda785792f6fe992fe3400"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 33035,
-      "sha256": "dd48b1ca35a93e732d995236f32af060324bb2f36acbd2838b85c1ae215651c1"
+      "bytes": 33119,
+      "sha256": "bb583e49e1a194fb35053fd0db939011e224146774cc0e976dbde635949eb85a"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 52111,
-      "sha256": "41a38cbe67447ff30089652d5078549c2be2c8b6a5c47ffb4b8b361eff0d9829"
+      "bytes": 52198,
+      "sha256": "2ddb28d2466d26b42c139be106bb5228b0987dda333389e403b88aa2c421d629"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -724,8 +724,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/agent_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/agent_linux.go",
-      "bytes": 14597,
-      "sha256": "86c54ca5e19a1682ff5efda9612e2c8b3a68203bdb965736807717845876cb8b",
+      "bytes": 14847,
+      "sha256": "258110bbd9f7d4ca98773abefbaf2f457692ab432ec0fbfe09f29998bead0fc9",
       "beforeSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab"
     },
     {
@@ -759,15 +759,15 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
-      "bytes": 14083,
-      "sha256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
+      "bytes": 14855,
+      "sha256": "6e49afad48e9ea4028d4a535fb3b5685a875b88d7d8ec7536279831622c29579",
       "beforeSHA256": null
     },
     {
       "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
-      "bytes": 27088,
-      "sha256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
+      "bytes": 28325,
+      "sha256": "fab8077cf6f90c259b88a36ce37e7351fbe5aede47aa21c834bfae190b37b1a2",
       "beforeSHA256": null
     },
     {
@@ -953,6 +953,13 @@
       "beforeSHA256": null
     },
     {
+      "target": "server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
+      "bytes": 6959,
+      "sha256": "74e3bf27916a75e72d027c031a5a4eba0ab341fdc8217ba4e72642467ededce1",
+      "beforeSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e"
+    },
+    {
       "target": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_catalog_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/namespace_runtime_catalog_linux.go",
       "bytes": 1328,
@@ -1083,6 +1090,20 @@
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
       "bytes": 6777,
       "sha256": "bcf11c0283992a27812fa20666dad5d7ecb95d514e5bb0e0ceee7816279030b8",
+      "beforeSHA256": null
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+      "bytes": 6107,
+      "sha256": "26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6",
+      "beforeSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4"
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+      "bytes": 5512,
+      "sha256": "385ac7680cb53707ba3ef7fabc3688fc9e67215058e53ca3bcdb638f166e98d9",
       "beforeSHA256": null
     },
     {
@@ -1786,6 +1807,7 @@
     "server/internal/namespaceimport/ownedcontrol/materializer_raw_linux.go",
     "server/internal/namespaceimport/ownedcontrol/materializer_reduce_linux.go",
     "server/internal/namespaceimport/ownedcontrol/materializer_roots_linux.go",
+    "server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_catalog_linux.go",
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_graph_linux.go",
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_launch_linux.go",
@@ -1805,6 +1827,8 @@
     "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_image_linux_test.go",
     "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux.go",
     "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
+    "server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+    "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
     "server/internal/namespaceimport/ownedcontrol/snapshot_history_segments_linux.go",
     "server/internal/namespaceimport/ownedcontrol/snapshot_validator_linux.go",
     "server/internal/namespaceimport/owner_history_original.go",
@@ -3463,7 +3487,8 @@
     "server/pkg/common/startrpc/fullgraph_dispatch_test.go": 420,
     "server/pkg/common/startrpc/fullgraph_evidence_linux_test.go": 420,
     "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go": 420,
-    "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_image_linux_test.go": 420
+    "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_image_linux_test.go": 420,
+    "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go": 420
   },
   "entrypointContract": {
     "entrypoints": [
@@ -4277,5 +4302,18 @@
     "currentSourcePASS": false,
     "runtimeAccepted": false
   },
-  "launcherTestsToRun": []
+  "launcherTestsToRun": [],
+  "finalFormattedSourceProof": {
+    "receipt": {
+      "path": ".qa/backend-final-inventory-resp3-mongo-batch-1/formatted.json",
+      "bytes": 15753,
+      "sha256": "7070733af6158562d9bcc972ce020a5df0b560a826435c16ead29597723326ad"
+    },
+    "source": {
+      "members": 1576,
+      "digest": "9eea825eb4661186f0f545b754da36db598c2f5cedb69bbb6e804f759c2355db"
+    },
+    "GoTestsExecuted": 0,
+    "RootAcceptanceRequired": true
+  }
 }

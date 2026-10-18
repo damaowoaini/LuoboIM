@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Proof readscope repair4/22: original controller CPU; exact original-source85 retained."""
+"""Scope/Redis repair4/16: original controller CPU; source-bound86 retained."""
 import argparse
 from collections import Counter
 from contextlib import contextmanager
@@ -10,11 +10,11 @@ from decimal import Decimal, InvalidOperation
 REPO = Path(__file__).resolve().parents[2]
 INPUTS = Path(__file__).with_name('inputs.json')
 PREFIX = "github.com/openimsdk/open-im-server/v3/"
-SCOPE = 'backend_history_merkle_proof4_reuse85_no_deployment'
+SCOPE = 'backend_history_scope_redis4_reuse86_no_deployment'
 BASE = {'members': 1407, 'digest': '5359b5cae2c92096dd2e0548926c6439c96583b46be1b03ce9b78df3aa91a2f9'}
-FINAL = {'members': 1557, 'digest': 'ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101'}
+FINAL = {'members': 1558, 'digest': '4d8d2511b6726abb1334efe54a71dec22d28e46bc8c03d856db89725f6861246'}
 SOURCE_ROOT = 'ci/candidates/backend-runtime-join-r8/source/'
-SELECTION_SHA = '1b9ed4fc6fb25d11d1909930337c53e4c64bab1576b969fe3d96a302507c0031'
+SELECTION_SHA = 'fc836e600e05461884b8b04bc9d1c9abf0b6ba4615d1e6f03cddcbb4779b0db3'
 RESOURCE = {'initialBytes': 4294967296, 'floorMiB': 1024, 'allocatedMiB': 16384, 'pollSeconds': .2, 'controllerSeconds': 3000, 'compileTotalSeconds': 1200, 'testPhaseSeconds': 2250, 'testGoTimeoutSeconds': 180}
 MONGO = 'mongodb://127.0.0.1:37017/?replicaSet=luoboIntegration'
 
@@ -22,11 +22,11 @@ REUSE_PROOF_SHA = 'a2273b8d18c15fc98fb65317067d89584a44c4570b899e619672f6ea47826
 PENDING_POSITIVE = ('pkg/common/startrpc','TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence')
 PENDING_TOKEN = ('pkg/common/startrpc','TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit')
 PREVIOUS_REPAIR_PROOF_SHA = '096dadcfbd249cc64e36f90e0361a13577908e1fc1a778543a8cc4023b2fe543'
-REPAIR_DELTA_SHA = '1f65c4d50fed65844ad009e7fe4bda0e4c85f7a5555316fafa344c68d4fb7b14'
+REPAIR_DELTA_SHA = '35c52012f4074bf647069205c21fdc8ab1a7db72b9db064407e061d35313450f'
 DIRECT_PRIOR = {('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeActualMongoTargetRejectsReplacementAndForeignClient')}
 DIRECT_CURRENT = {('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalUnattributedEvidenceIsInspectableAndCannotSilentlyPublish')}
 LATEST_REPAIR_PROOF_SHA = '2b6e93f014f13bf8e0a7830b7b94f15b02149f78c24229066b03629c3bbae3ff'
-REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}, {'label': 'targeted-tests-ownedcontrol-merkle-direct', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory']}}, {'label': 'targeted-tests-namespaceinventory-merkle-direct', 'targets': {'internal/namespaceinventory': ['TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume']}}]
+REPAIR_SCOPES = [{'label': 'targeted-tests-ownedcontrol-controller', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate']}}, {'label': 'targeted-tests-ownedcontrol-scope-redis-direct', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory', 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof']}}]
 LAST_BOUNDED_CAPTURE_SHA = 'f46d40ff9d90a2ad8ae981e3915f93fb0d5c4f00b57235ac01d47174cd87fd10'
 LAST_CAPTURE_STAMP_PROOF_SHA = 'ecb9f9fc71be15e4a0571308d0650b29799522dff2a5be59e3463691aa4c81fc'
 PREVIOUS_SPLIT_REPAIR_PROOF_SHA = '3e74a2121b5d9bf45c01d0e9b6c58e26d10a8dbe208547c9b3aef9120892c585'
@@ -36,7 +36,7 @@ COMMIT_DIRECT = frozenset([('internal/namespaceimport/ownedcontrol', 'TestHistor
 IMAGE_DIRECT = frozenset([('internal/namespaceimport/ownedcontrol', 'TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit')])
 IMAGE_NEW = frozenset([('internal/namespaceimport/ownedcontrol', 'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation')])
 PROGRESS_CAPTURE_SHA = 'e7819e3c0b5db8cd849335258f83339fd69ee96a2187c0dacfe5d9345bca616e'
-REPAIR_DELTA_TARGETS = frozenset(['server/internal/namespaceinventory/import_merkle.go'])
+REPAIR_DELTA_TARGETS = frozenset(['server/internal/namespaceimport/ownedcontrol/agent_linux.go', 'server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go', 'server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go', 'server/internal/namespaceimport/ownedcontrol/mongo_credential.go', 'server/internal/namespaceimport/ownedcontrol/redis_credential.go', 'server/internal/namespaceimport/ownedcontrol/redis_credential_test.go'])
 MERKLE_DIRECT = frozenset([('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalClosurePagesConsumeExactly64DespiteWitnessByteBudget'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceinventory', 'TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume')])
 NEW_MERKLE_CHILDREN = frozenset(['parents_range_matches_per-key_disk_oracle_across_odd_tail_and_reopen', 'parents_range_rejects_middle_tamper_cancellation_source_change_and_stale_head'])
 LAST_DESCRIPTOR_SHA = '26210362badea7d37ec7632c4f2b454eab64a1840b4c328e80a080258753310c'
@@ -48,6 +48,10 @@ NEW_COMMIT_CHILDREN = frozenset(['coalesced_descriptors_match_sequential_disk_or
 PROOF_DIRECT = frozenset([('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceinventory', 'TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume')])
 LAST_PROOF_SOURCE_SHA = 'a7b445cd61640ce82797a7c41045026bf64bf378a10531e4215355d590f3035a'
 LAST_CONTROLLER_CPU_SHA = 'c0bb5829546f7fe24c27abf4808b9ddf54df6709ae57cbcf3c03d29140472581'
+NEW_REVALIDATION_CHILDREN = frozenset(['revalidation_scope_fallback_preserves_original_context_guards'])
+REDIS_PARSER = ('internal/namespaceimport/ownedcontrol', 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof')
+CURRENT_REPAIR_DIRECT = frozenset([('internal/namespaceimport/ownedcontrol', 'TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate'), ('internal/namespaceimport/ownedcontrol', 'TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'), ('internal/namespaceimport/ownedcontrol', 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof')])
+LAST_PROOF_READSCOPE_SHA = 'e927422a213e39e66829976f55236c069c378e82c408682dbe9bbf2b28036e9a'
 
 
 
@@ -89,7 +93,7 @@ def check_selection(c):
     previous, new, affected = pairs(c['priorPassedTargets']), pairs(c['newTargets']), pairs(c['directlyAffectedTargets'])
     direct_existing, active = pairs(c['directExistingTargets']), pairs(c['targets'])
     reused, pending = pairs(c['reusedTargets']), pairs(c['pendingTargets'])
-    if (len(previous) != 173 or len(new) != 66 or previous & new
+    if (len(previous) != 173 or len(new) != 67 or previous & new
             or new & (affected | direct_existing | pending) or active != new | affected | direct_existing
             or affected - previous or direct_existing & previous or active & pending
             or reused != previous - affected - pending or reused & active
@@ -263,7 +267,7 @@ def check_repair(c, p):
     proof = p['acceptedPreviousRun']; current = p['previousRepairRun']; latest = p['latestRepairRun']; split = p['previousSplitRepairRun']; stamp = p['lastCaptureStampRun']
     old = {'members':1555,'digest':'686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}
     before = {'members':1555,'digest':'68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}
-    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_PROOF4_REUSE85' or p.get('source') != c['source']
+    if (p.get('schema') != 1 or p.get('state') != 'FROZEN_SCOPE_REDIS4_REUSE86' or p.get('source') != c['source']
             or sha(canonical(proof)) != REUSE_PROOF_SHA or p['reuseProofSHA256'] != REUSE_PROOF_SHA
             or proof['source'] != old or proof['run'] != 39041607488 or proof['attempt'] != 1
             or proof['head'] != '6384db596a54e1d27e3db7369f39fbd55e9b8867'
@@ -345,7 +349,7 @@ def check_repair(c, p):
         raise ValueError('actual same-source12 PASS and failed controller/profile contract required')
     recent_named = {(r['package'],r['name']) for r in recent['namedPASS']}
     recent_pass = pairs(p['lastCommitImagePassedTargets'])
-    expected_named = recent_pass | {(package,top+'/'+child) for package,top in recent_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_COMMIT_CHILDREN | NEW_MERKLE_CHILDREN | NEW_MERKLE_LEAF_CHILDREN | NEW_MERKLE_STEP_READ_CHILDREN}
+    expected_named = recent_pass | {(package,top+'/'+child) for package,top in recent_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_COMMIT_CHILDREN | NEW_MERKLE_CHILDREN | NEW_MERKLE_LEAF_CHILDREN | NEW_MERKLE_STEP_READ_CHILDREN | NEW_REVALIDATION_CHILDREN}
     if (len(recent_named) != 61 or len(recent['namedPASS']) != 61 or not expected_named <= recent_named
             or {(package,name) for package,name in recent_named if '/' not in name} != recent_pass
             or any((package,name.split('/')[0]) not in recent_pass for package,name in recent_named)
@@ -372,7 +376,7 @@ def check_repair(c, p):
         raise ValueError('actual descriptor10 PASS and failed controller bind only original source')
     descriptor_pass = pairs(p['lastDescriptorPassedTargets'])
     descriptor_named = {(r['package'],r['name']) for r in descriptor['namedPASS']}
-    expected_descriptor = descriptor_pass | {(package,top+'/'+child) for package,top in descriptor_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_MERKLE_CHILDREN | NEW_MERKLE_LEAF_CHILDREN | NEW_MERKLE_STEP_READ_CHILDREN}
+    expected_descriptor = descriptor_pass | {(package,top+'/'+child) for package,top in descriptor_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_MERKLE_CHILDREN | NEW_MERKLE_LEAF_CHILDREN | NEW_MERKLE_STEP_READ_CHILDREN | NEW_REVALIDATION_CHILDREN}
     if (len(descriptor_named) != 56 or len(descriptor['namedPASS']) != 56 or not expected_descriptor <= descriptor_named
             or descriptor_pass != COMMIT_DIRECT - pairs(recent['failedTargets'])
             or {(package,name) for package,name in descriptor_named if '/' not in name} != descriptor_pass
@@ -402,7 +406,7 @@ def check_repair(c, p):
     proof_run = p['lastProofSourceRun']
     proof_pass = pairs(proof_run['passedTargets']); proof_fail = pairs(proof_run['failedTargets'])
     proof_named = [(r['package'],r['name']) for r in proof_run['namedPASS']]
-    expected_proof_named = proof_pass | {(package,top+'/'+child) for package,top in proof_pass for child in c['requiredSubtests'].get(package,{}).get(top,[])}
+    expected_proof_named = proof_pass | {(package,top+'/'+child) for package,top in proof_pass for child in c['requiredSubtests'].get(package,{}).get(top,[]) if child not in NEW_REVALIDATION_CHILDREN}
     if (sha(canonical(proof_run)) != LAST_PROOF_SOURCE_SHA or p['lastProofSourceRunSHA256'] != LAST_PROOF_SOURCE_SHA
             or proof_run['source'] != {'members':1557,'digest':'4685c041c9c3775e3287b98768c99f4c7a86d6ea52c32115c13621f5b0c899af'}
             or (proof_run['run'],proof_run['job'],proof_run['head']) != (39075024485,117520274003,'a6d9276c53a75e8ca19e351cab1d34b419b560e7')
@@ -421,6 +425,28 @@ def check_repair(c, p):
                         'retainedTargets':{package:sorted(top for pkg,top in proof_retained if pkg==package) for package in sorted({pkg for pkg,top in proof_retained})},
                         'retainedNamedCompletions':proof_retained_names,'rootReceiptSHA256':proof_run['rootReceipt']['sha256'],
                         'derivation':'lastProofSourceRun actual named10PASS/51sub minus directlyAffectedProofTargets3PASS; only original4685 source facts'}
+    disk = p['lastProofReadscopeRun']
+    disk_named = [(row['package'],row['name']) for row in disk['retainedNamedCompletions']]
+    disk_pair = ('internal/namespaceinventory','TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume')
+    expected_disk = {disk_pair} | {(disk_pair[0],disk_pair[1]+'/'+child) for child in c['requiredSubtests'][disk_pair[0]][disk_pair[1]]}
+    if (sha(canonical(disk)) != LAST_PROOF_READSCOPE_SHA or p['lastProofReadscopeRunSHA256'] != LAST_PROOF_READSCOPE_SHA
+            or disk['source'] != {'members':1557,'digest':'ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101'}
+            or (disk['run'],disk['job'],disk['attempt'],disk['head']) != (39079106736,117532248829,1,'64c13478ae7e619dc0810a1b736ec593507eff2e')
+            or (disk['actualCompleteOtherTopPASS'],disk['actualCompleteOtherSubPASS'],disk['actualControllerTopFAIL'],disk['controllerChildPASSNotParentAcceptance'],disk['controllerChildFAIL'],disk['unexecutedControllerChildren']) != (3,17,1,2,1,2)
+            or disk['wholeAccepted'] is not False or disk['runtimeAccepted'] is not False
+            or not disk['sourceModesLocksGeneratedConfigAndPlanPostExact'] or not disk['fixtureResidualZero'] or disk['containerCleanupExit'] != 0
+            or pairs(disk['retainedTargets']) != {disk_pair} or len(disk_named) != 11 or set(disk_named) != expected_disk
+            or pairs(p['currentDirectlyAffectedTargets']) != CURRENT_REPAIR_DIRECT):
+        raise ValueError('only exact ff959 completed Disk1/10 may be reused; failed controller remains required')
+    current_overlay = {row['target']:row for row in c['overlay']}
+    for row in disk['sourcePins']:
+        now = current_overlay.get(row['target'])
+        if now is None or (now['bytes'],now['sha256']) != (row['bytes'],row['sha256']):
+            raise ValueError('reused DiskMerkle source bodies changed')
+    disk_reuse_group = {'source':disk['source'],'run':disk['run'],'job':disk['job'],'attempt':1,'retainedTopCount':1,'retainedSubCount':10,
+                        'retainedTargets':disk['retainedTargets'],'retainedNamedCompletions':disk['retainedNamedCompletions'],
+                        'rootReceiptSHA256':disk['rootReceipt']['sha256'],
+                        'derivation':'lastProofReadscopeRun exact completed DiskMerkle parent and10 children only; failed controller parent and its2 PASS children are not acceptance'}
     universe = pairs(c['targets'])
     passed, failed = pairs(proof['passedTargets']), pairs(proof['failedTargets'])
     current_pass, current_fail, current_incomplete = pairs(current['passedTargets']), pairs(current['failedTargets']), pairs(current['incompleteTargets'])
@@ -430,8 +456,8 @@ def check_repair(c, p):
     split_pass, split_fail = pairs(split['passedTargets']), pairs(split['failedTargets'])
     capture_direct = pairs(p['directlyAffectedCaptureFixtureTargets'])
     stamp_pass, stamp_fail = pairs(stamp['passedTargets']), pairs(stamp['failedTargets'])
-    if (len(universe) != 90 or len(passed) != 67 or len(failed) != 22 or passed & failed
-            or passed | failed != universe - IMAGE_NEW or pending != {PENDING_POSITIVE}
+    if (len(universe) != 91 or len(passed) != 67 or len(failed) != 22 or passed & failed
+            or passed | failed != universe - IMAGE_NEW - {REDIS_PARSER} or pending != {PENDING_POSITIVE}
             or len(current_pass) != 10 or len(current_fail) != 10 or len(current_incomplete) != 1
             or current_pass & (current_fail | current_incomplete) or current_fail & current_incomplete
             or current_pass | current_fail | current_incomplete != failed - pending
@@ -443,13 +469,13 @@ def check_repair(c, p):
             or split_pass & split_fail or len(split_pass) != 4 or len(split_fail) != 1 or pairs(split['incompleteTargets'])
             or split_pass | split_fail != latest_fail or capture_direct & split_pass
             or not capture_direct <= (passed - old_direct) | (current_pass - current_direct) | latest_pass
-            or stamp_pass != capture_direct or stamp_fail != split_fail or active != PROOF_DIRECT or len(active) != 4
+            or stamp_pass != capture_direct or stamp_fail != split_fail or active != CURRENT_REPAIR_DIRECT or len(active) != 4
             or pairs(bounded['passedTargets']) != capture_direct - pairs(bounded['failedTargets'])
-            or reused != (((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass | pairs(bounded['passedTargets']) | pairs(progress['passedTargets'])) - COMMIT_DIRECT - IMAGE_DIRECT | (recent_pass - COMMIT_DIRECT) | (descriptor_pass - COMMIT_DIRECT) | proof_retained or len(reused) != 85
+            or reused != (((passed - old_direct) - capture_direct) | ((current_pass - current_direct) - capture_direct) | (latest_pass - capture_direct) | split_pass | pairs(bounded['passedTargets']) | pairs(progress['passedTargets'])) - COMMIT_DIRECT - IMAGE_DIRECT | (recent_pass - COMMIT_DIRECT) | (descriptor_pass - COMMIT_DIRECT) | proof_retained | {disk_pair} or len(reused) != 86
             or active & (reused | pending) or active | reused | pending != universe
             or pairs(p['pendingRequiredTokenTargets']) != {PENDING_TOKEN} or pairs(c['pendingTargets']) != {PENDING_TOKEN}
-            or p['sourceReuse'][:5] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 65, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 5, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 2, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1557, 'digest': '7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a'}, 'run': 39060694518, 'retainedTopCount': 2, 'retainedSubCount': 5, 'retainedTargets': {'internal/namespaceimport/ownedcontrol': ['TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit', 'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}, 'derivation': 'lastCommitImageRun exact named PASS minus this Commit descriptor directlyAffectedCommitTargets; original source only'}] or p['sourceReuse'][5:] != [proof_reuse_group]):
-        raise ValueError('proof4/reuse85/positive1/required-token1 must retain exact original names')
+            or p['sourceReuse'][:5] != [{'source': {'members': 1555, 'digest': '686ba84ba24fd1c9e9c5e54bc9f27a41e74baf78eb0a0118cbc10044f14ee09f'}, 'run': 39041607488, 'retainedTopCount': 65, 'derivation': 'acceptedPreviousRun.passedTargets minus directlyAffectedPriorTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1555, 'digest': '68f9418e1540a4d4122edd227ff0ccaee2a96feb6d30f29a5b507acfd7e86f55'}, 'run': 39043896233, 'retainedTopCount': 5, 'derivation': 'previousRepairRun.passedTargets minus directlyAffectedCurrentTargets minus directlyAffectedCaptureFixtureTargets minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': 'c108a37cac20e390c99411e2b92dc8368cde204f85be9ac0347a0907f1ea7cec'}, 'run': 39046539739, 'retainedTopCount': 2, 'derivation': 'latestRepairRun.passedTargets minus directlyAffectedCaptureFixtureTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1556, 'digest': '1e12a108dc0949d3b3df232a2a422e2562f3013eb23cfb5d92e7595366d39132'}, 'run': 39048615208, 'retainedTopCount': 4, 'derivation': 'previousSplitRepairRun.passedTargets; exact original source only minus directlyAffectedCommitTargets minus directlyAffectedImageTargets'}, {'source': {'members': 1557, 'digest': '7ac5ef407e6364faa0132df154dc37c55b2376b0cb1458e38d344ee9c1d6269a'}, 'run': 39060694518, 'retainedTopCount': 2, 'retainedSubCount': 5, 'retainedTargets': {'internal/namespaceimport/ownedcontrol': ['TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit', 'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}, 'derivation': 'lastCommitImageRun exact named PASS minus this Commit descriptor directlyAffectedCommitTargets; original source only'}] or p['sourceReuse'][5:] != [proof_reuse_group,disk_reuse_group]):
+        raise ValueError('scope-redis4/reuse86/positive1/required-token1 must retain exact original names')
     entries = proof['compiledEntries']
     if (entries['completed'] != 14 or entries['uploadedBinaries'] is not False or entries['executed'] is not False
             or [(r['role'],r['package']) for r in entries['entries']] != [(r['role'],r['package']) for r in c['entrypoints']]):
@@ -458,10 +484,10 @@ def check_repair(c, p):
             or p['sourceDeltaSHA256'] != REPAIR_DELTA_SHA or sha(canonical(p['sourceDelta'])) != REPAIR_DELTA_SHA):
         raise ValueError('exact formatted bounded Commit/process image repair leaves required')
     if p['executionScopes'] != REPAIR_SCOPES:
-        raise ValueError('exact controller1 plus ownedcontrol2 and namespaceinventory1 required')
+        raise ValueError('exact controller1 plus original scope callers2 and Redis parser1 required')
     scoped = [pair for scope in REPAIR_SCOPES for pair in pairs(scope['targets'])]
     if len(scoped) != 4 or len(set(scoped)) != 4 or set(scoped) != active:
-        raise ValueError('only four exact proof callers may execute')
+        raise ValueError('only four exact scope/Redis targets may execute')
     overlay = {r['target']:r for r in c['overlay']}
     for row in p['sourceDelta']:
         now = overlay.get(row['target'])
@@ -830,11 +856,11 @@ def run():
         profile_root = work/'private-profile'
         profile_root.mkdir(mode=0o700)
         result = execute_repair_scopes(active, command, testenv, output, profile_root)
-    write(output / 'summary.json', {'state': 'proof_readscope4_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 65, 'previousRepairTopPASSReused': 5, 'latestRepairTopPASSReused': 2, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 0, 'originalCommitImageSourceTopPASSReused': 2, 'originalDescriptorSourceTopPASSReused': 0, 'original4685TopPASSReused': 7, 'original4685SubPASSReused': 34, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
+    write(output / 'summary.json', {'state': 'scope_redis4_pass' if result['accepted'] else 'failed_or_incomplete', 'actualEntryBuilds': 0, 'currentEntryBuildReexecuted': False, 'newBinaries': False, 'reusedActualEntryBuilds': 14, 'reusedBuildSource': repair['acceptedPreviousRun']['source'], 'reusedBuildRun': repair['acceptedPreviousRun']['run'], 'previousActualTopPASSReused': 65, 'previousRepairTopPASSReused': 5, 'latestRepairTopPASSReused': 2, 'previousSplitRepairTopPASSReused': 4, 'lastCaptureStampTopPASSReused': 0, 'originalCommitImageSourceTopPASSReused': 2, 'originalDescriptorSourceTopPASSReused': 0, 'original4685TopPASSReused': 7, 'original4685SubPASSReused': 34, 'originalff959DiskTopPASSReused': 1, 'originalff959DiskSubPASSReused': 10, 'reusedPASSByOriginalSource': repair['sourceReuse'], 'currentTargets': active['targets'], 'completeUniverseTargets': c['targets'], 'pendingPositiveTargets': repair['pendingPositiveTargets'], 'pendingRequiredTokenTargets': repair['pendingRequiredTokenTargets'], 'full14GraphOrV2TokenFixtureAccepted': False, 'scope': SCOPE, 'result': result, 'sourcePostExact': c['source'], 'sourceModesAndLocksPostExact': True, 'runtimeChanged': False, 'fullRegression': False, 'fixtureCollectCleanup': 'subsequent workflow steps must also pass', 'networkBoundary': 'original clean environment and exact owned loopback fixture; no new egress isolation claim'})
     return 0 if result['accepted'] else 1
 
 if __name__ == '__main__':
     p=argparse.ArgumentParser(); p.add_argument('--verify',action='store_true'); a=p.parse_args()
     if a.verify:
-        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':4, 'retainedOriginalCommitImageSourceTop':2, 'retainedOriginalDescriptorSourceTop':0, 'totalRetainedTop':85, 'retainedOriginal4685Top':7, 'retainedOriginal4685Sub':34, 'retainedPriorSourceTop':65, 'retainedPreviousRepairSourceTop':5, 'retainedLatestRepairSourceTop':2, 'retainedPreviousSplitSourceTop':4,'retainedLastCaptureStampSourceTop':0,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
+        c,_,_=verify(); repair=load_repair_plan(c); print(json.dumps({'source':c['source'],'newTops':len(pairs(c['newTargets'])),'affectedTops':len(pairs(c['directlyAffectedTargets']))+len(pairs(c['directExistingTargets'])),'reusedHistoricalTops':len(pairs(c['reusedTargets'])),'pendingTargets':c['pendingTargets'],'currentActualEntryBuilds':0,'priorSourceActualEntryBuildsReused':14,'currentTargets':4, 'retainedOriginalCommitImageSourceTop':2, 'retainedOriginalDescriptorSourceTop':0, 'totalRetainedTop':86, 'retainedOriginalff959DiskTop':1, 'retainedOriginalff959DiskSub':10, 'retainedOriginal4685Top':7, 'retainedOriginal4685Sub':34, 'retainedPriorSourceTop':65, 'retainedPreviousRepairSourceTop':5, 'retainedLatestRepairSourceTop':2, 'retainedPreviousSplitSourceTop':4,'retainedLastCaptureStampSourceTop':0,'pendingPositiveTargets':repair['pendingPositiveTargets'],'GoExecuted':0,'DBExecuted':0}))
     else: raise SystemExit(run())

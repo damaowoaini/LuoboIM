@@ -371,6 +371,36 @@ func TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory(t *te
 		}
 	})
 	i := finishMaterializedSource(t, s, fence)
+	t.Run("revalidation_scope_fallback_preserves_original_context_guards", func(t *testing.T) {
+		m := s.materializer
+		var retired context.Context
+		if e := m.Workspace().WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+			retired = readCtx
+			return s.Revalidate(readCtx, s.header, i)
+		}); e != nil {
+			t.Fatal("valid original workspace scope was rejected", e)
+		}
+		assertOriginalRejection := func(readCtx context.Context) {
+			t.Helper()
+			_, want := s.finalInventory(readCtx)
+			got := s.Revalidate(readCtx, s.header, i)
+			if want == nil || got != want {
+				t.Fatal("scope fallback changed the original inventory rejection", got, want)
+			}
+		}
+		assertOriginalRejection(retired)
+		// Same sealed files, but a distinct real workspace capability is foreign.
+		foreign, e := namespaceinventory.OpenImportWorkspace(ctx, m.snapshot, f, s.options.DerivedDirectory, s.header.SHA256(), m.policySHA, true)
+		if e != nil {
+			t.Fatal("original completed workspace could not reopen", e)
+		}
+		if e = foreign.WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+			assertOriginalRejection(readCtx)
+			return nil
+		}); e != nil {
+			t.Fatal("foreign workspace scope did not retain its own valid files", e)
+		}
+	})
 	t.Run("canonical bodies original base future and missing-proof disposition", func(t *testing.T) {
 		if i.OriginalTrust != "UNTRUSTED" || i.Counts.Origins != 2 || i.Counts.Windows != 2 || i.Counts.Quarantines != 0 || i.ProspectiveCount != 4 || i.OwnerHistorySegmentCount != 0 {
 			t.Fatal("known namespace lost, historical gap filled, or current roster became a base", i.Counts)

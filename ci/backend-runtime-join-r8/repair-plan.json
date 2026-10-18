@@ -1,18 +1,16 @@
 {
   "schema": 1,
-  "state": "FROZEN_PROOF4_REUSE85",
+  "state": "FROZEN_SCOPE_REDIS4_REUSE86",
   "source": {
-    "members": 1557,
-    "digest": "ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101"
+    "members": 1558,
+    "digest": "4d8d2511b6726abb1334efe54a71dec22d28e46bc8c03d856db89725f6861246"
   },
   "repairTargets": {
     "internal/namespaceimport/ownedcontrol": [
       "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
       "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
-      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory"
-    ],
-    "internal/namespaceinventory": [
-      "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+      "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof"
     ]
   },
   "actualPassedTargets": {
@@ -92,6 +90,7 @@
     ],
     "internal/namespaceinventory": [
       "TestImportCaptureStampDoesNotRenewOnResumeOrSourceDrift",
+      "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume",
       "TestImportOutputDocumentKeepsPrivateCustodyAcrossReopenAndTamper",
       "TestImportWorkspaceRejectsSnapshotChildrenAndAliasesBeforeWrite",
       "TestImportWorkspaceResumesBoundedDerivedCASWithoutSourceRecapture",
@@ -432,10 +431,56 @@
   },
   "sourceDelta": [
     {
-      "target": "server/internal/namespaceinventory/import_merkle.go",
-      "beforeSHA256": "91b7615c0143c50170d21d5e9cb3ae173e8680f1e9627e7ceadfc09e1e92608c",
-      "afterSHA256": "e34e34387dff887f4d400166f223f2c6346d29cd68a8d7fbbbeaae6f8909c566",
-      "afterBytes": 24569,
+      "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux.go",
+      "beforeSHA256": "cc86104d1662e57d22e2de0c8dafc1d6fcd044026b81da0680125ee5ef83b699",
+      "overlayBeforeSHA256": null,
+      "afterSHA256": "6e49afad48e9ea4028d4a535fb3b5685a875b88d7d8ec7536279831622c29579",
+      "afterBytes": 14855,
+      "mode": 420,
+      "production": true
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/historical_capture_source_linux_test.go",
+      "beforeSHA256": "88621cfa1ea550a870c391e61a2778fbc523c1cae595d620426ffdf647aaa3ba",
+      "overlayBeforeSHA256": null,
+      "afterSHA256": "fab8077cf6f90c259b88a36ce37e7351fbe5aede47aa21c834bfae190b37b1a2",
+      "afterBytes": 28325,
+      "mode": 420,
+      "production": false
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/redis_credential.go",
+      "beforeSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
+      "overlayBeforeSHA256": "467b3ff3cf90ca5cde2d24b54197f5594b21b9933c055f583e482fbfbe1d35d4",
+      "afterSHA256": "26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6",
+      "afterBytes": 6107,
+      "mode": 420,
+      "production": true
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+      "beforeSHA256": null,
+      "overlayBeforeSHA256": null,
+      "afterSHA256": "385ac7680cb53707ba3ef7fabc3688fc9e67215058e53ca3bcdb638f166e98d9",
+      "afterBytes": 5512,
+      "mode": 420,
+      "production": false
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/mongo_credential.go",
+      "beforeSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
+      "overlayBeforeSHA256": "328bae91d69cf42987ea9f331fb2196bc5cc31566bfd03a5b9b0c7a91adc827e",
+      "afterSHA256": "74e3bf27916a75e72d027c031a5a4eba0ab341fdc8217ba4e72642467ededce1",
+      "afterBytes": 6959,
+      "mode": 420,
+      "production": true
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/agent_linux.go",
+      "beforeSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab",
+      "overlayBeforeSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab",
+      "afterSHA256": "431870a578a8b5129acfc56e965a022673a6114f75bcea151ef454a514a8cc99",
+      "afterBytes": 12336,
       "mode": 420,
       "production": true
     }
@@ -797,9 +842,73 @@
       ],
       "rootReceiptSHA256": "adfeb46d66bc545148a72f29611e8c1fbcb2452d0d78085773ba6178a0da5f75",
       "derivation": "lastProofSourceRun actual named10PASS/51sub minus directlyAffectedProofTargets3PASS; only original4685 source facts"
+    },
+    {
+      "source": {
+        "members": 1557,
+        "digest": "ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101"
+      },
+      "run": 39079106736,
+      "job": 117532248829,
+      "attempt": 1,
+      "retainedTopCount": 1,
+      "retainedSubCount": 10,
+      "retainedTargets": {
+        "internal/namespaceinventory": [
+          "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
+        ]
+      },
+      "retainedNamedCompletions": [
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves0"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves1"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves3"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves64"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves65"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/parents_range_matches_per-key_disk_oracle_across_odd_tail_and_reopen"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/parents_range_rejects_middle_tamper_cancellation_source_change_and_stale_head"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves_batch_matches_original_cursor_thirty_and_EOF_across_reopen"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves_byte_boundary_checks_excluded_body_before_cursor_or_head_advances"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/step_read_authenticates_actual_job_descriptor_and_stale_head_across_reopen"
+        },
+        {
+          "package": "internal/namespaceinventory",
+          "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
+        }
+      ],
+      "rootReceiptSHA256": "552218a65d9ed65c9c585704ae5487d0fe08006773fb18f1b90f6a24c1165c63",
+      "derivation": "lastProofReadscopeRun exact completed DiskMerkle parent and10 children only; failed controller parent and its2 PASS children are not acceptance"
     }
   ],
-  "sourceDeltaSHA256": "1f65c4d50fed65844ad009e7fe4bda0e4c85f7a5555316fafa344c68d4fb7b14",
+  "sourceDeltaSHA256": "35c52012f4074bf647069205c21fdc8ab1a7db72b9db064407e061d35313450f",
   "latestRepairRun": {
     "schema": 1,
     "head": "1dbe0412baa8a3a04199a5ab80a559dcdf126e65",
@@ -922,19 +1031,12 @@
       }
     },
     {
-      "label": "targeted-tests-ownedcontrol-merkle-direct",
+      "label": "targeted-tests-ownedcontrol-scope-redis-direct",
       "targets": {
         "internal/namespaceimport/ownedcontrol": [
           "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
-          "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory"
-        ]
-      }
-    },
-    {
-      "label": "targeted-tests-namespaceinventory-merkle-direct",
-      "targets": {
-        "internal/namespaceinventory": [
-          "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
+          "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+          "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof"
         ]
       }
     }
@@ -2461,5 +2563,154 @@
     "internal/namespaceinventory": [
       "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
     ]
-  }
+  },
+  "lastProofReadscopeRun": {
+    "source": {
+      "members": 1557,
+      "digest": "ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101"
+    },
+    "run": 39079106736,
+    "attempt": 1,
+    "head": "64c13478ae7e619dc0810a1b736ec593507eff2e",
+    "artifact": {
+      "artifact": 12117909810,
+      "run": 39079106736,
+      "attempt": 1,
+      "head": "64c13478ae7e619dc0810a1b736ec593507eff2e",
+      "sha256": "937c7dbf39a969881b31c699cb047acfd9d9ee640e3d0111b3922a91411f2a9e",
+      "bytes": 77514,
+      "exactAPIDigest": true,
+      "files": 55,
+      "binariesDownloaded": false
+    },
+    "rootReceipt": {
+      "path": ".qa/backend-proof-readscope-and-begin-batch-1/root-proof4-threeTop17sub-published80-controller-tail-failure-review.json",
+      "bytes": 3820,
+      "sha256": "552218a65d9ed65c9c585704ae5487d0fe08006773fb18f1b90f6a24c1165c63"
+    },
+    "actualCompleteOtherTopPASS": 3,
+    "actualCompleteOtherSubPASS": 17,
+    "actualControllerTopFAIL": 1,
+    "controllerChildPASSNotParentAcceptance": 2,
+    "controllerChildFAIL": 1,
+    "unexecutedControllerChildren": 2,
+    "wholeAccepted": false,
+    "runtimeAccepted": false,
+    "sourceModesLocksGeneratedConfigAndPlanPostExact": true,
+    "fixtureResidualZero": true,
+    "containerCleanupExit": 0,
+    "retainedTargets": {
+      "internal/namespaceinventory": [
+        "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
+      ]
+    },
+    "retainedNamedCompletions": [
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves0"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves1"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves3"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves64"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves65"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/parents_range_matches_per-key_disk_oracle_across_odd_tail_and_reopen"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/parents_range_rejects_middle_tamper_cancellation_source_change_and_stale_head"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves_batch_matches_original_cursor_thirty_and_EOF_across_reopen"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/leaves_byte_boundary_checks_excluded_body_before_cursor_or_head_advances"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume/step_read_authenticates_actual_job_descriptor_and_stale_head_across_reopen"
+      },
+      {
+        "package": "internal/namespaceinventory",
+        "name": "TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume"
+      }
+    ],
+    "sourcePins": [
+      {
+        "target": "server/internal/namespaceinventory/import_merkle.go",
+        "bytes": 24569,
+        "sha256": "e34e34387dff887f4d400166f223f2c6346d29cd68a8d7fbbbeaae6f8909c566"
+      },
+      {
+        "target": "server/internal/namespaceinventory/import_merkle_test.go",
+        "bytes": 23237,
+        "sha256": "1d6a3accb5a4c55383402bdd16fc5091083d8c8fa96569207a156ebed348b428"
+      }
+    ],
+    "rawEvidence": [
+      {
+        "path": ".qa/backend-proof-readscope-and-begin-batch-1/backend-artifact/backend-runtime-join-r8/source.json",
+        "bytes": 8370,
+        "sha256": "e88511bdeb2c2f3823ffb06f0a1317d147bdb193f92f5af5204128bc873b79db"
+      },
+      {
+        "path": ".qa/backend-proof-readscope-and-begin-batch-1/backend-artifact/backend-runtime-join-r8/source-post.json",
+        "bytes": 260,
+        "sha256": "050abf4b14be7bdd90014503c33c2d195430f4a02469065a72a12f85b8b0990d"
+      },
+      {
+        "path": ".qa/backend-proof-readscope-and-begin-batch-1/backend-artifact/backend-runtime-join-r8/repair-plan-post.json",
+        "bytes": 144,
+        "sha256": "73acb52e6b3c79d11ca09037e3e1156665c449c84c778ab234cd52686f313105"
+      },
+      {
+        "path": ".qa/backend-proof-readscope-and-begin-batch-1/backend-artifact/backend-runtime-join-r8/targeted-tests-namespaceinventory-merkle-direct/stdout.jsonl",
+        "bytes": 14627,
+        "sha256": "7605a65a2fe0fe6f2f80681304d7a5b9ff58a52e2120355ee8fa689794f9984b"
+      },
+      {
+        "path": ".qa/backend-proof-readscope-and-begin-batch-1/backend-artifact/backend-runtime-join-r8/targeted-tests-namespaceinventory-merkle-direct/resource.json",
+        "bytes": 3226,
+        "sha256": "4046dfdb6d9ada2e59bc3645bcae5c6802c45671320af32f0e1f3dfaacbbc0f8"
+      }
+    ],
+    "job": 117532248829,
+    "terminalMetadata": {
+      "path": ".qa/backend-proof-readscope-and-begin-batch-1/backend-terminal-artifacts.json",
+      "bytes": 1289,
+      "sha256": "09f221fe7a31c5b724aefd75a54bacb39816f4d1e0327a467d4ada51c333fbe2"
+    },
+    "originalJobMetadata": {
+      "path": ".qa/backend-proof-readscope-and-begin-batch-1/backend-observation-2.json",
+      "bytes": 3671,
+      "sha256": "2723082d13abe53cf3aab5b8bb5e24096729da7db05adb8d2d7d0dfa1eaba623"
+    }
+  },
+  "lastProofReadscopeRunSHA256": "e927422a213e39e66829976f55236c069c378e82c408682dbe9bbf2b28036e9a",
+  "currentDirectlyAffectedTargets": {
+    "internal/namespaceimport/ownedcontrol": [
+      "TestHistoricalAmbiguousCurrentRosterCannotDiscardProvenBaseOrAdmitFuture",
+      "TestHistoricalSourceMongoControllerPublishesExactPagesAndKeepsReadinessSeparate",
+      "TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory",
+      "TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof"
+    ]
+  },
+  "currentRequiredTopCount": 4,
+  "currentRequiredSubCount": 16,
+  "currentSourceAcceptance": false
 }

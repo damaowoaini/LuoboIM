@@ -166,10 +166,13 @@ func (a *OwnedAgent) stopPhase(ctx context.Context, phase string, services map[s
 func (a *OwnedAgent) exclude(ctx context.Context, apply bool) error {
 	revoked := []namespaceimport.RevokedCredential{}
 	for _, v := range a.mongo {
+		if apply {
+			a.acquireObservation.Stage = "exclude-credentials-mongo"
+		}
 		if a.hold.Validate() != nil {
 			return ErrOwnedEvidence
 		}
-		r, e := RevokeOwnedMongoCredential(ctx, v.Admin, v.Legacy, v.Credential)
+		r, e := RevokeOwnedMongoCredential(ctx, v.Admin, v.Legacy, v.Credential, a.header.Database)
 		if e != nil {
 			return e
 		}
@@ -177,6 +180,9 @@ func (a *OwnedAgent) exclude(ctx context.Context, apply bool) error {
 		revoked = append(revoked, namespaceimport.RevokedCredential{Identity: v.Identity, RevocationRecord: "mongo-live:" + sha(body), RevocationGeneration: 1, State: "revoked"})
 	}
 	for _, v := range a.redis {
+		if apply {
+			a.acquireObservation.Stage = "exclude-credentials-redis"
+		}
 		if a.hold.Validate() != nil {
 			return ErrOwnedEvidence
 		}
@@ -188,6 +194,9 @@ func (a *OwnedAgent) exclude(ctx context.Context, apply bool) error {
 		revoked = append(revoked, namespaceimport.RevokedCredential{Identity: v.Identity, RevocationRecord: "redis-live:" + sha(body), RevocationGeneration: 1, State: "revoked"})
 	}
 	for _, v := range a.kafkaCredentials {
+		if apply {
+			a.acquireObservation.Stage = "exclude-credentials-kafka"
+		}
 		r, e := a.kafka.ExcludeLegacy(ctx, a.hold, v.Credential, apply)
 		if e != nil {
 			return e

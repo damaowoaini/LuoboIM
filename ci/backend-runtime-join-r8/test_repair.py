@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Proof readscope repair4/22 and original-controller-only CPU diagnostic controls; no Go, service or fixture execution."""
+"""Scope/Redis repair4/16 and original-controller-only CPU controls; no Go or service execution."""
 import copy, importlib.util, json, tempfile, unittest
 from pathlib import Path
 from unittest import mock
@@ -18,8 +18,8 @@ class RepairControls(unittest.TestCase):
             with self.subTest(field=field),self.assertRaises(ValueError):runner.check_repair(c,bad)
         self.assertEqual(len(runner.pairs(p['directlyAffectedCommitTargets'])),11)
         self.assertEqual(len(runner.pairs(p['newImageTargets'])),1)
-        self.assertEqual(sum(r['retainedTopCount'] for r in p['sourceReuse']),85)
-        self.assertEqual(runner.pairs(p['repairTargets']),runner.PROOF_DIRECT)
+        self.assertEqual(sum(r['retainedTopCount'] for r in p['sourceReuse']),86)
+        self.assertEqual(runner.pairs(p['repairTargets']),runner.CURRENT_REPAIR_DIRECT)
         self.assertEqual(sum(r['retainedTopCount'] for r in p['sourceReuse'][:5]),78)
         original=p['lastProofSourceRun'];retained=p['sourceReuse'][5]
         self.assertEqual((original['actualTopPASS'],original['actualSubPASS'],original['actualTopFAIL']),(10,51,1))
@@ -37,6 +37,16 @@ class RepairControls(unittest.TestCase):
             elif mode=='duplicate':bad['sourceReuse'][5]['retainedNamedCompletions'].append(copy.deepcopy(bad['sourceReuse'][5]['retainedNamedCompletions'][0]))
             else:bad['sourceReuse'][5]['source']=copy.deepcopy(c['source'])
             with self.subTest(retained4685=mode),self.assertRaises(ValueError):runner.check_repair(c,bad)
+        disk=p['sourceReuse'][6];self.assertEqual((disk['retainedTopCount'],disk['retainedSubCount']),(1,10))
+        self.assertEqual(disk['source']['digest'],'ff959a0d40e37ff9889d7679d062595d6567945687041745aadcd14f4cf64101')
+        self.assertNotEqual(disk['source'],c['source'])
+        self.assertEqual(p['lastProofReadscopeRun']['controllerChildPASSNotParentAcceptance'],2)
+        for mode in ('missing-child','wrong-source','failed-parent-as-pass'):
+            bad=copy.deepcopy(p)
+            if mode=='missing-child':bad['sourceReuse'][6]['retainedNamedCompletions'].pop()
+            elif mode=='wrong-source':bad['lastProofReadscopeRun']['source']=copy.deepcopy(c['source'])
+            else:bad['lastProofReadscopeRun']['retainedTargets'].setdefault('internal/namespaceimport/ownedcontrol',[]).append(runner.DIAGNOSTIC_TOP)
+            with self.subTest(diskReuse=mode),self.assertRaises(ValueError):runner.check_repair(c,bad)
         self.assertEqual(p['lastMerkleLeafRun']['actualTopPASS'],4)
         self.assertEqual(p['lastMerkleLeafRun']['source']['digest'],'a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84')
         for key,value in (('actualTopPASS',5),('wholeAccepted',True),('source',c['source'])):
@@ -44,7 +54,7 @@ class RepairControls(unittest.TestCase):
             with self.subTest(leafOnly=key),self.assertRaises(ValueError):runner.check_repair(c,bad)
         self.assertEqual(p['lastMerkleParentRun']['actualTopPASS'],4)
         self.assertEqual(p['lastMerkleParentRun']['source']['digest'],'423678c32661bc5f972917bed592452e5789c13d5b387db276fc98c46ee1dc09')
-        self.assertFalse(runner.pairs(p['directlyAffectedProofTargets']) & runner.pairs(p['actualPassedTargets']))
+        self.assertFalse(runner.pairs(p['currentDirectlyAffectedTargets']) & runner.pairs(p['actualPassedTargets']))
         for key,value in (('actualTopPASS',5),('wholeAccepted',True),('source',c['source'])):
             bad=copy.deepcopy(p);bad['lastMerkleParentRun'][key]=value
             with self.subTest(parentOnly=key),self.assertRaises(ValueError):runner.check_repair(c,bad)
@@ -73,10 +83,10 @@ class RepairControls(unittest.TestCase):
     def test_actual_repair_plan_has_no_build_rejects_partial_events_and_retains_primary_post_failure(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
         self.assertEqual(active['compile'],[]);self.assertEqual(len(runner.pairs(active['targets'])),4)
-        self.assertEqual(sum(len(children) for names in active['requiredSubtests'].values() for children in names.values()),22)
+        self.assertEqual(sum(len(children) for names in active['requiredSubtests'].values() for children in names.values()),16)
         self.assertFalse(runner.pairs(active['targets']) & runner.pairs(p['actualPassedTargets']))
         audited=copy.deepcopy(active)
-        first_package=next(iter(active['targets']));first_top=active['targets'][first_package][0]
+        first_package=next(iter(active['targets']));first_top=runner.DIAGNOSTIC_TOP
         # Parser-only child fixture; not added to actual Go source/selection.
         audited['requiredSubtests'].setdefault(first_package,{})[first_top]=['control-required-descendant']
         events=[]
@@ -90,12 +100,11 @@ class RepairControls(unittest.TestCase):
             events.append({'Action':'pass','Package':pkg})
         result=runner.require_children(runner.audit(events,0,active['targets']),audited)
         self.assertEqual(result['topPASS'],4)
-        leaf_top='TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume'
-        leaf_package='internal/namespaceinventory'
-        for leaf_child in runner.NEW_MERKLE_LEAF_CHILDREN | runner.NEW_MERKLE_STEP_READ_CHILDREN:
-            missing=[e for e in events if not (e.get('Package')==runner.PREFIX+leaf_package and e.get('Test')==leaf_top+'/'+leaf_child)]
-            with self.subTest(leafChild=leaf_child),self.assertRaises(ValueError):
-                runner.require_children(runner.audit(missing,0,active['targets']),audited)
+        for required_top,required_children in ((runner.REDIS_PARSER[1],audited['requiredSubtests'][first_package][runner.REDIS_PARSER[1]]),('TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory',runner.NEW_REVALIDATION_CHILDREN)):
+            for required_child in required_children:
+                missing=[e for e in events if not (e.get('Package')==runner.PREFIX+first_package and e.get('Test')==required_top+'/'+required_child)]
+                with self.subTest(requiredChild=required_child),self.assertRaises(ValueError):
+                    runner.require_children(runner.audit(missing,0,active['targets']),audited)
         with self.assertRaises(ValueError):runner.audit(events,1,active['targets'])
         result['namedCompletions']=[r for r in result['namedCompletions'] if '/' not in r['name']]
         with self.assertRaises(ValueError):runner.require_children(result,audited)
@@ -120,15 +129,15 @@ class RepairControls(unittest.TestCase):
 
     def test_split_process_dispatch_keeps_md_failure_and_missing_child_failed_but_runs_both_owned_scopes(self):
         c,p=self.contract();active=runner.repair_execution_plan(c,p)
-        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,2,1])
+        self.assertEqual([len(runner.pairs(scope['targets'])) for scope in active['scopes']],[1,3])
         merkle_children=set(c['requiredSubtests']['internal/namespaceinventory']['TestImportDiskMerkleMatchesCanonicalRootsAndPrivateResume'])
         self.assertTrue(runner.NEW_MERKLE_CHILDREN | runner.NEW_MERKLE_LEAF_CHILDREN | runner.NEW_MERKLE_STEP_READ_CHILDREN <= merkle_children)
         self.assertEqual(p['newMerkleLeafRequiredChildren'],sorted(runner.NEW_MERKLE_LEAF_CHILDREN))
         self.assertEqual(p['newMerkleStepReadRequiredChildren'],sorted(runner.NEW_MERKLE_STEP_READ_CHILDREN))
-        self.assertEqual([list(scope['targets']) for scope in active['scopes']],[['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol'],['internal/namespaceinventory']])
+        self.assertEqual([list(scope['targets']) for scope in active['scopes']],[['internal/namespaceimport/ownedcontrol'],['internal/namespaceimport/ownedcontrol']])
         real_child='real_commit_custody_failure_never_becomes_normal_capture_pending'
         self.assertIn(real_child,c['requiredSubtests']['internal/namespaceimport/ownedcontrol']['TestHistoricalSourceProducesSignedPagesWithoutInventingMissingHistory'])
-        self.assertEqual(runner.pairs(p['directlyAffectedProofTargets']),runner.pairs(p['repairTargets']))
+        self.assertEqual(runner.pairs(p['currentDirectlyAffectedTargets']),runner.pairs(p['repairTargets']))
         self.assertIn(('internal/namespaceimport/ownedcontrol','TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex'),runner.pairs(p['actualPassedTargets']))
         self.assertNotIn(('internal/namespaceimport/ownedcontrol','TestHistoricalPreparedProofBindingRechecksActualSnapshotAndIndex'),runner.pairs(p['repairTargets']))
         active=copy.deepcopy(active);first=active['scopes'][0];package=next(iter(first['targets']));top=first['targets'][package][0]
@@ -167,7 +176,7 @@ class RepairControls(unittest.TestCase):
                 self.assertEqual(cpu.call_count,1)
                 self.assertEqual(calls,[x['label'] for x in active['scopes']]);self.assertEqual(result['accepted'],mode=='all-pass')
                 self.assertTrue(all(x['accepted'] and not x['diagnosticRequired'] for x in result['processes'][1:]))
-                self.assertEqual(len(result['processes']),3)
+                self.assertEqual(len(result['processes']),2)
                 self.assertEqual(json.loads((output/'targeted-tests-union.json').read_bytes()),result)
                 record=json.loads((output/first['label']/'controller-diagnostic.json').read_bytes());self.assertEqual(record['accepted'],mode!='missing-diagnostic')
                 if mode=='first-nonzero':self.assertTrue(record['accepted']);self.assertFalse(result['accepted'])

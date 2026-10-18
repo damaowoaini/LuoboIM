@@ -57,7 +57,7 @@ class FullGraphControls(unittest.TestCase):
   # legacy's last successful announcement. Only the original call return is
   # represented; these finite fields never mint canonical or Ready evidence.
   acquire_base=dict(valid,phase='actual-agent-stop-dual-drain-and-credential-exclusion')
-  acquire_stages=['validate-request', 'check-targets', 'hold', 'services', 'stop-producer', 'drain-consumers-live', 'stop-consumer', 'exclude-credentials', 'drain-consumers-empty', 'held-metadata', 'signed-observe']
+  acquire_stages=['validate-request', 'check-targets', 'hold', 'services', 'stop-producer', 'drain-consumers-live', 'stop-consumer', 'exclude-credentials', 'exclude-credentials-mongo', 'exclude-credentials-redis', 'exclude-credentials-kafka', 'drain-consumers-empty', 'held-metadata', 'signed-observe']
   for stage in acquire_stages:
    for error_class in ('owned-evidence','deadline','cancelled','other'):
     value=dict(acquire_base,acquireStage=stage,acquireAttempted=True,acquireReturned=True,acquireErrorClass=error_class)
