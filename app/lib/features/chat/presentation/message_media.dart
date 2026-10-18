@@ -68,7 +68,7 @@ final class ChatAudioPlayback extends ChangeNotifier {
     final clock = now ?? DateTime.now;
     bool permitted() =>
         !_disposed && (allowed?.call() ?? true) && policy.canViewAt(clock());
-    final media = message.playableMedia;
+    final media = message.playableAudio;
     if (media == null || !permitted()) return;
     final request = ++_request;
     _unbind();

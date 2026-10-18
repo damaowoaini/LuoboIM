@@ -1,3 +1,4 @@
+import type { TagAudioProjection } from "@/core/legacyTagMessage";
 import { useMessageAccess } from "@/hooks/useMessagePrivacy";
 import { messageOwner } from "@/core/messagePrivacyRuntime";
 import { captureMessageAccess, messagePrivacyState } from "@/core/messagePrivacyRuntime";
@@ -11,33 +12,38 @@ import { feedbackToast } from "@/utils/common";
 import { IMessageItemProps } from ".";
 import styles from "./message-item.module.scss";
 
-const VoiceMessageRender: FC<IMessageItemProps> = ({ message, isSender, disabled, conversationID }) => {
+const VoiceMessageRender: FC<IMessageItemProps & { playableAudio?: TagAudioProjection }> = ({ message, isSender, disabled, conversationID, playableAudio }) => {
   const sourceOwner = useRef(messageOwner()).current;
   const sourceAccess = useMessageAccess(conversationID);
   const privacy = useMessagePrivacy(message, conversationID);
-  const audioEl = useRef<HTMLAudioElement>(new Audio());
+  const [audioEl] = useState<HTMLAudioElement>(() => new Audio());
   const [isPlaying, setIsPlaying] = useState(false);
+  const sourceUrl = playableAudio?.sourceUrl ?? message.soundElem.sourceUrl;
+  const duration = playableAudio ? playableAudio.durationSeconds : message.soundElem.duration;
 
   useEffect(() => {
-    const audio = audioEl.current;
+    const audio = audioEl;
     if (privacy.expired) { audio.pause(); audio.removeAttribute("src"); setIsPlaying(false); return; }
-    audio.src = message.soundElem.sourceUrl;
+    if (playableAudio) { audio.preload = "none"; audio.removeAttribute("src"); }
+    else audio.src = sourceUrl;
     audio.onended = audio.onpause = () => setIsPlaying(false);
     audio.onplay = () => setIsPlaying(true);
     return () => { audio.onended = audio.onpause = audio.onplay = null; audio.pause(); audio.removeAttribute("src"); };
-  }, [message.clientMsgID, message.soundElem.sourceUrl, privacy.expired]);
+  }, [message.clientMsgID, sourceUrl, !!playableAudio, privacy.expired]);
 
   const playAudio = () => {
     if (!sourceAccess.current()) return;
     const access = captureMessageAccess(conversationID, sourceOwner);
     if (!access.current() || messagePrivacyState(message, conversationID).expired) return;
     if (isPlaying) {
-      audioEl.current?.pause();
+      audioEl?.pause();
       setIsPlaying(false);
     } else {
-      audioEl.current
+      // A tag audio URL enters the media element only after the original access gates.
+      if (playableAudio) audioEl.src = sourceUrl;
+      audioEl
         ?.play()
-        .then(() => { if (!access.current() || messagePrivacyState(message, conversationID).expired) { audioEl.current.pause(); audioEl.current.removeAttribute("src"); } })
+        .then(() => { if (!access.current() || messagePrivacyState(message, conversationID).expired) { audioEl.pause(); audioEl.removeAttribute("src"); } })
         .catch((error) => { if (access.current()) feedbackToast({ error, msg: "play audio failed" }); });
     }
   };
@@ -45,9 +51,14 @@ const VoiceMessageRender: FC<IMessageItemProps> = ({ message, isSender, disabled
   if (privacy.expired) return <span role="status">消息已过期或已移除</span>;
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={isPlaying ? "暂停语音" : "播放语音"}
+      aria-pressed={isPlaying}
+      onKeyDown={event => { if (!event.repeat && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); playAudio(); } }}
       className={clsx(
         styles.bubble,
-        "flex cursor-pointer items-center !py-2",
+        "flex cursor-pointer items-center !py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600",
         !isSender && "flex-row-reverse",
         disabled && "justify-end",
       )}
@@ -59,7 +70,7 @@ const VoiceMessageRender: FC<IMessageItemProps> = ({ message, isSender, disabled
       />
       <span
         className={isSender ? "mr-1" : "ml-1"}
-      >{`${message.soundElem.duration} ‘’`}</span>
+      >{playableAudio && duration === undefined ? "标签语音" : `${duration} ‘’`}</span>
     </div>
   );
 };

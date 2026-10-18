@@ -1,3 +1,4 @@
+import { canForwardLegacyTagMessages } from "./legacyTagMessage";
 import type { MessageItem, SearchMessageResult } from "open-im-sdk-wasm/lib/types/entity";
 import type { SendReceipt } from "./messageBatch";
 import type { SendIntent, SendTarget } from "./messageSendIntent";
@@ -69,7 +70,7 @@ function exactSource(result: SearchMessageResult, cid: string, id: string): Mess
   if (!Array.isArray(groups) || groups.length !== 1 || groups[0].conversationID !== cid ||
       groups[0].messageCount !== 1 || !Array.isArray(groups[0].messageList) || groups[0].messageList.length !== 1) throw new Error("individual-forward-source");
   const source = groups[0].messageList[0];
-  if (source?.clientMsgID !== id || source.status !== 2 || !forwardTypes.has(source.contentType)) throw new Error("individual-forward-source");
+  if (source?.clientMsgID !== id || source.status !== 2 || !forwardTypes.has(source.contentType) || !canForwardLegacyTagMessages(source)) throw new Error("individual-forward-source");
   return source;
 }
 
@@ -129,7 +130,10 @@ export async function runIndividualForward(selection: IndividualForwardSelection
         const result = await bounded(deps.find(selection.sourceCID, row.sourceID));
         if (!admitted() || !intent.current()) break;
         const source = exactSource(result, selection.sourceCID, row.sourceID);
-        retention = captureMessageRetention(source, selection.sourceCID, selection.owner);
+        const originalRetention = captureMessageRetention(source, selection.sourceCID, selection.owner);
+        retention = { ...originalRetention,
+          current: () => originalRetention.current() && canForwardLegacyTagMessages(source),
+          assertCurrent() { originalRetention.assertCurrent(); if (!canForwardLegacyTagMessages(source)) throw new Error("individual-forward-source"); } };
         if (!retention.current()) { operation.rows[i] = { ...row, state: "rejected", reason: "invalid-source" }; break; }
         outgoing = await bounded(deps.create(source));
       } else {

@@ -24,6 +24,9 @@ enum MessageDelivery { sending, sent, failed }
 
 enum AttachmentKind { image, voice, video, file }
 
+// A received 903 audio view, never a native voice/file or retention capability.
+typedef TagAudioProjection = ({Uri source, int? durationSeconds});
+
 final class ChatAttachment {
   const ChatAttachment({
     required this.kind,
@@ -56,6 +59,7 @@ final class ChatMessage {
     this.location,
     this.card,
     this.media,
+    this.tagAudio,
     this.thumbnail,
     this.fileName,
     this.fileBytes,
@@ -86,6 +90,7 @@ final class ChatMessage {
   final ChatLocation? location;
   final ChatCard? card;
   final Uri? media;
+  final TagAudioProjection? tagAudio;
   final Uri? thumbnail;
   final String? fileName;
   final int? fileBytes;
@@ -111,6 +116,8 @@ final class ChatMessage {
   final String? localThumbnail;
   Uri? get playableMedia =>
       media ?? (localMedia == null ? null : Uri.file(localMedia!));
+  Uri? get playableAudio =>
+      kind == ChatMessageKind.custom ? tagAudio?.source : playableMedia;
 
   ChatMessage withDelivery(MessageDelivery value) => ChatMessage(
     id: id,
@@ -130,6 +137,7 @@ final class ChatMessage {
     location: location,
     card: card,
     media: media,
+    tagAudio: tagAudio,
     thumbnail: thumbnail,
     fileName: fileName,
     fileBytes: fileBytes,
@@ -161,6 +169,7 @@ final class ChatMessage {
     location: location,
     card: card,
     media: media,
+    tagAudio: tagAudio,
     thumbnail: thumbnail,
     fileName: fileName,
     fileBytes: fileBytes,

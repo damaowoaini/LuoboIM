@@ -52,6 +52,21 @@ _LegacyCustom? _legacyCustom(Message item) {
 /// visible row must not turn them into an ordinary group-message receipt.
 bool isLegacyCallSummary(Message item) => _legacyCustom(item)?.type == 901;
 
+TagAudioProjection? _legacyTagAudio(_LegacyCustom? custom) {
+  if (custom == null || custom.type != 903 || custom.data['textElem'] != null) {
+    return null;
+  }
+  final sound = custom.data['soundElem'];
+  if (sound is! Map || sound['sourceUrl'] is! String) return null;
+  final source = secureMediaUri(sound['sourceUrl'] as String);
+  final duration = sound['duration'];
+  if (source == null ||
+      (duration != null && (duration is! int || duration < 0))) {
+    return null;
+  }
+  return (source: source, durationSeconds: duration as int?);
+}
+
 String? _stickerSource(String? value) {
   if (value == null || value.length > 65536) return null;
   if (secureMediaUri(value) != null) return value;
@@ -108,7 +123,10 @@ String? _legacySummary(_LegacyCustom custom) {
       if (sound is Map) {
         final duration = sound['duration'];
         final length = duration is int && duration >= 0 ? ' $duration 秒' : '';
-        return '[标签语音]$length（当前版本暂不支持播放）';
+        final unavailable = _legacyTagAudio(custom) == null
+            ? '（当前版本暂不支持播放）'
+            : '';
+        return '[标签语音]$length$unavailable';
       }
       return null;
     case 905:
@@ -352,6 +370,7 @@ ChatMessage _mapMessage(
           )
         : null,
     media: secureMediaUri(media),
+    tagAudio: _legacyTagAudio(custom),
     thumbnail: secureMediaUri(
       item.videoElem?.snapshotUrl ?? picture?.snapshotPicture?.url,
     ),

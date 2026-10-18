@@ -1,3 +1,4 @@
+import { legacyTagSummary } from "@/core/legacyTagMessage";
 import { messagePrivacyState } from "@/core/messagePrivacyRuntime";
 import { sessionCoordinator } from "@/core/session/browser";
 import dayjs from "dayjs";
@@ -420,7 +421,7 @@ export const formatMessageByType = (message: MessageItem): string => {
         const customEl = message.customElem;
         const customData = JSON.parse(customEl.data);
         if (customData.customType === CustomMessageType.MassMsg)
-          return t("messageDescription.massMessage");
+          return legacyTagSummary(message) ?? t("messageDescription.massMessage");
         if (customData.customType === CustomMessageType.Call)
           return t("messageDescription.callMessage");
         if (customData.customType === CustomMessageType.MeetingInvitation)

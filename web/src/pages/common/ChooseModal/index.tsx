@@ -1,3 +1,4 @@
+import { canForwardLegacyTagMessages } from "@/core/legacyTagMessage";
 import { selectedSendTarget, type SendOrigin, type SendIntent } from "@/core/messageSendIntent";
 import { conversationSendTarget, sameSendTarget } from "@/core/messageSendIntent";
 import { isIndividualForwardSelection, runIndividualForward, INDIVIDUAL_FORWARD_LIMIT,
@@ -211,7 +212,9 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
     // Capture every explicit recipient before the first permission/file await.
     // Selection is independent of the active view, but bound to this modal's
     // original owner/history and original immutable recipient namespace.
-    const sourcePermitsSend = () => (!sourceCurrent || sourceCurrent()) && (!sourceCanShare || sourceCanShare());
+    if (type === "FORWARD_MESSAGE" && !canForwardLegacyTagMessages(extraData)) { message.warning("标签语音不能转发"); return; }
+    const sourcePermitsSend = () => (!sourceCurrent || sourceCurrent()) && (!sourceCanShare || sourceCanShare()) &&
+      (type !== "FORWARD_MESSAGE" || canForwardLegacyTagMessages(extraData));
     const selected = choosedList.map(item => {
       const target = selectedSendTarget(item);
       return target ? { target, intent: sendOrigin?.selectedIntent(target, sourcePermitsSend) } : undefined;
@@ -331,6 +334,7 @@ const ChooseModal: ForwardRefRenderFunction<OverlayVisibleHandle, IChooseModalPr
   };
 
   const getBatchMessage = async () => {
+    if (type === "FORWARD_MESSAGE" && !canForwardLegacyTagMessages(extraData)) throw new Error("标签语音不能转发");
     if ((extraData as MergerMsgParams).title) {
       return (await IMSDK.createMergerMessage(extraData as MergerMsgParams)).data;
     }

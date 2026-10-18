@@ -309,4 +309,122 @@ void main() {
       }
     });
   }
+
+  Future<Map<String, dynamic>> mountTagAudio(WidgetTester tester) async {
+    final wire = {
+      ...SdkHarness.message(id: 'tag-audio', text: ''),
+      'contentType': MessageType.custom,
+      'customElem': {
+        'data': jsonEncode({
+          'customType': 903,
+          'data': {
+            'soundElem': {
+              'sourceUrl': 'https://media.example.com/synthetic-tag.m4a',
+              'duration': 2,
+              'soundPath': '/private/never-open-this',
+            },
+          },
+        }),
+        'extension': 'unchanged-vendor-extension',
+        'description': '',
+      },
+    };
+    h.sdk.messages
+      ..clear()
+      ..add(wire);
+    await tester.runAsync(h.start);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          imGatewayProvider.overrideWithValue(h.sdk.gateway),
+          appRuntimeProvider.overrideWith((_) => h.sdk.runtime),
+        ],
+        child: MaterialApp(
+          home: ChatPage(
+            conversationId: 'single-alice-bob',
+            playbackFactory: (failure) => playback = ChatAudioPlayback(
+              onFailure: failure,
+              playerFactory: () => player,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    return wire;
+  }
+
+  testWidgets(
+    'tag903 audio starts only on tap and keeps the custom message menu',
+    (tester) async {
+      final wire = await mountTagAudio(tester);
+      final before = jsonEncode(wire);
+      try {
+        expect(find.text('标签语音'), findsOneWidget);
+        expect(player.entered.isCompleted, isFalse);
+        expect(player.plays, 0);
+        await tester.tap(find.text('标签语音'));
+        await tester.pump();
+        await tester.runAsync(
+          () => player.entered.future.timeout(const Duration(seconds: 2)),
+        );
+        await tester.pump();
+        expect(player.plays, 1);
+        expect(playback?.messageId, 'tag-audio');
+        await tester.longPress(find.text('标签语音'));
+        await tester.pumpAndSettle();
+        expect(find.text('转发到聊天'), findsNothing);
+        expect(find.text('复制文字'), findsOneWidget);
+        expect(jsonEncode(wire), before);
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+      } finally {
+        await close(tester);
+      }
+    },
+  );
+
+  for (final invalidation in ['expiry', 'route-exit']) {
+    testWidgets('tag903 pending audio cannot start after $invalidation', (
+      tester,
+    ) async {
+      player.urlRelease = Completer<void>();
+      await mountTagAudio(tester);
+      try {
+        await tester.tap(find.text('标签语音'));
+        await tester.pump();
+        await tester.runAsync(
+          () => player.entered.future.timeout(const Duration(seconds: 2)),
+        );
+        expect(player.plays, 0);
+        if (invalidation == 'expiry') {
+          h.sdk.gateway.privacyLedger.observe('single-alice-bob', {
+            'clientMsgID': 'tag-audio',
+            'attachedInfoElem': {
+              'isPrivateChat': true,
+              'hasReadTime': 1700000000000,
+              'burnDuration': 30,
+            },
+          }, now: DateTime.now());
+          await tester.pump();
+        } else {
+          await tester.pumpWidget(const SizedBox.shrink());
+        }
+        player.urlRelease!.complete();
+        await tester.pump();
+        expect(player.plays, 0);
+        expect(h.count('sendMessage'), 0);
+        if (invalidation == 'expiry') {
+          expect(player.stops, greaterThan(1));
+        } else {
+          expect(player.events.isClosed, isTrue);
+        }
+      } finally {
+        if (!player.urlRelease!.isCompleted) {
+          player.urlRelease!.complete();
+        }
+        await close(tester);
+      }
+    });
+  }
 }

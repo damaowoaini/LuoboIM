@@ -1,3 +1,4 @@
+import { canForwardLegacyTagMessages } from "@/core/legacyTagMessage";
 import { useMessageAccess } from "@/hooks/useMessagePrivacy";
 import { messageOwner } from "@/core/messagePrivacyRuntime";
 import { captureMessageAccess, captureMessageRetention, forgetMessage } from "@/core/messagePrivacyRuntime";
@@ -200,6 +201,7 @@ const MessageMenuContent = ({
         }).catch(() => { if (access.current()) feedbackToast({ error: new Error("表情未保存，请重新核实消息") }); });
         break;
       case 1:
+        if (!canForwardLegacyTagMessages(message)) { closeMenu(); return; }
         emitter.emit("OPEN_CHOOSE_MODAL", {
           type: "FORWARD_MESSAGE",
           sourceConversationID: conversationID, sourceOwner,
@@ -366,6 +368,7 @@ const MessageMenuContent = ({
     <div className="p-1">
       {messageMenuList.map((menu) => {
         if (![5, 6].includes(menu.idx) && !privacy.allowsRetention) return null;
+        if (menu.idx === 1 && !canForwardLegacyTagMessages(message)) return null;
         if (menu.idx === 0 && !canAddPhizTypes.includes(message.contentType)) {
           return null;
         }

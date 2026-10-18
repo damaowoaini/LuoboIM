@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "state": "FROZEN_FORMATTED_SOURCE",
+  "parent_commit": "2f17d99d2f32c4fc72b9b922f8d2a8783938b665",
+  "parent_source": {
+    "members": 363,
+    "digest": "ccec31d13c6e64bb4d0c9ff0b1b85baae3d50d198c743d34e9935a053d17ecd8"
+  },
+  "parent_portable": {
+    "members": 415,
+    "digest": "30879a35431337689eced3a9b5ce9a7c528342740be0be502053100b7be24d7d"
+  },
+  "source": {
+    "members": 363,
+    "digest": "e8ef155193d61b94942e29afc269ddf995f12b8dcba6b3253ddaa1b8a050d316"
+  },
+  "portable": {
+    "members": 415,
+    "digest": "8d42e4660335bc172ab40f24369318098429410ee6318af15f25205fb10b7781"
+  },
+  "delta6": [
+    {
+      "path": "app/lib/features/chat/domain/chat_message.dart",
+      "before": {
+        "path": "app/lib/features/chat/domain/chat_message.dart",
+        "bytes": 5053,
+        "sha256": "078e179505789b7b94adc34e7bb86da2524ebcb360a485bddad38adcb842d3c6"
+      },
+      "after": {
+        "path": "app/lib/features/chat/domain/chat_message.dart",
+        "bytes": 5408,
+        "sha256": "0e79ab3837f3fdefeeb41bf926b46007b5fb010d53e482a9bd64108a73407a6f"
+      }
+    },
+    {
+      "path": "app/lib/features/chat/data/message_mapper.dart",
+      "before": {
+        "path": "app/lib/features/chat/data/message_mapper.dart",
+        "bytes": 13443,
+        "sha256": "1199183a036b040c14e92f708c2fafe852bc83d9a9b3f5e2f9af0404251119cc"
+      },
+      "after": {
+        "path": "app/lib/features/chat/data/message_mapper.dart",
+        "bytes": 14138,
+        "sha256": "d51d3958e98553aefaf69517cee7291fa34ffeb3519362d8af5efbf5e4e32cca"
+      }
+    },
+    {
+      "path": "app/lib/features/chat/presentation/message_media.dart",
+      "before": {
+        "path": "app/lib/features/chat/presentation/message_media.dart",
+        "bytes": 7169,
+        "sha256": "49a73b9fcf6c3d79f5722fafae288cdb0acd14304455d48eade37cf0cabb7be0"
+      },
+      "after": {
+        "path": "app/lib/features/chat/presentation/message_media.dart",
+        "bytes": 7169,
+        "sha256": "bd1cd4dc492162ed76510a1dbeece6bd7c54f0553cd007ee71fa15a07f8ec13a"
+      }
+    },
+    {
+      "path": "app/lib/features/chat/presentation/chat_page.dart",
+      "before": {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 104148,
+        "sha256": "398c2a83d33894a229bcbbd150bd1b312dd1360debe87bd3eb85f046113fe0c2"
+      },
+      "after": {
+        "path": "app/lib/features/chat/presentation/chat_page.dart",
+        "bytes": 105945,
+        "sha256": "df77225db5f0624a40d75f228e55853121b94762fc735587f517aeca91c907da"
+      }
+    },
+    {
+      "path": "app/test/features/chat/legacy_custom_summary_test.dart",
+      "before": {
+        "path": "app/test/features/chat/legacy_custom_summary_test.dart",
+        "bytes": 12544,
+        "sha256": "7f2f6c94c654c00a3a0bed9fd512368608acf15ecdb44e637b8d3df2e7bfec51"
+      },
+      "after": {
+        "path": "app/test/features/chat/legacy_custom_summary_test.dart",
+        "bytes": 15703,
+        "sha256": "be3e93304c24c13789917fc4d0b42902a18a0684dc13f8abb5c3337e157a8b86"
+      }
+    },
+    {
+      "path": "app/test/features/chat/batch_media_access_test.dart",
+      "before": {
+        "path": "app/test/features/chat/batch_media_access_test.dart",
+        "bytes": 10900,
+        "sha256": "867afc7cdd663d649b4e04cbbfd559dec8c392ae68afb399309af685c511f1a4"
+      },
+      "after": {
+        "path": "app/test/features/chat/batch_media_access_test.dart",
+        "bytes": 14655,
+        "sha256": "619373f88a3d2e223e4d60b38b7e755e07e7192d26d51438e719f2e4548293c6"
+      }
+    }
+  ],
+  "analysis_paths": [
+    "lib/features/chat/domain/chat_message.dart",
+    "lib/features/chat/data/message_mapper.dart",
+    "lib/features/chat/presentation/message_media.dart",
+    "lib/features/chat/presentation/chat_page.dart",
+    "test/features/chat/legacy_custom_summary_test.dart",
+    "test/features/chat/batch_media_access_test.dart"
+  ],
+  "test_paths": [
+    "test/features/chat/legacy_custom_summary_test.dart",
+    "test/features/chat/batch_media_access_test.dart"
+  ],
+  "names8": [
+    "tag903 sound has a restricted audio projection without changing custom identity",
+    "tag903 keeps text priority and rejects unsafe or malformed audio projections",
+    "tag903 audio starts only on tap and keeps the custom message menu",
+    "tag903 pending audio cannot start after expiry",
+    "tag903 pending audio cannot start after route-exit",
+    "wrong typed known payload fields fall back without string coercion",
+    "nested audio active playback stops after root expiry",
+    "nested audio late setUrl cannot start after root exit"
+  ],
+  "expected_full_tests_only": 1333,
+  "whole_codec_completed": false,
+  "resource": {
+    "initial_bytes": 4294967296,
+    "floor_bytes": 1073741824,
+    "allocated_cap_bytes": 805306368,
+    "poll_seconds": 0.2,
+    "phase_seconds": 120
+  },
+  "helpers": [
+    {
+      "path": "ci/mobile-source.py",
+      "bytes": 36320,
+      "sha256": "4b974b5a5f4de270affe25313ef97b8c6eea8cc2b81e85ca0d6332b26340d35b"
+    },
+    {
+      "path": "ci/mobile-check.py",
+      "bytes": 36251,
+      "sha256": "c73873d8dc22bd256a9a5aab7831f5da6e8e75b90646a9f1300ef7ccb8387081"
+    },
+    {
+      "path": "ci/mobile-announcement.py",
+      "bytes": 35598,
+      "sha256": "c591483c07277305974b1964aa1a235a0f78c51f8d18ba6a677564001f959035"
+    },
+    {
+      "path": "ci/mobile/inputs.json",
+      "bytes": 193400,
+      "sha256": "df60daca701faef61c14eed46ce86f760062002f6b4e417e287c58f133f75df4"
+    },
+    {
+      "path": "ci/mobile/required-test-names.json",
+      "bytes": 2425409,
+      "sha256": "159823b546a914fe5bcb2570d666d6f4da43629ce450b2521772f2c096d80f92"
+    },
+    {
+      "path": "ci/mobile-setup.sh",
+      "bytes": 7411,
+      "sha256": "d200b959cfd3e6f7f0b5353ea756bbe4facd8a45e27227f8a9c13bc72883b82e"
+    },
+    {
+      "path": "ci/mobile-input-setup.sh",
+      "bytes": 7390,
+      "sha256": "49866848bf88c7877352caee2f77e20a37b67f79d03fbb54db9ad43f11a9740e"
+    },
+    {
+      "path": ".github/workflows/mobile-input.yml",
+      "bytes": 1687,
+      "sha256": "937b8cf202126345d1cef16aa716a3cbfb3d0d5345cadee578fd45d3d7d6e9e8"
+    },
+    {
+      "path": ".github/workflows/mobile-ci.yml",
+      "bytes": 2732,
+      "sha256": "72724f6325d93da3b20e91788177461fab832f71adf2677c89c863c74c08d801"
+    },
+    {
+      "path": "ci/mobile-input.py",
+      "bytes": 39925,
+      "sha256": "2e1993f28be8de964f680e4c48359086a703fcbe2ca0cc9339896cc44fe9db04"
+    },
+    {
+      "path": "ci/mobile-input-vm.py",
+      "bytes": 29374,
+      "sha256": "ae45ee63b40bb6363bc0e32a17be7654a19b51a4ffc80a258898b520ad0becd4"
+    },
+    {
+      "path": ".github/workflows/mobile-input-vm-diagnostic.yml",
+      "bytes": 1726,
+      "sha256": "9a476f746db69f0695cd6fb2acaed2c2e5282958f166a6cdbfc73f2ee163ecbe"
+    },
+    {
+      "path": "ci/mobile-input/inputs.json",
+      "bytes": 150186,
+      "sha256": "ad4399fee6290949734a9e97b70dbb26ca198829ecdc770e4ab3502c28642d7d"
+    },
+    {
+      "path": "ci/mobile-input/required-test-names.json",
+      "bytes": 343998,
+      "sha256": "703aae589ce0f8e80e0cea26347d6404c2b85f68f0c9f81ab1774ae347ed6052"
+    }
+  ],
+  "controllers": [
+    {
+      "path": "ci/mobile-tag903.py",
+      "bytes": 20094,
+      "sha256": "534024c4a6cb3645c091ab9ed16d2dac0885e29f2dc56ae96132a41ae6d96d51"
+    },
+    {
+      "path": ".github/workflows/mobile-tag903.yml",
+      "bytes": 2623,
+      "sha256": "ca1e14f878983ea2b02052056b296398f3d263a5c36f3af792ff52f4d1adfc14"
+    }
+  ],
+  "provenance": {
+    "RootFormatted6": {
+      "path": ".qa/mobile363-tag903-batch-1/formatted.json",
+      "bytes": 4069,
+      "sha256": "768f16a66389f310ab725a7b5214f41c7b3d11dbf6c9f4d57a5ab97b185b08fa"
+    },
+    "rawCandidateSHA256": "3e6274a1f5989463d4fa820fbe24317ee0f333640d75bc761e95de0e620d0cee",
+    "RootFormat6PASS": true,
+    "analysisAndTestsExecuted": 0,
+    "oldVMWidgetReused": false,
+    "parentPreparation": "exact original415 in finite owned prepared repo; only six parent git blobs from pinned2f; no setup helper mutation",
+    "oldSetupSourceJSON": "must remain original ccec/3087 with exact415rows before six overlay; separate tag903 source receipt",
+    "codecRemaining": [
+      "905",
+      "910",
+      "911"
+    ]
+  }
+}

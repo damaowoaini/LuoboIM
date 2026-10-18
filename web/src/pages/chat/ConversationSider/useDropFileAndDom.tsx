@@ -1,3 +1,4 @@
+import { canForwardLegacyTagMessages } from "@/core/legacyTagMessage";
 import { captureMessageRetention } from "@/core/messagePrivacyRuntime";
 import { selectedSendTarget } from "@/core/messageSendIntent";
 import { useDrop } from "ahooks";
@@ -85,6 +86,7 @@ export function useDropFileAndDom({
       dropEnd();
     },
     onDom: async ({ message, conversationID, sourceOwner }: { message: ExMessageItem; conversationID?: string; sourceOwner?: string }, e) => {
+      if (!canForwardLegacyTagMessages(message)) return;
       const intent = captureTarget();
       if (!intent || !conversationID || sourceOwner !== intent.ownerKey) return;
       const retention = captureMessageRetention(message, conversationID, sourceOwner);
@@ -116,8 +118,10 @@ export function useDropFileAndDom({
         cancelText: t("cancel"),
         onOk: async () => {
           intent.assertCurrent(); retention.assertCurrent();
+          if (!canForwardLegacyTagMessages(message)) return;
           const newMessage = (await IMSDK.createForwardMessage(message)).data;
           intent.assertCurrent(); retention.assertCurrent();
+          if (!canForwardLegacyTagMessages(message)) return;
           await sendMessage({ message: newMessage, intent, sourceRetention: retention });
         },
       });

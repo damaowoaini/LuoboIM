@@ -1240,6 +1240,60 @@ class _ChatPageState extends ConsumerState<ChatPage>
             ),
           ),
         );
+      case ChatMessageKind.custom:
+        final audio = item.tagAudio;
+        if (audio == null) {
+          return _messageText(
+            item,
+            portal: portal ?? item,
+            embedded: portal != null,
+          );
+        }
+        return InkWell(
+          onTap: () async {
+            final access = _contentAccess(item, portal, portalCurrent);
+            if (access == null || !access.canView) {
+              _notice('消息内容已不可用');
+              return;
+            }
+            await playback.toggle(
+              item,
+              allowed: () => access.canView,
+              privacy: access.privacy,
+              now: controller.repository.now,
+            );
+          },
+          child: SizedBox(
+            width: 210,
+            child: Row(
+              children: [
+                Icon(
+                  playback.messageId == item.id && playback.playing
+                      ? Icons.pause_circle_outline
+                      : Icons.volume_up_outlined,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('标签语音'),
+                      if (audio.durationSeconds != null)
+                        Text(
+                          '${audio.durationSeconds} 秒',
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       case ChatMessageKind.video:
       case ChatMessageKind.voice:
       case ChatMessageKind.file:
