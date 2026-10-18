@@ -69,6 +69,11 @@ type AcceptanceResult struct {
 	ReaderStage              string                     `json:"readerStage,omitempty"`
 	ReaderCallState          string                     `json:"readerCallState,omitempty"`
 	ReaderErrorClass         string                     `json:"readerErrorClass,omitempty"`
+	ConstructorStage         string                     `json:"constructorStage,omitempty"`
+	ConstructorRole          string                     `json:"constructorRole,omitempty"`
+	ConstructorCallState     string                     `json:"constructorCallState,omitempty"`
+	ConstructorErrorClass    string                     `json:"constructorErrorClass,omitempty"`
+	ConstructorPredicate     string                     `json:"constructorPredicate,omitempty"`
 	LocalCleanupObserved     bool                       `json:"localCleanupObserved"`
 	LocalCleanupState        string                     `json:"localCleanupState,omitempty"`
 	LocalCleanupFailureClass string                     `json:"localCleanupFailureClass,omitempty"`
@@ -175,6 +180,7 @@ func observeLocalCleanupFailure(err error) string {
 // missing fixture, malformed bootstrap or failed startup never passes a case.
 func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResult, runErr error) {
 	result = AcceptanceResult{Version: "owned-fullgraph-token-v2-result-v1", Scenario: plan.Scenario, Phase: "actual-resource-bootstrap", ResourcePlaneSHA256: plan.PlaneSHA256, FreshPlaneOnly: true}
+	result.ConstructorStage, result.ConstructorRole, result.ConstructorCallState, result.ConstructorErrorClass, result.ConstructorPredicate = "not-entered", "none", "not-entered", "none", "none"
 	plan.bootstrapStage = &result.BootstrapStage
 	boot, e := PrepareFresh(ctx, plan)
 	if e != nil {
@@ -242,6 +248,9 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 		result.ReaderStage = session.readerObservation.Stage
 		result.ReaderCallState = session.readerObservation.State
 		result.ReaderErrorClass = session.readerObservation.ErrorClass
+		if observation := session.constructorObservation; observation.Stage != "" {
+			result.ConstructorStage, result.ConstructorRole, result.ConstructorCallState, result.ConstructorErrorClass, result.ConstructorPredicate = observation.Stage, observation.Role, observation.State, observation.ErrorClass, observation.Predicate
+		}
 	}
 	if e != nil {
 		if session != nil {

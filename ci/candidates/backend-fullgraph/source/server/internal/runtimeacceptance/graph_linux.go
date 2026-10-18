@@ -23,6 +23,22 @@ type readerCallObservation struct {
 	ErrorClass string
 }
 
+// Last-entered call labels only; a Start return is not a registration claim.
+type constructorCallObservation struct {
+	Stage      string
+	Role       string
+	State      string
+	ErrorClass string
+	Predicate  string
+}
+
+func constructorOperationErrorClass(err error) string {
+	if errors.Is(err, ownedcontrol.ErrNamespaceRuntimeRegistrationPending) {
+		return "registration-pending"
+	}
+	return graphOperationErrorClass(err)
+}
+
 func graphOperationErrorClass(err error) string {
 	switch {
 	case err == nil:
@@ -225,7 +241,10 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 	s.Phase = "actual-twelve-other-source-constructors"
 	for _, role := range ownedcontrol.NamespaceRuntimeRoles() {
 		if role != "rpc-msg" && role != "rpc-conversation" {
+			s.constructorObservation = constructorCallObservation{Stage: "start", Role: role, State: "in-progress", ErrorClass: "in-progress", Predicate: "none"}
 			process, e := group.Start(ctx, frozen[role])
+			s.constructorObservation.State = "returned"
+			s.constructorObservation.ErrorClass = constructorOperationErrorClass(e)
 			if process.Service != nil {
 				out.Launched = append(out.Launched, process)
 			}
@@ -236,10 +255,20 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 	}
 	var graph *ownedcontrol.VerifiedNamespaceRuntimeGraph
 	for {
-		if e = check(); e != nil {
+		s.constructorObservation = constructorCallObservation{Stage: "source-custody", Role: "none", State: "in-progress", ErrorClass: "in-progress", Predicate: "none"}
+		e = check()
+		s.constructorObservation.State = "returned"
+		s.constructorObservation.ErrorClass = constructorOperationErrorClass(e)
+		if e != nil {
 			return out, e
 		}
-		graph, e = group.Observe(ctx)
+		s.constructorObservation = constructorCallObservation{Stage: "observe-registration", Role: "none", State: "in-progress", ErrorClass: "in-progress", Predicate: "none"}
+		var observation ownedcontrol.NamespaceRuntimeCallObservation
+		graph, observation, e = group.ObserveWithObservation(ctx)
+		s.constructorObservation.State = "returned"
+		s.constructorObservation.ErrorClass = constructorOperationErrorClass(e)
+		s.constructorObservation.Role = observation.Role
+		s.constructorObservation.Predicate = observation.Predicate
 		if e == nil {
 			break
 		}

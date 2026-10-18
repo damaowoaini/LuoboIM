@@ -60,6 +60,7 @@ type Session struct {
 	legacyChildRetained           bool
 	acquireObservation            ownedcontrol.AgentAcquireObservation
 	readerObservation             readerCallObservation
+	constructorObservation        constructorCallObservation
 	journal                       namespaceimport.Journal
 	cleanupMu                     sync.Mutex
 	localExited                   map[*ownedcontrol.OwnedService]bool

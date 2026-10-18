@@ -147,6 +147,11 @@ func (g *NamespaceRuntimeLaunchGroup) Start(ctx context.Context, spec PreparedNa
 	return value, e
 }
 func (g *NamespaceRuntimeLaunchGroup) Processes() ([]NamespaceRuntimeProcess, error) {
+	return g.processesWithObservation(nil)
+}
+
+func (g *NamespaceRuntimeLaunchGroup) processesWithObservation(observation *NamespaceRuntimeCallObservation) ([]NamespaceRuntimeProcess, error) {
+	observation.enter("", "process-set")
 	if g == nil {
 		return nil, ErrOwnedEvidence
 	}
@@ -154,6 +159,7 @@ func (g *NamespaceRuntimeLaunchGroup) Processes() ([]NamespaceRuntimeProcess, er
 	defer g.mu.Unlock()
 	var rows []NamespaceRuntimeProcess
 	for _, r := range g.requirements {
+		observation.enter(r.Role, "process-set")
 		row := g.entries[r.Role]
 		if row.Service == nil {
 			return nil, ErrOwnedEvidence
@@ -166,12 +172,24 @@ func (g *NamespaceRuntimeLaunchGroup) Processes() ([]NamespaceRuntimeProcess, er
 	return rows, nil
 }
 func (g *NamespaceRuntimeLaunchGroup) Observe(ctx context.Context) (*VerifiedNamespaceRuntimeGraph, error) {
-	rows, e := g.Processes()
+	return g.observeWithObservation(ctx, nil)
+}
+
+// Returns labels from this exact call, never a second observation of the child.
+// The labels cannot construct a graph, release, registration or canonical drain.
+func (g *NamespaceRuntimeLaunchGroup) ObserveWithObservation(ctx context.Context) (*VerifiedNamespaceRuntimeGraph, NamespaceRuntimeCallObservation, error) {
+	observation := NamespaceRuntimeCallObservation{Role: "none", Predicate: "process-set"}
+	graph, e := g.observeWithObservation(ctx, &observation)
+	return graph, observation, e
+}
+
+func (g *NamespaceRuntimeLaunchGroup) observeWithObservation(ctx context.Context, observation *NamespaceRuntimeCallObservation) (*VerifiedNamespaceRuntimeGraph, error) {
+	rows, e := g.processesWithObservation(observation)
 	if e != nil {
 		return nil, e
 	}
 	first := rows[0].Bootstrap
-	return ObserveNamespaceRuntimeGraph(ctx, g.hold, g.header, first.RuntimePreparationSHA256, first.InventorySHA256, first.ManifestSHA256, g.requirements, rows)
+	return observeNamespaceRuntimeGraph(ctx, g.hold, g.header, first.RuntimePreparationSHA256, first.InventorySHA256, first.ManifestSHA256, g.requirements, rows, observation)
 }
 func (g *NamespaceRuntimeLaunchGroup) OriginalReaderGroup() *HistoryReaderLaunchGroup {
 	if g == nil {

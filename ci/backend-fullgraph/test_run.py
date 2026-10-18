@@ -108,6 +108,51 @@ class FullGraphControls(unittest.TestCase):
    bad=dict(joined,**change)
    with self.subTest(reader=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
 
+  # These are labels from the same original call, never a new child/Ready probe.
+  constructor_keys=('constructorStage','constructorRole','constructorCallState','constructorErrorClass','constructorPredicate')
+  observed=collector.public_terminal(json.dumps(joined).encode(),joined['scenario'])
+  self.assertEqual(tuple(observed[k] for k in constructor_keys),('not-entered','none','not-entered','none','none'))
+  constructor_roles=('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth','rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user')
+  constructor_base=dict(joined,phase='actual-twelve-other-source-constructors',primaryRunErrorClass='permission',constructorStage='start',constructorRole='api',constructorCallState='returned',constructorErrorClass='owned-evidence',constructorPredicate='none',rawOwner='PRIVATE_OWNER_NONCE')
+  for role in constructor_roles:
+   if role not in ('rpc-conversation','rpc-msg'):
+    value=dict(constructor_base,constructorRole=role)
+    observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+    self.assertEqual((observed['constructorRole'],observed['constructorErrorClass']),(role,'owned-evidence'))
+    self.assertEqual(observed['primaryRunErrorClass'],'permission');self.assertFalse(observed['accepted'])
+    self.assertNotIn('rawOwner',observed);self.assertNotIn('PRIVATE_OWNER_NONCE',json.dumps(observed))
+  custody=dict(constructor_base,constructorStage='source-custody',constructorRole='none')
+  observed=collector.public_terminal(json.dumps(custody).encode(),custody['scenario'])
+  self.assertEqual((observed['constructorRole'],observed['constructorPredicate']),('none','none'))
+  predicates=('process-set','graph-preconditions','bootstrap','requirement','input-state','handle','joined','owner','done','process-before','image','envelope','instance','tuple','mongo-binding','services','components','process-after')
+  for predicate in predicates:
+   role='none' if predicate=='graph-preconditions' else 'api'
+   value=dict(constructor_base,constructorStage='observe-registration',constructorRole=role,constructorPredicate=predicate)
+   observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+   self.assertEqual((observed['constructorRole'],observed['constructorPredicate']),(role,predicate))
+   self.assertEqual((observed['primaryRunErrorClass'],observed['localCleanupFailureClass']),('permission','owned-evidence'))
+  for role in constructor_roles:
+   pending=dict(constructor_base,constructorStage='observe-registration',constructorRole=role,constructorPredicate='registration-absent',constructorErrorClass='registration-pending',primaryRunErrorClass='deadline',failureClass='deadline')
+   observed=collector.public_terminal(json.dumps(pending).encode(),pending['scenario'])
+   self.assertEqual((observed['constructorRole'],observed['constructorErrorClass'],observed['primaryRunErrorClass']),(role,'registration-pending','deadline'))
+  complete=dict(constructor_base,constructorStage='observe-registration',constructorRole='none',constructorPredicate='complete',constructorErrorClass='none')
+  observed=collector.public_terminal(json.dumps(complete).encode(),complete['scenario'])
+  self.assertFalse(observed['accepted']);self.assertEqual(observed['primaryRunErrorClass'],'permission')
+  for stage,role in [('start','api'),('source-custody','none'),('observe-registration','none')]:
+   value=dict(constructor_base,constructorStage=stage,constructorRole=role,constructorCallState='in-progress',constructorErrorClass='in-progress')
+   observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+   self.assertEqual(observed['constructorCallState'],'in-progress')
+  for change in [dict(constructorStage='PRIVATE_PATH'),dict(constructorRole='PRIVATE_UID'),dict(constructorRole=['api']),dict(constructorCallState=True),dict(constructorErrorClass='private-error-text'),dict(constructorPredicate='private-owner-path'),dict(constructorStage='not-entered'),dict(constructorCallState='not-entered'),dict(constructorCallState='in-progress'),dict(constructorRole='rpc-msg'),dict(constructorRole='none'),dict(constructorPredicate='done'),dict(constructorErrorClass='registration-pending')]:
+   bad=dict(constructor_base,**change)
+   with self.subTest(constructor=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+  for change in [dict(constructorRole='api'),dict(constructorPredicate='done'),dict(constructorErrorClass='registration-pending')]:
+   bad=dict(custody,**change)
+   with self.subTest(custody=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+  observe_base=dict(constructor_base,constructorStage='observe-registration',constructorRole='api',constructorPredicate='done')
+  for change in [dict(constructorRole='none'),dict(constructorPredicate='none'),dict(constructorPredicate='complete'),dict(constructorPredicate='registration-absent'),dict(constructorErrorClass='none'),dict(constructorErrorClass='registration-pending'),dict(constructorCallState='in-progress',constructorErrorClass='in-progress')]:
+   bad=dict(observe_base,**change)
+   with self.subTest(observe=change),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+
  def test_real_tracked_git_bodies_symlink_bounds_static_elf_and_strict_receipt(self):
   with tempfile.TemporaryDirectory() as directory:
    root=Path(directory);source=root/'source';source.mkdir()

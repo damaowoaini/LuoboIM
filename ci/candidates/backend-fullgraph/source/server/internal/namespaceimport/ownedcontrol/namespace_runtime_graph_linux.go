@@ -15,6 +15,27 @@ import (
 
 var ErrNamespaceRuntimeRegistrationPending = errors.New("owned namespace runtime registration pending")
 
+// Invocation-local labels only. These contain no owner identity or authority;
+// the original observed graph/error still determines every admission decision.
+type NamespaceRuntimeCallObservation struct {
+	Role      string
+	Predicate string
+}
+
+func (o *NamespaceRuntimeCallObservation) enter(role, predicate string) {
+	if o == nil {
+		return
+	}
+	o.Role = "none"
+	for _, allowed := range NamespaceRuntimeRoles() {
+		if role == allowed {
+			o.Role = role
+			break
+		}
+	}
+	o.Predicate = predicate
+}
+
 type NamespaceRuntimeProcess struct {
 	Service   *OwnedService
 	Bootstrap NamespaceRuntimeBootstrap
@@ -41,6 +62,11 @@ type VerifiedNamespaceRuntimeGraph struct {
 }
 
 func ObserveNamespaceRuntimeGraph(ctx context.Context, hold *AdmissionHold, h namespaceimport.Header, preparation, inventory, manifest string, requirements []NamespaceRuntimeRequirement, processes []NamespaceRuntimeProcess) (*VerifiedNamespaceRuntimeGraph, error) {
+	return observeNamespaceRuntimeGraph(ctx, hold, h, preparation, inventory, manifest, requirements, processes, nil)
+}
+
+func observeNamespaceRuntimeGraph(ctx context.Context, hold *AdmissionHold, h namespaceimport.Header, preparation, inventory, manifest string, requirements []NamespaceRuntimeRequirement, processes []NamespaceRuntimeProcess, observation *NamespaceRuntimeCallObservation) (*VerifiedNamespaceRuntimeGraph, error) {
+	observation.enter("", "graph-preconditions")
 	requirementsSHA, e := NamespaceRuntimeRequirementsSHA256(requirements)
 	if e != nil || ctx == nil || ctx.Err() != nil || hold == nil || hold.ValidateExclusion() != nil || h.Validate() != nil || hold.HeaderSHA256() != h.SHA256() || !isSHA(preparation) || !isSHA(inventory) || !isSHA(manifest) || len(processes) != len(requirements) {
 		return nil, ErrOwnedEvidence
@@ -48,72 +74,102 @@ func ObserveNamespaceRuntimeGraph(ctx context.Context, hold *AdmissionHold, h na
 	g := &VerifiedNamespaceRuntimeGraph{hold: hold, header: h.SHA256(), preparation: preparation, inventory: inventory, manifest: manifest, requirements: requirementsSHA, processes: append([]NamespaceRuntimeProcess(nil), processes...)}
 	for at, p := range processes {
 		b, r := p.Bootstrap, requirements[at]
+		observation.enter(r.Role, "bootstrap")
 		if b.ValidateShape() != nil || b.Header != h || b.RuntimePreparationSHA256 != preparation || b.InventorySHA256 != inventory || b.ManifestSHA256 != manifest || b.RequirementsSHA256 != requirementsSHA {
 			return nil, ErrOwnedEvidence
 		}
 		a, _ := json.Marshal(b.Requirement)
 		z, _ := json.Marshal(r)
+		observation.enter(r.Role, "requirement")
 		if string(a) != string(z) {
 			return nil, ErrOwnedEvidence
 		}
-		row, e := observeNamespaceRuntime(ctx, p)
+		row, e := observeNamespaceRuntimeWithObservation(ctx, p, observation)
 		if e != nil {
 			return nil, e
 		}
 		g.rows = append(g.rows, row)
 	}
 	g.observedAt = time.Now()
+	observation.enter("", "complete")
 	return g, nil
 }
 func observeNamespaceRuntime(ctx context.Context, p NamespaceRuntimeProcess) (ObservedNamespaceRuntime, error) {
+	return observeNamespaceRuntimeWithObservation(ctx, p, nil)
+}
+
+func observeNamespaceRuntimeWithObservation(ctx context.Context, p NamespaceRuntimeProcess, observation *NamespaceRuntimeCallObservation) (ObservedNamespaceRuntime, error) {
 	var empty ObservedNamespaceRuntime
 	s, b := p.Service, p.Bootstrap
+	observation.enter(b.Requirement.Role, "input-state")
 	if s == nil || ctx == nil || ctx.Err() != nil {
 		return empty, ErrOwnedEvidence
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	required := b.Requirement
+	observation.enter(required.Role, "owner")
 	if s.cmd == nil || s.cmd.Process == nil || s.joined || s.owner.Role != required.Role || s.owner.BinarySHA256 != required.BinarySHA256 || s.owner.SourceSHA256 != required.SourceSHA256 || s.owner.BuildReceiptSHA256 != required.BuildReceiptSHA256 || s.owner.BootstrapSHA256 != required.BootstrapSHA256 {
+		if observation != nil {
+			if s.cmd == nil || s.cmd.Process == nil {
+				observation.enter(required.Role, "handle")
+			} else if s.joined {
+				observation.enter(required.Role, "joined")
+			}
+		}
 		return empty, ErrOwnedEvidence
 	}
+	observation.enter(required.Role, "done")
 	select {
 	case <-s.done:
 		return empty, ErrOwnedEvidence
 	default:
 	}
+	observation.enter(required.Role, "process-before")
 	before, e := processIdentity(s.owner.PID)
 	if e != nil || !sameProcess(before, s.owner) || actualImage(s.owner.PID, s.owner.Executable, s.owner.BinarySHA256) != nil {
+		if observation != nil && e == nil && sameProcess(before, s.owner) {
+			// The original short circuit reached actualImage; do not observe it again.
+			observation.enter(required.Role, "image")
+		}
 		return empty, ErrOwnedEvidence
 	}
+	observation.enter(required.Role, "envelope")
 	var envelope namespaceRuntimeRegistrationEnvelope
 	sum, e := readServerEnvelope(b.RegistrationPath, &envelope)
 	if errors.Is(e, os.ErrNotExist) {
+		observation.enter(required.Role, "registration-absent")
 		return empty, ErrNamespaceRuntimeRegistrationPending
 	}
 	if e != nil || envelope.Schema != 1 || envelope.OwnerNonce != s.owner.OwnerNonce {
 		return empty, ErrOwnedEvidence
 	}
 	r := envelope.Registration
+	observation.enter(required.Role, "instance")
 	if b.ExpectedInstanceID != "" && r.InstanceID != b.ExpectedInstanceID {
 		return empty, ErrOwnedEvidence
 	}
+	observation.enter(required.Role, "tuple")
 	if r.ValidateShape() != nil || r.Role != required.Role || r.HeaderSHA256 != b.Header.SHA256() || r.RuntimePreparationSHA256 != b.RuntimePreparationSHA256 || r.RuntimeTokenSHA256 != sha([]byte(b.RuntimeToken)) || r.InventorySHA256 != b.InventorySHA256 || r.ManifestSHA256 != b.ManifestSHA256 || r.RequirementsSHA256 != b.RequirementsSHA256 || r.BootstrapSHA256 != required.BootstrapSHA256 || r.ConfigurationSHA256 != required.ConfigurationSHA256 || r.EnvironmentSHA256 != required.EnvironmentSHA256 || r.ContractSHA256 != required.ContractSHA256 {
 		return empty, ErrOwnedEvidence
 	}
+	observation.enter(required.Role, "mongo-binding")
 	if validateNamespaceRuntimeRegistrationMongo(r, b) != nil {
 		return empty, ErrOwnedEvidence
 	}
 	a, _ := json.Marshal(r.Services)
 	z, _ := json.Marshal(required.Services)
+	observation.enter(required.Role, "services")
 	if string(a) != string(z) {
 		return empty, ErrOwnedEvidence
 	}
 	a, _ = json.Marshal(r.Components)
 	z, _ = json.Marshal(required.Components)
+	observation.enter(required.Role, "components")
 	if string(a) != string(z) {
 		return empty, ErrOwnedEvidence
 	}
+	observation.enter(required.Role, "process-after")
 	after, e := processIdentity(s.owner.PID)
 	if e != nil || !sameProcess(before, after) {
 		return empty, ErrOwnedEvidence
