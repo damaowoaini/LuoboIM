@@ -12,21 +12,15 @@
   },
   "source": {
     "members": 363,
-    "digest": "e05419bfbd52e3c27a80c192bc9d3856569cc112b1899afcf2099ebf4d5c81e4"
+    "digest": "481546066d6bada56c6e46498eea0dfb39cec580878546c29ea772e92dc0adbc"
   },
   "portable": {
     "members": 415,
-    "digest": "d4fb9703b093fa7134e198bca1052d6e39e4854e9eaabf3382bd9eae54d0ab8a"
+    "digest": "a3a88bb8da2de8dd6853fe4cea3c1653b1aa5857a32e1bdd3f22ed864983fa94"
   },
   "analysis_paths": [
     "lib/features/chat/data/chat_repository.dart",
-    "lib/features/chat/data/message_mapper.dart",
-    "lib/features/chat/domain/chat_message.dart",
-    "lib/features/chat/presentation/chat_controller.dart",
     "lib/features/chat/presentation/chat_page.dart",
-    "lib/features/contacts/presentation/user_profile_page.dart",
-    "test/features/chat/batch_media_access_test.dart",
-    "test/features/chat/chat_forward_page_test.dart",
     "test/features/chat/legacy_custom_summary_test.dart"
   ],
   "test_paths": [
@@ -129,13 +123,13 @@
   "controllers": [
     {
       "path": "ci/mobile-tag903.py",
-      "bytes": 26032,
-      "sha256": "db6a96433c69a26127819c1b5dd2524d37e0f8d247f3e8a71db6a31be0d5d4dd"
+      "bytes": 32784,
+      "sha256": "c09432ea2f7ecd4c056ad529949eaeffe7c413b1c3dcb757ea9939e97b979231"
     },
     {
       "path": ".github/workflows/mobile-tag903.yml",
-      "bytes": 2637,
-      "sha256": "a4684f96899f7531a5d984fe808bb8f577cdd6abe46be05c9e6e55f68a4e4327"
+      "bytes": 2676,
+      "sha256": "83782e6400fab856bf77c639229bdda5816855bd1cdfadf26f9923df445fee2d"
     }
   ],
   "provenance": {
@@ -191,7 +185,24 @@
     "analysisAndTestsExecutedForCombinedSource": 0,
     "parentPreparation": "exact2f old415 reconstructed from ten fixed old blobs; one original setup then exactdelta10; original helpers/native pins unchanged",
     "expectedFull1357IsOnlyInventoryExpectation": true,
-    "wholeCodecCompleted": false
+    "wholeCodecCompleted": false,
+    "RootFormattedLint3": {
+      "path": ".qa/mobile363-codec-lint-batch-1/formatted.json",
+      "bytes": 3883,
+      "sha256": "56229be04816fa168defd32086c2a2b65a3e6eebd31e1f766d5bde634df80873"
+    },
+    "RootFormat3Resource": {
+      "path": ".qa/mobile363-codec-lint-batch-1/format3.resource.json",
+      "bytes": 859,
+      "sha256": "058467aa2cdaf16ed6b731d1d8d637d2ea1a563bd2226af4e9f3a0a2af439da6"
+    },
+    "RootOriginalAnalysis6PartialReview": {
+      "path": ".qa/mobile363-codec-combined-batch-1/root-1ad378-format9-analysis6-pass-3-lint-failure-review.json",
+      "bytes": 16578,
+      "sha256": "34047d8f714d47756b707023128927c068b8384c8ed37a36cd22097b87bc9e71"
+    },
+    "analysisFresh3AndTests35ExecutedForLintSource": 0,
+    "sameBodyOldAnalysis6Only": true
   },
   "historical_partial5": {
     "status": "historical-visible-testDone-only-parent-failed",
@@ -285,8 +296,8 @@
       },
       "after": {
         "path": "app/lib/features/chat/presentation/chat_page.dart",
-        "bytes": 110984,
-        "sha256": "cb40d703383254caa72308246ef45d4e1685de19884c0ab1da2607443fd2b7fc"
+        "bytes": 111006,
+        "sha256": "293412831f144266900c7d6146af4035d6e700392414c256576634913d8e6eaf"
       }
     },
     {
@@ -298,8 +309,8 @@
       },
       "after": {
         "path": "app/test/features/chat/legacy_custom_summary_test.dart",
-        "bytes": 51241,
-        "sha256": "5cc38bef220861b55d6954689e900b74bfa206e6f427e9d5db15fb80f2b1274c"
+        "bytes": 51269,
+        "sha256": "aa4a996cabd5ec5da2ce8b3bdaef173d44aff66b8343879623ec7b9e1f8aa3db"
       }
     },
     {
@@ -324,8 +335,8 @@
       },
       "after": {
         "path": "app/lib/features/chat/data/chat_repository.dart",
-        "bytes": 78980,
-        "sha256": "b07e943d78937703ae5fdcb160021b2cea56bac18855d0ecad3287b7ea5e1274"
+        "bytes": 78991,
+        "sha256": "a534ea9ccc7e2de5c24c3209c2a3ef30149097520f93b0a2465b6014357c0380"
       }
     },
     {
@@ -457,5 +468,214 @@
     "tag903 sound has a restricted audio projection without changing custom identity",
     "tag903 keeps text priority and rejects unsafe or malformed audio projections",
     "wrong typed known payload fields fall back without string coercion"
-  ]
+  ],
+  "analysis_reuse6": {
+    "status": "same-body-old-source-analysis-pass-only",
+    "source": {
+      "members": 363,
+      "digest": "e05419bfbd52e3c27a80c192bc9d3856569cc112b1899afcf2099ebf4d5c81e4"
+    },
+    "portable": {
+      "members": 415,
+      "digest": "d4fb9703b093fa7134e198bca1052d6e39e4854e9eaabf3382bd9eae54d0ab8a"
+    },
+    "head": "1ad378b0367dfe22fe1ef884cbf54def5dfe0218",
+    "run": 39089287566,
+    "job": 117562354285,
+    "compactArtifact": {
+      "artifact": 12122335814,
+      "run": 39089287566,
+      "attempt": 1,
+      "head": "1ad378b0367dfe22fe1ef884cbf54def5dfe0218",
+      "sha256": "6e2ad33b192634e0d6276998646f369a1fea29c4cd14fe47179cb32e3e97227b",
+      "bytes": 40926,
+      "exactAPIDigest": true,
+      "files": 44,
+      "binariesDownloaded": false
+    },
+    "RootReview": {
+      "path": ".qa/mobile363-codec-combined-batch-1/root-1ad378-format9-analysis6-pass-3-lint-failure-review.json",
+      "bytes": 16578,
+      "sha256": "34047d8f714d47756b707023128927c068b8384c8ed37a36cd22097b87bc9e71"
+    },
+    "oldParentWholeAccepted": false,
+    "oldParentAnalysisFailed3": 3,
+    "oldParent35TestsDispatched": 0,
+    "originalSourceToolsPostExact": true,
+    "originalResourceHealthy": true,
+    "originalToolsBefore": {
+      "path": "tag903-tools-before.json",
+      "bytes": 477,
+      "sha256": "ec3c14ec1cc96197a2500e88d7b7329b2316a43b6f520ead4f36152ac44469ae"
+    },
+    "originalToolsAfter": {
+      "path": "tag903-tools-after.json",
+      "bytes": 477,
+      "sha256": "ec3c14ec1cc96197a2500e88d7b7329b2316a43b6f520ead4f36152ac44469ae"
+    },
+    "originalSourcePost": {
+      "path": "tag903-source-post.json",
+      "bytes": 373,
+      "sha256": "25912e854941a13ada0d0e586782f15bc1a8aea0ba3e022281357f80df3defb0"
+    },
+    "freshAnalysisOnCurrentSource": 0,
+    "rows": [
+      {
+        "path": "lib/features/chat/data/message_mapper.dart",
+        "originalPhase": "tag903-analyze-2",
+        "source": {
+          "path": "app/lib/features/chat/data/message_mapper.dart",
+          "bytes": 16441,
+          "sha256": "aa2a72c6998e0052b151df4882bc0a00063680b36729978aad80967f01c30c80"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": "tag903-analyze-2.summary.json",
+          "bytes": 128,
+          "sha256": "1e0bb38c2df2e516ab148f93634f7ff4acb85ed49db7eebfddee748e431ba296"
+        },
+        "log": {
+          "path": "tag903-analyze-2.log",
+          "bytes": 50,
+          "sha256": "4e5c3aee8c7d8c0cffa1404ac38d8ebd9727a07f1323f2c2f7a6e6e37fb6e35e"
+        },
+        "resource": {
+          "path": "tag903-analyze-2.resource.json",
+          "bytes": 484,
+          "sha256": "b8e0ed3b5c47c8c1d5a363b99aba2fe159ebe9898b5d349f5e099d8a1fe1e8f3"
+        }
+      },
+      {
+        "path": "lib/features/chat/domain/chat_message.dart",
+        "originalPhase": "tag903-analyze-3",
+        "source": {
+          "path": "app/lib/features/chat/domain/chat_message.dart",
+          "bytes": 6709,
+          "sha256": "1d5ed4de6c2b529a9fba28dd4c52455a07aae2f021f4ff0ea411abc6ddb59167"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": "tag903-analyze-3.summary.json",
+          "bytes": 128,
+          "sha256": "5e2e1e465cb8127b661d2ffbc60592d51c3ba11b22ec508260fa73a65de45f8d"
+        },
+        "log": {
+          "path": "tag903-analyze-3.log",
+          "bytes": 48,
+          "sha256": "5fdf54ab57dcca04883f5e834cb59e650154702283d6bb71c3753d2f56fd35dd"
+        },
+        "resource": {
+          "path": "tag903-analyze-3.resource.json",
+          "bytes": 484,
+          "sha256": "36393ddf75677128017d442b1b133ab9f81144bca850edaed848709fb4a9d6ad"
+        }
+      },
+      {
+        "path": "lib/features/chat/presentation/chat_controller.dart",
+        "originalPhase": "tag903-analyze-4",
+        "source": {
+          "path": "app/lib/features/chat/presentation/chat_controller.dart",
+          "bytes": 26236,
+          "sha256": "b60089622b1d6116fd2a0b69b6d10e018c366e43a479d236c48b5bf3b69c89b6"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": "tag903-analyze-4.summary.json",
+          "bytes": 137,
+          "sha256": "d01681e82b97e16dfed9d069f4b5256bd8b243bcc1990b6bc41be22ff8f4c622"
+        },
+        "log": {
+          "path": "tag903-analyze-4.log",
+          "bytes": 51,
+          "sha256": "f2b8bd685f8e059b09b172fbbc2402c76ac859e8cab009608bc8c2bff7784834"
+        },
+        "resource": {
+          "path": "tag903-analyze-4.resource.json",
+          "bytes": 493,
+          "sha256": "5e571fbc739dd5936c7627d08429586b7a1d983d176938343e924056b67fc9aa"
+        }
+      },
+      {
+        "path": "lib/features/contacts/presentation/user_profile_page.dart",
+        "originalPhase": "tag903-analyze-6",
+        "source": {
+          "path": "app/lib/features/contacts/presentation/user_profile_page.dart",
+          "bytes": 35136,
+          "sha256": "e217d20416cad4c8349aa4a35c6fe79b4c97d4c0553c562b7fc7d32025adc493"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": "tag903-analyze-6.summary.json",
+          "bytes": 143,
+          "sha256": "d9e3cc2bd813c2a5617966eab1577a88d82192db3e14bd4d1bc0b03ad87fcdaa"
+        },
+        "log": {
+          "path": "tag903-analyze-6.log",
+          "bytes": 53,
+          "sha256": "01dabf6a52cad89c9fe161e19f7b77fb956d2abe5c3663d7069811f62ab57c24"
+        },
+        "resource": {
+          "path": "tag903-analyze-6.resource.json",
+          "bytes": 500,
+          "sha256": "213d5c1466455b26bcd05b0e7b9681bfda88fa61e3b163ced7e02e30eb9c5f6d"
+        }
+      },
+      {
+        "path": "test/features/chat/batch_media_access_test.dart",
+        "originalPhase": "tag903-analyze-7",
+        "source": {
+          "path": "app/test/features/chat/batch_media_access_test.dart",
+          "bytes": 16389,
+          "sha256": "32e1921721943ffa66269278065734628db20a685bca1cfcd8d1e4e55fa31cdc"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": "tag903-analyze-7.summary.json",
+          "bytes": 133,
+          "sha256": "56a4c629fd0f641b7b83fa79e457774e0e74892259ee18b30e1be2fc83f361e5"
+        },
+        "log": {
+          "path": "tag903-analyze-7.log",
+          "bytes": 59,
+          "sha256": "f0fb86c444ad88b3bc18149078d31e6c1254c7f9fd0757d940fcb48f4f984d28"
+        },
+        "resource": {
+          "path": "tag903-analyze-7.resource.json",
+          "bytes": 489,
+          "sha256": "2f0aa9fbb92f03df49ead4feaf68df213a47542d63ee29ba73bfea050ad36092"
+        }
+      },
+      {
+        "path": "test/features/chat/chat_forward_page_test.dart",
+        "originalPhase": "tag903-analyze-8",
+        "source": {
+          "path": "app/test/features/chat/chat_forward_page_test.dart",
+          "bytes": 18698,
+          "sha256": "ff98f642c331c2dc83cbc0328ecd8d8557b3a90ddba047035ff605a76f1ec7b8"
+        },
+        "passed": true,
+        "diagnostics": 0,
+        "summary": {
+          "path": "tag903-analyze-8.summary.json",
+          "bytes": 132,
+          "sha256": "8082563d716c11a29227ce76fa543e62b45b8eccf96f402af9948f706c1ac8ce"
+        },
+        "log": {
+          "path": "tag903-analyze-8.log",
+          "bytes": 58,
+          "sha256": "0b017247a75853c9952d6376e0816dbb6ef545317915f1a017927edf8f79b87c"
+        },
+        "resource": {
+          "path": "tag903-analyze-8.resource.json",
+          "bytes": 489,
+          "sha256": "9422a38f1f75262b9ce50adf2c86c029ce26a51c473c1380cc941560a86ce001"
+        }
+      }
+    ]
+  }
 }

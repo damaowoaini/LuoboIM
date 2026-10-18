@@ -887,8 +887,9 @@ final class _HintHarness {
         case 'createCustomMessage':
           ++creates;
           await createRelease?.future;
-          if (failCreate)
+          if (failCreate) {
             throw PlatformException(code: 'local-storage-failure');
+          }
           return jsonEncode({
             ...SdkHarness.message(
               id: 'local-hint-$creates',
@@ -910,8 +911,9 @@ final class _HintHarness {
           // Native persistence can precede or outlive its method response.
           h.sdk.messages.add(stored);
           await insertRelease?.future;
-          if (unknownInsert)
+          if (unknownInsert) {
             throw PlatformException(code: 'local-insert-unconfirmed');
+          }
           return jsonEncode(stored);
       }
       return h.respond(call);

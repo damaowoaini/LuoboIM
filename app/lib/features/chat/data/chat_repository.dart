@@ -1302,14 +1302,15 @@ final class ChatRepository {
           // keep this exact created ID unavailable across views of this same
           // gateway/generation, and make all ledger consumers hide it too.
           if (hintId != null) {
-            claims!.quarantined.add((conversationId, hintId!));
+            claims.quarantined.add((conversationId, hintId!));
             _raw.remove(hintId);
             _hintSources.remove(hintId);
             gateway.privacyLedger.forget([hintId!]);
           }
         }
-        if (hintId != null)
+        if (hintId != null) {
           claims!.pendingHints.remove((conversationId, hintId!));
+        }
         claims!.pending.remove(key);
       }
     }

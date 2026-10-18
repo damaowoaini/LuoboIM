@@ -1097,8 +1097,9 @@ class _ChatPageState extends ConsumerState<ChatPage>
         conversation?.isGroup != false ||
         peer?.isNotEmpty != true ||
         repository.relationshipHintType(item.id) != 911 ||
-        !repository.canView(item))
+        !repository.canView(item)) {
       return;
+    }
     final target = peer!;
     final origin = ModalRoute.of(context), navigator = Navigator.of(context);
     final owner = contacts.access.credentials;
@@ -1120,7 +1121,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
         origin?.isActive == true &&
         navigator.mounted &&
         identical(origin?.navigator, navigator) &&
-        (owned == null ? origin?.isCurrent == true : owned!.isActive);
+        (owned == null ? origin?.isCurrent == true : owned.isActive);
     final access = ChatContentAccess(
       repository: repository,
       root: item,
@@ -1145,7 +1146,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
         requestFriendOnOpen: true,
       ),
     );
-    unawaited(navigator.push<void>(owned!));
+    unawaited(navigator.push<void>(owned));
   }
 
   ChatContentAccess? _contentAccess(
@@ -2189,8 +2190,10 @@ class _ChatPageState extends ConsumerState<ChatPage>
 
   Future<void> _messageActions(ChatMessage item) async {
     final repository = controller.repository;
-    if (!controller.usable || repository.relationshipHintType(item.id) != null)
+    if (!controller.usable ||
+        repository.relationshipHintType(item.id) != null) {
       return;
+    }
     late final MessageHistoryAccess lease;
     try {
       lease = repository.gateway.historyAccess(
