@@ -27,6 +27,17 @@ enum AttachmentKind { image, voice, video, file }
 // A received 903 audio view, never a native voice/file or retention capability.
 typedef TagAudioProjection = ({Uri source, int? durationSeconds});
 
+// Display fields from received905; none grants meeting admission or identity.
+typedef TagMeetingProjection = ({
+  String inviterUserId,
+  String? inviterNickname,
+  String? inviterFaceUrl,
+  String subject,
+  String id,
+  int startSeconds,
+  int durationSeconds,
+});
+
 final class ChatAttachment {
   const ChatAttachment({
     required this.kind,
@@ -60,6 +71,10 @@ final class ChatMessage {
     this.card,
     this.media,
     this.tagAudio,
+    this.tagTextForwardable = false,
+    this.tagMeeting,
+    this.legacyCustomType,
+    this.tagText,
     this.thumbnail,
     this.fileName,
     this.fileBytes,
@@ -91,6 +106,12 @@ final class ChatMessage {
   final ChatCard? card;
   final Uri? media;
   final TagAudioProjection? tagAudio;
+  // Set only by the legacy text903 projection; custom identity stays intact.
+  final bool tagTextForwardable;
+  final TagMeetingProjection? tagMeeting;
+  // Decoded protocol classification, never sender identity or permission.
+  final int? legacyCustomType;
+  final String? tagText;
   final Uri? thumbnail;
   final String? fileName;
   final int? fileBytes;
@@ -100,15 +121,23 @@ final class ChatMessage {
   final bool read;
   final int? groupReadCount;
   final MessagePrivacy privacy;
+  // Native and other custom menus keep their existing behavior. For903/905,
+  // text copy/reply follows the text projection, not forwarding permission.
+  bool get canUseTextActions =>
+      kind != ChatMessageKind.custom ||
+      !const {903, 905}.contains(legacyCustomType) ||
+      tagText != null;
   bool get canForward =>
       mergedContentComplete &&
       delivery == MessageDelivery.sent &&
       privacy.allowsRetention &&
+      (kind != ChatMessageKind.custom ||
+          tagTextForwardable ||
+          tagMeeting != null) &&
       !const {
         ChatMessageKind.system,
         ChatMessageKind.typing,
         ChatMessageKind.unsupported,
-        ChatMessageKind.custom,
       }.contains(kind);
   // These paths are assigned only after account-scoped staging by the data
   // layer. Paths embedded in received protocol messages are never trusted.
@@ -138,6 +167,10 @@ final class ChatMessage {
     card: card,
     media: media,
     tagAudio: tagAudio,
+    tagTextForwardable: tagTextForwardable,
+    tagMeeting: tagMeeting,
+    legacyCustomType: legacyCustomType,
+    tagText: tagText,
     thumbnail: thumbnail,
     fileName: fileName,
     fileBytes: fileBytes,
@@ -170,6 +203,10 @@ final class ChatMessage {
     card: card,
     media: media,
     tagAudio: tagAudio,
+    tagTextForwardable: tagTextForwardable,
+    tagMeeting: tagMeeting,
+    legacyCustomType: legacyCustomType,
+    tagText: tagText,
     thumbnail: thumbnail,
     fileName: fileName,
     fileBytes: fileBytes,

@@ -63,7 +63,9 @@ class UserProfilePage extends ConsumerStatefulWidget {
     required this.userId,
     this.groupId,
     this.source,
+    this.requestFriendOnOpen = false,
   });
+  final bool requestFriendOnOpen;
   final String userId;
   final String? groupId;
   final UserProfileSource? source;
@@ -83,6 +85,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   NavigatorState? _sourceNavigator;
   bool _sourceRetired = false, _openingSourceDialog = false;
   int _sourceRead = 0;
+  bool _requestOpened = false;
   Timer? _sourceExpiry;
   @override
   void initState() {
@@ -255,6 +258,19 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
           _sourceGroup = AsyncData(group);
         }
       });
+      if (widget.requestFriendOnOpen && !_requestOpened) {
+        _requestOpened = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_sourceCurrent &&
+              !value.friend &&
+              !value.blocked &&
+              value.canRequestFriend &&
+              value.id == source.userId &&
+              value.id != source.repository.access.credentials.userId) {
+            unawaited(_requestFriend(source.repository, value));
+          }
+        });
+      }
     } catch (error, stack) {
       if (_sourceCurrent && read == _sourceRead) {
         setState(() => _sourceProfile = AsyncError(error, stack));
@@ -355,6 +371,39 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     } finally {
       _sourceDialog = null;
       _openingSourceDialog = false;
+    }
+  }
+
+  Future<void> _requestFriend(
+    ContactsRepository repository,
+    Contact user,
+  ) async {
+    if (busy || !_sourceCurrent) return;
+    final reason = await _input(
+      '添加好友',
+      hint: '填写验证信息',
+      maxLength: 256,
+      lines: 3,
+    );
+    if (reason != null &&
+        mounted &&
+        repository.access.isCurrent &&
+        _sourceCurrent) {
+      await run(
+        (repo) => repo.requestFriend(
+          user.id,
+          reason,
+          checkSource: widget.source == null ? null : _checkSource,
+        ),
+        success: '好友申请已发送',
+        expectedRepository: repository,
+        policy: (latest) =>
+            !latest.friend &&
+            !latest.blocked &&
+            latest.canRequestFriend &&
+            latest.id != repository.access.credentials.userId,
+        friendRequest: true,
+      );
     }
   }
 
@@ -821,43 +870,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                             child: OutlinedButton(
                               onPressed: busy
                                   ? null
-                                  : () async {
-                                      if (!_sourceCurrent) {
-                                        return;
-                                      }
-                                      final reason = await _input(
-                                        '添加好友',
-                                        hint: '填写验证信息',
-                                        maxLength: 256,
-                                        lines: 3,
-                                      );
-                                      if (reason != null &&
-                                          mounted &&
-                                          repository.access.isCurrent &&
-                                          _sourceCurrent) {
-                                        await run(
-                                          (repo) => repo.requestFriend(
-                                            user.id,
-                                            reason,
-                                            checkSource: widget.source == null
-                                                ? null
-                                                : _checkSource,
-                                          ),
-                                          success: '好友申请已发送',
-                                          expectedRepository: repository,
-                                          policy: (latest) =>
-                                              !latest.friend &&
-                                              !latest.blocked &&
-                                              latest.canRequestFriend &&
-                                              latest.id !=
-                                                  repository
-                                                      .access
-                                                      .credentials
-                                                      .userId,
-                                          friendRequest: true,
-                                        );
-                                      }
-                                    },
+                                  : () => _requestFriend(repository, user),
                               child: const Text('添加好友'),
                             ),
                           ),

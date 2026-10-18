@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manual legacy903 receive/play projection: format1, analysis1 and exact3; historical5 is partial only."""
+"""Manual codec903/905/910/911: format9, analysis9, exact35; historical5 remains partial only."""
 import argparse, hashlib, importlib.util, json, os, re, selectors, signal, stat
 import subprocess, sys, threading, time
 from pathlib import Path, PurePosixPath
@@ -10,10 +10,12 @@ INPUTS='ci/mobile-tag903/inputs.json'
 PARENT_COMMIT='2f17d99d2f32c4fc72b9b922f8d2a8783938b665'
 PARENT_SOURCE={'members':363,'digest':'ccec31d13c6e64bb4d0c9ff0b1b85baae3d50d198c743d34e9935a053d17ecd8'}
 PARENT_PORTABLE={'members':415,'digest':'30879a35431337689eced3a9b5ce9a7c528342740be0be502053100b7be24d7d'}
-PATHS6=['lib/features/chat/domain/chat_message.dart','lib/features/chat/data/message_mapper.dart','lib/features/chat/presentation/message_media.dart','lib/features/chat/presentation/chat_page.dart','test/features/chat/legacy_custom_summary_test.dart','test/features/chat/batch_media_access_test.dart']
-CHECK_PATHS1=['test/features/chat/batch_media_access_test.dart']
-TEST_PATHS=['test/features/chat/batch_media_access_test.dart']
-NAMES3=['tag903 audio starts only on tap and keeps the custom message menu', 'tag903 pending audio cannot start after expiry', 'tag903 pending audio cannot start after route-exit']
+PATHS10=['lib/features/chat/domain/chat_message.dart', 'lib/features/chat/data/message_mapper.dart', 'lib/features/chat/presentation/message_media.dart', 'lib/features/chat/presentation/chat_page.dart', 'test/features/chat/legacy_custom_summary_test.dart', 'test/features/chat/batch_media_access_test.dart', 'lib/features/chat/data/chat_repository.dart', 'lib/features/chat/presentation/chat_controller.dart', 'lib/features/contacts/presentation/user_profile_page.dart', 'test/features/chat/chat_forward_page_test.dart']
+CHECK_PATHS9=['lib/features/chat/data/chat_repository.dart', 'lib/features/chat/data/message_mapper.dart', 'lib/features/chat/domain/chat_message.dart', 'lib/features/chat/presentation/chat_controller.dart', 'lib/features/chat/presentation/chat_page.dart', 'lib/features/contacts/presentation/user_profile_page.dart', 'test/features/chat/batch_media_access_test.dart', 'test/features/chat/chat_forward_page_test.dart', 'test/features/chat/legacy_custom_summary_test.dart']
+TEST_PATHS=['test/features/chat/legacy_custom_summary_test.dart', 'test/features/chat/chat_forward_page_test.dart', 'test/features/chat/batch_media_access_test.dart', 'test/features/chat/chat_card_workflow_test.dart']
+NAMES35=['tag903 voice and malformed text cannot bypass the native forwarding gate', 'tag903 forwarding retains original owner and privacy fences while native creation waits', 'tag903 text metadata forwards through the actual menu and preserves custom JSON', 'meeting905 malformed fields cannot gain native forwarding authority', 'meeting905 retains original owner and privacy fences while native creation waits', 'meeting905 card displays original fields and forwards the unchanged custom invitation', 'mixed tag903 text keeps copy and reply while raw voice still prevents forwarding', 'tag903 text uses the actual legacy textElem payload', 'tag903 sound has a restricted audio projection without changing custom identity', 'tag903 keeps text priority and rejects unsafe or malformed audio projections', 'real private root still masks every known custom conversation preview', 'standard107 nested custom summaries keep the original joint privacy', 'meeting905 is readable without manufacturing a join action or URL', 'wrong typed known payload fields fall back without string coercion', 'tag903 audio starts only on tap and keeps the custom message menu', 'real send 1302 keeps the failed row and original error while inserting only one read local hint', 'real send 1303 keeps the failed row and original error while inserting only one read local hint', 'ordinary unopted send and non-relationship failure never create a local side effect', 'local hint create failure is observable and never replaces or replays the original failure', 'local hint unknown is observable and never replaces or replays the original failure', 'CID clear during native local insert retires the original timeline before its late ACK', 'source expiry while create is pending prevents LOCAL insert and never renews the original burn window', 'private source keeps its original privacy and suppresses a persistent hint without a new burn window', '911 hint opens the actual reason dialog once and confirms only the current single peer with no message send', '911 retained reason cannot apply after original clear invalidation', '911 retained reason cannot apply after original owner invalidation', '911 retained reason cannot apply after original issuer invalidation', '911 reason retained after its owned profile exits cannot dispatch a friend request', '910 has no friend-request action or ordinary message menu', 'stricter ledger facts than the raw send suppress durable hints without rewriting the original failure', 'damaged LOCAL ACK remains unknown and the already stored native hint is hidden after remount without replay', 'late stricter source facts never upgrade a pending hint and remain effective for a known hint after remount', 'ordinary contact profile without a message source keeps its normal friend request and dialog behavior', 'clear during the requestFriend inner profile await prevents the real final addFriend dispatch', 'foreign coverage of the owned friend-reason dialog retires its retained submit without a new action']
+FINAL_SOURCE={'members': 363, 'digest': 'e05419bfbd52e3c27a80c192bc9d3856569cc112b1899afcf2099ebf4d5c81e4'}
+FINAL_PORTABLE={'members': 415, 'digest': 'd4fb9703b093fa7134e198bca1052d6e39e4854e9eaabf3382bd9eae54d0ab8a'}
 HISTORICAL_PARTIAL5={'status': 'historical-visible-testDone-only-parent-failed', 'run': 39084923688, 'job': 117549360631, 'head': 'bff3ba487899c485c77aaedea695be5a167a063b', 'source': {'members': 363, 'digest': 'e8ef155193d61b94942e29afc269ddf995f12b8dcba6b3253ddaa1b8a050d316'}, 'portable': {'members': 415, 'digest': '8d42e4660335bc172ab40f24369318098429410ee6318af15f25205fb10b7781'}, 'RootReview': {'path': '.qa/tag903-mobile-web-batch-1/root-bff3-mobile7-pass-route-exit-timeout-review.json', 'bytes': 4249, 'sha256': 'ce892b9dc224d426b9fcb3c3e0f10ae71658324316f1240320b9594e7502a998'}, 'compactArtifact': {'artifact': 12119744075, 'run': 39084923688, 'attempt': 1, 'head': 'bff3ba487899c485c77aaedea695be5a167a063b', 'sha256': '758cfbeaa4fe2bab416b879abc59a6e09d2d69ea359be094738e668289b2e07e', 'bytes': 40412, 'exactAPIDigest': True, 'files': 36, 'binariesDownloaded': False}, 'names5': ['tag903 sound has a restricted audio projection without changing custom identity', 'tag903 keeps text priority and rejects unsafe or malformed audio projections', 'wrong typed known payload fields fall back without string coercion', 'nested audio active playback stops after root expiry', 'nested audio late setUrl cannot start after root exit'], 'parentWholeSelected8Accepted': False, 'machineDoneSuccess': False, 'latchedFailure': 'phase_timeout', 'childExitCodeIsNotAcceptance': 0, 'wholeProcessPASS': False, 'newSourcePASS': False}
 NAMES8=['tag903 sound has a restricted audio projection without changing custom identity','tag903 keeps text priority and rejects unsafe or malformed audio projections','tag903 audio starts only on tap and keeps the custom message menu','tag903 pending audio cannot start after expiry','tag903 pending audio cannot start after route-exit','wrong typed known payload fields fall back without string coercion','nested audio active playback stops after root expiry','nested audio late setUrl cannot start after root exit']
 RESOURCE={'initial_bytes':4<<30,'floor_bytes':1<<30,'allocated_cap_bytes':768<<20,'poll_seconds':.2,'phase_seconds':120}
@@ -50,19 +52,20 @@ def descriptor(repo=REPO):
  c=json.loads(regular(repo/INPUTS))
  if (c['schema']!=1 or c['state']!='FROZEN_FORMATTED_SOURCE' or c['parent_commit']!=PARENT_COMMIT
      or c['parent_source']!=PARENT_SOURCE or c['parent_portable']!=PARENT_PORTABLE
-     or c['analysis_paths']!=CHECK_PATHS1 or c['test_paths']!=TEST_PATHS or c['names8']!=NAMES8 or c['selected_names3']!=NAMES3
+     or c['source']!=FINAL_SOURCE or c['portable']!=FINAL_PORTABLE
+     or c['analysis_paths']!=CHECK_PATHS9 or c['test_paths']!=TEST_PATHS or c['names8']!=NAMES8 or c['selected_names35']!=NAMES35
      or json.dumps(c['historical_partial5'],sort_keys=True)!=json.dumps(HISTORICAL_PARTIAL5,sort_keys=True)
-     or c['resource']!=RESOURCE or len(c['delta6'])!=6 or [r['path'][4:] for r in c['delta6']]!=PATHS6
-     or c['expected_full_tests_only']!=1333 or c['whole_codec_completed'] is not False):raise ValueError('exact formatted903 scope required')
+     or c['resource']!=RESOURCE or len(c['delta10'])!=10 or [r['path'][4:] for r in c['delta10']]!=PATHS10
+     or c['expected_full_tests_only']!=1357 or c['whole_codec_completed'] is not False):raise ValueError('exact formatted combined codec scope required')
  for r in c['helpers']+c['controllers']:pinned(repo/safe(r['path']),r)
  old=load(repo/'ci/mobile-input.py','tag903_original_input_source_only');parent,base=old.descriptor()
  if parent['source_digest']!=PARENT_SOURCE['digest'] or parent['portable_digest']!=PARENT_PORTABLE['digest']:raise ValueError('exact363/415 parent required')
  before={r['path']:r for r in parent['source_rows']}
- for r in c['delta6']:
-  if r['before']!=before.get(r['path']) or r['after']['path']!=r['path']:raise ValueError('six original preimages required')
+ for r in c['delta10']:
+  if r['before']!=before.get(r['path']) or r['after']['path']!=r['path']:raise ValueError('ten original preimages required')
  return c,old,parent,base
 def checkout_sources(c,parent,base,repo=REPO):
- delta={r['path']:r for r in c['delta6']};files={}
+ delta={r['path']:r for r in c['delta10']};files={}
  for row in parent['source_rows']:
   target=delta.get(row['path'],{}).get('after',row);files[row['path']]=pinned(repo/safe(row['path']),target)
  actual=authored_paths(repo)
@@ -75,8 +78,8 @@ def checkout_sources(c,parent,base,repo=REPO):
  for row in base['native_source_snapshot']['files']:pinned(repo/safe(row['path']),row)
  return files
 def parent_git_body(repo,commit,row):
- # Exactly six public old source blobs. No fetch, floating ref or caller path.
- if commit!=PARENT_COMMIT or row['path'][4:] not in PATHS6:raise ValueError('fixed parent blob only')
+ # Exactly ten public old source blobs. No fetch, floating ref or caller path.
+ if commit!=PARENT_COMMIT or row['path'][4:] not in PATHS10:raise ValueError('fixed parent blob only')
  command=['/usr/bin/git','--no-pager','-C',str(repo),'show',commit+':'+row['path']]
  child=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
  data=bytearray();deadline=time.monotonic()+10;watch=selectors.DefaultSelector()
@@ -99,7 +102,7 @@ def parent_git_body(repo,commit,row):
  return raw
 def prepare_repo(c,parent,base,view,repo=REPO,reader=parent_git_body):
  current=checkout_sources(c,parent,base,repo);before=dict(current)
- for r in c['delta6']:before[r['path']]=reader(repo,c['parent_commit'],r['before'])
+ for r in c['delta10']:before[r['path']]=reader(repo,c['parent_commit'],r['before'])
  authored={p:b for p,b in before.items() if p.startswith('app/')}
  if len(authored)!=363 or digest(authored)!=PARENT_SOURCE['digest'] or digest(before)!=PARENT_PORTABLE['digest']:raise ValueError('actual old415 reconstruction differs')
  files=dict(before)
@@ -112,7 +115,7 @@ def prepare_repo(c,parent,base,view,repo=REPO,reader=parent_git_body):
  for name,raw in files.items():
   p=view/safe(name);p.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
   with p.open('xb') as out:out.write(raw)
- return {'parent_commit':c['parent_commit'],'source':PARENT_SOURCE,'portable':PARENT_PORTABLE,'files':len(files),'body_bytes':sum(map(len,files.values())),'restored_only6':[r['before'] for r in c['delta6']],'original_helpers_unchanged':True},before
+ return {'parent_commit':c['parent_commit'],'source':PARENT_SOURCE,'portable':PARENT_PORTABLE,'files':len(files),'body_bytes':sum(map(len,files.values())),'restored_only10':[r['before'] for r in c['delta10']],'original_helpers_unchanged':True},before
 def canonical_work(work):
  if work.resolve()!=work or work.is_relative_to(REPO) or not work.is_dir() or work.is_symlink():raise ValueError('canonical owned work outside checkout required')
 def verify_work(work,c,parent,base,before=False,view=None):
@@ -151,8 +154,8 @@ def origin_snapshot(work,c,parent,base):
  projection_raw=regular(work/'evidence/tag903-source.json');projection=json.loads(projection_raw)
  if (projection.get('source')!=c['source'] or projection.get('portable')!=c['portable'] or projection.get('parent_commit')!=PARENT_COMMIT
      or projection.get('setup_parent_source')!=PARENT_SOURCE or projection.get('setup_parent_portable')!=PARENT_PORTABLE
-     or projection.get('original_setup_source_sha256')!=sha(raw) or projection.get('overlay6')!=c['delta6']
-     or projection.get('original_helpers_unchanged') is not True or projection.get('old_vm_result_reused') is not False or projection.get('native_acceptance') is not False):raise ValueError('explicit original-setup-to-six projection required')
+     or projection.get('original_setup_source_sha256')!=sha(raw) or projection.get('overlay10')!=c['delta10']
+     or projection.get('original_helpers_unchanged') is not True or projection.get('old_vm_result_reused') is not False or projection.get('native_acceptance') is not False):raise ValueError('explicit original-setup-to-ten projection required')
  return {'originalSetupSHA256':sha(raw),'explicitDeltaSHA256':sha(projection_raw)}
 def setup(allocation):
  os.umask(0o077);c,old,parent,base=descriptor();check=old.CHECK
@@ -167,15 +170,15 @@ def setup(allocation):
  setup_raw=regular(work/'evidence/source.json')
  before=verify_work(work,c,parent,base,before=True,view=view)
  setup_sha=original_setup_receipt(setup_raw,before)
- for r in c['delta6']:
+ for r in c['delta10']:
   path=work/'source'/safe(r['path']);pinned(path,r['before'])
   with path.open('wb') as out:out.write(pinned(REPO/safe(r['path']),r['after']));out.flush();os.fsync(out.fileno())
  verify_work(work,c,parent,base)
- write(work/'evidence/tag903-source.json',dict(projection,source=c['source'],portable=c['portable'],setup_parent_source=PARENT_SOURCE,setup_parent_portable=PARENT_PORTABLE,original_setup_source_sha256=setup_sha,overlay6=c['delta6'],native_acceptance=False,old_vm_result_reused=False))
- return {'source':c['source'],'portable':c['portable'],'setup':'original-current363-exact-parent-then-explicit6','native_or_VM_acceptance':False}
+ write(work/'evidence/tag903-source.json',dict(projection,source=c['source'],portable=c['portable'],setup_parent_source=PARENT_SOURCE,setup_parent_portable=PARENT_PORTABLE,original_setup_source_sha256=setup_sha,overlay10=c['delta10'],native_acceptance=False,old_vm_result_reused=False))
+ return {'source':c['source'],'portable':c['portable'],'setup':'original-current363-exact-parent-then-explicit10','native_or_VM_acceptance':False}
 def phase_commands(work):
  dart=str(work/'flutter/bin/cache/dart-sdk/bin/dart');flutter=str(work/'flutter/bin/flutter')
- return ([dart,'format','--output=none','--set-exit-if-changed',*CHECK_PATHS1],[[dart,'analyze','--fatal-infos',p] for p in CHECK_PATHS1],[flutter,'test','--no-pub','--machine','--concurrency=1','--no-enable-vmservice','--name','^(?:'+'|'.join(map(re.escape,NAMES3))+')$',*TEST_PATHS])
+ return ([dart,'format','--output=none','--set-exit-if-changed',*CHECK_PATHS9],[[dart,'analyze','--fatal-infos',p] for p in CHECK_PATHS9],[flutter,'test','--no-pub','--machine','--concurrency=1','--no-enable-vmservice','--name','^(?:'+'|'.join(map(re.escape,NAMES35))+')$',*TEST_PATHS])
 def tool_snapshot(work):
  out={}
  for name,p in [('dart',work/'flutter/bin/cache/dart-sdk/bin/dart'),('flutter',work/'flutter/bin/flutter')]:
@@ -204,17 +207,17 @@ def run(work):
   tools=tool_snapshot(work);write(work/'evidence/tag903-tools-before.json',tools)
   write(work/'evidence/tag903-historical-partial5.json',HISTORICAL_PARTIAL5)
   fmt,analyses,test=phase_commands(work)
-  check.guarded(fmt,work,guard,'tag903-format1',timeout=120)
+  check.guarded(fmt,work,guard,'tag903-format9',timeout=120)
   for index,command in enumerate(analyses,1):
    verify_work(work,c,parent,base);label='tag903-analyze-'+str(index)
    log=check.guarded(command,work,guard,label,timeout=120,accepted_exits=(0,1,2,3))
    record=json.loads(regular(work/'evidence'/(label+'.resource.json')))
    result=old.ANALYSIS.analysis_outcome(record,log.read_text(),label,command);analysis.append(result)
    write(work/'evidence'/(label+'.summary.json'),result);verify_work(work,c,parent,base)
-  if not all(r['passed'] for r in analysis):raise ValueError('analysis1 failed; no tests started')
-  log=check.guarded(test,work,guard,'tag903-target3',timeout=120)
-  tests=check.required_name_summary(log.read_text(),3,[{'name':n,'count':1} for n in NAMES3])
-  write(work/'evidence/tag903-target3.summary.json',tests)
+  if not all(r['passed'] for r in analysis):raise ValueError('analysis9 failed; no tests started')
+  log=check.guarded(test,work,guard,'tag903-target35',timeout=120)
+  tests=check.required_name_summary(log.read_text(),35,[{'name':n,'count':1} for n in NAMES35])
+  write(work/'evidence/tag903-target35.summary.json',tests)
  except BaseException as error:primary=error
  finally:
   post={'accepted':False,'source':c['source'],'portable':c['portable']}
@@ -240,7 +243,7 @@ def run(work):
   write(work/'evidence/tag903-failed.json',{'accepted':False,'exceptionType':type(primary).__name__ if primary is not None else 'ValueError','analysisExecuted':len(analysis),'testsAccepted':tests is not None,'latched_failure':guard.reason,'codec_completed':False})
   if primary is not None:raise primary
   raise ValueError('903 scope/post/resource failed')
- write(work/'evidence/tag903-passed.json',{'accepted':True,'source':c['source'],'portable':c['portable'],'formatPaths':1,'analysisPaths':1,'selectedTests':3,'testNames':NAMES3,'newTests':0,'directExisting':3,'historicalPartial5':HISTORICAL_PARTIAL5,'wholeSelected8Accepted':False,'full1333Executed':False,'nativeAcceptance':False,'wholeCodecCompleted':False,'remaining':['905','910','911']})
+ write(work/'evidence/tag903-passed.json',{'accepted':True,'source':c['source'],'portable':c['portable'],'formatPaths':9,'analysisPaths':9,'selectedTests':35,'testNames':NAMES35,'newTests':24,'directExisting':11,'historicalPartial5':HISTORICAL_PARTIAL5,'wholeSelected8Accepted':False,'full1357Executed':False,'nativeAcceptance':False,'wholeCodecCompleted':False,'remaining':['905 actual meeting admission/join/RTC','native and real-service codec acceptance']})
  return 0
 def netns(work,run_as):
  if os.geteuid()!=0 or not run_as or run_as=='root':raise ValueError('root namespace launcher and original nonroot tester required')

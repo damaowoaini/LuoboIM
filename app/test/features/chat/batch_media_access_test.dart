@@ -392,10 +392,32 @@ void main() {
         await tester.longPress(find.text('标签语音'));
         await tester.pumpAndSettle();
         expect(find.text('转发到聊天'), findsNothing);
-        expect(find.text('复制文字'), findsOneWidget);
+        expect(find.text('复制文字'), findsNothing);
+        expect(find.text('引用回复'), findsNothing);
+        expect(find.text('删除消息'), findsOneWidget);
         expect(jsonEncode(wire), before);
+        final dismissibleBarrier = find.byWidgetPredicate(
+          (widget) => widget is ModalBarrier && widget.dismissible,
+        );
+        expect(dismissibleBarrier, findsOneWidget);
+        final barrierRect = tester.getRect(dismissibleBarrier);
+        final sheetRect = tester.getRect(find.byType(BottomSheet));
+        expect(sheetRect.top, greaterThan(barrierRect.top));
+        final dismissPoint = Offset(
+          barrierRect.center.dx,
+          (barrierRect.top + sheetRect.top) / 2,
+        );
+        expect(barrierRect.contains(dismissPoint), isTrue);
+        expect(sheetRect.contains(dismissPoint), isFalse);
+        await tester.tapAt(dismissPoint);
+        await tester.pumpAndSettle();
+        expect(find.byType(BottomSheet), findsNothing);
+        expect(dismissibleBarrier, findsNothing);
+        expect(find.text('删除消息'), findsNothing);
+        expect(find.byType(ChatPage), findsOneWidget);
         await tester.pageBack();
         await tester.pumpAndSettle();
+        expect(find.byType(ChatPage), findsNothing);
       } finally {
         await close(tester);
       }

@@ -42,6 +42,7 @@ final class ChatController extends ChangeNotifier {
         sourceMessageId = null;
         progress.clear();
         _sending.clear();
+        _localHintResults.clear();
         _lastReadId = null;
         loading = loadingOlder = preparing = false;
         hasMore = false;
@@ -90,6 +91,7 @@ final class ChatController extends ChangeNotifier {
       _draftTimer?.cancel();
       _refreshTimer?.cancel();
       repository.clear();
+      _localHintResults.clear();
       failure = const AppFailure(FailureKind.sessionExpired);
       notifyListeners();
     });
@@ -121,6 +123,24 @@ final class ChatController extends ChangeNotifier {
   String? _lastReadId;
   final Map<String, int> progress = {};
   final Set<String> _sending = {};
+  final Map<int, ChatLocalHintResult> _localHintResults = {};
+  Map<int, ChatLocalHintResult> get localHintResults =>
+      Map.unmodifiable(_localHintResults);
+  void _localHint(ChatLocalHintResult result, int timeline) {
+    if (!usable || timeline != _timeline) return;
+    _localHintResults[result.attempt] = result;
+    final hint = result.message;
+    if (hint != null && repository.canView(hint)) _merge([hint]);
+  }
+
+  void _checkSendSource(int timeline, String id) {
+    if (!usable ||
+        timeline != _timeline ||
+        !messages.any((item) => item.id == id && repository.canView(item))) {
+      throw const AppFailure(FailureKind.cancelled);
+    }
+  }
+
   final Map<String, String> _unconfirmedFaces = {};
   bool hasUnconfirmedFace(String entryId) =>
       _unconfirmedFaces.containsKey(entryId);
@@ -415,7 +435,11 @@ final class ChatController extends ChangeNotifier {
       final sent = await repository.send(
         message.id,
         access: access,
-        checkSource: checkSource,
+        checkSource: () {
+          checkSource();
+          _checkSendSource(timeline, message.id);
+        },
+        onLocalHint: (result) => _localHint(result, timeline),
         onDispatched: () {
           dispatched = true;
         },
@@ -491,7 +515,11 @@ final class ChatController extends ChangeNotifier {
       final sent = await repository.send(
         message.id,
         access: access,
-        checkSource: checkSource,
+        checkSource: () {
+          checkSource();
+          _checkSendSource(timeline, message.id);
+        },
+        onLocalHint: (result) => _localHint(result, timeline),
         onDispatched: () => dispatched = true,
       );
       if (current()) {
@@ -570,7 +598,11 @@ final class ChatController extends ChangeNotifier {
       final sent = await repository.send(
         message.id,
         access: access,
-        checkSource: checkSource,
+        checkSource: () {
+          checkSource();
+          _checkSendSource(timeline, message.id);
+        },
+        onLocalHint: (result) => _localHint(result, timeline),
         onDispatched: () => dispatched = true,
       );
       if (current()) {
@@ -621,7 +653,11 @@ final class ChatController extends ChangeNotifier {
     );
     notifyListeners();
     try {
-      final sent = await repository.send(id);
+      final sent = await repository.send(
+        id,
+        checkSource: () => _checkSendSource(timeline, id),
+        onLocalHint: (result) => _localHint(result, timeline),
+      );
       _unconfirmedFaces.removeWhere((_, value) => value == id);
       if (!usable || timeline != _timeline) return;
       _sending.remove(id);

@@ -33,6 +33,7 @@ import '../../group/data/group_repository.dart';
 import '../../group/presentation/group_creation_action.dart';
 import '../../contacts/domain/contact.dart';
 import '../../contacts/contacts_providers.dart';
+import '../../contacts/presentation/user_profile_page.dart';
 import 'chat_controller.dart';
 import 'chat_typing_controller.dart';
 import 'mention_text_controller.dart';
@@ -77,6 +78,7 @@ class ChatPage extends ConsumerStatefulWidget {
 class _ChatPageState extends ConsumerState<ChatPage>
     with WidgetsBindingObserver {
   late final ChatController controller;
+  final _relationshipLifetime = StreamController<void>.broadcast();
   late final ChatTypingController _typing;
   ChatReeditDraft? _reedit;
   StreamSubscription<ImEvent>? _inputEvents;
@@ -557,6 +559,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
 
   @override
   void dispose() {
+    _relationshipLifetime.add(null);
+    unawaited(_relationshipLifetime.close());
     WidgetsBinding.instance.removeObserver(this);
     ++_inputView;
     _discardReedit();
@@ -868,6 +872,37 @@ class _ChatPageState extends ConsumerState<ChatPage>
   );
 
   Widget _messageBody(ChatMessage item) {
+    final hint = controller.repository.relationshipHintType(item.id);
+    if (hint != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Center(
+          child: MessagePrivacyContent(
+            key: ValueKey(item.id),
+            privacy: item.privacy,
+            now: controller.repository.now,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  item.text,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.secondary,
+                    fontSize: 12,
+                  ),
+                ),
+                if (hint == 911 && controller.conversation?.isGroup == false)
+                  TextButton(
+                    onPressed: () => _relationshipRequest(item),
+                    child: const Text('发送好友验证'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     if (item.kind == ChatMessageKind.system ||
         item.kind == ChatMessageKind.typing) {
       return Padding(
@@ -1050,6 +1085,67 @@ class _ChatPageState extends ConsumerState<ChatPage>
         ],
       ),
     );
+  }
+
+  void _relationshipRequest(ChatMessage item) {
+    final repository = controller.repository;
+    final contacts = ref.read(contactsRepositoryProvider);
+    final conversation = controller.conversation;
+    final peer = conversation?.userId;
+    if (!_inputCurrent ||
+        contacts == null ||
+        conversation?.isGroup != false ||
+        peer?.isNotEmpty != true ||
+        repository.relationshipHintType(item.id) != 911 ||
+        !repository.canView(item))
+      return;
+    final target = peer!;
+    final origin = ModalRoute.of(context), navigator = Navigator.of(context);
+    final owner = contacts.access.credentials;
+    final generation = contacts.access.generation;
+    MaterialPageRoute<void>? owned;
+    bool current() =>
+        mounted &&
+        _foreground &&
+        !_leaving &&
+        controller.usable &&
+        widget.sourceCurrent?.call() != false &&
+        identical(ref.read(contactsRepositoryProvider), contacts) &&
+        contacts.access.isCurrent &&
+        contacts.access.generation == generation &&
+        identical(contacts.access.session.state.credentials, owner) &&
+        controller.repository.conversationId == widget.conversationId &&
+        controller.conversation?.isGroup == false &&
+        controller.conversation?.userId == target &&
+        origin?.isActive == true &&
+        navigator.mounted &&
+        identical(origin?.navigator, navigator) &&
+        (owned == null ? origin?.isCurrent == true : owned!.isActive);
+    final access = ChatContentAccess(
+      repository: repository,
+      root: item,
+      child: item,
+      isRouteCurrent: current,
+    );
+    if (!access.canView) return;
+    final source = UserProfileSource(
+      repository: contacts,
+      userId: target,
+      current: () => access.canView,
+      canRetain: () => access.canRetain,
+      changes: _relationshipLifetime.stream,
+      uiChanges: controller,
+      expiresAtMillis: () => access.privacy.expiresAtMilliseconds,
+      now: repository.now,
+    );
+    owned = MaterialPageRoute<void>(
+      builder: (_) => UserProfilePage(
+        userId: target,
+        source: source,
+        requestFriendOnOpen: true,
+      ),
+    );
+    unawaited(navigator.push<void>(owned!));
   }
 
   ChatContentAccess? _contentAccess(
@@ -1241,6 +1337,42 @@ class _ChatPageState extends ConsumerState<ChatPage>
           ),
         );
       case ChatMessageKind.custom:
+        final meeting = item.tagMeeting;
+        if (meeting != null) {
+          final start = DateTime.fromMillisecondsSinceEpoch(
+            meeting.startSeconds * 1000,
+          );
+          String two(int value) => value.toString().padLeft(2, '0');
+          final startLabel =
+              '${start.year}-${two(start.month)}-${two(start.day)} ${_time(start)}';
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.video_call_outlined, size: 20),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      meeting.subject.trim().isEmpty ? '会议邀请' : meeting.subject,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text('开始时间：$startLabel'),
+              Text('时长：${meeting.durationSeconds / 3600} 小时'),
+              Text('会议号：${meeting.id}'),
+              const SizedBox(height: 6),
+              const Text(
+                '当前版本未开放从邀请加入会议',
+                style: TextStyle(color: AppColors.secondary, fontSize: 12),
+              ),
+            ],
+          );
+        }
         final audio = item.tagAudio;
         if (audio == null) {
           return _messageText(
@@ -2057,7 +2189,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
 
   Future<void> _messageActions(ChatMessage item) async {
     final repository = controller.repository;
-    if (!controller.usable) return;
+    if (!controller.usable || repository.relationshipHintType(item.id) != null)
+      return;
     late final MessageHistoryAccess lease;
     try {
       lease = repository.gateway.historyAccess(
@@ -2105,8 +2238,8 @@ class _ChatPageState extends ConsumerState<ChatPage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 for (final entry in <String, String>{
-                  if (retainable) 'copy': '复制文字',
-                  if (retainable) 'reply': '引用回复',
+                  if (retainable && item.canUseTextActions) 'copy': '复制文字',
+                  if (retainable && item.canUseTextActions) 'reply': '引用回复',
                   if (item.canForward && retainable) 'forward': '转发到聊天',
                   if (!expired &&
                       repository.canRevokeSource(item) &&

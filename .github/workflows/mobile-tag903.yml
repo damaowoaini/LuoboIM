@@ -1,4 +1,4 @@
-name: Manual Mobile legacy903 receive and tap-play / format1 analysis1 exact3 / historical5 partial only
+name: Manual Mobile codec903 905 910 911 / format9 analysis9 exact35 / historical5 partial only
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
-      - name: Original current363 setup from exact parent projection then explicit six-file successor
+      - name: Original current363 setup from exact parent projection then explicit ten-file successor
         run: |
           set -euo pipefail
           umask 077
@@ -36,10 +36,10 @@ jobs:
             origin 2f17d99d2f32c4fc72b9b922f8d2a8783938b665:refs/tag903/source-parent
           test "$(git -C "$GITHUB_WORKSPACE" rev-parse --verify 'refs/tag903/source-parent^{commit}')" = '2f17d99d2f32c4fc72b9b922f8d2a8783938b665'
           test "$(git -C "$GITHUB_WORKSPACE" rev-parse --verify 'HEAD^{commit}')" = "$original_head"
-          # The unchanged setup verifies the six exact git blobs before its one original setup call.
+          # The unchanged setup verifies the ten exact git blobs before its one original setup call.
           python3 -B ci/mobile-tag903.py setup --allocation "$TAG903_ROOT"
           test "$(git -C "$GITHUB_WORKSPACE" rev-parse --verify 'HEAD^{commit}')" = "$original_head"
-      - name: Only format1 analyze1 and selected3 with no VM service or business network
+      - name: Only format9 analyze9 and selected35 with no VM service or business network
         run: |
           set -euo pipefail
           sudo unshare --net -- python3 -B "$GITHUB_WORKSPACE/ci/mobile-tag903.py" netns \

@@ -52,6 +52,13 @@ _LegacyCustom? _legacyCustom(Message item) {
 /// visible row must not turn them into an ordinary group-message receipt.
 bool isLegacyCallSummary(Message item) => _legacyCustom(item)?.type == 901;
 
+/// Relationship hints stay custom messages. Raw payload identities are never
+/// authority for a friend request; the action uses the original single peer.
+int? legacyRelationshipHintType(Message item) {
+  final type = _legacyCustom(item)?.type;
+  return type == 910 || type == 911 ? type : null;
+}
+
 TagAudioProjection? _legacyTagAudio(_LegacyCustom? custom) {
   if (custom == null || custom.type != 903 || custom.data['textElem'] != null) {
     return null;
@@ -65,6 +72,62 @@ TagAudioProjection? _legacyTagAudio(_LegacyCustom? custom) {
     return null;
   }
   return (source: source, durationSeconds: duration as int?);
+}
+
+String? _legacyTagText(_LegacyCustom? custom) {
+  if (custom == null || custom.type != 903) return null;
+  final text = custom.data['textElem'];
+  return text is Map && text['content'] is String
+      ? text['content'] as String
+      : null;
+}
+
+// Text remains a view of the original custom envelope. Extra metadata and
+// non-voice elements do not change the legacy text-first forwarding contract.
+// A raw sound element, including a malformed one, still forbids forwarding.
+bool _legacyTagTextForwardable(_LegacyCustom? custom) {
+  if (custom == null ||
+      custom.type != 903 ||
+      custom.data['soundElem'] != null) {
+    return false;
+  }
+  return _legacyTagText(custom) != null;
+}
+
+// The actual905 invitation fields are a read-only view of custom JSON.
+// Unknown metadata stays opaque and is forwarded intact, never as authority.
+TagMeetingProjection? _legacyTagMeeting(_LegacyCustom? custom) {
+  if (custom == null || custom.type != 905) return null;
+  final data = custom.data;
+  final inviter = data['inviterUserID'];
+  final nickname = data['inviterNickname'];
+  final faceUrl = data['inviterFaceURL'];
+  final subject = data['subject'];
+  final id = data['id'];
+  final start = data['start'];
+  final duration = data['duration'];
+  if (inviter is! String ||
+      (nickname != null && nickname is! String) ||
+      (faceUrl != null && faceUrl is! String) ||
+      subject is! String ||
+      id is! String ||
+      id.trim().isEmpty ||
+      start is! int ||
+      start < -8640000000000 ||
+      start > 8640000000000 ||
+      duration is! int ||
+      duration < 0) {
+    return null;
+  }
+  return (
+    inviterUserId: inviter,
+    inviterNickname: nickname as String?,
+    inviterFaceUrl: faceUrl as String?,
+    subject: subject,
+    id: id,
+    startSeconds: start,
+    durationSeconds: duration,
+  );
 }
 
 String? _stickerSource(String? value) {
@@ -371,6 +434,10 @@ ChatMessage _mapMessage(
         : null,
     media: secureMediaUri(media),
     tagAudio: _legacyTagAudio(custom),
+    tagTextForwardable: _legacyTagTextForwardable(custom),
+    tagMeeting: _legacyTagMeeting(custom),
+    legacyCustomType: custom?.type,
+    tagText: _legacyTagText(custom),
     thumbnail: secureMediaUri(
       item.videoElem?.snapshotUrl ?? picture?.snapshotPicture?.url,
     ),

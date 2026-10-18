@@ -24,6 +24,56 @@ import 'message_mapper.dart';
 import 'group_mention_authority.dart';
 import 'retained_merge_codec.dart';
 
+enum ChatLocalHintKind { inserted, failed, unknown, suppressed }
+
+/// Auxiliary LOCAL write outcome, bound to one original send attempt. This is
+/// never a successful send receipt or an instruction to retry a local write.
+final class ChatLocalHintResult {
+  const ChatLocalHintResult(
+    this.sourceMessageId,
+    this.attempt,
+    this.kind, {
+    this.hintId,
+    this.message,
+  });
+  final String sourceMessageId;
+  final int attempt;
+  final ChatLocalHintKind kind;
+  final String? hintId;
+  final ChatMessage? message;
+}
+
+final class _RelationshipHintClaims {
+  _RelationshipHintClaims(this.generation);
+  final int generation;
+  // Only IDs survive a view remount; no body, source closure or write replay.
+  final pending = <(String, String)>{};
+  final unknown = <(String, String)>{};
+  final quarantined = <(String, String)>{};
+  final pendingHints = <(String, String)>{};
+  // Downward-only session metadata, not a durable/native storage claim. A
+  // remounted repository still consults the original source's live ledger.
+  final sources = <(String, String), String>{};
+}
+
+final class _RelationshipHintSource {
+  const _RelationshipHintSource(
+    this.id,
+    this.attempt,
+    this.message,
+    this.peer,
+    this.access,
+    this.privacy,
+    this.checkSource,
+  );
+  final String id, peer;
+  final int attempt;
+  final Message message;
+  final MessageHistoryAccess access;
+  final MessagePrivacy privacy;
+  final void Function() checkSource;
+}
+
 enum ChatRevokeKind { acknowledged, notDispatched, unconfirmed, busy }
 
 final class ChatRevokeResult {
@@ -134,6 +184,28 @@ final class ChatRepository {
   }
 
   final Map<String, Message> _raw = {};
+  int _hintAttempt = 0;
+  static final _hintOwners = Expando<_RelationshipHintClaims>();
+  _RelationshipHintClaims get _hintClaims {
+    if (!current) throw const AppFailure(FailureKind.cancelled);
+    var claims = _hintOwners[gateway];
+    if (claims == null || claims.generation != generation) {
+      claims = _RelationshipHintClaims(generation);
+      _hintOwners[gateway] = claims;
+    }
+    return claims;
+  }
+
+  final Map<
+    String,
+    ({String sourceId, MessageHistoryAccess access, MessagePrivacy privacy})
+  >
+  _hintSources = {};
+  int? relationshipHintType(String id) {
+    final raw = _raw[id];
+    return raw == null ? null : legacyRelationshipHintType(raw);
+  }
+
   final Map<String, String> _preparedQuoteSources = {};
   // A late native snapshot cannot undo a removal already observed in this
   // repository's frozen account generation. This does not rewrite the SDK DB.
@@ -148,7 +220,22 @@ final class ChatRepository {
     ++_emojiPolicyRevision;
   }
 
-  bool isRemoved(String id) => _removedIds.contains(id);
+  bool isRemoved(String id) {
+    final claims = _hintOwners[gateway];
+    return _removedIds.contains(id) ||
+        claims != null &&
+            claims.generation == generation &&
+            (claims.quarantined.contains((conversationId, id)) ||
+                claims.pendingHints.contains((conversationId, id)));
+  }
+
+  String? _relationshipSourceId(String id) {
+    final claims = _hintOwners[gateway];
+    return claims?.generation == generation
+        ? claims?.sources[(conversationId, id)]
+        : null;
+  }
+
   final Map<String, ({String path, String? thumbnail})> _staged = {};
   static int _mediaSerial = 0;
   Conversation? _conversation;
@@ -165,6 +252,7 @@ final class ChatRepository {
     _groupReadMarked.clear();
     _visibleReadQueue.clear();
     _raw.clear();
+    _hintSources.clear();
     _preparedFaces.clear();
     _preparedLocations.clear();
     _preparedCards.clear();
@@ -173,14 +261,24 @@ final class ChatRepository {
   }
 
   ChatMessage _map(Message message) {
+    final nativePrivacy = gateway.privacyLedger.observe(
+      conversationId,
+      message.toJson(),
+      now: now(),
+    );
+    final hintSource = _hintSources[message.clientMsgID];
+    final rememberedSource = _relationshipSourceId(message.clientMsgID ?? '');
     final item = mapMessage(
       message,
       _userId,
-      privacy: gateway.privacyLedger.observe(
-        conversationId,
-        message.toJson(),
-        now: now(),
-      ),
+      privacy: hintSource == null && rememberedSource == null
+          ? nativePrivacy
+          : MessagePrivacy.combined([
+              nativePrivacy,
+              if (hintSource != null) hintSource.privacy,
+              if (rememberedSource != null)
+                gateway.privacyLedger.lookup(rememberedSource),
+            ]),
     );
     final local = _staged[item.id];
     return local == null
@@ -188,10 +286,33 @@ final class ChatRepository {
         : item.withLocalMedia(local.path, snapshot: local.thumbnail);
   }
 
-  MessagePrivacy privacyFor(ChatMessage item) =>
-      gateway.privacyLedger.lookup(item.id);
-  bool canView(ChatMessage item) =>
-      current && !isRemoved(item.id) && privacyFor(item).canViewAt(now());
+  MessagePrivacy privacyFor(ChatMessage item) {
+    final source = _hintSources[item.id];
+    final rememberedSource = _relationshipSourceId(item.id);
+    if (source == null && rememberedSource == null) {
+      return gateway.privacyLedger.lookup(item.id);
+    }
+    return MessagePrivacy.combined([
+      gateway.privacyLedger.lookup(item.id),
+      if (source != null) source.privacy,
+      if (rememberedSource != null)
+        gateway.privacyLedger.lookup(rememberedSource),
+    ]);
+  }
+
+  bool canView(ChatMessage item) {
+    final source = _hintSources[item.id];
+    if (source != null) {
+      try {
+        source.access.check();
+        if (isRemoved(source.sourceId)) return false;
+      } on AppFailure {
+        return false;
+      }
+    }
+    return current && !isRemoved(item.id) && privacyFor(item).canViewAt(now());
+  }
+
   bool canRetain(ChatMessage item) =>
       canView(item) && privacyFor(item).canRetainAt(now());
   void requireRetention(String id) {
@@ -895,6 +1016,59 @@ final class ChatRepository {
     MessageHistoryAccess? access,
     void Function()? checkSource,
     void Function()? onDispatched,
+    void Function(ChatLocalHintResult)? onLocalHint,
+  }) async {
+    _RelationshipHintSource? hintSource;
+    try {
+      return await _send(
+        id,
+        access: access,
+        checkSource: checkSource,
+        onDispatched: onDispatched,
+        captureHint: checkSource == null || onLocalHint == null
+            ? null
+            : (message, peer, lease, privacy) {
+                hintSource = _RelationshipHintSource(
+                  id,
+                  ++_hintAttempt,
+                  message,
+                  peer,
+                  lease,
+                  privacy,
+                  checkSource,
+                );
+              },
+      );
+    } catch (error, stack) {
+      final source = hintSource;
+      if (error is AppFailure &&
+          (error.code == 1302 || error.code == 1303) &&
+          source != null) {
+        // The original send operation has settled. The auxiliary LOCAL write
+        // uses that same lease; its timeout or callback can never replace the
+        // original failure object/code/stack or make the original row sent.
+        try {
+          onLocalHint!(
+            await _insertRelationshipHint(
+              source,
+              error.code == 1302 ? 910 : 911,
+            ),
+          );
+        } finally {
+          Error.throwWithStackTrace(error, stack);
+        }
+      }
+      rethrow;
+    }
+  }
+
+  Future<ChatMessage> _send(
+    String id, {
+    MessageHistoryAccess? access,
+    void Function()? checkSource,
+    void Function()? onDispatched,
+    void Function(Message, String, MessageHistoryAccess, MessagePrivacy)?
+    captureHint,
   }) => _run((manager, access) async {
     final actionTime = Stopwatch()..start();
     checkSource?.call();
@@ -947,6 +1121,9 @@ final class ChatRepository {
       throw const AppFailure(FailureKind.timeout);
     }
     onDispatched?.call();
+    if (!conversation.isGroup && conversation.userId?.isNotEmpty == true) {
+      captureHint?.call(message, conversation.userId!, access, policy);
+    }
     final sent = await manager.messageManager.sendMessage(
       message: message,
       userID: conversation.isGroup ? null : conversation.userId,
@@ -965,6 +1142,178 @@ final class ChatRepository {
     _raw[id] = sent;
     return _map(sent);
   }, access: access);
+
+  Future<ChatLocalHintResult> _insertRelationshipHint(
+    _RelationshipHintSource source,
+    int type,
+  ) async {
+    var dispatched = false, acknowledged = false, claimed = false;
+    _RelationshipHintClaims? claims;
+    final key = (conversationId, source.id);
+    String? hintId;
+    ChatLocalHintResult result(
+      ChatLocalHintKind kind, [
+      ChatMessage? message,
+    ]) => ChatLocalHintResult(
+      source.id,
+      source.attempt,
+      kind,
+      hintId: hintId,
+      message: message,
+    );
+    bool persistableOrdinary(MessagePrivacy policy) =>
+        policy.inspectionComplete &&
+        !policy.containsPrivateContent &&
+        !policy.hidden &&
+        policy.expiresAtMilliseconds == null &&
+        policy.canViewAt(now());
+    bool sourceCanPersist() =>
+        persistableOrdinary(inspectMessagePrivacy(source.message.toJson())) &&
+        persistableOrdinary(
+          MessagePrivacy.combined([
+            source.privacy,
+            gateway.privacyLedger.lookup(source.id),
+          ]),
+        );
+    void check() {
+      source.access.check();
+      source.checkSource();
+      if (!current ||
+          _cacheRevision != gateway.historyRevision ||
+          !identical(_raw[source.id], source.message) ||
+          isRemoved(source.id) ||
+          _conversation?.isGroup != false ||
+          _conversation?.userId != source.peer ||
+          _conversation?.canSend != true ||
+          source.message.sendID != _userId ||
+          !MessagePrivacy.combined([
+            source.privacy,
+            gateway.privacyLedger.lookup(source.id),
+          ]).canViewAt(now())) {
+        throw const AppFailure(FailureKind.cancelled);
+      }
+    }
+
+    try {
+      check();
+      // The SDK has no persistence receipt for the effective ledger policy.
+      // Do not create a stored hint for private/expiry/unknown facts, nor invent
+      // a new burn window. The original failed row/error remains available.
+      if (!sourceCanPersist()) return result(ChatLocalHintKind.suppressed);
+      // Unknown/pending LOCAL writes remain suppressed across view remounts
+      // in this account generation. A known outcome permits a new explicit
+      // send attempt, never an automatic retry of this auxiliary operation.
+      final currentClaims = _hintClaims;
+      claims = currentClaims;
+      if (currentClaims.unknown.contains(key) ||
+          !currentClaims.pending.add(key)) {
+        return result(ChatLocalHintKind.suppressed);
+      }
+      claimed = true;
+      return await _run((manager, lease) async {
+        check();
+        final data = jsonEncode({
+          'customType': type,
+          'data': <String, dynamic>{},
+        });
+        final hint = await manager.messageManager.createCustomMessage(
+          data: data,
+          extension: '',
+          description: '',
+        );
+        check();
+        hintId = hint.clientMsgID;
+        if (hintId?.isNotEmpty != true ||
+            hintId!.length > 512 ||
+            hintId == source.id ||
+            _raw.containsKey(hintId) ||
+            hint.contentType != MessageType.custom ||
+            hint.customElem?.data != data ||
+            legacyRelationshipHintType(hint) != type) {
+          throw const AppFailure(FailureKind.invalidResponse);
+        }
+        final original = Message.fromJson(source.message.toJson());
+        hint
+          ..sendID = _userId
+          ..recvID = source.peer
+          ..sessionType = ConversationType.single
+          ..status = 2
+          ..isRead = true
+          // Preserve the original timestamps, never start a new burn window.
+          ..attachedInfo = original.attachedInfo
+          ..attachedInfoElem = original.attachedInfoElem
+          ..hasReadTime = original.hasReadTime;
+        check();
+        if (!sourceCanPersist() ||
+            !persistableOrdinary(inspectMessagePrivacy(hint.toJson()))) {
+          return result(ChatLocalHintKind.suppressed);
+        }
+        currentClaims.pendingHints.add((conversationId, hintId!));
+        dispatched = true;
+        final inserted = await manager.messageManager
+            .insertSingleMessageToLocalStorage(
+              message: hint,
+              receiverID: source.peer,
+              senderID: _userId,
+            );
+        if (inserted.clientMsgID != hintId ||
+            inserted.contentType != MessageType.custom ||
+            inserted.customElem?.data != data ||
+            inserted.sendID != _userId ||
+            inserted.recvID != source.peer ||
+            inserted.status != 2 ||
+            inserted.isRead != true ||
+            inserted.sessionType != hint.sessionType ||
+            (inserted.groupID ?? '').isNotEmpty ||
+            inserted.attachedInfo != hint.attachedInfo ||
+            jsonEncode(inserted.attachedInfoElem?.toJson()) !=
+                jsonEncode(hint.attachedInfoElem?.toJson()) ||
+            inserted.hasReadTime != hint.hasReadTime ||
+            !persistableOrdinary(inspectMessagePrivacy(inserted.toJson())) ||
+            !sourceCanPersist()) {
+          throw const AppFailure(FailureKind.invalidResponse);
+        }
+        check();
+        acknowledged = true;
+        currentClaims.sources[(conversationId, hintId!)] = source.id;
+        _hintSources[hintId!] = (
+          sourceId: source.id,
+          access: source.access,
+          privacy: source.privacy,
+        );
+        _raw[hintId!] = inserted;
+        return result(ChatLocalHintKind.inserted, _map(inserted));
+      }, access: source.access);
+    } catch (_) {
+      // Finite, observable auxiliary result; never turn a native timeout or
+      // uncertain insert into ACK, replay it, or replace the original error.
+      return result(
+        acknowledged
+            ? ChatLocalHintKind.inserted
+            : dispatched
+            ? ChatLocalHintKind.unknown
+            : ChatLocalHintKind.failed,
+      );
+    } finally {
+      if (claimed) {
+        if (dispatched && !acknowledged) {
+          claims!.unknown.add(key);
+          // A bad ACK is not a rollback. The native row may already exist;
+          // keep this exact created ID unavailable across views of this same
+          // gateway/generation, and make all ledger consumers hide it too.
+          if (hintId != null) {
+            claims!.quarantined.add((conversationId, hintId!));
+            _raw.remove(hintId);
+            _hintSources.remove(hintId);
+            gateway.privacyLedger.forget([hintId!]);
+          }
+        }
+        if (hintId != null)
+          claims!.pendingHints.remove((conversationId, hintId!));
+        claims!.pending.remove(key);
+      }
+    }
+  }
 
   void _checkCurrent([MessageHistoryAccess? access]) {
     (access ??
@@ -1267,6 +1616,9 @@ final class ChatRepository {
             ChatMessageKind.file,
           }.contains(mapped.kind) &&
           (mapped.media == null || mapped.media!.scheme != 'https')) {
+        throw const FormatException();
+      }
+      if (mapped.kind == ChatMessageKind.custom && !mapped.canForward) {
         throw const FormatException();
       }
       if (mapped.kind == ChatMessageKind.unsupported ||
@@ -1918,6 +2270,7 @@ final class ChatRepository {
     _groupReadMarked.clear();
     _visibleReadQueue.clear();
     _raw.clear();
+    _hintSources.clear();
     _preparedFaces.clear();
     _preparedLocations.clear();
     _preparedCards.clear();
