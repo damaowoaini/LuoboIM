@@ -197,7 +197,15 @@ func (a *OwnedAgent) exclude(ctx context.Context, apply bool) error {
 		if apply {
 			a.acquireObservation.Stage = "exclude-credentials-kafka"
 		}
-		r, e := a.kafka.ExcludeLegacy(ctx, a.hold, v.Credential, apply)
+		var r KafkaRevocation
+		var e error
+		if apply {
+			var observation kafkaExclusionObservation
+			r, e = a.kafka.excludeLegacy(ctx, a.hold, v.Credential, apply, &observation)
+			a.acquireObservation.Stage = "exclude-credentials-kafka-" + observation.stage
+		} else {
+			r, e = a.kafka.ExcludeLegacy(ctx, a.hold, v.Credential, apply)
+		}
 		if e != nil {
 			return e
 		}

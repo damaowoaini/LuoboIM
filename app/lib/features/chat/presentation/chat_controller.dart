@@ -123,6 +123,26 @@ final class ChatController extends ChangeNotifier {
   String? _lastReadId;
   final Map<String, int> progress = {};
   final Set<String> _sending = {};
+  bool Function() Function()? _captureHintView;
+  void bindHintView(bool Function() Function() capture) {
+    _captureHintView = capture;
+  }
+
+  void retireViewHints({bool notify = true}) {
+    for (final result in _localHintResults.values) {
+      result.viewHint?.retire();
+    }
+    if (notify && !_disposed) {
+      notifyListeners();
+    }
+  }
+
+  List<ChatViewFailureHint> viewHintsFor(String sourceId) => List.unmodifiable([
+    for (final result in _localHintResults.values)
+      if (result.sourceMessageId == sourceId)
+        if (result.viewHint case final hint?)
+          if (hint.canView) hint,
+  ]);
   final Map<int, ChatLocalHintResult> _localHintResults = {};
   Map<int, ChatLocalHintResult> get localHintResults =>
       Map.unmodifiable(_localHintResults);
@@ -440,6 +460,7 @@ final class ChatController extends ChangeNotifier {
           _checkSendSource(timeline, message.id);
         },
         onLocalHint: (result) => _localHint(result, timeline),
+        hintViewCurrent: _captureHintView?.call(),
         onDispatched: () {
           dispatched = true;
         },
@@ -520,6 +541,7 @@ final class ChatController extends ChangeNotifier {
           _checkSendSource(timeline, message.id);
         },
         onLocalHint: (result) => _localHint(result, timeline),
+        hintViewCurrent: _captureHintView?.call(),
         onDispatched: () => dispatched = true,
       );
       if (current()) {
@@ -603,6 +625,7 @@ final class ChatController extends ChangeNotifier {
           _checkSendSource(timeline, message.id);
         },
         onLocalHint: (result) => _localHint(result, timeline),
+        hintViewCurrent: _captureHintView?.call(),
         onDispatched: () => dispatched = true,
       );
       if (current()) {
@@ -657,6 +680,7 @@ final class ChatController extends ChangeNotifier {
         id,
         checkSource: () => _checkSendSource(timeline, id),
         onLocalHint: (result) => _localHint(result, timeline),
+        hintViewCurrent: _captureHintView?.call(),
       );
       _unconfirmedFaces.removeWhere((_, value) => value == id);
       if (!usable || timeline != _timeline) return;
@@ -867,6 +891,8 @@ final class ChatController extends ChangeNotifier {
 
   @override
   void dispose() {
+    retireViewHints(notify: false);
+    _captureHintView = null;
     _disposed = true;
     _draftTimer?.cancel();
     _refreshTimer?.cancel();

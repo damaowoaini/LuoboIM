@@ -237,6 +237,16 @@ class _ChatPageState extends ConsumerState<ChatPage>
         now: widget.now,
       ),
     );
+    controller.bindHintView(() {
+      final ticket = _inputView, origin = _inputRoute;
+      final cid = widget.conversationId;
+      return () =>
+          mounted &&
+          ticket == _inputView &&
+          identical(_inputRoute, origin) &&
+          widget.conversationId == cid &&
+          _inputCurrent;
+    });
     _typing = ChatTypingController(
       controller.repository,
       isCurrent: () => _inputCurrent,
@@ -324,6 +334,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     _foreground = state == AppLifecycleState.resumed;
     if (!_foreground) {
+      controller.retireViewHints();
       _retireRevoke();
       ++_inputView;
       _discardReedit();
@@ -654,6 +665,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
       _retireRevoke();
     }
     if (!_routeVisible) {
+      controller.retireViewHints(notify: false);
       _readSignature = '';
       ++_inputView;
       _discardReedit();
@@ -861,7 +873,50 @@ class _ChatPageState extends ConsumerState<ChatPage>
     );
   }
 
-  Widget _message(ChatMessage item) => ChatSelectionRow(
+  Widget _message(ChatMessage item) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      _messageRow(item),
+      for (final hint in controller.viewHintsFor(item.id))
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Center(
+            child: MessagePrivacyContent(
+              key: ValueKey((
+                'view-only-failure',
+                hint.sourceMessageId,
+                hint.attempt,
+              )),
+              privacy: hint.privacy,
+              now: controller.repository.now,
+              onExpired: hint.retire,
+              expired: const SizedBox.shrink(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    hint.type == 910 ? '消息已发出，但被对方拒收了' : '对方开启了好友验证，你还不是对方的好友',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.secondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                  if (hint.type == 911)
+                    TextButton(
+                      onPressed: () =>
+                          _relationshipRequest(item, viewHint: hint),
+                      child: const Text('发送好友验证'),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+    ],
+  );
+
+  Widget _messageRow(ChatMessage item) => ChatSelectionRow(
     active: selection.active,
     eligible: selection.eligible(item),
     selected: selection.selected(item.id),
@@ -1087,7 +1142,7 @@ class _ChatPageState extends ConsumerState<ChatPage>
     );
   }
 
-  void _relationshipRequest(ChatMessage item) {
+  void _relationshipRequest(ChatMessage item, {ChatViewFailureHint? viewHint}) {
     final repository = controller.repository;
     final contacts = ref.read(contactsRepositoryProvider);
     final conversation = controller.conversation;
@@ -1096,7 +1151,12 @@ class _ChatPageState extends ConsumerState<ChatPage>
         contacts == null ||
         conversation?.isGroup != false ||
         peer?.isNotEmpty != true ||
-        repository.relationshipHintType(item.id) != 911 ||
+        (viewHint == null
+            ? repository.relationshipHintType(item.id) != 911
+            : viewHint.type != 911 ||
+                  viewHint.sourceMessageId != item.id ||
+                  viewHint.peerId != peer ||
+                  !viewHint.canView) ||
         !repository.canView(item)) {
       return;
     }
@@ -1122,22 +1182,52 @@ class _ChatPageState extends ConsumerState<ChatPage>
         navigator.mounted &&
         identical(origin?.navigator, navigator) &&
         (owned == null ? origin?.isCurrent == true : owned.isActive);
-    final access = ChatContentAccess(
-      repository: repository,
-      root: item,
-      child: item,
-      isRouteCurrent: current,
-    );
-    if (!access.canView) return;
+    final bool Function() canView, canRetain;
+    final int? Function() expiresAt;
+    if (viewHint == null) {
+      final access = ChatContentAccess(
+        repository: repository,
+        root: item,
+        child: item,
+        isRouteCurrent: current,
+      );
+      if (!access.canView) {
+        return;
+      }
+      canView = () => access.canView;
+      canRetain = () => access.canRetain;
+      expiresAt = () => access.privacy.expiresAtMilliseconds;
+    } else {
+      final sourceCheck = viewHint.takeFriendRequestCheck();
+      if (sourceCheck == null) {
+        return;
+      }
+      canView = () {
+        if (!current()) {
+          return false;
+        }
+        try {
+          sourceCheck();
+          return true;
+        } on AppFailure {
+          return false;
+        }
+      };
+      // Relationship authority is separate from retention. This original
+      // source never grants copying private profile IDs or card content.
+      canRetain = () => false;
+      expiresAt = () => viewHint.privacy.expiresAtMilliseconds;
+    }
     final source = UserProfileSource(
       repository: contacts,
       userId: target,
-      current: () => access.canView,
-      canRetain: () => access.canRetain,
+      current: canView,
+      canRetain: canRetain,
       changes: _relationshipLifetime.stream,
       uiChanges: controller,
-      expiresAtMillis: () => access.privacy.expiresAtMilliseconds,
+      expiresAtMillis: expiresAt,
       now: repository.now,
+      friendRequestOnly: viewHint != null,
     );
     owned = MaterialPageRoute<void>(
       builder: (_) => UserProfilePage(

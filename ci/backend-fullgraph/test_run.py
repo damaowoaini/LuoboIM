@@ -11,7 +11,7 @@ run=load('run');builder=load('minio_build');resources=load('resources')
 
 class FullGraphControls(unittest.TestCase):
  def test_prepare_lock_fresh_scope_and_unknown_cannot_alias_old_pass_or_canonical(self):
-  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'cleanupCompleteScopes':copy.deepcopy(run.CLEANUP_COMPLETE_SCOPES),'cleanupRecentReuse':copy.deepcopy(run.CLEANUP_RECENT_REUSE),'cleanupFixtureRepair':copy.deepcopy(run.CLEANUP_FIXTURE_REPAIR),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN),'cleanupPassedReuse':copy.deepcopy(run.CLEANUP_PASSED_REUSE),'cleanupTestsToRun':[]}
+  source={'members':1,'digest':'1'*64};c={'state':'FROZEN_FINAL_SOURCE','source':source,'sourceReviewAccepted':True,'scenarios':list(run.SCENARIOS),'roles':list(run.ROLES),'existingGreenTestsToRerun':[],'reuseOldBinary':False,'resource':run.RESOURCE,'cleanupScopes':copy.deepcopy(run.CLEANUP_SCOPES),'cleanupReuse':copy.deepcopy(run.CLEANUP_REUSE),'cleanupCompleteScopes':copy.deepcopy(run.CLEANUP_COMPLETE_SCOPES),'cleanupRecentReuse':copy.deepcopy(run.CLEANUP_RECENT_REUSE),'cleanupFixtureRepair':copy.deepcopy(run.CLEANUP_FIXTURE_REPAIR),'originalTargets':copy.deepcopy(run.GRAPH_TARGETS),'requiredOriginalSubtests':copy.deepcopy(run.GRAPH_CHILDREN),'cleanupPassedReuse':copy.deepcopy(run.CLEANUP_PASSED_REUSE),'cleanupTestsToRun':[],'targetedKafkaACLControl':copy.deepcopy(run.KAFKA_ACL_CONTROL)}
   with mock.patch.object(run,'FINAL_SOURCE',None),self.assertRaises(ValueError):run.check_locked(c)
   with mock.patch.object(run,'FINAL_SOURCE',source):
    run.check_locked(c)
@@ -58,6 +58,7 @@ class FullGraphControls(unittest.TestCase):
   # represented; these finite fields never mint canonical or Ready evidence.
   acquire_base=dict(valid,phase='actual-agent-stop-dual-drain-and-credential-exclusion')
   acquire_stages=['validate-request', 'check-targets', 'hold', 'services', 'stop-producer', 'drain-consumers-live', 'stop-consumer', 'exclude-credentials', 'exclude-credentials-mongo', 'exclude-credentials-redis', 'exclude-credentials-kafka', 'drain-consumers-empty', 'held-metadata', 'signed-observe']
+  acquire_stages += ['exclude-credentials-kafka-input', 'exclude-credentials-kafka-admin-client', 'exclude-credentials-kafka-admin-handle', 'exclude-credentials-kafka-metadata-controller', 'exclude-credentials-kafka-metadata', 'exclude-credentials-kafka-acl-resource', 'exclude-credentials-kafka-legacy-client', 'exclude-credentials-kafka-broker-input', 'exclude-credentials-kafka-broker-handle', 'exclude-credentials-kafka-broker-open', 'exclude-credentials-kafka-live-denial', 'exclude-credentials-kafka-evidence', 'exclude-credentials-kafka-complete', 'exclude-credentials-kafka-legacy-close', 'exclude-credentials-kafka-admin-close', 'exclude-credentials-kafka-topic-guard', 'exclude-credentials-kafka-topic-write-controller', 'exclude-credentials-kafka-topic-write-call', 'exclude-credentials-kafka-topic-write-response', 'exclude-credentials-kafka-topic-read-controller', 'exclude-credentials-kafka-topic-read-call', 'exclude-credentials-kafka-topic-read-response', 'exclude-credentials-kafka-topic-exact-deny', 'exclude-credentials-kafka-group-guard', 'exclude-credentials-kafka-group-write-controller', 'exclude-credentials-kafka-group-write-call', 'exclude-credentials-kafka-group-write-response', 'exclude-credentials-kafka-group-read-controller', 'exclude-credentials-kafka-group-read-call', 'exclude-credentials-kafka-group-read-response', 'exclude-credentials-kafka-group-exact-deny', 'exclude-credentials-kafka-transaction-guard', 'exclude-credentials-kafka-transaction-write-controller', 'exclude-credentials-kafka-transaction-write-call', 'exclude-credentials-kafka-transaction-write-response', 'exclude-credentials-kafka-transaction-read-controller', 'exclude-credentials-kafka-transaction-read-call', 'exclude-credentials-kafka-transaction-read-response', 'exclude-credentials-kafka-transaction-exact-deny', 'exclude-credentials-kafka-cluster-guard', 'exclude-credentials-kafka-cluster-write-controller', 'exclude-credentials-kafka-cluster-write-call', 'exclude-credentials-kafka-cluster-write-response', 'exclude-credentials-kafka-cluster-read-controller', 'exclude-credentials-kafka-cluster-read-call', 'exclude-credentials-kafka-cluster-read-response', 'exclude-credentials-kafka-cluster-exact-deny']
   for stage in acquire_stages:
    for error_class in ('owned-evidence','deadline','cancelled','other'):
     value=dict(acquire_base,acquireStage=stage,acquireAttempted=True,acquireReturned=True,acquireErrorClass=error_class)
@@ -76,6 +77,12 @@ class FullGraphControls(unittest.TestCase):
   for changed in [dict(acquireStage='PRIVATE_ERROR_USER_GROUP'),dict(acquireErrorClass='provider-raw'),dict(acquireAttempted=1),dict(acquireReturned=1),dict(acquireAttempted=False),dict(acquireReturned=False),dict(acquireStage='not-entered'),dict(acquireErrorClass='in-progress'),dict(acquireStage='hold',acquireErrorClass='ok')]:
    bad=dict(value,**changed)
    with self.subTest(acquire=changed),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
+
+  for stage in ("exclude-credentials-kafka-topic-write-response", "exclude-credentials-kafka-live-denial", "exclude-credentials-kafka-admin-close"):
+   for changed in (dict(acquireAttempted=False),dict(acquireErrorClass='ok'),dict(acquireStage=stage+'-PRIVATE_USER')):
+    bad=dict(acquire_base,acquireStage=stage,acquireAttempted=True,acquireReturned=True,acquireErrorClass='owned-evidence',rawKafkaPrincipal='PRIVATE_USER')
+    bad.update(changed)
+    with self.subTest(kafka_stage=stage,kafka_invalid=changed),self.assertRaises(ValueError):collector.public_terminal(json.dumps(bad).encode(),bad['scenario'])
 
   # Original primary and local cleanup error classifications are independent.
   reader_base=dict(valid,phase='actual-two-reader-processes-and-original-registration',primaryRunErrorClass='preparation-unavailable',readerStage='start-rpc-conversation',readerCallState='returned',readerErrorClass='preparation-unavailable')
@@ -399,7 +406,7 @@ class FullGraphControls(unittest.TestCase):
         {'Action':'output','Test':'TestRuntime','Output':'RUNTIME_PRIVATE_TEST'},
         {'Action':'build-output','Test':'TestRuntime','Output':'NOT_A_COMPILER_EVENT'}]
   raw=('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
-  for phase in ['pending-two-original-oracles','launcher-ownedcontrol','redis-parser']+[scope['label'] for scope in run.CLEANUP_SCOPES]:
+  for phase in ['pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response']+[scope['label'] for scope in run.CLEANUP_SCOPES]:
    projected,diagnostic=run.project_go_test_events(raw,phase)
    self.assertEqual(diagnostic,{'phase':phase,'publicSourceOnly':True,'selection':'go-test-build-output-without-Test-only','completeBytes':len(public.encode()),'completeSHA256':hashlib.sha256(public.encode()).hexdigest(),'diagnostic':public,'truncated':False})
    self.assertTrue(all('Output' not in row and 'ImportPath' not in row for row in projected))
@@ -479,6 +486,36 @@ class FullGraphControls(unittest.TestCase):
      rows.append({'Action':'pass','Package':full,'Test':top})
     rows.append({'Action':'pass','Package':full})
    return rows
+  # This exact source-only ACL top reuses the same owned Go cache/environment.
+  control=run.KAFKA_ACL_CONTROL;package='internal/namespaceimport/ownedcontrol';top='TestOwnedKafkaExclusionRequiresEveryWildcardDeny'
+  self.assertEqual(control,{'phase':'kafka-acl-response','targets':{package:[top]},'requiredSubtests':{package:{top:['create-reply-error-and-shape-cannot-be-a-success','describe-reply-error-and-shape-cannot-replace-exact-deny']}},'goTimeoutSeconds':180,'phaseGuardSeconds':240,'newDatabaseFixtures':0,'otherKafkaOrRedisTestsDispatched':False})
+  kafka_line=next(node.lineno for node in calls if isinstance(node.func,ast.Name) and node.func.id=='run_kafka_acl_control')
+  self.assertLess(cleanup_line,kafka_line);self.assertLess(kafka_line,compile_line)
+  self.assertEqual(ast.literal_eval(summary_fields['actualKafkaACLTestsDispatched']),1)
+  locked=json.loads(run.INPUTS.read_bytes());run.check_locked(locked)
+  changed=copy.deepcopy(locked);changed['targetedKafkaACLControl']['requiredSubtests'][package][top]=[]
+  with self.assertRaises(ValueError):run.check_locked(changed)
+  for mode in ('complete','missing-child','skip','foreign-top','missing-footer','phase-error'):
+   with self.subTest(kafkaACL=mode),tempfile.TemporaryDirectory() as directory:
+    out=Path(directory).resolve();seen=[];environment={'GOPROXY':'off','GOSUMDB':'off','GOCACHE':'/owned/buildcache','GOMODCACHE':'/owned/modcache'}
+    def acl_command(label,argv,seconds,actual_environment):
+     seen.append(label);self.assertEqual(label,'kafka-acl-response');self.assertEqual(seconds,240);self.assertIs(actual_environment,environment)
+     self.assertEqual(argv,['/owned/go','test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run','^'+top+'$','./'+package])
+     if mode=='phase-error':raise ValueError('actual phase failed; private raw retained')
+     rows=events(control['targets'],control['requiredSubtests'])
+     if mode=='missing-child':rows=[row for row in rows if row.get('Test')!=top+'/create-reply-error-and-shape-cannot-be-a-success']
+     if mode=='skip':rows=[dict(row,Action='skip') if row.get('Test')==top+'/describe-reply-error-and-shape-cannot-replace-exact-deny' and row['Action']=='pass' else row for row in rows]
+     if mode=='foreign-top':rows.insert(1,{'Action':'run','Package':parent.PREFIX+package,'Test':'TestForeign'})
+     if mode=='missing-footer':rows=[row for row in rows if not(row['Action']=='pass' and 'Test'not in row)]
+     return encoded(rows)
+    if mode!='complete':
+     with self.assertRaises(ValueError):run.run_kafka_acl_control('/owned/go',environment,acl_command,parent,out)
+     self.assertEqual(seen,['kafka-acl-response']);self.assertFalse((out/'kafka-acl-response-names.json').exists());continue
+    actual=run.run_kafka_acl_control('/owned/go',environment,acl_command,parent,out)
+    self.assertEqual((actual['source'],actual['topPASS'],actual['subPASS'],actual['skip'],actual['fail']),(run.FINAL_SOURCE,1,2,0,0))
+    self.assertEqual(len(actual['namedCompletions']),3);self.assertEqual(seen,['kafka-acl-response'])
+    self.assertEqual(json.loads((out/'kafka-acl-response-names.json').read_bytes()),actual)
+
   # Exercise the real dispatch and original Go JSON auditor, without Go/DB.
   for mode in ('complete','missing-child','skip','foreign-top','missing-footer','phase-error'):
    with self.subTest(redisParser=mode),tempfile.TemporaryDirectory() as directory:

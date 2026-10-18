@@ -31,6 +31,7 @@ final class UserProfileSource {
     this.now = DateTime.now,
     this.groupId,
     this.groupsRepository,
+    this.friendRequestOnly = false,
   }) : _owner = repository.access.credentials,
        _generation = repository.access.generation;
   final ContactsRepository repository;
@@ -45,6 +46,7 @@ final class UserProfileSource {
   final DateTime Function() now;
   final String? groupId;
   final GroupRepository? groupsRepository;
+  final bool friendRequestOnly;
   final Object _owner;
   final int _generation;
   void check() {
@@ -160,7 +162,7 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
   }
 
   bool get _canCopyId {
-    if (!_sourceCurrent) {
+    if (widget.source?.friendRequestOnly == true || !_sourceCurrent) {
       return false;
     }
     try {
@@ -521,7 +523,10 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
             identical(expectedRepository, repository)) &&
         _sourceCurrent &&
         isCurrent?.call() != false;
-    if (repository == null || busy || !current()) {
+    if (repository == null ||
+        busy ||
+        !current() ||
+        widget.source?.friendRequestOnly == true && !friendRequest) {
       return;
     }
     setState(() => busy = true);
@@ -570,6 +575,9 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
     ContactsRepository repository,
     String id,
   ) async {
+    if (widget.source?.friendRequestOnly == true) {
+      return;
+    }
     final view = _conversationView;
     final owner = repository.access.credentials;
     final group = widget.groupId;
@@ -617,7 +625,9 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
       return const SizedBox.shrink();
     }
     return Scaffold(
-      appBar: AppBar(title: const Text('个人资料')),
+      appBar: AppBar(
+        title: Text(widget.source?.friendRequestOnly == true ? '好友验证' : '个人资料'),
+      ),
       body: widget.source != null && !_sourceCurrent
           ? const Center(child: Text('消息内容已不可用'))
           : profile.when(
@@ -660,6 +670,29 @@ class _UserProfilePageState extends ConsumerState<UserProfilePage>
                         !groupValue.preventMemberFriends ||
                         groupValue.canManage ||
                         groupValue.me?.id == user.id);
+                if (widget.source?.friendRequestOnly == true) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(user.displayName, textAlign: TextAlign.center),
+                          const SizedBox(height: 12),
+                          if (!me && allowRequest)
+                            OutlinedButton(
+                              onPressed: busy
+                                  ? null
+                                  : () => _requestFriend(repository, user),
+                              child: const Text('添加好友'),
+                            )
+                          else
+                            const Text('当前不能向该用户申请好友'),
+                        ],
+                      ),
+                    ),
+                  );
+                }
                 return Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 720),

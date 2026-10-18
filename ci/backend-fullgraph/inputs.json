@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_and_four_planes_redis122c1top3sub_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1576,
-    "digest": "3a350f7fe76993e9a4fab84f2b28ffe734967fe076e2dab1f3a96f9145923e4d"
+    "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 59659,
-      "sha256": "ed52e1430f9bba2348b08c27e8f587c34ba6029af4b11fd53d6b5e06981c711e"
+      "bytes": 61578,
+      "sha256": "987e788bec986f74dd765e1e6b5e5c07849f3ff0b7a03df3e012766afe77875d"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 40087,
-      "sha256": "2e73cb59cccef4186834885b1141b9b83aff7603aa4f367e53600fde9f236ed2"
+      "bytes": 42241,
+      "sha256": "5798214b4b834f9b7654840046c55bb5f4fe2b58f6be5821df93865965583489"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 68703,
-      "sha256": "82029cac77e6c5f4c4154a1fa2d5e47858c1ae1e2b048c2145721c8fb1048007"
+      "bytes": 74816,
+      "sha256": "3852fc7cbbabec8524254515258f4dc620fe1a7043ca28200d974805e3a807e7"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -745,8 +745,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/agent_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/agent_linux.go",
-      "bytes": 14847,
-      "sha256": "258110bbd9f7d4ca98773abefbaf2f457692ab432ec0fbfe09f29998bead0fc9",
+      "bytes": 15119,
+      "sha256": "1f1d7d9c8dae101882a4e7f9a0489745bc36e1b087fafcb52ea8de4bfb6a18c1",
       "beforeSHA256": "71693ecd9bff0ef6ee78f0f53c7739a9aa035d39cf872564c06d57f7dfc2e2ab"
     },
     {
@@ -1700,6 +1700,20 @@
       "bytes": 13689,
       "sha256": "93c5369c3361cf0578fe79bd2fd87ef68136fe29419c703a61a7dfa8ff1a2449",
       "beforeSHA256": "831487af0ce9ea3f182fd4f69b693fe00e44826326ba93e229e918ea05f26825"
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
+      "bytes": 8858,
+      "sha256": "2aa5e33413371f40e103fbda1064a58acace7eda1197f0073d1e2adf08dbef3c",
+      "beforeSHA256": "d26782b41f648e98030a56bbccd0417e3bcd1cbe9fab06e55680aaa1cd653719"
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
+      "bytes": 4167,
+      "sha256": "6556ed40b1e60c8d24f8c8dbf83446a6e1a802c0d4409a09874a81c7840ec890",
+      "beforeSHA256": "9a8605dba4dacfdc8f81b714f1ee8c51b4b5e555ad8ada2d9420d9aaf48f68ae"
     }
   ],
   "allowedOverlayTargets": [
@@ -1818,6 +1832,8 @@
     "server/internal/namespaceimport/ownedcontrol/history_reader_binding_linux_test.go",
     "server/internal/namespaceimport/ownedcontrol/history_reader_launch_linux.go",
     "server/internal/namespaceimport/ownedcontrol/history_readiness_source_linux.go",
+    "server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
+    "server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
     "server/internal/namespaceimport/ownedcontrol/launcher_linux.go",
     "server/internal/namespaceimport/ownedcontrol/materializer_capture_identity_linux.go",
     "server/internal/namespaceimport/ownedcontrol/materializer_history_preparation_linux.go",
@@ -4329,18 +4345,18 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-start-boundary-observation-batch-1/formatted.json",
-      "bytes": 4568,
-      "sha256": "006077a4329a35c7eee4cf5c65c1bdf91739ada83907ebd13ce9e9a589ce7695"
+      "path": ".qa/backend-kafka-response-batch-1/formatted.json",
+      "bytes": 6637,
+      "sha256": "61dda228b6613a908251892be8c21a4306bf0bc4c90f723d328753c27861759f"
     },
     "resource": {
-      "path": ".qa/backend-start-boundary-observation-batch-1/format.resource.json",
-      "bytes": 897,
-      "sha256": "d237102364ce63606658a984605be271b1844d2f7370b720ea88f65acd8cf049"
+      "path": ".qa/backend-kafka-response-batch-1/format3.resource.json",
+      "bytes": 944,
+      "sha256": "8dfa1a1b50dd5496a1c2954995cde234233f689e9f7f15247d2f5d5f8aa25846"
     },
     "source": {
       "members": 1576,
-      "digest": "3a350f7fe76993e9a4fab84f2b28ffe734967fe076e2dab1f3a96f9145923e4d"
+      "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
     },
     "GoTestsExecuted": 0,
     "RootAcceptanceRequired": true
@@ -4448,5 +4464,25 @@
       }
     ]
   },
-  "redisParserTestsToRun": []
+  "redisParserTestsToRun": [],
+  "targetedKafkaACLControl": {
+    "phase": "kafka-acl-response",
+    "targets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+      ]
+    },
+    "requiredSubtests": {
+      "internal/namespaceimport/ownedcontrol": {
+        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
+          "create-reply-error-and-shape-cannot-be-a-success",
+          "describe-reply-error-and-shape-cannot-replace-exact-deny"
+        ]
+      }
+    },
+    "goTimeoutSeconds": 180,
+    "phaseGuardSeconds": 240,
+    "newDatabaseFixtures": 0,
+    "otherKafkaOrRedisTestsDispatched": false
+  }
 }

@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE = {'members': 1576, 'digest': '3a350f7fe76993e9a4fab84f2b28ffe734967fe076e2dab1f3a96f9145923e4d'}
+FINAL_SOURCE = {'members': 1576, 'digest': 'a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371'}
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -21,6 +21,7 @@ LAUNCHER_PASSED_REUSE={'run': 39075035152, 'job': 117520306290, 'head': 'a6d9276
 GRAPH_TARGETS={'pkg/common/startrpc': ['TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence', 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit']}
 REDIS_PARSER_CONTROL = {'phase': 'redis-parser', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof': ['equivalent-protocols-complete-summary-and-real-disabled-state', 'malformed-fields-and-nil-first-duplicate-reject', 'disabled-check-keeps-off-allcommands-and-empty-passwords']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 240, 'newDatabaseFixtures': 0, 'otherR8TargetsDispatched': False}
 REDIS_PARSER_PASSED_REUSE = {'run': 39082704756, 'job': 117542803080, 'attempt': 1, 'head': '2f17d99d2f32c4fc72b9b922f8d2a8783938b665', 'source': {'members': 1576, 'digest': '122c6e2d1b158bbe9addd879c733ef85bf6c2b26a345f583aa4b5a31d2260f48'}, 'artifact': {'artifact': 12119877247, 'run': 39082704756, 'attempt': 1, 'head': '2f17d99d2f32c4fc72b9b922f8d2a8783938b665', 'sha256': 'b7bbb052d28081550d537cfb867103cf8e2e19ad84f4b90893a4157f569f7eef', 'bytes': 41738, 'exactAPIDigest': True, 'files': 56, 'binariesDownloaded': False}, 'rootReviewSHA256': 'cc2fa43abea21d6b2c305571e66eeb62e422f2a67f5965b6c71591f532c40501', 'topPASS': 1, 'subPASS': 3, 'skip': 0, 'fail': 0, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/disabled-check-keeps-off-allcommands-and-empty-passwords'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/equivalent-protocols-complete-summary-and-real-disabled-state'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedRedisCredentialNormalizesRESP2RESP3WithoutWeakeningDisableProof/malformed-fields-and-nil-first-duplicate-reject'}], 'sourcePins': [{'target': 'server/internal/namespaceimport/ownedcontrol/redis_credential.go', 'bytes': 6107, 'sha256': '26fad310f6cda0b25068cb03e6ab53d2a59a5258f78923b8ab7f49db5a5461b6'}, {'target': 'server/internal/namespaceimport/ownedcontrol/redis_credential_test.go', 'bytes': 5522, 'sha256': 'd9c8471dd01df8dcd9b746edb179a751dbf6444d756eab83d5eea4e3e731867d'}], 'sourcePostExact': True, 'currentSourcePASS': False, 'runtimeAccepted': False, 'actualRedisParserTestsDispatched': 0, 'rawEvidence': [{'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/redis-parser-names.json', 'bytes': 956, 'sha256': '94e60e18529a5f933ce070d15e0418819d19ed725929cc4e4cb8c5474bcf1c13'}, {'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/redis-parser-events.json', 'bytes': 5001, 'sha256': '1056eb00f05ca35635dca33dd667d538f1f967a329509af0ecec1ba5d9e0afd7'}, {'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/source-post.json', 'bytes': 120, 'sha256': 'd25ccb64f558e0966dbdacea71ba478c3f50330e0d3583f611165ece87aed8cc'}, {'path': '.qa/backend-reader-boundary-and-redis-golden-batch-1/graph-artifact/phase-0004.json', 'bytes': 2509, 'sha256': 'b3594ce1d3614e16a7b91e95982b3b4aff0fc5bb6005ea33ce5167eeb423628d'}]}
+KAFKA_ACL_CONTROL = {'phase': 'kafka-acl-response', 'targets': {'internal/namespaceimport/ownedcontrol': ['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']}, 'requiredSubtests': {'internal/namespaceimport/ownedcontrol': {'TestOwnedKafkaExclusionRequiresEveryWildcardDeny': ['create-reply-error-and-shape-cannot-be-a-success', 'describe-reply-error-and-shape-cannot-replace-exact-deny']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 240, 'newDatabaseFixtures': 0, 'otherKafkaOrRedisTestsDispatched': False}
 GRAPH_CHILDREN={'TestOwnedPreparedReaderRegistersBeforeServeAndRetainsFinalWriterFence': ['registered-not-serving-before-readiness', 'known-readiness-still-keeps-writer-fence'], 'TestOwnedPushActualOwnerClosesOriginalResourcesBeforeRedisUnknownNonpermit': ['required-token-only']}
 
 
@@ -63,6 +64,7 @@ def check_locked(c):
  if FINAL_SOURCE is None or c.get('state')!='FROZEN_FINAL_SOURCE' or c.get('source')!=FINAL_SOURCE or c.get('sourceReviewAccepted') is not True:raise ValueError('Root final formatted whole-source identity required; prepare-only cannot execute')
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
+ if c.get('targetedKafkaACLControl')!=KAFKA_ACL_CONTROL:raise ValueError('exact original Kafka ACL parent and two new children required')
  if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('cleanupCompleteScopes')!=CLEANUP_COMPLETE_SCOPES or c.get('cleanupRecentReuse')!=CLEANUP_RECENT_REUSE or c.get('cleanupFixtureRepair')!=CLEANUP_FIXTURE_REPAIR or c.get('cleanupReuse')!=CLEANUP_REUSE or 'ownedcontrolReuse' in c or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN or c.get('cleanupPassedReuse')!=CLEANUP_PASSED_REUSE or c.get('cleanupTestsToRun')!=[]:raise ValueError('exact fresh local1/runtime2/graph2+3 with original3top9sub and unbound1 reuse required')
 def validate_entries(bodies,c):
     rows = c['entrypoints']
@@ -118,7 +120,7 @@ def verify():
  return c,bodies,recipe,parent,old,catalog
 
 def project_go_test_events(raw,phase):
- if phase not in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
+ if phase not in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
  events=[];digest=hashlib.sha256();total=0;head=bytearray()
  for line in raw.splitlines():
   event=json.loads(line)
@@ -192,6 +194,18 @@ def run_redis_parser_control(go,environment,command,parent,out):
   raise ValueError('exact Redis parser parent and all three children required')
  receipt=dict(result,source=FINAL_SOURCE,accepted=True,newDatabaseFixtures=0,otherR8TargetsDispatched=False)
  write(out/'redis-parser-names.json',receipt)
+ return receipt
+
+def run_kafka_acl_control(go,environment,command,parent,out):
+ control=KAFKA_ACL_CONTROL;targets=control['targets'];package=next(iter(targets));top=targets[package][0]
+ raw=command(control['phase'],[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run','^'+top+'$','./'+package],control['phaseGuardSeconds'],environment)
+ events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()]
+ result=parent.audit(events,0,targets)
+ expected={(package,top)}|{(package,top+'/'+child) for child in control['requiredSubtests'][package][top]}
+ names=[(row['package'],row['name']) for row in result['namedCompletions']]
+ if result['topPASS']!=1 or result['subPASS']!=2 or len(names)!=3 or set(names)!=expected:raise ValueError('exact Kafka ACL parent and both response children required')
+ receipt=dict(result,source=FINAL_SOURCE,accepted=True,newDatabaseFixtures=0,otherKafkaOrRedisTestsDispatched=False)
+ write(out/'kafka-acl-response-names.json',receipt)
  return receipt
 
 def run_cleanup_controls(go,environment,command,parent,out):
@@ -416,7 +430,7 @@ def run():
     raw=regular(folder/'stderr',32<<20) if (folder/'stderr').exists() else b''
     write(out/(f'compile-failure-{command_index:04d}.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
    fixture_observations=None
-   if label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser'} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
+   if label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response'} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
     raw_events=regular(folder/'stdout',32<<20)
     if label=='cleanup-runtimeacceptance':
      fixture_observations=runtime_cleanup_observations(raw_events,label)
@@ -443,6 +457,7 @@ def run():
   redis_parser_reuse=load_redis_parser_reuse(out,bodies)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
+  kafka_acl_audit=run_kafka_acl_control(go,offline,command,parent,out)
   binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
   entries=[{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]+c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'}]
   for entry in entries:
@@ -506,7 +521,7 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'kafkaACLTopPASS':kafka_acl_audit['topPASS'],'kafkaACLSubPASS':kafka_acl_audit['subPASS'],'actualKafkaACLTestsDispatched':1,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

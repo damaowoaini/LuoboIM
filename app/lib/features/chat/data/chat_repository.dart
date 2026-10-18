@@ -24,9 +24,9 @@ import 'message_mapper.dart';
 import 'group_mention_authority.dart';
 import 'retained_merge_codec.dart';
 
-enum ChatLocalHintKind { inserted, failed, unknown, suppressed }
+enum ChatLocalHintKind { inserted, failed, unknown, suppressed, viewOnly }
 
-/// Auxiliary LOCAL write outcome, bound to one original send attempt. This is
+/// Auxiliary LOCAL or view-only outcome, bound to one original send attempt. This is
 /// never a successful send receipt or an instruction to retry a local write.
 final class ChatLocalHintResult {
   const ChatLocalHintResult(
@@ -35,12 +35,76 @@ final class ChatLocalHintResult {
     this.kind, {
     this.hintId,
     this.message,
+    this.viewHint,
   });
+  final ChatViewFailureHint? viewHint;
   final String sourceMessageId;
   final int attempt;
   final ChatLocalHintKind kind;
   final String? hintId;
   final ChatMessage? message;
+}
+
+/// Current-view data only: not a ChatMessage, SDK110 record, storage result or
+/// retention capability. It never appears in history/search or another view.
+final class ChatViewFailureHint {
+  ChatViewFailureHint._(
+    this.sourceMessageId,
+    this.attempt,
+    this.type,
+    this.peerId,
+    this.privacy,
+    this._now,
+    this._sourceCheck,
+    this._viewCurrent,
+  );
+  final String sourceMessageId, peerId;
+  final int attempt, type;
+  final MessagePrivacy privacy;
+  final DateTime Function() _now;
+  void Function()? _sourceCheck;
+  bool Function()? _viewCurrent;
+  bool get canView {
+    final sourceCheck = _sourceCheck, viewCurrent = _viewCurrent;
+    if (sourceCheck == null || viewCurrent == null) {
+      return false;
+    }
+    try {
+      sourceCheck();
+      if (viewCurrent() && privacy.canViewAt(_now())) {
+        return true;
+      }
+    } on AppFailure {
+      // The original cut is never captured again after retirement.
+    }
+    retire();
+    return false;
+  }
+
+  void retire() {
+    _sourceCheck = null;
+    _viewCurrent = null;
+  }
+
+  /// One explicit 911 click may hand the same source check to its own existing
+  /// profile/reason route. The caller must still bind that exact route; this
+  /// check gives no retention, native-message or automatic-apply permission.
+  void Function()? takeFriendRequestCheck() {
+    if (type != 911 || !canView) {
+      return null;
+    }
+    final sourceCheck = _sourceCheck;
+    if (sourceCheck == null) {
+      return null;
+    }
+    retire();
+    return () {
+      sourceCheck();
+      if (!privacy.canViewAt(_now())) {
+        throw const AppFailure(FailureKind.permissionDenied);
+      }
+    };
+  }
 }
 
 final class _RelationshipHintClaims {
@@ -65,7 +129,9 @@ final class _RelationshipHintSource {
     this.access,
     this.privacy,
     this.checkSource,
+    this.viewCurrent,
   );
+  final bool Function()? viewCurrent;
   final String id, peer;
   final int attempt;
   final Message message;
@@ -1017,6 +1083,7 @@ final class ChatRepository {
     void Function()? checkSource,
     void Function()? onDispatched,
     void Function(ChatLocalHintResult)? onLocalHint,
+    bool Function()? hintViewCurrent,
   }) async {
     _RelationshipHintSource? hintSource;
     try {
@@ -1036,6 +1103,7 @@ final class ChatRepository {
                   lease,
                   privacy,
                   checkSource,
+                  hintViewCurrent,
                 );
               },
       );
@@ -1199,7 +1267,31 @@ final class ChatRepository {
       // The SDK has no persistence receipt for the effective ledger policy.
       // Do not create a stored hint for private/expiry/unknown facts, nor invent
       // a new burn window. The original failed row/error remains available.
-      if (!sourceCanPersist()) return result(ChatLocalHintKind.suppressed);
+      if (!sourceCanPersist()) {
+        final viewCurrent = source.viewCurrent;
+        if (viewCurrent == null || !viewCurrent()) {
+          return result(ChatLocalHintKind.suppressed);
+        }
+        final privacy = MessagePrivacy.combined([
+          source.privacy,
+          gateway.privacyLedger.lookup(source.id),
+        ]);
+        return ChatLocalHintResult(
+          source.id,
+          source.attempt,
+          ChatLocalHintKind.viewOnly,
+          viewHint: ChatViewFailureHint._(
+            source.id,
+            source.attempt,
+            type,
+            source.peer,
+            privacy,
+            now,
+            check,
+            viewCurrent,
+          ),
+        );
+      }
       // Unknown/pending LOCAL writes remain suppressed across view remounts
       // in this account generation. A known outcome permits a new explicit
       // send attempt, never an automatic retry of this auxiliary operation.

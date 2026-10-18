@@ -7,10 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_openim_sdk/flutter_openim_sdk.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:imapp/core/error/app_failure.dart';
+import 'package:imapp/core/im/im_event.dart';
 import 'package:imapp/features/chat/data/chat_repository.dart';
 import 'package:imapp/features/chat/data/message_mapper.dart';
 import 'package:imapp/features/chat/domain/chat_message.dart';
 import 'package:imapp/features/conversation/data/conversation_repository.dart';
+import 'package:imapp/features/contacts/presentation/user_profile_page.dart';
 
 import '../../core/im/sdk_harness.dart';
 import 'batch_harness.dart';
@@ -38,6 +40,7 @@ Message legacyCustom(
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   _relationshipHintTests();
+  _transientRelationshipHintTests();
 
   test('tag903 text uses the actual legacy textElem payload', () {
     final message = legacyCustom(903, {
@@ -1081,17 +1084,65 @@ void _relationshipHintTests() {
 
   test('CID clear during native local insert retires the original timeline before its late ACK', () async {
     final f = _HintHarness()..insertRelease = Completer<void>();
+    StreamSubscription<ImEvent>? invalidationSubscription;
+    Future<void>? observedClear;
+    Object? clearError;
+    StackTrace? clearStack;
     try {
       await f.start();
       await f.h.chat.sendText('清理前原文');
       await f.settle(() => f.inserts == 1);
-      final clear = f.h.sdk.gateway.clearConversationMessages(
-        f.h.sdk.session.state.generation,
-        f.h.source.conversationId,
+      final gateway = f.h.sdk.gateway;
+      final generation = f.h.sdk.session.state.generation;
+      final cid = f.h.source.conversationId;
+      final lease = gateway.historyAccess(generation, conversationId: cid);
+      final revision = gateway.conversationHistoryRevision(cid);
+      final invalidated = Completer<void>();
+      invalidationSubscription = gateway.events.listen((event) {
+        if (event.generation == generation &&
+            event.kind == ImEventKind.conversationHistoryInvalidated &&
+            event.resourceIds.length == 1 &&
+            event.resourceIds.single == cid &&
+            event.historyClearing == true &&
+            !invalidated.isCompleted) {
+          invalidated.complete();
+        }
+      });
+      // Observe errors immediately, while retaining their original stack for
+      // the assertion path and joining clear before fixture/session teardown.
+      observedClear = gateway
+          .clearConversationMessages(generation, cid)
+          .then<void>(
+            (_) {},
+            onError: (Object error, StackTrace stack) {
+              clearError = error;
+              clearStack = stack;
+            },
+          );
+      expect(
+        lease.check,
+        throwsA(
+          isA<AppFailure>().having(
+            (e) => e.kind,
+            'retired CID lease',
+            FailureKind.cancelled,
+          ),
+        ),
       );
+      expect(gateway.isConversationHistoryClearing(cid), isTrue);
+      expect(gateway.conversationHistoryRevision(cid), revision + 1);
+      expect(f.h.count('clearConversationAndDeleteAllMsg'), 0);
+      // The CID barrier is synchronous; its broadcast reaches the timeline
+      // asynchronously. Deliver it while the original native ACK stays held.
+      await f.settle(() => invalidated.isCompleted);
+      expect(f.insertRelease!.isCompleted, isFalse);
+      expect(f.h.count('clearConversationAndDeleteAllMsg'), 0);
       expect(f.h.chat.messages, isEmpty);
       f.insertRelease!.complete();
-      await clear;
+      await observedClear;
+      if (clearError != null) {
+        Error.throwWithStackTrace(clearError!, clearStack!);
+      }
       await f.settle(() => f.h.count('clearConversationAndDeleteAllMsg') == 1);
       expect(f.h.chat.messages, isEmpty);
       expect(f.h.chat.localHintResults, isEmpty);
@@ -1099,7 +1150,18 @@ void _relationshipHintTests() {
       expect(f.inserts, 1);
       expect(f.h.count('sendMessage'), 1);
     } finally {
-      await f.close();
+      if (!f.insertRelease!.isCompleted) {
+        f.insertRelease!.complete();
+      }
+      try {
+        await observedClear;
+      } finally {
+        try {
+          await invalidationSubscription?.cancel();
+        } finally {
+          await f.close();
+        }
+      }
     }
   });
 
@@ -1468,4 +1530,353 @@ void _relationshipHintTests() {
       await f.close(tester);
     }
   });
+}
+
+void _transientRelationshipHintTests() {
+  for (final policy in ['private', 'inspection-unknown']) {
+    test(
+      'view-only $policy relationship failures preserve the failed source without native hints or remount reconstruction',
+      () async {
+        for (final code in [1302, 1303]) {
+          final f = _HintHarness()..failureCode = code;
+          try {
+            await f.start();
+            if (policy == 'private') {
+              f.privacy = {
+                'isPrivateChat': true,
+                'burnDuration': 60,
+                'hasReadTime': DateTime.now().millisecondsSinceEpoch,
+              };
+            } else {
+              f.encodedPrivacy = '{';
+            }
+            f.h.chat.bindHintView(
+              () =>
+                  () => true,
+            );
+            expect(await f.h.chat.sendText('只在当前页显示失败'), isTrue);
+            await f.settle(() => f.h.chat.failure != null);
+            final result = f.h.chat.localHintResults.values.single;
+            final source = f.h.chat.messages.singleWhere(
+              (m) => m.id == result.sourceMessageId,
+            );
+            final hint = result.viewHint!;
+            expect(f.h.chat.failure, f.failure);
+            expect(source.delivery, MessageDelivery.failed);
+            expect(source.text, '只在当前页显示失败');
+            expect(result.kind, ChatLocalHintKind.viewOnly);
+            expect(result.message, isNull);
+            expect(result.hintId, isNull);
+            expect(hint.type, code == 1302 ? 910 : 911);
+            expect(hint.peerId, 'bob');
+            expect(hint.attempt, result.attempt);
+            expect(hint.canView, isTrue);
+            expect(hint.privacy.canRetainAt(DateTime.now()), isFalse);
+            expect(
+              hint.privacy.expiresAtMilliseconds,
+              source.privacy.expiresAtMilliseconds,
+            );
+            expect(f.h.chat.viewHintsFor(source.id), [hint]);
+            if (code == 1302) {
+              expect(hint.takeFriendRequestCheck(), isNull);
+            }
+            expect(
+              f.h.chat.messages.where((m) => m.kind == ChatMessageKind.custom),
+              isEmpty,
+            );
+            final remounted = ChatRepository(
+              gateway: f.h.sdk.gateway,
+              session: f.h.sdk.session,
+              conversationId: f.h.source.conversationId,
+            );
+            await remounted.conversation();
+            final history = await remounted.history();
+            expect(
+              history.messages.where((m) => m.kind == ChatMessageKind.custom),
+              isEmpty,
+            );
+            remounted.clear();
+            expect(f.creates, 0);
+            expect(f.inserts, 0);
+            expect(f.h.count('addFriend'), 0);
+            expect(f.h.count('sendMessage'), 1);
+          } finally {
+            await f.close();
+          }
+        }
+      },
+    );
+  }
+
+  test('view-only relationship hints retire on deletion clear expiry logout and route loss without renewed authority', () async {
+    for (final invalidation in [
+      'delete',
+      'clear',
+      'expiry',
+      'logout',
+      'route',
+    ]) {
+      final f = _HintHarness();
+      var visible = true;
+      try {
+        await f.start();
+        f.privacy = {
+          'isPrivateChat': true,
+          'burnDuration': 60,
+          'hasReadTime': DateTime.now().millisecondsSinceEpoch,
+        };
+        f.h.chat.bindHintView(
+          () =>
+              () => visible,
+        );
+        await f.h.chat.sendText('原失败来源');
+        await f.settle(() => f.h.chat.failure != null);
+        final result = f.h.chat.localHintResults.values.single;
+        final hint = result.viewHint!;
+        expect(hint.canView, isTrue);
+        if (invalidation == 'delete') {
+          f.h.source.forgetMessages([result.sourceMessageId]);
+        } else if (invalidation == 'clear') {
+          await f.h.sdk.gateway.clearConversationMessages(
+            f.h.sdk.session.state.generation,
+            f.h.source.conversationId,
+          );
+        } else if (invalidation == 'expiry') {
+          f.h.sdk.gateway.privacyLedger.observe(f.h.source.conversationId, {
+            'clientMsgID': result.sourceMessageId,
+            'attachedInfoElem': {
+              'isPrivateChat': true,
+              'burnDuration': 1,
+              'hasReadTime': 1700000000000,
+            },
+          }, now: DateTime.now());
+        } else if (invalidation == 'logout') {
+          await f.h.sdk.session.signOut();
+        } else {
+          visible = false;
+        }
+        expect(hint.canView, isFalse);
+        visible = true;
+        expect(hint.canView, isFalse);
+        expect(hint.takeFriendRequestCheck(), isNull);
+        expect(f.h.chat.viewHintsFor(result.sourceMessageId), isEmpty);
+        expect(f.creates, 0);
+        expect(f.inserts, 0);
+        expect(f.h.count('addFriend'), 0);
+        expect(f.h.count('sendMessage'), 1);
+      } finally {
+        await f.close();
+      }
+    }
+  });
+
+  testWidgets(
+    'private view-only 911 opens only the original reason flow and confirms the current peer without native hint storage',
+    (tester) async {
+      final f = ChatCardFixture();
+      try {
+        await f.mount(tester);
+        final hint = await _privateViewFailure(tester, f);
+        final original = f.controller.messages.singleWhere(
+          (m) => m.id == hint.sourceMessageId,
+        );
+        expect(original.delivery, MessageDelivery.failed);
+        expect(original.privacy.containsPrivateContent, isTrue);
+        expect(hint.canView, isTrue);
+        final input = await _reason(tester, f);
+        final page = tester.widget<UserProfilePage>(
+          find.byType(UserProfilePage),
+        );
+        final source = page.source!;
+        expect(source.friendRequestOnly, isTrue);
+        expect(source.userId, f.controller.conversation!.userId);
+        expect(source.canRetain(), isFalse);
+        expect(source.current(), isTrue);
+        expect(hint.canView, isFalse);
+        expect(find.text('发消息'), findsNothing);
+        expect(find.text('投诉'), findsNothing);
+        expect(find.text('加入黑名单'), findsNothing);
+        expect(f.friendRequests, 0);
+        await tester.enterText(input, '当前失败消息的好友验证');
+        await tester.tap(find.widgetWithText(TextButton, '确定').hitTestable());
+        await f.transport.base.until(tester, () => f.friendRequests == 1);
+        final request = f.sdk.calls.singleWhere((c) => c.method == 'addFriend');
+        expect(request.arguments['toUserID'], 'bob');
+        expect(request.arguments['reqMsg'], '当前失败消息的好友验证');
+        expect(f.conversations, 0);
+        _expectNoNativeViewHint(f);
+      } finally {
+        await f.close(tester);
+      }
+    },
+  );
+
+  testWidgets(
+    'private view-only 911 retained reason cannot apply after clear issuer expiry or its owned route exits',
+    (tester) async {
+      for (final change in ['clear', 'issuer', 'expiry', 'route']) {
+        final f = ChatCardFixture();
+        try {
+          await f.mount(tester);
+          final hint = await _privateViewFailure(tester, f);
+          final input = await _reason(tester, f);
+          await tester.enterText(input, '迟返不能发送');
+          final retained = tester
+              .widget<TextButton>(find.widgetWithText(TextButton, '确定'))
+              .onPressed!;
+          if (change == 'route') {
+            Navigator.of(tester.element(find.byType(AlertDialog))).pop();
+            await f.transport.base.frame(tester);
+            f.transport.base.navigator.currentState!.pop();
+            await f.transport.base.frame(tester);
+          } else {
+            await f.transport.base.actual(tester, () async {
+              if (change == 'clear') {
+                await f.sdk.gateway.clearConversationMessages(
+                  f.sdk.session.state.generation,
+                  f.transport.cid,
+                );
+              } else if (change == 'issuer') {
+                await f.transport.base.changeOwner(
+                  user: 'alice',
+                  issuer: 'https://another.example/',
+                );
+              } else {
+                f.sdk.gateway.privacyLedger.observe(f.transport.cid, {
+                  'clientMsgID': hint.sourceMessageId,
+                  'attachedInfoElem': {
+                    'isPrivateChat': true,
+                    'burnDuration': 1,
+                    'hasReadTime': 1700000000000,
+                  },
+                }, now: DateTime.now());
+              }
+            });
+          }
+          retained();
+          await f.transport.base.frame(tester);
+          expect(f.friendRequests, 0);
+          expect(f.conversations, 0);
+          expect(hint.canView, isFalse);
+          _expectNoNativeViewHint(f);
+        } finally {
+          await f.close(tester);
+        }
+      }
+    },
+  );
+
+  testWidgets(
+    'private send failure arriving under another route cannot create a late view hint when the chat returns',
+    (tester) async {
+      final f = ChatCardFixture();
+      final entered = Completer<void>(), release = Completer<void>();
+      try {
+        await f.mount(tester);
+        _installPrivateSendFailure(
+          f,
+          beforeFailure: () async {
+            entered.complete();
+            await release.future;
+          },
+        );
+        await f.transport.base.actual(tester, () async {
+          expect(await f.controller.sendText('保留原失败行'), isTrue);
+          await entered.future;
+        });
+        unawaited(
+          f.transport.base.navigator.currentState!.push<void>(
+            MaterialPageRoute<void>(
+              builder: (_) => const Scaffold(body: Text('原路由已被覆盖')),
+            ),
+          ),
+        );
+        await f.transport.base.ready(tester, find.text('原路由已被覆盖'));
+        await f.transport.base.actual(tester, () async {
+          release.complete();
+        });
+        await f.transport.base.until(
+          tester,
+          () => f.controller.failure != null,
+        );
+        final result = f.controller.localHintResults.values.single;
+        expect(result.kind, ChatLocalHintKind.suppressed);
+        expect(result.viewHint, isNull);
+        final original = f.controller.messages.singleWhere(
+          (m) => m.id == result.sourceMessageId,
+        );
+        expect(original.delivery, MessageDelivery.failed);
+        expect(original.text, '保留原失败行');
+        expect(f.controller.failure?.code, 1303);
+        f.transport.base.navigator.currentState!.pop();
+        await f.transport.base.frame(tester);
+        expect(f.controller.viewHintsFor(original.id), isEmpty);
+        expect(find.text('发送好友验证'), findsNothing);
+        _expectNoNativeViewHint(f);
+      } finally {
+        if (!release.isCompleted) {
+          release.complete();
+        }
+        await f.close(tester);
+      }
+    },
+  );
+}
+
+void _installPrivateSendFailure(
+  ChatCardFixture f, {
+  Future<void> Function()? beforeFailure,
+}) {
+  final prior = f.sdk.overrideCall!;
+  f.sdk.overrideCall = (call) async {
+    if (call.method == 'createTextMessage') {
+      final value = Map<String, dynamic>.from(
+        jsonDecode(await prior(call)) as Map,
+      );
+      value['attachedInfoElem'] = {
+        'isPrivateChat': true,
+        'burnDuration': 60,
+        'hasReadTime': DateTime.now().millisecondsSinceEpoch,
+      };
+      return jsonEncode(value);
+    }
+    if (call.method == 'sendMessage') {
+      await beforeFailure?.call();
+      throw PlatformException(code: '1303');
+    }
+    return prior(call);
+  };
+}
+
+Future<ChatViewFailureHint> _privateViewFailure(
+  WidgetTester tester,
+  ChatCardFixture f,
+) async {
+  _installPrivateSendFailure(f);
+  await f.transport.base.actual(tester, () async {
+    expect(await f.controller.sendText('私密原发送仍失败'), isTrue);
+  });
+  await f.transport.base.until(tester, () => f.controller.failure != null);
+  expect(
+    f.controller.failure,
+    isA<AppFailure>()
+        .having((e) => e.kind, 'original failure kind', FailureKind.unknown)
+        .having((e) => e.code, 'original send code', 1303),
+  );
+  final result = f.controller.localHintResults.values.single;
+  expect(result.kind, ChatLocalHintKind.viewOnly);
+  expect(result.message, isNull);
+  expect(result.hintId, isNull);
+  _expectNoNativeViewHint(f);
+  return result.viewHint!;
+}
+
+void _expectNoNativeViewHint(ChatCardFixture f) {
+  for (final method in [
+    'createCustomMessage',
+    'insertSingleMessageToLocalStorage',
+  ]) {
+    expect(f.sdk.calls.where((c) => c.method == method), isEmpty);
+  }
+  expect(f.sdk.calls.where((c) => c.method == 'sendMessage'), hasLength(1));
 }

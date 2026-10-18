@@ -1,4 +1,4 @@
-name: Manual Mobile codec903 905 910 911 / fresh3 same-body-old6 exact35 / historical5 partial only
+name: Manual Mobile codec903 905 910 911 / fresh5 same-body-old4 exact15 / historical5 partial only
 
 on:
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
           # The unchanged setup verifies the ten exact git blobs before its one original setup call.
           python3 -B ci/mobile-tag903.py setup --allocation "$TAG903_ROOT"
           test "$(git -C "$GITHUB_WORKSPACE" rev-parse --verify 'HEAD^{commit}')" = "$original_head"
-      - name: Only fresh format3 analyze3 plus same-body old analysis6 and selected35 with no VM service or business network
+      - name: Only fresh format5 analyze5 plus same-body old analysis4 and selected15 with no VM service or business network
         run: |
           set -euo pipefail
           sudo unshare --net -- python3 -B "$GITHUB_WORKSPACE/ci/mobile-tag903.py" netns \
