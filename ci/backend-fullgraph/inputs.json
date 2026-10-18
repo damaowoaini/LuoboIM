@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_and_four_planes_redis122c1top3sub_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1576,
-    "digest": "990ba2c75a0de47d34c8801e6b95a85b4e5574354dc0801907b133febbfafda9"
+    "digest": "df4a7fa81384a0985937751553bbca5363630343690b8c2cb8f09838b54c10f8"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -43,7 +43,7 @@
     {
       "path": "ci/backend-fullgraph/run.py",
       "bytes": 59659,
-      "sha256": "8fad69ba692f3aacd0b17fd80f1910527c0413c24e29cac920cc606250bfe862"
+      "sha256": "1e0f1b4001f464ab6695237d83711c9ebdd073fecef0590ea5a3f5d07a5629c2"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -1347,8 +1347,8 @@
     {
       "target": "server/internal/rpc/group/managed_start.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/rpc/group/managed_start.go",
-      "bytes": 12532,
-      "sha256": "60fe751f048f8ac8a0e3727aa9039775ce3fda840fb6de4c3a97878831f58fb0",
+      "bytes": 12592,
+      "sha256": "b368ba6d81b4558c8aa03f62cc8b0771d6f94d85f587e5b3bbc4a5dcb1fbd981",
       "beforeSHA256": "dbe5f70f18e3535315f5f323d5ae761a140f952e076bc950b71989c703a81c39"
     },
     {
@@ -4305,13 +4305,18 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-reader-database-instance-batch-1/formatted.json",
-      "bytes": 3599,
-      "sha256": "c64699d3c0ba0cfffe34d9ade1ba67a09c7fc65f41212cf081b60d0065ec3b52"
+      "path": ".qa/backend-group-mongo-handle-name-batch-1/formatted.json",
+      "bytes": 738,
+      "sha256": "3032501632df9f72384150fa4112902bd0ecd4833caa39c5a469ef06f0a31679"
+    },
+    "resource": {
+      "path": ".qa/backend-group-mongo-handle-name-batch-1/format.resource.json",
+      "bytes": 889,
+      "sha256": "a39ae806d866f26a59ed28b58b649ed1b7eeb60f220e4ed5e925ca87c2fe2d8b"
     },
     "source": {
       "members": 1576,
-      "digest": "990ba2c75a0de47d34c8801e6b95a85b4e5574354dc0801907b133febbfafda9"
+      "digest": "df4a7fa81384a0985937751553bbca5363630343690b8c2cb8f09838b54c10f8"
     },
     "GoTestsExecuted": 0,
     "RootAcceptanceRequired": true
