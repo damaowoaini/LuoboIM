@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+import tempfile
 from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
@@ -65,5 +66,67 @@ class TargetedContracts(unittest.TestCase):
             return value
         with patch.object(controller, 'stable', side_effect=changed), self.assertRaises(ValueError):
             controller.verify(pin, source_required=False)
+
+
+class NewDownloadObservationControls(unittest.TestCase):
+    def test_original_download_plan_and_known_source_difference_projection_remain_strict_and_private(self):
+        self.assertEqual(controller.module_download_plan('/fixed/go'), ['/fixed/go', 'mod', 'download', '-json'])
+        with tempfile.TemporaryDirectory(prefix='private-only-source-') as directory:
+            root = Path(directory).resolve()
+            (root / 'pkg').mkdir()
+            module = root / 'go.mod'; module.write_text('module public.example\n')
+            source = root / 'pkg/public.go'; source.write_text('package public\n')
+            expected = [{'path': 'go.mod', **controller.stable(module)},
+                        {'path': 'pkg/public.go', **controller.stable(source)}]
+            module.write_text('module public.example\n// PRIVATE-DO-NOT-EXPORT\n')
+            (root / 'pkg/private-added.go').write_text('PRIVATE-NEW-CONTENT')
+            projection = controller.source_difference(root, expected)
+            self.assertEqual(projection['knownChangedCount'], 1)
+            self.assertEqual(projection['knownChanges'][0]['path'], 'go.mod')
+            self.assertEqual(projection['knownChanges'][0]['after'], controller.stable(module))
+            self.assertEqual(projection['unknownAddedCategories']['regular-go'], 1)
+            self.assertTrue(projection['driftStillRejectsRun'])
+            encoded = json.dumps(projection)
+            for private in ['PRIVATE-', 'private-added', directory]: self.assertNotIn(private, encoded)
+            module.unlink()
+            missing = controller.source_difference(root, expected)['knownChanges'][0]
+            self.assertEqual(missing['kind'], 'missing'); self.assertIsNone(missing['after'])
+            private = root / 'private'; private.mkdir()
+            (private / 'module-download.resource.json').write_text(json.dumps(
+                {'status': 'failed', 'exit_code': 7, 'command': ['PRIVATE-DSN']}))
+            (private / 'go-test.resource.json').write_text('[]')
+            (private / 'unknown-secret.resource.json').write_text('PRIVATE-UNKNOWN')
+            statuses = controller.command_observations(private)
+            self.assertEqual(statuses, {'module-download': {'exit': 7, 'guardStatus': 'failed'},
+                                       'go-test': {'exit': None, 'guardStatus': 'unconfirmed'}})
+            self.assertNotIn('PRIVATE-', json.dumps(statuses))
+
+    def test_failed_go_observation_keeps_fixed_individual_facts_without_output_or_package_acceptance(self):
+        rows = [{'Action': 'start', 'Package': controller.PACKAGE}]
+        for name in controller.TESTS[:2]:
+            rows += [{'Action': 'run', 'Package': controller.PACKAGE, 'Test': name},
+                     {'Action': 'pass', 'Package': controller.PACKAGE, 'Test': name}]
+        rows += [{'Action': 'run', 'Package': controller.PACKAGE, 'Test': controller.TESTS[2]},
+                 {'Action': 'output', 'Package': controller.PACKAGE, 'Test': controller.TESTS[2],
+                  'Output': '    service_test.go:42: PRIVATE-DSN\n/private/place/service_test.go:44: SECRET\nservice_test.go:999999: PRIVATE-OUTSIDE-SOURCE\nunknown_test.go:1: UNKNOWN'},
+                 {'Action': 'fail', 'Package': controller.PACKAGE, 'Test': controller.TESTS[2]},
+                 {'Action': 'fail', 'Package': controller.PACKAGE}]
+        encode = lambda values: ('\n'.join(json.dumps(row) for row in values) + '\n').encode()
+        limits = {'service_test.go': 300, 'admin_disable_revocation_test.go': 200}
+        value = controller.failed_go_observation(encode(rows), limits, 1)
+        self.assertEqual(value['individualPASSObserved'], controller.TESTS[:2])
+        self.assertEqual(value['knownFrames'], [{'test': controller.TESTS[2], 'basename': 'service_test.go', 'line': 42}])
+        self.assertFalse(value['wholeInvocationAccepted'])
+        for private in ['PRIVATE-DSN', '/private/', 'SECRET', 'unknown_test', 'UNKNOWN']:
+            self.assertNotIn(private, json.dumps(value))
+        with self.assertRaises(ValueError): controller.go_events(encode(rows), 1)
+        partial = controller.failed_go_observation(encode(rows) + b'{unfinished', limits, 1)
+        self.assertFalse(partial['completeJSON']); self.assertFalse(partial['wholeInvocationAccepted'])
+        build = [{'Action': 'build-output', 'ImportPath': controller.PACKAGE,
+                  'Output': 'pkg/common/admindelegation/admin_disable_revocation_test.go:54: SECRET'},
+                 {'Action': 'build-fail', 'ImportPath': controller.PACKAGE}]
+        self.assertEqual(controller.failed_go_observation(encode(build), limits, 1)['knownFrames'],
+            [{'test': None, 'basename': 'admin_disable_revocation_test.go', 'line': 54}])
+        self.assertFalse(controller.failed_go_observation(encode(build), limits, 1)['wholeInvocationAccepted'])
 
 if __name__ == '__main__': unittest.main()

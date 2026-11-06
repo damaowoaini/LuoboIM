@@ -190,6 +190,19 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	defer func() {
 		// Observe the original named return before any cleanup or boot.Close joins.
 		result.PrimaryRunErrorClass = graphOperationErrorClass(runErr)
+		if runErr != nil && session != nil && session.Runtime != nil && session.Runtime.Processes != nil {
+			// Observation-only: preserve the original error and take every cached
+			// owner outcome BEFORE the first cleanup/Stop can send a signal. The
+			// original owners remain private for the collector's exact association.
+			_, _ = writePrivate(filepath.Join(plan.Work, "original-runtime-wait-before-cleanup.json"), struct {
+				Version            string                                               `json:"version"`
+				Boundary           string                                               `json:"boundary"`
+				Scenario           string                                               `json:"scenario"`
+				SourceSHA256       string                                               `json:"sourceSHA256"`
+				Roles              []ownedcontrol.NamespaceRuntimeCachedWaitObservation `json:"roles"`
+				AcceptanceEvidence bool                                                 `json:"acceptanceEvidence"`
+			}{"original-runtime-cached-wait-v1", "before-original-cleanup", plan.Scenario, result.SourceSHA256, session.Runtime.Processes.CachedWaitObservations(), false})
+		}
 		cleanup, stop := context.WithTimeout(context.Background(), 120*time.Second)
 		defer stop()
 		localCleanupErr := cleanupAcceptanceSession(cleanup, session)

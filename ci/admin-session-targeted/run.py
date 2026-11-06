@@ -111,6 +111,111 @@ def go_events(raw, exit_code):
     return {'actualTopRun': sorted(runs), 'actualTopPASS': sorted(passed), 'subtests': 0,
             'skips': 0, 'packagePASS': True, 'actualFooter': True, 'rawOutputExported': False}
 
+def module_download_plan(go):
+    return [go, 'mod', 'download', '-json']
+
+
+def source_difference(root, expected):
+    root = Path(root)
+    indexed = {row['path']: row for row in expected}
+    changes = []
+    for name, before in indexed.items():
+        path = root / name
+        try:
+            after = stable(path)
+            kind = 'changed'
+        except FileNotFoundError:
+            after, kind = None, 'missing'
+        except (ValueError, OSError):
+            after, kind = None, 'unsafe'
+        if after != {key: before[key] for key in ('bytes', 'sha256', 'mode')}:
+            changes.append({'path': name, 'kind': kind,
+                'before': {key: before[key] for key in ('bytes', 'sha256', 'mode')}, 'after': after})
+    added = {'regular-go': 0, 'alias-or-nonregular': 0}
+    for path in root.rglob('*.go'):
+        if path.relative_to(root).as_posix() not in indexed:
+            category = 'alias-or-nonregular' if path.is_symlink() or not path.is_file() else 'regular-go'
+            added[category] += 1
+    return {'knownChangedCount': len(changes), 'knownChanges': changes[:16],
+        'knownProjectionTruncated': len(changes) > 16, 'unknownAddedCategories': added,
+        'unknownNamesOrBodiesOrHashesExported': False, 'rawSourceOrPrivatePathsExported': False,
+        'diagnosticOnly': True, 'driftStillRejectsRun': True}
+
+
+def test_frame_limits(inputs):
+    limits = {}
+    for name in ('service_test.go', 'admin_disable_revocation_test.go'):
+        path = 'pkg/common/admindelegation/' + name
+        row = next(item for item in inputs['source'] if item['path'] == path)
+        raw = (REPO / 'product/chart' / path).read_bytes()
+        if len(raw) != row['bytes'] or sha(raw) != row['sha256']:
+            raise ValueError('known test source frame boundary differs')
+        limits[name] = len(raw.splitlines())
+    return limits
+
+
+def failed_go_observation(raw, limits, code):
+    counts = {name: {action: 0 for action in ('run', 'pass', 'fail', 'skip')} for name in TESTS}
+    result = {'observationOnly': True, 'wholeInvocationAccepted': False,
+        'wrapperExitCode': code if type(code) is int and -128 <= code <= 255 else None,
+        'knownTests': counts, 'knownFrames': [], 'completeJSON': False,
+        'expectedSelectionOnly': True, 'rawOutputOrValuesExported': False}
+    if not isinstance(raw, bytes) or not raw or len(raw) > 16 << 20:
+        result['individualPASSObserved'] = []
+        return result
+    result.update(originalMachineJSON_SHA256=sha(raw), originalMachineJSON_Bytes=len(raw))
+    starts, frames, valid = 0, set(), True
+    for line in raw.splitlines():
+        try:
+            value = json.loads(line)
+            if not isinstance(value, dict): raise ValueError('object required')
+        except (ValueError, UnicodeError):
+            valid = False
+            break
+        if value.get('Package', value.get('ImportPath')) != PACKAGE:
+            continue
+        action, name = value.get('Action'), value.get('Test')
+        if name is not None and not isinstance(name, str):
+            result['expectedSelectionOnly'] = False
+            continue
+        if action == 'start' and not name: starts += 1
+        if name and action in ('run', 'pass', 'fail', 'skip'):
+            if name in counts:
+                counts[name][action] = min(2, counts[name][action] + 1)
+            else:
+                result['expectedSelectionOnly'] = False
+        if (name is None or name in counts) and action in ('output', 'build-output') and isinstance(value.get('Output'), str):
+            for text in value['Output'].splitlines()[:32]:
+                match = re.match(r'^[ \t]*(?:\./)?(?:pkg/common/admindelegation/)?(service_test\.go|admin_disable_revocation_test\.go):([1-9][0-9]{0,5}):', text)
+                if match and 1 <= int(match[2]) <= limits.get(match[1], 0):
+                    frames.add((name or '', match[1], int(match[2])))
+    result['completeJSON'] = valid and raw.endswith(b'\n')
+    result['knownFrames'] = [{'test': name or None, 'basename': file, 'line': line}
+                             for name, file, line in sorted(frames)[:8]]
+    result['framesTruncated'] = len(frames) > 8
+    result['individualPASSObserved'] = [name for name, seen in counts.items()
+        if starts == 1 and seen == {'run': 1, 'pass': 1, 'fail': 0, 'skip': 0}]
+    return result
+
+
+def command_observations(private):
+    labels = ['go-version', 'module-download', 'go-test'] + ['build-' + name for _, _, name in BUILDS]
+    result = {}
+    for label in labels:
+        path = private / (label + '.resource.json')
+        if not path.is_file(): continue
+        try:
+            stable(path, 65536)
+            value = json.loads(path.read_bytes())
+            if not isinstance(value, dict): raise ValueError('resource object required')
+            code = value.get('exit_code')
+            result[label] = {'exit': code if type(code) is int and -128 <= code <= 255 else None,
+                'guardStatus': value.get('status') if value.get('status') in ('passed', 'failed') else 'other'}
+        except (ValueError, OSError):
+            result[label] = {'exit': None, 'guardStatus': 'unconfirmed'}
+    return result
+
+
 def command(root, label, args, cwd, env, seconds):
     private = root / 'private'
     out, err = private / (label + '.stdout'), private / (label + '.stderr')
@@ -154,6 +259,7 @@ def run(root, inputs, input_sha):
     live = fixture.Fixture(root, inputs['images'])
     failure, events, cleanup, before_tools, source, go = None, None, None, None, None, None
     builds, source_post, build_resources = [], False, {}
+    observed_passes = []
     builder = fixture.module('ci/chart-route-build/run.py', 'admin_session_five_elf_audit')
     phase = 'fixture'
     try:
@@ -178,7 +284,7 @@ def run(root, inputs, input_sha):
         if code != 0 or raw.decode().strip() != 'go version go1.27.2 linux/amd64':
             raise ValueError('fixed Go1.27.2 required')
         phase = 'module-download'
-        code, _, guard = command(root, 'module-download', [go, 'mod', 'download', 'all'], source, env, 600)
+        code, _, guard = command(root, 'module-download', module_download_plan(go), source, env, 600)
         if code != 0 or guard.get('status') != 'passed' or guard.get('exit_code') != 0:
             raise ValueError('locked module download failed')
         if tree(source) != inputs['source']: raise ValueError('module source/locks changed')
@@ -189,6 +295,10 @@ def run(root, inputs, input_sha):
         args = [go, 'test', '-mod=readonly', '-race', '-p=1', '-parallel=1', '-count=1', '-json',
                 '-vet=off', '-timeout=180s', '-run', '^(' + '|'.join(TESTS) + ')$', './pkg/common/admindelegation']
         code, raw, guard = command(root, 'go-test', args, source, env, 600)
+        if code != 0 or guard.get('status') != 'passed' or guard.get('exit_code') != 0:
+            observation = failed_go_observation(raw, test_frame_limits(inputs), code)
+            observed_passes = observation['individualPASSObserved']
+            write(output / 'events-observation.json', observation)
         if guard.get('status') != 'passed' or guard.get('exit_code') != 0:
             raise ValueError('actual Go resource/exit not passed')
         events = go_events(raw, code)
@@ -222,19 +332,32 @@ def run(root, inputs, input_sha):
     except BaseException as error:
         failure = {'phase': phase, 'class': type(error).__name__ if type(error).__name__ in ['ValueError', 'OSError', 'TimeoutExpired', 'InterruptedError', 'JSONDecodeError'] else 'other', 'rawErrorExported': False}
     finally:
+        if source is not None:
+            try: write(output / 'source-difference.json', source_difference(source, inputs['source']))
+            except (ValueError, OSError):
+                write(output / 'source-difference.json', {'diagnosticOnly': True, 'unconfirmed': True,
+                      'rawSourceOrPrivatePathsExported': False, 'driftStillRejectsRun': True})
         if before_tools is not None:
+            try: source_exact = tree(source) == inputs['source']
+            except (ValueError, OSError): source_exact = False
+            try: tools_exact = toolset(go) == before_tools
+            except (ValueError, OSError): tools_exact = False
+            source_post = source_exact
+            write(output / 'source-tools.json', {'sourceMembers': len(inputs['source']),
+                'sourceDigest': inputs['sourceDigest'], 'sourceAndLocksPostExact': source_exact,
+                'toolsBeforeAndAfterExact': tools_exact, 'tools': before_tools,
+                'GoVersion': 'go1.27.2 linux/amd64', 'sourceOrPrivateLogsExported': False})
+            if not source_exact or not tools_exact:
+                failure = failure or {'phase': 'post-source-tools', 'class': 'ValueError', 'rawErrorExported': False}
+        partial = live.private / 'go-test.stdout'
+        if events is None and not (output / 'events-observation.json').exists() and partial.is_file():
             try:
-                source_exact = tree(source) == inputs['source']
-                source_post = source_exact
-                tools_exact = toolset(go) == before_tools
-                write(output / 'source-tools.json', {'sourceMembers': len(inputs['source']),
-                    'sourceDigest': inputs['sourceDigest'], 'sourceAndLocksPostExact': source_exact,
-                    'toolsBeforeAndAfterExact': tools_exact, 'tools': before_tools,
-                    'GoVersion': 'go1.27.2 linux/amd64', 'sourceOrPrivateLogsExported': False})
-                if not source_exact or not tools_exact:
-                    failure = failure or {'phase': 'post-source-tools', 'class': 'ValueError', 'rawErrorExported': False}
-            except BaseException:
-                failure = failure or {'phase': 'post-source-tools', 'class': 'other', 'rawErrorExported': False}
+                stable(partial, 16 << 20)
+                observation = failed_go_observation(partial.read_bytes(), test_frame_limits(inputs), None)
+                observed_passes = observation['individualPASSObserved']
+                write(output / 'events-observation.json', observation)
+            except (ValueError, OSError): pass
+        commands = command_observations(live.private)
         try: cleanup = live.cleanup()
         except BaseException: cleanup = {'accepted': False, 'cleanupUnconfirmed': True, 'rawErrorExported': False}
         write(output / 'cleanup.json', cleanup)
@@ -257,7 +380,8 @@ def run(root, inputs, input_sha):
     write(output / 'summary.json', {'accepted': accepted, 'cohort': COHORT, 'head': os.environ['GITHUB_SHA'],
         'actualTopPASS': 4 if events is not None else 0, 'freshChartBuilds': len(builds), 'freshRouteBuilds': 0,
         'subtests': 0, 'skipsAccepted': 0,
-        'failure': failure, 'cleanupAccepted': cleanup.get('accepted') is True,
+        'failure': failure, 'commands': commands, 'observedIndividualPASS': observed_passes,
+        'individualFactsAreNotWholePackagePASS': True, 'cleanupAccepted': cleanup.get('accepted') is True,
         'fixtureRuntimeOnly': True, 'IMExternalCallsStubbed': True,
         'HTTPOrProduct20OrFullRegressionAccepted': False, 'outerResourceGuardStillRequired': True})
     return 0 if accepted else 1

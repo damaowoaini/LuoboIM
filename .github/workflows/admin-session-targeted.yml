@@ -63,6 +63,8 @@ jobs:
             ci-results/admin-session/summary.json
             ci-results/admin-session/events.json
             ci-results/admin-session/source-tools.json
+            ci-results/admin-session/source-difference.json
+            ci-results/admin-session/events-observation.json
             ci-results/admin-session/builds.json
             ci-results/admin-session/fixture-ready.json
             ci-results/admin-session/fixture-after.json

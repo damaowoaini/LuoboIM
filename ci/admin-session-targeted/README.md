@@ -39,3 +39,17 @@ not called because it would attach an unexecuted historical parser claim.
 A distinct bounded five-ELF build-only artifact is uploaded only after four real
 live tests, fresh five builds, source/tools postchecks and both cleanup steps and
 the outer resource guard pass. It grants no Ready/P20/runtime/deployment claim.
+
+## Bounded failure continuation
+
+Dependency preparation now uses the original chart-route command `go mod download
+-json` without `all`; the product module locks and source259 remain exact and any
+drift still fails. The first failure did not retain an after-row vector, so its
+boolean source drift cannot identify the actual changed file. A small diagnostic
+now exports only known source-relative before/after size/SHA/mode rows (cap16).
+Unknown added files expose category/count only, never names, hashes or bodies.
+Failed Go invocations retain only four fixed test-action counters, individually
+observed PASS facts and two known test basenames with source-bounded line numbers.
+No Output/SQL/token/value or private path is exported; individual facts never
+convert failed/truncated/skip output into package or whole-run acceptance.
+Fixed command labels retain only integer exit and finite resource status.

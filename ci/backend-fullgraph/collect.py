@@ -126,7 +126,7 @@ def console_observation(rows,monitor,main,terminals,phases):
  statuses|={prefix+gate for prefix in ('not_started_','stopped_','failed_final_') for gate in ('disk_gate','task_allocation_gate')}
  def status(value):return value if value in statuses else 'unobserved'
  def code(value):return value if type(value) is int and -128<=value<=255 else None
- names={'rtc-panic-runtime-build','rtc-panic-runtime-execute','go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase'],run.CURRENT_KAFKA_CONFIRM_CONTROL['phase'],run.CURRENT_RELEASE_CONTROL['phase'],run.CURRENT_MANAGED_SHAPE_CONTROL['phase'],run.CURRENT_PRODUCER_CONTROL['phase'],run.CURRENT_GROUP_RECOVERY_CONTROL['phase'],run.CURRENT_CACHE_TEST_DELTA_CONTROL['phase'],run.CURRENT_CRON_FIXTURE_CONTROL['phase'],run.CRON_FIXTURE_DEPENDENCY_CONTROL['phase'],run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL['phase'],run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['phase'],run.CURRENT_RUNTIME_RELEASE_CONTROL['phase'],run.CURRENT_RTC_ACTIVATION_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
+ names={run.CURRENT_CACHED_WAIT_CONTROL['phase'],'rtc-panic-runtime-build','rtc-panic-runtime-execute','go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase'],run.CURRENT_KAFKA_CONFIRM_CONTROL['phase'],run.CURRENT_RELEASE_CONTROL['phase'],run.CURRENT_MANAGED_SHAPE_CONTROL['phase'],run.CURRENT_PRODUCER_CONTROL['phase'],run.CURRENT_GROUP_RECOVERY_CONTROL['phase'],run.CURRENT_CACHE_TEST_DELTA_CONTROL['phase'],run.CURRENT_CRON_FIXTURE_CONTROL['phase'],run.CRON_FIXTURE_DEPENDENCY_CONTROL['phase'],run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL['phase'],run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['phase'],run.CURRENT_RUNTIME_RELEASE_CONTROL['phase'],run.CURRENT_RTC_ACTIVATION_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
  def phase(value):
   label=value.get('phase');result={'phase':'unobserved','role':'none','scenario':'none','exitCode':code(value.get('exitCode')),'resourceStatus':status(value.get('resource',{}).get('status'))}
   if label in names:result['phase']=label
@@ -676,13 +676,13 @@ def original_constructor_output_failure(terminal):
 def constructor_projection_empty(status,role):
  return dict(gateway_projection_empty(status),version=run.ORIGINAL_CONSTRUCTOR_LOG_POLICY['version'],role=role)
 
-def constructor_private_file(path,maximum):
+def constructor_private_file(path,maximum,allow_empty=False):
  path=Path(path)
  if path.resolve()!=path:raise ValueError('canonical original private file required')
  fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC)
  try:
   before=os.fstat(fd)
-  if not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or stat.S_IMODE(before.st_mode)!=0o600 or not 1<=before.st_size<=maximum:raise ValueError('owned regular0600 bounded single-link original file required')
+  if not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or stat.S_IMODE(before.st_mode)!=0o600 or not (0 if allow_empty else 1)<=before.st_size<=maximum:raise ValueError('owned regular0600 bounded single-link original file required')
   raw=bytearray();left=maximum+1
   while left:
    part=os.read(fd,min(1<<20,left))
@@ -770,6 +770,93 @@ def project_original_constructor_log(work,terminal,bodies):
   value=project_service_log_bytes(raw,bodies,policy,lambda status:constructor_projection_empty(status,role),constructor_error_prefix);value.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'],**constructor_output_boundary(terminal));return value
  except RuntimeError:return dict(result,status='unsafe')
  except (OSError,ValueError,UnicodeError):return result
+
+def cached_wait_unique_json(raw):
+ def unique(pairs):
+  value={}
+  for key,item in pairs:
+   if key in value:raise ValueError('duplicate private observation key')
+   value[key]=item
+  return value
+ return json.loads(raw,object_pairs_hook=unique)
+
+def checked_cached_wait_row(row):
+ keys={'role','ownerState','waitState','waitErrorClass','processState','signal','stopIntent','joinRecorded'}
+ if not isinstance(row,dict) or not keys<=set(row) or set(row)-keys-{'owner','exitCode'} or row['role'] not in run.ROLES or type(row['joinRecorded']) is not bool:raise ValueError('closed original-role cached Wait row required')
+ if row['ownerState'] not in ('not-launched','owner-mismatch','matched'):raise ValueError('closed retained owner state required')
+ if row['ownerState']!='matched':
+  if set(row)!=keys or any(row[key]!='unobserved' for key in ('waitState','waitErrorClass','processState','signal','stopIntent')) or row['joinRecorded']:raise ValueError('missing or mismatched owner cannot expose a Wait result')
+ else:
+  if not isinstance(row.get('owner'),dict) or row['stopIntent'] not in ('not-attempted','attempted') or row['waitState'] not in ('pending','returned'):raise ValueError('exact private original owner and synchronized stop intent required')
+  if row['waitState']=='pending':
+   if 'exitCode' in row or any(row[key]!='unobserved' for key in ('waitErrorClass','processState','signal')) or row['joinRecorded']:raise ValueError('pending Wait cannot expose ProcessState')
+  else:
+   if row['waitErrorClass'] not in ('none','exit-error','exit-error-with-owned-evidence','owned-evidence','other') or row['processState'] not in ('absent','other','exited','signaled'):raise ValueError('closed original Wait and ProcessState required')
+   if row['processState']=='exited':
+    if type(row.get('exitCode')) is not int or not 0<=row['exitCode']<=255 or row['signal']!='none' or row['exitCode']!=0 and row['waitErrorClass'] not in ('exit-error','exit-error-with-owned-evidence'):raise ValueError('actual bounded exit outcome required')
+   elif row['processState']=='signaled':
+    if 'exitCode' in row or row['signal'] not in run.CACHED_WAIT_DIAGNOSTIC_POLICY['signals'] or row['waitErrorClass'] not in ('exit-error','exit-error-with-owned-evidence'):raise ValueError('closed original signal outcome required')
+   elif 'exitCode' in row or row['signal']!='none':raise ValueError('absent or other ProcessState has no exit/signal claim')
+ return {key:value for key,value in row.items() if key!='owner'}
+
+def cached_wait_role_log(work,role,nonce,bodies):
+ policy=run.ORIGINAL_CONSTRUCTOR_LOG_POLICY;result=constructor_projection_empty('unavailable',role);directory=work/'services/required'/role
+ try:
+  folders=(work,work/'services',work/'services/required',directory);identities=[]
+  for folder in folders:
+   info=folder.lstat()
+   if folder.resolve()!=folder or not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:return dict(result,status='unsafe')
+   identities.append((info.st_dev,info.st_ino,info.st_mode,info.st_uid))
+  matches=[]
+  with os.scandir(directory) as entries:
+   for count,entry in enumerate(entries):
+    if count>=policy['directoryEntriesLimit']:return dict(result,status='unsafe')
+    if __import__('re').fullmatch(r'service-[0-9a-f]{64}\.log',entry.name):matches.append(Path(entry.path))
+  if len(matches)!=1:return dict(result,status='absent' if not matches else 'ambiguous')
+  if matches[0].name!='service-'+nonce+'.log':return dict(result,status='unsafe')
+  raw=constructor_private_file(matches[0],policy['logLimitBytes'],allow_empty=True)
+  for folder,identity in zip(folders,identities):
+   info=folder.lstat()
+   if folder.resolve()!=folder or identity!=(info.st_dev,info.st_ino,info.st_mode,info.st_uid):return dict(result,status='unsafe')
+  value=project_service_log_bytes(raw,bodies,policy,lambda status:constructor_projection_empty(status,role),constructor_error_prefix)
+  value['managedExecReturnedErrorLineObserved']=role=='msgtransfer-managed' and any(line==b'managed ordinary startup or drain failed; inspect owned evidence' for line in raw.split(b'\n'))
+  return value
+ except RuntimeError:return dict(result,status='unsafe')
+ except (OSError,ValueError,UnicodeError):return result
+
+def project_cached_wait_snapshot(work,terminal,bodies):
+ if not original_constructor_output_failure(terminal):return None
+ result={'version':run.CACHED_WAIT_DIAGNOSTIC_POLICY['version'],'status':'unavailable','source':run.FINAL_SOURCE,'scenario':terminal['scenario'],'snapshotBoundary':'before-original-cleanup','logReadBoundary':'after-original-cleanup','physicalFirstFailureEstablished':False,'acceptanceEvidence':False,'runtimePIDReadyP20Accepted':False,'rawTextExported':False,'roles':[]}
+ try:
+  work=Path(work)
+  if work.resolve()!=work:return dict(result,status='unsafe')
+  info=work.lstat()
+  if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:return dict(result,status='unsafe')
+  value=cached_wait_unique_json(constructor_private_file(work/'original-runtime-wait-before-cleanup.json',run.CACHED_WAIT_DIAGNOSTIC_POLICY['snapshotLimitBytes']))
+  if not isinstance(value,dict) or set(value)!={'version','boundary','scenario','sourceSHA256','roles','acceptanceEvidence'} or value['version']!='original-runtime-cached-wait-v1' or value['boundary']!='before-original-cleanup' or value['scenario']!=terminal['scenario'] or value['sourceSHA256']!=run.FINAL_SOURCE['digest'] or value['acceptanceEvidence'] is not False or not isinstance(value['roles'],list) or len(value['roles'])!=len(run.ROLES):raise ValueError('complete original precleanup snapshot required')
+  if [row.get('role') for row in value['roles'] if isinstance(row,dict)]!=list(run.ROLES):raise ValueError('every fixed original requirement role exactly once required')
+  rows=[]
+  for row in value['roles']:
+   public=checked_cached_wait_row(row)
+   if row['ownerState']=='matched':
+    role=row['role'];nonce=constructor_original_owner_nonce(work,role);owner=cached_wait_unique_json(constructor_private_file(work/'runtime-owners'/(role+'-runtime-actual-owner.json'),run.ORIGINAL_CONSTRUCTOR_LOG_POLICY['ownerRecordLimitBytes']))
+    if owner!=row['owner'] or owner.get('ownerNonce')!=nonce:raise ValueError('cached original owner differs from original runtime owner record')
+    public['originalOwnerRecordStatus']='matched'
+    public['logProjection']=cached_wait_role_log(work,role,nonce,bodies)
+   else:public['originalOwnerRecordStatus']='not-read';public['logProjection']=constructor_projection_empty('not-read',row['role'])
+   rows.append(public)
+  result.update(status='projected',roles=rows);return result
+ except RuntimeError:return dict(result,status='unsafe')
+ except (ValueError,UnicodeError):return dict(result,status='unsafe')
+ except OSError:return result
+
+def emit_cached_wait_diagnostic(out,work,terminal):
+ if not original_constructor_output_failure(terminal):return False
+ try:
+  _,bodies,*_=run.verify();value=project_cached_wait_snapshot(work,terminal,bodies)
+  if value is not None:run.write(out/('original-runtime-cached-wait-'+terminal['scenario']+'.json'),value)
+  return value is not None
+ except Exception:return False
 
 def emit_original_constructor_diagnostic(out,work,terminal):
  if not original_constructor_output_failure(terminal):return False
@@ -860,12 +947,36 @@ def checked_rtc_panic_runtime_evidence(out):
  if any((out/name).exists() for name in ('current-rtc-activation-phase-names.json','current-rtc-activation-phase-events.json','rtc-activation-historical-source-compatibility.json','same-go1579-runtime-release-controls-reuse.json','current-runtime-release-context-names.json','same-go1578-group-and-named-scopes-reuse.json','current-group-registry-fixture-contract-names.json','current-cron-fixture-contract-names.json','current-cache-test-delta-controls-names.json','current-group-recovery-controls-names.json','current-managed-producer-control-names.json','current-release-controls-names.json','current-image-kafka-names.json')):raise ValueError('actual panic probe cannot alias fresh prior named controls')
  return value
 
+def checked_cached_wait_source_bridge_evidence(out):
+ value=json.loads(run.regular(out/'cached-wait-historical-source-compatibility.json',1<<20));post=json.loads(run.regular(out/'source-post.json',4096));before=json.loads(run.regular(out/'tools-before.json',65536));after=json.loads(run.regular(out/'tools-after.json',65536))
+ if post!={'accepted':True,'source':run.FINAL_SOURCE} or before!=after:raise ValueError('new source post and unchanged current tool bodies required')
+ _,bodies,recipe,*_=run.verify();return run.check_cached_wait_source_bridge(value,bodies,recipe,before.get('go',{}))
+
+def checked_cached_wait_control_evidence(out):
+ value=run.check_cached_wait_receipt(json.loads(run.regular(out/'current-cached-wait-observation-names.json',65536)));control=run.CURRENT_CACHED_WAIT_CONTROL;package=next(iter(control['targets']));prefix='github.com/openimsdk/open-im-server/v3/'
+ events=json.loads(run.regular(out/'current-cached-wait-observation-events.json',1<<20));expected={(row['package'],row['name']) for row in value['namedCompletions']}
+ if not isinstance(events,list) or not events or any(not isinstance(row,dict) or set(row)-{'Time','Action','Package','Test','Elapsed'} or row.get('Package')!=prefix+package or row.get('Action') not in ('start','run','output','pass','pause','cont') for row in events):raise ValueError('finite original fixture contract events required')
+ for action in ('run','pass'):
+  actual=[(package,row['Test']) for row in events if row.get('Test') and row.get('Action')==action]
+  if len(actual)!=3 or set(actual)!=expected:raise ValueError('fixture top and all three original child run/pass pairs required')
+ if len([row for row in events if row.get('Action')=='start' and not row.get('Test')])!=1 or len([row for row in events if row.get('Action')=='pass' and not row.get('Test')])!=1:raise ValueError('one original fixture package start/footer required')
+ phases=[]
+ for path in sorted(out.glob('phase-*.json')):
+  phase=json.loads(run.regular(path,1<<20))
+  if phase.get('phase')==control['phase']:phases.append(phase)
+ if len(phases)!=1:raise ValueError('one original fixture contract command required')
+ phase=phases[0];resource=phase.get('resource',{})
+ if type(phase.get('exitCode')) is not int or phase['exitCode']!=0 or resource.get('status')!='passed' or type(resource.get('exit_code')) is not int or resource['exit_code']!=0:raise ValueError('actual fresh fixture contract must succeed')
+ checked_cached_wait_source_bridge_evidence(out)
+ if any((out/name).exists() for name in ('rtc-panic-runtime-control.json','rtc-activation-historical-source-compatibility.json','same-graph-go1579-rtc-control-facts.json','current-rtc-activation-phase-names.json','current-rtc-activation-phase-events.json','same-go1579-runtime-release-controls-reuse.json','current-runtime-release-context-names.json','current-runtime-release-context-events.json','runtime-release-historical-source-compatibility.json','same-go1578-group-and-named-scopes-reuse.json','current-group-registry-fixture-contract-names.json','group-registry-fixture-named-scope-reuse.json','group-registry-fixture-reused-scope-deps.json','same-source-current-go-named-scopes-reuse.json','cron-fixture-named-scope-reuse.json','cron-fixture-reused-scope-deps.json','current-cron-fixture-contract-names.json','completed-package-test-delta-reuse.json','current-cache-test-delta-controls-names.json','current-group-recovery-controls-names.json','current-managed-producer-control-names.json','same-source-completed-kafka-package-reuse.json','current-managed-shape-controls-names.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('new fixture-only branch must not alias prior controls or redispatch unaffected scopes')
+ return value
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
   run.write(out/'collection.json',{'started':False,'accepted':False,'reason':'no-original-allocation','privateDataUploaded':False});pack(out);return 0
  if allocation.resolve()!=allocation or allocation.stat().st_uid!=os.getuid() or stat.S_IMODE(allocation.stat().st_mode)!=0o700 or json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original job allocation required')
- c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None;producer_required=c.get('currentProducerControl') is not None;group_recovery_required=c.get('currentGroupRecoveryControl') is not None;cache_test_delta_required=c.get('currentCacheTestDeltaControl') is not None;cron_fixture_required=c.get('currentCronFixtureControl') is not None;named_scope_reuse_required=run.current_go_named_scope_reuse_selected(c);group_registry_fixture_required=run.current_group_registry_fixture_selected(c);group_fixture_passed_required=c.get('passedGroupRegistryAndNamedScopes') is not None;runtime_release_required=c.get('currentRuntimeReleaseControl') is not None;runtime_release_passed_required=c.get('passedRuntimeReleaseControl') is not None;rtc_activation_required=c.get('currentRTCActivationControl') is not None;rtc_probe_required=c.get('rtcPanicRuntimeProbe') is not None
+ c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None;producer_required=c.get('currentProducerControl') is not None;group_recovery_required=c.get('currentGroupRecoveryControl') is not None;cache_test_delta_required=c.get('currentCacheTestDeltaControl') is not None;cron_fixture_required=c.get('currentCronFixtureControl') is not None;named_scope_reuse_required=run.current_go_named_scope_reuse_selected(c);group_registry_fixture_required=run.current_group_registry_fixture_selected(c);group_fixture_passed_required=c.get('passedGroupRegistryAndNamedScopes') is not None;runtime_release_required=c.get('currentRuntimeReleaseControl') is not None;runtime_release_passed_required=c.get('passedRuntimeReleaseControl') is not None;rtc_activation_required=c.get('currentRTCActivationControl') is not None;rtc_probe_required=c.get('rtcPanicRuntimeProbe') is not None;cached_wait_required=c.get('currentCachedWaitControl') is not None
  root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False;terminals={}
  for scenario in run.SCENARIOS:
   folder=root/('plane-'+scenario);work=root/('scenario-'+scenario);entry={'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False}
@@ -886,7 +997,9 @@ def collect():
    try:
     terminal=public_terminal(run.regular(work/'result.json',1<<20),scenario);terminals[scenario]=terminal
     run.write(out/('terminal-'+scenario+'.json'),terminal)
-    if original_constructor_output_failure(terminal):emit_original_constructor_diagnostic(out,work,terminal)
+    if original_constructor_output_failure(terminal):
+     emit_original_constructor_diagnostic(out,work,terminal)
+     emit_cached_wait_diagnostic(out,work,terminal)
    except Exception as error:entry['terminalExceptionType']=type(error).__name__;failed=True
   if (work/'operator-intent.json').exists():
    entry['runtimeAttempted']=True
@@ -914,6 +1027,10 @@ def collect():
    run.write(out/'source-post-recovery-inspection.json',post)
   else:post=json.loads(run.regular(postpath))
   failed=failed or post.get('accepted') is not True
+ cached_wait_accepted=False
+ if (out/'current-cached-wait-observation-names.json').exists():
+  try:checked_cached_wait_control_evidence(out);cached_wait_accepted=True
+  except Exception:failed=True
  rtc_probe_accepted=False
  if (out/'rtc-panic-runtime-control.json').exists():
   try:checked_rtc_panic_runtime_evidence(out);rtc_probe_accepted=True
@@ -1007,7 +1124,8 @@ def collect():
  try:
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
- if rtc_probe_required:kafka_current_accepted=rtc_probe_accepted and not rtc_activation_accepted and not any((runtime_release_passed_accepted,runtime_release_accepted,group_fixture_passed_accepted,current_group_registry_fixture_accepted,group_registry_fixture_reuse_accepted,current_named_scope_reuse_accepted,current_cron_fixture_accepted,cron_fixture_reuse_accepted,current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
+ if cached_wait_required:kafka_current_accepted=cached_wait_accepted and not rtc_probe_accepted and not rtc_activation_accepted and not any((runtime_release_passed_accepted,runtime_release_accepted,group_fixture_passed_accepted,current_group_registry_fixture_accepted,group_registry_fixture_reuse_accepted,current_named_scope_reuse_accepted,current_cron_fixture_accepted,cron_fixture_reuse_accepted,current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
+ elif rtc_probe_required:kafka_current_accepted=rtc_probe_accepted and not rtc_activation_accepted and not any((runtime_release_passed_accepted,runtime_release_accepted,group_fixture_passed_accepted,current_group_registry_fixture_accepted,group_registry_fixture_reuse_accepted,current_named_scope_reuse_accepted,current_cron_fixture_accepted,cron_fixture_reuse_accepted,current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
  elif rtc_activation_required:kafka_current_accepted=rtc_activation_accepted and not any((runtime_release_passed_accepted,runtime_release_accepted,group_fixture_passed_accepted,current_group_registry_fixture_accepted,group_registry_fixture_reuse_accepted,current_named_scope_reuse_accepted,current_cron_fixture_accepted,cron_fixture_reuse_accepted,current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
  elif runtime_release_passed_required:kafka_current_accepted=runtime_release_passed_accepted and not any((runtime_release_accepted,group_fixture_passed_accepted,current_group_registry_fixture_accepted,group_registry_fixture_reuse_accepted,current_named_scope_reuse_accepted,current_cron_fixture_accepted,cron_fixture_reuse_accepted,current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
  elif runtime_release_required:kafka_current_accepted=runtime_release_accepted and not any((group_fixture_passed_accepted,current_group_registry_fixture_accepted,group_registry_fixture_reuse_accepted,current_named_scope_reuse_accepted,current_cron_fixture_accepted,cron_fixture_reuse_accepted,current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
@@ -1025,7 +1143,7 @@ def collect():
  elif fresh_required:kafka_current_accepted=current_image_kafka_accepted and not current_kafka_confirm_accepted and not kafka_reuse_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  else:kafka_current_accepted=kafka_reuse_accepted and not current_image_kafka_accepted and not current_kafka_confirm_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  accepted=launcher_accepted and kafka_current_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'rtcPanicRuntimeControlAccepted':rtc_probe_accepted,'rtcPanicRuntimeControlRequired':rtc_probe_required,'actualCurrentRTCGoTestCommands':0 if rtc_probe_required else (1 if rtc_activation_required else 0),'rtcActivationPhaseControlAccepted':rtc_activation_accepted,'freshRTCActivationPhaseRequired':rtc_activation_required,'sameWholeGo1579':False,'oldControlCurrentActualPASS':False,'sameGo1579RuntimeReleaseControlReuseAccepted':runtime_release_passed_accepted,'sameGo1579RuntimeReleaseControlReuseRequired':runtime_release_passed_required,'actualCurrentRuntimeReleaseControlCommands':(1 if runtime_release_accepted else None) if runtime_release_required else 0,'runtimeReleaseContextControlAccepted':runtime_release_accepted,'freshRuntimeReleaseContextRequired':runtime_release_required,'historicalSourceCompatibilityOnly':runtime_release_required or runtime_release_passed_required or rtc_activation_required,'sameWholeGo1578':False,'oldScopesCurrentActualPASS':False,'sameGo1578GroupAndNamedScopesReuseAccepted':group_fixture_passed_accepted,'sameGo1578GroupAndNamedScopesReuseRequired':group_fixture_passed_required,'currentGroupRegistryFixtureContractAccepted':current_group_registry_fixture_accepted,'freshGroupRegistryFixtureContractRequired':group_registry_fixture_required,'groupRegistryFixtureNamedScopeCompatibilityAccepted':group_registry_fixture_reuse_accepted,'actualGroupRegistryFixtureTopDispatched':(1 if current_group_registry_fixture_accepted else None) if group_registry_fixture_required else 0,'historicalCronContractOnly':group_registry_fixture_required,'sameSourceCurrentGoNamedScopesReuseAccepted':current_named_scope_reuse_accepted,'sameSourceCurrentGoNamedScopesReuseRequired':named_scope_reuse_required,'currentCronFixtureContractAccepted':current_cron_fixture_accepted,'freshCronFixtureContractRequired':cron_fixture_required,'cronFixtureNamedScopeCompatibilityAccepted':cron_fixture_reuse_accepted,'actualDependencyGoListInvocations':((1 if group_registry_fixture_reuse_accepted else None) if group_registry_fixture_required else ((1 if cron_fixture_reuse_accepted else None) if cron_fixture_required else 0)),'actualCronFixtureTopDispatched':(1 if current_cron_fixture_accepted else None) if cron_fixture_required else 0,'currentCacheTestDeltaControlsAccepted':current_cache_test_delta_accepted,'freshCacheTestDeltaControlsRequired':cache_test_delta_required,'cacheTestDeltaPackageCompatibilityAccepted':cache_test_delta_reuse_accepted,'sameWholeSource':False,'originalGoCommandPassed':False,'cacheCommandInvocations':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'cachePackageExecutions':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'currentGroupRecoveryControlsAccepted':current_group_recovery_accepted,'freshGroupRecoveryControlsRequired':group_recovery_required,'groupRecoveryCommandInvocations':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'groupRecoveryPackageExecutions':(3 if current_group_recovery_accepted else None) if group_recovery_required else 0,'actualCacheTopsDispatched':(2 if current_cache_test_delta_accepted else None) if cache_test_delta_required else ((2 if current_group_recovery_accepted else None) if group_recovery_required else 0),'actualManagedShapeTopsDispatched':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'currentProducerControlAccepted':current_producer_accepted,'freshProducerControlRequired':producer_required,'producerCommandInvocations':(1 if current_producer_accepted else None) if producer_required else 0,'producerPackageExecutions':(1 if current_producer_accepted else None) if producer_required else 0,'sameSourceCompletedKafkaPackageReuseAccepted':completed_kafka_reuse_accepted,'originalTwoPackageScopeAccepted':False,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required and not producer_required and not group_recovery_required and not cache_test_delta_required and not cron_fixture_required and not named_scope_reuse_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_group_recovery_accepted or current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if named_scope_reuse_required or cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':named_scope_reuse_required or cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeProjectGoPASS':False,'currentAdminSourceAcceptedByOldRTC':False,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'cachedWaitControlAccepted':cached_wait_accepted,'cachedWaitControlRequired':cached_wait_required,'actualCurrentRuntimeProbeCommands':0 if cached_wait_required else (2 if rtc_probe_required else 0),'rtcPanicRuntimeControlAccepted':rtc_probe_accepted,'rtcPanicRuntimeControlRequired':rtc_probe_required,'actualCurrentRTCGoTestCommands':0 if rtc_probe_required else (1 if rtc_activation_required else 0),'rtcActivationPhaseControlAccepted':rtc_activation_accepted,'freshRTCActivationPhaseRequired':rtc_activation_required,'sameWholeGo1579':False,'oldControlCurrentActualPASS':False,'sameGo1579RuntimeReleaseControlReuseAccepted':runtime_release_passed_accepted,'sameGo1579RuntimeReleaseControlReuseRequired':runtime_release_passed_required,'actualCurrentRuntimeReleaseControlCommands':(1 if runtime_release_accepted else None) if runtime_release_required else 0,'runtimeReleaseContextControlAccepted':runtime_release_accepted,'freshRuntimeReleaseContextRequired':runtime_release_required,'historicalSourceCompatibilityOnly':runtime_release_required or runtime_release_passed_required or rtc_activation_required,'sameWholeGo1578':False,'oldScopesCurrentActualPASS':False,'sameGo1578GroupAndNamedScopesReuseAccepted':group_fixture_passed_accepted,'sameGo1578GroupAndNamedScopesReuseRequired':group_fixture_passed_required,'currentGroupRegistryFixtureContractAccepted':current_group_registry_fixture_accepted,'freshGroupRegistryFixtureContractRequired':group_registry_fixture_required,'groupRegistryFixtureNamedScopeCompatibilityAccepted':group_registry_fixture_reuse_accepted,'actualGroupRegistryFixtureTopDispatched':(1 if current_group_registry_fixture_accepted else None) if group_registry_fixture_required else 0,'historicalCronContractOnly':group_registry_fixture_required,'sameSourceCurrentGoNamedScopesReuseAccepted':current_named_scope_reuse_accepted,'sameSourceCurrentGoNamedScopesReuseRequired':named_scope_reuse_required,'currentCronFixtureContractAccepted':current_cron_fixture_accepted,'freshCronFixtureContractRequired':cron_fixture_required,'cronFixtureNamedScopeCompatibilityAccepted':cron_fixture_reuse_accepted,'actualDependencyGoListInvocations':((1 if group_registry_fixture_reuse_accepted else None) if group_registry_fixture_required else ((1 if cron_fixture_reuse_accepted else None) if cron_fixture_required else 0)),'actualCronFixtureTopDispatched':(1 if current_cron_fixture_accepted else None) if cron_fixture_required else 0,'currentCacheTestDeltaControlsAccepted':current_cache_test_delta_accepted,'freshCacheTestDeltaControlsRequired':cache_test_delta_required,'cacheTestDeltaPackageCompatibilityAccepted':cache_test_delta_reuse_accepted,'sameWholeSource':False,'originalGoCommandPassed':False,'cacheCommandInvocations':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'cachePackageExecutions':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'currentGroupRecoveryControlsAccepted':current_group_recovery_accepted,'freshGroupRecoveryControlsRequired':group_recovery_required,'groupRecoveryCommandInvocations':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'groupRecoveryPackageExecutions':(3 if current_group_recovery_accepted else None) if group_recovery_required else 0,'actualCacheTopsDispatched':(2 if current_cache_test_delta_accepted else None) if cache_test_delta_required else ((2 if current_group_recovery_accepted else None) if group_recovery_required else 0),'actualManagedShapeTopsDispatched':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'currentProducerControlAccepted':current_producer_accepted,'freshProducerControlRequired':producer_required,'producerCommandInvocations':(1 if current_producer_accepted else None) if producer_required else 0,'producerPackageExecutions':(1 if current_producer_accepted else None) if producer_required else 0,'sameSourceCompletedKafkaPackageReuseAccepted':completed_kafka_reuse_accepted,'originalTwoPackageScopeAccepted':False,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required and not producer_required and not group_recovery_required and not cache_test_delta_required and not cron_fixture_required and not named_scope_reuse_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_group_recovery_accepted or current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if named_scope_reuse_required or cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':named_scope_reuse_required or cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeProjectGoPASS':False,'currentAdminSourceAcceptedByOldRTC':False,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  emit_console_observation(rows,monitor,main,terminals,out)
  pack(out)
  return 0 if accepted else 1
