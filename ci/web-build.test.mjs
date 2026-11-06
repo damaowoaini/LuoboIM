@@ -20,8 +20,31 @@ test("build-only plan contains locked install, exact patch and Vite without any 
   assert.equal(plan.some((p) => p.args.some((v) => /vitest|tsc|--noEmit/.test(v))), false);
 });
 
-test("reviewed4316 descriptor refuses changed source, duplicate paths and historical identity", () => {
-  assert.equal(validateDescriptor(input).sourceFiles, 4316);
+test("reviewed4340 descriptor binds SDK8/public2 and refuses changed source, duplicate paths and historical identity", () => {
+  assert.equal(validateDescriptor(input).sourceFiles, 4340);
+  assert.equal(input.sourceDigest, "3503ee773da527e252fa284c2380dcda386999012a5aa538fa60f84c42b2b636");
+  const sdk = JSON.parse(readFileSync(fileURLToPath(new URL("../web/sdk-patches/manifest.json", import.meta.url)), "utf8"));
+  assert.equal(sdk.package, "open-im-sdk-wasm");
+  assert.equal(sdk.version, "3.5.1-alpha.3");
+  assert.equal(sdk.files.length, 8);
+  for (const entry of sdk.files) {
+    const row = input.files.find((r) => r.path === `sdk-patches/${entry.path.replaceAll("/", "__")}.patched`);
+    assert.equal(row?.sha256, entry.patched_sha256);
+  }
+  const public2 = [
+    { path: "public/openIM.wasm", bytes: 35566446, sha256: "43a4a8929e01415ec9c03b6297137878c7ddab0fe03da31a90d686016396cea7" },
+    { path: "public/wasm_exec.js", bytes: 16992, sha256: "0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14" },
+  ];
+  assert.deepEqual(sdk.coreFiles, public2);
+  for (const expected of public2) assert.deepEqual(input.files.find((r) => r.path === expected.path), expected);
+  for (const previous of [
+    { path: "public/openIM.wasm", bytes: 30202912, sha256: "dff9e28c95e36d9ea95beb20bde7a53d4204c1c2fd2497f19b7c4a504ca665ab" },
+    { path: "public/wasm_exec.js", bytes: 16952, sha256: "a3034fedf9b873ef5d9ce5b06f81d911019f245e86bbfb287473ebf22d7908ab" },
+  ]) {
+    const changed = structuredClone(input);
+    Object.assign(changed.files.find((r) => r.path === previous.path), previous);
+    assert.throws(() => validateDescriptor(changed));
+  }
   for (const mutate of [
     (x) => { x.files[0].sha256 = "0".repeat(64); },
     (x) => { x.files[1].path = x.files[0].path; },
@@ -32,6 +55,9 @@ test("reviewed4316 descriptor refuses changed source, duplicate paths and histor
     (x) => { x.cohort = "web4308-build-only-v2"; },
     (x) => { x.cohort = "web4312-build-only-v1"; },
     (x) => { x.cohort = "web4315-build-only-v3"; },
+    (x) => { x.cohort = "web4316-build-only-v1"; },
+    (x) => { x.cohort = "web4316-build-only-v2"; },
+    (x) => { x.cohort = "web4316-build-only-v3"; },
   ]) { const changed = structuredClone(input); mutate(changed); assert.throws(() => validateDescriptor(changed)); }
 });
 

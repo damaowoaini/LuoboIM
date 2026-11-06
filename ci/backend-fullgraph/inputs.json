@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 207498,
-      "sha256": "057826dfaaaa10a160f565d11296346796535eb1465f91085c056dca047acdf4"
+      "bytes": 209483,
+      "sha256": "10f3f199cb85b54608cc65e3a0dfb3577da4533b582be9fab1343036617d1c33"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -67,8 +67,8 @@
     },
     {
       "path": "ci/backend-fullgraph/service_selectors.py",
-      "bytes": 2093,
-      "sha256": "ab233d389211e7eab830789475ccb1d7ae8c87bb22e62e5e4296d2ca090e62c6"
+      "bytes": 2134,
+      "sha256": "0606aeaabf2d586b579878ed11c170a33db543fb90f9549ecf0566ddc1da07e7"
     },
     {
       "path": ".github/workflows/backend-fullgraph-targeted.yml",

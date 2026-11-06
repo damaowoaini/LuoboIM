@@ -1,4 +1,12 @@
-# Current4301 manual build only
+# Current4340 manual build only (prepared, not built)
+
+Only `web4340-build-only-v1` is admitted by the current manual build lane. It binds all4340 tracked Web source rows at digest `3503ee773da527e252fa284c2380dcda386999012a5aa538fa60f84c42b2b636`, observed at public `8d0a844fca3f1ae17e004b23a17db3e8986781e7` (Web tree `2a359deba3cb762d912cd4a3e6c75f20844b2787`). Relative to the previous4316 descriptor,47 rows change and24 are added. Older lane successes do not establish a4340 bundle.
+
+Node24.21.0, the unchanged1128-entry npm lock, scripts-disabled official install, current SDK preparation8, offline Vite build, source/tool/resource boundaries and all SDK/public13/CSP/dist checks remain. Current `openIM.wasm` and `wasm_exec.js` must match their tracked bytes and the existing `ci/web-controlled-wasm/reused-r2-validation.json` build/ABI provenance. This lane consumes those bodies; it does not rebuild or execute WASM, bind native SDKs, run tests/types/full811, or certify SDK initialization or business behavior. Metadata for the actual Node/npm and source digest remains separately recorded by the original controller.
+
+After Root's affected descriptor control, the existing workflow can be dispatched once for the first current-source bundle. Accepted upload still requires every source/SDK/public/CSP/output check and the complete outer resource guard. A completed candidate or Vite exit0 alone is insufficient. No preview is switched or deployed by this workflow. Actual service configuration, login/messages, screenshots and mobile-style alignment remain separate runtime/UI acceptance work; Web107 scope is retained. The records below are historical identities and do not relax current admission.
+
+## Historical4301 build-only lane
 
 This separate workflow has only the `web4301-build-only-v1` choice. It performs an official locked npm install with scripts disabled, the existing reviewed SDK JavaScript patch, and the existing `vite.web.config.mts` build. It does not run helper tests, application tests, Web/Desktop types, historical suites, SDK/native binds or business actions. Push remains Safety-only. Existing Web CI and its historical full689/expected763 identities remain unchanged.
 

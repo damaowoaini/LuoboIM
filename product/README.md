@@ -12,4 +12,4 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
-本批仅CI诊断及同完整Go1578/工具的原命名事实复用，ordinary1884源码不变。3fb实际group writer/parser1/3、三roots1123包test依赖闭包、16编译及首场景通过，第二rpc-third observe-registration/done，原Wait/Sync/Close仅知返回、结果未导出。固定12constructor的实际失败role沿原owner记录读取exact私有log，仅投影闭合类别和白名单源码帧；不推断退出码，不新增生命周期调用。已过group/list/cron/cache/producer/Kafka0重派，原服务图/oracles/清理独立fresh，cache/runtime/PID/Ready/P20接受边界不变。
+本批仅补CI的rpc-third服务selector：实际Third与本地EvidenceVerifier均由原Start注册，旧selector只含Third，原RecordPrepared的严格服务集比较必拒绝。两项名称从真实注册及原生成ServiceDesc做针对性合同核对；Go1578/ordinary1884/模块锁/生产校验均不变。8d0a观察到namespace-evidence与main31，仅确认源码合同缺项，尚未证明唯一实际首错。同完整Go/工具下旧命名合同和list0重派；原服务图/oracles/清理/ELF及P20门禁保持。

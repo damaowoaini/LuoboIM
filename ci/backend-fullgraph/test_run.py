@@ -1686,4 +1686,16 @@ class FullGraphControls(unittest.TestCase):
    ownerpath.unlink();self.assertEqual(collector.project_original_constructor_log(work,current,bodies)['originalOwnerRecordStatus'],'unavailable')
    projected=collector.project_service_log_bytes(b'panic: '+private+b'\n\t/private/server/cmd/synthetic/main.go:999\n',bodies,run.ORIGINAL_CONSTRUCTOR_LOG_POLICY,lambda status:collector.constructor_projection_empty(status,role),collector.constructor_error_prefix);self.assertEqual(projected['errorPrefixClass'],'other');self.assertEqual(projected['sourceFrames'],[]);self.assertNotIn(private.decode(),json.dumps(projected))
 
+
+ def test_third_selector_matches_both_actual_startup_grpc_descriptors(self):
+  selectors=load('service_selectors');manifest=json.loads(run.regular(run.REPO/'product/source-manifest.json',1<<20));self.assertEqual(manifest['sources']['server'],run.FINAL_SOURCE)
+  def source(path):
+   rows=[row for row in manifest['files'] if row['path']==path];self.assertEqual(len(rows),1);row=rows[0];self.assertEqual(row['provider'],'ci/backend-fullgraph/run.py:verify');raw=run.regular(run.REPO/'product'/path);self.assertEqual({'bytes':len(raw),'sha256':run.sha(raw)},{key:row[key] for key in ('bytes','sha256')});return raw.decode()
+  startup=source('server/internal/rpc/third/third.go');generated={'third':source('server/pkg/protocol/third/third.pb.go'),'evidencepb':source('server/internal/objectverify/pb/evidence_grpc.pb.go')};pattern=__import__('re');start=startup[startup.index('func Start('):startup.index('type thirdServer struct')];registrations=pattern.findall(r'(?m)^\s*([A-Za-z_][A-Za-z0-9_]*)\.(Register[A-Za-z0-9_]+Server)\(server,',start);self.assertTrue(registrations);self.assertEqual(len(registrations),len(set(registrations)));self.assertEqual({alias for alias,_ in registrations},set(generated));services=[]
+  # Resolve each real Start registration through its generated RegisterServer
+  # function to the original ServiceDesc.ServiceName, without running Start/DB.
+  for alias,register in registrations:
+   body=generated[alias];descriptors=pattern.findall(r'func '+pattern.escape(register)+r'\([^{}]*\)\s*\{\s*s\.RegisterService\(&([A-Za-z_][A-Za-z0-9_]*),\s*srv\)\s*\}',body);self.assertEqual(len(descriptors),1);names=pattern.findall(r'var\s+'+pattern.escape(descriptors[0])+r'\s*=\s*grpc\.ServiceDesc\s*\{\s*ServiceName:\s*"([^"\r\n]+)"',body);self.assertEqual(len(names),1);services.extend(names)
+  self.assertEqual(len(services),len(registrations));self.assertEqual(len(set(services)),len(services));self.assertEqual(selectors.SERVICES['rpc-third'],sorted(services))
+
 if __name__=='__main__':unittest.main()

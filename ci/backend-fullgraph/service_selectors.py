@@ -15,7 +15,7 @@ SERVICES = {
  'rpc-group': ['OpenIMServer.group.group'],
  'rpc-msg': ['OpenIMServer.msg.msg'],
  'rpc-rtc': ['OpenIMServer.rtc.RtcService'],
- 'rpc-third': ['OpenIMServer.third.third'],
+ 'rpc-third': ['OpenIMServer.third.third','luobo.internal.object.EvidenceVerifier'],
  'rpc-user': ['OpenIMServer.user.user'],
 }
 COMPONENTS = {

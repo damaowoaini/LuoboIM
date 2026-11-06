@@ -33,6 +33,11 @@ REUSE6_BINDING = {'path': '.qa/personal-analysis-batch-20261106/verified-0111-pe
                   'bytes': 7566, 'sha256': '3bd673cf9584d4e3d4a9da774e3989a9d1efce0e8f709dd2e05dd4ade6f7a590'}
 REUSE6_FACTS_SHA = 'fd4a18b55bcb4deb5245695a826a41b637aa6bda6b2c4c4b62cea82b50962fa2'
 GUARDED_UI_SHA = '4075034954b2c3f70af01fcfef9fa604246ea561575b1d9b910662ae9ca5c7fc'
+PICKER_TEST = 'app/test/features/personal/personal_action_epoch_test.dart'
+PICKER_BINDING = {'path': '.qa/constructor-context-batch-20261106/verified-8d0a-personal-analysis-and-nine-named-facts.json',
+                  'bytes': 16451, 'sha256': 'bf61c0f799aaa20addf3c8163e6da30c29920ba7898eabe66bdf9a15669f2a23'}
+PICKER_FACTS_SHA = '1d3ce2521ba8c3ccdb57ecc1e30a1f941207047108ed414185dff7738f8bdf05'
+PICKER_AFTER_SHA = 'd7d77e445481484739f6e816a7b10f2b11d83f57705f20986cbebfa723eb6bbb'
 BROWSER_NAME = 'part/body source-index manifest and cross-account claims fail closed'
 NAMES12 = [
     'legacy export partitions 10001 items and preserves IDs and source order',
@@ -388,9 +393,86 @@ def format_owned(work, cfg, tag, files, receipt, check, guard, command):
     return derived, derivation
 
 
+def personal_picker_bridge(cfg, files, tools, tag):
+    """One8d0a fixture-path inverse permits analysis6 and individual runtime9."""
+    facts = cfg.get('picker_reuse8d0a')
+    canonical = json.dumps(facts, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    if cfg.get('picker_reuse8d0a_binding') != PICKER_BINDING or sha(canonical) != PICKER_FACTS_SHA:
+        raise ValueError('exact Root8d0a analysis/individual-name facts required')
+    expected_paths = [row['path'][4:] for row in facts['formatted7Pins'] if row['path'].startswith('app/')]
+    if cfg['analysis_paths6'] != expected_paths or cfg['toolchain'] != facts['toolchain']:
+        raise ValueError('same original picker analysis order and SDK required')
+    bodies = {name: {key: row[key] for key in ('bytes', 'sha256', 'mode')}
+              for name, row in tools.items()}
+    if bodies != facts['toolsBodyAndMode']:
+        raise ValueError('same original picker Dart/Flutter body and mode required')
+    for row in facts['formatted7Pins']:
+        if row['path'] == PICKER_TEST:
+            continue
+        value = files.get(row['path'])
+        if not isinstance(value, bytes) or len(value) != row['bytes'] or sha(value) != row['sha256']:
+            raise ValueError('unaffected original formatted pin differs: ' + row['path'])
+    fixture = files.get(PICKER_TEST)
+    if not isinstance(fixture, bytes) or len(fixture) != 15463 or sha(fixture) != PICKER_AFTER_SHA:
+        raise ValueError('exact named-picker fixture after pin required')
+    original_anchor = b"        name: entry.key,\n        mimeType: 'application/json',\n"
+    named_anchor = (b'        name: entry.key,\n        path: entry.key,\n'
+                    b"        mimeType: 'application/json',\n")
+    if fixture.count(named_anchor) != 1:
+        raise ValueError('exact memory-picker path argument anchor required')
+    original_fixture = fixture.replace(named_anchor, original_anchor, 1)
+    original_pin = next(row for row in facts['formatted7Pins'] if row['path'] == PICKER_TEST)
+    if len(original_fixture) != original_pin['bytes'] or sha(original_fixture) != original_pin['sha256']:
+        raise ValueError('original fixture not reconstructed by exact path inverse')
+    if (sha(files.get(INTEGRATION, b'')) != 'add5be3db4385a71bf34ea51c9ff23a0480e5f6bfe00883204c63f0dfa61bddd'
+            or files.get(SIBLING_CODEC) != files.get(CODEC)):
+        raise ValueError('original picker auxiliary JSON or codec differs')
+    restored = dict(files)
+    restored[PICKER_TEST] = original_fixture
+    source = {name: value for name, value in restored.items() if name.startswith('app/')}
+    portable = {name: value for name, value in restored.items() if name not in (INTEGRATION, SIBLING_CODEC)}
+    for values, expected in [(source, facts['formatterDerivedSource']),
+                             (portable, facts['formatterDerivedPortable'])]:
+        if len(values) != expected['members'] or tag.digest(values) != expected['digest']:
+            raise ValueError('original8d0a full formatted source/portable not reconstructed')
+    fresh = facts['freshAffectedWidgetNames3']
+    reused = facts['reusableIndividualNamed9']
+    names9 = [row['name'] for row in reused]
+    if (len(fresh) != 3 or len(set(fresh)) != 3 or len(names9) != 9 or len(set(names9)) != 9
+            or set(fresh) & set(names9) or set(fresh) | set(names9) != set(NAMES12)
+            or facts['targetOriginal']['actualSelectedNames'] != NAMES12
+            or facts['targetOriginal']['actualExitCode'] != 1
+            or facts['targetOriginal']['packageOrSuiteAccepted'] is not False):
+        raise ValueError('closed fresh3/original9 and failed original phase required')
+    for row in reused:
+        value = restored.get(row['sourcePath'])
+        original = row['testSourceAfter']
+        if (row['result'] != 'success' or row['actualCount'] != 1 or not isinstance(value, bytes)
+                or len(value) != original['bytes'] or sha(value) != original['sha256']):
+            raise ValueError('original individual named fact/source differs')
+    common = {'binding': PICKER_BINDING, 'origin': facts['origin'], 'originJob': facts['originJob'],
+              'originalFullFormattedSource': facts['formatterDerivedSource'],
+              'originalFullFormattedPortable': facts['formatterDerivedPortable'],
+              'exactPickerPathInverse': True, 'originalTargetPhaseExitCode': 1,
+              'originalPackageOrSuiteAccepted': False, 'runtimeAcceptance': False}
+    return {'fresh': [4], 'reused': [1, 2, 3, 5, 6, 7],
+            'receipt': dict(common, status='original-analysis-coverage-except-changed-epoch4',
+                            originalAnalysisCoverage=facts['analysisCoverage7'],
+                            freshAnalysisIndices=[4], reusedOriginalIndices=[1, 2, 3, 5, 6, 7],
+                            freshAnalysis7Executed=False),
+            'runtime': {'freshNames': fresh, 'reusedNames': names9,
+                        'receipt': dict(common, status='original-nine-individual-PASS-not-package-PASS',
+                                        originalTarget=facts['targetOriginal'], individualFacts=reused,
+                                        freshWidgetNames=fresh, freshTarget12Executed=False)}}
+
+
 def personal_analysis_plan(cfg, files, tools, tag):
-    """Only fresh7 or the exact0111 six-fact/private-UI-guard bridge."""
+    """Fresh7, exact0111 UI guard, or exact8d0a private picker fixture."""
     mode = cfg.get('analysis_mode', 'fresh7')
+    if mode == 'reuse6-epoch4-target3':
+        return personal_picker_bridge(cfg, files, tools, tag)
+    if cfg.get('picker_reuse8d0a') is not None or cfg.get('picker_reuse8d0a_binding') is not None:
+        raise ValueError('picker facts require the exact fixture mode; no fallback')
     if mode == 'fresh7':
         if cfg.get('analysis_reuse6') is not None or cfg.get('analysis_reuse6_binding') is not None:
             raise ValueError('fresh7 does not consume reuse facts')
@@ -447,6 +529,18 @@ def personal_analysis_plan(cfg, files, tools, tag):
         'freshAnalysis7Executed': False, 'runtimeAcceptance': False}}
 
 
+def personal_targets(work, plan, selected, browser):
+    runtime = plan.get('runtime')
+    if runtime is None:
+        return [('personal-target12', selected, NAMES12),
+                ('personal-browser1', browser, [BROWSER_NAME])]
+    names = runtime['freshNames']
+    target3 = [str(work / 'flutter/bin/flutter'), 'test', '--no-pub', '--machine',
+               '--concurrency=1', '--no-enable-vmservice', '--name',
+               '^(?:' + '|'.join(map(re.escape, names)) + ')$', PICKER_TEST[4:]]
+    return [('personal-target3', target3, names), ('personal-browser1', browser, [BROWSER_NAME])]
+
+
 def run(parent, work):
     cfg, raw, tag, c, old, original, base, files = descriptor(parent)
     input_files = dict(files)
@@ -490,6 +584,8 @@ def run(parent, work):
         analysis_plan = personal_analysis_plan(cfg, files, tools, tag)
         if analysis_plan['receipt'] is not None:
             tag.write(work / 'evidence/personal-analysis-reused6.json', analysis_plan['receipt'])
+        if analysis_plan.get('runtime') is not None:
+            tag.write(work / 'evidence/personal-runtime-reused9.json', analysis_plan['runtime']['receipt'])
         analysis_failures = []
         for index, command in enumerate(analyses + [helper], 1):
             if index not in analysis_plan['fresh']:
@@ -515,8 +611,7 @@ def run(parent, work):
         if analysis_failures:
             raise ValueError('affected-path analyses failed: ' +
                              ', '.join(row['phase'] for row in analysis_failures))
-        for label, command, names in [('personal-target12', selected, NAMES12),
-                                       ('personal-browser1', browser, [BROWSER_NAME])]:
+        for label, command, names in personal_targets(work, analysis_plan, selected, browser):
             verify_work(work, cfg, tag, files, receipt)
             log = check.guarded(command, work, guard, label, timeout=120)
             summaries[label] = check.required_name_summary(log.read_text(), len(names),
@@ -599,6 +694,15 @@ def run(parent, work):
               'reused_original_indices': analysis_plan['reused'],
               'analysis_union_paths': len(analysis_completed) + len(analysis_plan['reused']),
               'fresh_analysis7_executed': len(analysis_completed) == 7, 'integration_json': 1,
+              'runtime_tests_actual': len(analysis_plan.get('runtime', {}).get('freshNames', NAMES12)),
+              'runtime_original_individual_tests_reused': len(analysis_plan.get('runtime', {}).get('reusedNames', [])),
+              'runtime_union_tests': len(analysis_plan.get('runtime', {}).get('freshNames', NAMES12)) + len(analysis_plan.get('runtime', {}).get('reusedNames', [])),
+              'fresh_target12_executed': analysis_plan.get('runtime') is None,
+              'fresh_target_label': 'personal-target3' if analysis_plan.get('runtime') is not None else 'personal-target12',
+              'browser_tests_actual': 1, 'browser_previous_result_reused': False,
+              'original_target_phase_exit_code': 1 if analysis_plan.get('runtime') is not None else None,
+              'original_target_phase_accepted': False if analysis_plan.get('runtime') is not None else None,
+              'original_package_or_suite_accepted': False if analysis_plan.get('runtime') is not None else None,
               'old_sdk_compile_or_device_io_verified': False, 'full_regression': False,
               'native_acceptance': False, 'whole_goal_complete': False})
 
