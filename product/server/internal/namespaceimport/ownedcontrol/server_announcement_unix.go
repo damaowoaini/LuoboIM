@@ -5,6 +5,7 @@ package ownedcontrol
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
 	"path/filepath"
@@ -150,6 +151,15 @@ func readServerEnvelope(path string, out any) (string, error) {
 		return "", e
 	}
 	at, e := os.Lstat(path)
+	if errors.Is(e, os.ErrNotExist) {
+		// Only absence of the final file under the same validated private parent
+		// is pending. Keep closed evidence identity and never retain PathError.
+		_, current, parentErr := privateParent(path)
+		if parentErr != nil || !os.SameFile(id, current) {
+			return "", ErrOwnedEvidence
+		}
+		return "", errors.Join(ErrOwnedEvidence, os.ErrNotExist)
+	}
 	if e != nil || !private(at, false) || at.Size() < 1 || at.Size() > 64*1024 {
 		return "", ErrOwnedEvidence
 	}

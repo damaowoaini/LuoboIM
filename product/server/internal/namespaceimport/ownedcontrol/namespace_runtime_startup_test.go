@@ -5,10 +5,12 @@ package ownedcontrol
 import (
 	"context"
 	"crypto/ed25519"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
 )
@@ -128,6 +130,157 @@ func TestNamespaceRuntimeCompleteRoleAndActualOwnerHandlesAreMandatory(t *testin
 		}
 		if rows, e := g.AwaitStarted(context.Background(), strings.Repeat("a", 64)); e == nil || rows != nil {
 			t.Fatal("unobserved graph claimed real starts")
+		}
+	})
+}
+
+// A private final release file is expected to be absent before the producer's
+// signed publication. Absence is still closed evidence for every other reader;
+// only AwaitAdmission's existing context/ticker branch may wait for it.
+func TestNamespaceRuntimeMissingReleaseWaitsWithoutWeakeningPrivateEvidence(t *testing.T) {
+	fixture := func(t *testing.T) (*NamespaceRuntimeStartupGate, NamespaceRuntimeBootstrap, string) {
+		t.Helper()
+		b, original, _ := namespaceRuntimeFixture(t)
+		b.Requirement.Role = "msggateway"
+		b.Requirement.ContractSHA256 = NamespaceRuntimeContractSHA256("msggateway")
+		b.Requirement.Services = []string{"OpenIMServer.msggateway.msgGateway"}
+		b.Requirement.Components = []string{"provider-callbacks", "rpc-handlers", "source-ownership", "websocket-admission", "websocket-runtime"}
+		path := filepath.Join(filepath.Dir(original), "gateway-bootstrap.json")
+		pin, e := WriteNamespaceRuntimeBootstrap(path, b)
+		if e != nil {
+			t.Fatal("gateway fixture bootstrap rejected", e)
+		}
+		nonce := strings.Repeat("d", 64)
+		r := b.Requirement
+		gate, e := NewNamespaceRuntimeStartupGate(path, pin, r.Role, b.ExpectedInstanceID, r.BootstrapSHA256, r.ConfigurationSHA256, r.EnvironmentSHA256, nonce)
+		if e != nil {
+			t.Fatal("gateway fixture gate rejected", e)
+		}
+		bindings := NamespaceRuntimeBindings{Role: r.Role, HeaderSHA256: b.Header.SHA256(), Resources: []string{"callback-http", "redis", "websocket-runtime"}}
+		if _, e = gate.RecordPrepared(context.Background(), r.Services, r.Components, bindings); e != nil {
+			t.Fatal("actual private registration rejected", e)
+		}
+		return gate, b, nonce
+	}
+	t.Run("missing-release-waits-and-cancels-without-ready", func(t *testing.T) {
+		gate, b, _ := fixture(t)
+		var release NamespaceRuntimeRelease
+		_, e := readServerEnvelope(b.ReleasePath, &release)
+		if !errors.Is(e, ErrOwnedEvidence) || !errors.Is(e, os.ErrNotExist) || strings.Contains(e.Error(), filepath.Dir(b.ReleasePath)) {
+			t.Fatal("missing final file lost closed evidence or exposed its private path")
+		}
+		original, e := os.ReadFile(b.RegistrationPath)
+		if e != nil {
+			t.Fatal("original registration absent")
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		done := make(chan error, 1)
+		go func() { done <- gate.AwaitAdmission(ctx) }()
+		select {
+		case <-done:
+			t.Fatal("absence ended the original admission wait")
+		case <-time.After(150 * time.Millisecond):
+		}
+		if _, _, e := gate.KnownPublication(); !errors.Is(e, ErrOwnedEvidence) {
+			t.Fatal("missing release became a publication")
+		}
+		cancel()
+		select {
+		case e := <-done:
+			if !errors.Is(e, context.Canceled) {
+				t.Fatal("original cancellation did not end the wait", e)
+			}
+		case <-time.After(2 * time.Second):
+			t.Fatal("original admission wait ignored cancellation")
+		}
+		if _, _, e := gate.KnownPublication(); !errors.Is(e, ErrOwnedEvidence) {
+			t.Fatal("cancelled wait became a publication")
+		}
+		current, e := os.ReadFile(b.RegistrationPath)
+		if e != nil || string(current) != string(original) {
+			t.Fatal("waiting replayed or changed the original registration")
+		}
+		if _, e := os.Lstat(b.ReleasePath); !errors.Is(e, os.ErrNotExist) {
+			t.Fatal("waiting fabricated a release")
+		}
+	})
+	for _, kind := range []string{"malformed-release", "empty-release", "public-mode-release", "symlink-release", "hardlink-release", "directory-release"} {
+		t.Run(kind, func(t *testing.T) {
+			gate, b, _ := fixture(t)
+			private := filepath.Join(filepath.Dir(b.ReleasePath), "private-target.json")
+			switch kind {
+			case "malformed-release":
+				if e := os.WriteFile(b.ReleasePath, []byte("{private malformed data"), 0600); e != nil {
+					t.Fatal(e)
+				}
+			case "empty-release":
+				if e := os.WriteFile(b.ReleasePath, nil, 0600); e != nil {
+					t.Fatal(e)
+				}
+			case "public-mode-release":
+				if _, e := writeServerEnvelope(b.ReleasePath, NamespaceRuntimeRelease{}); e != nil {
+					t.Fatal(e)
+				}
+				if e := os.Chmod(b.ReleasePath, 0644); e != nil {
+					t.Fatal(e)
+				}
+			case "symlink-release":
+				if _, e := writeServerEnvelope(private, NamespaceRuntimeRelease{}); e != nil {
+					t.Fatal(e)
+				}
+				if e := os.Symlink(private, b.ReleasePath); e != nil {
+					t.Fatal(e)
+				}
+			case "hardlink-release":
+				if _, e := writeServerEnvelope(private, NamespaceRuntimeRelease{}); e != nil {
+					t.Fatal(e)
+				}
+				if e := os.Link(private, b.ReleasePath); e != nil {
+					t.Fatal(e)
+				}
+			case "directory-release":
+				if e := os.Mkdir(b.ReleasePath, 0700); e != nil {
+					t.Fatal(e)
+				}
+			}
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			defer cancel()
+			var release NamespaceRuntimeRelease
+			if _, e := readServerEnvelope(b.ReleasePath, &release); !errors.Is(e, ErrOwnedEvidence) || errors.Is(e, os.ErrNotExist) {
+				t.Fatal("invalid private file escaped the original reader", e)
+			}
+			if e := gate.AwaitAdmission(ctx); !errors.Is(e, ErrOwnedEvidence) || errors.Is(e, os.ErrNotExist) {
+				t.Fatal("existing invalid release was treated as pending", e)
+			}
+		})
+	}
+	t.Run("absent-parent-is-not-release-pending", func(t *testing.T) {
+		_, b, _ := fixture(t)
+		var release NamespaceRuntimeRelease
+		_, e := readServerEnvelope(filepath.Join(filepath.Dir(b.ReleasePath), "absent", "release.json"), &release)
+		if !errors.Is(e, ErrOwnedEvidence) || errors.Is(e, os.ErrNotExist) {
+			t.Fatal("missing parent became pending", e)
+		}
+	})
+	t.Run("aliased-parent-is-not-release-pending", func(t *testing.T) {
+		_, b, _ := fixture(t)
+		parent := filepath.Dir(b.ReleasePath)
+		alias := filepath.Join(parent, "alias")
+		if e := os.Symlink(parent, alias); e != nil {
+			t.Fatal(e)
+		}
+		var release NamespaceRuntimeRelease
+		_, e := readServerEnvelope(filepath.Join(alias, "absent-release.json"), &release)
+		if !errors.Is(e, ErrOwnedEvidence) || errors.Is(e, os.ErrNotExist) {
+			t.Fatal("aliased parent became pending", e)
+		}
+	})
+	t.Run("missing-announcement-cannot-be-ready", func(t *testing.T) {
+		_, b, nonce := fixture(t)
+		_, _, e := ReadServerRuntimeAnnouncement(filepath.Join(filepath.Dir(b.ReleasePath), "absent-ready.json"), nonce)
+		if !errors.Is(e, ErrOwnedEvidence) || errors.Is(e, os.ErrNotExist) {
+			t.Fatal("missing announcement escaped closed evidence", e)
 		}
 	})
 }

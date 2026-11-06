@@ -31,6 +31,17 @@ unknown attribute value/coordinate, arbitrary exception message or credentials.
 Gradle remains9.3.1/Groovy4.0.29. The production writer and consumer bodies remain
 the same; its resolver hash is rebound in the fixture and complete cohort.
 
+Current source-origin binding keeps the historical R12 catalog immutable. Only
+four exact existing rows may use their individually enumerated Plugin Portal URL
+with the identical original body. Two newly observed POMs are pinned independently
+to their official published bytes. One exact source per row remains mandatory;
+no generic mirror/host rewrite or ambiguous multi-source admission is introduced.
+The original strong XML/download/cache-body receipt is never edited. A separate
+current policy SHA and exact actual source admissions are bound in the new receipt;
+all18 JAR bodies, selected metadata, generator/parents, BC witness and22 plugin
+reports remain mandatory. This policy is acquisition evidence, not a declaration
+that the historical origin check passed or the whole graph was previously hermetic.
+
 One manual native job: setup -> restore -> preseal -> gradle-setup -> apk.
 Setup acquires JDK/Gradle/Android/Flutter/Pub/SQLite only, without Go/mobile tools.
 build_core and builder reject execution; restore has no fallback. The original

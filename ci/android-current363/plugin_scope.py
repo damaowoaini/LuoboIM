@@ -16,6 +16,7 @@ import time
 import urllib.request
 
 import rich_current as rich
+import rich_origins as origins
 import support as s
 
 CONTRACT_SHA = 'cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625'
@@ -335,8 +336,8 @@ def reports(work, here, inputs, phase, require_all):
 
 
 def bind_origins(work, here, inputs):
-    # Existing App14+BC4 and every original18 source/body/origin remain mandatory.
-    rich.require_origin_binding(work, here)
+    # Original App14+BC4 bodies/variants plus the strict current exact-source policy remain mandatory.
+    origins.require_origin_binding(work, here)
     proof = reports(work, here, inputs, 'metadata', True)
     s.write_json(Path(work) / 'evidence/plugin-rich-origin-binding.json', {
         **proof, 'App_origin_binding_sha256': s.sha(Path(work) / 'evidence/rich-origin-binding.json'),
@@ -344,7 +345,7 @@ def bind_origins(work, here, inputs):
 
 
 def require_origin_binding(work, here, inputs):
-    rich.require_origin_binding(work, here)
+    origins.require_origin_binding(work, here)
     proof = reports(work, here, inputs, 'metadata', True)
     expected = {**proof, 'App_origin_binding_sha256': s.sha(Path(work) / 'evidence/rich-origin-binding.json'),
                 'template_catalog_sha256': rich.CATALOG_SHA, 'actual_registered_configurations': len(proof['actual_project_configurations'])}

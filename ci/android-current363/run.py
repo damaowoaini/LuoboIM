@@ -22,6 +22,7 @@ import support as s
 import verify_inputs
 import core_restore
 import rich_current
+import rich_origins
 import maven_file_origins
 import plugin_scope
 import plugin_scope_fixture
@@ -131,6 +132,7 @@ def metadata():
     plugin_scope.contract(HERE,inputs)
     plugin_scope_fixture.writer_bytes(HERE)
     check_catalogue(context)
+    rich_origins.validate_scope(rich_origins.load_policy(HERE),context,inputs)
     core_restore.validate(read(HERE/'core-reuse.json'),context,inputs,tools)
     if (context['original_context_sha256']!=s.sha(generic.HERE/'current-app-cohort.json')
             or context['pub_lock_after']!=old_context['pub_lock_after']
@@ -314,7 +316,7 @@ class Job(generic.Job):
                     or cwd!=self.w/'source/app/android' or env!=parent.environment(self.w,True)
                     or timeout!=1800 or reject is not None or stdin is not None):
                 raise ValueError('fixed production APK dispatch required')
-            rich_current.require_origin_binding(self.w,HERE)
+            rich_origins.require_origin_binding(self.w,HERE)
             plugin_scope.require_origin_binding(self.w,HERE,self.inputs)
             plugin_before=plugin_scope.verified(self.w,HERE,self.inputs,self.b)[1]
             binding=classpaths.verified_catalog(self.w);args=list(args)+['-I',HERE/'resolve.gradle']
@@ -335,7 +337,7 @@ class Job(generic.Job):
                     check_current_packages(self.w,self.context))
             if label=='assemble-debug':
                 s.write_json(self.w/'evidence/rich-apk-consumed.json',{'actual_configurations':
-                    rich_current.check_apk_reports(self.w,HERE),
+                    rich_origins.check_apk_reports(self.w,HERE),
                     'actual_plugin_configurations':plugin_scope.reports(self.w,HERE,self.inputs,'apk',False),
                     'unused_configurations_not_claimed':True})
             return result
@@ -419,7 +421,7 @@ class Job(generic.Job):
             self.verify()
             result=None
             if self._typed_resolver_dispatch is not True:raise ValueError('production resolver not dispatched')
-            rich_current.bind_origins(self.w,HERE,s.write_json)
+            rich_origins.bind_origins(self.w,HERE,s.write_json)
             plugin_scope.bind_origins(self.w,HERE,self.inputs)
             return result
         finally:self._typed_resolver_dispatch=None

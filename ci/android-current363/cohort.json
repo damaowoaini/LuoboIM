@@ -163,9 +163,9 @@
       "sha256": "393904b5ccf56db42fa8593150a982e99cf6c92b8b97dfb77f60b2776ed3bcf3"
     },
     {
-      "bytes": 3328,
+      "bytes": 4142,
       "path": "ci/android-current363/README.md",
-      "sha256": "8941f523f06996c34a209806bb166a25ec5f8150ac0259d7d83c2b487f292aca"
+      "sha256": "ff225d739602ca849347717b8109d74b5c25b060bf5e8ff6b48194fe3271d0a0"
     },
     {
       "bytes": 8534,
@@ -208,9 +208,9 @@
       "sha256": "cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625"
     },
     {
-      "bytes": 20848,
+      "bytes": 20905,
       "path": "ci/android-current363/plugin_scope.py",
-      "sha256": "959382229dedcefcbfca7767d4da412914a9e4855e0e43281c89a3cc355f8ae1"
+      "sha256": "d61dd084cd3030e3cb1261777d4ae242b00f62e580d6e67852b9611bf188a684"
     },
     {
       "bytes": 11062,
@@ -238,17 +238,32 @@
       "sha256": "3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3"
     },
     {
-      "bytes": 31597,
+      "bytes": 4084,
+      "path": "ci/android-current363/rich-origin-policy.json",
+      "sha256": "40bb2b763ab5d923461f77e85ce0f7045dd5de97a060573915493486aea76115"
+    },
+    {
+      "bytes": 6092,
+      "path": "ci/android-current363/rich_origins.py",
+      "sha256": "4846a1d6fd256dc2a13f6f54a692801c771df1379f4db066f1437a921bd1c0b0"
+    },
+    {
+      "bytes": 31696,
       "path": "ci/android-current363/run.py",
-      "sha256": "18cadc9c2947fbeedb3f5329c9ffa6948e8c6d989f38b379bc08596d6b3f9a18"
+      "sha256": "a903d61112f92770b5401fdeac312d355d9d72af4925116b5a0b8c70cfa32a96"
     },
     {
       "bytes": 3442,
       "path": "ci/android-current363/test_identity.py",
       "sha256": "060d5ea990bebde00e59c050db690527dd1310dbc497e329a853224d119c747e"
+    },
+    {
+      "bytes": 4454,
+      "path": "ci/android-current363/test_rich_origins.py",
+      "sha256": "5daeaadded94c519197cda264d12a8a526558867361a480f739b9633459946c6"
     }
   ],
-  "controller_revision": "current363-verified-core-reuse-exact-tooling-attributes-closed-refusal-v4",
+  "controller_revision": "current363-verified-core-reuse-exact-current-origin-policy-v5",
   "core_build_mode": "restore-verified-current363",
   "core_compatibility": {
     "freshActualGoBuildRequired": false,

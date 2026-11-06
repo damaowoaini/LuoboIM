@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "state": "FROZEN_FINAL_SOURCE",
-  "scope": "original_graph2top3sub_four_planes_same_whole_source_kafka1top3sub_reuse_finite_gateway_exit2_diagnostic_only",
+  "scope": "original_graph2top3sub_four_scenarios_fresh_release3top19sub_kafka1top3sub_single_race",
   "source": {
     "members": 1576,
-    "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
+    "digest": "ffd081874f7c2eaf0c0ec6e3e24e52796662dd8fa3d3bf16421f98bfd1ac5c82"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 100966,
-      "sha256": "3903976c7e6367f859d1559fc66f455de3aa3898ac2f1eff2ac871871efadff8"
+      "bytes": 111131,
+      "sha256": "89b2e5a0ec853679a44e85a5de5e583fe2bc0b4c6a5241a05c480539164ce08f"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 69239,
-      "sha256": "8c8e270201cfb5fbc5bbd2784e4de0ddba5518743901bf951d0ec5b50715b6c6"
+      "bytes": 72930,
+      "sha256": "d28c839c0b6b31cf51a24805ee14775e916302adeb24f73cfe0059485a3e5df6"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 121984,
-      "sha256": "a5806a5daa761b5849f810ddf4c098cdada8a1b927383720f7eee3c491af4890"
+      "bytes": 129735,
+      "sha256": "ba10e4bf3212db0f3f43859eb27ec5674bc5d4c4ba766c41b7b9461ca4f7964f"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -883,6 +883,20 @@
       "beforeSHA256": null
     },
     {
+      "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
+      "bytes": 10313,
+      "sha256": "251a04573421ffaaea68d0935c60b9342db9c87b673797cba9a5ad28b0d94aea",
+      "beforeSHA256": "d26782b41f648e98030a56bbccd0417e3bcd1cbe9fab06e55680aaa1cd653719"
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
+      "bytes": 7832,
+      "sha256": "a6799a677ccc7d9eb99edab36636a28213979666be86d8331c0a839a95dca1b7",
+      "beforeSHA256": "9a8605dba4dacfdc8f81b714f1ee8c51b4b5e555ad8ada2d9420d9aaf48f68ae"
+    },
+    {
       "target": "server/internal/namespaceimport/ownedcontrol/launcher_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/launcher_linux.go",
       "bytes": 14298,
@@ -1025,8 +1039,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_startup_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/namespace_runtime_startup_test.go",
-      "bytes": 6033,
-      "sha256": "b37a656ee639d27d583c3688e0c82197b04217b23d14cce8aa30f6fd8843d675",
+      "bytes": 12338,
+      "sha256": "63dec1da66f8e469d174aa9b989273215657e71bc19dcc0d50c311e5d00f8378",
       "beforeSHA256": null
     },
     {
@@ -1126,6 +1140,13 @@
       "bytes": 5522,
       "sha256": "d9c8471dd01df8dcd9b746edb179a751dbf6444d756eab83d5eea4e3e731867d",
       "beforeSHA256": null
+    },
+    {
+      "target": "server/internal/namespaceimport/ownedcontrol/server_announcement_unix.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/server_announcement_unix.go",
+      "beforeSHA256": "d109df9d94260148a419af4a39d60d22b7b2e12c6a5d71e2d083831bed0be1d1",
+      "bytes": 7993,
+      "sha256": "92b078a732a4b824899a3e984c87a440c26391978bcbe4492f53fa10f10527f3"
     },
     {
       "target": "server/internal/namespaceimport/ownedcontrol/snapshot_history_segments_linux.go",
@@ -1700,20 +1721,6 @@
       "bytes": 13689,
       "sha256": "93c5369c3361cf0578fe79bd2fd87ef68136fe29419c703a61a7dfa8ff1a2449",
       "beforeSHA256": "831487af0ce9ea3f182fd4f69b693fe00e44826326ba93e229e918ea05f26825"
-    },
-    {
-      "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
-      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
-      "bytes": 10313,
-      "sha256": "251a04573421ffaaea68d0935c60b9342db9c87b673797cba9a5ad28b0d94aea",
-      "beforeSHA256": "d26782b41f648e98030a56bbccd0417e3bcd1cbe9fab06e55680aaa1cd653719"
-    },
-    {
-      "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
-      "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
-      "bytes": 7832,
-      "sha256": "a6799a677ccc7d9eb99edab36636a28213979666be86d8331c0a839a95dca1b7",
-      "beforeSHA256": "9a8605dba4dacfdc8f81b714f1ee8c51b4b5e555ad8ada2d9420d9aaf48f68ae"
     }
   ],
   "allowedOverlayTargets": [
@@ -1869,6 +1876,7 @@
     "server/internal/namespaceimport/ownedcontrol/process_local_cleanup_linux_test.go",
     "server/internal/namespaceimport/ownedcontrol/redis_credential.go",
     "server/internal/namespaceimport/ownedcontrol/redis_credential_test.go",
+    "server/internal/namespaceimport/ownedcontrol/server_announcement_unix.go",
     "server/internal/namespaceimport/ownedcontrol/snapshot_history_segments_linux.go",
     "server/internal/namespaceimport/ownedcontrol/snapshot_validator_linux.go",
     "server/internal/namespaceimport/owner_history_original.go",
@@ -4345,30 +4353,30 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-kafka-visibility-batch-20261106/go-freeze.json",
-      "bytes": 2496,
-      "sha256": "486550e305cbfd8e69849359379483862b9f4e3951ade125b060ec7b37d04459"
+      "path": ".qa/namespace-release-origin-batch-20261106/formatted-go.json",
+      "bytes": 1746,
+      "sha256": "9a5b2dcad0e86f400fdf3e499af3f19a6992a8981094aa4e68a661c91c974979"
     },
     "toolSHA256": "5894006a03afafb375c8dcde9eeae1e6e5bd292d5e6d8a5eaac9ff0974694482",
     "changedSourcePins": [
       {
-        "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
-        "bytes": 10313,
-        "sha256": "251a04573421ffaaea68d0935c60b9342db9c87b673797cba9a5ad28b0d94aea"
+        "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/server_announcement_unix.go",
+        "bytes": 7993,
+        "sha256": "92b078a732a4b824899a3e984c87a440c26391978bcbe4492f53fa10f10527f3"
       },
       {
-        "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
-        "bytes": 7832,
-        "sha256": "a6799a677ccc7d9eb99edab36636a28213979666be86d8331c0a839a95dca1b7"
+        "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/namespace_runtime_startup_test.go",
+        "bytes": 12338,
+        "sha256": "63dec1da66f8e469d174aa9b989273215657e71bc19dcc0d50c311e5d00f8378"
       }
     ],
     "source": {
       "members": 1576,
-      "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
+      "digest": "ffd081874f7c2eaf0c0ec6e3e24e52796662dd8fa3d3bf16421f98bfd1ac5c82"
     },
     "unchangedOtherSourceBodiesFrom": {
       "members": 1576,
-      "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
+      "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
     },
     "GoBuildTestOrListExecuted": 0
   },
@@ -4497,7 +4505,9 @@
     "otherKafkaOrRedisTestsDispatched": false
   },
   "kafkaACLPassedReuse": null,
-  "kafkaACLTestsToRun": [],
+  "kafkaACLTestsToRun": [
+    "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+  ],
   "kafkaACLHistoricalPass": {
     "schema": 1,
     "kind": "root-accepted-kafka-acl-source-bound-reuse-v1",
@@ -4694,20 +4704,23 @@
   "currentImageKafkaControl": null,
   "historicalCleanupDependencyBoundary": {
     "changedSourceTargets": [
-      "server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
-      "server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go"
+      "server/internal/namespaceimport/ownedcontrol/server_announcement_unix.go",
+      "server/internal/namespaceimport/ownedcontrol/namespace_runtime_startup_test.go"
     ],
     "unchangedProcessImageBodies": true,
     "processImagePriorIndividualPassOnly": true,
     "currentProcessImageTestsDispatched": 0,
-    "currentKafkaParentThreeChildrenMustRun": false,
+    "currentKafkaParentThreeChildrenMustRun": true,
     "historicalCleanupAndLauncherReceiptsAreNotCurrentPackagePASS": true,
     "currentWholeOwnedcontrolPackagePASS": false,
     "originalCrossSourceObligationsKept": true,
     "originalSameWholeSourceKafkaParentThreeChildrenPassed": true,
     "originalKafkaActualTestsDispatched": 1,
-    "currentKafkaActualTestsDispatched": 0,
-    "sameWholeSourceKafkaReuseRequiresExactGoExecutable": true
+    "currentKafkaActualTestsDispatched": null,
+    "sameWholeSourceKafkaReuseRequiresExactGoExecutable": false,
+    "currentKafkaPlannedTopDispatches": 1,
+    "prior7acKafkaIndividualFactOnly": true,
+    "currentReleaseAndKafkaSharedRaceRequired": true
   },
   "currentKafkaConfirmControl": null,
   "processImageHistoricalPass": {
@@ -4757,7 +4770,83 @@
     "actualCurrentTestsDispatched": 0,
     "runtimeAccepted": false
   },
-  "kafkaConfirmPassedReuse": {
+  "kafkaConfirmPassedReuse": null,
+  "gatewayStartLogProjectionPolicy": {
+    "version": "owned-gateway-start-log-projection-v2",
+    "logLimitBytes": 8388608,
+    "lineLimit": 16384,
+    "lineBytesLimit": 4096,
+    "framesLimit": 8,
+    "directoryEntriesLimit": 64,
+    "onlyRole": "msggateway",
+    "onlyCachedWaitExitCode": 2,
+    "rawTextExported": false,
+    "acceptanceEvidence": false,
+    "panicPrefixClassesLimit": 8,
+    "wrapperLimit": 8
+  },
+  "currentReleaseControl": {
+    "phase": "current-release-controls",
+    "targets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestNamespaceRuntimeMissingReleaseWaitsWithoutWeakeningPrivateEvidence",
+        "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
+        "TestOwnedServerRuntimeEvidenceDoesNotInventLegacyEpoch",
+        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+      ]
+    },
+    "requiredSubtests": {
+      "internal/namespaceimport/ownedcontrol": {
+        "TestNamespaceRuntimeMissingReleaseWaitsWithoutWeakeningPrivateEvidence": [
+          "missing-release-waits-and-cancels-without-ready",
+          "malformed-release",
+          "empty-release",
+          "public-mode-release",
+          "symlink-release",
+          "hardlink-release",
+          "directory-release",
+          "absent-parent-is-not-release-pending",
+          "aliased-parent-is-not-release-pending",
+          "missing-announcement-cannot-be-ready"
+        ],
+        "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit": [
+          "actual-exclusive-registration-still-not-permission",
+          "second-registration-cannot-change-original-resource-identity",
+          "unsigned-or-foreign-release-remains-closed",
+          "retirement-is-sticky"
+        ],
+        "TestOwnedServerRuntimeEvidenceDoesNotInventLegacyEpoch": [
+          "legacy_actual_identity_round_trip",
+          "legacy_target_epoch_rejected",
+          "required_must_carry_actual_runtime_identity",
+          "unknown_role_cannot_self_enroll",
+          "drain_exact_nonce_and_complete_ordered_join"
+        ],
+        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
+          "create-reply-error-and-shape-cannot-be-a-success",
+          "describe-reply-error-and-shape-cannot-replace-exact-deny",
+          "new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+        ]
+      }
+    },
+    "goTimeoutSeconds": 180,
+    "phaseGuardSeconds": 240,
+    "topPASS": 4,
+    "subPASS": 22,
+    "samePackageSingleRaceInvocation": true,
+    "newDatabaseFixtures": 0,
+    "releaseIndividualTopPASS": 3,
+    "releaseIndividualSubPASS": 19,
+    "kafkaIndividualTopPASS": 1,
+    "kafkaIndividualSubPASS": 3,
+    "wholeOwnedcontrolPackagePASS": false
+  },
+  "currentReleaseTestsToRun": [
+    "TestNamespaceRuntimeMissingReleaseWaitsWithoutWeakeningPrivateEvidence",
+    "TestNamespaceRuntimeRegistrationIsPrivateOnceAndNeverAReadyPermit",
+    "TestOwnedServerRuntimeEvidenceDoesNotInventLegacyEpoch"
+  ],
+  "kafkaConfirmHistoricalPass": {
     "schema": 1,
     "kind": "root-accepted-current-whole-source-kafka-confirmation-reuse-v1",
     "run": 42183524424,
@@ -5011,19 +5100,5 @@
     "currentFreshPASS": false,
     "currentWholeOwnedcontrolPackagePASS": false,
     "runtimeAccepted": false
-  },
-  "gatewayStartLogProjectionPolicy": {
-    "version": "owned-gateway-start-log-projection-v2",
-    "logLimitBytes": 8388608,
-    "lineLimit": 16384,
-    "lineBytesLimit": 4096,
-    "framesLimit": 8,
-    "directoryEntriesLimit": 64,
-    "onlyRole": "msggateway",
-    "onlyCachedWaitExitCode": 2,
-    "rawTextExported": false,
-    "acceptanceEvidence": false,
-    "panicPrefixClassesLimit": 8,
-    "wrapperLimit": 8
   }
 }
