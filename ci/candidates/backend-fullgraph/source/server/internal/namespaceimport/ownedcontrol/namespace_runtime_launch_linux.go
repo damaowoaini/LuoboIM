@@ -191,6 +191,15 @@ func (g *NamespaceRuntimeLaunchGroup) Processes() ([]NamespaceRuntimeProcess, er
 	return g.processesWithObservation(nil)
 }
 
+func (g *NamespaceRuntimeLaunchGroup) ProcessesWithObservation() ([]NamespaceRuntimeProcess, NamespaceRuntimeCallObservation, error) {
+	observation := NamespaceRuntimeCallObservation{Role: "none", Predicate: "process-set"}
+	rows, err := g.processesWithObservation(&observation)
+	if err == nil {
+		observation.enter("", "processes-complete")
+	}
+	return rows, observation, err
+}
+
 func (g *NamespaceRuntimeLaunchGroup) processesWithObservation(observation *NamespaceRuntimeCallObservation) ([]NamespaceRuntimeProcess, error) {
 	observation.enter("", "process-set")
 	if g == nil {

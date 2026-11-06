@@ -187,16 +187,37 @@ func (p *NamespaceRuntimePreparation) PublishRuntimeAdmission(ctx context.Contex
 // signing key alone has no method accepting an arbitrary publication/body.
 // An absent/unknown DB result or changed actual graph returns no release.
 func (p *NamespaceRuntimePreparation) WriteRuntimeReleases(ctx context.Context, graph *ownedcontrol.VerifiedNamespaceRuntimeGraph, processes []ownedcontrol.NamespaceRuntimeProcess) ([]string, error) {
+	return p.writeRuntimeReleases(ctx, graph, processes, nil)
+}
+
+func (p *NamespaceRuntimePreparation) WriteRuntimeReleasesWithObservation(ctx context.Context, graph *ownedcontrol.VerifiedNamespaceRuntimeGraph, processes []ownedcontrol.NamespaceRuntimeProcess) ([]string, ownedcontrol.NamespaceRuntimeCallObservation, error) {
+	observation := ownedcontrol.NamespaceRuntimeCallObservation{Role: "none", Predicate: "release-input"}
+	written, err := p.writeRuntimeReleases(ctx, graph, processes, &observation)
+	return written, observation, err
+}
+
+func (p *NamespaceRuntimePreparation) writeRuntimeReleases(ctx context.Context, graph *ownedcontrol.VerifiedNamespaceRuntimeGraph, processes []ownedcontrol.NamespaceRuntimeProcess, observation *ownedcontrol.NamespaceRuntimeCallObservation) ([]string, error) {
+	observation.Record("", "release-input")
 	if p == nil || ctx == nil || graph == nil || p.validate(ctx) != nil {
 		return nil, ErrUnprepared
 	}
-	if e := graph.Refresh(ctx); e != nil {
-		return nil, e
+	var refresh ownedcontrol.NamespaceRuntimeCallObservation
+	var refreshErr error
+	if observation == nil {
+		refreshErr = graph.Refresh(ctx)
+	} else {
+		refresh, refreshErr = graph.RefreshWithObservation(ctx)
+		observation.Record(refresh.Role, "release-refresh-"+refresh.Predicate)
+	}
+	if refreshErr != nil {
+		return nil, refreshErr
 	}
 	h := p.history
+	observation.Record("", "release-local-graph")
 	if e := graph.ValidateLocal(h.hold, h.writer.header.SHA256(), p.sha256, p.record.InventorySHA256, p.record.ManifestSHA256, p.record.RequirementsSHA256); e != nil {
 		return nil, e
 	}
+	observation.Record("", "release-read-admission")
 	publication, found, e := h.writer.readNamespaceRuntimeAdmission(ctx)
 	if e != nil {
 		return nil, e
@@ -204,6 +225,7 @@ func (p *NamespaceRuntimePreparation) WriteRuntimeReleases(ctx context.Context, 
 	if !found {
 		return nil, ErrCommitUnconfirmed
 	}
+	observation.Record("", "release-graph-json")
 	rows := graph.AuditRows()
 	body, e := json.Marshal(rows)
 	if e != nil || string(body) != publication.GraphJSON || len(processes) != len(rows) {
@@ -216,20 +238,24 @@ func (p *NamespaceRuntimePreparation) WriteRuntimeReleases(ctx context.Context, 
 	var written []string
 	for at, process := range processes {
 		b, row := process.Bootstrap, rows[at]
+		observation.Record(row.Role, "release-process")
 		if b.ValidateShape() != nil || b.Header != h.writer.header || b.RuntimePreparationSHA256 != p.sha256 || b.Requirement.Role != row.Role || process.Service == nil || forbiddenHistoryCustodyPath(b.ReleasePath, h.custodyDirectories) {
 			return written, ErrConflict
 		}
 		release := ownedcontrol.NamespaceRuntimeRelease{Version: "namespace-runtime-release-v1", KeyID: p.record.ReleaseKeyID, Role: row.Role, InstanceID: row.Registration.InstanceID, OwnerNonceSHA256: row.OwnerNonceSHA256, RegistrationSHA256: row.RegistrationSHA256, PublicationJSON: string(raw), PublicationSHA256: hash(raw)}
+		observation.Record(row.Role, "release-signing")
 		signing, e := release.SigningBytes()
 		if e != nil {
 			return written, e
 		}
 		release.Signature = ed25519.Sign(p.releaseKey, signing)
+		observation.Record(row.Role, "release-write")
 		if _, e = ownedcontrol.WriteOrInspectNamespaceRuntimeRelease(b.ReleasePath, release); e != nil {
 			return written, e
 		}
 		written = append(written, row.Role)
 	}
+	observation.Record("", "release-complete")
 	return written, nil
 }
 

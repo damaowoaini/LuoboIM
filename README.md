@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端Go1578/6fa、P20派生1580/824f、ordinary1884不变。本批补CI的rpc-third selector漏项：真实Start还注册本地EvidenceVerifier，旧单服务预期与原严格RecordPrepared必冲突；保留原校验并用真实注册/生成descriptor核对两项服务。8d0a原log有限投影为namespace-evidence/main31，具体唯一首错仍未证明。同完整Go/工具下已过group/list/cron/cache/producer/Kafka0重派；原16编译/4场景/2top3及cleanup/PID/ELF门禁保留，cache无receiver、P20binding=null。
+- 后端graph `1579/2296d8a9b79ec6e6a1c48008ebb14610f21d90f679002dcbedf9fdc6d47c2bd6` 修AwaitStarted吞失原announcement deadline/cancel，并沿同一次Processes/release/AwaitStarted/reader调用报告有限阶段；身份、服务模式、签名发布及清理判定不变。仅fresh真实原owner/announcement控制1top3；旧命名事实经5体逆转＋移除新test还原旧1578向量作来源兼容审查，0重派、不称新Go实际PASS。d4已16编译/前两场景通过，ack在私有release/等待启动阶段失败，具体首谓词未证；该超时遗漏不声称其根因。新16编译/4场景/原2top3及全部门禁仍必需，cache无receiver、P20binding=null。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
 )
 
 type NamespaceRuntimeStartedValidator interface {
@@ -24,45 +26,58 @@ type NamespaceRuntimeStartedObservation struct {
 // only after the original canonical announcements, same process/image/start,
 // private nonce and exact KNOWN Mongo admission have all been rechecked.
 func (g *NamespaceRuntimeLaunchGroup) AwaitStarted(ctx context.Context, publicationSHA string) ([]NamespaceRuntimeStartedObservation, error) {
+	return g.awaitStarted(ctx, publicationSHA, nil)
+}
+
+func (g *NamespaceRuntimeLaunchGroup) AwaitStartedWithObservation(ctx context.Context, publicationSHA string) ([]NamespaceRuntimeStartedObservation, NamespaceRuntimeCallObservation, error) {
+	observation := NamespaceRuntimeCallObservation{Role: "none", Predicate: "started-input"}
+	rows, err := g.awaitStarted(ctx, publicationSHA, &observation)
+	return rows, observation, err
+}
+
+func (g *NamespaceRuntimeLaunchGroup) awaitStarted(ctx context.Context, publicationSHA string, observation *NamespaceRuntimeCallObservation) ([]NamespaceRuntimeStartedObservation, error) {
+	observation.enter("", "started-input")
 	if g == nil || ctx == nil || ctx.Done() == nil || !isSHA(publicationSHA) {
 		return nil, ErrOwnedEvidence
 	}
+	observation.enter("", "started-validator")
 	validator, ok := g.validator.(NamespaceRuntimeStartedValidator)
 	if !ok {
 		return nil, ErrOwnedEvidence
 	}
-	graph, e := g.Observe(ctx)
+	graph, e := g.observeWithObservation(ctx, observation)
+	if e != nil && observation != nil {
+		observation.enter(observation.Role, "started-observe-"+observation.Predicate)
+	}
 	if e != nil {
 		return nil, e
 	}
 	rows := graph.AuditRows()
+	observation.enter("", "started-publication")
 	if e = validator.ValidateNamespaceRuntimeStarted(ctx, publicationSHA, rows); e != nil {
 		return nil, e
 	}
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	observation.enter("", "started-state")
 	if g.stopping || g.transferred {
 		return nil, ErrOwnedEvidence
 	}
 	var observed []NamespaceRuntimeStartedObservation
 	for at, r := range g.requirements {
 		p := g.entries[r.Role]
-		s := p.Service
-		owner, a, e := s.AwaitAnnouncement(ctx)
-		if e != nil || owner.PID != rows[at].PID || owner.StartToken != rows[at].StartToken || owner.BootID != rows[at].BootID || sha([]byte(owner.OwnerNonce)) != rows[at].OwnerNonceSHA256 || a.InstanceID != rows[at].Registration.InstanceID || a.DatabaseSHA256 != sha([]byte(g.header.Database)) || a.Epoch != g.header.Epoch || a.ActivationSHA256 != g.header.ActivationSHA256 || a.BootstrapSHA256 != r.BootstrapSHA256 {
-			return nil, ErrOwnedEvidence
-		}
-		s.mu.Lock()
-		sum := s.announcementSHA
-		server := s.serverAnnouncement
-		s.mu.Unlock()
-		if !isSHA(sum) || r.Role != "msgtransfer-managed" && (server == nil || server.Mode != "required") || r.Role == "msgtransfer-managed" && server != nil {
-			return nil, ErrOwnedEvidence
-		}
-		current, e := observeNamespaceRuntime(ctx, p)
+		sum, e := awaitNamespaceRuntimeStartedAnnouncement(ctx, p, rows[at], r, g.header, observation)
 		if e != nil {
 			return nil, e
 		}
+		current, e := observeNamespaceRuntimeWithObservation(ctx, p, observation)
+		if e != nil && observation != nil {
+			observation.enter(observation.Role, "started-reobserve-"+observation.Predicate)
+		}
+		if e != nil {
+			return nil, e
+		}
+		observation.enter(r.Role, "started-row-identity")
 		x, _ := json.Marshal(current)
 		y, _ := json.Marshal(rows[at])
 		if !bytes.Equal(x, y) {
@@ -70,6 +85,7 @@ func (g *NamespaceRuntimeLaunchGroup) AwaitStarted(ctx context.Context, publicat
 		}
 		observed = append(observed, NamespaceRuntimeStartedObservation{current, sum})
 	}
+	observation.enter("", "started-seal")
 	raw, e := json.Marshal(observed)
 	if e != nil {
 		return nil, e
@@ -85,13 +101,49 @@ func (g *NamespaceRuntimeLaunchGroup) AwaitStarted(ctx context.Context, publicat
 			Observations                                        []NamespaceRuntimeStartedObservation
 		}{"namespace-runtime-actual-started-v1", g.header.SHA256(), publicationSHA, sum, observed}
 		path := filepath.Join(g.dir, "runtime-actual-started.json")
+		observation.enter("", "started-record")
 		if e = writeOrInspectRuntimeEvidence(path, record); e != nil {
 			return nil, e
 		}
 		g.startedSHA, g.publicationSHA, g.started = sum, publicationSHA, observed
 	}
+	observation.enter("", "started-complete")
 	return cloneRuntimeStarted(observed), nil
 }
+
+// Keep the original announcement call and all identity/mode checks together.
+// A timeout/cancellation belongs to this original call, never a new evidence
+// rejection; the supervisor decides whether its existing bounded turn retries.
+func awaitNamespaceRuntimeStartedAnnouncement(ctx context.Context, p NamespaceRuntimeProcess, row ObservedNamespaceRuntime, r NamespaceRuntimeRequirement, h namespaceimport.Header, observation *NamespaceRuntimeCallObservation) (string, error) {
+	s := p.Service
+	var startup ServiceStartupObservation
+	var trace *ServiceStartupObservation
+	if observation != nil {
+		trace = &startup
+	}
+	observation.enter(r.Role, "started-announcement")
+	owner, a, e := s.awaitAnnouncement(ctx, trace)
+	if observation != nil {
+		observation.enter(r.Role, "started-announcement-"+string(startup.Stage))
+	}
+	if e != nil {
+		return "", e
+	}
+	observation.enter(r.Role, "started-owner-identity")
+	if owner.PID != row.PID || owner.StartToken != row.StartToken || owner.BootID != row.BootID || sha([]byte(owner.OwnerNonce)) != row.OwnerNonceSHA256 || a.InstanceID != row.Registration.InstanceID || a.DatabaseSHA256 != sha([]byte(h.Database)) || a.Epoch != h.Epoch || a.ActivationSHA256 != h.ActivationSHA256 || a.BootstrapSHA256 != r.BootstrapSHA256 {
+		return "", ErrOwnedEvidence
+	}
+	s.mu.Lock()
+	sum := s.announcementSHA
+	server := s.serverAnnouncement
+	s.mu.Unlock()
+	observation.enter(r.Role, "started-announcement-evidence")
+	if !isSHA(sum) || r.Role != "msgtransfer-managed" && (server == nil || server.Mode != "required") || r.Role == "msgtransfer-managed" && server != nil {
+		return "", ErrOwnedEvidence
+	}
+	return sum, nil
+}
+
 func cloneRuntimeStarted(rows []NamespaceRuntimeStartedObservation) []NamespaceRuntimeStartedObservation {
 	raw, _ := json.Marshal(rows)
 	var copy []NamespaceRuntimeStartedObservation

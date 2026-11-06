@@ -302,19 +302,30 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 	}
 	out.ReaderPhases = append(out.ReaderPhases, phase)
 	s.Phase = "actual-private-releases-and-fourteen-started-owners"
-	processes, e := group.Processes()
+	s.constructorObservation = constructorCallObservation{Stage: "release-processes", Role: "none", State: "in-progress", ErrorClass: "in-progress", Predicate: "none"}
+	processes, releaseObservation, e := group.ProcessesWithObservation()
+	s.constructorObservation.State, s.constructorObservation.ErrorClass = "returned", constructorOperationErrorClass(e)
+	s.constructorObservation.Role, s.constructorObservation.Predicate = releaseObservation.Role, releaseObservation.Predicate
 	if e != nil {
 		return out, e
 	}
-	if _, e = prep.WriteRuntimeReleases(ctx, graph, processes); e != nil {
+	s.constructorObservation = constructorCallObservation{Stage: "private-releases", Role: "none", State: "in-progress", ErrorClass: "in-progress", Predicate: "none"}
+	_, releaseObservation, e = prep.WriteRuntimeReleasesWithObservation(ctx, graph, processes)
+	s.constructorObservation.State, s.constructorObservation.ErrorClass = "returned", constructorOperationErrorClass(e)
+	s.constructorObservation.Role, s.constructorObservation.Predicate = releaseObservation.Role, releaseObservation.Predicate
+	if e != nil {
 		return out, e
 	}
 	for {
+		s.constructorObservation = constructorCallObservation{Stage: "await-started", Role: "none", State: "in-progress", ErrorClass: "in-progress", Predicate: "started-caller-check"}
 		if e = check(); e != nil {
+			s.constructorObservation.State, s.constructorObservation.ErrorClass = "returned", constructorOperationErrorClass(e)
 			return out, e
 		}
 		turn, cancel := context.WithTimeout(ctx, 3*time.Second)
-		out.Started, e = group.AwaitStarted(turn, out.AdmissionSHA256)
+		out.Started, releaseObservation, e = group.AwaitStartedWithObservation(turn, out.AdmissionSHA256)
+		s.constructorObservation.State, s.constructorObservation.ErrorClass = "returned", constructorOperationErrorClass(e)
+		s.constructorObservation.Role, s.constructorObservation.Predicate = releaseObservation.Role, releaseObservation.Predicate
 		cancel()
 		if e == nil {
 			break
@@ -327,6 +338,7 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 		}
 	}
 	for _, row := range readerGraph.AuditRows() {
+		s.constructorObservation = constructorCallObservation{Stage: "serving-readers", Role: row.Role, State: "in-progress", ErrorClass: "in-progress", Predicate: "reader-original-inode"}
 		originalInode := ""
 		for _, r := range out.ReaderPhases[0].Endpoints {
 			if r.Role == row.Role {
@@ -334,13 +346,17 @@ func (s *Session) startActualGraph(ctx context.Context, p *messagedelivery.Histo
 			}
 		}
 		if originalInode == "" {
+			s.constructorObservation.State, s.constructorObservation.ErrorClass = "returned", "owned-evidence"
 			return out, ownedcontrol.ErrOwnedEvidence
 		}
+		s.constructorObservation.Predicate = "reader-endpoint"
 		endpoint, e := probeActualReaderEndpoint(ctx, readerGraph, row, in.ReaderPorts[row.Role], true, originalInode)
+		s.constructorObservation.State, s.constructorObservation.ErrorClass = "returned", constructorOperationErrorClass(e)
 		if e != nil {
 			return out, e
 		}
 		out.ReaderServed = append(out.ReaderServed, endpoint)
 	}
+	s.constructorObservation = constructorCallObservation{Stage: "serving-readers", Role: "none", State: "returned", ErrorClass: "none", Predicate: "complete"}
 	return out, nil
 }

@@ -36,6 +36,11 @@ func (o *NamespaceRuntimeCallObservation) enter(role, predicate string) {
 	o.Predicate = predicate
 }
 
+// Record carries invocation-local public labels only; it grants no capability.
+func (o *NamespaceRuntimeCallObservation) Record(role, predicate string) {
+	o.enter(role, predicate)
+}
+
 type NamespaceRuntimeProcess struct {
 	Service   *OwnedService
 	Bootstrap NamespaceRuntimeBootstrap
@@ -177,25 +182,39 @@ func observeNamespaceRuntimeWithObservation(ctx context.Context, p NamespaceRunt
 	return ObservedNamespaceRuntime{Role: required.Role, PID: s.owner.PID, UID: s.owner.UID, StartToken: s.owner.StartToken, BootID: s.owner.BootID, BinarySHA256: s.owner.BinarySHA256, SourceSHA256: s.owner.SourceSHA256, BuildReceiptSHA256: s.owner.BuildReceiptSHA256, OwnerNonceSHA256: sha([]byte(s.owner.OwnerNonce)), RegistrationSHA256: sum, Registration: r}, nil
 }
 func (g *VerifiedNamespaceRuntimeGraph) Refresh(ctx context.Context) error {
+	return g.refresh(ctx, nil)
+}
+
+func (g *VerifiedNamespaceRuntimeGraph) RefreshWithObservation(ctx context.Context) (NamespaceRuntimeCallObservation, error) {
+	observation := NamespaceRuntimeCallObservation{Role: "none", Predicate: "refresh-input"}
+	err := g.refresh(ctx, &observation)
+	return observation, err
+}
+
+func (g *VerifiedNamespaceRuntimeGraph) refresh(ctx context.Context, observation *NamespaceRuntimeCallObservation) error {
+	observation.enter("", "refresh-input")
 	if g == nil {
 		return ErrOwnedEvidence
 	}
 	g.mu.Lock()
 	defer g.mu.Unlock()
+	observation.enter("", "refresh-preconditions")
 	if g.hold == nil || g.hold.ValidateExclusion() != nil || len(g.rows) != len(NamespaceRuntimeRoles()) || len(g.processes) != len(g.rows) {
 		return ErrOwnedEvidence
 	}
 	for at, p := range g.processes {
-		row, e := observeNamespaceRuntime(ctx, p)
+		row, e := observeNamespaceRuntimeWithObservation(ctx, p, observation)
 		if e != nil {
 			return e
 		}
+		observation.enter(p.Bootstrap.Requirement.Role, "refresh-row-identity")
 		a, _ := json.Marshal(row)
 		z, _ := json.Marshal(g.rows[at])
 		if string(a) != string(z) {
 			return ErrOwnedEvidence
 		}
 	}
+	observation.enter("", "refresh-complete")
 	g.observedAt = time.Now()
 	return nil
 }
