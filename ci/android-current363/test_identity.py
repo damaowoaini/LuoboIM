@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import io
+import json
 import importlib.util
 from pathlib import Path
 import sys
@@ -9,6 +10,7 @@ import struct
 import tempfile
 import unittest
 import zipfile
+from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('android_current363_identity', HERE / 'run.py')
@@ -124,6 +126,75 @@ class Current363SourceTests(unittest.TestCase):
         with self.assertRaises(ValueError): tool.archive(packed('../aapt2', elf))
         struct.pack_into('<H', elf, 18, 183)
         with self.assertRaises(ValueError): tool.archive(packed('aapt2', elf))
+
+
+    def test_exact_app_debug_scope_retains_real_seven_gate_plan_and_rejects_other_targets(self):
+        class Planned(Exception):
+            pass
+        class ReachedOrigin(Exception):
+            pass
+        with tempfile.TemporaryDirectory(prefix='current363-app-task-') as directory:
+            job = object.__new__(controller.Job)
+            job.w = Path(directory).resolve()
+            artifact = job.w / 'artifacts/core-current257-arm64.aar'
+            artifact.parent.mkdir(parents=True)
+            artifact.write_bytes(b'synthetic gate-plan input, not a native AAR')
+            artifact.with_suffix('.build.json').write_text(json.dumps({'qa_overlay_sha256': 'a' * 64}))
+            (job.w / 'source/app/build').mkdir(parents=True)
+            job.verify = lambda: None
+            job.check_java_lock = lambda: None
+            job.check_packages = lambda: None
+            calls = []
+            def capture(args, cwd, env, label, timeout=900, reject=None, stdin=None):
+                calls.append((list(map(str, args)), label, timeout, reject))
+                self.assertEqual(cwd, job.w / 'source/app/android')
+                self.assertIn('--offline', args)
+                self.assertEqual(args[-3:], ['--offline', '--dependency-verification', 'strict'])
+                if label == 'assemble-debug':
+                    raise Planned()
+            job.cmd = capture
+            # Execute the actual inherited gate-plan source; only tool dispatch
+            # and namespace inspection are test doubles. Stop before acceptance.
+            with patch.object(controller.parent, 'netns'), self.assertRaises(Planned):
+                controller.parent.Job.build_apk(job)
+            self.assertEqual([row[1] for row in calls], [
+                'gate-assemblerelease', 'gate-assembleprofile', 'gate-assemble',
+                'gate-missing-sha', 'gate-wrong-sha', 'gate-missing-manifest',
+                'gate-wrong-overlay', 'assemble-debug'])
+            for index, selector in enumerate(['assembleRelease', 'assembleProfile', 'assemble']):
+                self.assertIn(selector, calls[index][0])
+                self.assertEqual(calls[index][3], 'QA core requires assembleDebug')
+            for row in calls[3:]:
+                self.assertIn(':app:assembleDebug', row[0])
+                self.assertNotIn('assembleDebug', row[0])
+            self.assertEqual([row[2] for row in calls], [180] * 7 + [1800])
+            self.assertEqual([row[3] for row in calls[:7]], [
+                'QA core requires assembleDebug', 'QA core requires assembleDebug',
+                'QA core requires assembleDebug',
+                'QA core requires an explicit AAR path and lowercase SHA256.',
+                'QA core AAR checksum mismatch.',
+                'QA core requires its bounded, auditable build manifest.',
+                'QA core build manifest does not match the reviewed debug trust artifact.'])
+            self.assertIsNone(calls[-1][3])
+            self.assertFalse(any(value.startswith('-PluoboQaCoreSha256=') for value in calls[3][0]))
+            self.assertIn('-PluoboQaCoreSha256=' + '0' * 64, calls[4][0])
+            alias = job.w / 'negative/missing-provenance.aar'
+            for row in calls[5:7]:
+                self.assertIn('-PluoboQaCoreAar=' + str(alias), row[0])
+                self.assertIn('-PluoboQaCoreSha256=' + controller.s.sha(alias), row[0])
+            self.assertEqual(json.loads(alias.with_suffix('.build.json').read_bytes())['qa_overlay_sha256'], '0' * 64)
+            # Real cmd's exact argv guard must reject root/other project/non-Debug
+            # targets before reaching any origin or native/tool requirement.
+            env = controller.parent.environment(job.w, True)
+            for selector in ['assembleDebug', ':audio_session:assembleDebug', ':app:assembleRelease']:
+                bad = controller.parent.Job.gradle(job, selector)
+                with self.subTest(selector=selector), self.assertRaises(ValueError):
+                    controller.Job.cmd(job, bad, job.w / 'source/app/android', env, 'assemble-debug', 1800)
+            with patch.object(controller.rich_origins, 'require_origin_binding', side_effect=ReachedOrigin):
+                with self.assertRaises(ReachedOrigin):
+                    controller.Job.cmd(job, job.gradle('assembleDebug'), job.w / 'source/app/android', env, 'assemble-debug', 1800)
+            self.assertIn('dependencies', job.gradle('dependencies', offline=False))
+            self.assertNotIn(':app:dependencies', job.gradle('dependencies', offline=False))
 
 
 if __name__ == '__main__':

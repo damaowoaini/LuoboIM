@@ -258,14 +258,14 @@
       "sha256": "4846a1d6fd256dc2a13f6f54a692801c771df1379f4db066f1437a921bd1c0b0"
     },
     {
-      "bytes": 31893,
+      "bytes": 32303,
       "path": "ci/android-current363/run.py",
-      "sha256": "45f79b263fae02e82f467738ba86262de2b6861909d11fe0e930cec0ef498387"
+      "sha256": "12abed1389f51005364cecebb5ea49f20bd76e03983d15fa018e2b56507a25be"
     },
     {
-      "bytes": 7680,
+      "bytes": 12307,
       "path": "ci/android-current363/test_identity.py",
-      "sha256": "7bcfb6f99b657437ecbfa0e7b25f9831b65e9602951054fd6db28cc2df7ab295"
+      "sha256": "11fccf63bc986ed5c83389c5703c2fb29765032bfcb3c523397daf05ddd594a0"
     },
     {
       "bytes": 3621,

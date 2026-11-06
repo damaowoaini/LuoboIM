@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_four_scenarios_managed_producer1top13sub_kafka1top3sub_two_packages_one_command",
   "source": {
     "members": 1576,
-    "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+    "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 163190,
-      "sha256": "b6d9aa26d7c0c74999be9a961387776d4b055f079a5c84d323547989573082ca"
+      "bytes": 180418,
+      "sha256": "77261c8507ca4985d0fe0c98ace7ac077326c1ccfb56f9860db4afbce5261ab1"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 90267,
-      "sha256": "a45ade0e28538851fcf83dfdd211a61b7a17c9eea632cf27a79aac97936de84b"
+      "bytes": 95538,
+      "sha256": "6b884236619f9a2ec8393b3eacbef4007dac7eeecd30e21b835fb475b44d4369"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 157429,
-      "sha256": "911441ef4ec7f212c8e0f9d51bf400ef18d74e637456795b5bb4172b12571994"
+      "bytes": 167075,
+      "sha256": "f8e007cda9e3373d3689226a2eeabae3586bc36198ea917f6dc2f5621eb1da70"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -1747,8 +1747,8 @@
       "target": "server/pkg/common/db/cache/group_authority_invalidator_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/pkg/common/db/cache/group_authority_invalidator_test.go",
       "beforeSHA256": "bac084a0a4cef86e044478d3d10dd17ab6526b83b7abeed09909064036a63cf2",
-      "bytes": 12325,
-      "sha256": "b19daee1eb934bd08e079487f730b0da9f125dc6d5bdb528695b28290a9427c6"
+      "bytes": 12326,
+      "sha256": "21d806aef240c2953b682848dbb622e44e1c86ea2a730d3603e13416f72115e9"
     }
   ],
   "allowedOverlayTargets": [
@@ -4542,9 +4542,7 @@
     "otherKafkaOrRedisTestsDispatched": false
   },
   "kafkaACLPassedReuse": null,
-  "kafkaACLTestsToRun": [
-    "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-  ],
+  "kafkaACLTestsToRun": [],
   "kafkaACLHistoricalPass": {
     "schema": 1,
     "kind": "root-accepted-kafka-acl-source-bound-reuse-v1",
@@ -5431,80 +5429,8 @@
     "originalTwoPackageScopeAccepted": false,
     "producerPackageStarted": false
   },
-  "currentGroupRecoveryControl": {
-    "phase": "current-group-recovery-controls",
-    "targets": {
-      "pkg/common/db/cache": [
-        "TestGroupAuthorityInvalidatorOwnsFiniteClientWithoutChangingSharedOptions",
-        "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime"
-      ],
-      "internal/msgtransfer": [
-        "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
-      ],
-      "internal/namespaceimport/ownedcontrol": [
-        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-      ]
-    },
-    "requiredSubtests": {
-      "pkg/common/db/cache": {
-        "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime": [
-          "single-node-independent-options-and-close",
-          "cluster-independent-options-and-close",
-          "closing-base-keeps-existing-recovery",
-          "actual-driver-ack-keeps-original-owner",
-          "actual-driver-lost-ack-retires-only-recovery",
-          "parent-cancel-refuses-rebuild",
-          "foreign-and-malformed-owned-clients-refused"
-        ]
-      },
-      "internal/msgtransfer": {
-        "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape": [
-          "producer-and-child-loader-roundtrip",
-          "alphabetic-map-reorder",
-          "unknown-field",
-          "missing-field",
-          "duplicate-field",
-          "wrong-value-type",
-          "null-string",
-          "wrong-pin",
-          "public-file",
-          "symlink-file",
-          "hardlink-file",
-          "trailing-json",
-          "missing-file"
-        ]
-      },
-      "internal/namespaceimport/ownedcontrol": {
-        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
-          "create-reply-error-and-shape-cannot-be-a-success",
-          "describe-reply-error-and-shape-cannot-replace-exact-deny",
-          "new-deny-visibility-is-bounded-without-grace-for-existing-denies"
-        ]
-      }
-    },
-    "goTimeoutSeconds": 180,
-    "phaseGuardSeconds": 600,
-    "topPASS": 4,
-    "subPASS": 23,
-    "packages": 3,
-    "goCommandInvocations": 1,
-    "packageExecutions": 3,
-    "samePackageInvocation": false,
-    "newDatabaseFixtures": 0,
-    "wholePackagePASS": false
-  },
-  "currentGroupRecoveryTargets": {
-    "pkg/common/db/cache": [
-      "TestGroupAuthorityInvalidatorOwnsFiniteClientWithoutChangingSharedOptions",
-      "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime"
-    ],
-    "internal/msgtransfer": [
-      "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
-    ],
-    "internal/namespaceimport/ownedcontrol": [
-      "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-    ]
-  },
+  "currentGroupRecoveryControl": null,
+  "currentGroupRecoveryTargets": {},
   "groupRecoveryHistoricalFacts": {
     "kind": "group-recovery-original-349-controls-historical-facts-v1",
     "source": {
@@ -5727,5 +5653,213 @@
     "acceptanceEvidence": false,
     "panicPrefixClassesLimit": 8,
     "wrapperLimit": 8
+  },
+  "currentCacheTestDeltaControl": {
+    "phase": "current-cache-test-delta-controls",
+    "targets": {
+      "pkg/common/db/cache": [
+        "TestGroupAuthorityInvalidatorOwnsFiniteClientWithoutChangingSharedOptions",
+        "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime"
+      ]
+    },
+    "requiredSubtests": {
+      "pkg/common/db/cache": {
+        "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime": [
+          "single-node-independent-options-and-close",
+          "cluster-independent-options-and-close",
+          "closing-base-keeps-existing-recovery",
+          "actual-driver-ack-keeps-original-owner",
+          "actual-driver-lost-ack-retires-only-recovery",
+          "parent-cancel-refuses-rebuild",
+          "foreign-and-malformed-owned-clients-refused"
+        ]
+      }
+    },
+    "goTimeoutSeconds": 180,
+    "phaseGuardSeconds": 600,
+    "topPASS": 2,
+    "subPASS": 7,
+    "packages": 1,
+    "goCommandInvocations": 1,
+    "packageExecutions": 1,
+    "newDatabaseFixtures": 0,
+    "wholePackagePASS": false
+  },
+  "cacheTestDeltaTestsToRun": [
+    "TestGroupAuthorityInvalidatorOwnsFiniteClientWithoutChangingSharedOptions",
+    "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime"
+  ],
+  "cacheTestDeltaPackageReuse": {
+    "version": "exact-cache-test-delta-completed-package-compatibility-v1",
+    "originalBinding": {
+      "schema": 1,
+      "kind": "root-accepted-two-completed-packages-in-failed-cache-command-v1",
+      "run": 42215107940,
+      "job": 127883050593,
+      "head": "1ef9d4920278da3aa407a2c8f6d4fc37fd12896b",
+      "attempt": 1,
+      "source": {
+        "members": 1576,
+        "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+      },
+      "rootReviewSHA256": "3b0ff325cd616925e89c1d36b69a2c3e9f4a8c92469195171b14eded0837d02f",
+      "artifactID": 13501560279,
+      "artifactSHA256": "170825c7e45f76c38a9af6ace929f13464512823850ae339d8936af27140389b",
+      "eventsSHA256": "5830ce62ab57d7560dce479259cc5356309a08ae867cf4e1e46df63915eaee81",
+      "phaseSHA256": "489ea6a494e0ba87d4d4659418eb1676161e7dcc47945148870dee31416aeebd",
+      "sourcePostSHA256": "ec0213a4e905f6acdd29b214d0371027e50b16014876e1407f9a202bd2f36824",
+      "toolsSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+      "GoToolBodyAndMode": {
+        "bytes": 17164055,
+        "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+        "mode": 493
+      },
+      "completedPackages": {
+        "internal/msgtransfer": {
+          "source": {
+            "members": 1576,
+            "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+          },
+          "topPASS": 1,
+          "subPASS": 13,
+          "skip": 0,
+          "fail": 0,
+          "namedCompletions": [
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/alphabetic-map-reorder"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/duplicate-field"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/hardlink-file"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-field"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-file"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/null-string"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/producer-and-child-loader-roundtrip"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/public-file"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/symlink-file"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/trailing-json"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/unknown-field"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-pin"
+            },
+            {
+              "package": "internal/msgtransfer",
+              "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-value-type"
+            }
+          ],
+          "originalPackageFooterPASS": true,
+          "wholePackagePASS": false,
+          "runtimeAccepted": false
+        },
+        "internal/namespaceimport/ownedcontrol": {
+          "source": {
+            "members": 1576,
+            "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+          },
+          "topPASS": 1,
+          "subPASS": 3,
+          "skip": 0,
+          "fail": 0,
+          "namedCompletions": [
+            {
+              "package": "internal/namespaceimport/ownedcontrol",
+              "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+            },
+            {
+              "package": "internal/namespaceimport/ownedcontrol",
+              "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+            },
+            {
+              "package": "internal/namespaceimport/ownedcontrol",
+              "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+            },
+            {
+              "package": "internal/namespaceimport/ownedcontrol",
+              "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+            }
+          ],
+          "originalPackageFooterPASS": true,
+          "wholePackagePASS": false,
+          "runtimeAccepted": false
+        }
+      },
+      "originalGoCommandPassed": false,
+      "originalWholeScopeAccepted": false,
+      "cachePackagePassed": false,
+      "sameWholeSourceForLaterTestDelta": false,
+      "onlyExplicitExactTestDeltaCompatibilityMayConsume": true,
+      "currentFreshCacheRequired": true,
+      "runtimeAccepted": false
+    },
+    "currentSource": {
+      "members": 1576,
+      "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
+    },
+    "originalSource": {
+      "members": 1576,
+      "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+    },
+    "delta": {
+      "target": "server/pkg/common/db/cache/group_authority_invalidator_test.go",
+      "before": {
+        "bytes": 12325,
+        "sha256": "b19daee1eb934bd08e079487f730b0da9f125dc6d5bdb528695b28290a9427c6"
+      },
+      "after": {
+        "bytes": 12326,
+        "sha256": "21d806aef240c2953b682848dbb622e44e1c86ea2a730d3603e13416f72115e9"
+      },
+      "contextStart": "\tt.Run(\"cluster-independent-options-and-close\", func(t *testing.T) {",
+      "contextEnd": "\tt.Run(\"closing-base-keeps-existing-recovery\", func(t *testing.T) {",
+      "oldLiteral": "opts.MaxRetries != 0",
+      "newLiteral": "opts.MaxRetries != -1",
+      "occurrences": 1
+    },
+    "sameWholeSource": false,
+    "originalGoCommandPassed": false,
+    "originalWholeScopeAccepted": false,
+    "oldCachePackagePassed": false,
+    "compatibilityOnlyForNamedCompletedPackages": true,
+    "actualCurrentProducerCommands": 0,
+    "actualCurrentKafkaCommands": 0,
+    "actualCurrentPackageExecutionsForReusedFacts": 0,
+    "runtimeAccepted": false,
+    "wholeSourceAccepted": false,
+    "wholePackagePASS": false
   }
 }

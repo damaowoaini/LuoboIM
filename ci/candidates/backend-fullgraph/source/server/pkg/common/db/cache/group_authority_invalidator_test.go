@@ -133,7 +133,7 @@ func TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime
 		invalidator, recovery := checkOwned(t, base)
 		original := base.UniversalClient.(*redis.ClusterClient).Options()
 		opts := recovery.UniversalClient.(*redis.ClusterClient).Options()
-		if !opts.ContextTimeoutEnabled || opts.DialTimeout != time.Second || opts.ReadTimeout != time.Second || opts.WriteTimeout != time.Second || opts.PoolTimeout != time.Second || opts.MaxRetries != 0 || opts.MaxRedirects != 0 || opts.DialerRetries != 1 || len(opts.Addrs) != 1 || opts.Addrs[0] != original.Addrs[0] {
+		if !opts.ContextTimeoutEnabled || opts.DialTimeout != time.Second || opts.ReadTimeout != time.Second || opts.WriteTimeout != time.Second || opts.PoolTimeout != time.Second || opts.MaxRetries != -1 || opts.MaxRedirects != 0 || opts.DialerRetries != 1 || len(opts.Addrs) != 1 || opts.Addrs[0] != original.Addrs[0] {
 			t.Fatal("owned cluster recovery options differ")
 		}
 		opts.Addrs[0] = "synthetic-foreign:1"

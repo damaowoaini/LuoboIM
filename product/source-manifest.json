@@ -9208,11 +9208,11 @@
       "sha256": "dd363114f869c1d78e872049c27bfba3e9b6794217b0ba77133be9df87a4e06c"
     },
     {
-      "bytes": 12325,
+      "bytes": 12326,
       "mode": 420,
       "path": "server/pkg/common/db/cache/group_authority_invalidator_test.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "b19daee1eb934bd08e079487f730b0da9f125dc6d5bdb528695b28290a9427c6"
+      "sha256": "21d806aef240c2953b682848dbb622e44e1c86ea2a730d3603e13416f72115e9"
     },
     {
       "bytes": 1916,
@@ -13177,7 +13177,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "292cf9b63e3e5949db54acb23dd195b0871432163c5432951b3784a79c07eef1",
+  "filesSHA256": "9c441624e19f9aa8551c790c50f9d30e681edce43960cfd26433b60f1e83519b",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13235,7 +13235,7 @@
     },
     "server": {
       "members": 1576,
-      "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+      "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
     }
   },
   "state": "MATERIALIZED_SOURCE_ONLY"

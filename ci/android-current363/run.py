@@ -42,6 +42,7 @@ SOURCE_DIGEST='07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f'
 BUSINESS_DIGEST='a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475'
 PORTABLE_DIGEST='0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f'
 STAGES=['setup','restore','preseal','gradle-setup','apk']
+APP_DEBUG_TASK=':app:assembleDebug'
 
 
 def read(path):return json.loads(Path(path).read_bytes())
@@ -147,6 +148,12 @@ def metadata():
 
 
 class Job(generic.Job):
+    def gradle(self,task,offline=True,aar=None,digest=None):
+        # The inherited Debug intent targets this APK, not every library AAR's
+        # same-named lifecycle task. Artifact-negative probes share this scope.
+        selected=APP_DEBUG_TASK if task=='assembleDebug' else task
+        return parent.Job.gradle(self,selected,offline=offline,aar=aar,digest=digest)
+
     def __init__(self,work,inputs,tools,budget,context):
         super().__init__(work,inputs,tools,budget,context)
 
