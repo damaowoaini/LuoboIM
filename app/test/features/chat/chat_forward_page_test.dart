@@ -72,11 +72,16 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> openConfirmation(WidgetTester tester) async {
+  Future<VoidCallback> openConfirmation(WidgetTester tester) async {
     await tester.longPress(find.text('可直接转发的原文'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('转发到聊天'));
     await tester.pumpAndSettle();
+    final tile = tester.widget<ListTile>(
+      find.ancestor(of: find.text('目标会话'), matching: find.byType(ListTile)),
+    );
+    expect(tile.onTap, isNotNull);
+    final originalTap = tile.onTap!;
     await tester.tap(find.text('目标会话'));
     await tester.pumpAndSettle();
     expect(find.text('转发给 目标会话？'), findsOneWidget);
@@ -84,6 +89,7 @@ void main() {
       harness.calls.where((call) => call.method == 'sendMessage'),
       isEmpty,
     );
+    return originalTap;
   }
 
   testWidgets(
@@ -658,11 +664,7 @@ void main() {
       };
       await mount(tester);
       try {
-        await openConfirmation(tester);
-        final tile = tester.widget<ListTile>(
-          find.ancestor(of: find.text('目标会话'), matching: find.byType(ListTile)),
-        );
-        final originalTap = tile.onTap!;
+        final originalTap = await openConfirmation(tester);
         await tester.tap(find.widgetWithText(TextButton, '发送'));
         await tester.pumpAndSettle();
         expect(find.textContaining('转发结果未确认'), findsWidgets);
@@ -799,6 +801,8 @@ void main() {
       await mount(tester);
       try {
         await tester.longPress(find.text('可直接转发的原文'));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('多选消息'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('多选消息'));
         await tester.pumpAndSettle();

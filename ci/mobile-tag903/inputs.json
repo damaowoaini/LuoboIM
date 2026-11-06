@@ -12,24 +12,19 @@
   },
   "source": {
     "members": 363,
-    "digest": "8a84a1535d460aab38db8994018a0b1c262b9b30ecb37272c2efcf30bf544a33"
+    "digest": "a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475"
   },
   "portable": {
     "members": 415,
-    "digest": "031581d805c34e107a70aede311b7c51007c43dc60b31d0c254aeacaae2cdd27"
+    "digest": "0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f"
   },
   "analysis_paths": [
-    "test/features/chat/chat_forward_page_test.dart"
+    "test/features/chat/chat_forward_page_test.dart",
+    "test/features/favorite/favorite_forward_privacy_test.dart"
   ],
   "test_paths": [
     "test/features/chat/chat_forward_page_test.dart",
-    "test/features/favorite/favorite_forward_privacy_test.dart",
-    "test/features/chat/chat_favorite_test.dart",
-    "test/features/chat/batch_page_test.dart",
-    "test/features/favorite/favorite_pages_test.dart",
-    "test/features/chat/global_history_clear_test.dart",
-    "test/features/chat/mention_forward_test.dart",
-    "test/features/chat/legacy_custom_summary_test.dart"
+    "test/features/favorite/favorite_forward_privacy_test.dart"
   ],
   "names8": [
     "tag903 sound has a restricted audio projection without changing custom identity",
@@ -125,18 +120,18 @@
   "controllers": [
     {
       "path": "ci/mobile-tag903.py",
-      "bytes": 50361,
-      "sha256": "8bc1acb369a7d0902719277df417503434c616296c78a77565324a966bf79d30"
+      "bytes": 69866,
+      "sha256": "e9ded1964f2293c8e90de2b970e505198bd2e1b9707de692f9675eb0bcdfe55e"
     },
     {
       "path": ".github/workflows/mobile-tag903.yml",
-      "bytes": 2721,
-      "sha256": "9f127c1505233cb7a831ca43f019a728ab0ee9f38e33f312032c3c189f5e851f"
+      "bytes": 2731,
+      "sha256": "ea3692800c67c7b86286528a6d3d56b069a5b9ed176392c620ed0dd4c0207b17"
     },
     {
       "path": "ci/mobile-tag903/test_progress.py",
-      "bytes": 4122,
-      "sha256": "4e1e332149119c6deaab7cf15eece4a4ff0ca0f15580093bc7366007001cd16c"
+      "bytes": 5671,
+      "sha256": "671870f96a19025e0c1883c69572003a20ef4b7a1833783895d7d485632dea47"
     }
   ],
   "provenance": {
@@ -279,6 +274,26 @@
       "prior39CompletedNamesAvailable": false,
       "prior39Accepted": false,
       "priorFinalSourceAndToolSnapshotsAvailable": false
+    },
+    "fixture3Followup": {
+      "sourceCandidate": {
+        "path": "references/integration/mobile39-three-fixtures-20261106-candidate/candidate-manifest.json",
+        "bytes": 3085,
+        "sha256": "6c8a9faacf9cc6e2d075a17e512e7f1d0f28c6c42634924b2e5ab7db591bc8af"
+      },
+      "original39RootReview": {
+        "path": ".qa/targeted-recovery-batch-20261106/root-aab-mobile39-36pass-3fixture-fail-review.json",
+        "bytes": 5203,
+        "sha256": "8581f9729920313e486ce5ab287f59f8a1fd535d80581cac6a2963c26d2fab37"
+      },
+      "freshFormatAnalysisPlanned": 2,
+      "priorBoundaryAnalysis4": true,
+      "oldAnalysis7Unchanged": true,
+      "freshTestsPlanned": 5,
+      "originalRuntime34RetainedOnly": true,
+      "freshCurrent39Claimed": false,
+      "localDartFormatAnalyzeExecuted": false,
+      "localFlutterExecuted": false
     }
   },
   "historical_partial5": {
@@ -585,8 +600,8 @@
       },
       "after": {
         "path": "app/test/features/chat/chat_forward_page_test.dart",
-        "bytes": 33970,
-        "sha256": "3979648795efbf399949e997d6df9339945a1e48b814fb6591df0a1c8003efcf"
+        "bytes": 34142,
+        "sha256": "501eb59c543c6ba101e7639cc62b09325e85693800b2858dc8c88954638233cb"
       }
     },
     {
@@ -624,8 +639,8 @@
       },
       "after": {
         "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
-        "bytes": 12980,
-        "sha256": "263e265fbff2e8a41159dabe36e9f40bad3a1c472e42efd44821b9f57bb6823b"
+        "bytes": 12995,
+        "sha256": "9e08bed20d3acff2b5c171d9c909868f7a7823284e00a232b66361c3d900d3ab"
       }
     },
     {
@@ -997,7 +1012,17 @@
     "fullExecuted": false,
     "currentSelectedOnly": 39
   },
-  "selected_names39": [
+  "universe_test_paths8": [
+    "test/features/chat/chat_forward_page_test.dart",
+    "test/features/favorite/favorite_forward_privacy_test.dart",
+    "test/features/chat/chat_favorite_test.dart",
+    "test/features/chat/batch_page_test.dart",
+    "test/features/favorite/favorite_pages_test.dart",
+    "test/features/chat/global_history_clear_test.dart",
+    "test/features/chat/mention_forward_test.dart",
+    "test/features/chat/legacy_custom_summary_test.dart"
+  ],
+  "universe_names39": [
     "forward dispatch observation stays at the real SDK send edge for ordinary and at-text creation",
     "single forwarding real post-create reread rejects a deleted source without adopting a new body",
     "single forwarding real post-create reread rejects a replaced source without adopting a new body",
@@ -1038,7 +1063,14 @@
     "tag903 forwarding retains original owner and privacy fences while native creation waits",
     "meeting905 retains original owner and privacy fences while native creation waits"
   ],
-  "prior_static5": {
+  "selected_names5": [
+    "single unknown dispatch blocks replay and explicit review keeps the original confirmed destination",
+    "favorite unknown dispatch blocks replay and reviews only its original confirmed account",
+    "merge picker route retirement also fences the original native dispatch callback",
+    "chat long press forwards one original message after explicit destination confirmation",
+    "ordinary favorite forwarding still reaches exactly the confirmed account once"
+  ],
+  "prior_static4": {
     "status": "same-body-analysis-pass-at-original-before-target39-boundary-only",
     "repository": "damaowoaini/LuoboIM",
     "head": "fd8ecc48de81ab21a9654b4ef20c25d55abe4471",
@@ -1107,16 +1139,6 @@
         "passedAtBeforeTarget39Boundary": true
       },
       {
-        "path": "test/features/favorite/favorite_forward_privacy_test.dart",
-        "originalPhase": "tag903-analyze-5",
-        "source": {
-          "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
-          "bytes": 12980,
-          "sha256": "263e265fbff2e8a41159dabe36e9f40bad3a1c472e42efd44821b9f57bb6823b"
-        },
-        "passedAtBeforeTarget39Boundary": true
-      },
-      {
         "path": "test/features/chat/chat_favorite_test.dart",
         "originalPhase": "tag903-analyze-6",
         "source": {
@@ -1127,5 +1149,323 @@
         "passedAtBeforeTarget39Boundary": true
       }
     ]
+  },
+  "runtime_reuse34": {
+    "status": "original-source-testPASS34-same-production-and-narrow-fixture-projection-only",
+    "head": "aab27f77458418b0c7276764665f31e0c4144067",
+    "run": 42152657597,
+    "job": 127679311416,
+    "attempt": 1,
+    "RootReview": {
+      "path": ".qa/targeted-recovery-batch-20261106/root-aab-mobile39-36pass-3fixture-fail-review.json",
+      "bytes": 5203,
+      "sha256": "8581f9729920313e486ce5ab287f59f8a1fd535d80581cac6a2963c26d2fab37"
+    },
+    "compactArtifact": {
+      "run": 42152657597,
+      "head": "aab27f77458418b0c7276764665f31e0c4144067",
+      "attempt": 1,
+      "artifactID": 13472878074,
+      "bytes": 48379,
+      "sha256": "d3611d9151cc7817c502f71131522302f48daaf7583b6f13a73fa5896fd19adb",
+      "exactAPIDigest": true,
+      "files": 27,
+      "binaryDownloaded": false
+    },
+    "originalSource": {
+      "members": 363,
+      "digest": "8a84a1535d460aab38db8994018a0b1c262b9b30ecb37272c2efcf30bf544a33"
+    },
+    "originalPortable": {
+      "members": 415,
+      "digest": "031581d805c34e107a70aede311b7c51007c43dc60b31d0c254aeacaae2cdd27"
+    },
+    "originalMachineLog": {
+      "path": ".qa/targeted-recovery-batch-20261106/mobile-artifact/tag903-target39.log",
+      "bytes": 34671,
+      "sha256": "8320ef075ce9f54ca9ed2d4a4214304edb2776b99079793d1f958503b92e34ea"
+    },
+    "originalSourcePost": {
+      "path": ".qa/targeted-recovery-batch-20261106/mobile-artifact/tag903-source-post.json",
+      "bytes": 373,
+      "sha256": "104ce188f64b90cf9baad6689c5af04ef637037085645e157a42f6eb0557af47"
+    },
+    "originalToolsBefore": {
+      "path": ".qa/targeted-recovery-batch-20261106/mobile-artifact/tag903-tools-before.json",
+      "bytes": 477,
+      "sha256": "31f7fb8913a23ac9acdf636d9116b8f19c1ea101dc6af2a94c7edb2293f337fb"
+    },
+    "originalToolsAfter": {
+      "path": ".qa/targeted-recovery-batch-20261106/mobile-artifact/tag903-tools-after.json",
+      "bytes": 477,
+      "sha256": "31f7fb8913a23ac9acdf636d9116b8f19c1ea101dc6af2a94c7edb2293f337fb"
+    },
+    "productionLib": {
+      "members": 182,
+      "digest": "0e579b2b8ecf7f41f3483af848651140aca18df1abb4b7f824ba2fd7fad41b0f"
+    },
+    "originalSourceAndToolPostExact": true,
+    "originalRunAccepted": false,
+    "originalExact39Completed": 39,
+    "originalPassedNames36": [
+      "forwarding stops when refreshed destination identity differs from the confirmed account",
+      "chat long press forwards one original message after explicit destination confirmation",
+      "source changing to private during confirmation is rejected before native creation or send",
+      "account exit while selecting a destination cancels forwarding before any write dispatch",
+      "tag903 text metadata forwards through the actual menu and preserves custom JSON",
+      "meeting905 card displays original fields and forwards the unchanged custom invitation",
+      "single forward rejects body replacement after native creation without renewing its source intent",
+      "single forward rejects CID clear after native creation without renewing its source intent",
+      "single forward rejects owner exit after native creation without renewing its source intent",
+      "single forward source route cannot revive after foreign coverage while native create waits",
+      "single forward preserves definitive 1302 rejection without an unknown replay lock",
+      "single forward preserves definitive 1303 rejection without an unknown replay lock",
+      "single review handoff rejects owner replacement after push before its first builder without new account SDK reads",
+      "favorite forwarding refuses target identity changes after the confirmed lease",
+      "favorite forwarding refuses source denial changes after the confirmed lease",
+      "favorite forwarding refuses history clear changes after the confirmed lease",
+      "favorite forwarding refuses during create changes after the confirmed lease",
+      "ordinary favorite forwarding still reaches exactly the confirmed account once",
+      "favorite source route cannot revive after foreign coverage while native create waits",
+      "favorite rechecks the confirmed destination after native creation before dispatch",
+      "favorite preserves a definitive friendship rejection without creating a forward hint or unknown result",
+      "forward strips local paths, retains extensions and sends a new native identity",
+      "exit during native forward creation fences the later send dispatch",
+      "forward dispatch observation stays at the real SDK send edge for ordinary and at-text creation",
+      "single forwarding real post-create reread rejects a deleted source without adopting a new body",
+      "single forwarding real post-create reread rejects a replaced source without adopting a new body",
+      "merge reuses one stable-ID destination picker and generic count confirmation without copying bodies into its dialog",
+      "a merge send with unknown ACK is terminal in the picker and a second tap cannot repeat it",
+      "opening an old private favorite forwarding screen cannot list recipients or dispatch SDK work",
+      "opening an old forwarding screen after account switch never initializes or lists the new account SDK",
+      "forward creation cannot renew its lease and send an old snapshot after clear",
+      "forwarding at-text to a singlechat preserves original metadata in a standard non-pinging single merge",
+      "forwarding at-text to a different-membership group preserves original metadata in a standard non-pinging single merge",
+      "private facts learned while the at-forward merge is created still block final send",
+      "tag903 forwarding retains original owner and privacy fences while native creation waits",
+      "meeting905 retains original owner and privacy fences while native creation waits"
+    ],
+    "originalFailedNames3": [
+      "single unknown dispatch blocks replay and explicit review keeps the original confirmed destination",
+      "merge picker route retirement also fences the original native dispatch callback",
+      "favorite unknown dispatch blocks replay and reviews only its original confirmed account"
+    ],
+    "freshNames5StillRequired": [
+      "single unknown dispatch blocks replay and explicit review keeps the original confirmed destination",
+      "favorite unknown dispatch blocks replay and reviews only its original confirmed account",
+      "merge picker route retirement also fences the original native dispatch callback",
+      "chat long press forwards one original message after explicit destination confirmation",
+      "ordinary favorite forwarding still reaches exactly the confirmed account once"
+    ],
+    "reusedNames34": [
+      "forward dispatch observation stays at the real SDK send edge for ordinary and at-text creation",
+      "single forwarding real post-create reread rejects a deleted source without adopting a new body",
+      "single forwarding real post-create reread rejects a replaced source without adopting a new body",
+      "single forward rejects body replacement after native creation without renewing its source intent",
+      "single forward rejects CID clear after native creation without renewing its source intent",
+      "single forward rejects owner exit after native creation without renewing its source intent",
+      "single forward source route cannot revive after foreign coverage while native create waits",
+      "single forward preserves definitive 1302 rejection without an unknown replay lock",
+      "single forward preserves definitive 1303 rejection without an unknown replay lock",
+      "single review handoff rejects owner replacement after push before its first builder without new account SDK reads",
+      "favorite source route cannot revive after foreign coverage while native create waits",
+      "favorite rechecks the confirmed destination after native creation before dispatch",
+      "favorite preserves a definitive friendship rejection without creating a forward hint or unknown result",
+      "forwarding stops when refreshed destination identity differs from the confirmed account",
+      "source changing to private during confirmation is rejected before native creation or send",
+      "account exit while selecting a destination cancels forwarding before any write dispatch",
+      "tag903 text metadata forwards through the actual menu and preserves custom JSON",
+      "meeting905 card displays original fields and forwards the unchanged custom invitation",
+      "merge reuses one stable-ID destination picker and generic count confirmation without copying bodies into its dialog",
+      "a merge send with unknown ACK is terminal in the picker and a second tap cannot repeat it",
+      "favorite forwarding refuses target identity changes after the confirmed lease",
+      "favorite forwarding refuses source denial changes after the confirmed lease",
+      "favorite forwarding refuses history clear changes after the confirmed lease",
+      "favorite forwarding refuses during create changes after the confirmed lease",
+      "opening an old private favorite forwarding screen cannot list recipients or dispatch SDK work",
+      "opening an old forwarding screen after account switch never initializes or lists the new account SDK",
+      "forward strips local paths, retains extensions and sends a new native identity",
+      "exit during native forward creation fences the later send dispatch",
+      "forward creation cannot renew its lease and send an old snapshot after clear",
+      "forwarding at-text to a singlechat preserves original metadata in a standard non-pinging single merge",
+      "forwarding at-text to a different-membership group preserves original metadata in a standard non-pinging single merge",
+      "private facts learned while the at-forward merge is created still block final send",
+      "tag903 forwarding retains original owner and privacy fences while native creation waits",
+      "meeting905 retains original owner and privacy fences while native creation waits"
+    ],
+    "universeNames39": [
+      "forward dispatch observation stays at the real SDK send edge for ordinary and at-text creation",
+      "single forwarding real post-create reread rejects a deleted source without adopting a new body",
+      "single forwarding real post-create reread rejects a replaced source without adopting a new body",
+      "single forward rejects body replacement after native creation without renewing its source intent",
+      "single forward rejects CID clear after native creation without renewing its source intent",
+      "single forward rejects owner exit after native creation without renewing its source intent",
+      "single forward source route cannot revive after foreign coverage while native create waits",
+      "single unknown dispatch blocks replay and explicit review keeps the original confirmed destination",
+      "single forward preserves definitive 1302 rejection without an unknown replay lock",
+      "single forward preserves definitive 1303 rejection without an unknown replay lock",
+      "merge picker route retirement also fences the original native dispatch callback",
+      "single review handoff rejects owner replacement after push before its first builder without new account SDK reads",
+      "favorite source route cannot revive after foreign coverage while native create waits",
+      "favorite rechecks the confirmed destination after native creation before dispatch",
+      "favorite unknown dispatch blocks replay and reviews only its original confirmed account",
+      "favorite preserves a definitive friendship rejection without creating a forward hint or unknown result",
+      "forwarding stops when refreshed destination identity differs from the confirmed account",
+      "chat long press forwards one original message after explicit destination confirmation",
+      "source changing to private during confirmation is rejected before native creation or send",
+      "account exit while selecting a destination cancels forwarding before any write dispatch",
+      "tag903 text metadata forwards through the actual menu and preserves custom JSON",
+      "meeting905 card displays original fields and forwards the unchanged custom invitation",
+      "merge reuses one stable-ID destination picker and generic count confirmation without copying bodies into its dialog",
+      "a merge send with unknown ACK is terminal in the picker and a second tap cannot repeat it",
+      "favorite forwarding refuses target identity changes after the confirmed lease",
+      "favorite forwarding refuses source denial changes after the confirmed lease",
+      "favorite forwarding refuses history clear changes after the confirmed lease",
+      "favorite forwarding refuses during create changes after the confirmed lease",
+      "ordinary favorite forwarding still reaches exactly the confirmed account once",
+      "opening an old private favorite forwarding screen cannot list recipients or dispatch SDK work",
+      "opening an old forwarding screen after account switch never initializes or lists the new account SDK",
+      "forward strips local paths, retains extensions and sends a new native identity",
+      "exit during native forward creation fences the later send dispatch",
+      "forward creation cannot renew its lease and send an old snapshot after clear",
+      "forwarding at-text to a singlechat preserves original metadata in a standard non-pinging single merge",
+      "forwarding at-text to a different-membership group preserves original metadata in a standard non-pinging single merge",
+      "private facts learned while the at-forward merge is created still block final send",
+      "tag903 forwarding retains original owner and privacy fences while native creation waits",
+      "meeting905 retains original owner and privacy fences while native creation waits"
+    ],
+    "currentWhole39Accepted": false,
+    "freshCurrent39Executed": false,
+    "testSourcePins": [
+      {
+        "path": "app/test/features/chat/chat_forward_page_test.dart",
+        "bytes": 34142,
+        "sha256": "501eb59c543c6ba101e7639cc62b09325e85693800b2858dc8c88954638233cb"
+      },
+      {
+        "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+        "bytes": 12995,
+        "sha256": "9e08bed20d3acff2b5c171d9c909868f7a7823284e00a232b66361c3d900d3ab"
+      },
+      {
+        "path": "app/test/features/chat/chat_favorite_test.dart",
+        "bytes": 12646,
+        "sha256": "e89b0857128a6b347f70f854280f731f612c69a2eef6c53c4a715965a57278e7"
+      },
+      {
+        "path": "app/test/features/chat/batch_page_test.dart",
+        "bytes": 9601,
+        "sha256": "470dc4e30ca07b71b9f0dca19098de3cad6f553378f8175a6e0d442e78edf76a"
+      },
+      {
+        "path": "app/test/features/favorite/favorite_pages_test.dart",
+        "bytes": 12623,
+        "sha256": "15291d98cf9be88f09ee8e06d2b7d13b7af52660021a1994269f48082fcd54e6"
+      },
+      {
+        "path": "app/test/features/chat/global_history_clear_test.dart",
+        "bytes": 12175,
+        "sha256": "7ce9634305d6aa47596ab0cf1c515d091873f041001f3436e85ba047f06d1ee8"
+      },
+      {
+        "path": "app/test/features/chat/mention_forward_test.dart",
+        "bytes": 5598,
+        "sha256": "d18e0464781b2bbbea8f941441a24f54935721aee0874087e9134a731e98e5a6"
+      },
+      {
+        "path": "app/test/features/chat/legacy_custom_summary_test.dart",
+        "bytes": 66470,
+        "sha256": "0cd58e9eeb28d5a042fef5e99f563cb7cfcf983a7cc43d4261bea5ad1bab5449"
+      }
+    ],
+    "changedFixtureProjection": [
+      {
+        "path": "app/test/features/chat/chat_forward_page_test.dart",
+        "before": {
+          "path": "app/test/features/chat/chat_forward_page_test.dart",
+          "bytes": 33970,
+          "sha256": "3979648795efbf399949e997d6df9339945a1e48b814fb6591df0a1c8003efcf"
+        },
+        "after": {
+          "path": "app/test/features/chat/chat_forward_page_test.dart",
+          "bytes": 34142,
+          "sha256": "501eb59c543c6ba101e7639cc62b09325e85693800b2858dc8c88954638233cb"
+        },
+        "otherBytesExact": true,
+        "maskedEqualSHA256": "58c18bad37db72b5d9530ddc627b0ccc28b9aebc8fc6990f565ec6659d9a1526",
+        "changedSpans": [
+          {
+            "kind": "helper",
+            "name": "openConfirmation",
+            "beforeBytes": 504,
+            "beforeSHA256": "22cf16abecff4f28b8fb7b1e13a4927b9cf55664e1994ae597f2be606142dd92",
+            "afterBytes": 742,
+            "afterSHA256": "416a32f2f8c9becf1aa48fe98c17b2b432a41908ea3abde758eec7c63de7b205"
+          },
+          {
+            "kind": "fresh-test",
+            "name": "single unknown dispatch blocks replay and explicit review keeps the original confirmed destination",
+            "beforeBytes": 2743,
+            "beforeSHA256": "8506411f6c24aedfaeb01866bc03827a292feee1d8fe907a3872af9f826bfa26",
+            "afterBytes": 2576,
+            "afterSHA256": "4523de69918ef55e1b839197092064a9532ee801b88135d96becec98dfc2d266"
+          },
+          {
+            "kind": "fresh-test",
+            "name": "merge picker route retirement also fences the original native dispatch callback",
+            "beforeBytes": 2558,
+            "beforeSHA256": "70f806e7d3b4a2d0801a48976003a089d553d566fbac84d1d40f5beb180a727d",
+            "afterBytes": 2659,
+            "afterSHA256": "f7d7481ecd468182d7527989491bbe4d045acc7696f1402f19c3fa9b61f305ae"
+          }
+        ]
+      },
+      {
+        "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+        "before": {
+          "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+          "bytes": 12980,
+          "sha256": "263e265fbff2e8a41159dabe36e9f40bad3a1c472e42efd44821b9f57bb6823b"
+        },
+        "after": {
+          "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+          "bytes": 12995,
+          "sha256": "9e08bed20d3acff2b5c171d9c909868f7a7823284e00a232b66361c3d900d3ab"
+        },
+        "otherBytesExact": true,
+        "maskedEqualSHA256": "f45c835d960aa4c859518b726ac15af77bfa60593a951184242a3aa4a396a2d6",
+        "changedSpans": [
+          {
+            "kind": "helper",
+            "name": "confirmation",
+            "beforeBytes": 401,
+            "beforeSHA256": "5a184d3ac6c74a2485a5944e846dc80cc077f08bb3d6cd3057b765c8fe083c5f",
+            "afterBytes": 642,
+            "afterSHA256": "e03d09737895cd2d6343d37197dd8139380bcc80cdd9a917d76c5f2d8d14171f"
+          },
+          {
+            "kind": "fresh-test",
+            "name": "favorite unknown dispatch blocks replay and reviews only its original confirmed account",
+            "beforeBytes": 1963,
+            "beforeSHA256": "f0315016d8a30791562e9ef0570bdc99e85a9df3b1e16ef54d44cf7de6b24e29",
+            "afterBytes": 1737,
+            "afterSHA256": "5f79e735a9e1cf6c40bd66e47ed528a720801dfdd204cdd818c25aec37c5ab9b"
+          }
+        ]
+      }
+    ],
+    "helperBoundary": {
+      "addedOperations": [
+        "synchronous WidgetTester.widget read",
+        "nonnull enabled-callback assertion",
+        "return original callback"
+      ],
+      "sdkCallsAdded": 0,
+      "callbackInvocationsAdded": 0,
+      "awaitsAdded": 0,
+      "returnedValueNotConsumedByReused34": true,
+      "previousHelperDialogAssertionAlreadyRequiredEnabledOriginalDestinationTap": true
+    },
+    "boundary": "Retain original34 PASS only; exact current fresh5 is mandatory. Neither original process nor current fresh39 is accepted."
   }
 }

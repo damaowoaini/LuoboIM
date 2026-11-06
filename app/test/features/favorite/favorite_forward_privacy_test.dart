@@ -84,13 +84,19 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> confirmation(WidgetTester tester) async {
+  Future<VoidCallback> confirmation(WidgetTester tester) async {
     await tester.enterText(find.byType(TextField), 'CAROL');
     await tester.pumpAndSettle();
+    final tile = tester.widget<ListTile>(
+      find.ancestor(of: find.text('同名收件人'), matching: find.byType(ListTile)),
+    );
+    expect(tile.onTap, isNotNull);
+    final originalTap = tile.onTap!;
     await tester.tap(find.text('同名收件人'));
     await tester.pumpAndSettle();
     expect(find.text('账号 ID：carol\n\n确认转发这条消息。'), findsOneWidget);
     expect(find.textContaining('forward-sensitive'), findsNothing);
+    return originalTap;
   }
 
   Future<void> close(WidgetTester tester) async {
@@ -296,15 +302,7 @@ void main() {
         return original(call);
       };
       try {
-        await confirmation(tester);
-        final originalTap = tester
-            .widget<ListTile>(
-              find.ancestor(
-                of: find.text('同名收件人'),
-                matching: find.byType(ListTile),
-              ),
-            )
-            .onTap!;
+        final originalTap = await confirmation(tester);
         await tester.tap(find.widgetWithText(TextButton, '发送'));
         await tester.pumpAndSettle();
         expect(find.textContaining('转发结果未确认'), findsWidgets);

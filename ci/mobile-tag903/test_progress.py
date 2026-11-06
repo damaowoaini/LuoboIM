@@ -53,29 +53,57 @@ class FailureProgressTests(unittest.TestCase):
         import copy
 
         c = {'source': controller.FINAL_SOURCE, 'portable': controller.FINAL_PORTABLE,
-             'prior_static5': copy.deepcopy(controller.PRIOR_STATIC5)}
+             'prior_static4': copy.deepcopy(controller.PRIOR_STATIC4)}
         wrong = copy.deepcopy(c)
-        wrong['prior_static5']['job'] = 0
+        wrong['prior_static4']['job'] = 0
         with self.assertRaises(ValueError):
-            controller.prior_static5(wrong)
+            controller.prior_static4(wrong)
         wrong = copy.deepcopy(c)
-        wrong['prior_static5']['boundary']['finalSourceAndToolSnapshotsAvailable'] = True
+        wrong['prior_static4']['boundary']['finalSourceAndToolSnapshotsAvailable'] = True
         with self.assertRaises(ValueError):
-            controller.prior_static5(wrong)
+            controller.prior_static4(wrong)
         with tempfile.TemporaryDirectory() as root:
             repo = Path(root).resolve()
-            for row in controller.PRIOR_STATIC5['rows']:
+            for row in controller.PRIOR_STATIC4['rows']:
                 path = repo / row['source']['path']
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes((REPO / row['source']['path']).read_bytes())
-            result = controller.prior_static5(c, repo)
-            self.assertEqual(result['sameBodyPriorBoundaryAnalysisCount'], 5)
+            result = controller.prior_static4(c, repo)
+            self.assertEqual(result['sameBodyPriorBoundaryAnalysisCount'], 4)
             self.assertEqual(result['freshAnalysisOnCurrentSource'], 0)
             self.assertFalse(result['finalSourceAndToolSnapshotsAccepted'])
-            path = repo / controller.PRIOR_STATIC5['rows'][0]['source']['path']
+            path = repo / controller.PRIOR_STATIC4['rows'][0]['source']['path']
             path.write_bytes(path.read_bytes() + b'\n')
             with self.assertRaises(ValueError):
-                controller.prior_static5(c, repo)
+                controller.prior_static4(c, repo)
+
+        c = {'source': controller.FINAL_SOURCE, 'portable': controller.FINAL_PORTABLE,
+             'runtime_reuse34': copy.deepcopy(controller.RUNTIME_REUSE34),
+             'selected_names5': list(controller.NAMES5), 'universe_names39': list(controller.NAMES39)}
+        wrong = copy.deepcopy(c)
+        wrong['runtime_reuse34']['job'] = 0
+        with self.assertRaises(ValueError):
+            controller.runtime_reuse34(wrong)
+        wrong = copy.deepcopy(c)
+        wrong['selected_names5'].pop()
+        with self.assertRaises(ValueError):
+            controller.runtime_reuse34(wrong)
+        with tempfile.TemporaryDirectory() as root:
+            repo = Path(root).resolve()
+            names = {n for n in controller.authored_paths(REPO) if n.startswith('app/lib/')}
+            names.update(row['path'] for row in controller.RUNTIME_REUSE34['testSourcePins'])
+            for name in names:
+                path = repo / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes((REPO / name).read_bytes())
+            result = controller.runtime_reuse34(c, repo)
+            self.assertEqual(result['reusedOriginalTests'], 34)
+            self.assertFalse(result['currentWhole39Accepted'])
+            self.assertFalse(result['freshCurrent39Executed'])
+            path = repo / sorted(n for n in names if n.startswith('app/lib/'))[0]
+            path.write_bytes(path.read_bytes() + b'\n')
+            with self.assertRaises(ValueError):
+                controller.runtime_reuse34(c, repo)
 
 if __name__ == '__main__':
     unittest.main()
