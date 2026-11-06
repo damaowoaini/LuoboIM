@@ -252,32 +252,52 @@ func (l *Launcher) admissionOpen() error {
 // owner persistence fails the lock stays poisoned/held until the actual owner
 // joins; no subsequent launcher can silently open a replacement generation.
 func (l *Launcher) Start(ctx context.Context, spec ServiceSpec) (*OwnedService, error) {
+	return l.start(ctx, spec, nil)
+}
+
+// Observation never replaces a permit or the original child/error objects.
+func (l *Launcher) StartWithObservation(ctx context.Context, spec ServiceSpec) (*OwnedService, ServiceStartupObservation, error) {
+	var observation ServiceStartupObservation
+	child, err := l.start(ctx, spec, &observation)
+	return child, observation, err
+}
+func (l *Launcher) start(ctx context.Context, spec ServiceSpec, observation *ServiceStartupObservation) (*OwnedService, error) {
+	observeServiceStartup(observation, startupLauncherEnter)
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	if e := l.enter(); e != nil {
 		return nil, e
 	}
 	defer l.leave()
+	observeServiceStartup(observation, startupLauncherAdmission)
 	if e := l.admissionOpen(); e != nil {
 		return nil, e
 	}
+	observeServiceStartup(observation, startupLauncherState)
 	h, st, e := l.load()
 	if e != nil {
 		return nil, e
 	}
+	observeServiceStartup(observation, startupLauncherRole)
 	for _, row := range st.Entries {
 		if row.Owner.Role == spec.Role {
 			return nil, ErrOwnedEvidence
 		}
 	}
-	service, e := startOwnedService(ctx, spec)
+	service, e := startOwnedServiceWithObservation(ctx, spec, observation)
 	if service != nil {
 		service.launcher = l
 		l.children[spec.Role] = service
 		st.Entries = append(st.Entries, launcherEntry{Owner: service.owner, AnnouncementPath: service.announcementPath})
 		if pe := l.commit(h, st); pe != nil {
+			if e == nil {
+				observeServiceStartup(observation, startupLauncherPersist)
+			}
 			l.poison = true
 			return service, pe
+		}
+		if e == nil {
+			observeServiceStartup(observation, startupLauncherPersist)
 		}
 	}
 	return service, e

@@ -43,6 +43,9 @@ def verify():
  if c['schema']!=1 or c['scope']!='one-fresh-product20-http-ws-only' or c['productRebuilds']!=0 or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
  for path,expected in c['helpers'].items():
   if sha(regular(REPO/path))!=expected:raise ValueError('source helper drift')
+ builder=load(c['fixtureSourceBuilder'],'p20_original_fixture_policy')
+ if c.get('fixtureSourceBuildRequiredWhenNoVerifiedProvider') is not True:raise ValueError('explicit null-provider fixture source-build policy required')
+ builder.fixture_policy({'minioFixturePolicy':builder.FIXTURE_POLICY,'minioFixtureBinding':c['fixtureMinIOProvider']})
  graph=load(c['graphProvider']['path'],'p20_graph_source');g,bodies,*_=graph.verify()
  if g['source']!=c['graphProvider']['source']:raise ValueError('explicit graph source differs')
  chart=load('ci/chart-route-build/run.py','p20_chart_source');cc,chart_bodies=chart.verify()
@@ -178,6 +181,9 @@ def run():
  try:
   core=artifact(binding['core14'],graph.ROLES,root/'product14',2<<30,core_source=c['graphProvider']['source'])
   six=artifact(binding['chart6'],NAMES,root/'product6',512<<20,chart_sources=c['chartProvider']['sources'])
+  # Product API reads are complete. Only the original fixture receiver keeps
+  # this local token; every subsequent child sees the existing explicit env.
+  fixture_token=os.environ.pop('GH_TOKEN',None)
   if core['locks']!={n:sha(original['server/'+n]) for n in ('go.mod','go.sum')} or six['locks']!=c['chartProvider']['locks']:raise ValueError('original module locks differ from actual artifacts')
   # Only two necessary auxiliaries are compiled; product20 are never rebuilt.
   go=shutil.which('go');version=command('go-version',[go,'version'],15,env).decode().strip()
@@ -195,9 +201,18 @@ def run():
   legacy=binroot/'msgtransfer-legacy';legacy_raw=regular(legacy,256<<20);rp=private/'legacy-receipt.json';rs=write(rp,{'schema':1,'sourceSHA256':core['source']['digest'],'binarySHA256':sha(legacy_raw),'binaryBytes':len(legacy_raw),'toolchainSHA256':go_sha})
   buildpath=private/'builds.json';bs=write(buildpath,{'version':'source-bound-fullgraph-builds-v1','sourceSHA256':core['source']['digest'],'binaries':builds,'legacyMessageTransfer':{'role':'msgtransfer-legacy','path':str(legacy),'sha256':sha(legacy_raw),'sourceSHA256':core['source']['digest'],'receiptPath':str(rp),'receiptSHA256':rs}})
   resources=load('ci/backend-fullgraph/resources.py','p20_resources');builder=load('ci/backend-fullgraph/minio_build.py','p20_minio');catalog=json.loads(regular(REPO/'ci/backend-fullgraph/image-catalog.json'))
-  # Source-MinIO is fixture-only, using its original exact builder. No prior
-  # fixture ELF is retained by product14 artifact, so this new job needs it.
-  minio,proof=builder.build(root,catalog,command,go,go_sha,env);write(out/'fixture-minio.json',proof)
+  # A bound fixture uses the unchanged full API/ZIP/manifest/ELF receiver.
+  # Only an explicit null provider selects a new original source build.
+  provider=c['fixtureMinIOProvider']
+  try:
+   if provider is None:
+    minio,proof=builder.build(root,catalog,command,go,go_sha,env)
+    acquisition={'mode':'original-source-build','fixtureOnly':True,'productRuntimeAccepted':False,'freshMinioCompile':True}
+   else:
+    minio,proof=builder.receive(root,catalog,provider,go_sha,fixture_token,os.environ['GITHUB_REPOSITORY'])
+    acquisition={'mode':'root-accepted-fixture-artifact','fixtureOnly':True,'productRuntimeAccepted':False,'freshMinioCompile':False,'artifactID':provider['artifactID'],'rootAcceptanceSHA256':provider['rootAcceptanceSHA256']}
+  finally:fixture_token=None
+  write(out/'fixture-minio.json',proof);write(out/'fixture-minio-acquisition.json',acquisition)
   for image in sorted(set(catalog['images'].values())|{c['mysql']['image']}):command('fixture-image-'+sha(image.encode())[:8],['/usr/bin/docker','--host','unix:///var/run/docker.sock','pull','--platform','linux/amd64',image],600)
   plane=resources.Plane(root/'plane',catalog['images'],minio_source=minio);claim=plane.prepare();keeper=next(r for r in claim['observations'] if r['role']=='keeper')
   mysql_id=create_mysql(plane,c['mysql'],secrets.token_hex(32))

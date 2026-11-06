@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/ed25519"
 	"encoding/json"
+	"errors"
 	"sync"
 	"time"
 
@@ -41,23 +42,34 @@ type KafkaExclusion struct {
 type HeldMetadataBootstrap interface {
 	PrepareHeldMetadata(context.Context, *AdmissionHold, namespaceimport.Header) error
 }
+
+// AgentAcquireObservation describes one valid Acquire invocation only. It is
+// neither a fence nor proof that the last entered stage failed or completed.
+type AgentAcquireObservation struct {
+	Stage      string
+	Attempted  bool
+	Returned   bool
+	ErrorClass string
+}
+
 type OwnedAgent struct {
-	mu               sync.Mutex
-	header           namespaceimport.Header
-	launcher         *Launcher
-	writers          []OwnedWriter
-	kafka            *KafkaProbe
-	mongo            []MongoExclusion
-	redis            []RedisExclusion
-	kafkaCredentials []KafkaExclusion
-	prepared         bool
-	metadata         HeldMetadataBootstrap
-	keyID            string
-	key              ed25519.PrivateKey
-	hold             *AdmissionHold
-	generation       uint64
-	joined           []namespaceimport.JoinedWriter
-	revoked          []namespaceimport.RevokedCredential
+	mu                 sync.Mutex
+	header             namespaceimport.Header
+	launcher           *Launcher
+	writers            []OwnedWriter
+	kafka              *KafkaProbe
+	mongo              []MongoExclusion
+	redis              []RedisExclusion
+	kafkaCredentials   []KafkaExclusion
+	prepared           bool
+	metadata           HeldMetadataBootstrap
+	keyID              string
+	key                ed25519.PrivateKey
+	hold               *AdmissionHold
+	generation         uint64
+	joined             []namespaceimport.JoinedWriter
+	revoked            []namespaceimport.RevokedCredential
+	acquireObservation AgentAcquireObservation
 }
 
 func NewOwnedAgent(header namespaceimport.Header, launcher *Launcher, writers []OwnedWriter, kafka *KafkaProbe, mongoUsers []MongoExclusion, redisUsers []RedisExclusion, kafkaUsers []KafkaExclusion, metadata HeldMetadataBootstrap, keyID string, key ed25519.PrivateKey) (*OwnedAgent, error) {
@@ -154,10 +166,13 @@ func (a *OwnedAgent) stopPhase(ctx context.Context, phase string, services map[s
 func (a *OwnedAgent) exclude(ctx context.Context, apply bool) error {
 	revoked := []namespaceimport.RevokedCredential{}
 	for _, v := range a.mongo {
+		if apply {
+			a.acquireObservation.Stage = "exclude-credentials-mongo"
+		}
 		if a.hold.Validate() != nil {
 			return ErrOwnedEvidence
 		}
-		r, e := RevokeOwnedMongoCredential(ctx, v.Admin, v.Legacy, v.Credential)
+		r, e := RevokeOwnedMongoCredential(ctx, v.Admin, v.Legacy, v.Credential, a.header.Database)
 		if e != nil {
 			return e
 		}
@@ -165,6 +180,9 @@ func (a *OwnedAgent) exclude(ctx context.Context, apply bool) error {
 		revoked = append(revoked, namespaceimport.RevokedCredential{Identity: v.Identity, RevocationRecord: "mongo-live:" + sha(body), RevocationGeneration: 1, State: "revoked"})
 	}
 	for _, v := range a.redis {
+		if apply {
+			a.acquireObservation.Stage = "exclude-credentials-redis"
+		}
 		if a.hold.Validate() != nil {
 			return ErrOwnedEvidence
 		}
@@ -176,7 +194,18 @@ func (a *OwnedAgent) exclude(ctx context.Context, apply bool) error {
 		revoked = append(revoked, namespaceimport.RevokedCredential{Identity: v.Identity, RevocationRecord: "redis-live:" + sha(body), RevocationGeneration: 1, State: "revoked"})
 	}
 	for _, v := range a.kafkaCredentials {
-		r, e := a.kafka.ExcludeLegacy(ctx, a.hold, v.Credential, apply)
+		if apply {
+			a.acquireObservation.Stage = "exclude-credentials-kafka"
+		}
+		var r KafkaRevocation
+		var e error
+		if apply {
+			var observation kafkaExclusionObservation
+			r, e = a.kafka.excludeLegacy(ctx, a.hold, v.Credential, apply, &observation)
+			a.acquireObservation.Stage = "exclude-credentials-kafka-" + observation.stage
+		} else {
+			r, e = a.kafka.ExcludeLegacy(ctx, a.hold, v.Credential, apply)
+		}
 		if e != nil {
 			return e
 		}
@@ -192,14 +221,27 @@ func (a *OwnedAgent) Acquire(ctx context.Context, request namespaceimport.ProbeR
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	a.acquireObservation = AgentAcquireObservation{Stage: "validate-request", Attempted: true, ErrorClass: "in-progress"}
+	observation, err := a.acquireLocked(ctx, request)
+	// Record a return only after the real call returns. Panic/Goexit must not
+	// be rewritten as a successful return by an observation defer.
+	a.acquireObservation.Returned = true
+	a.acquireObservation.ErrorClass = acquireObservationError(err)
+	return observation, err
+}
+
+// The caller holds the original a.mu for the complete unchanged control path.
+func (a *OwnedAgent) acquireLocked(ctx context.Context, request namespaceimport.ProbeRequest) (namespaceimport.FenceObservation, error) {
 	current, stop := context.WithTimeout(ctx, 55*time.Second)
 	defer stop()
 	if request.Header != a.header || request.Nonce == "" || request.LeaseID != "" {
 		return namespaceimport.FenceObservation{}, ErrOwnedEvidence
 	}
+	a.acquireObservation.Stage = "check-targets"
 	if e := a.checkActualTargets(current); e != nil {
 		return namespaceimport.FenceObservation{}, e
 	}
+	a.acquireObservation.Stage = "hold"
 	hold, e := a.launcher.Hold(current)
 	if e != nil {
 		return namespaceimport.FenceObservation{}, e
@@ -208,24 +250,30 @@ func (a *OwnedAgent) Acquire(ctx context.Context, request namespaceimport.ProbeR
 		return namespaceimport.FenceObservation{}, ErrOwnedEvidence
 	}
 	a.hold = hold
+	a.acquireObservation.Stage = "services"
 	services, e := a.services(current)
 	if e != nil {
 		return namespaceimport.FenceObservation{}, e
 	}
 	// Producers join BEFORE offsets are inspected. Consumers remain alive until
 	// both real queue planes reach stable broker end == committed NEXT.
+	a.acquireObservation.Stage = "stop-producer"
 	if e = a.stopPhase(current, "producer", services); e != nil {
 		return namespaceimport.FenceObservation{}, e
 	}
+	a.acquireObservation.Stage = "drain-consumers-live"
 	if _, e = a.kafka.ObserveDrained(current, false, 250*time.Millisecond); e != nil {
 		return namespaceimport.FenceObservation{}, e
 	}
+	a.acquireObservation.Stage = "stop-consumer"
 	if e = a.stopPhase(current, "consumer", services); e != nil {
 		return namespaceimport.FenceObservation{}, e
 	}
+	a.acquireObservation.Stage = "exclude-credentials"
 	if e = a.exclude(current, true); e != nil {
 		return namespaceimport.FenceObservation{}, e
 	}
+	a.acquireObservation.Stage = "drain-consumers-empty"
 	drained, e := a.kafka.ObserveDrained(current, true, 250*time.Millisecond)
 	if e != nil {
 		return namespaceimport.FenceObservation{}, e
@@ -237,12 +285,45 @@ func (a *OwnedAgent) Acquire(ctx context.Context, request namespaceimport.ProbeR
 	}{a.joined, a.revoked, drained})
 	a.hold.exclusionSHA = sha(proof)
 	a.hold.exclusionAt = time.Now().UTC()
+	a.acquireObservation.Stage = "held-metadata"
 	if e = a.metadata.PrepareHeldMetadata(current, a.hold, a.header); e != nil {
 		return namespaceimport.FenceObservation{}, e
 	}
 	a.prepared = true
+	a.acquireObservation.Stage = "signed-observe"
 	return a.observe(current, request)
 }
+
+// AcquireObservation returns only the invocation's closed diagnostic facts.
+// It carries no owner, nonce, provider text, fence, permission or Ready state.
+func (a *OwnedAgent) AcquireObservation() AgentAcquireObservation {
+	notEntered := AgentAcquireObservation{Stage: "not-entered", ErrorClass: "not-entered"}
+	if a == nil {
+		return notEntered
+	}
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if !a.acquireObservation.Attempted {
+		return notEntered
+	}
+	return a.acquireObservation
+}
+
+func acquireObservationError(err error) string {
+	switch {
+	case err == nil:
+		return "ok"
+	case errors.Is(err, context.DeadlineExceeded):
+		return "deadline"
+	case errors.Is(err, context.Canceled):
+		return "cancelled"
+	case errors.Is(err, ErrOwnedEvidence):
+		return "owned-evidence"
+	default:
+		return "other"
+	}
+}
+
 func (a *OwnedAgent) Observe(ctx context.Context, request namespaceimport.ProbeRequest) (namespaceimport.FenceObservation, error) {
 	if a == nil || ctx == nil {
 		return namespaceimport.FenceObservation{}, ErrOwnedEvidence

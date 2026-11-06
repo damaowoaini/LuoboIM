@@ -1151,6 +1151,9 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	for _, name := range product20Names {
 		args := []string{"-config_folder_path", filepath.Join(chartConfig, "config.yaml"), "-port", strconv.Itoa(ports[name])}
 		env := baseEnv
+		if name == "chat-api" {
+			env = append(append([]string{}, baseEnv...), "LUOBO_ROUTE_SHARED_SECRET="+boot.Credential["serviceSecret"])
+		}
 		if name == "route-service" {
 			args = nil
 			env = routeEnv

@@ -90,12 +90,24 @@ func roleCount(row bson.Raw, key string) (int, string, error) {
 	return len(rows), sha(v), nil
 }
 
+// probeOwnedMongoCollections separates command authorization from cursor
+// cleanup. Even a typed code13 from Close is not a command-denial proof.
+// A successful read closes its own server cursor before any role revocation.
+func probeOwnedMongoCollections(ctx context.Context, client *mongo.Client, database string) (commandErr error, closeErr error) {
+	cursor, err := client.Database(database).RunCommandCursor(ctx, bson.D{{Key: "listCollections", Value: 1}, {Key: "nameOnly", Value: true}})
+	if err != nil {
+		return err, nil
+	}
+	return nil, cursor.Close(ctx)
+}
+
 // RevokeOwnedMongoCredential is an explicit MUTATING migration operation, to be
 // called only after the owned launcher admission hold and actual process joins.
 // It never runs during Capture/Inspect. Actual usersInfo and a real permission
-// denial are both required; auth-disabled fixtures cannot manufacture success.
-func RevokeOwnedMongoCredential(ctx context.Context, admin, legacy *mongo.Client, c MongoLegacyCredential) (MongoRevocation, error) {
-	if ctx == nil || admin == nil || legacy == nil || !strings.HasPrefix(c.User, "owned_legacy_") || c.User == c.AdminUser || c.AuthDB == "" || !isSHA(c.UserIDHash) || c.AdminUser == "" || c.AdminAuthDB == "" {
+// denial on the explicitly selected business database are both required;
+// auth-disabled fixtures cannot manufacture success. AuthDB remains authSource.
+func RevokeOwnedMongoCredential(ctx context.Context, admin, legacy *mongo.Client, c MongoLegacyCredential, database string) (MongoRevocation, error) {
+	if ctx == nil || admin == nil || legacy == nil || !strings.HasPrefix(c.User, "owned_legacy_") || c.User == c.AdminUser || c.AuthDB == "" || !isSHA(c.UserIDHash) || c.AdminUser == "" || c.AdminAuthDB == "" || database == "" || strings.TrimSpace(database) != database || strings.EqualFold(database, "admin") || strings.EqualFold(database, "config") || strings.EqualFold(database, "local") {
 		return MongoRevocation{}, ErrOwnedEvidence
 	}
 	if err := authenticatedAs(ctx, admin, c.AdminUser, c.AdminAuthDB); err != nil {
@@ -116,9 +128,28 @@ func RevokeOwnedMongoCredential(ctx context.Context, admin, legacy *mongo.Client
 	if err != nil {
 		return MongoRevocation{}, err
 	}
-	_, beforeSHA, err := roleCount(before, "roles")
+	beforeCount, beforeSHA, err := roleCount(before, "roles")
 	if err != nil {
 		return MongoRevocation{}, err
+	}
+	beforeInherited, _, err := roleCount(before, "inheritedRoles")
+	if err != nil {
+		return MongoRevocation{}, err
+	}
+	// Probe the exact held business database, independently of the authSource.
+	// An already-revoked identity must still demonstrate a real authorization
+	// denial; a first revocation must prove this same operation was permitted.
+	beforeProbe, closeErr := probeOwnedMongoCollections(ctx, legacy, database)
+	if closeErr != nil {
+		return MongoRevocation{}, closeErr
+	}
+	if beforeCount == 0 && beforeInherited == 0 {
+		var command mongo.CommandError
+		if !errors.As(beforeProbe, &command) || command.Code != 13 {
+			return MongoRevocation{}, ErrOwnedEvidence
+		}
+	} else if beforeProbe != nil {
+		return MongoRevocation{}, beforeProbe
 	}
 	// No password/DSN is transmitted in argv/logs, and no user is deleted/recreated.
 	if err = admin.Database(c.AuthDB).RunCommand(ctx, bson.D{{Key: "updateUser", Value: c.User}, {Key: "roles", Value: bson.A{}}, {Key: "writeConcern", Value: bson.D{{Key: "w", Value: "majority"}, {Key: "j", Value: true}}}}).Err(); err != nil {
@@ -138,7 +169,10 @@ func RevokeOwnedMongoCredential(ctx context.Context, admin, legacy *mongo.Client
 	}
 	// A read-only metadata command checks the OLD authenticated connection's real
 	// effective authorization. Timeout/connection errors are not permission proof.
-	err = legacy.Database(c.AuthDB).RunCommand(ctx, bson.D{{Key: "listCollections", Value: 1}, {Key: "nameOnly", Value: true}}).Err()
+	err, closeErr = probeOwnedMongoCollections(ctx, legacy, database)
+	if closeErr != nil {
+		return MongoRevocation{}, closeErr
+	}
 	var command mongo.CommandError
 	if !errors.As(err, &command) || command.Code != 13 {
 		return MongoRevocation{}, ErrOwnedEvidence

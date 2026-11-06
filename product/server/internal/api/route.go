@@ -87,7 +87,7 @@ func newGinRouter(discov discoveryregistry.SvcDiscoveryRegistry, rdb redis.Unive
 		favoriteDatabase = registerFavoriteRoutes(r, ParseToken, rdb, conversationRpc.Client)
 	} else {
 		favoriteDatabase = owned.database
-		if err := registerFavoriteRoutesOnDatabase(owned.ctx, r, ParseToken, rdb, conversationRpc.Client, favoriteDatabase); err != nil {
+		if err := registerFavoriteRoutesWithHistoryReader(owned.ctx, r, ParseToken, rdb, conversationRpc.Client, favoriteDatabase, owned.historyReader); err != nil {
 			return nil, err
 		}
 	}
@@ -108,7 +108,7 @@ func newGinRouter(discov discoveryregistry.SvcDiscoveryRegistry, rdb redis.Unive
 			return nil, err
 		}
 		registerRTCWebhookWithContext(owned.ctx, r, favoriteDatabase)
-		registerAdminPreviewRoutesWithContext(owned.ctx, r, ParseToken, favoriteDatabase, rdb, conversationRpc.Client)
+		registerAdminPreviewRoutesWithHistoryReader(owned.ctx, r, ParseToken, favoriteDatabase, rdb, conversationRpc.Client, owned.historyReader)
 	}
 	userRouterGroup := r.Group("/user")
 	{

@@ -14,19 +14,101 @@ type RedisRevocation struct {
 	LegacyPermissionDenied bool
 }
 
-func redisUser(value any) (map[string]any, error) {
-	list, ok := value.([]interface{})
-	if !ok || len(list)%2 != 0 {
-		return nil, ErrOwnedEvidence
+// redisACLFields accepts only the two actual GETUSER protocol objects. The
+// explicit seen-key check must also reject a duplicate whose first value is nil.
+func redisACLFields(value any, required []string) (map[string]any, error) {
+	out := make(map[string]any, len(required))
+	add := func(rawKey, value any) error {
+		key, ok := rawKey.(string)
+		if !ok {
+			return ErrOwnedEvidence
+		}
+		if _, exists := out[key]; exists {
+			return ErrOwnedEvidence
+		}
+		known := false
+		for _, field := range required {
+			known = known || key == field
+		}
+		if !known {
+			return ErrOwnedEvidence
+		}
+		out[key] = value
+		return nil
 	}
-	out := map[string]any{}
-	for i := 0; i < len(list); i += 2 {
-		key, ok := list[i].(string)
-		if !ok || out[key] != nil {
+	switch reply := value.(type) {
+	case []interface{}: // RESP2 alternating field/value array.
+		if len(reply) != 2*len(required) {
 			return nil, ErrOwnedEvidence
 		}
-		out[key] = list[i+1]
+		for i := 0; i < len(reply); i += 2 {
+			if err := add(reply[i], reply[i+1]); err != nil {
+				return nil, err
+			}
+		}
+	case map[interface{}]interface{}: // RESP3 map returned by Cmd.ReadReply.
+		if len(reply) != len(required) {
+			return nil, ErrOwnedEvidence
+		}
+		for key, item := range reply {
+			if err := add(key, item); err != nil {
+				return nil, err
+			}
+		}
+	default:
+		return nil, ErrOwnedEvidence
 	}
+	if len(out) != len(required) {
+		return nil, ErrOwnedEvidence
+	}
+	return out, nil
+}
+
+// Normalize the complete fixed GETUSER contract, including selectors, before
+// hashing either private ACL reply. No raw RESP3 map is passed to encoding/json.
+func redisUser(value any) (map[string]any, error) {
+	out, err := redisACLFields(value, []string{"flags", "passwords", "commands", "keys", "channels", "selectors"})
+	if err != nil {
+		return nil, err
+	}
+	for _, field := range []string{"flags", "passwords"} {
+		items, ok := out[field].([]interface{})
+		if !ok || items == nil {
+			return nil, ErrOwnedEvidence
+		}
+		copyItems := make([]interface{}, len(items))
+		for i, item := range items {
+			text, ok := item.(string)
+			if !ok {
+				return nil, ErrOwnedEvidence
+			}
+			copyItems[i] = text
+		}
+		out[field] = copyItems
+	}
+	for _, field := range []string{"commands", "keys", "channels"} {
+		if _, ok := out[field].(string); !ok {
+			return nil, ErrOwnedEvidence
+		}
+	}
+	selectors, ok := out["selectors"].([]interface{})
+	if !ok || selectors == nil {
+		return nil, ErrOwnedEvidence
+	}
+	normalized := make([]interface{}, len(selectors))
+	for i, value := range selectors {
+		selector, err := redisACLFields(value, []string{"commands", "keys", "channels"})
+		if err != nil {
+			return nil, err
+		}
+		for _, field := range []string{"commands", "keys", "channels"} {
+			if _, ok := selector[field].(string); !ok {
+				return nil, ErrOwnedEvidence
+			}
+		}
+		normalized[i] = selector
+	}
+	out["selectors"] = normalized
 	return out, nil
 }
 func redisDisabled(row map[string]any) bool {
@@ -44,6 +126,10 @@ func redisDisabled(row map[string]any) bool {
 	}
 	commands, ok := row["commands"].(string)
 	if !ok || commands != "-@all" {
+		return false
+	}
+	selectors, ok := row["selectors"].([]interface{})
+	if !ok || selectors == nil || len(selectors) != 0 {
 		return false
 	}
 	passwords, ok := row["passwords"].([]interface{})
@@ -102,11 +188,11 @@ func RevokeOwnedRedisCredential(ctx context.Context, admin, legacy redis.Univers
 	}
 	// Only hashes of private ACL replies survive; passwords/ACL bodies are never
 	// put in a public observation. Network/timeout errors are not a successful deny.
-	b, err := json.Marshal(before)
+	b, err := json.Marshal(beforeRow)
 	if err != nil {
 		return RedisRevocation{}, err
 	}
-	a, err := json.Marshal(after)
+	a, err := json.Marshal(row)
 	if err != nil {
 		return RedisRevocation{}, err
 	}

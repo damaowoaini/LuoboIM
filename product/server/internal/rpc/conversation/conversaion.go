@@ -83,6 +83,8 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		return err
 	}
 
+	database := mongo.GetDatabase()
+
 	readyContext := context.Background()
 	if startrpc.IsOwnedRPC(server) {
 		readyContext = startrpc.OwnedRPCContext(server)
@@ -94,12 +96,12 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 	var history *messagedelivery.HistoryWindowReader
 	var readerStartup *messagedelivery.HistoryReaderStartupBinding
 	if readerPath != "" {
-		history, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(readyContext, mongo.GetDatabase(), "rpc-conversation", readerPath, readerSHA)
+		history, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(readyContext, database, "rpc-conversation", readerPath, readerSHA)
 		if err != nil {
 			return err
 		}
 	}
-	namespaceRuntime, err := messagedelivery.NewNamespaceRuntimeBindingForOwnedContext(readyContext, mongo.GetDatabase())
+	namespaceRuntime, err := messagedelivery.NewNamespaceRuntimeBindingForOwnedContext(readyContext, database)
 	if err != nil {
 		return err
 	}
@@ -115,12 +117,12 @@ func Start(client discoveryregistry.SvcDiscoveryRegistry, server *grpc.Server) e
 		}
 		readyContext = namespaceRuntime.BindRuntimeContext(readyContext)
 	}
-	conversationDB, err := mgo.NewConversationMongo(mongo.GetDatabase())
+	conversationDB, err := mgo.NewConversationMongo(database)
 	if err != nil {
 		return err
 	}
 	if readerPath == "" {
-		history, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(readyContext, mongo.GetDatabase(), "rpc-conversation", "", "")
+		history, readerStartup, err = messagedelivery.NewStartupHistoryWindowReader(readyContext, database, "rpc-conversation", "", "")
 		if err != nil {
 			return err
 		}

@@ -40,6 +40,8 @@ const (
 	bootstrapLauncherProbe BootstrapStage = "launcher-probe"
 )
 
+const bootstrapKafkaCoordinator BootstrapStage = "kafka-coordinator"
+
 type PrivatePlan struct {
 	Version           string `json:"version"`
 	Scenario          string `json:"scenario"`
@@ -182,6 +184,36 @@ func waitFreshKafkaClient(ctx context.Context, user, password string) (sarama.Cl
 		}
 		// Each protocol attempt retains the original three-second I/O bounds.
 		// Only this interval is immediately cancellable; no deadline is renewed.
+		timer := time.NewTimer(200 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return nil, ctx.Err()
+		case <-timer.C:
+			timer.Stop()
+		}
+	}
+}
+
+// The original client owns every returned Broker. Only the read-only lookup
+// for the two nonce-bound fresh groups below may wait for coordinator startup.
+func waitFreshKafkaCoordinator(ctx context.Context, client sarama.Client, group string) (*sarama.Broker, error) {
+	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		broker, err := client.Coordinator(group)
+		if err == nil {
+			if err = ctx.Err(); err != nil {
+				return nil, err
+			}
+			return broker, nil
+		}
+		if !errors.Is(err, sarama.ErrConsumerCoordinatorNotAvailable) {
+			return nil, err
+		}
+		// Preserve the original three-second I/O and caller deadline. The
+		// borrowed broker/client is never closed or replaced by this wait.
 		timer := time.NewTimer(200 * time.Millisecond)
 		select {
 		case <-ctx.Done():
@@ -415,10 +447,12 @@ func PrepareFresh(ctx context.Context, p PrivatePlan) (*Bootstrap, error) {
 		if e != nil || end != 0 {
 			return out, ownedcontrol.ErrOwnedEvidence
 		}
-		broker, e := client.Coordinator(group)
+		p.observeBootstrapStage(bootstrapKafkaCoordinator)
+		broker, e := waitFreshKafkaCoordinator(ctx, client, group)
 		if e != nil {
 			return out, e
 		}
+		p.observeBootstrapStage(bootstrapKafka)
 		fetch := &sarama.OffsetFetchRequest{Version: 7, ConsumerGroup: group, RequireStable: true}
 		fetch.AddPartition(topic, 0)
 		old, e := broker.FetchOffset(fetch)
@@ -569,7 +603,7 @@ func (b *Bootstrap) writeConfiguration(name string, legacy bool, redisAddress st
 		}
 		rpcNames["openIm"+nameField+"Name"] = "fullgraph_" + b.Resource.Nonce + "_" + strings.ReplaceAll(role, "-", "_")
 	}
-	value := map[string]any{"envs": map[string]any{"discovery": "zookeeper"}, "zookeeper": map[string]any{"schema": "fullgraph_" + b.Resource.Nonce, "address": []string{"127.0.0.1:2181"}, "username": "", "password": ""}, "mongo": map[string]any{"uri": mongoURI(c["mongo"+scope+"User"], c["mongo"+scope+"Password"], b.Header.Database, false), "database": b.Header.Database, "maxPoolSize": 4}, "redis": map[string]any{"clusterMode": false, "address": []string{redisAddress}, "username": c["redis"+scope+"User"], "password": c["redis"+scope+"Password"], "enablePipeline": false}, "kafka": map[string]any{"username": c["kafka"+scope+"User"], "password": c["kafka"+scope+"Password"], "addr": []string{"127.0.0.1:9092"}, "producerAck": "all", "compressType": "none", "latestMsgToRedis": map[string]any{"topic": topics[0]}, "offlineMsgToMongo": map[string]any{"topic": topics[1]}, "msgToPush": map[string]any{"topic": topics[2]}, "consumerGroupID": map[string]any{"msgToRedis": groups[0], "msgToMongo": groups[1], "msgToPush": groups[2], "msgToMySql": "unused_fullgraph_" + b.Resource.Nonce}}, "rpc": map[string]any{"registerIP": "127.0.0.1", "listenIP": "127.0.0.1"}, "rpcPort": rpcPorts, "rpcRegisterName": rpcNames, "api": map[string]any{"openImApiPort": []int{b.Ports["api"]}, "listenIP": "127.0.0.1"}, "longConnSvr": map[string]any{"openImMessageGatewayPort": []int{b.Ports["msggateway"]}, "openImWsPort": []int{31001}, "websocketMaxConnNum": 8, "websocketMaxMsgLen": 1048576, "websocketTimeout": 30, "websocketWriteBufferSize": 4096, "isEncryption": false}, "object": map[string]any{"enable": "minio", "apiURL": "http://127.0.0.1:31000", "minio": map[string]any{"bucket": "fullgraph-" + b.Resource.Nonce, "endpoint": "http://127.0.0.1:9000", "signEndpoint": "http://127.0.0.1:9000", "accessKeyID": c["minioUser"], "secretAccessKey": c["minioSecret"], "publicRead": false}}, "push": map[string]any{"enable": "none", "maxConcurrentWorkers": 1}, "manager": map[string]any{"userID": []string{b.ManagerID}, "nickname": []string{"Synthetic fullgraph owner"}}, "im-admin": map[string]any{"userID": []string{b.ManagerID}, "nickname": []string{"Synthetic fullgraph owner"}}, "secret": c["serviceSecret"], "multiLoginPolicy": 1, "msgCacheTimeout": 60, "retainChatRecords": 365, "chatRecordsClearTime": "23:59", "msgDestructTime": "23:58", "tokenPolicy": map[string]any{"expire": 3600}, "singleMessageHasReadReceiptEnable": true, "groupMessageHasReadReceiptEnable": true, "prometheus": map[string]any{"enable": false}, "log": map[string]any{"storageLocation": dir, "rotationTime": 24, "remainRotationCount": 1, "remainLogLevel": 4, "isStdout": false, "isJson": true, "withStack": false}, "msg": map[string]any{"maxMsgLimit": 100, "maxSearchLimit": 100, "msgChannelTimeout": 10, "handshakeTimeout": 10, "listenIP": "127.0.0.1", "defaultReadTimeout": 10, "defaultWriteTimeout": 10, "readBufferSize": 4096, "writeBufferSize": 4096}}
+	value := map[string]any{"envs": map[string]any{"discovery": "zookeeper"}, "zookeeper": map[string]any{"schema": "fullgraph_" + b.Resource.Nonce, "address": []string{"127.0.0.1:2181"}, "username": "", "password": ""}, "mongo": map[string]any{"uri": mongoURI(c["mongo"+scope+"User"], c["mongo"+scope+"Password"], b.Header.Database, false), "database": b.Header.Database, "maxPoolSize": 4}, "redis": map[string]any{"clusterMode": false, "address": []string{redisAddress}, "username": c["redis"+scope+"User"], "password": c["redis"+scope+"Password"], "enablePipeline": false}, "kafka": map[string]any{"username": c["kafka"+scope+"User"], "password": c["kafka"+scope+"Password"], "addr": []string{"127.0.0.1:9092"}, "producerAck": "all", "compressType": "none", "latestMsgToRedis": map[string]any{"topic": topics[0]}, "offlineMsgToMongo": map[string]any{"topic": topics[1]}, "msgToPush": map[string]any{"topic": topics[2]}, "consumerGroupID": map[string]any{"msgToRedis": groups[0], "msgToMongo": groups[1], "msgToPush": groups[2], "msgToMySql": "unused_fullgraph_" + b.Resource.Nonce}}, "rpc": map[string]any{"registerIP": "127.0.0.1", "listenIP": "127.0.0.1"}, "rpcPort": rpcPorts, "rpcRegisterName": rpcNames, "api": map[string]any{"openImApiPort": []int{b.Ports["api"]}, "listenIP": "127.0.0.1"}, "longConnSvr": map[string]any{"openImMessageGatewayPort": []int{b.Ports["msggateway"]}, "openImWsPort": []int{31001}, "websocketMaxConnNum": 8, "websocketMaxMsgLen": 1048576, "websocketTimeout": 30, "websocketWriteBufferSize": 4096, "isEncryption": false}, "object": map[string]any{"enable": "minio", "apiURL": "http://127.0.0.1:31000", "minio": map[string]any{"bucket": "fullgraph-" + b.Resource.Nonce, "endpoint": "http://127.0.0.1:9000", "signEndpoint": "http://127.0.0.1:9000", "accessKeyID": c["minioUser"], "secretAccessKey": c["minioSecret"], "publicRead": false}}, "push": map[string]any{"enable": "none", "maxConcurrentWorkers": 1}, "manager": map[string]any{"userID": []string{b.ManagerID}, "nickname": []string{"Synthetic fullgraph owner"}}, "im-admin": map[string]any{"userID": []string{b.ManagerID}, "nickname": []string{"Synthetic fullgraph owner"}}, "secret": c["serviceSecret"], "multiLoginPolicy": 1, "msgCacheTimeout": 60, "retainChatRecords": 365, "chatRecordsClearTime": "23:59", "msgDestructTime": "23:58", "tokenPolicy": map[string]any{"expire": 3600}, "singleMessageHasReadReceiptEnable": true, "groupMessageHasReadReceiptEnable": true, "prometheus": map[string]any{"enable": false, "apiPrometheusPort": []int{20001}, "userPrometheusPort": []int{20110}, "friendPrometheusPort": []int{20120}, "messagePrometheusPort": []int{20130}, "messageGatewayPrometheusPort": []int{20140, 20141, 20142, 20143}, "groupPrometheusPort": []int{20150}, "authPrometheusPort": []int{20160}, "pushPrometheusPort": []int{20170}, "conversationPrometheusPort": []int{20180}, "rtcPrometheusPort": []int{21300}, "thirdPrometheusPort": []int{20190}, "messageTransferPrometheusPort": []int{20002}}, "log": map[string]any{"storageLocation": dir, "rotationTime": 24, "remainRotationCount": 1, "remainLogLevel": 4, "isStdout": false, "isJson": true, "withStack": false}, "msg": map[string]any{"maxMsgLimit": 100, "maxSearchLimit": 100, "msgChannelTimeout": 10, "handshakeTimeout": 10, "listenIP": "127.0.0.1", "defaultReadTimeout": 10, "defaultWriteTimeout": 10, "readBufferSize": 4096, "writeBufferSize": 4096}}
 	if _, e := writePrivate(filepath.Join(dir, "config.yaml"), value); e != nil {
 		return "", e
 	}

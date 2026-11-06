@@ -32,18 +32,24 @@ func registerAdminPreviewRoutes(router *gin.Engine, authenticate gin.HandlerFunc
 	registerAdminPreviewRoutesWithContext(context.Background(), router, authenticate, db, rdb, conversations)
 }
 func registerAdminPreviewRoutesWithContext(parent context.Context, router *gin.Engine, authenticate gin.HandlerFunc, db *mongo.Database, rdb redis.UniversalClient, conversations conversation.ConversationClient) {
+	registerAdminPreviewRoutesWithHistoryReader(parent, router, authenticate, db, rdb, conversations, nil)
+}
+
+func registerAdminPreviewRoutesWithHistoryReader(parent context.Context, router *gin.Engine, authenticate gin.HandlerFunc, db *mongo.Database, rdb redis.UniversalClient, conversations conversation.ConversationClient, historyReader *messagedelivery.HistoryWindowReader) {
 	ctx, cancel := context.WithTimeout(parent, 30*time.Second)
 	defer cancel()
 	audit, err := adminpreview.NewMongoAudit(ctx, db)
 	if err != nil {
 		panic(err)
 	}
-	historyReader, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(db)
-	if err != nil {
-		panic(err)
-	}
-	if err := historyReader.CheckReady(ctx); err != nil {
-		panic(err)
+	if historyReader == nil {
+		historyReader, err = messagedelivery.NewHistoryWindowReaderFromEnvironment(db)
+		if err != nil {
+			panic(err)
+		}
+		if err := historyReader.CheckReady(ctx); err != nil {
+			panic(err)
+		}
 	}
 	key := sha256.Sum256([]byte("luobo-admin-preview-cursor-v1\n" + config.Config.Secret))
 	api := &adminPreviewAPI{redis: rdb, service: &adminpreview.Service{Source: &adminpreview.DataSource{Database: db, Redis: rdb, Reader: controller.NewReadOnlyMessageReader(rdb, db, historyReader), Conversations: conversations}, Audit: audit, CursorKey: key[:]}}

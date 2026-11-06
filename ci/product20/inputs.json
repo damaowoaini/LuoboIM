@@ -80,7 +80,7 @@
     "ci/product20/source/server/cmd/tools/product20-acceptance/main.go"
   ],
   "overlay": {
-    "server/internal/runtimeacceptance/product20_linux.go": "68a6f9b16c90130978a8630751d1ee7a5f1881a445bddd42a4ef853ad5aa30f8",
+    "server/internal/runtimeacceptance/product20_linux.go": "d3c0ea49d5c733e15fa81133ec734614d7c901e8673591827c4c3138503e6c4f",
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392"
   },
   "fixtureConfiguration": {
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1578,
-    "digest": "b3f231630844ce5dbbe950d6dcf2c897c294ab139a068261156aa1bf521c4c30"
+    "digest": "0a1b76833da1700d26c583dad6621b8ac75fe81d2146840e791f7b97ea36e685"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [
@@ -103,7 +103,33 @@
   ],
   "fixtureSourceBuildRequiredWhenNoVerifiedProvider": true,
   "fixtureSourceBuilder": "ci/backend-fullgraph/minio_build.py",
-  "fixtureMinIOProvider": null,
+  "fixtureMinIOProvider": {
+    "rootFixtureAccepted": true,
+    "rootAcceptanceSHA256": "cd1010e6e2429d2dfb594072e07b24d79918d33451a5fc3a220276f0e1237495",
+    "repository": "damaowoaini/LuoboIM",
+    "run": 42152637741,
+    "head": "aab27f77458418b0c7276764665f31e0c4144067",
+    "attempt": 1,
+    "jobID": 127679246498,
+    "jobConclusion": "failure",
+    "runConclusion": "failure",
+    "artifactID": 13474215432,
+    "artifactBytes": 70210047,
+    "artifactSHA256": "41cd1ae1525a601b7436efef8446137743fd88178903373fee9e88d84661ca76",
+    "manifestSHA256": "ed84605ccc523ae5f41d6b82584765b6a04aac3f685d6cd9ecf44b3784c2ead5",
+    "receipt": {
+      "version": "owned-minio-source-build-receipt-v1",
+      "repository": "https://github.com/minio/minio",
+      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
+      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
+      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
+      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
+      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "cgoEnabled": "0",
+      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
+      "binaryBytes": 146777192
+    }
+  },
   "oldTestsToRerun": [],
   "resource": {
     "initialBytes": 4294967296,

@@ -59,6 +59,24 @@ type AcceptanceResult struct {
 	DataReadySHA256          string                     `json:"dataReadySHA256,omitempty"`
 	KnownAdmissionSHA256     string                     `json:"knownAdmissionSHA256,omitempty"`
 	ActualStartedRoles       int                        `json:"actualStartedRoles"`
+	LegacyStartupStage       string                     `json:"legacyStartupStage,omitempty"`
+	LegacyChildRetained      bool                       `json:"legacyChildRetained"`
+	AcquireStage             string                     `json:"acquireStage,omitempty"`
+	AcquireAttempted         bool                       `json:"acquireAttempted"`
+	AcquireReturned          bool                       `json:"acquireReturned"`
+	AcquireErrorClass        string                     `json:"acquireErrorClass,omitempty"`
+	PrimaryRunErrorClass     string                     `json:"primaryRunErrorClass,omitempty"`
+	ReaderStage              string                     `json:"readerStage,omitempty"`
+	ReaderCallState          string                     `json:"readerCallState,omitempty"`
+	ReaderErrorClass         string                     `json:"readerErrorClass,omitempty"`
+	ConstructorStage         string                     `json:"constructorStage,omitempty"`
+	ConstructorRole          string                     `json:"constructorRole,omitempty"`
+	ConstructorCallState     string                     `json:"constructorCallState,omitempty"`
+	ConstructorErrorClass    string                     `json:"constructorErrorClass,omitempty"`
+	ConstructorPredicate     string                     `json:"constructorPredicate,omitempty"`
+	LocalCleanupObserved     bool                       `json:"localCleanupObserved"`
+	LocalCleanupState        string                     `json:"localCleanupState,omitempty"`
+	LocalCleanupFailureClass string                     `json:"localCleanupFailureClass,omitempty"`
 	ReaderPhases             []ReaderPhaseObservation   `json:"readerPhases"`
 	ReaderServed             []ActualReaderEndpoint     `json:"readerServed"`
 	Cancellation             *CancellationObservation   `json:"cancellation,omitempty"`
@@ -114,6 +132,8 @@ func observeBootstrapFailure(err error) string {
 	var broker sarama.KError
 	if errors.As(err, &broker) {
 		switch broker {
+		case sarama.ErrConsumerCoordinatorNotAvailable:
+			return "kafka-coordinator-unavailable"
 		case sarama.ErrSASLAuthenticationFailed:
 			return "kafka-auth"
 		case sarama.ErrTopicAuthorizationFailed, sarama.ErrClusterAuthorizationFailed:
@@ -138,11 +158,29 @@ func observeBootstrapFailure(err error) string {
 	}
 }
 
+// Only local retained Wait/Close outcomes are summarized here, never raw errors
+// or a canonical business drain. The original error remains joined unchanged.
+func observeLocalCleanupFailure(err error) string {
+	switch {
+	case err == nil:
+		return "none"
+	case errors.Is(err, context.Canceled):
+		return "cancelled"
+	case errors.Is(err, context.DeadlineExceeded):
+		return "deadline"
+	case errors.Is(err, ownedcontrol.ErrOwnedEvidence):
+		return "owned-evidence"
+	default:
+		return "other"
+	}
+}
+
 // RunAcceptance is one non-retrying scenario in one freshly created plane.
 // Both success and failure are collected from actual source processes; a
 // missing fixture, malformed bootstrap or failed startup never passes a case.
 func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResult, runErr error) {
 	result = AcceptanceResult{Version: "owned-fullgraph-token-v2-result-v1", Scenario: plan.Scenario, Phase: "actual-resource-bootstrap", ResourcePlaneSHA256: plan.PlaneSHA256, FreshPlaneOnly: true}
+	result.ConstructorStage, result.ConstructorRole, result.ConstructorCallState, result.ConstructorErrorClass, result.ConstructorPredicate = "not-entered", "none", "not-entered", "none", "none"
 	plan.bootstrapStage = &result.BootstrapStage
 	boot, e := PrepareFresh(ctx, plan)
 	if e != nil {
@@ -150,12 +188,24 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	}
 	var session *Session
 	defer func() {
+		// Observe the original named return before any cleanup or boot.Close joins.
+		result.PrimaryRunErrorClass = graphOperationErrorClass(runErr)
 		cleanup, stop := context.WithTimeout(context.Background(), 120*time.Second)
 		defer stop()
-		runErr = errors.Join(runErr, cleanupAcceptanceSession(cleanup, session))
+		localCleanupErr := cleanupAcceptanceSession(cleanup, session)
+		runErr = errors.Join(runErr, localCleanupErr)
 		if boot != nil {
 			runErr = errors.Join(runErr, boot.Close(cleanup))
 		}
+		result.LocalCleanupState = "no-session"
+		if session != nil {
+			result.LocalCleanupState = "incomplete"
+			if session.CleanupComplete() {
+				result.LocalCleanupState = "complete"
+			}
+		}
+		result.LocalCleanupFailureClass = observeLocalCleanupFailure(localCleanupErr)
+		result.LocalCleanupObserved = true
 		if runErr != nil {
 			result.Accepted = false
 			result.FailureSHA256 = digestBytes([]byte(runErr.Error()))
@@ -188,6 +238,20 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	result.BusinessPermissions = boot.BusinessPermissions
 	result.Phase = "actual-hold-import-and-fourteen-original-processes"
 	session, e = Start(ctx, boot.Inputs)
+	if session != nil {
+		result.LegacyStartupStage = session.legacyStartupStage
+		result.LegacyChildRetained = session.legacyChildRetained
+		result.AcquireStage = session.acquireObservation.Stage
+		result.AcquireAttempted = session.acquireObservation.Attempted
+		result.AcquireReturned = session.acquireObservation.Returned
+		result.AcquireErrorClass = session.acquireObservation.ErrorClass
+		result.ReaderStage = session.readerObservation.Stage
+		result.ReaderCallState = session.readerObservation.State
+		result.ReaderErrorClass = session.readerObservation.ErrorClass
+		if observation := session.constructorObservation; observation.Stage != "" {
+			result.ConstructorStage, result.ConstructorRole, result.ConstructorCallState, result.ConstructorErrorClass, result.ConstructorPredicate = observation.Stage, observation.Role, observation.State, observation.ErrorClass, observation.Predicate
+		}
+	}
 	if e != nil {
 		if session != nil {
 			result.Phase = session.Phase

@@ -34,16 +34,22 @@ func registerFavoriteRoutes(router *gin.Engine, authenticate gin.HandlerFunc, rd
 }
 
 func registerFavoriteRoutesOnDatabase(ctx context.Context, router *gin.Engine, authenticate gin.HandlerFunc, rdb redis.UniversalClient, conversations conversation.ConversationClient, database *mongo.Database) error {
+	return registerFavoriteRoutesWithHistoryReader(ctx, router, authenticate, rdb, conversations, database, nil)
+}
+
+func registerFavoriteRoutesWithHistoryReader(ctx context.Context, router *gin.Engine, authenticate gin.HandlerFunc, rdb redis.UniversalClient, conversations conversation.ConversationClient, database *mongo.Database, historyReader *messagedelivery.HistoryWindowReader) error {
 	store, err := favorite.NewMongoStore(ctx, database)
 	if err != nil {
 		return err
 	}
-	historyReader, err := messagedelivery.NewHistoryWindowReaderFromEnvironment(database)
-	if err != nil {
-		return err
-	}
-	if err := historyReader.CheckReady(ctx); err != nil {
-		return err
+	if historyReader == nil {
+		historyReader, err = messagedelivery.NewHistoryWindowReaderFromEnvironment(database)
+		if err != nil {
+			return err
+		}
+		if err := historyReader.CheckReady(ctx); err != nil {
+			return err
+		}
 	}
 	api := &favoriteAPI{service: &favorite.Service{Store: store}, retention: &favorite.RetentionGate{Source: &favoriteMessageSource{
 		conversations: conversations, messages: controller.NewReadOnlyMessageIdentityReader(rdb, database, historyReader),

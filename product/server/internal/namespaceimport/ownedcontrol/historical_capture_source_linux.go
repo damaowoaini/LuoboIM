@@ -306,9 +306,30 @@ func (s *HistoricalCaptureSource) revalidate(ctx context.Context, h namespaceimp
 	if e := s.reviewLegacy(ctx); e != nil {
 		return e
 	}
-	actual, e := s.finalInventory(ctx)
+	var actual namespaceimport.Inventory
+	entered := false
+	var inventoryErr error
+	e := s.materializer.workspace.WithSnapshotReadScope(ctx, func(readCtx context.Context) error {
+		entered = true
+		actual, inventoryErr = s.finalInventory(readCtx)
+		return inventoryErr
+	})
+	if !entered && errors.Is(e, namespaceinventory.ErrInvalid) {
+		// Preserve ordinary PageSource and existing-scope reads through their original checks.
+		actual, inventoryErr = s.finalInventory(ctx)
+		e = inventoryErr
+	}
 	if e != nil {
-		return e
+		actual = namespaceimport.Inventory{}
+		// Keep finalInventory's original rejection ahead of the scope's end check.
+		if inventoryErr != nil {
+			return inventoryErr
+		}
+		if !entered {
+			// Its first Checkpoint also normalizes every fresh failure to Pending.
+			return ErrCaptureProgressPending
+		}
+		return ErrOwnedEvidence
 	}
 	if historicalJSONSHA(actual) != historicalJSONSHA(i) {
 		return ErrOwnedEvidence
