@@ -306,6 +306,30 @@ def validate_report(catalog, entry, seal_sha, value):
     return rich.validate_report(projected, value)  # Unchanged original18 graph/body/variant/origin template.
 
 
+def summarize_reports(seal_sha, pins, seen):
+    # Only this known pair field crosses from validated internal tuples to JSON.
+    # Other report fields are neither normalized nor coerced.
+    if any(type(pair) is not tuple or len(pair)!=2 or
+           any(type(value) is not str for value in pair) for pair in seen):
+        raise ValueError('validated internal project/configuration tuples required')
+    return {'seal_sha256': seal_sha, 'reports': pins,
+            'actual_project_configurations': [[project, configuration] for project, configuration in seen],
+            'runtime_or_APK_accepted': False}
+
+
+def origin_binding_value(proof, app_binding_sha):
+    return {**proof, 'App_origin_binding_sha256': app_binding_sha,
+            'template_catalog_sha256': rich.CATALOG_SHA,
+            'actual_registered_configurations': len(proof['actual_project_configurations'])}
+
+
+def require_origin_binding_value(value, proof, app_binding_sha):
+    expected=origin_binding_value(proof, app_binding_sha)
+    if (type(value) is not dict or value.get('runtime_or_APK_accepted') is not False
+            or type(value.get('actual_registered_configurations')) is not int or value!=expected):
+        raise ValueError('registered plugin graph/source/origin proof changed')
+
+
 def reports(work, here, inputs, phase, require_all):
     if phase not in ('metadata', 'apk'):
         raise ValueError('finite plugin report phase required')
@@ -331,23 +355,19 @@ def reports(work, here, inputs, phase, require_all):
     wanted = {(entry['project'], rich.kgp_owner_model.ABI) for entry in seal['entries']}
     if len(set(seen)) != len(seen) or require_all and set(seen) != wanted:
         raise ValueError('complete registered plugin configuration reports required')
-    return {'seal_sha256': rich.sha(body), 'reports': pins, 'actual_project_configurations': seen,
-            'runtime_or_APK_accepted': False}
+    return summarize_reports(rich.sha(body), pins, seen)
 
 
 def bind_origins(work, here, inputs):
     # Original App14+BC4 bodies/variants plus the strict current exact-source policy remain mandatory.
     origins.require_origin_binding(work, here)
     proof = reports(work, here, inputs, 'metadata', True)
-    s.write_json(Path(work) / 'evidence/plugin-rich-origin-binding.json', {
-        **proof, 'App_origin_binding_sha256': s.sha(Path(work) / 'evidence/rich-origin-binding.json'),
-        'template_catalog_sha256': rich.CATALOG_SHA, 'actual_registered_configurations': len(proof['actual_project_configurations'])})
+    s.write_json(Path(work) / 'evidence/plugin-rich-origin-binding.json',
+        origin_binding_value(proof, s.sha(Path(work) / 'evidence/rich-origin-binding.json')))
 
 
 def require_origin_binding(work, here, inputs):
     origins.require_origin_binding(work, here)
     proof = reports(work, here, inputs, 'metadata', True)
-    expected = {**proof, 'App_origin_binding_sha256': s.sha(Path(work) / 'evidence/rich-origin-binding.json'),
-                'template_catalog_sha256': rich.CATALOG_SHA, 'actual_registered_configurations': len(proof['actual_project_configurations'])}
-    if json.loads(rich.read(Path(work) / 'evidence/plugin-rich-origin-binding.json', 16 << 20)) != expected:
-        raise ValueError('registered plugin graph/source/origin proof changed')
+    value = json.loads(rich.read(Path(work) / 'evidence/plugin-rich-origin-binding.json', 16 << 20))
+    require_origin_binding_value(value, proof, s.sha(Path(work) / 'evidence/rich-origin-binding.json'))

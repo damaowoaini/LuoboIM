@@ -124,15 +124,13 @@ func (g *NamespaceRuntimeLaunchGroup) startWithObservation(ctx context.Context, 
 		if s.BootstrapEnvironmentKey != "LUOBO_ORDINARY_OWNED_RUNTIME_INPUT" || s.BootstrapSHAEnvironmentKey != "LUOBO_ORDINARY_OWNED_RUNTIME_INPUT_SHA256" {
 			return empty, ErrOwnedEvidence
 		}
-		var original map[string]json.RawMessage
 		observation.enter(spec.Service.Role, "start-managed-shape")
-		sum, e := readServerEnvelope(s.BootstrapPath, &original)
-		if e != nil || sum != r.BootstrapSHA256 || len(original) != 15 {
+		original, e := ReadNamespaceRuntimeManagedInput(s.BootstrapPath, r.BootstrapSHA256)
+		if e != nil {
 			return empty, ErrOwnedEvidence
 		}
-		var version, database, epoch, activation, drain string
 		observation.enter(spec.Service.Role, "start-managed-fields")
-		if json.Unmarshal(original["version"], &version) != nil || json.Unmarshal(original["database"], &database) != nil || json.Unmarshal(original["epoch"], &epoch) != nil || json.Unmarshal(original["activationSHA256"], &activation) != nil || json.Unmarshal(original["drainPath"], &drain) != nil || version != NamespaceRuntimeManagedBootstrapVersion || database != g.header.Database || epoch != g.header.Epoch || activation != g.header.ActivationSHA256 || filepath.Dir(drain) != s.Work {
+		if original.Version != NamespaceRuntimeManagedBootstrapVersion || original.Database != g.header.Database || original.Epoch != g.header.Epoch || original.ActivationSHA256 != g.header.ActivationSHA256 || filepath.Dir(original.DrainPath) != s.Work {
 			return empty, ErrOwnedEvidence
 		}
 	}

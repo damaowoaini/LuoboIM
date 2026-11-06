@@ -6142,11 +6142,11 @@
       "sha256": "955c954bf3f758be1a48f75dba46afff78065e68018f9460c2a5f697f89db2ef"
     },
     {
-      "bytes": 3930,
+      "bytes": 8535,
       "mode": 420,
       "path": "server/internal/msgtransfer/managed_ordinary_bootstrap_test.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "086f5b9c80555cdec23c6e066577abbf41c7a90a69c6659cafc8ef3b23d656d6"
+      "sha256": "c688794e62fea95066204520fcce22053bcfec543da37749f61b1b2e8f1087e5"
     },
     {
       "bytes": 7421,
@@ -6674,11 +6674,11 @@
       "sha256": "ed0f580d97536a15424617166ab57f801e6d4dcd3f12a517c81e462d1bb58e85"
     },
     {
-      "bytes": 11862,
+      "bytes": 11504,
       "mode": 420,
       "path": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_launch_linux.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "0a04e1a4778635ce73ff61ad7ac70f7bfeaca2b5e8c5b387d13cb1d7ff27a371"
+      "sha256": "aeddf2e7076e63349ae762647037721ed20e4e61728cf782abb5e36e9ecea35b"
     },
     {
       "bytes": 11144,
@@ -6737,11 +6737,11 @@
       "sha256": "0a86ffdaa90a348b2e3e12095d86e9ad6722cbcf2d34b9b77812c4913155fce7"
     },
     {
-      "bytes": 13196,
+      "bytes": 15058,
       "mode": 420,
       "path": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_types.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "14800f19a055ebf8d29ace404d8739af115f8ef07d43ff377dd7801678f2f132"
+      "sha256": "81732f2a53727f55ba5fc2f1ccec104d65d9e73200803ed56ae0e10acc63577c"
     },
     {
       "bytes": 3008,
@@ -13177,7 +13177,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "b0e08c3c851bcafb635ffc209acd86273bc29b2f240eb5f12a2ace114605b9b4",
+  "filesSHA256": "63f4bb7fdbda840a4bd56dc41e75c0f0442e6f4e0a730090465cc9bbe1f8aa7d",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13235,7 +13235,7 @@
     },
     "server": {
       "members": 1576,
-      "digest": "ffd081874f7c2eaf0c0ec6e3e24e52796662dd8fa3d3bf16421f98bfd1ac5c82"
+      "digest": "3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea"
     }
   },
   "state": "MATERIALIZED_SOURCE_ONLY"

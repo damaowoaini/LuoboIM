@@ -846,7 +846,7 @@ class FullGraphControls(unittest.TestCase):
 
   # The earlier explicit fresh image/Kafka branch remains independently checked.
   control=run.CURRENT_IMAGE_KAFKA_CONTROL;package=next(iter(control['targets']));parent=run.module('ci/backend-runtime-join-r7/run.py','image_kafka_pure_auditor')
-  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package][:1]),processImageTestsToRun=list(control['targets'][package][1:]),currentImageKafkaControl=copy.deepcopy(control),currentKafkaConfirmControl=None,currentReleaseControl=None,currentReleaseTestsToRun=[],kafkaConfirmPassedReuse=None,kafkaACLPassedReuse=None);run.check_current_image_kafka_plan(locked)
+  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package][:1]),processImageTestsToRun=list(control['targets'][package][1:]),currentImageKafkaControl=copy.deepcopy(control),currentKafkaConfirmControl=None,currentReleaseControl=None,currentReleaseTestsToRun=[],currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],kafkaConfirmPassedReuse=None,kafkaACLPassedReuse=None);run.check_current_image_kafka_plan(locked)
   for change in ({'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'processImageTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentImageKafkaControl':{}}):
    with self.assertRaises(ValueError):run.check_current_image_kafka_plan(dict(locked,**change))
   events=[{'Action':'start','Package':parent.PREFIX+package}]
@@ -898,7 +898,7 @@ class FullGraphControls(unittest.TestCase):
 
   # The earlier explicit fresh Kafka branch remains independently checked.
   control=run.CURRENT_KAFKA_CONFIRM_CONTROL;package=next(iter(control['targets']));parent=run.module('ci/backend-runtime-join-r7/run.py','kafka_confirm_pure_auditor')
-  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package]),processImageTestsToRun=[],currentImageKafkaControl=None,currentKafkaConfirmControl=copy.deepcopy(control),currentReleaseControl=None,currentReleaseTestsToRun=[],kafkaConfirmPassedReuse=None,kafkaACLPassedReuse=None);run.check_current_kafka_confirm_plan(locked)
+  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package]),processImageTestsToRun=[],currentImageKafkaControl=None,currentKafkaConfirmControl=copy.deepcopy(control),currentReleaseControl=None,currentReleaseTestsToRun=[],currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],kafkaConfirmPassedReuse=None,kafkaACLPassedReuse=None);run.check_current_kafka_confirm_plan(locked)
   for change in ({'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']},{'kafkaACLTestsToRun':[]},{'currentKafkaConfirmControl':{}},{'processImageHistoricalPass':{}},{'currentImageKafkaControl':run.CURRENT_IMAGE_KAFKA_CONTROL}):
    with self.assertRaises(ValueError):run.check_current_kafka_confirm_plan(dict(locked,**change))
   events=[{'Action':'start','Package':parent.PREFIX+package}]
@@ -952,7 +952,7 @@ class FullGraphControls(unittest.TestCase):
   # Historical reuse is valid only under its original whole-source identity.
   with mock.patch.object(run,'FINAL_SOURCE',run.KAFKA_CONFIRM_PASSED_REUSE['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.KAFKA_CONFIRM_PASSED_REUSE['source']):
    # Same whole-source Kafka reuse preserves the original run and never dispatches.
-   locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentReleaseControl=None,currentReleaseTestsToRun=[],kafkaACLTestsToRun=[],currentKafkaConfirmControl=None,kafkaConfirmPassedReuse=copy.deepcopy(run.KAFKA_CONFIRM_PASSED_REUSE));receipt=copy.deepcopy(run.KAFKA_CONFIRM_PASSED_REUSE)
+   locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentReleaseControl=None,currentReleaseTestsToRun=[],currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],kafkaACLTestsToRun=[],currentKafkaConfirmControl=None,kafkaConfirmPassedReuse=copy.deepcopy(run.KAFKA_CONFIRM_PASSED_REUSE));receipt=copy.deepcopy(run.KAFKA_CONFIRM_PASSED_REUSE)
    self.assertEqual(run.check_kafka_confirm_reuse_plan(locked),receipt)
    self.assertEqual((receipt['originalReceipt']['topPASS'],receipt['originalReceipt']['subPASS']),(1,3))
    self.assertEqual(receipt['originalActualKafkaTestsDispatched'],1);self.assertEqual(receipt['actualCurrentKafkaTestsDispatched'],0)
@@ -1124,58 +1124,117 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_release_controls_keep_one_race_and_exact_named_evidence(self):
-  collector=load('collect');control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes())
-  self.assertEqual(run.check_current_release_plan(locked),control);run.check_locked(locked)
-  self.assertNotEqual(run.FINAL_SOURCE,run.KAFKA_CONFIRM_PRIOR_PASS['source']);self.assertIsNone(locked['kafkaConfirmPassedReuse']);self.assertEqual(run.check_kafka_confirm_prior_pass(locked['kafkaConfirmHistoricalPass']),run.KAFKA_CONFIRM_PRIOR_PASS)
+  collector=load('collect')
+  with mock.patch.object(run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']):
+   control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],currentReleaseControl=copy.deepcopy(control),currentReleaseTestsToRun=control['targets'][package][:-1],kafkaACLTestsToRun=control['targets'][package][-1:])
+   self.assertEqual(run.check_current_release_plan(locked),control);run.check_locked(locked)
+   self.assertNotEqual(run.FINAL_SOURCE,run.KAFKA_CONFIRM_PRIOR_PASS['source']);self.assertIsNone(locked['kafkaConfirmPassedReuse']);self.assertEqual(run.check_kafka_confirm_prior_pass(locked['kafkaConfirmHistoricalPass']),run.KAFKA_CONFIRM_PRIOR_PASS)
+   rows=[{'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False} for scenario in run.SCENARIOS]
+   observation=collector.console_observation(rows,{}, {},{},[{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed'}}])
+   self.assertEqual(observation['lastPhase']['phase'],control['phase']);self.assertFalse(observation['acceptanceEvidence'])
+   for change in ({'currentReleaseTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'kafkaConfirmPassedReuse':run.KAFKA_CONFIRM_PRIOR_PASS},{'currentKafkaConfirmControl':run.CURRENT_KAFKA_CONFIRM_CONTROL},{'currentImageKafkaControl':run.CURRENT_IMAGE_KAFKA_CONTROL},{'kafkaConfirmHistoricalPass':{}},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
+    with self.assertRaises(ValueError):run.check_current_release_plan(dict(locked,**change))
+   with self.assertRaises(ValueError):run.check_kafka_confirm_reuse_receipt(run.KAFKA_CONFIRM_PRIOR_PASS)
+   parent=run.module('ci/backend-runtime-join-r7/run.py','release_control_pure_auditor');events=[{'Action':'start','Package':parent.PREFIX+package}]
+   for top in control['targets'][package]:
+    events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
+    for child in control['requiredSubtests'][package][top]:
+     name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+    events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
+   events.append({'Action':'pass','Package':parent.PREFIX+package})
+   for mode in ('complete','missing-release-child','missing-kafka-child','skip','foreign-top','missing-footer','phase-error'):
+    with self.subTest(releaseControl=mode),tempfile.TemporaryDirectory() as directory:
+     out=Path(directory).resolve();seen=[];environment={'GOPROXY':'off','GOSUMDB':'off'}
+     def command(label,argv,seconds,actual_environment):
+      seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,240);self.assertEqual(actual_environment,environment)
+      self.assertEqual(argv[:3],['/owned/go','test','-mod=readonly']);self.assertIn('-race',argv);self.assertIn('-count=1',argv);self.assertIn('-timeout=180s',argv);self.assertEqual(argv[-1],'./'+package)
+      pattern=__import__('re').compile(argv[argv.index('-run')+1]);self.assertTrue(all(pattern.fullmatch(top) for top in control['targets'][package]));self.assertIsNone(pattern.fullmatch('TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation'))
+      if mode=='phase-error':raise ValueError('original phase failure')
+      rows=copy.deepcopy(events)
+      if mode=='missing-release-child':rows=[row for row in rows if row.get('Test')!=control['targets'][package][0]+'/'+control['requiredSubtests'][package][control['targets'][package][0]][0]]
+      elif mode=='missing-kafka-child':rows=[row for row in rows if row.get('Test')!=control['targets'][package][-1]+'/'+control['requiredSubtests'][package][control['targets'][package][-1]][-1]]
+      elif mode=='skip':rows[2]['Action']='skip'
+      elif mode=='foreign-top':rows.insert(1,{'Action':'run','Package':parent.PREFIX+package,'Test':'TestForeign'})
+      elif mode=='missing-footer':rows=rows[:-1]
+      return ('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
+     if mode!='complete':
+      with self.assertRaises(ValueError):run.run_current_release_control('/owned/go',environment,command,parent,out)
+      self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-release-controls-names.json').exists());continue
+     value=run.run_current_release_control('/owned/go',environment,command,parent,out)
+     self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS']),(4,22));self.assertEqual(value['actualOwnedcontrolRaceInvocations'],1);self.assertEqual(value['actualReleaseTopsDispatched'],3);self.assertFalse(value['wholeSourceAccepted']);self.assertFalse(value['runtimeAccepted'])
+     item=value['individualKafkaFact'];self.assertEqual((item['topPASS'],item['subPASS'],len(item['namedCompletions'])),(1,3,4));self.assertEqual(item['sharedRaceInvocation'],1);self.assertEqual(item['separateKafkaInvocations'],0);self.assertFalse(item['currentWholeOwnedcontrolPackagePASS'])
+     projected,_=run.project_go_test_events(('\n'.join(json.dumps(row) for row in events)+'\n').encode(),control['phase']);self.assertNotIn('PRIVATE_OUTPUT',json.dumps(projected))
+     run.write(out/'current-release-controls-events.json',projected);run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}})
+     run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':{'bytes':1,'sha256':'a'*64,'mode':0o755}};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+     self.assertEqual(collector.checked_current_release_evidence(out),value)
+     names=('current-release-controls-events.json','current-release-kafka-individual.json','phase-0001.json','source-post.json','tools-after.json','kafka-confirm-historical-pass.json','kafka-acl-historical-pass.json','process-image-historical-pass.json');original={name:(out/name).read_bytes() for name in names}
+     for changed in names:
+      for name,raw in original.items():(out/name).write_bytes(raw)
+      (out/changed).write_text(json.dumps(projected[:-1]) if changed.endswith('-events.json') else '{}')
+      with self.subTest(releaseCustody=changed),self.assertRaises(ValueError):collector.checked_current_release_evidence(out)
+     for name,raw in original.items():(out/name).write_bytes(raw)
+     for fields in ({'source':run.KAFKA_CONFIRM_PRIOR_PASS['source']},{'topPASS':True},{'subPASS':21},{'actualReleaseTopsDispatched':0},{'actualOwnedcontrolRaceInvocations':2},{'actualKafkaACLTestsDispatched':0},{'actualProcessImageTestsDispatched':1},{'runtimeAccepted':True},{'wholeSourceAccepted':True},{'individualKafkaFact':dict(item,separateKafkaInvocations=1)},{'namedCompletions':value['namedCompletions'][:-1]}):
+      with self.assertRaises(ValueError):run.check_current_release_receipt(dict(value,**fields))
+     for alias in ('kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json'):
+      run.write(out/alias,{})
+      with self.assertRaises(ValueError):collector.checked_current_release_evidence(out)
+      (out/alias).unlink()
+
+
+ def test_managed_shape_controls_keep_two_packages_one_command_and_exact_subsets(self):
+  collector=load('collect');control=run.CURRENT_MANAGED_SHAPE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());owned='internal/namespaceimport/ownedcontrol';managed='internal/msgtransfer'
+  self.assertEqual(run.check_current_managed_shape_plan(locked),control);run.check_locked(locked);self.assertIsNone(locked['currentReleaseControl']);self.assertNotEqual(run.FINAL_SOURCE,run.RELEASE_CONTROLS_PRIOR_PASS['source'])
+  for fields in ({'currentManagedShapeTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentReleaseControl':run.CURRENT_RELEASE_CONTROL},{'releaseControlsHistoricalPass':{}},{'kafkaConfirmPassedReuse':run.KAFKA_CONFIRM_PRIOR_PASS},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
+   with self.assertRaises(ValueError):run.check_current_managed_shape_plan(dict(locked,**fields))
+  with self.assertRaises(ValueError):run.check_release_controls_prior_pass(dict(run.RELEASE_CONTROLS_PRIOR_PASS,source=run.FINAL_SOURCE))
   rows=[{'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False} for scenario in run.SCENARIOS]
-  observation=collector.console_observation(rows,{}, {},{},[{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed'}}])
-  self.assertEqual(observation['lastPhase']['phase'],control['phase']);self.assertFalse(observation['acceptanceEvidence'])
-  for change in ({'currentReleaseTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'kafkaConfirmPassedReuse':run.KAFKA_CONFIRM_PRIOR_PASS},{'currentKafkaConfirmControl':run.CURRENT_KAFKA_CONFIRM_CONTROL},{'currentImageKafkaControl':run.CURRENT_IMAGE_KAFKA_CONTROL},{'kafkaConfirmHistoricalPass':{}},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
-   with self.assertRaises(ValueError):run.check_current_release_plan(dict(locked,**change))
-  with self.assertRaises(ValueError):run.check_kafka_confirm_reuse_receipt(run.KAFKA_CONFIRM_PRIOR_PASS)
-  parent=run.module('ci/backend-runtime-join-r7/run.py','release_control_pure_auditor');events=[{'Action':'start','Package':parent.PREFIX+package}]
-  for top in control['targets'][package]:
-   events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
-   for child in control['requiredSubtests'][package][top]:
-    name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
-   events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
-  events.append({'Action':'pass','Package':parent.PREFIX+package})
-  for mode in ('complete','missing-release-child','missing-kafka-child','skip','foreign-top','missing-footer','phase-error'):
-   with self.subTest(releaseControl=mode),tempfile.TemporaryDirectory() as directory:
+  self.assertEqual(collector.console_observation(rows,{}, {},{},[{'phase':control['phase']}])['lastPhase']['phase'],control['phase'])
+  parent=run.module('ci/backend-runtime-join-r7/run.py','managed_shape_pure_auditor');events=[]
+  for package,tops in control['targets'].items():
+   events.append({'Action':'start','Package':parent.PREFIX+package})
+   for top in tops:
+    events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
+    for child in control['requiredSubtests'][package][top]:
+     name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+    events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
+   events.append({'Action':'pass','Package':parent.PREFIX+package})
+  for mode in ('complete','missing-producer-child','missing-kafka-child','skip','foreign-top','missing-package-footer','phase-error'):
+   with self.subTest(managedShape=mode),tempfile.TemporaryDirectory() as directory:
     out=Path(directory).resolve();seen=[];environment={'GOPROXY':'off','GOSUMDB':'off'}
     def command(label,argv,seconds,actual_environment):
-     seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,240);self.assertEqual(actual_environment,environment)
-     self.assertEqual(argv[:3],['/owned/go','test','-mod=readonly']);self.assertIn('-race',argv);self.assertIn('-count=1',argv);self.assertIn('-timeout=180s',argv);self.assertEqual(argv[-1],'./'+package)
-     pattern=__import__('re').compile(argv[argv.index('-run')+1]);self.assertTrue(all(pattern.fullmatch(top) for top in control['targets'][package]));self.assertIsNone(pattern.fullmatch('TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation'))
-     if mode=='phase-error':raise ValueError('original phase failure')
-     rows=copy.deepcopy(events)
-     if mode=='missing-release-child':rows=[row for row in rows if row.get('Test')!=control['targets'][package][0]+'/'+control['requiredSubtests'][package][control['targets'][package][0]][0]]
-     elif mode=='missing-kafka-child':rows=[row for row in rows if row.get('Test')!=control['targets'][package][-1]+'/'+control['requiredSubtests'][package][control['targets'][package][-1]][-1]]
-     elif mode=='skip':rows[2]['Action']='skip'
-     elif mode=='foreign-top':rows.insert(1,{'Action':'run','Package':parent.PREFIX+package,'Test':'TestForeign'})
-     elif mode=='missing-footer':rows=rows[:-1]
-     return ('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
+     seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,240);self.assertEqual(actual_environment,environment);self.assertEqual(argv[-2:],['./'+owned,'./'+managed]);self.assertIn('-race',argv);self.assertIn('-count=1',argv)
+     pattern=__import__('re').compile(argv[argv.index('-run')+1]);self.assertTrue(all(pattern.fullmatch(top) for tops in control['targets'].values() for top in tops));self.assertIsNone(pattern.fullmatch('TestNamespaceRuntimeMissingReleaseWaitsWithoutWeakeningPrivateEvidence'))
+     if mode=='phase-error':raise ValueError('original phase failed')
+     selected=copy.deepcopy(events)
+     if mode in ('missing-producer-child','missing-kafka-child'):
+      package=managed if mode=='missing-producer-child' else owned;top=control['targets'][package][0];name=top+'/'+control['requiredSubtests'][package][top][0];selected=[row for row in selected if (row.get('Package'),row.get('Test'))!=(parent.PREFIX+package,name)]
+     elif mode=='skip':selected[2]['Action']='skip'
+     elif mode=='foreign-top':selected.insert(1,{'Action':'run','Package':parent.PREFIX+owned,'Test':'TestForeign'})
+     elif mode=='missing-package-footer':selected=[row for row in selected if not(row.get('Package')==parent.PREFIX+managed and row.get('Action')=='pass' and not row.get('Test'))]
+     return ('\n'.join(json.dumps(row) for row in selected)+'\n').encode()
     if mode!='complete':
-     with self.assertRaises(ValueError):run.run_current_release_control('/owned/go',environment,command,parent,out)
-     self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-release-controls-names.json').exists());continue
-    value=run.run_current_release_control('/owned/go',environment,command,parent,out)
-    self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS']),(4,22));self.assertEqual(value['actualOwnedcontrolRaceInvocations'],1);self.assertEqual(value['actualReleaseTopsDispatched'],3);self.assertFalse(value['wholeSourceAccepted']);self.assertFalse(value['runtimeAccepted'])
-    item=value['individualKafkaFact'];self.assertEqual((item['topPASS'],item['subPASS'],len(item['namedCompletions'])),(1,3,4));self.assertEqual(item['sharedRaceInvocation'],1);self.assertEqual(item['separateKafkaInvocations'],0);self.assertFalse(item['currentWholeOwnedcontrolPackagePASS'])
+     with self.assertRaises(ValueError):run.run_current_managed_shape_control('/owned/go',environment,command,parent,out)
+     self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-managed-shape-controls-names.json').exists());continue
+    value=run.run_current_managed_shape_control('/owned/go',environment,command,parent,out);self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS'],value['packages']),(2,16,2));self.assertEqual((value['actualGoCommandInvocations'],value['actualPackageExecutions']),(1,2));self.assertFalse(value['samePackageSingleRaceInvocation'])
+    self.assertEqual((value['packageFacts'][owned]['topPASS'],value['packageFacts'][owned]['subPASS']),(1,3));self.assertEqual((value['packageFacts'][managed]['topPASS'],value['packageFacts'][managed]['subPASS']),(1,13));self.assertEqual(value['individualKafkaFact']['separateKafkaCommandInvocations'],0);self.assertFalse(value['wholeSourceAccepted'])
     projected,_=run.project_go_test_events(('\n'.join(json.dumps(row) for row in events)+'\n').encode(),control['phase']);self.assertNotIn('PRIVATE_OUTPUT',json.dumps(projected))
-    run.write(out/'current-release-controls-events.json',projected);run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}})
-    run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':{'bytes':1,'sha256':'a'*64,'mode':0o755}};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
-    self.assertEqual(collector.checked_current_release_evidence(out),value)
-    names=('current-release-controls-events.json','current-release-kafka-individual.json','phase-0001.json','source-post.json','tools-after.json','kafka-confirm-historical-pass.json','kafka-acl-historical-pass.json','process-image-historical-pass.json');original={name:(out/name).read_bytes() for name in names}
+    run.write(out/'current-managed-shape-controls-events.json',projected);run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}});run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':{'bytes':1,'sha256':'a'*64,'mode':0o755}};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+    self.assertEqual(collector.checked_current_managed_shape_evidence(out),value)
+    names=('current-managed-shape-controls-events.json','current-managed-shape-kafka-individual.json','phase-0001.json','source-post.json','tools-after.json','release-controls-historical-pass.json','kafka-confirm-historical-pass.json','kafka-acl-historical-pass.json','process-image-historical-pass.json');original={name:(out/name).read_bytes() for name in names}
     for changed in names:
      for name,raw in original.items():(out/name).write_bytes(raw)
      (out/changed).write_text(json.dumps(projected[:-1]) if changed.endswith('-events.json') else '{}')
-     with self.subTest(releaseCustody=changed),self.assertRaises(ValueError):collector.checked_current_release_evidence(out)
+     with self.subTest(managedCustody=changed),self.assertRaises(ValueError):collector.checked_current_managed_shape_evidence(out)
     for name,raw in original.items():(out/name).write_bytes(raw)
-    for fields in ({'source':run.KAFKA_CONFIRM_PRIOR_PASS['source']},{'topPASS':True},{'subPASS':21},{'actualReleaseTopsDispatched':0},{'actualOwnedcontrolRaceInvocations':2},{'actualKafkaACLTestsDispatched':0},{'actualProcessImageTestsDispatched':1},{'runtimeAccepted':True},{'wholeSourceAccepted':True},{'individualKafkaFact':dict(item,separateKafkaInvocations=1)},{'namedCompletions':value['namedCompletions'][:-1]}):
-     with self.assertRaises(ValueError):run.check_current_release_receipt(dict(value,**fields))
-    for alias in ('kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json'):
+    (out/'current-managed-shape-kafka-individual.json').write_text(json.dumps(dict(value['individualKafkaFact'],commandInvocations=True)))
+    with self.assertRaises(ValueError):collector.checked_current_managed_shape_evidence(out)
+    (out/'current-managed-shape-kafka-individual.json').write_bytes(original['current-managed-shape-kafka-individual.json'])
+    bad_facts=copy.deepcopy(value['packageFacts']);bad_facts[owned]['topPASS']=True
+    for fields in ({'source':run.RELEASE_CONTROLS_PRIOR_PASS['source']},{'packages':1},{'topPASS':True},{'subPASS':15},{'actualGoCommandInvocations':2},{'actualPackageExecutions':1},{'samePackageSingleRaceInvocation':True},{'packageFacts':bad_facts},{'runtimeAccepted':True},{'wholeSourceAccepted':True},{'individualKafkaFact':dict(value['individualKafkaFact'],separateKafkaCommandInvocations=1)}):
+     with self.assertRaises(ValueError):run.check_current_managed_shape_receipt(dict(value,**fields))
+    for alias in ('current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json'):
      run.write(out/alias,{})
-     with self.assertRaises(ValueError):collector.checked_current_release_evidence(out)
+     with self.assertRaises(ValueError):collector.checked_current_managed_shape_evidence(out)
      (out/alias).unlink()
 
 if __name__=='__main__':unittest.main()

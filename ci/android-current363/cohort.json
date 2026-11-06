@@ -208,9 +208,9 @@
       "sha256": "cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625"
     },
     {
-      "bytes": 20905,
+      "bytes": 21705,
       "path": "ci/android-current363/plugin_scope.py",
-      "sha256": "d61dd084cd3030e3cb1261777d4ae242b00f62e580d6e67852b9611bf188a684"
+      "sha256": "7a3c9621a275f996593bb937369d21580ce0c92c3045b2a078f458742a656fee"
     },
     {
       "bytes": 11062,
@@ -258,12 +258,17 @@
       "sha256": "060d5ea990bebde00e59c050db690527dd1310dbc497e329a853224d119c747e"
     },
     {
+      "bytes": 3621,
+      "path": "ci/android-current363/test_plugin_binding.py",
+      "sha256": "d31f14fa71e14cb9d4f965396dbfd47b9f47fd0e2e3811c68b31a1fa0b46885d"
+    },
+    {
       "bytes": 4454,
       "path": "ci/android-current363/test_rich_origins.py",
       "sha256": "5daeaadded94c519197cda264d12a8a526558867361a480f739b9633459946c6"
     }
   ],
-  "controller_revision": "current363-verified-core-reuse-exact-current-origin-policy-v5",
+  "controller_revision": "current363-verified-core-reuse-json-native-plugin-binding-v6",
   "core_build_mode": "restore-verified-current363",
   "core_compatibility": {
     "freshActualGoBuildRequired": false,

@@ -1,14 +1,18 @@
 package msgtransfer
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/openimsdk/open-im-server/v3/internal/deliveryprofile"
 	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
+	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
 )
 
 func managedOrdinaryBootstrapFixture(t *testing.T) (OwnedOrdinaryBootstrap, string) {
@@ -96,6 +100,117 @@ func TestManagedOrdinaryBootstrapRejectsIncompleteUnsafeOrChangedInputs(t *testi
 			}
 			if _, err := LoadOwnedOrdinaryBootstrap(b.Database); err == nil {
 				t.Fatal("unsafe or changed bootstrap accepted")
+			}
+		})
+	}
+}
+
+func TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape(t *testing.T) {
+	for _, fault := range []string{"producer-and-child-loader-roundtrip", "alphabetic-map-reorder", "unknown-field", "missing-field", "duplicate-field", "wrong-value-type", "null-string", "wrong-pin", "public-file", "symlink-file", "hardlink-file", "trailing-json", "missing-file"} {
+		t.Run(fault, func(t *testing.T) {
+			b, path := managedOrdinaryBootstrapFixture(t)
+			b.Version = ownedcontrol.NamespaceRuntimeManagedBootstrapVersion
+			t.Setenv(ManagedOwnerAnnouncementPathEnv, filepath.Join(filepath.Dir(path), "owner.json"))
+			t.Setenv(ManagedOwnerNonceEnv, strings.Repeat("f", 64))
+			t.Setenv(ownedcontrol.NamespaceRuntimePreparationPathEnv, filepath.Join(filepath.Dir(path), "not-created-runtime.json"))
+			t.Setenv(ownedcontrol.NamespaceRuntimePreparationSHAEnv, strings.Repeat("a", 64))
+			// Use the real producer type and the actual ServicePlan writer's
+			// json.Marshal(struct)+newline wire convention, including empty callbacks.
+			raw, e := json.Marshal(b)
+			if e != nil {
+				t.Fatal(e)
+			}
+			raw = append(raw, '\n')
+			switch fault {
+			case "alphabetic-map-reorder":
+				var fields map[string]json.RawMessage
+				if e := json.Unmarshal(raw, &fields); e != nil {
+					t.Fatal(e)
+				}
+				reordered, e := json.Marshal(fields)
+				if e != nil {
+					t.Fatal(e)
+				}
+				reordered = append(reordered, '\n')
+				if bytes.Equal(raw, reordered) {
+					t.Fatal("fixture lost the struct/map canonical distinction")
+				}
+				raw = reordered
+			case "unknown-field":
+				raw = append(append([]byte(nil), raw[:len(raw)-2]...), []byte(",\"unexpected\":\"value\"}\n")...)
+			case "missing-field":
+				raw = bytes.Replace(raw, []byte(",\"onlineCallbacksPath\":\"\""), nil, 1)
+			case "duplicate-field":
+				version, e := json.Marshal(b.Version)
+				if e != nil {
+					t.Fatal(e)
+				}
+				prefix := append(append([]byte("{\"version\":"), version...), ',')
+				raw = append(prefix, raw[1:]...)
+			case "wrong-value-type":
+				raw = bytes.Replace(raw, []byte("\"onlineCallbacksPath\":\"\""), []byte("\"onlineCallbacksPath\":7"), 1)
+			case "null-string":
+				raw = bytes.Replace(raw, []byte("\"onlineCallbacksPath\":\"\""), []byte("\"onlineCallbacksPath\":null"), 1)
+			case "trailing-json":
+				raw = append(raw, []byte("{}\n")...)
+			}
+			if e := os.WriteFile(path, raw, 0600); e != nil {
+				t.Fatal(e)
+			}
+			pin := deliveryprofile.SHA(raw)
+			t.Setenv(OwnedOrdinaryBootstrapSHAEnv, pin)
+			switch fault {
+			case "wrong-pin":
+				pin = deliveryprofile.SHA([]byte("different source"))
+			case "public-file":
+				if e := os.Chmod(path, 0644); e != nil {
+					t.Fatal(e)
+				}
+			case "symlink-file":
+				retained := filepath.Join(filepath.Dir(path), "retained.json")
+				if e := os.Rename(path, retained); e != nil {
+					t.Fatal(e)
+				}
+				if e := os.Symlink(retained, path); e != nil {
+					t.Fatal(e)
+				}
+			case "hardlink-file":
+				if e := os.Link(path, filepath.Join(filepath.Dir(path), "hardlink.json")); e != nil {
+					t.Fatal(e)
+				}
+			case "missing-file":
+				if e := os.Remove(path); e != nil {
+					t.Fatal(e)
+				}
+			}
+			got, e := ownedcontrol.ReadNamespaceRuntimeManagedInput(path, pin)
+			if fault != "producer-and-child-loader-roundtrip" {
+				if !errors.Is(e, ownedcontrol.ErrOwnedEvidence) {
+					t.Fatal("unsafe or changed private managed shape accepted", e)
+				}
+				return
+			}
+			if e != nil {
+				t.Fatal("real producer canonical bytes rejected", e)
+			}
+			canonical, e := json.Marshal(got)
+			if e != nil || !bytes.Equal(append(canonical, '\n'), raw) {
+				t.Fatal("consumer shape changed any producer field/order")
+			}
+			var fields map[string]json.RawMessage
+			if e := json.Unmarshal(raw, &fields); e != nil || len(fields) != 15 {
+				t.Fatal("producer no longer has the fixed fifteen fields")
+			}
+			loaded, e := LoadOwnedOrdinaryBootstrap(b.Database)
+			if e != nil || loaded.inputSHA != pin {
+				t.Fatal("same producer bytes failed the actual child loader", e)
+			}
+			gate, e := ownedcontrol.NewNamespaceRuntimeStartupGate(os.Getenv(ownedcontrol.NamespaceRuntimePreparationPathEnv), strings.Repeat("a", 64), "msgtransfer-managed", b.Epoch, pin, strings.Repeat("a", 64), strings.Repeat("a", 64), strings.Repeat("f", 64))
+			if e == nil || gate != nil {
+				t.Fatal("loaded private shape manufactured runtime admission")
+			}
+			if _, e := os.Stat(b.DrainPath); !os.IsNotExist(e) {
+				t.Fatal("shape reader manufactured a drain receipt")
 			}
 		})
 	}

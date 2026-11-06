@@ -17,6 +17,42 @@ import (
 const NamespaceRuntimeServerBootstrapVersion = "owned-server-namespace-admission-v2"
 const NamespaceRuntimeManagedBootstrapVersion = "owned-ordinary-namespace-admission-v2"
 
+// NamespaceRuntimeManagedInput is the fixed fifteen-field private producer
+// wire shape. Its order is deliberate: the source-owned producer marshals a
+// struct, and the existing private reader requires the identical canonical
+// bytes. This DTO is separate from the producer's private in-memory inputSHA.
+// Reading it grants no owner, runtime admission, or Ready capability.
+type NamespaceRuntimeManagedInput struct {
+	Version                string `json:"version"`
+	Database               string `json:"database"`
+	Epoch                  string `json:"epoch"`
+	ActivationSHA256       string `json:"activationSHA256"`
+	BadgeEvidenceSHA256    string `json:"badgeEvidenceSHA256"`
+	Topic                  string `json:"topic"`
+	ConsumerGroup          string `json:"consumerGroup"`
+	PolicySHA256           string `json:"policySHA256"`
+	VendorPath             string `json:"vendorPath"`
+	VendorSHA256           string `json:"vendorSHA256"`
+	OnlineCallbacksPath    string `json:"onlineCallbacksPath"`
+	OnlineCallbacksSHA256  string `json:"onlineCallbacksSHA256"`
+	OfflineCallbacksPath   string `json:"offlineCallbacksPath"`
+	OfflineCallbacksSHA256 string `json:"offlineCallbacksSHA256"`
+	DrainPath              string `json:"drainPath"`
+}
+
+// ReadNamespaceRuntimeManagedInput preserves the original private-file and
+// hash checks. Strict typed decoding and canonical re-encoding require all
+// fifteen keys with string values, no duplicates/unknown fields, and the
+// producer's exact field order; semantic role/header checks remain at launch.
+func ReadNamespaceRuntimeManagedInput(path, expectedSHA string) (NamespaceRuntimeManagedInput, error) {
+	var b NamespaceRuntimeManagedInput
+	sum, e := readServerEnvelope(path, &b)
+	if e != nil || !isSHA(expectedSHA) || sum != expectedSHA {
+		return NamespaceRuntimeManagedInput{}, ErrOwnedEvidence
+	}
+	return b, nil
+}
+
 // This finite graph is the actual required-mode replacement graph. Raw legacy
 // msgtransfer and extend-msg's empty placeholder are not serving replacements.
 // Required push retains token administration; delivery is owned by the real
