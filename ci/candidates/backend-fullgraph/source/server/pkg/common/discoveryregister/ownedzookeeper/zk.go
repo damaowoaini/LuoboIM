@@ -28,8 +28,11 @@ import (
 )
 
 const (
-	defaultFreq = time.Minute * 30
-	timeout     = 5
+	// Per-dial WithResolvers owns builder identity; a ZooKeeper namespace may
+	// contain URI-illegal scheme characters and must remain only a ZK path.
+	ownedResolverScheme = "openim-zookeeper"
+	defaultFreq         = time.Minute * 30
+	timeout             = 5
 )
 
 type Logger interface {
@@ -117,7 +120,7 @@ func newClientContext(parent context.Context, zkServers []string, zkRoot string,
 	if parent == nil {
 		return nil, errors.New("owned discovery context required")
 	}
-	client := &ZkClient{zkServers: zkServers, zkRoot: "/", scheme: zkRoot, timeout: timeout,
+	client := &ZkClient{zkServers: zkServers, zkRoot: "/", scheme: ownedResolverScheme, timeout: timeout,
 		localConns: make(map[string][]*grpc.ClientConn), resolvers: make(map[string]map[*Resolver]struct{}), lock: &sync.Mutex{},
 		logger: zk.DefaultLogger, owned: ownedLifecycle{connections: make(map[*grpc.ClientConn]struct{}), closeDone: make(chan struct{})}}
 	baseCtx, cancel := context.WithCancel(parent)
