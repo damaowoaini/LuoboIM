@@ -136,11 +136,11 @@
       "sha256": "1352383e60adc9ea4e4464d1d71d510688ea06abb1a38327d1270b7bdcde6cd7"
     },
     {
-      "bytes": 8831,
+      "bytes": 8922,
       "mode": 420,
       "path": "chart/internal/api/admin_delegation_test.go",
       "provider": "ci/chart-route-build/run.py:verify",
-      "sha256": "f3e2451325f9aac5aaf685d6d53524a0afcbc4bf65b1f269190b4e4a23e0c105"
+      "sha256": "80c36d2f0d0ba478c48a70667d343b38acb12080bbe37ed004699475d4ac3263"
     },
     {
       "bytes": 1131,
@@ -752,18 +752,25 @@
       "sha256": "f80870016f5319818be1be2017dfaaf31662de71089455b061ed179eafd5b140"
     },
     {
-      "bytes": 7835,
+      "path": "chart/pkg/common/admindelegation/admin_disable_revocation_test.go",
+      "mode": 420,
+      "provider": "ci/chart-route-build/run.py:verify",
+      "bytes": 6665,
+      "sha256": "3821d78ad07ac1931493fce7568a5f579c70972214a0c9697d7d2aa1cdb287c9"
+    },
+    {
+      "bytes": 8192,
       "mode": 420,
       "path": "chart/pkg/common/admindelegation/service.go",
       "provider": "ci/chart-route-build/run.py:verify",
-      "sha256": "e86ef4943ac720f0758d47a788e4fc547f0fbeff90086661491db876546770a0"
+      "sha256": "aecd771ddea507e96beaf9ec36e85608e2b3897e3670a688bce69997374072bf"
     },
     {
-      "bytes": 6799,
+      "bytes": 11259,
       "mode": 420,
       "path": "chart/pkg/common/admindelegation/service_test.go",
       "provider": "ci/chart-route-build/run.py:verify",
-      "sha256": "df6995dfec6fc256717a05983d00642d47091005cc65fa5a13a282b8679aac60"
+      "sha256": "55107fd6c78ee82b99063137bf789b4147f2af497bcc59daaaf6dfa255c303bd"
     },
     {
       "bytes": 2922,
@@ -1039,11 +1046,11 @@
       "sha256": "20e3c71ddcba444d4caac7da2149381b88a7b2750a4b8cb1ced4edd872d98b1b"
     },
     {
-      "bytes": 17347,
+      "bytes": 17636,
       "mode": 420,
       "path": "chart/pkg/common/db/database/admin.go",
       "provider": "ci/chart-route-build/run.py:verify",
-      "sha256": "9be0ee1e097f9717aa5c0b8439744e7bac008e302429a1aeb75785f2b8b88f20"
+      "sha256": "46479f34c651eab9813abbe36651bb82e9699b2361ad10c7abb279015ead9e7c"
     },
     {
       "bytes": 16308,
@@ -13198,7 +13205,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "937103b7042302fce95ba2cfd1e2415daa1545b465ef73c45e497dd7918316a7",
+  "filesSHA256": "6a7cbbe2068052551326ec89937497da0b5f701924ecddd0cc338bebb6836bbf",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13247,8 +13254,8 @@
   "servicesStarted": false,
   "sources": {
     "chart": {
-      "members": 258,
-      "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+      "members": 259,
+      "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
     },
     "route": {
       "members": 33,

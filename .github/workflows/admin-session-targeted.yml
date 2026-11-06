@@ -1,0 +1,88 @@
+name: Admin session SQL Redis exact4 and current chart5 build-only
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [admin-session-live4-chart5-v1]
+      inputs_sha256:
+        description: Exact Root reviewed formatted source and controller inputs SHA256
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: admin-session-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  live-four:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      ADMIN_SESSION_COHORT: ${{ inputs.cohort }}
+      ADMIN_SESSION_INPUTS_SHA256: ${{ inputs.inputs_sha256 }}
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Bind exact formatted source and finite controller inputs
+        run: python3 -B ci/admin-session-targeted/run.py --mode verify --inputs-sha256 "$ADMIN_SESSION_INPUTS_SHA256"
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+        with:
+          go-version: '1.27.2'
+          check-latest: false
+          cache: false
+      - name: Exact owned fixtures, four live race tests, five current chart builds
+        id: targeted
+        run: |
+          umask 077
+          work="$RUNNER_TEMP/admin-session-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          test ! -e "$work"
+          mkdir -m 700 "$work"
+          mkdir -p ci-results
+          python3 -B ci/group-effects/resource_guard.py --cwd "$GITHUB_WORKSPACE" --allocated-root "$work" --max-allocated-mib 8192 --min-free-mib 1024 --poll-interval .2 --timeout 1800 --log "$work/controller-private.log" --record "$GITHUB_WORKSPACE/ci-results/admin-session-controller.resource.json" -- python3 -B ci/admin-session-targeted/run.py --mode run --work "$work" --inputs-sha256 "$ADMIN_SESSION_INPUTS_SHA256"
+      - name: Always original owner ID cleanup and logical SQL Redis absence
+        if: always()
+        run: |
+          umask 077
+          work="$RUNNER_TEMP/admin-session-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          if test -d "$work"; then
+            python3 -B ci/admin-session-targeted/run.py --mode cleanup --work "$work" --inputs-sha256 "$ADMIN_SESSION_INPUTS_SHA256"
+          fi
+      - name: Only finite whitelisted receipts, no raw Go SQL Redis or credentials
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: admin-session-live4-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ci-results/admin-session/summary.json
+            ci-results/admin-session/events.json
+            ci-results/admin-session/source-tools.json
+            ci-results/admin-session/builds.json
+            ci-results/admin-session/fixture-ready.json
+            ci-results/admin-session/fixture-after.json
+            ci-results/admin-session/cleanup.json
+            ci-results/admin-session/cleanup-final.json
+            ci-results/admin-session-controller.resource.json
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Five current chart ELFs only, separate build-only review artifact
+        if: success() && steps.targeted.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: admin-session-current259-chart5-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/chat-api
+            ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/admin-api
+            ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/chat-rpc
+            ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/admin-rpc
+            ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/office-rpc
+            ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/manifest.json
+          compression-level: 1
+          retention-days: 14
+          if-no-files-found: error

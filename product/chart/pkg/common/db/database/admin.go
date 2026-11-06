@@ -158,8 +158,15 @@ func (o *AdminDatabase) UpdateAdmin(ctx context.Context, userID string, update m
 			copy[k] = v
 		}
 		copy["password"] = hashed
+		update = copy
+	}
+	_, passwordChanged := update["password"]
+	disabled, _ := update["disabled"].(bool)
+	if passwordChanged || disabled {
+		// Re-enabling never clears this durable revocation barrier. The existing
+		// generation-bound worker must revoke sessions before it can complete.
 		return o.sql.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-			if err := tx.Model(&table.Admin{}).Where("user_id = ?", userID).Updates(copy).Error; err != nil {
+			if err := tx.Model(&table.Admin{}).Where("user_id = ?", userID).Updates(update).Error; err != nil {
 				return errs.Wrap(err)
 			}
 			return accountstate.QueueCredentialRevocation(ctx, tx, userID)

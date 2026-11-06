@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端graph `1579/08fa16062f31b2a9f0aca757daf8b25090a36c4bb035e82d5860d76af0a09154` 保留RTC原sentinel/cause，parent.Err早退不再丢cause；固定6phase及白名单cause类型直接来自原同次activation，不输出Message/UserID/未知数字。lookup/WaitForReady/一次attempt/30s/Ready与授权不变。fresh真实SDK/middleware错误和取消控制1top3，RTC2体精确逆转旧2296仅作旧控制历史兼容（0重派、不称sameWholeGo1579或新package PASS）。bcd原投影仅RTC sentinel不等于原err无cause，当前根因未证；新原16编译/4scene/2top3及cleanup/ELF门禁保留，P20binding=null。
+- 后端graph Go1579/08fa与P20 server派生1581/9ec5同体；a319真实RTC1top3通过，后继同完整graph源及Go工具复用、0重派。修正Go panic续行单TAB导致phase/cause漏投影；fresh仅stdlib custom-error真实panic build+exec，probe退出2不代表原rpc-rtc Wait退出码。原16编译/4scene/2top3及cleanup/8产物门保持，实际RTC原因仍未知。Admin5属于独立chart来源258→259，SQL/Redis定向验证另行；旧chart6仅历史，P20execution=null。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

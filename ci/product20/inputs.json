@@ -14,8 +14,8 @@
   "chartProvider": {
     "sources": {
       "chart": {
-        "members": 258,
-        "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+        "members": 259,
+        "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
       },
       "route": {
         "members": 33,
@@ -32,18 +32,11 @@
         "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
       }
     },
-    "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
-    "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7"
+    "rootAcceptancePath": null,
+    "rootAcceptanceSHA256": null,
+    "status": "current-source-only-new-chart259-awaits-build-and-acceptance"
   },
-  "acceptedChartArtifact": {
-    "run": 42180782218,
-    "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
-    "attempt": 1,
-    "artifactID": 13485700505,
-    "artifactBytes": 76891085,
-    "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
-    "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9"
-  },
+  "acceptedChartArtifact": null,
   "executionBinding": null,
   "mysql": {
     "image": "docker.io/library/mysql@sha256:1f8411cc085d2f2f92060fca926746cbf97f87b76c3008e9741ad62e604c4ffa",
@@ -60,17 +53,18 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "875a87e13441ff1fa43122a4ca5e7d2de43691e29a667afaf9af44670ef6518e",
-    "ci/backend-fullgraph/inputs.json": "53eb1f6626fd9392aa864619a696a66ce680971f543f8899222f3d4230e96fc5",
+    "ci/backend-fullgraph/run.py": "a9e66c2d28b2b8b9e7d0b6dc083cde5340c7c13f404a568e9e6ccf6de3264e3d",
+    "ci/backend-fullgraph/inputs.json": "2c942c9d5c19fad9f641502ea5ae5491631a455bdf686d912f0ae63b4604253e",
     "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "0606aeaabf2d586b579878ed11c170a33db543fb90f9549ecf0566ddc1da07e7",
     "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
     "ci/chart-route-build/run.py": "2b6a3f66f761181fc693502f6c910ffd5b24ee3c38badabb54627b5518b1bb9d",
-    "ci/chart-route-build/inputs.json": "1a4067e0bb9f6d177585af886cb2a87c366ec43b78545ecfc58017fd6d61092e",
+    "ci/chart-route-build/inputs.json": "c2224155e5acf34f693427986c043dc7daf795209b5aa61d02f8f4b6f8e3af03",
     "ci/group-effects/resource_guard.py": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c",
     "ci/group-effects/capture.py": "d8f7dd31925857d5042e3c89a07a0bc127d1371e6063b4b186b8200d9f93c199",
-    "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef"
+    "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
+    "ci/backend-fullgraph/rtc_panic_probe.py": "db870170fd137ec9c0ebc8ee29688f2cecfa4c61c270b50bc9f9559f071d510a"
   },
   "controllers": [
     "ci/product20/run.py",
@@ -209,5 +203,41 @@
       ]
     },
     "MySQL": "one admin prepares two fresh nonce schemas/users; chart/core use chart schema-only user, route uses route schema-only user; no synthetic user/chat rows or tokens"
+  },
+  "historicalAcceptedChartArtifact": {
+    "provider": {
+      "sources": {
+        "chart": {
+          "members": 258,
+          "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+        },
+        "route": {
+          "members": 33,
+          "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+        }
+      },
+      "locks": {
+        "chart": {
+          "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+          "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+        },
+        "route": {
+          "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+          "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+        }
+      },
+      "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
+      "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7"
+    },
+    "artifact": {
+      "run": 42180782218,
+      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "attempt": 1,
+      "artifactID": 13485700505,
+      "artifactBytes": 76891085,
+      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9"
+    },
+    "acceptedForCurrentChartSource": false
   }
 }

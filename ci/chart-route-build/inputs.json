@@ -6,8 +6,8 @@
   "target": "linux/amd64 CGO_ENABLED=0",
   "sources": {
     "chart": {
-      "members": 258,
-      "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+      "members": 259,
+      "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
     },
     "route": {
       "members": 33,

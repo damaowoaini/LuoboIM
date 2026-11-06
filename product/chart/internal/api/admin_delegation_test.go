@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"github.com/OpenIMSDK/chat/pkg/common/accountstate"
 	"github.com/OpenIMSDK/chat/pkg/common/admindelegation"
 	"github.com/OpenIMSDK/chat/pkg/common/apicall"
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -85,7 +86,7 @@ func delegationFixture(t *testing.T) (*AdminApi, *redis.Client, string, string) 
 		r, _ = root.DB()
 		r.Close()
 	})
-	if e := db.AutoMigrate(&admintable.Admin{}, &admindelegation.Record{}, &admindelegation.RequestAudit{}, &adminMessageSearchAudit{}); e != nil {
+	if e := db.AutoMigrate(&admintable.Admin{}, &admindelegation.Record{}, &admindelegation.RequestAudit{}, &adminMessageSearchAudit{}, &accountstate.CredentialRevocation{}); e != nil {
 		t.Fatal("schema failed")
 	}
 	if db.Create(&admintable.Admin{Account: "normal", UserID: id, Level: 80, GoogleAuthEnabled: true, GoogleAuthSecret: "synthetic-totp", CreateTime: time.Now()}).Error != nil {

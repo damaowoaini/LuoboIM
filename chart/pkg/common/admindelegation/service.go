@@ -9,6 +9,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/OpenIMSDK/chat/pkg/common/accountstate"
 	admintable "github.com/OpenIMSDK/chat/pkg/common/db/table/admin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -78,6 +79,11 @@ func (s *Service) liveAdmin(ctx context.Context, id string) (int32, error) {
 	}
 	if len(admins) != 1 || admins[0].Disabled || !admins[0].GoogleAuthEnabled || admins[0].GoogleAuthSecret == "" || admins[0].Level < 1 || admins[0].Level > 100 {
 		return 0, errors.New("administrator unavailable")
+	}
+	// Ordinary HTTP checks GetTokens; delegated capabilities must honor the
+	// same durable barrier while Redis cleanup is pending or unavailable.
+	if pending, err := accountstate.HasPendingCredentials(ctx, s.DB, id); err != nil || pending {
+		return 0, errors.New("administrator session unavailable")
 	}
 	return admins[0].Level, nil
 }

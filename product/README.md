@@ -13,3 +13,5 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
 本批仅RTC原activation错误保留与闭合phase/cause：Unwrap保留原sentinel/cause，Error仅6phase和白名单cause类，修parent.Err原因丢失；原lookup/WaitForReady/一次attempt/30s/Ready/权限不改。fresh真实SDK与实际middleware的缺ID/权限CodeError和未Serve连接取消控制1top3；原控制只保留来源，经RTC2体逆向还原旧完整Go2296作历史兼容，不冒充新Go/package PASS。bcd的RTC sentinel投影不能证明原error仅sentinel，当前唯一原因仍未知。原16编译/4场景/oracles/cleanup/ELF/P20门禁保留。
+
+本批Admin5仅影响chart来源259与普通源码1886，server graph1579/08fa及P20 server派生1581/9ec5不变。a319 RTC1/3只在完整graph源及Go工具exact时复用，不代表Admin或整个项目通过。新stdlib-only custom-error panic控制直接执行私有二进制，将真实stderr送原projector，仅导闭合标签；probe exit2与原RTC Wait unknown严格区分。原chart6旧258接受仅历史，当前259待构建接受，P20executionBinding=null。
