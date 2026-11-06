@@ -13,6 +13,7 @@ spec.loader.exec_module(controller)
 class SplitProducerContract(unittest.TestCase):
  def test_current5_expected_manifest_original6_route_and_locked_core_keep_exact_provenance(self):
   c=json.loads((HERE/'inputs.json').read_bytes())
+  c['executionBinding']=None;c['acceptedChartArtifact']=None  # Explicit original locked-policy fixture.
   self.assertIsNone(c['executionBinding']);self.assertIsNone(c['acceptedChartArtifact'])
   with self.assertRaises(ValueError):controller.require_bound(c)
   policy=controller.chart_assembly_policy(c)

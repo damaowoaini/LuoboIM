@@ -1,5 +1,25 @@
 {
-  "acceptedChartArtifact": null,
+  "acceptedChartArtifact": {
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
+    "currentChart5": {
+      "artifactBytes": 71834348,
+      "artifactID": 13535759454,
+      "artifactSHA256": "fba7b461eec0e9504c8046f198dd13ef03e50add9ff7e30513bebcd0f6665401",
+      "attempt": 1,
+      "head": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
+      "manifestSHA256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2",
+      "run": 42283432687
+    },
+    "historicalRouteFrom6": {
+      "artifactBytes": 76891085,
+      "artifactID": 13485700505,
+      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+      "attempt": 1,
+      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "run": 42180782218
+    }
+  },
   "auxiliaryBuilds": [
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
@@ -282,7 +302,42 @@
     "digest": "7dc11cc40a714afae27fabdc644c82201b469b29f340ee1a11e493755c54c01b"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
-  "executionBinding": null,
+  "executionBinding": {
+    "rootAccepted": true,
+    "source": {
+      "members": 1584,
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
+    },
+    "rootAcceptanceSHA256": "edf29c4e587cbf181a7e7e9d526e6fc300c0f328f32d2314b7a547854a1d7ae4",
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
+    "currentChart5": {
+      "artifactBytes": 71834348,
+      "artifactID": 13535759454,
+      "artifactSHA256": "fba7b461eec0e9504c8046f198dd13ef03e50add9ff7e30513bebcd0f6665401",
+      "attempt": 1,
+      "head": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
+      "manifestSHA256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2",
+      "run": 42283432687
+    },
+    "historicalRouteFrom6": {
+      "artifactBytes": 76891085,
+      "artifactID": 13485700505,
+      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+      "attempt": 1,
+      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "run": 42180782218
+    },
+    "core14": {
+      "run": 42310913329,
+      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+      "attempt": 1,
+      "artifactID": 13548912327,
+      "artifactBytes": 607490716,
+      "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
+      "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e"
+    }
+  },
   "fixtureConfiguration": {
     "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
     "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
@@ -327,7 +382,7 @@
       "members": 1584,
       "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
     },
-    "status": "required-raw-push-request-contract-source-await-current-core14-acceptance"
+    "status": "root-accepted-current-core14-source-four-scenes-full-artifact-body-receive-required"
   },
   "helpers": {
     "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
@@ -445,5 +500,5 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
-  "state": "SOURCE_ONLY_SPLIT_CHART5_ORIGINAL_ROUTE1_EXPECTED_MANIFEST_LOCKED_PENDING_CURRENT_CORE14_ROOT_ACCEPTANCE"
+  "state": "ROOT_BOUND_CURRENT_CORE14_SPLIT_CHART5_ROUTE1_PENDING_FRESH_PRODUCT20_HTTP_WS"
 }
