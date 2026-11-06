@@ -259,10 +259,11 @@ def project_gateway_start_log(work,terminal,bodies):
  if not gateway_start_exit2(terminal):return None
  result=gateway_projection_empty('unavailable');result.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
  try:
-  work=Path(work);directory=work/'required/msggateway'
+  work=Path(work);directory=work/'services/required/msggateway'
   if work.resolve()!=work or directory.resolve()!=directory:return dict(result,status='unsafe')
-  info=directory.stat()
-  if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:return dict(result,status='unsafe')
+  for folder in (work,work/'services',work/'services/required',directory):
+   info=folder.lstat()
+   if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:return dict(result,status='unsafe')
   matches=[]
   with os.scandir(directory) as entries:
    for count,entry in enumerate(entries):
@@ -276,6 +277,7 @@ def project_gateway_start_log(work,terminal,bodies):
   if identity(before)!=identity(after):return dict(result,status='unsafe')
   projected=project_gateway_log_bytes(raw,bodies);projected.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
   return projected
+ except RuntimeError:return dict(result,status='unsafe')  # A cyclic intermediate symlink cannot be canonical.
  except (OSError,ValueError,UnicodeError):return result
 
 def emit_gateway_start_log_diagnostic(out,work,terminal):

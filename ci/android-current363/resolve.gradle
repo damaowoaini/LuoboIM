@@ -566,8 +566,11 @@ gradle.beforeProject { p ->
 }
 gradle.projectsEvaluated {
     def rootForTooling=gradle.rootProject
-    def bouncyConfiguration=rootForTooling.configurations.findByName('kotlinBouncyCastleConfiguration')
-    if (bouncyConfiguration!=null && toolingWitness.scoped(rootForTooling,bouncyConfiguration)) bouncyConfiguration.resolve()
+    // Fixed Gradle9.3.1 requires the configuration owner's actual project lock.
+    rootForTooling.getOwner().applyToMutableState {
+        def bouncyConfiguration=rootForTooling.configurations.findByName('kotlinBouncyCastleConfiguration')
+        if (bouncyConfiguration!=null && toolingWitness.scoped(rootForTooling,bouncyConfiguration)) bouncyConfiguration.resolve()
+    }
     gradle.rootProject.tasks.named('dependencies').configure {
         doLast {
             def rows = []

@@ -16,8 +16,10 @@ The producer top-level current363-activation.json was not archived. Actual539
 source/core records and setup/core/preseal phase/cohort proofs are used explicitly;
 no activation record is invented and no source354 identity is substituted.
 
-The resolver changes only the two outer lexical variable names that collided with
-nested p/c closure parameters. All tooling/configuration/source admission stays.
+The resolver retains the outer lexical variable renames. At projectsEvaluated,
+its scoped tooling configuration resolves under that project's native mutable-state
+lock, using fixed Gradle's owner.applyToMutableState. All tooling/configuration/source
+admission stays; no unsafe-resolution exception or project lock is bypassed.
 Gradle remains9.3.1/Groovy4.0.29. The production writer and consumer bodies remain
 the same; its resolver hash is rebound in the fixture and complete cohort.
 

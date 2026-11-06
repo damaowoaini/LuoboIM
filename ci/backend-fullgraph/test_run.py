@@ -1006,7 +1006,14 @@ class FullGraphControls(unittest.TestCase):
    with mock.patch.object(collector.run,'regular',side_effect=AssertionError('ineligible output must not be read')):
     self.assertIsNone(collector.project_gateway_start_log(Path('/not-read'),dict(terminal,**change),bodies))
   with tempfile.TemporaryDirectory() as directory:
-   work=Path(directory).resolve();folder=work/'required/msggateway';folder.mkdir(mode=0o700,parents=True)
+   work=Path(directory).resolve()
+   # Follow the actual constructor chain: scenario/services/required/<role>.
+   # A valid-looking log in the earlier incorrect directory is never searched.
+   old=work/'required/msggateway';old.parent.mkdir(mode=0o700);old.mkdir(mode=0o700)
+   bait=old/('service-'+'a'*64+'.log');bait.write_bytes(b'panic: x509: PRIVATE_WRONG_DIRECTORY');bait.chmod(0o600)
+   self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unavailable')
+   folder=work/'services/required/msggateway'
+   for current in (work/'services',work/'services/required',folder):current.mkdir(mode=0o700)
    self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'absent')
    path=folder/('service-'+'a'*64+'.log');path.write_bytes(raw);path.chmod(0o600)
    value=collector.project_gateway_start_log(work,terminal,bodies);self.assertEqual(value['status'],'projected');self.assertEqual(value['sourceFrames'],[{'path':target,'line':2}]);self.assertNotIn('PRIVATE',json.dumps(value));self.assertNotIn('originalPrivateLogSHA256',value);self.assertNotIn('originalPrivateLogBytes',value)
@@ -1015,7 +1022,34 @@ class FullGraphControls(unittest.TestCase):
    path.chmod(0o644);self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');path.chmod(0o600)
    original=work/'original-private-log';path.rename(original);path.symlink_to(original)
    self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');path.unlink();original.rename(path)
-   folder.chmod(0o755);self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');folder.chmod(0o700)
+   # Every fixed directory is private; canonical resolution rejects aliases at
+   # services, required and the role without opening any private log.
+   for current in (work,work/'services',work/'services/required',folder):
+    current.chmod(0o755);self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');current.chmod(0o700)
+   for current in (work/'services',work/'services/required',folder):
+    retained=work/('retained-'+current.name);current.rename(retained)
+    for destination in (retained,current):
+     current.symlink_to(destination,target_is_directory=True)
+     with mock.patch.object(collector.run,'regular',side_effect=AssertionError('directory aliases cannot read logs')):
+      self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe')
+     current.unlink()
+    retained.rename(current)
+   linked=work/'hardlinked-private-log';os.link(path,linked)
+   self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');linked.unlink()
+   original_regular=collector.run.regular;retained=work/'replaced-private-log'
+   def replace_after_original_read(candidate,limit):
+    value=original_regular(candidate,limit)
+    if candidate==path:path.rename(retained);path.write_bytes(value);path.chmod(0o600)
+    return value
+   with mock.patch.object(collector.run,'regular',side_effect=replace_after_original_read):
+    self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe')
+   path.unlink();retained.rename(path)
+   extras=[folder/('bounded-entry-'+str(i)) for i in range(run.GATEWAY_START_LOG_POLICY['directoryEntriesLimit'])]
+   for extra in extras:extra.touch(mode=0o600)
+   self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe')
+   for extra in extras:extra.unlink()
+   value=collector.project_gateway_start_log(work,terminal,bodies)
+   self.assertEqual(value['status'],'projected');self.assertEqual(value['errorPrefixClass'],'config-yaml');self.assertNotIn('PRIVATE',json.dumps(value))
    with mock.patch.object(collector.run,'verify',return_value=({},bodies,None,None,None,None)),mock.patch.object(collector.run,'write',side_effect=OSError('PRIVATE_ERROR')):
     self.assertFalse(collector.emit_gateway_start_log_diagnostic(work,work,terminal))
 

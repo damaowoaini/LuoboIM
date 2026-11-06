@@ -47,8 +47,8 @@
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 64097,
-      "sha256": "b17a3d953f47193ae22675fd1a8eed5d8c11599a6e642be25c03efb45afdb851"
+      "bytes": 64292,
+      "sha256": "aa771aab9c903c908f97af3fc1a3b113641bef469170c59c2a07666cc58b85ad"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 111024,
-      "sha256": "a80991fcbd05a2b632a8e38654c9f518546dc18037748652c235a3858894430b"
+      "bytes": 113495,
+      "sha256": "63b6884e6b83a6286e1c1c131f0e906d1021359e631444f60d1afc6a58c7b460"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
