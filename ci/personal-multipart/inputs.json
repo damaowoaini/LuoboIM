@@ -28,22 +28,22 @@
   "browser_name": "part/body source-index manifest and cross-account claims fail closed",
   "candidateInputPaths": [
     {
-      "bytes": 15368,
+      "bytes": 16410,
       "originalPath": "app/lib/features/personal/data/personal_migration.dart",
       "path": "ci/candidates/personal-multipart/after/app/lib/features/personal/data/personal_migration.dart",
-      "sha256": "c5fe1339d28041a1e1bcc5db44d5ca0b295f42a8d2f6e82e5a28c7b36ebd255a"
+      "sha256": "c60daa6d6422c66d2cec56ec220ca71a51dc661a162660a5c27bd3ad41379b31"
     },
     {
-      "bytes": 13901,
+      "bytes": 14766,
       "originalPath": "app/lib/features/personal/data/personal_repository.dart",
       "path": "ci/candidates/personal-multipart/after/app/lib/features/personal/data/personal_repository.dart",
-      "sha256": "c85fab3c7a35f5777a593980d87b16146d94362d51cfc23a5c0e06a842e595ba"
+      "sha256": "2c32b383c8697e650190939baaf76ac9fb950e713d0c2e5cda40424e80a7427c"
     },
     {
-      "bytes": 33733,
+      "bytes": 34608,
       "originalPath": "app/lib/features/personal/presentation/personal_page.dart",
       "path": "ci/candidates/personal-multipart/after/app/lib/features/personal/presentation/personal_page.dart",
-      "sha256": "bcc0dfe0a42fe0e8de4379f7f3b20cb65abf011a9d942b8c0520a7e912244c05"
+      "sha256": "59d73522be54a6e43cbcfa3e71c454a764c278bb83130566b96560853c06bdbc"
     },
     {
       "bytes": 14783,
@@ -70,13 +70,24 @@
       "sha256": "add5be3db4385a71bf34ea51c9ff23a0480e5f6bfe00883204c63f0dfa61bddd"
     },
     {
-      "bytes": 5188,
+      "bytes": 5483,
       "originalPath": "migration/legacy_personal_export/legacy_personal_export.dart",
       "path": "ci/candidates/personal-multipart/after/migration/legacy_personal_export/legacy_personal_export.dart",
-      "sha256": "e713c7880f6de0294865086cab0e4ca942b9b83be50661b7d7c09aae2e23e461"
+      "sha256": "293525253d3ea97430c5837a7fa0b2580fe95061a86daef211da45105f712fdf"
     }
   ],
   "candidate_input_prefix": "ci/candidates/personal-multipart/after",
+  "candidate_source_revision": {
+    "Dart_runtime_PASS": false,
+    "actual_lint_diagnostics_fixed": 11,
+    "canonical_App_adopted": false,
+    "kind": "real-formatted-four-Dart-plus-block-only-lint-fix",
+    "origin_API_ZIP_SHA256": "50b280c7db5c38e79afc656da9e3fe42227f8603adc7fbcfe8c904ea564a6433",
+    "origin_artifact_id": 13514180885,
+    "origin_head": "3fb83ea24d68243e808ddef94734314f94fe2e0a",
+    "origin_run": 42239209207,
+    "same_rule_source_blocks_fixed": 5
+  },
   "canonical_head": {
     "App539Adopted": false,
     "legacy8CanonicalTargetsModified": false,
@@ -96,26 +107,26 @@
       "sha256": "946362446d22ff3ab23c0d912c12c633cb75d2dba00b7ffa477d9c33f3690c50"
     },
     {
-      "bytes": 31770,
+      "bytes": 32201,
       "path": "ci/personal-multipart.py",
-      "sha256": "8213e412a92f18e4063b59eaa94aa93c59b902885b43aa82f75366a5aea3e6a8"
+      "sha256": "2f7b1c4ac27a28400575c0dac1db21678936e77fc2bff80ac7ed298b4d082cb7"
     }
   ],
   "delta8": [
     {
       "after": {
-        "bytes": 15368,
+        "bytes": 16410,
         "path": "app/lib/features/personal/data/personal_migration.dart",
-        "sha256": "c5fe1339d28041a1e1bcc5db44d5ca0b295f42a8d2f6e82e5a28c7b36ebd255a"
+        "sha256": "c60daa6d6422c66d2cec56ec220ca71a51dc661a162660a5c27bd3ad41379b31"
       },
       "before": null,
       "path": "app/lib/features/personal/data/personal_migration.dart"
     },
     {
       "after": {
-        "bytes": 13901,
+        "bytes": 14766,
         "path": "app/lib/features/personal/data/personal_repository.dart",
-        "sha256": "c85fab3c7a35f5777a593980d87b16146d94362d51cfc23a5c0e06a842e595ba"
+        "sha256": "2c32b383c8697e650190939baaf76ac9fb950e713d0c2e5cda40424e80a7427c"
       },
       "before": {
         "bytes": 6353,
@@ -126,9 +137,9 @@
     },
     {
       "after": {
-        "bytes": 33733,
+        "bytes": 34608,
         "path": "app/lib/features/personal/presentation/personal_page.dart",
-        "sha256": "bcc0dfe0a42fe0e8de4379f7f3b20cb65abf011a9d942b8c0520a7e912244c05"
+        "sha256": "59d73522be54a6e43cbcfa3e71c454a764c278bb83130566b96560853c06bdbc"
       },
       "before": {
         "bytes": 27726,
@@ -183,9 +194,9 @@
     },
     {
       "after": {
-        "bytes": 5188,
+        "bytes": 5483,
         "path": "migration/legacy_personal_export/legacy_personal_export.dart",
-        "sha256": "e713c7880f6de0294865086cab0e4ca942b9b83be50661b7d7c09aae2e23e461"
+        "sha256": "293525253d3ea97430c5837a7fa0b2580fe95061a86daef211da45105f712fdf"
       },
       "before": {
         "bytes": 2942,
@@ -320,7 +331,7 @@
     }
   ],
   "portable_after": {
-    "digest": "0472b11bb2a5dcaa94d2ed6d233b68527f508c84d208540388de780137d14ce0",
+    "digest": "ba51bbd1aee59f7c960e3f3f7f876a1e242b4697ef5353b64f12bb52ab22b84f",
     "members": 418
   },
   "portable_before": {
@@ -362,7 +373,7 @@
     "runner_chrome_missing": "hard failure, not skip/pass"
   },
   "source_after": {
-    "digest": "6e80974b79d66274f4018ce3fa199eb9c39cb0e146ab6b312f68674c027b9aa0",
+    "digest": "a399bdcf038dd55742922d18ed213c1d2cc734221a269f2b63264c34694d0c85",
     "members": 366
   },
   "source_before": {

@@ -27,22 +27,34 @@ List<int> legacyPersonalBackupBytes({String? rawNotes, String? rawTodos}) =>
 /// Only the OLD app adapter touches its filesystem. The shared codec remains
 /// portable. The stream must fully finish and fsync before its proof is returned.
 Future<PersonalMigrationFile> writeLegacyPersonalMigrationFile(
-  Directory directory, String name, Stream<List<int>> chunks,
+  Directory directory,
+  String name,
+  Stream<List<int>> chunks,
 ) async {
-  if (!RegExp(r'^(original|manifest|unmigrated|part-[0-9]+)\.json$').hasMatch(name)) {
+  if (!RegExp(r'^(original|manifest|unmigrated|part-[0-9]+)\.json$')
+      .hasMatch(name)) {
     throw const FormatException('Invalid backup filename');
   }
   final file = File('${directory.path}/$name');
   if (await file.exists()) throw const FileSystemException('Backup exists');
   final sink = file.openWrite();
-  try { await sink.addStream(chunks); await sink.flush(); }
-  finally { await sink.close(); }
+  try {
+    await sink.addStream(chunks);
+    await sink.flush();
+  } finally {
+    await sink.close();
+  }
   final handle = await file.open(mode: FileMode.append);
-  try { await handle.flush(); } finally { await handle.close(); }
+  try {
+    await handle.flush();
+  } finally {
+    await handle.close();
+  }
   final sha = (await sha256.bind(file.openRead()).first).toString();
   final proof = PersonalMigrationFile(await file.length(), sha);
   if (name == 'original.json') {
-    await File('${directory.path}/raw-complete').writeAsString(sha, flush: true);
+    await File('${directory.path}/raw-complete')
+        .writeAsString(sha, flush: true);
   }
   return proof;
 }
@@ -69,18 +81,31 @@ class _LegacyPersonalExportButtonState
       var incomplete = false;
       try {
         final manifest = await exportLegacyPersonalMigration(
-          write: (name, chunks) => writeLegacyPersonalMigrationFile(directory, name, chunks),
+          write: (name, chunks) =>
+              writeLegacyPersonalMigrationFile(directory, name, chunks),
           rawNotes: preferences.getString('local_notes'),
-          rawTodos: preferences.getString('local_todos'));
+          rawTodos: preferences.getString('local_todos'),
+        );
         incomplete = manifest.rejected > 0 || manifest.incomplete;
-        files = [XFile('${directory.path}/manifest.json', mimeType: 'application/json'),
-          for (final name in ['original.json', 'unmigrated.json',
-              ...manifest.parts.map((part) => part['file'] as String)])
-            XFile('${directory.path}/$name', mimeType: 'application/json')];
+        files = [
+          XFile(
+            '${directory.path}/manifest.json',
+            mimeType: 'application/json',
+          ),
+          for (final name in [
+            'original.json',
+            'unmigrated.json',
+            ...manifest.parts.map((part) => part['file'] as String),
+          ])
+            XFile('${directory.path}/$name', mimeType: 'application/json'),
+        ];
       } catch (_) {
         // A conversion error does not hide an already completed raw backup.
         final raw = File('${directory.path}/original.json');
-        if (!await raw.exists() || !await File('${directory.path}/raw-complete').exists()) rethrow;
+        if (!await raw.exists() ||
+            !await File('${directory.path}/raw-complete').exists()) {
+          rethrow;
+        }
         files = [XFile(raw.path, mimeType: 'application/json')];
         rawOnly = true;
       }
@@ -97,14 +122,21 @@ class _LegacyPersonalExportButtonState
             : box.localToGlobal(Offset.zero) & box.size,
       );
       if (mounted && (rawOnly || incomplete)) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
-          rawOnly ? '原始备份已保留，但分卷未完成；不要删除旧资料' :
-            '部分记录未迁移，原文保留在原始备份；请同时保存未迁移报告')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              rawOnly
+                  ? '原始备份已保留，但分卷未完成；不要删除旧资料'
+                  : '部分记录未迁移，原文保留在原始备份；请同时保存未迁移报告',
+            ),
+          ),
+        );
       }
     } catch (_) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('导出未完成，原资料仍保留，请重试')));
+      }
     } finally {
       if (mounted) setState(() => busy = false);
     }

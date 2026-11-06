@@ -421,6 +421,7 @@ def run(parent, work):
         fmt, analyses, helper, selected, browser = phase_commands(work, cfg)
         files, derivation = format_owned(work, cfg, tag, files, receipt, check, guard, fmt)
         derivation_raw = tag.regular(work / 'evidence/personal-formatter-derived.json')
+        analysis_failures = []
         for index, command in enumerate(analyses + [helper], 1):
             verify_work(work, cfg, tag, files, receipt)
             cwd = work / 'source/migration/legacy_personal_export' if command == helper else None
@@ -431,7 +432,14 @@ def run(parent, work):
             result = old.ANALYSIS.analysis_outcome(record, log.read_text(), label, command)
             tag.write(work / 'evidence' / (label + '.summary.json'), result)
             if not result['passed']:
-                raise ValueError('affected-path analysis failed')
+                analysis_failures.append(result)
+        tag.write(work / 'evidence/personal-analysis-batch.json', {
+            'analysed_paths': len(analyses) + 1,
+            'all_passed': not analysis_failures,
+            'failed_paths': [row['path'] for row in analysis_failures]})
+        if analysis_failures:
+            raise ValueError('affected-path analyses failed: ' +
+                             ', '.join(row['phase'] for row in analysis_failures))
         for label, command, names in [('personal-target12', selected, NAMES12),
                                        ('personal-browser1', browser, [BROWSER_NAME])]:
             verify_work(work, cfg, tag, files, receipt)

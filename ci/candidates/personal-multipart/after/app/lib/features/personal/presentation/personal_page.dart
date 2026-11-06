@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:crypto/crypto.dart';
+
 import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
@@ -503,11 +504,17 @@ class _PersonalPageState extends ConsumerState<PersonalPage> {
     void check() {
       if (!current()) throw const AppFailure(FailureKind.cancelled);
     }
+
     check();
-    final selected = await openFiles(acceptedTypeGroups: const [
-      XTypeGroup(label: '分卷资料', extensions: ['json'],
-          uniformTypeIdentifiers: ['public.json']),
-    ]);
+    final selected = await openFiles(
+      acceptedTypeGroups: const [
+        XTypeGroup(
+          label: '分卷资料',
+          extensions: ['json'],
+          uniformTypeIdentifiers: ['public.json'],
+        ),
+      ],
+    );
     if (!current() || selected.isEmpty) return;
     Future<Uint8List> bytes(XFile file) async {
       final builder = BytesBuilder(copy: false);
@@ -518,36 +525,54 @@ class _PersonalPageState extends ConsumerState<PersonalPage> {
         }
         builder.add(chunk);
       }
-      check(); return builder.takeBytes();
+      check();
+      return builder.takeBytes();
     }
+
     Future<String> verify(XFile file, Map spec) async {
       var count = 0;
-      final hash = await sha256.bind(file.openRead().map((chunk) {
-        check(); count += chunk.length;
-        if (count > (spec['bytes'] as int)) {
-          throw const FormatException('Backup size differs');
-        }
-        return chunk;
-      })).first;
+      final hash = await sha256
+          .bind(
+            file.openRead().map((chunk) {
+              check();
+              count += chunk.length;
+              if (count > (spec['bytes'] as int)) {
+                throw const FormatException('Backup size differs');
+              }
+              return chunk;
+            }),
+          )
+          .first;
       check();
       if (count != spec['bytes'] || hash.toString() != spec['sha256']) {
         throw const FormatException('Backup hash differs');
       }
       return hash.toString();
     }
+
     try {
       final files = <String, XFile>{};
       for (final file in selected) {
-        if (files.containsKey(file.name)) throw const FormatException('Duplicate file');
+        if (files.containsKey(file.name)) {
+          throw const FormatException('Duplicate file');
+        }
         files[file.name] = file;
       }
       final manifestFile = files['manifest.json'];
       if (manifestFile == null) throw const FormatException('Missing manifest');
-      final manifest = PersonalMigrationManifest.decode(await bytes(manifestFile));
+      final manifest = PersonalMigrationManifest.decode(
+        await bytes(manifestFile),
+      );
       check();
-      final expected = {'manifest.json', 'original.json', 'unmigrated.json',
-        ...manifest.parts.map((part) => part['file'] as String)};
-      if (!expected.containsAll(files.keys)) throw const FormatException('Unlisted file');
+      final expected = {
+        'manifest.json',
+        'original.json',
+        'unmigrated.json',
+        ...manifest.parts.map((part) => part['file'] as String),
+      };
+      if (!expected.containsAll(files.keys)) {
+        throw const FormatException('Unlisted file');
+      }
       final previous = await repository.migrationProgress(manifest);
       check();
       final raw = files['original.json'], report = files['unmigrated.json'];
@@ -555,40 +580,76 @@ class _PersonalPageState extends ConsumerState<PersonalPage> {
         _notice('首次导入请同时选择清单、原始备份、未迁移报告和需要导入的分卷');
         return;
       }
-      final rawSha = raw == null ? manifest.setId :
-          await verify(raw, manifest.data['raw'] as Map);
+      final rawSha = raw == null
+          ? manifest.setId
+          : await verify(raw, manifest.data['raw'] as Map);
       check();
-      final reportSha = report == null ?
-          (manifest.data['report'] as Map)['sha256'] as String :
-          await verify(report, manifest.data['report'] as Map);
+      final reportSha = report == null
+          ? (manifest.data['report'] as Map)['sha256'] as String
+          : await verify(report, manifest.data['report'] as Map);
       check();
-      final pending = [for (var i = 0; i < manifest.parts.length; i++)
-        if (!(previous?.contains(i) ?? false)) manifest.parts[i]['file'] as String];
+      final pending = [
+        for (var i = 0; i < manifest.parts.length; i++)
+          if (!(previous?.contains(i) ?? false))
+            manifest.parts[i]['file'] as String,
+      ];
       var confirmed = false;
-      final proceed = await showDialog<bool>(context: context,
-        builder: (dialogContext) => StatefulBuilder(builder: (_, update) => AlertDialog(
-          title: const Text('导入旧版分卷资料'),
-          content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('共 ${manifest.parts.length} 卷，本账号已完成 ${previous?.length ?? 0} 卷。可分次选择其余分卷继续。'),
-              if (pending.isNotEmpty) Text('待完成：${pending.take(12).join('、')}'
-                  '${pending.length > 12 ? ' 等 ${pending.length} 卷' : ''}'),
-              Text('有 ${manifest.rejected} 条未迁移记录；'
-                  '${manifest.incomplete ? '另有旧数组无法完整解析。' : ''}'
-                  '原文保留在 original.json，请保留全部备份文件。'),
-              const Text('现有资料会保留。标识冲突会另存副本；已完成卷不会因重试覆盖后来的编辑。'),
-              CheckboxListTile(contentPadding: EdgeInsets.zero, value: confirmed,
-                title: const Text('旧版资料没有账号归属，我确认导入当前账号'),
-                onChanged: (value) => update(() => confirmed = value ?? false)),
-            ])),
-          actions: [TextButton(onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('取消')),
-            FilledButton(onPressed: confirmed ? () => Navigator.pop(dialogContext, true) : null,
-              child: const Text('导入'))],
-        )));
+      final proceed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (_, update) => AlertDialog(
+            title: const Text('导入旧版分卷资料'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '共 ${manifest.parts.length} 卷，本账号已完成 ${previous?.length ?? 0} 卷。可分次选择其余分卷继续。',
+                  ),
+                  if (pending.isNotEmpty)
+                    Text(
+                      '待完成：${pending.take(12).join('、')}'
+                      '${pending.length > 12 ? ' 等 ${pending.length} 卷' : ''}',
+                    ),
+                  Text(
+                    '有 ${manifest.rejected} 条未迁移记录；'
+                    '${manifest.incomplete ? '另有旧数组无法完整解析。' : ''}'
+                    '原文保留在 original.json，请保留全部备份文件。',
+                  ),
+                  const Text('现有资料会保留。标识冲突会另存副本；已完成卷不会因重试覆盖后来的编辑。'),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: confirmed,
+                    title: const Text('旧版资料没有账号归属，我确认导入当前账号'),
+                    onChanged: (value) =>
+                        update(() => confirmed = value ?? false),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('取消'),
+              ),
+              FilledButton(
+                onPressed: confirmed
+                    ? () => Navigator.pop(dialogContext, true)
+                    : null,
+                child: const Text('导入'),
+              ),
+            ],
+          ),
+        ),
+      );
       if (proceed != true || !current()) return;
-      await repository.startMigration(manifest, confirmOwnership: confirmed,
-          verifiedRawSha: rawSha, verifiedReportSha: reportSha);
+      await repository.startMigration(
+        manifest,
+        confirmOwnership: confirmed,
+        verifiedRawSha: rawSha,
+        verifiedReportSha: reportSha,
+      );
       check();
       var inserted = 0;
       for (var index = 0; index < manifest.parts.length; index++) {
@@ -601,8 +662,10 @@ class _PersonalPageState extends ConsumerState<PersonalPage> {
       }
       final completed = await repository.migrationProgress(manifest);
       check();
-      _notice('本次新增 $inserted 条；已完成 ${completed!.length}/${manifest.parts.length} 卷。'
-          '${manifest.rejected > 0 || manifest.incomplete ? '仍有未迁移原文，请保留原始备份。' : ''}');
+      _notice(
+        '本次新增 $inserted 条；已完成 ${completed!.length}/${manifest.parts.length} 卷。'
+        '${manifest.rejected > 0 || manifest.incomplete ? '仍有未迁移原文，请保留原始备份。' : ''}',
+      );
     } on FormatException {
       if (current()) _notice('分卷或清单不匹配。已完成的卷和原始备份仍保留，可重新选择文件续传');
     }
