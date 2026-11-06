@@ -1084,6 +1084,30 @@ def emit_redis_null_failure_observation(out,raw):
  except Exception:pass
 
 
+PASSED_REDIS_NULL_ACK_FACTS = {'version': 'same-complete-Go5404-null-named-scope-facts-v1', 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}, 'originalHead': 'fa6a75e7e202a7376802a12e8afd4ea51524a0ec', 'originalRun': 42297454212, 'originalGraphAccepted': False, 'rootReview': {'path': '.qa/redis-null-fixture-eof-batch-20261107/root-fa6a75e-null-control-pass-push-evidence-rejected-review.json', 'sha256': '1bcfe5137fad2024dc2dc0efaa3714cc165c2f606bf765ace213adf04582e0ff'}, 'namedReceipt': {'topPASS': 1, 'subPASS': 3, 'skip': 0, 'fail': 0, 'packages': 1, 'namedCompletions': [{'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/complete-pipeline-null-and-value-preserve-all-original-results'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/real-rockscache-cold-set-null-and-warm-hit-retain-original-owner'}], 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}, 'accepted': True, 'newDatabaseFixtures': 0, 'scope': {'phase': 'current-owned-redis-null-ack', 'targets': {'pkg/common/db/cache': ['TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown']}, 'requiredSubtests': {'pkg/common/db/cache': {'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown': ['real-rockscache-cold-set-null-and-warm-hit-retain-original-owner', 'complete-pipeline-null-and-value-preserve-all-original-results', 'mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 600, 'topPASS': 1, 'subPASS': 3, 'packages': 1, 'goCommandInvocations': 1, 'packageExecutions': 1, 'wholePackagePASS': False}, 'actualGoCommandInvocations': 1, 'actualPackageExecutions': 1, 'actualKafkaACLTestsDispatched': 0, 'actualManagedShapeTopsDispatched': 0, 'actualCacheTopsDispatched': 0, 'wholePackagePASS': False, 'runtimeAccepted': False, 'wholeSourceAccepted': False}, 'eventsSHA256': 'd5b64b8549e1658eebab4cd0b625aaebc8e5e46e7b6435e069ea7e52e57c6b95', 'eventFacts': {'run': 4, 'pass': 5, 'fail': 0, 'skip': 0, 'packageStart': 1, 'packagePASS': 1}, 'phaseFacts': {'label': 'current-owned-redis-null-ack', 'exitCode': 0, 'resourceStatus': 'passed', 'resourceExitCode': 0}, 'sourcePost': {'accepted': True, 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}}, 'GoToolBodyAndMode': {'bytes': 17164055, 'sha256': '548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0', 'mode': 493}, 'historyBridgeCanonicalSHA256': 'b41ad40645612d44dd7cae6f6d71a1edc28a6c4e76e4228eeaa040c8346a647c', 'wholePackagePASS': False, 'currentWholeProjectGoPASS': False, 'runtimePIDReadyP20Accepted': False}
+
+def check_redis_null_passed_plan(c):
+ if c.get('passedRedisNullAckControl')!=PASSED_REDIS_NULL_ACK_FACTS or c.get('currentRedisNullAckControl') is not None or c.get('redisNullSourceBridge') is not None or c.get('redisNullTestsToRun')!=[]:raise ValueError('exact same-complete-Go Null scope reuse without fresh dispatch required')
+ fixture=dict(c,passedRedisNullAckControl=None,currentRedisNullAckControl=CURRENT_REDIS_NULL_ACK_CONTROL,redisNullSourceBridge=REDIS_NULL_SOURCE_BRIDGE,redisNullTestsToRun=CURRENT_REDIS_NULL_ACK_CONTROL['targets']['pkg/common/db/cache'])
+ check_redis_null_ack_plan(fixture)
+ return check_redis_null_passed_facts(c['passedRedisNullAckControl'])
+
+def check_redis_null_passed_facts(value,go_tool=None):
+ if value!=PASSED_REDIS_NULL_ACK_FACTS or value['source']!=FINAL_SOURCE or value['sourcePost']!={'accepted':True,'source':FINAL_SOURCE}:raise ValueError('same complete current Go source and exact original Null facts required')
+ check_redis_null_ack_receipt(value['namedReceipt'])
+ if value['eventFacts']!={'run':4,'pass':5,'fail':0,'skip':0,'packageStart':1,'packagePASS':1} or value['phaseFacts']!={'label':CURRENT_REDIS_NULL_ACK_CONTROL['phase'],'exitCode':0,'resourceStatus':'passed','resourceExitCode':0}:raise ValueError('original complete named events/footer and successful phase required')
+ if value['historyBridgeCanonicalSHA256']!=sha(json.dumps(REDIS_NULL_SOURCE_BRIDGE,sort_keys=True,separators=(',',':')).encode()) or value['originalGraphAccepted'] is not False or value['wholePackagePASS'] is not False or value['currentWholeProjectGoPASS'] is not False or value['runtimePIDReadyP20Accepted'] is not False:raise ValueError('Null named scope cannot grant original graph or runtime authority')
+ if go_tool is not None and {key:go_tool.get(key) for key in value['GoToolBodyAndMode']}!=value['GoToolBodyAndMode']:raise ValueError('same exact actual Go tool body and mode required')
+ return value
+
+def emit_redis_null_passed_reuse(out,go_tool):
+ value=check_redis_null_passed_facts(PASSED_REDIS_NULL_ACK_FACTS,go_tool)
+ receipt={'version':'same-complete-Go-null-named-scope-reuse-v1','source':FINAL_SOURCE,'originalRun':value['originalRun'],'factsCanonicalSHA256':sha(json.dumps(value,sort_keys=True,separators=(',',':')).encode()),'sameCompleteGraphGoSource':True,'originalTopPASS':1,'originalSubPASS':3,'actualCurrentNullGoCommands':0,'wholePackagePASS':False,'currentWholeProjectGoPASS':False,'runtimePIDReadyP20Accepted':False}
+ write(out/'same-go-null-named-scope-reuse.json',receipt);return receipt
+
+def write_redis_null_passed_summary(out,receipt,cleanup_audit,launcher_reuse,redis_parser_reuse):
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'targetedTopPASS':2,'targetedSubPASS':3,'redisNullNamedScopeReuse':receipt,'actualCurrentNullGoCommands':0,'actualCurrentResolverCommands':0,'actualCurrentCachedWaitCommands':0,'actualCurrentRTCGoTestCommands':0,'actualCurrentRuntimeProbeCommands':0,'actualDependencyGoListInvocations':0,'currentFreshGo':{'topPASS':0,'subPASS':0,'includesOriginalGraph':False},'originalGraphOracleHistoricalReuse':{'topPASS':2,'subPASS':3,'currentCommands':0,'source':'cleanupPassedReuse','fresh':False},'pendingOriginalAndTargetedFieldsFresh':False,'wholePackagePASS':False,'currentWholeProjectGoPASS':False,'launcherPassedReuse':launcher_reuse,'redisParserPassedReuse':redis_parser_reuse,'cleanupAudit':cleanup_audit,'reuseOldBinary':False,'deployment':False,'privateLogsUploaded':False})
+
 def check_redis_null_ack_plan(c):
  control=CURRENT_REDIS_NULL_ACK_CONTROL;package=next(iter(control['targets']))
  if c.get('currentRedisNullAckControl')!=control or c.get('redisNullTestsToRun')!=control['targets'][package] or c.get('redisNullSourceBridge')!=REDIS_NULL_SOURCE_BRIDGE:raise ValueError('one fresh real Redis-driver/rockscache Null acknowledgement control required')
@@ -1147,7 +1171,8 @@ def check_locked(c):
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
  if c.get('targetedKafkaACLControl')!=KAFKA_ACL_CONTROL:raise ValueError('exact original Kafka ACL parent and two new children required')
- if c.get('currentRedisNullAckControl') is not None or c.get('redisNullSourceBridge') is not None:check_redis_null_ack_plan(c)
+ if c.get('passedRedisNullAckControl') is not None:check_redis_null_passed_plan(c)
+ elif c.get('currentRedisNullAckControl') is not None or c.get('redisNullSourceBridge') is not None:check_redis_null_ack_plan(c)
  elif c.get('currentOwnedResolverSchemeControl') is not None or c.get('ownedResolverSourceBridge') is not None:check_owned_resolver_scheme_plan(c)
  elif c.get('currentCachedWaitControl') is not None or c.get('cachedWaitSourceBridge') is not None:check_cached_wait_plan(c)
  elif c.get('rtcPanicRuntimeProbe') is not None or c.get('passedRTCActivationPhaseControl') is not None:check_rtc_panic_runtime_plan(c)
@@ -1217,7 +1242,9 @@ def verify():
  for row in c['controllerPins']:pin(row)
  check_redis_parser_reuse(c.get('redisParserPassedReuse'),bodies)
  if c.get('redisParserTestsToRun')!=[]:raise ValueError('unchanged Redis parser must not be redispatched')
- if c.get('currentRedisNullAckControl') is not None:
+ if c.get('passedRedisNullAckControl') is not None:
+  check_redis_null_passed_plan(c);check_redis_null_source_bridge(REDIS_NULL_SOURCE_BRIDGE,bodies,recipe);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
+ elif c.get('currentRedisNullAckControl') is not None:
   check_redis_null_ack_plan(c);check_redis_null_source_bridge(c['redisNullSourceBridge'],bodies,recipe);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
  elif c.get('currentOwnedResolverSchemeControl') is not None:
   check_owned_resolver_scheme_plan(c);check_owned_resolver_source_bridge(c['ownedResolverSourceBridge'],bodies,recipe);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
@@ -1658,8 +1685,10 @@ def run():
   redis_parser_reuse=load_redis_parser_reuse(out,bodies)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
-  kafka_acl_reuse=None;current_image_kafka=None;current_kafka_confirm=None;kafka_confirm_reuse=None;current_release=None;current_managed_shape=None;current_producer=None;current_group_recovery=None;current_cache_test_delta=None;current_cron_fixture=None;current_named_scope_reuse=None;current_group_registry_fixture=None;current_group_fixture_passed=None;current_runtime_release=None;current_runtime_release_passed=None;current_rtc_activation=None;current_rtc_panic_runtime=None;current_cached_wait=None;current_owned_resolver_scheme=None;current_redis_null_ack=None
-  if c.get('currentRedisNullAckControl') is not None:current_redis_null_ack=run_redis_null_ack_control(go,offline,command,parent,out,bodies,recipe,tools['go'])
+  kafka_acl_reuse=None;current_image_kafka=None;current_kafka_confirm=None;kafka_confirm_reuse=None;current_release=None;current_managed_shape=None;current_producer=None;current_group_recovery=None;current_cache_test_delta=None;current_cron_fixture=None;current_named_scope_reuse=None;current_group_registry_fixture=None;current_group_fixture_passed=None;current_runtime_release=None;current_runtime_release_passed=None;current_rtc_activation=None;current_rtc_panic_runtime=None;current_cached_wait=None;current_owned_resolver_scheme=None;current_redis_null_ack=None;current_redis_null_passed=None
+  if c.get('passedRedisNullAckControl') is not None:
+   check_redis_null_source_bridge(REDIS_NULL_SOURCE_BRIDGE,bodies,recipe,tools['go']);current_redis_null_passed=emit_redis_null_passed_reuse(out,tools['go'])
+  elif c.get('currentRedisNullAckControl') is not None:current_redis_null_ack=run_redis_null_ack_control(go,offline,command,parent,out,bodies,recipe,tools['go'])
   elif c.get('currentOwnedResolverSchemeControl') is not None:current_owned_resolver_scheme=run_owned_resolver_scheme_control(go,offline,command,parent,out,bodies,recipe,tools['go'])
   elif c.get('currentCachedWaitControl') is not None:current_cached_wait=run_cached_wait_control(go,offline,command,parent,out,bodies,recipe,tools['go'])
   elif c.get('rtcPanicRuntimeProbe') is not None:current_rtc_panic_runtime=run_rtc_panic_runtime_control(go,offline,private,out,bodies,recipe,tools['go'],command)
@@ -1742,7 +1771,9 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- if current_redis_null_ack is not None:
+ if current_redis_null_passed is not None:
+  write_redis_null_passed_summary(out,current_redis_null_passed,cleanup_audit,launcher_reuse,redis_parser_reuse)
+ elif current_redis_null_ack is not None:
   write_redis_null_ack_summary(out,current_redis_null_ack,cleanup_audit,launcher_reuse,redis_parser_reuse)
  elif current_owned_resolver_scheme is not None:
   write_owned_resolver_scheme_summary(out,current_owned_resolver_scheme,cleanup_audit,launcher_reuse,redis_parser_reuse)

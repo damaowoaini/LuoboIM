@@ -35,6 +35,11 @@ jobs:
           # Same known0777 -> root0755 normalization of the already-installed
           # Chrome inode; no browser download, no no-sandbox flag.
           sudo -n -- "$(command -v node)" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" normalize-chrome
+      - name: Install exact Ubuntu CJK font for CI rendering only
+        run: |
+          set -euo pipefail
+          sudo -n timeout --kill-after=5s 120s apt-get update
+          sudo -n env DEBIAN_FRONTEND=noninteractive timeout --kill-after=5s 180s apt-get install --no-install-recommends -y 'fonts-noto-cjk=1:20230817+repack1-3'
       - name: Fail early if installed Chrome or CJK font is unavailable
         run: |
           set -euo pipefail
@@ -59,7 +64,6 @@ jobs:
           "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" legacy "$UI_ROOT" "$legacy"
       - name: Original Linux Flutter tester runtime libraries
         run: |
-          sudo apt-get update
           sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
       - name: One original SDK and lock-enforced setup; no old tests or APK
         run: |

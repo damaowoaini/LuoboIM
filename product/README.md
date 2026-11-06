@@ -13,3 +13,6 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
 本批仅修新RESP夹具下一帧起点的预期关闭：Peek(1)空缓冲且EOF/closed-pipe才成功，任何已有字节的部分帧仍由原bounded parser拒绝，其它IO错误/超时也不放行。生产Null ACK逻辑、原解析器和有限失败观察不变；上轮1top3仍失败且共享cleanup故障已定位，主断言尚不宣称通过。只重试失败1top3；旧已过控制0重派，16编译/4场景/cleanup/8产物门及P20split、两binding=null保持。
+
+
+本批CI只投影原required-push阶段既有布尔/一次调用计数及封闭ACK计数类别，按原七段顺序标记未确认边界，不导原错误、token/key或其hash，不把边界当唯一首错。fa6同完整Go5404及精确Go工具下Null1top3已实际通过，下一轮严格复用该单项事实且0重派；原graph失败、全包/全项目/Runtime/PID/Ready/P20仍未接受。原16编译/4场景/cleanup/8产物门保持，无ELF缓存复用。
