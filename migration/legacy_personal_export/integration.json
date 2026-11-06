@@ -1,21 +1,62 @@
 {
-  "state": "helper_implemented_old_app_install_not_yet_verified",
+  "state": "canonical_source_adopted_scoped_cloud_checks_passed_device_pending",
   "purpose": "旧版全局 SharedPreferences 资料通过用户明确导出后导入萝卜对话，不能跨包名直接读取沙箱",
   "source_application_id": "com.jrtxa.wanfeng.app",
   "target_application_id": "com.luoboduihua.imapp",
   "integration": [
-    "将 legacy_personal_export.dart 复制进旧版项目 lib/migration/，不要修改只读 references 基线",
-    "在旧版笔记或待办入口加入 LegacyPersonalExportButton；该组件复用原依赖 shared_preferences/path_provider/share_plus 7.2.x",
-    "使用原 application ID、原签名/Team 和升级权限构建并安装旧版迁移更新，不要先卸载原 App",
-    "用户点击导出，通过系统分享面板存到文件；确认文件保存且有可恢复副本后再处理旧 App",
-    "在新 App 登录实际归属账号，通过 我的 → 笔记或待办 → 资料管理 → 导入选择 JSON，并明确确认旧资料归属",
-    "核对导入数量和内容；重复导入相同备份不重复添加，不删除原键和原文件"
+    "将 legacy_personal_export.dart 和 app/lib/features/personal/data/personal_migration.dart（正文不变）复制进旧项目 lib/migration/；不修改只读 references 基线",
+    "旧项目必须显式核对并接入兼容的 package:crypto 3.x；其余组件继续使用 SharedPreferences/path_provider/share_plus 7.2.x，尚未验证旧依赖解析/编译",
+    "在旧笔记或待办入口加入 LegacyPersonalExportButton；必须保留原 application ID、签名/Team 和升级权限，不可先卸载旧 App",
+    "先把原始偏好字符串流式写入独立备份目录的 original.json，关闭并 flush 后记录 raw-complete；不删除原键/旧文件。之后分卷、拒绝报告和 SHA 清单最后写入",
+    "通过系统分享保存 manifest.json、original.json、unmigrated.json 与全部 part-N.json；保持文件名。系统真实多文件分享和保存成功需要设备核实",
+    "新 App 登录资料实际归属账号，在资料管理 → 导入分卷资料，首次同时选择清单、原始备份、拒绝报告与要导入的卷，显式确认 unknown-owner 归属",
+    "同账号再次选择同一 manifest.json 与未完成卷可续传；首导 raw/report SHA 验证收据只在该账号 SQLite 中有效，其他账号需重新选择原始备份/报告并确认",
+    "每卷哈希/来源序号校验，数据和来源→目标 ID 收据同一事务；事务内检测到账号失效整卷回滚，进程中断按SQLite原子事务恢复；已完成卷不重放，不覆盖后来编辑/删除的记录",
+    "核对已完成/待导入卷与拒绝报告；拒绝记录原文仍在 original.json，完整原件与旧 App 应继续保留，不能把部分导入称作完整迁移",
+    "历史单文件 legacy 与 luobo-personal-data/v1 路径保留，不要求历史文件补清单；新版专用分卷格式必须走分卷入口"
   ],
   "limits": [
-    "旧 App 可安装签名产物尚未构建；没有原签名/升级权限时无法通过此方式访问既有沙箱",
-    "旧版笔记无账号归属，辅助导出不会根据当前登录账号伪造归属",
-    "损坏 JSON 原文仍可导出保全，新 App 会拒绝整个损坏归档，不能部分导入后删除原资料",
-    "当前单个导入文件最大16MiB、最多10000条，超限资料仍需分批导出支持",
-    "JSON备份包含资料明文；旧 App 不改键、不删除副本、也不自动上传到任何服务器"
-  ]
+    "已采用云端实际格式化的7份Dart正文；format7、分析1+同源复用6、运行3+原9具名闭集12及浏览器codec1通过。尚未验证旧签名升级、新App原生重构建或设备完整迁移；旧App363/native539结果仅适用于原来源。",
+    "无法签名升级原 Bundle/application ID 时，当前不能访问其已有沙箱；新 Bundle 不能假定直接读取旧资料",
+    "旧 App 原始字段样本、真实历史数据与系统多文件选择/分享行为缺少证据。适配器只支持当前已知字段；其他字段/无效/超长单项保留 raw，明确未迁移",
+    "单卷仍最多16MiB和10000条，按含转义/信封的实际UTF8字节分卷；当前模型toJson正常化后的合法单项可容纳；原始超大表示仍受边界约束，超大单项不截断/不拆成虚假笔记",
+    "分卷器逐项解码，但 SharedPreferences 本身仍把两条原始 String 载入内存；源跨度列表占用随条目数增加。无限大输入/低内存旧设备仍需实机证据",
+    "无法可靠解析根数组时整类原文保全、sourceCount未知并标记结构错误；不把可见前缀或部分卷算成该类完整迁移",
+    "最多10000个分卷且清单仍受16MiB上限；超出时完整raw仍保留，仅可分享raw，不能宣称完成分卷",
+    "来源顺序按 kind+sourceIndex 和收据保留，原ID保留；与现有数据冲突时新ID写入稳定映射。正常列表仍沿现有置顶/更新时间排序",
+    "备份与拒绝报告是明文，本地不删除副本且不自动上传；raw-complete只是本地完整写入标记，不证明用户已把系统分享文件保存到外部",
+    "恢复收据在新 App 账号数据库内，正常重启可续传；卸载/清空新 App 数据后需由原备份重新恢复，不能声称跨沙箱自动继承收据",
+    "两张收据表按可重复事务附加，不修改原表且保留user_version1；SQLite收据/回退兼容定向用例已有云端具名通过证据，真实旧版reader与设备回退仍待验证。",
+    "共用codec和其4条测试不使用dart:io；同codec浏览器定向1条实际通过，不能据此称Web或设备全功能验收。"
+  ],
+  "format": {
+    "manifest": "luobo-personal-migration/v1",
+    "part": "luobo-personal-migration-part/v1",
+    "owner": null,
+    "legacy_single_and_owned_v1": "unchanged",
+    "raw_offsets": "UTF16 indices into decoded local_notes/local_todos String, not byte offsets in envelope",
+    "receipt": "Additive SQLite migration_sets + migration_parts, user_version remains1 for old reader compatibility; per-part ordered sourceIndex/originalId/targetId/action with exact manifest/part/account pins",
+    "portable_codec": "dart:convert + crypto only; bounded Stream writer callback; File/Directory/fsync remain in old helper"
+  },
+  "verification": {
+    "head": "d4adc8cb54200a8a02f58569cc478f4132d4485b",
+    "run": 42251557610,
+    "job": 128007691471,
+    "source_members": 366,
+    "source_digest": "2be96d98e4193ee4919e47b828c46af498a26704e2bfe93207537d6d428b1827",
+    "portable_members": 418,
+    "portable_digest": "d8898207e1a1fa11ef9d5f5c71c91fcb0bd02f067992d294ce2ab92a81f4a47d",
+    "format_dart_actual": 7,
+    "analysis_actual": 1,
+    "analysis_exact_source_reused": 6,
+    "runtime_actual": 3,
+    "runtime_original_individual_reused": 9,
+    "runtime_distinct_union": 12,
+    "browser_actual": 1,
+    "old_target12_phase_exit_code": 1,
+    "old_package_or_suite_accepted": false,
+    "fresh_target12_executed": false,
+    "new_native_or_device_accepted": false,
+    "full_regression": false
+  }
 }
