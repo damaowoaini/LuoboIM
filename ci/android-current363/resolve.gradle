@@ -375,6 +375,20 @@ toolingSource.scope=new LinkedHashMap(richSource.scope)
 toolingSource.scope.putAll([project:':',project_relative:'flutter/packages/flutter_tools/gradle',
     root_relative:'flutter/packages/flutter_tools/gradle',
     sources:toolingField.source_files.collectEntries { k,v -> [(k):v.sha256] }])
+// The original R12 producer's empty consumer attributes are not the KGP
+// publishing owner's configuration. Clone exactly the changed map layer; the
+// original App/plugin catalog, declarations, graph and artifact baselines stay.
+def toolingTemplates=richSource.configurations.findAll { it.name=='kotlinBouncyCastleConfiguration' }
+if (toolingTemplates.size()!=1 || toolingTemplates[0].attributes!=[:])
+    throw new GradleException('original BC4 configuration template required')
+def toolingConfiguration=new LinkedHashMap(toolingTemplates[0])
+def toolingConfigurationAttributes=[
+    'org.gradle.category':[type:'org.gradle.api.attributes.Category',value:'library'],
+    'org.gradle.usage':[type:'org.gradle.api.attributes.Usage',value:'java-runtime'],
+    'org.gradle.libraryelements':[type:'org.gradle.api.attributes.LibraryElements',value:'jar']]
+toolingConfiguration.attributes=toolingConfigurationAttributes.collectEntries { attributeName,attributeValue ->
+    [(attributeName):new LinkedHashMap(attributeValue)] }
+toolingSource.configurations=[toolingConfiguration]
 def toolingGate=pluginFactory(owned,toolingSource,localRef,fileDigest,richField.catalog_sha256)
 def pluginGates = [:]
 def richFor = { p,c ->
@@ -390,6 +404,104 @@ def richFor = { p,c ->
     }
     [gate:pluginGates[p.path],entry:entry]
 }
+// Closed, bounded refusal evidence only; never changes an admission decision.
+def toolingRefusal = { p,c,String refusalStage,Exception refusalFailure,Map artifactSnapshot ->
+    if (!(refusalStage in ['declaration','requested','graph']) || !toolingWitness.scoped(p,c))
+        throw new GradleException('fixed tooling refusal scope required')
+    def failureClasses=[
+        'rich forced/configuration attributes refused':'configuration-shape',
+        'rich declared dependency type/force refused':'declaration-type',
+        'rich declared roots/generator differ':'declaration-roots',
+        'rich fourth or changed complete selector refused':'requested-selector',
+        'rich actual unresolved':'unresolved',
+        'rich unknown edge':'edge-type',
+        'rich forced/substituted result refused':'selected-force-or-rule',
+        'rich parent/constraint/selected complete graph differs':'complete-graph',
+        'rich artifact18 selected/body differs':'artifact-body-or-variant']
+    def attrKeys=c.attributes.keySet()
+    def knownTypes=['org.gradle.api.attributes.Category','org.gradle.api.attributes.Usage',
+        'org.gradle.api.attributes.LibraryElements','java.lang.String']
+    def publicValues=['org.gradle.category':['library','platform','enforced-platform','verification'],
+        'org.gradle.usage':['java-api','java-runtime'],
+        'org.gradle.libraryelements':['jar','classes','resources']]
+    def attrChecks=toolingConfigurationAttributes.collectEntries { knownKey,expectedValue ->
+        def matching=attrKeys.findAll { it.name==knownKey }
+        def observation=[expected:expectedValue,status:'missing']
+        if (matching.size()>1) observation.status='duplicate-known-key'
+        else if (matching.size()==1) {
+            def attribute=matching[0]
+            def actualType=attribute.type.name
+            observation.actual_type=actualType in knownTypes ? actualType : 'unreviewed-type'
+            if (actualType!=expectedValue.type) observation.status='type-mismatch'
+            else {
+                def actualValue=String.valueOf(c.attributes.getAttribute(attribute))
+                observation.status=actualValue==expectedValue.value ? 'exact' : 'value-mismatch'
+                observation.actual_value=actualValue in publicValues[knownKey] ? actualValue : 'unreviewed-value'
+            }
+        }
+        [(knownKey):observation]
+    }
+    def knownCoordinates=[
+        [group:'org.bouncycastle',module:'bcpg-jdk18on',version:'1.80'],
+        [group:'org.bouncycastle',module:'bcpkix-jdk18on',version:'1.80'],
+        [group:'org.bouncycastle',module:'bcprov-jdk18on',version:'1.80.2'],
+        [group:'org.bouncycastle',module:'bcutil-jdk18on',version:'1.80.2']]
+    def forced=c.resolutionStrategy.forcedModules
+    def forceChecks=forced.take(16).collect { forcedSelector ->
+        def known=knownCoordinates.find { it.group==forcedSelector.group &&
+            it.module==forcedSelector.name && it.version==forcedSelector.version }
+        known==null ? [status:'unexpected-force'] : [status:'known-bc-force-rejected',coordinate:known]
+    }
+    def dependencies=c.allDependencies
+    def declaredChecks=dependencies.take(16).collect { dependency ->
+        if (!(dependency instanceof org.gradle.api.artifacts.ExternalModuleDependency))
+            return [status:'unexpected-dependency-type']
+        def expectedRoot=toolingConfiguration.declared.find {
+            it.group==dependency.group && it.module==dependency.name }
+        if (expectedRoot==null) return [status:'unexpected-root']
+        def constraint=dependency.versionConstraint
+        def matches=constraint.requiredVersion==expectedRoot.constraint.required &&
+            constraint.strictVersion==expectedRoot.constraint.strict &&
+            constraint.preferredVersion==expectedRoot.constraint.preferred &&
+            constraint.rejectedVersions==expectedRoot.constraint.rejected &&
+            constraint.branch==expectedRoot.constraint.branch
+        [root:[group:expectedRoot.group,module:expectedRoot.module],
+            constraint:matches ? 'exact' : 'constraint-mismatch',changing:dependency.changing,
+            attributes:dependency.attributes.keySet().empty ? 'none' : 'unexpected-attributes',
+            capabilities:dependency.requestedCapabilities.empty ? 'none' : 'unexpected-capabilities']
+    }
+    def artifactChecks=null
+    if (artifactSnapshot?.kind=='rich-artifact-refusal-v1' && artifactSnapshot.actual_artifacts instanceof List &&
+            artifactSnapshot.actual_artifacts.size()<=64) {
+        artifactChecks=toolingConfiguration.artifacts.collect { baseline ->
+            def matches=artifactSnapshot.actual_artifacts.findAll { it.id==baseline.id }
+            def result=[coordinate:baseline.id,status:matches.empty ? 'missing' : matches.size()>1 ? 'duplicate' : 'present']
+            if (matches.size()==1) {
+                result.filename=matches[0].filename==baseline.filename ? 'exact' : 'mismatch'
+                result.body=matches[0].bytes==baseline.bytes && matches[0].sha256==baseline.sha256 ? 'exact' : 'mismatch'
+                result.variant=matches[0].variant==baseline.variant ? 'exact' : 'mismatch'
+            }
+            result
+        }
+    }
+    def report=[schema:1,kind:'kgp-tooling-refusal-v1',accepted:false,
+        stage:refusalStage,failure_class:failureClasses[refusalFailure.message] ?: 'other-refusal',
+        owner:'fixed-Flutter-gradle',configuration:'kotlinBouncyCastleConfiguration',
+        attribute_count_cap:Math.min(attrKeys.size(),33),unknown_attribute_count_cap:
+            Math.min(attrKeys.count { !toolingConfigurationAttributes.containsKey(it.name) },33),
+        attributes:attrChecks,force_count_cap:Math.min(forced.size(),17),force_count_truncated:forced.size()>16,
+        forces:forceChecks,declaration_count_cap:Math.min(dependencies.size(),17),
+        declarations_truncated:dependencies.size()>16,declarations:declaredChecks,
+        artifact_checks:artifactChecks,artifact_snapshot_available:artifactChecks!=null,
+        artifact_count_cap:artifactChecks==null ? null : Math.min(artifactSnapshot.actual_artifacts.size(),65),
+        unexpected_artifact_count_cap:artifactChecks==null ? null : Math.min(
+            artifactSnapshot.actual_artifacts.count { !knownCoordinates.contains(it.id) },65)]
+    def encodedReport=JsonOutput.toJson(report)
+    if (encodedReport.getBytes('UTF-8').length>16*1024)
+        throw new GradleException('closed tooling refusal evidence cap')
+    logger.lifecycle('LUOBO_TOOLING_REFUSAL ' + encodedReport)
+}
+
 def richPersist = { c,proof,String family,String pluginSlot=null ->
     if ((pluginSlot==null ? !(family in ['rich-consumed','rich-refused','kgp-tooling-owner']) :
             (!pluginSlots.containsKey(pluginSlot) || !(family in ['plugin-rich-consumed','plugin-rich-refused']))) ||
@@ -432,10 +544,15 @@ def richWrite = { p,c ->
     def decorate = { value -> selected.entry==null ? value : value +
         [plugin_seal_sha256:pluginField.seal_sha256,plugin_origin:selected.entry.origin] }
     def proof
+    def toolingArtifactSnapshot=null
     try { proof = selected.gate.audit(p,c,{ refused ->
-        richPersist(c,decorate(refused),selected.entry==null ? 'rich-refused' : 'plugin-rich-refused',selected.entry?.slot) }) }
+        if (selected.tooling==true) toolingArtifactSnapshot=refused
+        else richPersist(c,decorate(refused),selected.entry==null ? 'rich-refused' : 'plugin-rich-refused',selected.entry?.slot) }) }
     catch (Exception failure) {
-        if (selected.entry!=null) {
+        if (selected.tooling==true) {
+            try { toolingRefusal(p,c,'graph',failure,toolingArtifactSnapshot) }
+            catch (Exception evidenceFailure) { failure.addSuppressed(evidenceFailure) }
+        } else if (selected.entry!=null) {
             def target=new File(owned,'evidence/plugin-rich-refused/'+richPhase+'/'+selected.entry.slot+'/'+c.name+'.json')
             if (!target.exists()) {
                 try { richPersist(c,decorate(selected.gate.diagnostic(p,c,'graph')),'plugin-rich-refused',selected.entry.slot) }
@@ -531,7 +648,10 @@ gradle.beforeProject { p ->
             c.incoming.beforeResolve {
                 try { selected.gate.declarations(p,c) }
                 catch (Exception failure) {
-                    if (selected.entry!=null) {
+                    if (selected.tooling==true) {
+                        try { toolingRefusal(p,c,'declaration',failure,null) }
+                        catch (Exception evidenceFailure) { failure.addSuppressed(evidenceFailure) }
+                    } else if (selected.entry!=null) {
                         try {
                             def observed=selected.gate.diagnostic(p,c,'declaration') +
                                 [plugin_seal_sha256:pluginField.seal_sha256,plugin_origin:selected.entry.origin]
@@ -556,7 +676,14 @@ gradle.beforeProject { p ->
                         logger.lifecycle('LUOBO_PLUGIN_SCOPE_REFUSAL ' + JsonOutput.toJson(
                             [reason:'unregistered-project-or-config',project:p.path.take(256),
                              configuration:c.name.take(256),source_seal_sha256:pluginField.seal_sha256]))
-                    requestedGate.gate.requested(p,c,d.requested)
+                    try { requestedGate.gate.requested(p,c,d.requested) }
+                    catch (Exception failure) {
+                        if (requestedGate.tooling==true) {
+                            try { toolingRefusal(p,c,'requested',failure,null) }
+                            catch (Exception evidenceFailure) { failure.addSuppressed(evidenceFailure) }
+                        }
+                        throw failure
+                    }
                 }
                 else checkModule(d.requested.group, d.requested.module, d.requested.version)
             }

@@ -1053,4 +1053,70 @@ class FullGraphControls(unittest.TestCase):
    with mock.patch.object(collector.run,'verify',return_value=({},bodies,None,None,None,None)),mock.patch.object(collector.run,'write',side_effect=OSError('PRIVATE_ERROR')):
     self.assertFalse(collector.emit_gateway_start_log_diagnostic(work,work,terminal))
 
+  # Preserve the exact command wrapper stage; a returned error is never a
+  # unique panic/runtime diagnosis, and only fixed public prefixes escape.
+  self.assertEqual(projected['version'],'owned-gateway-start-log-projection-v2')
+  cases=(
+   (b'failed to get configuration from command: unmarshal yaml error: PRIVATE','configuration','config-yaml'),
+   (b'failed to get configuration from command: stat config path error: PRIVATE','configuration','config-stat'),
+   (b'failed to get configuration from command: read file error: PRIVATE','configuration','config-read'),
+   ('failed to get configuration from command: 配置项 secret 不安全（为空、占位符、默认值或少于 16 位），请换成随机强密钥后再启动'.encode(),'configuration','config-secret'),
+   (b'failed to initialize from config: PRIVATE','logger','other'),
+   (b'owned RPC lifecycle is unconfirmed','unclassified','owned-rpc'),
+   (b'owned gateway lifecycle is unconfirmed','unclassified','owned-gateway'),
+   (b'original owned Redis source is unconfirmed','unclassified','owned-redis'),
+   (b'owned namespace control evidence invalid','unclassified','namespace-evidence'),
+   (b'owned namespace runtime registration pending','unclassified','namespace-registration-pending'),
+   (b'owned history reader has not registered yet','unclassified','history-registration-pending'),
+   (b'original owned Mongo observer is required','unclassified','owned-mongo-observer'),
+   (b'original source outcome owner is required','unclassified','owned-source-observer'),
+   (b'callback transport type is unconfirmed','unclassified','callback-transport'),
+   (b'callback transport is absent','unclassified','callback-transport'),
+   (b'context deadline exceeded','unclassified','deadline'),(b'context canceled','unclassified','cancelled'))
+  discovery=(b'owned discovery lifetime required',b'owned discovery context required',b'owned discovery type refused',b'owned discovery returned nil connection',b'owned discovery connection closed before ready',b'owned discovery connection timeout',b'owned discovery is closed',b'owned discovery close is unconfirmed')
+  for payload,stage,kind in cases+tuple((value,'unclassified','owned-discovery') for value in discovery):
+   value=collector.project_gateway_log_bytes(b'panic: '+payload,bodies)
+   self.assertEqual((value['execErrorStage'],value['errorPrefixClass']),(stage,kind));self.assertNotIn('PRIVATE',json.dumps(value));self.assertFalse(value['prefixIsCauseProof'])
+  # Join can preserve a lower-level category on later lines. Log lines before
+  # the first panic and text after its runtime stack header are not panic data.
+  joined=b'yaml: PRIVATE_BEFORE\npanic: owned RPC lifecycle is unconfirmed\nPRIVATE_UNKNOWN\noriginal owned Redis source is unconfirmed\noriginal owned Redis source is unconfirmed PRIVATE_DUPLICATE\nread file error: PRIVATE_FILE\nPRIVATE_MIDLINE dial PRIVATE\n\ngoroutine 1 [running]:\nx509: PRIVATE_AFTER\n\t/PRIVATE/source/'+target.encode()+b':2 +0xabc\n'
+  value=collector.project_gateway_log_bytes(joined,bodies)
+  self.assertEqual(value['errorPrefixClass'],'owned-rpc');self.assertEqual(value['panicPrefixClasses'],['owned-rpc','owned-redis','config-read']);self.assertEqual(value['sourceFrames'],[{'path':target,'line':2}]);self.assertNotIn('PRIVATE',json.dumps(value))
+  self.assertFalse(value['acceptanceEvidence']);self.assertFalse(value['prefixIsCauseProof'])
+  for header in (b'runtime stack:',b'stack trace:'):
+   value=collector.project_gateway_log_bytes(b'panic: PRIVATE\n'+header+b'\nyaml: PRIVATE',bodies);self.assertEqual(value['panicPrefixClasses'],[])
+  value=collector.project_gateway_log_bytes(b'panic: PRIVATE\n'+b'\n'.join((b'open PRIVATE',b'listen PRIVATE',b'dial PRIVATE',b'tls:PRIVATE',b'x509:PRIVATE',b'json:PRIVATE',b'yaml:PRIVATE',b'owned RPC lifecycle is unconfirmed',b'original owned Redis source is unconfirmed')),bodies)
+  self.assertEqual(len(value['panicPrefixClasses']),run.GATEWAY_START_LOG_POLICY['panicPrefixClassesLimit']);self.assertTrue(value['scanTruncated']);self.assertNotIn('PRIVATE',json.dumps(value))
+  # The verified Wrap1/2/3 text contains a function+line, never a Go filename.
+  # Resolve only a unique same-package actual call; no symbol or argument is
+  # retained. Closure suffixes share their actual source function declaration.
+  wrap_target='server/internal/msggateway/init.go'
+  wrap_body=b'package msggateway\nimport "github.com/OpenIMSDK/tools/utils"\nfunc Launch() error {\n return utils.Wrap1(nil)\n}\n'
+  wrap_bodies=dict(bodies,**{wrap_target:wrap_body})
+  wrapper=b'==> github.com/openimsdk/open-im-server/v3/internal/msggateway.Launch.func1()@4: : '
+  value=collector.project_gateway_log_bytes(b'panic: '+wrapper+b'listen tcp PRIVATE\n\ngoroutine 1 [running]:\n\t/PRIVATE/source/'+target.encode()+b':2 +0xabc',wrap_bodies)
+  self.assertEqual(value['sourceFrames'],[{'path':wrap_target,'line':4},{'path':target,'line':2}]);self.assertEqual(value['errorPrefixClass'],'listen');self.assertNotIn('Launch',json.dumps(value));self.assertNotIn('PRIVATE',json.dumps(value));self.assertNotIn('0xabc',json.dumps(value))
+  for name in (b'Wrap1',b'Wrap2',b'Wrap3'):
+   current=dict(wrap_bodies,**{wrap_target:wrap_body.replace(b'Wrap1',name)})
+   value=collector.project_gateway_log_bytes(b'panic: failed to initialize from config: '+wrapper+b'open PRIVATE',current)
+   self.assertEqual((value['execErrorStage'],value['errorPrefixClass']),('logger','file-open'));self.assertEqual(value['sourceFrames'],[{'path':wrap_target,'line':4}])
+  method_body=wrap_body.replace(b'func Launch()',b'func (owner *Owner) Launch()')
+  method_wrapper=wrapper.replace(b'Launch.func1',b'(*Owner).Launch.func1')
+  value=collector.project_gateway_log_bytes(b'panic: '+method_wrapper+b'dial PRIVATE',dict(wrap_bodies,**{wrap_target:method_body}));self.assertEqual(value['sourceFrames'],[{'path':wrap_target,'line':4}]);self.assertEqual(value['errorPrefixClass'],'dial')
+  for invalid in (wrapper.replace(b'github.com/openimsdk/open-im-server/v3/',b'github.com/foreign/private/'),wrapper.replace(b'internal/msggateway',b'internal/../msggateway'),wrapper.replace(b'internal/msggateway',b'internal//msggateway'),wrapper.replace(b'Launch.func1',b'Unknown'),wrapper.replace(b'Launch.func1',b'Launch(PRIVATE_ARGUMENT)'),wrapper.replace(b'@4:',b'@0:'),wrapper.replace(b'@4:',b'@9999999:'),wrapper.replace(b'@4:',b'@-4:'),wrapper.replace(b': : ',b': PRIVATE_MESSAGE: ')):
+   value=collector.project_gateway_log_bytes(b'panic: '+invalid+b'listen PRIVATE',wrap_bodies);self.assertEqual(value['sourceFrames'],[]);self.assertEqual(value['errorPrefixClass'],'other');self.assertNotIn('PRIVATE',json.dumps(value))
+  for changed in (dict(wrap_bodies,**{'server/internal/msggateway/duplicate.go':wrap_body}),dict(wrap_bodies,**{wrap_target:wrap_body.replace(b'return utils.Wrap1(nil)',b'return nil // utils.Wrap1(nil)')}),dict(wrap_bodies,**{wrap_target:wrap_body.replace(b'return utils.Wrap1(nil)',b'return "utils.Wrap1(nil)"')}),dict(wrap_bodies,**{wrap_target:wrap_body.replace(b'"github.com/OpenIMSDK/tools/utils"',b'"github.com/foreign/utils"')})):
+   value=collector.project_gateway_log_bytes(b'panic: '+wrapper+b'listen PRIVATE',changed);self.assertEqual(value['sourceFrames'],[]);self.assertEqual(value['errorPrefixClass'],'other')
+  value=collector.project_gateway_log_bytes(b'panic: '+wrapper*run.GATEWAY_START_LOG_POLICY['wrapperLimit']+b'tls:PRIVATE',wrap_bodies)
+  self.assertEqual(value['errorPrefixClass'],'tls');self.assertEqual(value['sourceFrames'],[{'path':wrap_target,'line':4}])
+  value=collector.project_gateway_log_bytes(b'panic: '+wrapper*(run.GATEWAY_START_LOG_POLICY['wrapperLimit']+1)+b'tls:PRIVATE',wrap_bodies)
+  self.assertEqual(value['errorPrefixClass'],'other');self.assertTrue(value['scanTruncated']);self.assertNotIn('PRIVATE',json.dumps(value))
+  # Multiple Join references share the original combined eight-frame limit.
+  many_bodies={};many_lines=[]
+  for index in range(run.GATEWAY_START_LOG_POLICY['framesLimit']+1):
+   name=f'server/public{index}/wrap.go';many_bodies[name]=wrap_body
+   many_lines.append(b'==> github.com/openimsdk/open-im-server/v3/public'+str(index).encode()+b'.Launch()@4: : dial PRIVATE')
+  value=collector.project_gateway_log_bytes(b'panic: PRIVATE\n'+b'\n'.join(many_lines),many_bodies)
+  self.assertEqual(len(value['sourceFrames']),run.GATEWAY_START_LOG_POLICY['framesLimit']);self.assertTrue(value['scanTruncated']);self.assertNotIn('PRIVATE',json.dumps(value))
+
 if __name__=='__main__':unittest.main()

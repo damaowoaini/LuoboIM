@@ -211,7 +211,73 @@ def gateway_start_exit2(terminal):
  return isinstance(terminal,dict) and terminal.get('version')=='owned-fullgraph-token-v2-result-v1' and terminal.get('accepted') is False and terminal.get('scenario') in run.SCENARIOS and terminal.get('sourceSHA256')==run.FINAL_SOURCE['digest'] and terminal.get('constructorStage')=='start' and terminal.get('constructorRole')=='msggateway' and terminal.get('constructorCallState')=='returned' and terminal.get('constructorErrorClass')=='owned-evidence' and terminal.get('constructorPredicate') in predicates
 
 def gateway_projection_empty(status):
- return {'version':'owned-gateway-start-log-projection-v1','status':status,'headerClass':'none','errorPrefixClass':'none','sourceFrames':[],'scanTruncated':False,'rawTextExported':False,'privatePathsExported':False,'diagnosticOnly':True,'acceptanceEvidence':False,'prefixIsCauseProof':False}
+ return {'version':run.GATEWAY_START_LOG_POLICY['version'],'status':status,'headerClass':'none','execErrorStage':'none','errorPrefixClass':'none','panicPrefixClasses':[],'sourceFrames':[],'scanTruncated':False,'rawTextExported':False,'privatePathsExported':False,'diagnosticOnly':True,'acceptanceEvidence':False,'prefixIsCauseProof':False}
+
+def gateway_wrapper_sites(bodies):
+ # Tools v0.0.23 Wrap1/2/3 use a qualified function + line, not a Go path.
+ # Only a unique call outside comments/literals in this exact source may map
+ # that reference back to a public file. No symbol is exported or trusted.
+ re=__import__('re');sites={}
+ literals=re.compile(rb'//[^\n]*|/\*.*?\*/|"(?:\\.|[^"\\])*"|`[^`]*`|\'(?:\\.|[^\'\\])*\'',re.DOTALL)
+ declaration=re.compile(rb'^func[ \t]+(?:\(([A-Za-z_][A-Za-z0-9_]*)[ \t]+(\*?)([A-Za-z_][A-Za-z0-9_]*)\)[ \t]*)?([A-Za-z_][A-Za-z0-9_]*)[ \t]*\(')
+ call=re.compile(rb'\butils[ \t]*\.[ \t]*Wrap[123][ \t]*\(')
+ for name,body in bodies.items():
+  if not isinstance(name,str) or not name.startswith('server/') or not name.endswith('.go') or any(part in ('','.', '..') for part in name.split('/')) or '\\' in name or not isinstance(body,bytes) or b'"github.com/OpenIMSDK/tools/utils"' not in body:continue
+  masked=literals.sub(lambda match:bytes(10 if char==10 else 32 for char in match[0]),body);owner=None
+  for number,line in enumerate(masked.splitlines(),1):
+   if line.startswith(b'func '):
+    match=declaration.match(line);owner=None
+    if match is not None:
+     owner=match[4].decode('ascii')
+     if match[3] is not None:
+      receiver=match[3].decode('ascii');owner=('(*'+receiver+')' if match[2] else receiver)+'.'+owner
+   if owner is not None and call.search(line):sites.setdefault((name.rsplit('/',1)[0][7:],number,owner),[]).append(name)
+ return sites
+
+def gateway_fixed_wrapper(payload,sites):
+ pattern=rb'==> github\.com/openimsdk/open-im-server/v3/([A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*)\.((?:[A-Za-z_][A-Za-z0-9_]*|\(\*[A-Za-z_][A-Za-z0-9_]*\))(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\(\)@([1-9][0-9]{0,6}): : '
+ match=__import__('re').match(pattern,payload)
+ if match is None:return None
+ package,symbol=match[1].decode('ascii'),match[2].decode('ascii')
+ owner=__import__('re').sub(r'(?:\.func[1-9][0-9]*)+$','',symbol);number=int(match[3])
+ candidates=sites.get((package,number,owner),[])
+ if len(candidates)!=1:return None
+ return payload[match.end():],{'path':candidates[0],'line':number}
+
+def gateway_error_prefix(payload,sites):
+ policy=run.GATEWAY_START_LOG_POLICY;stage='unclassified';frames=[];truncated=False
+ wrappers=((b'failed to get configuration from command: ','configuration'),(b'failed to initialize from config: ','logger'))
+ for _ in range(policy['wrapperLimit']):
+  wrapper=next(((prefix,kind) for prefix,kind in wrappers if payload.startswith(prefix)),None)
+  if wrapper is not None:
+   if stage=='unclassified':stage=wrapper[1]
+   payload=payload[len(wrapper[0]):];continue
+  fixed=gateway_fixed_wrapper(payload,sites)
+  if fixed is None:break
+  payload,frame=fixed;frames.append(frame)
+ else:
+  if any(payload.startswith(prefix) for prefix,_ in wrappers) or gateway_fixed_wrapper(payload,sites) is not None:truncated=True
+ prefixes=(
+  (b'runtime error: invalid memory address or nil pointer dereference','runtime-nil'),
+  (b'unmarshal yaml error: ','config-yaml'),(b'yaml:','config-yaml'),
+  (b'stat config path error: ','config-stat'),(b'read file error: ','config-read'),
+  ('配置项 secret 不安全（为空、占位符、默认值或少于 16 位），请换成随机强密钥后再启动'.encode(),'config-secret'),
+  (b'owned RPC lifecycle is unconfirmed','owned-rpc'),(b'owned gateway lifecycle is unconfirmed','owned-gateway'),
+  (b'original owned Redis source is unconfirmed','owned-redis'),
+  (b'owned namespace control evidence invalid','namespace-evidence'),
+  (b'owned namespace runtime registration pending','namespace-registration-pending'),
+  (b'owned history reader has not registered yet','history-registration-pending'),
+  (b'original owned Mongo observer is required','owned-mongo-observer'),
+  (b'original source outcome owner is required','owned-source-observer'),
+  (b'owned discovery lifetime required','owned-discovery'),(b'owned discovery context required','owned-discovery'),
+  (b'owned discovery type refused','owned-discovery'),(b'owned discovery returned nil connection','owned-discovery'),
+  (b'owned discovery connection closed before ready','owned-discovery'),(b'owned discovery connection timeout','owned-discovery'),
+  (b'owned discovery is closed','owned-discovery'),(b'owned discovery close is unconfirmed','owned-discovery'),
+  (b'callback transport type is unconfirmed','callback-transport'),(b'callback transport is absent','callback-transport'),
+  (b'context deadline exceeded','deadline'),(b'context canceled','cancelled'),
+  (b'json:','json'),(b'invalid character ','json'),(b'open ','file-open'),(b'listen ','listen'),(b'dial ','dial'),(b'tls:','tls'),(b'x509:','x509'))
+ kind=next((kind for prefix,kind in prefixes if payload.startswith(prefix)),'other')
+ return stage,kind,frames,truncated
 
 def project_gateway_log_bytes(raw,bodies):
  policy=run.GATEWAY_START_LOG_POLICY
@@ -219,12 +285,16 @@ def project_gateway_log_bytes(raw,bodies):
  result=gateway_projection_empty('projected');source_lines={}
  for name,body in bodies.items():
   if isinstance(name,str) and name.startswith('server/') and name.endswith('.go') and all(part not in ('','.', '..') for part in name.split('/')) and '\\' not in name and isinstance(body,bytes):source_lines[name]=body.count(b'\n')+1
- # Reconstruct only source inventory paths and bounded line numbers. Stack
- # symbols/arguments, arbitrary log strings and absolute paths never escape.
+ sites=gateway_wrapper_sites({name:bodies[name] for name in source_lines})
  pattern=__import__('re').compile(rb'[ \t]+([^\x00-\x1f\x7f\\]+\.go):([1-9][0-9]{0,6})(?: \+0x[0-9a-fA-F]+)?(?: fp=0x[0-9a-fA-F]+ sp=0x[0-9a-fA-F]+ pc=0x[0-9a-fA-F]+)?')
- wrappers=(b'failed to get configuration from command: ',b'failed to initialize from config: ')
- prefixes=((b'runtime error: invalid memory address or nil pointer dereference','runtime-nil'),(b'yaml:','config-yaml'),(b'json:','json'),(b'invalid character ','json'),(b'open ','file-open'),(b'listen ','listen'),(b'dial ','dial'),(b'tls:','tls'),(b'x509:','x509'))
- start=0;seen=set();line_count=0
+ stack_header=__import__('re').compile(rb'goroutine [1-9][0-9]* \[[^\]\r\n]{1,128}\]:')
+ start=0;seen=set();classes=set();line_count=0;panic_region=False
+ def add_frame(frame):
+  key=(frame['path'],frame['line'])
+  if key in seen:return
+  seen.add(key)
+  if len(result['sourceFrames'])>=policy['framesLimit']:result['scanTruncated']=True;return
+  result['sourceFrames'].append(frame)
  while start<len(raw):
   if line_count>=policy['lineLimit']:result['scanTruncated']=True;break
   end=raw.find(b'\n',start)
@@ -232,15 +302,22 @@ def project_gateway_log_bytes(raw,bodies):
   line_count+=1
   if end-start>policy['lineBytesLimit']:
    result['scanTruncated']=True;start=end+1;continue
-  line=raw[start:end].rstrip(b'\r');start=end+1
+  line=raw[start:end].rstrip(b'\r');start=end+1;payload=None;first=False
   if result['headerClass']=='none' and (line.startswith(b'panic: ') or line.startswith(b'fatal error: ')):
    panic=line.startswith(b'panic: ');payload=line[7:] if panic else line[13:]
-   result['headerClass']='go-panic' if panic else 'go-runtime-fatal'
-   for _ in range(2):
-    wrapper=next((prefix for prefix in wrappers if payload.startswith(prefix)),None)
-    if wrapper is None:break
-    payload=payload[len(wrapper):]
-   result['errorPrefixClass']=next((kind for prefix,kind in prefixes if payload.startswith(prefix)),'other')
+   result['headerClass']='go-panic' if panic else 'go-runtime-fatal';panic_region=True;first=True
+  elif panic_region:
+   if stack_header.fullmatch(line) or line in (b'runtime stack:',b'stack trace:'):panic_region=False
+   elif line:payload=line
+  if payload is not None:
+   stage,kind,frames,truncated=gateway_error_prefix(payload,sites)
+   if first:result['execErrorStage']=stage;result['errorPrefixClass']=kind
+   if kind!='other' and kind not in classes:
+    classes.add(kind)
+    if len(result['panicPrefixClasses'])>=policy['panicPrefixClassesLimit']:result['scanTruncated']=True
+    else:result['panicPrefixClasses'].append(kind)
+   for frame in frames:add_frame(frame)
+   if truncated:result['scanTruncated']=True
   match=pattern.fullmatch(line)
   if match is None:continue
   try:path=match[1].decode('utf-8')
@@ -249,11 +326,9 @@ def project_gateway_log_bytes(raw,bodies):
   candidates=[name for name in source_lines if path==name or path.endswith('/'+name)]
   if len(candidates)!=1:continue
   name=candidates[0];number=int(match[2])
-  if number>source_lines[name] or (name,number) in seen:continue
-  seen.add((name,number))
-  if len(result['sourceFrames'])>=policy['framesLimit']:result['scanTruncated']=True;continue
-  result['sourceFrames'].append({'path':name,'line':number})
+  if number<=source_lines[name]:add_frame({'path':name,'line':number})
  return result
+
 
 def project_gateway_start_log(work,terminal,bodies):
  if not gateway_start_exit2(terminal):return None

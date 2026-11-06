@@ -20,6 +20,14 @@ The resolver retains the outer lexical variable renames. At projectsEvaluated,
 its scoped tooling configuration resolves under that project's native mutable-state
 lock, using fixed Gradle's owner.applyToMutableState. All tooling/configuration/source
 admission stays; no unsafe-resolution exception or project lock is bypassed.
+The fixed KGP2.2.21 publishing owner requires exactly Category/library,
+Usage/java-runtime and LibraryElements/jar typed configuration attributes.
+Only its single scoped BC configuration map is cloned and projected; the original
+R12/App/plugin catalog and complete BC4 graph/body/variant/origin checks stay.
+Empty forcedModules remains mandatory. No force or arbitrary attribute is allowed.
+Tooling refusals emit one bounded closed JSON line: only known public attribute
+types/values and BC coordinates, finite mismatch classes/count caps, no raw path,
+unknown attribute value/coordinate, arbitrary exception message or credentials.
 Gradle remains9.3.1/Groovy4.0.29. The production writer and consumer bodies remain
 the same; its resolver hash is rebound in the fixture and complete cohort.
 

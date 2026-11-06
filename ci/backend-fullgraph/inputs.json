@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 100896,
-      "sha256": "85b2f9716bca49716ffbaad7ed716c8a7dbd98271b9c573b7d1573c32ea6d303"
+      "bytes": 100966,
+      "sha256": "3903976c7e6367f859d1559fc66f455de3aa3898ac2f1eff2ac871871efadff8"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 64292,
-      "sha256": "aa771aab9c903c908f97af3fc1a3b113641bef469170c59c2a07666cc58b85ad"
+      "bytes": 69239,
+      "sha256": "8c8e270201cfb5fbc5bbd2784e4de0ddba5518743901bf951d0ec5b50715b6c6"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 113495,
-      "sha256": "63b6884e6b83a6286e1c1c131f0e906d1021359e631444f60d1afc6a58c7b460"
+      "bytes": 121984,
+      "sha256": "a5806a5daa761b5849f810ddf4c098cdada8a1b927383720f7eee3c491af4890"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -5013,7 +5013,7 @@
     "runtimeAccepted": false
   },
   "gatewayStartLogProjectionPolicy": {
-    "version": "owned-gateway-start-log-projection-v1",
+    "version": "owned-gateway-start-log-projection-v2",
     "logLimitBytes": 8388608,
     "lineLimit": 16384,
     "lineBytesLimit": 4096,
@@ -5022,6 +5022,8 @@
     "onlyRole": "msggateway",
     "onlyCachedWaitExitCode": 2,
     "rawTextExported": false,
-    "acceptanceEvidence": false
+    "acceptanceEvidence": false,
+    "panicPrefixClassesLimit": 8,
+    "wrapperLimit": 8
   }
 }
