@@ -2,7 +2,7 @@
 
 这里的 `server/`、`chart/`、`route/` 是独立的普通 Go 模块。源码已经从固定来源完整物化；从这些目录构建不需要运行 CI 胶囊、source loader 或验收程序。
 
-当前选定来源为 graph `1582/b65c289d84894acbada54492c0323084aa07865b8dbf2ea244decc1cdf03a4b8`、chart `259/432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1889 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
+当前选定来源为 graph `1583/36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5`、chart `259/432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1890 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
 
 使用 Go 1.27.2，在各模块目录独立构建，并显式设置 `GOWORK=off GOTOOLCHAIN=local GOENV=off GOAUTH=off`。保留原 `server/go.work`、`go.work.sum` 和所有模块锁；server 原本地 protocol 替换模块位于 `server/pkg/protocol`。不要用新的跨模块 workspace、统一协议版本或重新生成锁文件代替这些来源。
 
@@ -12,4 +12,4 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
-本批仅解耦owned ZooKeeper namespace与resolver URI scheme：固定合法私有scheme、每dial绑定原owner，原root/path/endpoint、注册/关闭、协议/权限/Ready和RTC30秒不变。fresh真实resolver1top2覆盖合法/下划线/嵌套root、多owner原endpoint与独立关闭。已过cachedWait1/2、RTC/probe只保留原来源，精确2体逆转全旧1581并核工具，0重派且不称新Go全体PASS；当前唯一实际根因仍待图验证。原16构建/4场景/2top3/cleanup/8产物门保留，P20executionBinding=null。
+本批保留owned Redis完整Null响应的原redis.Nil语义；单命令及所有结果完整的nil/Nil-only pipeline观察为ACK，wrapped/joined、Lua错误、丢回包仍保留原unknown/关池。fresh真实driver+rockscache1top3使用有界RESP3 peer，无真实Lua引擎声明，原图用真实Redis。已过resolver1/2及cachedWait/RTC/probe仅保留来源，2体逆转全旧1582/工具exact后0重派，不称新Go全体PASS；原oracle2top3历史、16编译/4场景/cleanup/8产物门保持，P20split策略和两binding=null保持。

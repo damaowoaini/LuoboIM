@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端graph 1582/b65c289d84894acbada54492c0323084aa07865b8dbf2ea244decc1cdf03a4b8 将owned ZooKeeper resolver改为固定合法私有scheme，与ZK namespace/path解耦，保留fullgraph_、嵌套root与原endpoint；每dial WithResolvers保持多owner隔离。非法URI scheme契约缺陷已确认，是否本轮唯一运行原因待新图证明，不延长RTC30秒或放宽Ready/权限。fresh仅真实resolver1top2；已过cachedWait1top2/RTC/probe经精确源码逆向及工具绑定保留历史事实、0重派，不冒充新Go全体PASS；原16编译/4scene/2top3/cleanup/8产物门不变，chart259/Admin/Web/Native不改、P20execution=null。
+- 后端graph 1583/36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5 修复owned Redis把合法Null ACK当unknown的问题：单命令保留直接redis.Nil，pipeline仅全项已确认nil/Nil才认可，原sentinel交回caller；混合Lua错误、丢尾回复、joined Nil+EOF仍原unknown/关池，不增重试/超时/权限。fresh仅真实driver+rockscache Null1top3（有界RESP3非真实Lua引擎），原4场景仍用真Redis验证；已过resolver/cachedWait/RTC/probe仅精确2体逆向/工具绑定历史沿用0派，当前整Go未宣称通过。fresh1top3，原oracle2top3仅历史。16编译/4scene/cleanup/8产物门不变，chart259/Admin/Web/Native不改，P20两binding=null且保留split assembly。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

@@ -278,8 +278,8 @@
     "ci/product20/test_receiver.py"
   ],
   "derivedHarnessSource": {
-    "digest": "d0b43980beb966c57669535a9f63a27b692c8cc655c540d2e7e1536e6d3434f5",
-    "members": 1584
+    "members": 1585,
+    "digest": "5dc99f8703b3348cb2cf77c27f729da9f709cd2cbf98868a6f90562c7c213117"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": null,
@@ -324,19 +324,19 @@
   "graphProvider": {
     "path": "ci/backend-fullgraph/run.py",
     "source": {
-      "digest": "b65c289d84894acbada54492c0323084aa07865b8dbf2ea244decc1cdf03a4b8",
-      "members": 1582
+      "members": 1583,
+      "digest": "36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5"
     },
-    "status": "owned-resolver-scheme-source-fix-only-await-current-core14-acceptance"
+    "status": "owned-redis-null-ack-source-fix-only-await-current-core14-acceptance"
   },
   "helpers": {
     "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
     "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
-    "ci/backend-fullgraph/inputs.json": "c9ddc473c39914c38597566014dfe11cd472464fa9ba7abdcb463f9e7cdf59f0",
+    "ci/backend-fullgraph/inputs.json": "72a45345ef338c817dffaeca1cb917e0f7393b08493722525f25417dd1465534",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
     "ci/backend-fullgraph/rtc_panic_probe.py": "db870170fd137ec9c0ebc8ee29688f2cecfa4c61c270b50bc9f9559f071d510a",
-    "ci/backend-fullgraph/run.py": "0a67c55c2bfc70c5065ba974503e4355d3c22e31a54ba8619412378a1fc23ec1",
+    "ci/backend-fullgraph/run.py": "1600027638f1137a9fd6eeb160d9292f99fdad51a69e93eb2f26923af76922e8",
     "ci/backend-fullgraph/service_selectors.py": "0606aeaabf2d586b579878ed11c170a33db543fb90f9549ecf0566ddc1da07e7",
     "ci/chart-route-build/inputs.json": "c2224155e5acf34f693427986c043dc7daf795209b5aa61d02f8f4b6f8e3af03",
     "ci/chart-route-build/run.py": "2b6a3f66f761181fc693502f6c910ffd5b24ee3c38badabb54627b5518b1bb9d",

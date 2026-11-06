@@ -9355,11 +9355,18 @@
       "sha256": "e0c107eca66566a963e3022260990c326fe31ea9d80ca4934be1707b83b3ee14"
     },
     {
-      "bytes": 11323,
+      "bytes": 12287,
       "mode": 420,
       "path": "server/pkg/common/db/cache/owned_source_redis.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "2173dfb695e10f8cda4ed525e94f63e6bc345d25425db5b39aa6d515c3f94142"
+      "sha256": "985c029a5d3039a3cb0c6a7db11a5a56f79ff3efaefbf565987c4946d29c3385"
+    },
+    {
+      "path": "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
+      "mode": 420,
+      "provider": "ci/backend-fullgraph/run.py:verify",
+      "bytes": 9812,
+      "sha256": "5cc88debea06169957c9caef3955c65d3f12f29e0f6b4802ceb9f20ba02e2511"
     },
     {
       "bytes": 4763,
@@ -13226,7 +13233,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "3fbcc1de2256324988b1a6ab4773bb81aaef7e94a4b1c3354ec296435045248a",
+  "filesSHA256": "6193146718eb51301842ddc1fc45011c78365b622d8f0ce6f5577f6d0395811d",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13283,8 +13290,8 @@
       "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
     },
     "server": {
-      "members": 1582,
-      "digest": "b65c289d84894acbada54492c0323084aa07865b8dbf2ea244decc1cdf03a4b8"
+      "members": 1583,
+      "digest": "36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5"
     }
   },
   "state": "MATERIALIZED_SOURCE_ONLY"

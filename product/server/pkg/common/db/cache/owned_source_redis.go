@@ -122,7 +122,22 @@ func (h *ownedRedisSource) run(ctx context.Context, write bool, next func(contex
 }
 func (h *ownedRedisSource) ProcessHook(next redis.ProcessHook) redis.ProcessHook {
 	return func(ctx context.Context, cmd redis.Cmder) error {
-		return h.run(ctx, ownedRedisBusinessWrite(cmd), func(ctx context.Context) error { return next(ctx, cmd) })
+		var original error
+		observed := h.run(ctx, ownedRedisBusinessWrite(cmd), func(current context.Context) error {
+			original = next(current, cmd)
+			// A direct driver Null reply is a complete acknowledged result. In
+			// particular rockscache luaSet deliberately returns Lua nil after writes.
+			// Preserve that exact sentinel for its original caller; joined/wrapped Nil
+			// and all other errors remain subject to the original unknown-write fence.
+			if original == redis.Nil {
+				return nil
+			}
+			return original
+		})
+		if observed != nil {
+			return observed
+		}
+		return original
 	}
 }
 func (h *ownedRedisSource) ProcessPipelineHook(next redis.ProcessPipelineHook) redis.ProcessPipelineHook {
@@ -131,18 +146,36 @@ func (h *ownedRedisSource) ProcessPipelineHook(next redis.ProcessPipelineHook) r
 		for _, cmd := range cmds {
 			write = write || ownedRedisBusinessWrite(cmd)
 		}
-		return h.run(ctx, write, func(ctx context.Context) error {
-			err := next(ctx, cmds)
+		var original error
+		observed := h.run(ctx, write, func(current context.Context) error {
+			original = next(current, cmds)
+			onlyAcknowledgedNull := original == redis.Nil && len(cmds) > 0
+			sawNull := false
 			for _, cmd := range cmds {
-				if issue := cmd.Err(); issue != nil {
+				issue := cmd.Err()
+				if issue == redis.Nil {
+					sawNull = true
+					continue
+				}
+				if issue != nil {
+					onlyAcknowledgedNull = false
 					var reply redis.Error
-					if !errors.As(issue, &reply) && !errors.Is(issue, redis.Nil) {
+					if !errors.As(issue, &reply) {
 						return ErrOwnedRedis
 					}
 				}
 			}
-			return err
+			// The pinned driver reads/stamps every result before returning a reply
+			// error. An outer first-Null cannot hide a later Lua/Redis/transport error.
+			if onlyAcknowledgedNull && sawNull {
+				return nil
+			}
+			return original
 		})
+		if observed != nil {
+			return observed
+		}
+		return original
 	}
 }
 
