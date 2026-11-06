@@ -57,19 +57,19 @@
       "sha256": "d0b7a910755e2b7449a7c3668520202f307f61a76a7fc4a76e2abc711b9a8862"
     },
     {
-      "bytes": 15203,
+      "bytes": 15860,
       "path": "ci/README.web-build.md",
-      "sha256": "8ec982d3d2d080089116190acf4ac5059b05358a8db3760d413630e59bf0a4e4"
+      "sha256": "37cf5c0e5f059937f1aff6f00919f1e5295c1b6fd604c668d5730df66e39e60a"
     },
     {
       "bytes": 28148,
       "path": "ci/web-build.mjs",
-      "sha256": "c14ff4ff3e84d87eccb8e7e89d427dc41784fd231f26ecd3fb93d42b6088e0e6"
+      "sha256": "03d088e29e8f2448ab16f22dc66a7a01796479401775790a65d85a4ffa73a59c"
     },
     {
       "bytes": 10288,
       "path": "ci/web-build.test.mjs",
-      "sha256": "4aa05e6cf070b0c560c8cf0ef311add7fa75c8ac22614a797a374a9882debd10"
+      "sha256": "b93232fcbc13293f19a40d17c51a35779d5f660ee5ea462f6f0cd5beb0b290a4"
     },
     {
       "bytes": 3597,
@@ -21471,9 +21471,9 @@
       "sha256": "475284792f801fa09c69c0102becc02b0abd63a991a831fc2637bb812410e344"
     },
     {
-      "bytes": 10418,
+      "bytes": 10588,
       "path": "src/pages/login/LoginForm.test.tsx",
-      "sha256": "82ec9e8c3cb71ddb21973b4fe92edfd9731a70078fe59904dd4dfd9793004c66"
+      "sha256": "4a5a2b3ff46ea9c1513e5ee35bb15102ceba8d333e80e26071974667b13640eb"
     },
     {
       "bytes": 11985,
@@ -21816,90 +21816,64 @@
       "version": "5.0.4"
     },
     "skipOrFailAccepted": false,
-    "sourceLineCount": 191,
+    "sourceLineCount": 194,
     "suite": "LoginForm authenticator disclosure"
   },
   "node": "24.21.0",
   "predecessorSource": {
-    "cohort": "web4340-build-only-v1",
+    "actualObservedAtPublicHead": "03825a0f60053c4a083a449a89f9176f8cd24857",
+    "cohort": "web4341-login-alignment-v1",
     "sourceDeclaration": {
-      "bytes": 812891,
-      "path": "references/integration/web-build-readiness-20261106-candidate/current-web-source.json",
-      "sha256": "4de481efa401e0e3eee9d647b910a543bb8c6a23d2bf47257107ea33d33ffb3e"
+      "bytes": 813160,
+      "path": "references/integration/web-login-single-build-wiring-20261107-candidate/current-web-source.json",
+      "sha256": "c6622818e1f91495a931e144a8e8a3cf6800419d47faad69df685d2ae4b283d9"
     },
-    "sourceDigest": "3503ee773da527e252fa284c2380dcda386999012a5aa538fa60f84c42b2b636",
-    "sourceFiles": 4340,
-    "sourceObservedAtPublicRef": "8d0a844fca3f1ae17e004b23a17db3e8986781e7",
-    "sourceOriginRef": "8d0a844fca3f1ae17e004b23a17db3e8986781e7"
+    "sourceDigest": "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec",
+    "sourceFiles": 4341,
+    "sourceObservedAtPublicRef": null,
+    "sourceOriginRef": null
   },
   "schema": "luobo.web.login-build.v1",
   "scope": "one real MFA form case then current Vite; no old full tests/typecheck/E2E/App/native/Go/SDK bind/business/deployment",
   "sourceDeclaration": {
-    "bytes": 813160,
-    "path": "references/integration/web-login-single-build-wiring-20261107-candidate/current-web-source.json",
-    "sha256": "c6622818e1f91495a931e144a8e8a3cf6800419d47faad69df685d2ae4b283d9"
+    "bytes": 813802,
+    "path": "references/integration/web-login-feedback-wait-20261107-candidate/current-web-source.json",
+    "sha256": "c0d6372f6215f9fbf15967ce81dcbe69225e9c53f608dd99d04f352e48f6fbe9"
   },
-  "sourceDigest": "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec",
+  "sourceDigest": "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
   "sourceFiles": 4341,
   "sourceObservedAtPublicRef": null,
   "sourceOriginRef": null,
   "sourceOverlay": {
-    "additions": 1,
+    "actualFailure": {
+      "finiteReceiptSHA256": "35761d57ecb2f9a93257d82ff3f789ce1f514b3fc43fbed7acc4912ac519db73",
+      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+      "job": 128208979256,
+      "publicTestLine": 110,
+      "run": 42310056013
+    },
+    "additions": 0,
     "delta": [
       {
         "after": {
-          "bytes": 6859,
-          "path": "src/pages/login/index.tsx",
-          "sha256": "48e59012f7b0a17dba6597165067d8e84379af1522fdff456cabafd59bdbfa05"
+          "bytes": 10588,
+          "path": "src/pages/login/LoginForm.test.tsx",
+          "sha256": "4a5a2b3ff46ea9c1513e5ee35bb15102ceba8d333e80e26071974667b13640eb"
         },
         "before": {
-          "bytes": 6669,
-          "path": "src/pages/login/index.tsx",
-          "sha256": "51e5787f539d82038e6a11eabd4fd69cbfe866b2ed315b20a6d5aff03e6671ff"
-        },
-        "path": "src/pages/login/index.tsx"
-      },
-      {
-        "after": {
-          "bytes": 4328,
-          "path": "src/pages/login/index.module.scss",
-          "sha256": "f039f2cf4b76991addd2c7976c114d8e51aa62a1c1225fe9c6560677f4eeefa6"
-        },
-        "before": {
-          "bytes": 2912,
-          "path": "src/pages/login/index.module.scss",
-          "sha256": "7e1d2d44d9598d6ed587b8d986b2c340c100e76fbe26670893a2fdf243da24d6"
-        },
-        "path": "src/pages/login/index.module.scss"
-      },
-      {
-        "after": {
-          "bytes": 11985,
-          "path": "src/pages/login/LoginForm.tsx",
-          "sha256": "5c42b6f69e3839e09199c14660570902ba7739889cf2c60a50134361a7fe35d1"
-        },
-        "before": {
-          "bytes": 8916,
-          "path": "src/pages/login/LoginForm.tsx",
-          "sha256": "4ac9ac64abd78ae7c741199b7ff1cc5ed96364ee0f0d9063d4cb2b566bf09112"
-        },
-        "path": "src/pages/login/LoginForm.tsx"
-      },
-      {
-        "after": {
           "bytes": 10418,
           "path": "src/pages/login/LoginForm.test.tsx",
           "sha256": "82ec9e8c3cb71ddb21973b4fe92edfd9731a70078fe59904dd4dfd9793004c66"
         },
-        "before": null,
         "path": "src/pages/login/LoginForm.test.tsx"
       }
     ],
-    "kind": "login UI3 plus one real-form regression from exact reviewed4340",
-    "manifestSHA256": "95d153a437758aa5b473df49b1d4f2a5b2dea4e8a9bd54854a782865cbae684e",
+    "kind": "single failed real-form test feedback waiting successor; no product/body or CI acceptance logic change",
+    "parentSourceDigest": "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec",
+    "parentUI4ManifestSHA256": "95d153a437758aa5b473df49b1d4f2a5b2dea4e8a9bd54854a782865cbae684e",
     "removals": 0,
-    "replacements": 3,
-    "state": "FROZEN_SOURCE_PENDING_ONE_NAMED_TEST_AND_BUILD"
+    "replacements": 1,
+    "state": "FROZEN_SOURCE_PENDING_FAILED_SINGLE_CASE_RETRY_THEN_FIRST_VITE"
   }
 }

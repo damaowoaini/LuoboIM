@@ -13,7 +13,7 @@ const cohort = "web4341-login-alignment-v1";
 const loginFile = "src/pages/login/LoginForm.test.tsx";
 const loginSuite = "LoginForm authenticator disclosure";
 const loginName = "reveals an invalid folded MFA field and preserves values without weakening existing mode clearing";
-const sourceDigest = "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec";
+const sourceDigest = "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90";
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 const hash = (body) => createHash("sha256").update(body).digest("hex");
 const json = (file) => JSON.parse(readFileSync(file, "utf8"));

@@ -22,7 +22,7 @@ test("build-only plan contains locked install, exact patch and Vite without any 
 
 test("reviewed4341 descriptor binds unchanged SDK8/public2 and exact login selection, refusing historical identity", () => {
   assert.equal(validateDescriptor(input).sourceFiles, 4341);
-  assert.equal(input.sourceDigest, "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec");
+  assert.equal(input.sourceDigest, "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90");
   const sdk = JSON.parse(readFileSync(fileURLToPath(new URL("../web/sdk-patches/manifest.json", import.meta.url)), "utf8"));
   assert.equal(sdk.package, "open-im-sdk-wasm");
   assert.equal(sdk.version, "3.5.1-alpha.3");

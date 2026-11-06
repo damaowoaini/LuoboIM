@@ -22,10 +22,19 @@ actual process and source/SDK/tool postconditions. The paired existing audit rej
 Successful dist-proof additionally binds that actual test receipt; neither the
 case alone nor Vite alone accepts a bundle, preview or backend/MFA authority.
 
-Current source is4341/fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec, composed from UI4r3 95d153a437758aa5b473df49b1d4f2a5b2dea4e8a9bd54854a782865cbae684e. The same private network namespace enables only lo for local worker/IPC; one-interface and zero-default-route gates remain.
+Current source is4341/6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90, test-only feedback-wait successor to UI4r3 95d153a437758aa5b473df49b1d4f2a5b2dea4e8a9bd54854a782865cbae684e. The same private network namespace enables only lo for local worker/IPC; one-interface and zero-default-route gates remain.
 Actual run IDs, dist file rows and artifact hashes remain unknown until one
 future existing workflow run. Preview/render bindings must use that actual new
 artifact; this workflow does not claim pictures or interaction acceptance.
+
+The actual03825a0 predecessor run42310056013 completed the selected case with
+one assertion failure before Vite. Expanded/focused MFA was observed, but its
+following error text assertion was not part of the awaited condition. The
+successor changes only test polling to a2s wall-clock deadline/20ms normal React
+act intervals and awaits all three feedback conditions. It retains every error,
+focus/value/API0 and later server/ownership assertion. No product, animation,
+Vitest15s, command60s or worker300s timeout changes; only this failed case retries.
+No particular AntD debounce or animation cause is asserted from the finite log.
 
 ## Historical4340 build-only identity
 

@@ -64,7 +64,10 @@ async function submit() {
   });
 }
 async function until(predicate: () => boolean) {
-  for (let i = 0; i < 30 && !predicate(); i++) await act(async () => { await tick(); });
+  const deadline = Date.now() + 2000;
+  while (!predicate() && Date.now() < deadline) {
+    await act(async () => { await new Promise<void>(resolve => setTimeout(resolve, 20)); });
+  }
   expect(predicate()).toBe(true);
 }
 function Harness() {
@@ -106,7 +109,7 @@ describe("LoginForm authenticator disclosure", () => {
     await enter(input('input[aria-label="验证器动态码"]'), "12");
     disclosure.open = false;
     await submit();
-    await until(() => disclosure.open && document.activeElement === input('input[aria-label="验证器动态码"]'));
+    await until(() => disclosure.open && document.activeElement === input('input[aria-label="验证器动态码"]') && host.textContent?.includes("请输入6位验证器动态码") === true);
     expect(host.textContent).toContain("请输入6位验证器动态码");
     expect(input('input[aria-label="验证器动态码"]').value).toBe("12");
     expect(f.login).not.toHaveBeenCalled();
