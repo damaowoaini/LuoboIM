@@ -1,4 +1,33 @@
-# Current363 / source539 verified-core ARM64 Debug QA successor
+# Current366 / source542 verified-core ARM64 Debug QA (prepared)
+
+The existing Android build workflow now admits only
+`current366-verified-core-reuse-arm64-debug-v1`, with source ref
+`b5bd894eb54a520f94944f4030acb0ca298a7186`, complete542 digest
+`a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0`,
+App366/2be96d98 and portable418/d8898207. No current APK is inherited.
+
+`source-compatibility.json` binds exactly7 Dart deltas. Reversing them recovers
+the complete old539/07de source. The nonbusiness176 set is NOT all unchanged:
+its external legacy exporter changed; the remaining175 rows, App dependency
+lock/pubspec, native7 and SDK/protocol/build sources stay exact. The helper is
+not granted a general exclusion. Unknown source deltas fail admission.
+
+`core-reuse.json`, producer539 identity, all546+5 original raw/product bodies,
+core AAR/CA/locks/API/callback and ELF checks remain untouched. The receiver542
+binding is separate; old producer evidence is never rewritten or relabelled.
+Source compatibility permits the same reviewed core, not a fresh bind or an old
+APK result. Fresh native build and real APK badging/resources/signature/LOAD16K/
+zipalign/source+tool/resource audits remain required for the new App.
+
+Builtin2, current23 metadata/APK models and plugin3 are fresh: the former produce
+this job's sealed classpaths/models, and plugin3 is affected by the resolver's
+new source scope/SHA. Original gates, real `:app:assembleDebug`, exact scopes,
+negative expectations and immutable plugin inventories remain. Accepted App
+business tests are not rerun by this lane. No new workflow/full suite is added.
+This is only debug-QA ARM64 preparation; device/service TLS, release signing,
+four ABIs, complete migration and Mobile403 are not accepted by source changes.
+
+## Historical363 / source539 predecessor
 
 This explicit v2 scope keeps App ref3942c2a/business363/portable415, all176 native
 inputs, the178-package lock and all original source checks. The v1 fresh cohort

@@ -1,0 +1,150 @@
+{
+  "canonicalPersonalReview": {
+    "bytes": 1614,
+    "path": ".qa/canonical-personal-batch-20261107/root-personal-canonical-adoption-review.json",
+    "sha256": "90a0f14ff5803194ab95fd48d6c15166b04681af5f08abee542a648c5356f8c0"
+  },
+  "compatibility_basis": "Reverse only these exact7 Dart rows to reconstruct complete original539/07de. Apart from the exact legacy export Dart tool row, all175 remaining nonbusiness rows are byte-identical. App pubspec/lock/native7, SDK/protocol/build sources are unchanged. This is source compatibility for the original AAR, not a new Go bind or inheritance of the old APK.",
+  "exclusion_boundary": "The changed migration/legacy_personal_export Dart helper is outside app/lib and SDK/protocol/native source/build directories; no source wildcard exclusion or arbitrary changed helper is permitted.",
+  "kind": "current366-personal-only-source-compatibility-v1",
+  "nonbusiness": {
+    "claim_all176_unchanged": false,
+    "delta_paths": [
+      "migration/legacy_personal_export/legacy_personal_export.dart"
+    ],
+    "producer_digest": "cad2c5e45083a9845826efe1432a3cf2a8ae42efd3d2bd44739e6cd1e286f6d5",
+    "producer_members": 176,
+    "receiver_digest": "8e1d3d464705a9b836b7eebd783726a0712a26c8b49f0502deeff1cae03fc3a5",
+    "receiver_members": 176,
+    "unchanged_members": 175,
+    "unchanged_rows_digest": "fce2ae1658a5c26970d0bed28545d2505cfdd32517d0e0ec9d06053a3da0c536"
+  },
+  "producer": {
+    "cohort": "current363-verified-core-reuse-arm64-debug-v2",
+    "coreRootReviewSHA256": "b19141e087ff0034a23e2db28cea2b1761d31f4d5af7f7b622e360e659ebf634",
+    "oldAPKRootReviewSHA256": "8f513368ae1e2db61e4fde1ef62a34d906f3824c69c5d3799ac4d53f30f813d7",
+    "original_inputs": {
+      "bytes": 102576,
+      "path": "ci/android-current363/inputs.json",
+      "sha256": "53b78ddb90ce7eb54319752ead11f94e95d2e326d1ea073c95b4ef8b45ea3f87"
+    },
+    "source": {
+      "digest": "07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f",
+      "members": 539,
+      "ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7"
+    },
+    "unchanged_core_reuse": {
+      "bytes": 4649,
+      "path": "ci/android-current363/core-reuse.json",
+      "sha256": "4a851bdcb4074f63eac4d65baccaa53a592d078317c8b99b4ebcd6475a7f0a1b"
+    }
+  },
+  "receiver": {
+    "business": {
+      "digest": "2be96d98e4193ee4919e47b828c46af498a26704e2bfe93207537d6d428b1827",
+      "members": 366
+    },
+    "cohort": "current366-verified-core-reuse-arm64-debug-v1",
+    "portable": {
+      "digest": "d8898207e1a1fa11ef9d5f5c71c91fcb0bd02f067992d294ce2ab92a81f4a47d",
+      "members": 418
+    },
+    "source": {
+      "digest": "a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0",
+      "members": 542,
+      "ref": "b5bd894eb54a520f94944f4030acb0ca298a7186"
+    }
+  },
+  "reuse_policy": {
+    "actual_app_assemble_and_APK_audit": "fresh required",
+    "builtin2": "fresh producer outputs required",
+    "business_tests": "accepted affected personal facts retained; no repeat native business/full suite",
+    "core_AAR": "exact original producer539 identity and original full receiver/AAR/ELF/API/callback audit retained",
+    "metadata_and_APK23_models": "fresh current-source/current-seal models required",
+    "old_APK_reused": false,
+    "plugin3": "fresh actual controls; resolver scope/SHA is affected"
+  },
+  "schema": 1,
+  "source_delta": [
+    {
+      "after": {
+        "bytes": 16410,
+        "path": "app/lib/features/personal/data/personal_migration.dart",
+        "sha256": "c60daa6d6422c66d2cec56ec220ca71a51dc661a162660a5c27bd3ad41379b31"
+      },
+      "before": null,
+      "path": "app/lib/features/personal/data/personal_migration.dart"
+    },
+    {
+      "after": {
+        "bytes": 14766,
+        "path": "app/lib/features/personal/data/personal_repository.dart",
+        "sha256": "2c32b383c8697e650190939baaf76ac9fb950e713d0c2e5cda40424e80a7427c"
+      },
+      "before": {
+        "bytes": 6353,
+        "path": "app/lib/features/personal/data/personal_repository.dart",
+        "sha256": "2dabc8df3d748e2e4046ff0d2c7baeb2cb548d62e497373d887a802269df6473"
+      },
+      "path": "app/lib/features/personal/data/personal_repository.dart"
+    },
+    {
+      "after": {
+        "bytes": 34663,
+        "path": "app/lib/features/personal/presentation/personal_page.dart",
+        "sha256": "4075034954b2c3f70af01fcfef9fa604246ea561575b1d9b910662ae9ca5c7fc"
+      },
+      "before": {
+        "bytes": 27726,
+        "path": "app/lib/features/personal/presentation/personal_page.dart",
+        "sha256": "c3bbd8ff492ad9d73d17846e56c891aa09ea06f4a4509a1686364c95d9dafd91"
+      },
+      "path": "app/lib/features/personal/presentation/personal_page.dart"
+    },
+    {
+      "after": {
+        "bytes": 15463,
+        "path": "app/test/features/personal/personal_action_epoch_test.dart",
+        "sha256": "d7d77e445481484739f6e816a7b10f2b11d83f57705f20986cbebfa723eb6bbb"
+      },
+      "before": {
+        "bytes": 9574,
+        "path": "app/test/features/personal/personal_action_epoch_test.dart",
+        "sha256": "827a18f8fe272057a1dea989703962c29bc001f1b714c84ceefb50fe9af769f2"
+      },
+      "path": "app/test/features/personal/personal_action_epoch_test.dart"
+    },
+    {
+      "after": {
+        "bytes": 10385,
+        "path": "app/test/features/personal/personal_migration_repository_test.dart",
+        "sha256": "365ff97da33a303d8308fc843ffb2d6735761a99f2a66d3228c239326db9f595"
+      },
+      "before": null,
+      "path": "app/test/features/personal/personal_migration_repository_test.dart"
+    },
+    {
+      "after": {
+        "bytes": 7470,
+        "path": "app/test/features/personal/personal_migration_test.dart",
+        "sha256": "0139973810276717737936679c412331694f0d1d91f0c1c5e84dae71b38efd45"
+      },
+      "before": null,
+      "path": "app/test/features/personal/personal_migration_test.dart"
+    },
+    {
+      "after": {
+        "bytes": 5483,
+        "path": "migration/legacy_personal_export/legacy_personal_export.dart",
+        "sha256": "293525253d3ea97430c5837a7fa0b2580fe95061a86daef211da45105f712fdf"
+      },
+      "before": {
+        "bytes": 2942,
+        "path": "migration/legacy_personal_export/legacy_personal_export.dart",
+        "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
+      },
+      "path": "migration/legacy_personal_export/legacy_personal_export.dart"
+    }
+  ],
+  "state": "FROZEN_SOURCE_PENDING_ROOT_VERIFICATION"
+}

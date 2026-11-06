@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Current363/source539 Android: one explicitly restored verified ARM64 debug-QA core."""
+"""Current366/source542 Android: original539 verified ARM64 debug-QA core only."""
 import argparse
 import copy
 import hashlib
@@ -37,11 +37,11 @@ home_admission=generic.home_admission
 check_flutter_environment_sources=generic.check_flutter_environment_sources
 check_current_packages=generic.check_current_packages
 
-COHORT='current363-verified-core-reuse-arm64-debug-v2'
-SOURCE_REF='3942c2acadd0b6343b9f64e3a444a52d0a28e3d7'
-SOURCE_DIGEST='07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f'
-BUSINESS_DIGEST='a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475'
-PORTABLE_DIGEST='0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f'
+COHORT='current366-verified-core-reuse-arm64-debug-v1'
+SOURCE_REF='b5bd894eb54a520f94944f4030acb0ca298a7186'
+SOURCE_DIGEST='a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0'
+BUSINESS_DIGEST='2be96d98e4193ee4919e47b828c46af498a26704e2bfe93207537d6d428b1827'
+PORTABLE_DIGEST='d8898207e1a1fa11ef9d5f5c71c91fcb0bd02f067992d294ce2ab92a81f4a47d'
 STAGES=['setup','restore','preseal','gradle-setup','apk']
 APP_DEBUG_TASK=':app:assembleDebug'
 
@@ -60,20 +60,20 @@ def validate_inputs(inputs,context):
             'packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart',
             'migration/legacy_personal_export/legacy_personal_export.dart')]
     if (context.get('core_build_mode')!='restore-verified-current363' or context.get('restore_fallback')is not False
-            or inputs['schema']!='luobo.android.current363-inputs.v1'
-            or context['schema']!='luobo.android.current363-context.v1'
+            or inputs['schema']!='luobo.android.current366-inputs.v1'
+            or context['schema']!='luobo.android.current366-context.v1'
             or inputs['cohort']!=COHORT or context['cohort']!=COHORT
             or context['source_ref']!=SOURCE_REF
-            or inputs['members']!=539 or context['source_members']!=539
-            or len(rows)!=539 or len({r['path']for r in rows})!=539
+            or inputs['members']!=542 or context['source_members']!=542
+            or len(rows)!=542 or len({r['path']for r in rows})!=542
             or any(set(r)!={'path','bytes','sha256'}for r in rows)
             or inputs['source_digest']!=SOURCE_DIGEST or context['source_digest']!=SOURCE_DIGEST
             or generic.digest(rows)!=context['source_digest']
-            or len(business)!=363 or context['business_members']!=363
+            or len(business)!=366 or context['business_members']!=366
             or generic.digest(business)!=BUSINESS_DIGEST or context['business_rows_digest']!=BUSINESS_DIGEST
-            or len(portable)!=415 or context['portable_members']!=415
+            or len(portable)!=418 or context['portable_members']!=418
             or generic.digest(portable)!=PORTABLE_DIGEST or context['portable_digest']!=PORTABLE_DIGEST):
-        raise ValueError('exact published363/source539/portable415 identity required')
+        raise ValueError('exact published366/source542/portable418 identity required')
     for row in rows:
         if (s.name(row['path'])!=row['path']or type(row['bytes'])is not int
                 or row['bytes']<0 or len(row['sha256'])!=64
@@ -90,12 +90,16 @@ def validate_inputs(inputs,context):
 
 
 def require_core_equivalence(inputs,original,context):
-    # All176 unchanged nonbusiness entries include protocol52, SDK source/tools,
-    # wrapper/build files and native7. No Dart business equality is asserted.
+    # The native inventory's nonbusiness176 includes an external Dart exporter.
+    # Only that exact changed helper is reversed; all175 other rows stay exact.
+    proof=core_restore.source_compatibility(context,inputs)
     now=nonbusiness(inputs['files']);before=nonbusiness(original['files'])
-    if (len(now)!=176 or sorted(now,key=lambda r:r['path'])!=sorted(before,key=lambda r:r['path'])
-            or generic.digest(now)!=context['core_compatibility']['nonbusiness176_digest']):
-        raise ValueError('original354 Go/protocol/SDK/native subset differs')
+    helper='migration/legacy_personal_export/legacy_personal_export.dart'
+    delta=next(row for row in proof['source_delta'] if row['path']==helper)
+    restored=[delta['before'] if row['path']==helper else row for row in now]
+    if (len(now)!=176 or sorted(restored,key=lambda r:r['path'])!=sorted(before,key=lambda r:r['path'])
+            or generic.digest(restored)!=context['core_compatibility']['nonbusiness176_digest']):
+        raise ValueError('original nonbusiness176 must be recovered by the one exact helper reversal')
     old={r['path']:r for r in original['files']};new={r['path']:r for r in inputs['files']}
     if any(new[p]!=old[p]for p in ['app/pubspec.yaml','app/pubspec.lock']):
         raise ValueError('original178 package/native dependency identity differs')
@@ -179,12 +183,12 @@ class Job(generic.Job):
                     raise ValueError('unexpected current363 source member')
                 body=bundle.extractfile(member).read();row=wanted[member.name]
                 if len(body)!=row['bytes']or hashlib.sha256(body).hexdigest()!=row['sha256']:
-                    raise ValueError('fixed published539 body differs')
+                    raise ValueError('fixed published542 body differs')
                 s.put(self.w/'source'/s.name(member.name),body);seen.add(member.name)
-        if seen!=wanted.keys():raise ValueError('incomplete source539')
+        if seen!=wanted.keys():raise ValueError('incomplete source542')
         self.verify()
         s.write_json(self.w/'evidence/current363-source.json',{'cohort':COHORT,'source_ref':SOURCE_REF,
-            'members':539,'App_members':363,'source_digest':self.inputs['source_digest'],
+            'members':542,'App_members':366,'source_digest':self.inputs['source_digest'],
             'archive_sha256':s.sha(archive),'old354_source_not_relabelled':True})
 
     def build_core(self):
@@ -450,9 +454,9 @@ class Job(generic.Job):
         if proof['source_members']!=427 or proof['source_digest']!=self.inputs['source_digest']:
             raise ValueError('unexpected original audit template')
         source=self.w/'artifacts/luobo-current257-auditable-arm64-debug.apk'
-        target=self.w/'artifacts/luobo-current363-auditable-arm64-debug.apk';s.put(target,source.read_bytes())
+        target=self.w/'artifacts/luobo-current366-auditable-arm64-debug.apk';s.put(target,source.read_bytes())
         s.write_json(self.w/'evidence/current363-APK-audit.json',{**proof,'cohort':COHORT,
-            'source_members':539,'App_members':363,'source_ref':SOURCE_REF,
+            'source_members':542,'App_members':366,'source_ref':SOURCE_REF,
             'published_APK':str(target.relative_to(self.w)),'published_SHA256':s.sha(target),
             'inherited_template_SHA256':s.sha(inherited),'restored_core_origin':read(self.w/'evidence/current363-core-import.json'),
             'Go_bind_executed_in_this_job':False,'verified_current363_core_restored':True,
@@ -469,7 +473,7 @@ def main():
     p.add_argument('--approved-context-sha256',default='');a=p.parse_args()
     context,inputs,tools=metadata()
     if a.stage=='readonly':
-        print(json.dumps({'cohort':COHORT,'source_members':539,'App_members':363,
+        print(json.dumps({'cohort':COHORT,'source_members':542,'App_members':366,
             'state':'source_identity_frozen_core_binding_and_approved_JVM18_only','native_execution':False}));return
     require_reviewed_consumer(context,a.approved_context_sha256)  # BEFORE work creation, tokens or downloads.
     if a.work is None or sys.platform!='linux'or os.geteuid()==0:p.error('ordinary-user Linux fresh root required')

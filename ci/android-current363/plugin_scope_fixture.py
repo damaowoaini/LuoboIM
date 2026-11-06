@@ -12,7 +12,7 @@ import rich_current as rich
 import rich_fixture as old_fixture
 import support as s
 
-RESOLVER_SHA = 'e68ef15af1d67164d1ffb12aa74367a0f946a45dec0c01255655c3cb9a0b25f1'
+RESOLVER_SHA = 'e96f3f27f6616c0d5987ff003cbba47a4bbee4a646ac7b0a86cd39d4fcaad540'
 START = 'def richPersist = '
 END = 'def richWrite = '
 PHASE_START = 'def richPhaseFor = '

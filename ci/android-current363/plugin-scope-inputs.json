@@ -66,7 +66,7 @@
       "version": "0.5.2+11"
     },
     {
-      "kind": "local-source539",
+      "kind": "local-source542",
       "package": "flutter_openim_sdk",
       "package_relative": "source/packages/flutter_openim_sdk",
       "project": ":flutter_openim_sdk",
@@ -740,6 +740,6 @@
   },
   "root_relative": "source/app/android",
   "schema": 1,
-  "source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
-  "source539_digest": "07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f"
+  "source542_digest": "a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0",
+  "source_ref": "b5bd894eb54a520f94944f4030acb0ca298a7186"
 }

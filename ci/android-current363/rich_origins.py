@@ -5,7 +5,7 @@ from pathlib import Path
 
 import rich_current as historical
 
-POLICY_SHA256 = '40bb2b763ab5d923461f77e85ce0f7045dd5de97a060573915493486aea76115'
+POLICY_SHA256 = 'df0e32ffb1580ae7514d215754a7b46e4e6a1b31b8dd35f331b5cea652701d39'
 
 
 def encoded(value):

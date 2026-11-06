@@ -1,8 +1,8 @@
 {
-  "schema": "luobo.android.current363-inputs.v1",
-  "cohort": "current363-verified-core-reuse-arm64-debug-v2",
-  "members": 539,
-  "source_digest": "07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f",
+  "schema": "luobo.android.current366-inputs.v1",
+  "cohort": "current366-verified-core-reuse-arm64-debug-v1",
+  "members": 542,
+  "source_digest": "a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0",
   "files": [
     {
       "path": "app/analysis_options.yaml",
@@ -915,9 +915,14 @@
       "sha256": "d4674a05f478929256651b9f54e1698c2bce05c0187224c3483475dc56a8f647"
     },
     {
+      "path": "app/lib/features/personal/data/personal_migration.dart",
+      "bytes": 16410,
+      "sha256": "c60daa6d6422c66d2cec56ec220ca71a51dc661a162660a5c27bd3ad41379b31"
+    },
+    {
       "path": "app/lib/features/personal/data/personal_repository.dart",
-      "bytes": 6353,
-      "sha256": "2dabc8df3d748e2e4046ff0d2c7baeb2cb548d62e497373d887a802269df6473"
+      "bytes": 14766,
+      "sha256": "2c32b383c8697e650190939baaf76ac9fb950e713d0c2e5cda40424e80a7427c"
     },
     {
       "path": "app/lib/features/personal/domain/personal_item.dart",
@@ -931,8 +936,8 @@
     },
     {
       "path": "app/lib/features/personal/presentation/personal_page.dart",
-      "bytes": 27726,
-      "sha256": "c3bbd8ff492ad9d73d17846e56c891aa09ea06f4a4509a1686364c95d9dafd91"
+      "bytes": 34663,
+      "sha256": "4075034954b2c3f70af01fcfef9fa604246ea561575b1d9b910662ae9ca5c7fc"
     },
     {
       "path": "app/lib/features/qr/data/qr_platform.dart",
@@ -1816,8 +1821,8 @@
     },
     {
       "path": "app/test/features/personal/personal_action_epoch_test.dart",
-      "bytes": 9574,
-      "sha256": "827a18f8fe272057a1dea989703962c29bc001f1b714c84ceefb50fe9af769f2"
+      "bytes": 15463,
+      "sha256": "d7d77e445481484739f6e816a7b10f2b11d83f57705f20986cbebfa723eb6bbb"
     },
     {
       "path": "app/test/features/personal/personal_archive_parts_test.dart",
@@ -1833,6 +1838,16 @@
       "path": "app/test/features/personal/personal_editor_test.dart",
       "bytes": 2347,
       "sha256": "fd0f1b5f28a8a5de0be29e74b87e4498d722c69f4e4a641772845916766b5e9a"
+    },
+    {
+      "path": "app/test/features/personal/personal_migration_repository_test.dart",
+      "bytes": 10385,
+      "sha256": "365ff97da33a303d8308fc843ffb2d6735761a99f2a66d3228c239326db9f595"
+    },
+    {
+      "path": "app/test/features/personal/personal_migration_test.dart",
+      "bytes": 7470,
+      "sha256": "0139973810276717737936679c412331694f0d1d91f0c1c5e84dae71b38efd45"
     },
     {
       "path": "app/test/features/personal/personal_page_lifecycle_test.dart",
@@ -1965,9 +1980,9 @@
       "sha256": "e6ee531e22d104b76d35580d607231f7a5ac7610379ebb3bbc658d23f3607133"
     },
     {
-      "bytes": 2942,
       "path": "migration/legacy_personal_export/legacy_personal_export.dart",
-      "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
+      "bytes": 5483,
+      "sha256": "293525253d3ea97430c5837a7fa0b2580fe95061a86daef211da45105f712fdf"
     },
     {
       "bytes": 7427,

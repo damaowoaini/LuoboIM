@@ -24,13 +24,15 @@ spec.loader.exec_module(controller)
 class Current363SourceTests(unittest.TestCase):
     def test_exact_current_source_rejects_old_scope_and_partial_inventory(self):
         context, inputs, tools = controller.metadata()
-        self.assertEqual((inputs['members'], context['business_members'], context['portable_members']), (539, 363, 415))
+        self.assertEqual((inputs['members'], context['business_members'], context['portable_members']), (542, 366, 418))
         self.assertEqual(context['source_ref'], controller.SOURCE_REF)
         self.assertEqual(context['locked_packages'], 178)
-        for mode in ('old-ref', 'old-count', 'partial-source', 'restore-fallback'):
+        for mode in ('old-ref', 'old-count', 'old363-ref', 'old363-count', 'partial-source', 'restore-fallback'):
             c, value = copy.deepcopy(context), copy.deepcopy(inputs)
             if mode == 'old-ref': c['source_ref'] = '0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1'
             elif mode == 'old-count': value['members'] = 535
+            elif mode == 'old363-ref': c['source_ref'] = '3942c2acadd0b6343b9f64e3a444a52d0a28e3d7'
+            elif mode == 'old363-count': value['members'] = 539
             elif mode == 'partial-source': value['files'].pop()
             else: c['restore_fallback'] = True
             with self.subTest(mode=mode), self.assertRaises(ValueError):
@@ -43,6 +45,11 @@ class Current363SourceTests(unittest.TestCase):
         spec = controller.read(HERE / 'core-reuse.json')
         self.assertEqual(spec['parent']['run'], 42183531372)
         self.assertEqual(spec['source']['members'], 539)
+        self.assertNotEqual(spec['source']['digest'], inputs['source_digest'])
+        compatibility = controller.core_restore.source_compatibility(context, inputs)
+        self.assertEqual(compatibility['receiver']['source']['members'], 542)
+        self.assertEqual(compatibility['nonbusiness']['unchanged_members'], 175)
+        self.assertFalse(compatibility['nonbusiness']['claim_all176_unchanged'])
         self.assertFalse(spec['producer_top_activation_included'])
         for case in ('old-producer', 'raw-sha', 'product-sha', 'missing-product', 'missing-marker', 'wrong-source', 'wrong-CA'):
             value = copy.deepcopy(spec)
@@ -55,6 +62,19 @@ class Current363SourceTests(unittest.TestCase):
             else: value['publicCoreCASHA256'] = '0' * 64
             with self.subTest(case=case), self.assertRaises(ValueError):
                 controller.core_restore.validate(value, context, inputs, tools)
+        for case in ('old-receiver', 'wrong-ref', 'wrong-helper', 'other-native-row', 'wrong-proof-pin'):
+            c, current = copy.deepcopy(context), copy.deepcopy(inputs)
+            if case == 'old-receiver': current['members'] = 539
+            elif case == 'wrong-ref': c['source_ref'] = '3942c2acadd0b6343b9f64e3a444a52d0a28e3d7'
+            elif case == 'wrong-proof-pin': c['source_compatibility']['sha256'] = '0' * 64
+            else:
+                target = ('migration/legacy_personal_export/legacy_personal_export.dart'
+                          if case == 'wrong-helper' else 'packages/flutter_openim_sdk/pubspec.yaml')
+                next(row for row in current['files'] if row['path'] == target)['sha256'] = '0' * 64
+                current['source_digest'] = controller.generic.digest(current['files'])
+                c['source_digest'] = current['source_digest']
+            with self.subTest(receiver=case), self.assertRaises(ValueError):
+                controller.core_restore.validate(spec, c, current, tools)
         for name in ('build_core', 'builder'):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 getattr(controller.Job, name)(None)

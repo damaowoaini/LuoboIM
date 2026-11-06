@@ -1,4 +1,4 @@
-"""One explicit current363 producer; no old354 identity or fresh-bind fallback."""
+"""Current366 receiver; exact original539 core producer is never relabelled."""
 import hashlib
 import importlib.util
 import json
@@ -8,6 +8,7 @@ from pathlib import Path
 import audit
 import support as s
 import verify_inputs
+import current_app as generic
 
 SPEC_SHA256 = '4a851bdcb4074f63eac4d65baccaa53a592d078317c8b99b4ebcd6475a7f0a1b'
 
@@ -16,15 +17,70 @@ def encoded(value):
     return (json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\n').encode()
 
 
+SOURCE_COMPATIBILITY_SHA256 = '74e3f1f8ac3a8e002822800a305c5fef1ed4c2dc73da37a1ffd7cf562ad17c2d'
+
+
+def source_compatibility(context, inputs):
+    path = Path(__file__).resolve().parent / 'source-compatibility.json'
+    raw = path.read_bytes()
+    wanted = {'path': 'ci/android-current363/source-compatibility.json',
+              'bytes': 6457, 'sha256': SOURCE_COMPATIBILITY_SHA256}
+    if (hashlib.sha256(raw).hexdigest() != SOURCE_COMPATIBILITY_SHA256
+            or context.get('source_compatibility') != wanted):
+        raise ValueError('exact personal-only source compatibility proof required')
+    proof = json.loads(raw)
+    receiver = proof['receiver']
+    if (context['cohort'] != receiver['cohort']
+            or {'members': inputs['members'], 'digest': inputs['source_digest'],
+                 'ref': context['source_ref']} != receiver['source']
+            or inputs['cohort'] != receiver['cohort']
+            or len(inputs['files']) != 542 or generic.digest(inputs['files']) != inputs['source_digest']):
+        raise ValueError('exact current542 receiver source required')
+    current = {row['path']: row for row in inputs['files']}
+    if len(current) != 542:
+        raise ValueError('unique current542 source rows required')
+    original = dict(current)
+    for delta in proof['source_delta']:
+        name = delta['path']
+        if current.get(name) != delta['after']:
+            raise ValueError('exact current personal delta required')
+        if delta['before'] is None:
+            del original[name]
+        else:
+            original[name] = delta['before']
+    producer = proof['producer']['source']
+    if len(original) != 539 or generic.digest(list(original.values())) != producer['digest']:
+        raise ValueError('seven exact Dart reversals must recover complete producer539 source')
+    helper = 'migration/legacy_personal_export/legacy_personal_export.dart'
+    now_business = {r['path'] for r in generic.business(list(current.values()))}
+    old_business = {r['path'] for r in generic.business(list(original.values()))}
+    now_other = [r for name, r in current.items() if name not in now_business]
+    old_other = [r for name, r in original.items() if name not in old_business]
+    boundary = proof['nonbusiness']
+    changed = sorted(name for name in set(current) | set(original)
+                     if name not in now_business | old_business and current.get(name) != original.get(name))
+    same_now = sorted((r for r in now_other if r['path'] != helper), key=lambda r: r['path'])
+    same_old = sorted((r for r in old_other if r['path'] != helper), key=lambda r: r['path'])
+    if (len(now_other) != 176 or len(old_other) != 176 or changed != [helper]
+            or boundary['delta_paths'] != [helper] or same_now != same_old or len(same_now) != 175
+            or generic.digest(same_now) != boundary['unchanged_rows_digest']
+            or generic.digest(now_other) != boundary['receiver_digest']
+            or generic.digest(old_other) != boundary['producer_digest']
+            or boundary['claim_all176_unchanged'] is not False):
+        raise ValueError('only the exact legacy Dart helper may differ outside business source')
+    return proof
+
+
 def validate(spec, context, inputs, tools):
+    compatibility = source_compatibility(context, inputs)
     if hashlib.sha256(encoded(spec)).hexdigest() != SPEC_SHA256:
         raise ValueError('exact Root frozen current363 producer binding required')
-    if (spec['source'] != {'members': inputs['members'], 'digest': inputs['source_digest'], 'ref': context['source_ref']}
+    if (spec['source'] != compatibility['producer']['source']
             or context['core_build_mode'] != 'restore-verified-current363' or context['restore_fallback'] is not False
-            or context['cohort'] != spec['cohort'] or context['core_compatibility']['nonbusiness176_digest'] != spec['nonbusiness176_digest']
+            or spec['cohort'] != compatibility['producer']['cohort'] or context['core_compatibility']['nonbusiness176_digest'] != spec['nonbusiness176_digest']
             or spec['source']['members'] != 539 or spec['onlyDebugQA_ARM64'] is not True
             or spec['coreBindAgain'] is not False or spec['productionReplacement'] is not False):
-        raise ValueError('explicit same-source539/native176 debug-only restore required')
+        raise ValueError('explicit producer539/current542 debug-only compatibility required')
     if (spec['producerMobileTool']['version'] != tools['mobile']['version']
             or spec['producerMobileTool']['commit'] != tools['mobile']['commit']):
         raise ValueError('original fixed mobile tool identity differs')
@@ -46,7 +102,8 @@ def product_files(root, spec):
         pinned(root, row)
 
 
-def audit_metadata(raw, products, spec, inputs, tools):
+def audit_metadata(raw, products, spec, inputs, tools, context):
+    validate(spec, context, inputs, tools)
     # Whole raw ZIP hash binds every member; these fourteen critical records are
     # also individually frozen. The missing top-level activation is not invented.
     for row in spec['raw_markers']:
@@ -54,10 +111,10 @@ def audit_metadata(raw, products, spec, inputs, tools):
     load = lambda name: json.loads(verify_inputs.checked_path(raw, 'evidence/' + name).read_bytes())
     source, built = load('current363-source.json'), load('current363-core-build.json')
     if (source['members'] != 539 or source['App_members'] != 363
-            or source['source_ref'] != spec['source']['ref'] or source['source_digest'] != inputs['source_digest']
+            or source['source_ref'] != spec['source']['ref'] or source['source_digest'] != spec['source']['digest']
             or source['cohort'] != spec['producer_cohort'] or source['old354_source_not_relabelled'] is not True
             or built['cohort'] != spec['producer_cohort'] or built['source_members'] != 539 or built['App_members'] != 363
-            or built['source_ref'] != spec['source']['ref'] or built['source_digest'] != inputs['source_digest']
+            or built['source_ref'] != spec['source']['ref'] or built['source_digest'] != spec['source']['digest']
             or built['fresh_Go_bind_executed'] is not True or built['restored_binary'] is not False
             or built['only_debug_QA'] is not True or built['production_replacement'] is not False
             or built['AAR_sha256'] != spec['AARSHA256']
@@ -134,7 +191,7 @@ def restore(owner, spec):
     finally:
         token = None
     raw, products = root / 'raw', root / 'products'
-    proof = audit_metadata(raw, products, spec, owner.inputs, owner.tools)
+    proof = audit_metadata(raw, products, spec, owner.inputs, owner.tools, owner.context)
     for row in spec['product_pins']:
         target = 'recovered-core-ca-public.pem' if row['path'] == 'job-ca-public.pem' else row['path']
         s.put(owner.w / 'artifacts' / target, (products / row['path']).read_bytes())
@@ -143,7 +200,11 @@ def restore(owner, spec):
     s.write_json(owner.w / 'evidence/core-audit.json', proof)
     s.write_json(owner.w / 'evidence/current363-core-import.json', {
         'cohort': owner.context['cohort'], 'producer': identity, 'source': spec['source'],
-        'native176_digest': spec['nonbusiness176_digest'], 'Root_review_sha256': spec['rootReviewSHA256'],
+        'producer_nonbusiness176_digest': spec['nonbusiness176_digest'],
+        'receiver_source': {'members': owner.inputs['members'], 'digest': owner.inputs['source_digest'], 'ref': owner.context['source_ref']},
+        'source_compatibility_sha256': SOURCE_COMPATIBILITY_SHA256,
+        'all_nonbusiness176_unchanged': False, 'unchanged_nonbusiness_rows': 175,
+        'Root_review_sha256': spec['rootReviewSHA256'],
         'AAR_sha256': spec['AARSHA256'], 'full_API_ZIP_CRC_and_five_bodies_checked': True,
         'actual_AAR_ARM64_ELF_API_callbacks_reaudited': True, 'producer_top_activation_included': False,
         'producer_source_and_phase_cohort_evidence_used': True,

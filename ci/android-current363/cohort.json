@@ -147,25 +147,42 @@
       "sha256": "c242cbcc956b498b33a13dc18f87234212486616235b93de8443c63da7aac7f3"
     }
   ],
-  "business_members": 363,
-  "business_rows_digest": "a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475",
+  "business_members": 366,
+  "business_rows_digest": "2be96d98e4193ee4919e47b828c46af498a26704e2bfe93207537d6d428b1827",
+  "canonical_personal_source": {
+    "adopted_at_ref": "6fa2f3db2f29fbc4b6da0e8d9616b522312f77e5",
+    "business": {
+      "digest": "2be96d98e4193ee4919e47b828c46af498a26704e2bfe93207537d6d428b1827",
+      "members": 366
+    },
+    "fresh_App_native_build_inherited": false,
+    "portable": {
+      "digest": "d8898207e1a1fa11ef9d5f5c71c91fcb0bd02f067992d294ce2ab92a81f4a47d",
+      "members": 418
+    },
+    "review": {
+      "bytes": 1614,
+      "path": ".qa/canonical-personal-batch-20261107/root-personal-canonical-adoption-review.json",
+      "sha256": "90a0f14ff5803194ab95fd48d6c15166b04681af5f08abee542a648c5356f8c0"
+    }
+  },
   "catalogue_approval": {
     "catalog_sha256": "00d559f734c28560b9f18a27ef2fedfd5488c7eb9fa0a6d8d18930d0927d2cc7",
     "graph_sha256": "e70247c7426c9c0afc7891eac6e10a3cb49b7fccc0ec99e17ffc041bc87c4c5e",
     "native_or_App_accepted": false,
     "root_acceptance_sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
   },
-  "cohort": "current363-verified-core-reuse-arm64-debug-v2",
+  "cohort": "current366-verified-core-reuse-arm64-debug-v1",
   "controller_inputs": [
     {
       "bytes": 4949,
       "path": ".github/workflows/android-current363-debug.yml",
-      "sha256": "393904b5ccf56db42fa8593150a982e99cf6c92b8b97dfb77f60b2776ed3bcf3"
+      "sha256": "e116a65d36963b657277f059511c11107a64ea22629c2a1eb207fa1820190ff3"
     },
     {
-      "bytes": 4142,
+      "bytes": 5913,
       "path": "ci/android-current363/README.md",
-      "sha256": "ff225d739602ca849347717b8109d74b5c25b060bf5e8ff6b48194fe3271d0a0"
+      "sha256": "7e136a0336bd10997c6aca18e9523e8f021347ea873915d833fb20c8d5f5e679"
     },
     {
       "bytes": 1196,
@@ -193,14 +210,14 @@
       "sha256": "4a851bdcb4074f63eac4d65baccaa53a592d078317c8b99b4ebcd6475a7f0a1b"
     },
     {
-      "bytes": 10210,
+      "bytes": 13839,
       "path": "ci/android-current363/core_restore.py",
-      "sha256": "012aa9d792da190996779d13abba4d036262266c5d4fe473668e14aa5b5a5740"
+      "sha256": "ad25afa84b003c401074655ba70fbc3da5c00ddd58f2398fc431514a1de02bbc"
     },
     {
-      "bytes": 102576,
+      "bytes": 103160,
       "path": "ci/android-current363/inputs.json",
-      "sha256": "53b78ddb90ce7eb54319752ead11f94e95d2e326d1ea073c95b4ef8b45ea3f87"
+      "sha256": "e8f17b0d76a88b4d1bb9d84469a35f5bcdb284596508bb8e40071cf5e4d0ae1d"
     },
     {
       "bytes": 4445,
@@ -210,7 +227,7 @@
     {
       "bytes": 600,
       "path": "ci/android-current363/netns.sh",
-      "sha256": "af827b777a4fdd209ace46216eff5de0296ff384433e6a71b7cfba208856728f"
+      "sha256": "5222b5ed6fe81c405a354727bf425dc2004f5197abd9a466ed17fa7f0d4139e7"
     },
     {
       "bytes": 10593,
@@ -220,17 +237,17 @@
     {
       "bytes": 35983,
       "path": "ci/android-current363/plugin-scope-inputs.json",
-      "sha256": "cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625"
+      "sha256": "3fc2f44ca9c46f04437c3574e7cb23cc97ce67d069b759c0a46dc88b3737e30c"
     },
     {
       "bytes": 26610,
       "path": "ci/android-current363/plugin_scope.py",
-      "sha256": "3d4c32c3e1a635f2c0d67534ab06f0fc0d1fcee3188335d6fe51b50910ef46c9"
+      "sha256": "475e66e8d9f5b895d021336b2c503487258bdf68bd774f4b68c3418caf55fdae"
     },
     {
       "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "3bb2852837ff3b87a97b014b2c6896a373f54736edbfaa21a30878eceefbb4ab"
+      "sha256": "2c929ac5e38a62ae77bb623d49f6407ad5287d68c1e1b7fe0957d5219ef0f797"
     },
     {
       "bytes": 1384,
@@ -240,7 +257,7 @@
     {
       "bytes": 67116,
       "path": "ci/android-current363/resolve.gradle",
-      "sha256": "e68ef15af1d67164d1ffb12aa74367a0f946a45dec0c01255655c3cb9a0b25f1"
+      "sha256": "e96f3f27f6616c0d5987ff003cbba47a4bbee4a646ac7b0a86cd39d4fcaad540"
     },
     {
       "bytes": 71217,
@@ -255,22 +272,27 @@
     {
       "bytes": 4084,
       "path": "ci/android-current363/rich-origin-policy.json",
-      "sha256": "40bb2b763ab5d923461f77e85ce0f7045dd5de97a060573915493486aea76115"
+      "sha256": "df0e32ffb1580ae7514d215754a7b46e4e6a1b31b8dd35f331b5cea652701d39"
     },
     {
       "bytes": 6092,
       "path": "ci/android-current363/rich_origins.py",
-      "sha256": "4846a1d6fd256dc2a13f6f54a692801c771df1379f4db066f1437a921bd1c0b0"
+      "sha256": "c93f955db91f717b46e7481cce5430f9dc2b8dade083eca70aadc28b88902d59"
     },
     {
-      "bytes": 32613,
+      "bytes": 32930,
       "path": "ci/android-current363/run.py",
-      "sha256": "e109fbde389ad0d095ce32ed0649b020dd3e3d6aa46271127b72b2be8a8c32d8"
+      "sha256": "d89a420c8ff8a062d1dc892bbf5ecb7dfeb592ca0d19bcffe6a75cd69ae84202"
     },
     {
-      "bytes": 19832,
+      "bytes": 6457,
+      "path": "ci/android-current363/source-compatibility.json",
+      "sha256": "74e3f1f8ac3a8e002822800a305c5fef1ed4c2dc73da37a1ffd7cf562ad17c2d"
+    },
+    {
+      "bytes": 21470,
       "path": "ci/android-current363/test_identity.py",
-      "sha256": "a74871f8ed9239bd62493628edfc5fddc8ce5089ac847c9de56528b45bdd38a7"
+      "sha256": "725a617e6b0e137c8f233724d7f15d64365f5b1a23f83a13126de5f68d234bd0"
     },
     {
       "bytes": 3621,
@@ -283,15 +305,23 @@
       "sha256": "5daeaadded94c519197cda264d12a8a526558867361a480f739b9633459946c6"
     }
   ],
-  "controller_revision": "current363-verified-core-reuse-json-native-plugin-binding-v6",
+  "controller_revision": "current366-source542-personal-compatibility-v1",
   "core_build_mode": "restore-verified-current363",
   "core_compatibility": {
     "freshActualGoBuildRequired": false,
     "freshBindFallback": false,
     "nonbusiness176_digest": "cad2c5e45083a9845826efe1432a3cf2a8ae42efd3d2bd44739e6cd1e286f6d5",
     "oldArtifactsUsed": false,
+    "only_nonbusiness_delta": [
+      "migration/legacy_personal_export/legacy_personal_export.dart"
+    ],
+    "producer_nonbusiness176_same_as_historical354_and359": true,
     "productionReplacement": false,
-    "source176SameAsHistorical354And359": true,
+    "receiver_nonbusiness176_all_unchanged": false,
+    "receiver_nonbusiness176_digest": "8e1d3d464705a9b836b7eebd783726a0712a26c8b49f0502deeff1cae03fc3a5",
+    "source176SameAsHistorical354And359": false,
+    "source_compatibility_sha256": "74e3f1f8ac3a8e002822800a305c5fef1ed4c2dc73da37a1ffd7cf562ad17c2d",
+    "unchanged_nonbusiness_rows": 175,
     "verifiedCurrent363ProducerRequired": true
   },
   "execution_gate": "Root supplies exact complete new cohort SHA after source/affected-control review; this is scope binding, not a user approval request.",
@@ -313,11 +343,6 @@
     }
   ],
   "locked_packages": 178,
-  "mobile_source_declaration_at_ref": {
-    "bytes": 193400,
-    "path": "ci/mobile/inputs.json",
-    "sha256": "df60daca701faef61c14eed46ce86f760062002f6b4e417e287c58f133f75df4"
-  },
   "native_source_snapshot": {
     "Kotlin_compile_Swift_parse_typecheck_passed": true,
     "R1_manifest_sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894",
@@ -413,7 +438,7 @@
     "fixture": {
       "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "3bb2852837ff3b87a97b014b2c6896a373f54736edbfaa21a30878eceefbb4ab"
+      "sha256": "2c929ac5e38a62ae77bb623d49f6407ad5287d68c1e1b7fe0957d5219ef0f797"
     },
     "mandatory_preseal_after_builtin_before_production_models": true,
     "owned_outputs_policy_unchanged": true,
@@ -422,16 +447,73 @@
   "plugin_source_scope": {
     "App_original18_still_required": true,
     "actual_plugin_graphs_accepted": false,
-    "changed_business_rows": 21,
-    "contract_sha256": "cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625",
+    "changed_business_rows": 6,
+    "contract_sha256": "3fc2f44ca9c46f04437c3574e7cb23cc97ce67d069b759c0a46dc88b3737e30c",
     "localSDK": 1,
-    "nonbusiness176_unchanged": true,
+    "nonbusiness176_unchanged": false,
     "project_bound_configurations_expected": 44,
     "pub_packages": 21,
-    "source539_bound": true
+    "source542_bound": true,
+    "unchanged_nonbusiness_rows": 175
   },
-  "portable_digest": "0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f",
-  "portable_members": 415,
+  "portable_digest": "d8898207e1a1fa11ef9d5f5c71c91fcb0bd02f067992d294ce2ab92a81f4a47d",
+  "portable_members": 418,
+  "predecessor_accepted363": {
+    "APKRootReviewSHA256": "8f513368ae1e2db61e4fde1ef62a34d906f3824c69c5d3799ac4d53f30f813d7",
+    "business_members": 363,
+    "cohort": "current363-verified-core-reuse-arm64-debug-v2",
+    "context_sha256": "127bbe4be85f338ce5c18b6cfeec2f0393787da159da3d1fa71044f96193a26f",
+    "mobile_source_declaration_at_ref": {
+      "bytes": 193400,
+      "path": "ci/mobile/inputs.json",
+      "sha256": "df60daca701faef61c14eed46ce86f760062002f6b4e417e287c58f133f75df4"
+    },
+    "old_APK_accepted_for_new_source": false,
+    "portable_members": 415,
+    "source_digest": "07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f",
+    "source_members": 539,
+    "source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+    "source_successor": {
+      "current_363_native_build_executed": false,
+      "current_source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "native_or_new_App_result_inherited": false,
+      "previous_business_members": 359,
+      "previous_source_ref": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1",
+      "production_Dart_added": [
+        "app/lib/features/chat/presentation/chat_typing_controller.dart"
+      ],
+      "production_Dart_existing_changed": [
+        "app/lib/core/im/im_event.dart",
+        "app/lib/core/im/open_im_gateway.dart",
+        "app/lib/features/chat/data/chat_repository.dart",
+        "app/lib/features/chat/data/message_mapper.dart",
+        "app/lib/features/chat/domain/chat_message.dart",
+        "app/lib/features/chat/presentation/chat_controller.dart",
+        "app/lib/features/chat/presentation/chat_forward_page.dart",
+        "app/lib/features/chat/presentation/chat_page.dart",
+        "app/lib/features/chat/presentation/mention_text_controller.dart",
+        "app/lib/features/chat/presentation/message_media.dart",
+        "app/lib/features/contacts/presentation/user_profile_page.dart",
+        "app/lib/features/favorite/presentation/favorite_forward_page.dart"
+      ],
+      "test_added": [
+        "app/test/features/chat/chat_input_fixture.dart",
+        "app/test/features/chat/chat_reedit_workflow_test.dart",
+        "app/test/features/chat/chat_typing_workflow_test.dart"
+      ],
+      "test_existing_changed": [
+        "app/test/core/im/sdk_harness.dart",
+        "app/test/features/chat/batch_media_access_test.dart",
+        "app/test/features/chat/chat_favorite_test.dart",
+        "app/test/features/chat/chat_forward_page_test.dart",
+        "app/test/features/chat/chat_location_fixture.dart",
+        "app/test/features/chat/group_revoke_fixture.dart",
+        "app/test/features/chat/group_revoke_workflow_test.dart",
+        "app/test/features/chat/legacy_custom_summary_test.dart",
+        "app/test/features/favorite/favorite_forward_privacy_test.dart"
+      ]
+    }
+  },
   "predecessor_fresh_v1": {
     "APK_built": false,
     "cohort": "current363-fresh-fixed-core-arm64-debug-v1",
@@ -486,56 +568,46 @@
       "039a35aefab7747c557242fa216c9ea11743b604"
     ],
     "after_use": "read-only URL/object/filter/scope validation",
-    "current_source539_fresh_AAR_required": false,
-    "current_source539_verified_AAR_required": true,
+    "current_source542_fresh_AAR_required": false,
+    "current_source542_verified_AAR_required": true,
     "early_once": "beforeSettings/beforeProject existing+whenObjectAdded;fixedfilter freeze",
     "fixed_Gradle": "9.3.1",
     "new_actual_Gradle1": "required in this explicit native batch; source preparation is not execution"
   },
   "restore_fallback": false,
-  "schema": "luobo.android.current363-context.v1",
-  "shared_source_identity": "Current363 App is new; exact SDK/protocol/native176 may share source provenance, never old APK or binary results.",
-  "source_digest": "07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f",
-  "source_members": 539,
-  "source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+  "schema": "luobo.android.current366-context.v1",
+  "shared_source_identity": "Receiver542 is current App366; original producer539/AAR remains separate. Exact7 Dart reversal proves complete producer source and175 unchanged nonbusiness rows, never all176 or old APK reuse.",
+  "source_compatibility": {
+    "bytes": 6457,
+    "path": "ci/android-current363/source-compatibility.json",
+    "sha256": "74e3f1f8ac3a8e002822800a305c5fef1ed4c2dc73da37a1ffd7cf562ad17c2d"
+  },
+  "source_digest": "a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0",
+  "source_members": 542,
+  "source_ref": "b5bd894eb54a520f94944f4030acb0ca298a7186",
   "source_successor": {
-    "current_363_native_build_executed": false,
-    "current_source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+    "current_366_native_build_executed": false,
+    "current_source_ref": "b5bd894eb54a520f94944f4030acb0ca298a7186",
+    "guide_JSON_outside_native_inventory": "migration/legacy_personal_export/integration.json is canonical guidance metadata, not an extra native build input",
     "native_or_new_App_result_inherited": false,
-    "previous_business_members": 359,
-    "previous_source_ref": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1",
+    "nonbusiness_Dart_changed": [
+      "migration/legacy_personal_export/legacy_personal_export.dart"
+    ],
+    "previous_business_members": 363,
+    "previous_source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
     "production_Dart_added": [
-      "app/lib/features/chat/presentation/chat_typing_controller.dart"
+      "app/lib/features/personal/data/personal_migration.dart"
     ],
     "production_Dart_existing_changed": [
-      "app/lib/core/im/im_event.dart",
-      "app/lib/core/im/open_im_gateway.dart",
-      "app/lib/features/chat/data/chat_repository.dart",
-      "app/lib/features/chat/data/message_mapper.dart",
-      "app/lib/features/chat/domain/chat_message.dart",
-      "app/lib/features/chat/presentation/chat_controller.dart",
-      "app/lib/features/chat/presentation/chat_forward_page.dart",
-      "app/lib/features/chat/presentation/chat_page.dart",
-      "app/lib/features/chat/presentation/mention_text_controller.dart",
-      "app/lib/features/chat/presentation/message_media.dart",
-      "app/lib/features/contacts/presentation/user_profile_page.dart",
-      "app/lib/features/favorite/presentation/favorite_forward_page.dart"
+      "app/lib/features/personal/data/personal_repository.dart",
+      "app/lib/features/personal/presentation/personal_page.dart"
     ],
     "test_added": [
-      "app/test/features/chat/chat_input_fixture.dart",
-      "app/test/features/chat/chat_reedit_workflow_test.dart",
-      "app/test/features/chat/chat_typing_workflow_test.dart"
+      "app/test/features/personal/personal_migration_repository_test.dart",
+      "app/test/features/personal/personal_migration_test.dart"
     ],
     "test_existing_changed": [
-      "app/test/core/im/sdk_harness.dart",
-      "app/test/features/chat/batch_media_access_test.dart",
-      "app/test/features/chat/chat_favorite_test.dart",
-      "app/test/features/chat/chat_forward_page_test.dart",
-      "app/test/features/chat/chat_location_fixture.dart",
-      "app/test/features/chat/group_revoke_fixture.dart",
-      "app/test/features/chat/group_revoke_workflow_test.dart",
-      "app/test/features/chat/legacy_custom_summary_test.dart",
-      "app/test/features/favorite/favorite_forward_privacy_test.dart"
+      "app/test/features/personal/personal_action_epoch_test.dart"
     ]
   },
   "verified_core_reuse": {

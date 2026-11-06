@@ -361,8 +361,8 @@ def pluginRegistry = pluginField.registry
 def pluginScript = Base64.decoder.decode(pluginField.script_base64)
 if (pluginScript.length>32*1024 || digestBytes(pluginScript)!=pluginField.script_sha256 ||
         pluginRegistry.schema!=1 || pluginRegistry.contract_sha256!=pluginField.contract_sha256 ||
-        pluginRegistry.source_ref!='3942c2acadd0b6343b9f64e3a444a52d0a28e3d7' ||
-        pluginRegistry.source_digest!='07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f' ||
+        pluginRegistry.source_ref!='b5bd894eb54a520f94944f4030acb0ca298a7186' ||
+        pluginRegistry.source_digest!='a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0' ||
         pluginRegistry.root_relative!='source/app/android' || pluginRegistry.entries.size()!=22 ||
         pluginRegistry.any { k,v -> pluginSeal[k]!=v })
     throw new GradleException('plugin source registry identity differs')

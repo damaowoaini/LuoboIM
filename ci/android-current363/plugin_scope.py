@@ -19,9 +19,9 @@ import rich_current as rich
 import rich_origins as origins
 import support as s
 
-CONTRACT_SHA = 'cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625'
-SOURCE_REF = '3942c2acadd0b6343b9f64e3a444a52d0a28e3d7'
-SOURCE_DIGEST = '07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f'
+CONTRACT_SHA = '3fc2f44ca9c46f04437c3574e7cb23cc97ce67d069b759c0a46dc88b3737e30c'
+SOURCE_REF = 'b5bd894eb54a520f94944f4030acb0ca298a7186'
+SOURCE_DIGEST = 'a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0'
 SEAL = 'evidence/plugin-source-seal.json'
 PREFIX = 'evidence/plugin-sources'
 CONFIGS = {'kotlinAbiValidationCompatClasspath', 'kotlinBouncyCastleConfiguration'}
@@ -60,13 +60,13 @@ def contract(here, inputs):
     value = json.loads(raw)
     projects = value['projects']
     indexed = {x['path']: x for x in inputs['files']}
-    if (value['schema'] != 1 or value['source_ref'] != SOURCE_REF or value['source539_digest'] != SOURCE_DIGEST
-            or inputs['source_digest'] != SOURCE_DIGEST or inputs['members'] != 539
+    if (value['schema'] != 1 or value['source_ref'] != SOURCE_REF or value['source542_digest'] != SOURCE_DIGEST
+            or inputs['source_digest'] != SOURCE_DIGEST or inputs['members'] != 542
             or value['pub_lock'] != indexed['app/pubspec.lock'] or value['locked_package_count'] != 178
             or len(projects) != 22 or len({p['project'] for p in projects}) != 22
-            or sum(p['kind'] == 'local-source539' for p in projects) != 1
+            or sum(p['kind'] == 'local-source542' for p in projects) != 1
             or set(value['configurations']) != CONFIGS):
-        raise ValueError('exact539/native plugin source identity required')
+        raise ValueError('exact542/native plugin source identity required')
     catalog, _, _ = rich.approved(here)
     if (value['App_catalog_sha256'] != rich.CATALOG_SHA or value['old_App_library_sha256'] != rich.SCRIPT_SHA
             or value['App_scope_sources'] != catalog['scope']['sources']
@@ -76,11 +76,11 @@ def contract(here, inputs):
         if (not re.fullmatch(':[a-z][a-z0-9_]*', entry['project'])
                 or entry['slot'] != rich.sha(entry['project'].encode())):
             raise ValueError('finite exact project identity required')
-        if entry['kind'] == 'local-source539':
+        if entry['kind'] == 'local-source542':
             expected = [r for r in inputs['files'] if r['path'].startswith('packages/flutter_openim_sdk/')]
             if (entry['project'] != ':flutter_openim_sdk' or entry['source_rows'] != expected
                     or entry['project_relative'] != 'source/packages/flutter_openim_sdk/android'):
-                raise ValueError('local SDK plugin must come from current539 rows')
+                raise ValueError('local SDK plugin must come from current542 rows')
         elif (entry['kind'] != 'locked-official-pub-archive'
                 or entry['project'] != ':' + entry['package']
                 or entry['project_relative'] != entry['package_relative'] + '/android'
@@ -292,15 +292,15 @@ def produce(job, here):
     if file_row(work / 'source/app/pubspec.lock') != {k: lock[k] for k in ('bytes', 'sha256')}:
         raise ValueError('fixed178 pub lock differs before plugin producer')
     s.write_json(work / PREFIX / 'intent.json', {'contract_sha256': CONTRACT_SHA,
-        'before_app_models': True, 'independent_archives': 21, 'local_source539': 1})
+        'before_app_models': True, 'independent_archives': 21, 'local_source542': 1})
     entries, archive_total, decoded, count = [], 0, 0, 0
     deadline = time.monotonic() + 600
     for entry in spec['projects']:
         b.check()
-        if entry['kind'] == 'local-source539':
+        if entry['kind'] == 'local-source542':
             prefix = 'packages/flutter_openim_sdk/'
             files = [{**row, 'path': row['path'][len(prefix):]} for row in entry['source_rows']]
-            origin = {'kind': 'local-source539', 'source_ref': SOURCE_REF, 'source_digest': SOURCE_DIGEST}
+            origin = {'kind': 'local-source542', 'source_ref': SOURCE_REF, 'source_digest': SOURCE_DIGEST}
         else:
             archive = work / 'downloads/plugin-source-origins' / (entry['package'] + '-' + entry['version'] + '.tar.gz')
             origin = {'kind': 'locked-official-pub-archive', **acquire(entry, archive, b, spec['archive_limits']['each'], deadline)}
@@ -350,8 +350,8 @@ def verified(work, here, inputs, budget=None):
         value = json.loads(rich.read(p, 16 << 20))
         if value['project'] != entry['project'] or value['origin'] != entry['origin']:
             raise ValueError('plugin manifest origin or project differs')
-        if approved['kind'] == 'local-source539':
-            if value['origin'] != {'kind': 'local-source539', 'source_ref': SOURCE_REF, 'source_digest': SOURCE_DIGEST}:
+        if approved['kind'] == 'local-source542':
+            if value['origin'] != {'kind': 'local-source542', 'source_ref': SOURCE_REF, 'source_digest': SOURCE_DIGEST}:
                 raise ValueError('local SDK535 origin differs')
             files = [{**row, 'path': row['path'][len('packages/flutter_openim_sdk/'):]} for row in approved['source_rows']]
         else:
