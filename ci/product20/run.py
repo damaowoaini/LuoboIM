@@ -5,6 +5,8 @@ from pathlib import Path
 REPO=Path(__file__).resolve().parents[2]
 HERE=Path(__file__).resolve().parent
 NAMES=('admin-rpc','chat-rpc','office-rpc','admin-api','chat-api','route-service')
+ASSEMBLY_MODE='core14-currentChart5-historicalRouteFrom6-v1'
+CHART5={'chat-api':'./cmd/api/chat-api','admin-api':'./cmd/api/admin-api','chat-rpc':'./cmd/rpc/chat-rpc','admin-rpc':'./cmd/rpc/admin-rpc','office-rpc':'./cmd/rpc/office-rpc'}
 OVERLAYS=('server/internal/runtimeacceptance/product20_linux.go','server/cmd/tools/product20-acceptance/main.go')
 BOOT='server/internal/runtimeacceptance/bootstrap_linux.go'
 ANCHOR='"secret": c["serviceSecret"], "multiLoginPolicy": 1'
@@ -60,22 +62,81 @@ def verify():
   if target in bodies or sha(raw)!=c['overlay'][target]:raise ValueError('new tool overlay identity differs')
   bodies[target]=raw
  if vector(bodies)!=c['derivedHarnessSource']:raise ValueError('explicit auxiliary-only derived source differs')
+ chart_assembly_policy(c)
  return c,graph,g,original,bodies,chart_bodies
+
+def artifact_binding(a):
+ if not isinstance(a,dict) or set(a)!={'run','head','attempt','artifactID','artifactBytes','artifactSHA256','manifestSHA256'} or any(type(a[k]) is not int or a[k]<=0 for k in ('run','artifactID','artifactBytes')) or any(not isinstance(a[n],str) or not re.fullmatch('[0-9a-f]{64}',a[n]) for n in ('artifactSHA256','manifestSHA256')) or not isinstance(a['head'],str) or not re.fullmatch('[0-9a-f]{40}',a['head']) or type(a['attempt']) is not int or a['attempt']!=1 or a['artifactBytes']>2<<30:raise ValueError('exact successful artifact binding required')
+ return a
+
+def chart_assembly_policy(c):
+ p=c.get('chartAssembly')
+ if not isinstance(p,dict) or set(p)!={'mode','currentChart5','historicalRouteFrom6'} or p['mode']!=ASSEMBLY_MODE:raise ValueError('explicit split producer assembly required')
+ five,old=p['currentChart5'],p['historicalRouteFrom6']
+ if set(five)!={'artifact','expectedManifest','derivation'} or set(old)!={'artifact','provider','selectedRoute','originalManifestBytes','originalManifestSHA256'}:raise ValueError('exact assembly policy fields required')
+ a=artifact_binding(five['artifact']);original=artifact_binding(old['artifact']);expect=five['expectedManifest'];m=expect['body']
+ raw=(json.dumps(m,sort_keys=True,indent=2)+'\n').encode()
+ if set(expect)!={'evidence','bytes','sha256','body'} or expect['evidence']!='expected-derived-not-observed' or type(expect['bytes']) is not int or not 0<expect['bytes']<=1<<20 or len(raw)!=expect['bytes'] or sha(raw)!=expect['sha256'] or expect['sha256']!=a['manifestSHA256']:raise ValueError('explicit expected not observed five manifest required')
+ keys={'schema','kind','head','run','attempt','source','locks','binaries','buildResources','freshChartBuilds','freshRouteBuilds','sourceToolHelperPostExact','GoVersion','selectedLive4Accepted','SQLRedisOriginalOwnerCleanupAccepted','parserOracleExecuted','ReadyOrP20OrDeploymentAccepted','outerResourceGuardStillRequired'}
+ if set(m)!=keys or type(m['schema']) is not int or m['schema']!=1 or m['kind']!='current259-five-chart-build-only-v1' or m['head']!=a['head'] or m['run']!=str(a['run']) or m['attempt']!=str(a['attempt']) or m['source']!=c['chartProvider']['sources']['chart'] or m['locks']!=c['chartProvider']['locks']['chart'] or m['GoVersion']!='go1.27.2 linux/amd64' or type(m['freshChartBuilds']) is not int or m['freshChartBuilds']!=5 or type(m['freshRouteBuilds']) is not int or m['freshRouteBuilds']!=0:raise ValueError('expected five producer source or scope differs')
+ if any(m[k] is not True for k in ('sourceToolHelperPostExact','selectedLive4Accepted','SQLRedisOriginalOwnerCleanupAccepted','outerResourceGuardStillRequired')) or any(m[k] is not False for k in ('parserOracleExecuted','ReadyOrP20OrDeploymentAccepted')):raise ValueError('expected five admission boundary differs')
+ rows=m['binaries']
+ if not isinstance(rows,list) or len(rows)!=5 or {r['name'] for r in rows}!=set(CHART5) or sum(r['bytes'] for r in rows)>512<<20:raise ValueError('exact five current rows required')
+ for r in rows:
+  if set(r)!={'module','package','name','sourceVector','bytes','sha256','mode','GOOS','GOARCH','CGO_ENABLED'} or r['module']!='chart' or r['package']!=CHART5[r['name']] or r['sourceVector']!=m['source'] or type(r['bytes']) is not int or not 0<r['bytes']<=128<<20 or not re.fullmatch('[0-9a-f]{64}',r['sha256']) or r['mode']!=0o700 or (r['GOOS'],r['GOARCH'],r['CGO_ENABLED'])!=('linux','amd64','0'):raise ValueError('exact five platform or body row differs')
+ if set(m['buildResources'])!=set(CHART5):raise ValueError('five actual build resources required')
+ for r in m['buildResources'].values():
+  if set(r)!={'exit','status','resourceSHA256'} or type(r['exit']) is not int or r['exit']!=0 or r['status']!='passed' or not re.fullmatch('[0-9a-f]{64}',r['resourceSHA256']):raise ValueError('five build resource boundary differs')
+ if set(five['derivation'])!={'producerControllerSHA256','producerInputsSHA256','buildsReceiptSHA256','rootExpectedOnlyReviewSHA256'} or any(not isinstance(v,str) or not re.fullmatch('[0-9a-f]{64}',v) for v in five['derivation'].values()):raise ValueError('finite expected manifest derivation pins required')
+ historical=c['historicalAcceptedChartArtifact']
+ if original!=historical['artifact'] or old['provider']!=historical['provider'] or old['originalManifestSHA256']!=original['manifestSHA256'] or type(old['originalManifestBytes']) is not int or not 0<old['originalManifestBytes']<=1<<20 or old['provider']['sources']['route']!=c['chartProvider']['sources']['route'] or old['provider']['locks']['route']!=c['chartProvider']['locks']['route']:raise ValueError('original route source and locks must remain historical')
+ r=old['selectedRoute']
+ if set(r)!={'module','package','name','sourceVector','bytes','sha256','mode','GOOS','GOARCH','CGO_ENABLED'} or (r['module'],r['package'],r['name'])!=('route','.','route-service') or r['sourceVector']!=c['chartProvider']['sources']['route'] or type(r['bytes']) is not int or not 0<r['bytes']<=128<<20 or not re.fullmatch('[0-9a-f]{64}',r['sha256']) or r['mode']!=0o700 or (r['GOOS'],r['GOARCH'],r['CGO_ENABLED'])!=('linux','amd64','0'):raise ValueError('original route row differs')
+ return p
+
+def chart_artifact_binding(c):
+ p=chart_assembly_policy(c)
+ return {'mode':ASSEMBLY_MODE,'currentChart5':p['currentChart5']['artifact'],'historicalRouteFrom6':p['historicalRouteFrom6']['artifact']}
 
 def require_bound(c):
  binding=c.get('executionBinding')
- if not isinstance(binding,dict) or binding.get('rootAccepted') is not True or binding.get('source')!=c['graphProvider']['source'] or not re.fullmatch('[0-9a-f]{64}',binding.get('rootAcceptanceSHA256','')):raise ValueError('Root accepted successful current core14 artifact remains required')
- for key in ('core14','chart6'):
-  a=binding[key]
-  if set(a)!={'run','head','attempt','artifactID','artifactBytes','artifactSHA256','manifestSHA256'} or any(not re.fullmatch('[0-9a-f]{64}',a[n]) for n in ('artifactSHA256','manifestSHA256')) or not re.fullmatch('[0-9a-f]{40}',a['head']) or a['attempt']!=1 or not 0<a['artifactBytes']<=2<<30:raise ValueError('exact successful artifact binding required')
- if binding['chart6']!=c['acceptedChartArtifact']:raise ValueError('original accepted chart6 artifact binding differs')
+ if not isinstance(binding,dict) or set(binding)!={'rootAccepted','source','rootAcceptanceSHA256','mode','core14','currentChart5','historicalRouteFrom6'} or binding.get('rootAccepted') is not True or binding.get('source')!=c['graphProvider']['source'] or not re.fullmatch('[0-9a-f]{64}',binding.get('rootAcceptanceSHA256','')) or binding.get('mode')!=ASSEMBLY_MODE:raise ValueError('Root accepted successful current core14 artifact remains required')
+ for key in ('core14','currentChart5','historicalRouteFrom6'):artifact_binding(binding[key])
+ selected={k:binding[k] for k in ('mode','currentChart5','historicalRouteFrom6')}
+ if selected!=c['acceptedChartArtifact'] or selected!=chart_artifact_binding(c):raise ValueError('original split chart and route artifact bindings differ')
  mysql=c.get('mysql')
  if not isinstance(mysql,dict) or not re.fullmatch('docker.io/library/mysql@sha256:[0-9a-f]{64}',mysql.get('image','')) or not mysql.get('officialSourceReviewSHA256'):raise ValueError('reviewed exact MySQL fixture binding required')
  return binding
+
+def manifest_products(m,a,names,limit,core_source=None,chart_sources=None,chart5=None):
+ if sum(x is not None for x in (core_source,chart_sources,chart5))!=1:raise ValueError('one explicit original manifest schema required')
+ if not isinstance(m,dict) or not isinstance(m.get('binaries'),list):raise ValueError('explicit product manifest object required')
+ products=m['binaries']
+ if len(products)!=len(names) or {r['name'] for r in products}!=set(names) or sum(r['bytes'] for r in products)>limit:raise ValueError('exact product manifest required')
+ if core_source:
+  if not {'source','head','runID','attempt','CGO_ENABLED','configsLogsKeysAuxiliariesIncluded'}<=set(m):raise ValueError('core manifest schema required')
+  if m['source']!=core_source or m['head']!=a['head'] or str(m['runID'])!=str(a['run']) or str(m['attempt'])!=str(a['attempt']) or m['CGO_ENABLED']!='1' or m['configsLogsKeysAuxiliariesIncluded'] is not False:raise ValueError('core product source/platform differs')
+ elif chart5 is not None:
+  if a!=chart5['artifact'] or m!=chart5['expectedManifest']['body']:raise ValueError('actual five manifest differs from explicit expected producer body')
+ else:
+  if not {'sourceVectors','head','run','attempt','sourceHelperToolPostExact','configsLogsOrSourceIncluded'}<=set(m):raise ValueError('original six manifest schema required')
+  if m['sourceVectors']!=chart_sources or m['head']!=a['head'] or str(m['run'])!=str(a['run']) or str(m['attempt'])!=str(a['attempt']) or m['sourceHelperToolPostExact'] is not True or m['configsLogsOrSourceIncluded'] is not False:raise ValueError('six product source/platform differs')
+ return products
+
+def assemble_chart_products(c,five,six):
+ p=chart_assembly_policy(c);current,old=p['currentChart5'],p['historicalRouteFrom6']
+ current_rows=manifest_products(five,current['artifact'],tuple(CHART5),512<<20,chart5=current)
+ old_rows=manifest_products(six,old['artifact'],NAMES,512<<20,chart_sources=old['provider']['sources'])
+ if six['locks']!=old['provider']['locks']:raise ValueError('original six module locks differ')
+ route=next(r for r in old_rows if r['name']=='route-service')
+ if route!=old['selectedRoute']:raise ValueError('original route selection differs')
+ by_name={r['name']:{'provider':'currentChart5','binary':r} for r in current_rows}
+ by_name['route-service']={'provider':'historicalRouteFrom6','binary':route}
+ return [by_name[name] for name in NAMES]
 class NoRedirect(urllib.request.HTTPRedirectHandler):
  def redirect_request(self,req,fp,code,msg,headers,newurl):return None
 
-def artifact(a,names,directory,limit,core_source=None,chart_sources=None):
+def artifact(a,names,directory,limit,core_source=None,chart_sources=None,chart5=None):
  # Only API metadata receives the task token. Signed blob URL is never logged
  # or sent with Bearer; no binary is downloaded on the local workstation.
  repo=os.environ['GITHUB_REPOSITORY'];token=os.environ['GH_TOKEN']
@@ -117,12 +178,7 @@ def artifact(a,names,directory,limit,core_source=None,chart_sources=None):
     if total!=row.file_size:raise ValueError('complete CRC-checked body required')
  manifest_raw=regular(directory/'manifest.json',1<<20)
  if sha(manifest_raw)!=a['manifestSHA256']:raise ValueError('original producer manifest differs')
- m=json.loads(manifest_raw);products=m['binaries']
- if len(products)!=len(names) or {r['name'] for r in products}!=set(names) or sum(r['bytes'] for r in products)>limit:raise ValueError('exact product manifest required')
- if core_source:
-  if m['source']!=core_source or m['head']!=a['head'] or str(m['runID'])!=str(a['run']) or str(m['attempt'])!=str(a['attempt']) or m['CGO_ENABLED']!='1' or m['configsLogsKeysAuxiliariesIncluded'] is not False:raise ValueError('core product source/platform differs')
- else:
-  if m['sourceVectors']!=chart_sources or m['head']!=a['head'] or str(m['run'])!=str(a['run']) or str(m['attempt'])!=str(a['attempt']) or m['sourceHelperToolPostExact'] is not True or m['configsLogsOrSourceIncluded'] is not False:raise ValueError('six product source/platform differs')
+ m=json.loads(manifest_raw);products=manifest_products(m,a,names,limit,core_source=core_source,chart_sources=chart_sources,chart5=chart5)
  for row in products:
   p=directory/row['name'];rawhead=b'';h=hashlib.sha256();n=0
   with p.open('rb') as f:
@@ -180,11 +236,15 @@ def run():
   return regular(folder/'stdout',32<<20)
  try:
   core=artifact(binding['core14'],graph.ROLES,root/'product14',2<<30,core_source=c['graphProvider']['source'])
-  six=artifact(binding['chart6'],NAMES,root/'product6',512<<20,chart_sources=c['chartProvider']['sources'])
+  policy=chart_assembly_policy(c)
+  five=artifact(binding['currentChart5'],tuple(CHART5),root/'current-chart5',512<<20,chart5=policy['currentChart5'])
+  six=artifact(binding['historicalRouteFrom6'],NAMES,root/'historical-six',512<<20,chart_sources=policy['historicalRouteFrom6']['provider']['sources'])
+  selected=assemble_chart_products(c,five,six)
+  write(out/'chart-assembly.json',{'mode':ASSEMBLY_MODE,'currentChart5':binding['currentChart5'],'historicalRouteFrom6':binding['historicalRouteFrom6'],'selected':selected,'productRebuilds':0,'oldChart258Selected':False,'expectedFiveManifestNowReceivedAndVerified':True})
   # Product API reads are complete. Only the original fixture receiver keeps
   # this local token; every subsequent child sees the existing explicit env.
   fixture_token=os.environ.pop('GH_TOKEN',None)
-  if core['locks']!={n:sha(original['server/'+n]) for n in ('go.mod','go.sum')} or six['locks']!=c['chartProvider']['locks']:raise ValueError('original module locks differ from actual artifacts')
+  if core['locks']!={n:sha(original['server/'+n]) for n in ('go.mod','go.sum')}:raise ValueError('original module locks differ from actual artifacts')
   # Only two necessary auxiliaries are compiled; product20 are never rebuilt.
   go=shutil.which('go');version=command('go-version',[go,'version'],15,env).decode().strip()
   if version!='go version go1.27.2 linux/amd64':raise ValueError('exact Go1.27.2 required')
@@ -218,7 +278,8 @@ def run():
   mysql_id=create_mysql(plane,c['mysql'],secrets.token_hex(32))
   corework=root/'core';corework.mkdir(mode=0o700);work=root/'chain';work.mkdir(mode=0o700)
   template=REPO/'chart/config/config.example.yaml'
-  products=[{'name':r['name'],'path':str(root/'product6'/r['name']),'sha256':r['sha256'],'bytes':r['bytes'],'sourceSHA256':r['sourceVector']['sha256']} for r in six['binaries']]
+  product_roots={'currentChart5':root/'current-chart5','historicalRouteFrom6':root/'historical-six'}
+  products=[{'name':x['binary']['name'],'path':str(product_roots[x['provider']]/x['binary']['name']),'sha256':x['binary']['sha256'],'bytes':x['binary']['bytes'],'sourceSHA256':x['binary']['sourceVector']['sha256']} for x in selected]
   p={'version':'fresh-product20-http-ws-v1','work':str(work),'core':{'version':'owned-fullgraph-acceptance-v1','scenario':'ack','work':str(corework),'planePath':str(plane.private/'plane.json'),'planeSHA256':sha(regular(plane.private/'plane.json')),'credentialsPath':str(plane.private/'credentials.json'),'credentialsSHA256':sha(regular(plane.private/'credentials.json')),'buildsPath':str(buildpath),'buildsSHA256':bs},'chartTemplatePath':str(template),'chartTemplateSHA256':c['helpers']['chart/config/config.example.yaml'],'sqlRootPassword':json.loads(regular(plane.private/'product20-mysql.json'))['rootPassword'],'products':products}
   pp=private/'product20-input.json';ps=write(pp,p);groups=','.join(map(str,sorted(set(os.getgroups()+[os.getgid()]))))
   argv=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--','/usr/bin/setpriv','--reuid',str(os.getuid()),'--regid',str(os.getgid()),'--groups',groups,'--no-new-privs','--','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+os.environ['HOME'],'TMPDIR='+str(work),str(binroot/'product20-acceptance'),'--private-input',str(pp),'--private-input-sha256',ps]

@@ -1,150 +1,11 @@
 {
-  "schema": 1,
-  "scope": "one-fresh-product20-http-ws-only",
-  "state": "FORMATTED_SOURCE_ONLY_LOCKED_PENDING_SUCCESSFUL_CORE14_ARTIFACT",
-  "canonicalPublicParent": "bff3ba487899c485c77aaedea695be5a167a063b",
-  "graphProvider": {
-    "path": "ci/backend-fullgraph/run.py",
-    "source": {
-      "members": 1582,
-      "digest": "b65c289d84894acbada54492c0323084aa07865b8dbf2ea244decc1cdf03a4b8"
-    },
-    "status": "owned-resolver-scheme-source-fix-only-await-current-core14-acceptance"
-  },
-  "chartProvider": {
-    "sources": {
-      "chart": {
-        "members": 259,
-        "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
-      },
-      "route": {
-        "members": 33,
-        "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
-      }
-    },
-    "locks": {
-      "chart": {
-        "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
-        "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
-      },
-      "route": {
-        "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
-        "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
-      }
-    },
-    "rootAcceptancePath": null,
-    "rootAcceptanceSHA256": null,
-    "status": "current-source-only-new-chart259-awaits-build-and-acceptance"
-  },
   "acceptedChartArtifact": null,
-  "executionBinding": null,
-  "mysql": {
-    "image": "docker.io/library/mysql@sha256:1f8411cc085d2f2f92060fca926746cbf97f87b76c3008e9741ad62e604c4ffa",
-    "configDigest": "sha256:efb212ddf03576a6c0b02b8d364e6a46f21e628308a719db0b0450f8817c0517",
-    "officialSourceReviewSHA256": "4f99e06c2d5217369d9872dd59ee8ad3d32ffdffeabb4d7bf271313f1e0bfaa0",
-    "sourceVersion": "8.4.11",
-    "actualImageRuntimeAccepted": false,
-    "defaultAuth": "caching_sha2_password",
-    "rootHost": "127.0.0.1",
-    "nonrootOwnedDirectories": [
-      "/var/lib/mysql",
-      "/var/run/mysqld"
-    ],
-    "noDefaultAuthenticationPluginOverride": true
-  },
-  "helpers": {
-    "ci/backend-fullgraph/run.py": "0a67c55c2bfc70c5065ba974503e4355d3c22e31a54ba8619412378a1fc23ec1",
-    "ci/backend-fullgraph/inputs.json": "c9ddc473c39914c38597566014dfe11cd472464fa9ba7abdcb463f9e7cdf59f0",
-    "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
-    "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
-    "ci/backend-fullgraph/service_selectors.py": "0606aeaabf2d586b579878ed11c170a33db543fb90f9549ecf0566ddc1da07e7",
-    "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
-    "ci/chart-route-build/run.py": "2b6a3f66f761181fc693502f6c910ffd5b24ee3c38badabb54627b5518b1bb9d",
-    "ci/chart-route-build/inputs.json": "c2224155e5acf34f693427986c043dc7daf795209b5aa61d02f8f4b6f8e3af03",
-    "ci/group-effects/resource_guard.py": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c",
-    "ci/group-effects/capture.py": "d8f7dd31925857d5042e3c89a07a0bc127d1371e6063b4b186b8200d9f93c199",
-    "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
-    "ci/backend-fullgraph/rtc_panic_probe.py": "db870170fd137ec9c0ebc8ee29688f2cecfa4c61c270b50bc9f9559f071d510a"
-  },
-  "controllers": [
-    "ci/product20/run.py",
-    "ci/product20/inputs.json",
-    ".github/workflows/product20-targeted.yml",
-    "ci/product20/source/server/internal/runtimeacceptance/product20_linux.go",
-    "ci/product20/source/server/cmd/tools/product20-acceptance/main.go"
-  ],
-  "overlay": {
-    "server/internal/runtimeacceptance/product20_linux.go": "d3c0ea49d5c733e15fa81133ec734614d7c901e8673591827c4c3138503e6c4f",
-    "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392"
-  },
-  "fixtureConfiguration": {
-    "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
-    "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
-    "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
-    "exactSingleAnchor": "\"secret\": c[\"serviceSecret\"], \"multiLoginPolicy\": 1",
-    "replacement": "\"secret\": c[\"serviceSecret\"], \"adminDelegation\": map[string]any{\"issuer\": b.Header.Tenant}, \"mysql\": fixtureSQL, \"messageVerify\": map[string]bool{\"friendVerify\": false}, \"multiLoginPolicy\": 1",
-    "purpose": "Task real tenant issuer, actual schema-only SQL policy DB, explicit friendVerify=false before every role config/bootstrap generation; auxiliary-only derivative, product14 and old four scenarios untouched",
-    "constructorPrefix": "\tfixtureSQL,e := product20FixtureSQL(b); if e != nil { return \"\",e }\n"
-  },
-  "derivedHarnessSource": {
-    "members": 1584,
-    "digest": "d0b43980beb966c57669535a9f63a27b692c8cc655c540d2e7e1536e6d3434f5"
-  },
-  "productRebuilds": 0,
   "auxiliaryBuilds": [
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "fixtureSourceBuildRequiredWhenNoVerifiedProvider": true,
-  "fixtureSourceBuilder": "ci/backend-fullgraph/minio_build.py",
-  "fixtureMinIOProvider": {
-    "rootFixtureAccepted": true,
-    "rootAcceptanceSHA256": "cd1010e6e2429d2dfb594072e07b24d79918d33451a5fc3a220276f0e1237495",
-    "repository": "damaowoaini/LuoboIM",
-    "run": 42152637741,
-    "head": "aab27f77458418b0c7276764665f31e0c4144067",
-    "attempt": 1,
-    "jobID": 127679246498,
-    "jobConclusion": "failure",
-    "runConclusion": "failure",
-    "artifactID": 13474215432,
-    "artifactBytes": 70210047,
-    "artifactSHA256": "41cd1ae1525a601b7436efef8446137743fd88178903373fee9e88d84661ca76",
-    "manifestSHA256": "ed84605ccc523ae5f41d6b82584765b6a04aac3f685d6cd9ecf44b3784c2ead5",
-    "receipt": {
-      "version": "owned-minio-source-build-receipt-v1",
-      "repository": "https://github.com/minio/minio",
-      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
-      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
-      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
-      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
-      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
-      "cgoEnabled": "0",
-      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
-      "binaryBytes": 146777192
-    }
-  },
-  "oldTestsToRerun": [],
-  "resource": {
-    "initialBytes": 4294967296,
-    "floorMiB": 1024,
-    "pollSeconds": 0.2,
-    "allocatedMiB": 16384,
-    "controllerSeconds": 10800,
-    "operatorContextSeconds": 1200,
-    "operatorPhaseSeconds": 1380,
-    "operatorCleanupSeconds": 120
-  },
+  "canonicalPublicParent": "bff3ba487899c485c77aaedea695be5a167a063b",
   "chain": {
-    "productProcesses": 20,
-    "preconditions": [
-      "fresh MySQL schema/least-privilege schema users",
-      "SQL tenant row and explicit OTP-required client policies before services cache",
-      "task CA and loopback-IP SAN child/client trust only",
-      "new scenario finite ordinary/registration runtime Redis key domains; inherited actual admin-denial checks",
-      "core role configs use same actual chart SQL policy schema before bootstrap sealing",
-      "fresh dual-account policy messageVerify.friendVerify=false; real blacklist/risk checks remain"
-    ],
     "actualBusiness": [
       "route config",
       "SMTP-delivered OTP x2",
@@ -167,55 +28,333 @@
       "remote provider offline push",
       "Mongo reopen/durable persistence independently proven",
       "canonical old906 exclusion from chart OS exit"
-    ]
+    ],
+    "preconditions": [
+      "fresh MySQL schema/least-privilege schema users",
+      "SQL tenant row and explicit OTP-required client policies before services cache",
+      "task CA and loopback-IP SAN child/client trust only",
+      "new scenario finite ordinary/registration runtime Redis key domains; inherited actual admin-denial checks",
+      "core role configs use same actual chart SQL policy schema before bootstrap sealing",
+      "fresh dual-account policy messageVerify.friendVerify=false; real blacklist/risk checks remain"
+    ],
+    "productProcesses": 20
   },
-  "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
-  "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
-  "permissionsSourceReview": {
-    "runtimeRedis": {
-      "scope": "new-fresh20-only",
-      "finitePrefixesAndExactKeys": 33,
-      "channels": [
-        "sensitive_word_reload"
-      ],
-      "management": "only inherited exact ACL WHOAMI and CLIENT INFO; no ACL management/CONFIG/MODULE/SHUTDOWN/MIGRATE",
-      "newExactRequiredKey": "GLOBAL_CONFIG:FORBID_NEW_MEMBER_HISTORY",
-      "proofCallers": [
-        "chart/internal/rpc/admin/admin.go:79",
-        "chart/pkg/common/db/database/admin.go:249",
-        "server/pkg/common/db/cache",
-        "chart/pkg/common/db/cache",
-        "github.com/dtm-labs/rockscache@v0.1.1"
-      ],
-      "scriptCommands": [
-        "eval",
-        "evalsha"
-      ],
-      "actualPermissionChecks": "PrepareFresh original runtime/legacy actual NOPERM, Kafka31/29 retained",
-      "requiredNoncePrefixes": [
-        "ROUTE_REGISTRATION_NONCE:*",
-        "LUOBO_SERVICE_NONCE:*"
-      ],
-      "nonceCallers": [
-        "chart/internal/api/registration_receipt.go:68",
-        "server/internal/admincapability/guard.go:215",
-        "server/pkg/common/registrationproof/rpc.go:130"
-      ]
-    },
-    "MySQL": "one admin prepares two fresh nonce schemas/users; chart/core use chart schema-only user, route uses route schema-only user; no synthetic user/chat rows or tokens"
-  },
-  "historicalAcceptedChartArtifact": {
-    "provider": {
-      "sources": {
-        "chart": {
-          "members": 258,
-          "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+  "chartAssembly": {
+    "currentChart5": {
+      "artifact": {
+        "artifactBytes": 71834348,
+        "artifactID": 13535759454,
+        "artifactSHA256": "fba7b461eec0e9504c8046f198dd13ef03e50add9ff7e30513bebcd0f6665401",
+        "attempt": 1,
+        "head": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
+        "manifestSHA256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2",
+        "run": 42283432687
+      },
+      "derivation": {
+        "buildsReceiptSHA256": "f39f43f8dc8e22e1472bd35df78550e9583554bd51a1efc340e00fa4622e0355",
+        "producerControllerSHA256": "c7ef1c44ffd8b81936720e7a32f962e1dfbbc4f14ae6c94ecf099f57adcae4d0",
+        "producerInputsSHA256": "e7129e5899675ada324e574341b4c3e3786f03c60dd7cb6e7de5b49c5c0261b4",
+        "rootExpectedOnlyReviewSHA256": "bc3aa3e27d75148ea62c152eca15d5fc4feaeaace3539e1015b3b03e38e5877c"
+      },
+      "expectedManifest": {
+        "body": {
+          "GoVersion": "go1.27.2 linux/amd64",
+          "ReadyOrP20OrDeploymentAccepted": false,
+          "SQLRedisOriginalOwnerCleanupAccepted": true,
+          "attempt": "1",
+          "binaries": [
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 43258016,
+              "mode": 448,
+              "module": "chart",
+              "name": "chat-api",
+              "package": "./cmd/api/chat-api",
+              "sha256": "c150772d91dc308d56728554aaadda7f5a94be747e7ffdc3364aaaacb9c694cf",
+              "sourceVector": {
+                "members": 259,
+                "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 43798688,
+              "mode": 448,
+              "module": "chart",
+              "name": "admin-api",
+              "package": "./cmd/api/admin-api",
+              "sha256": "78462c5ecdffdcbc12d29b2c0647781749bfae7b2c3c8401bd2b7a203723c46a",
+              "sourceVector": {
+                "members": 259,
+                "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 38822048,
+              "mode": 448,
+              "module": "chart",
+              "name": "chat-rpc",
+              "package": "./cmd/rpc/chat-rpc",
+              "sha256": "c0b44b9c934bf503256d58c5a6c73031534f039d08ef912048ba155369c36e92",
+              "sourceVector": {
+                "members": 259,
+                "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 36253856,
+              "mode": 448,
+              "module": "chart",
+              "name": "admin-rpc",
+              "package": "./cmd/rpc/admin-rpc",
+              "sha256": "dd5fa4a9f054970dfe892c2a54eb548a805cff10f75944af9760ae6a571146ee",
+              "sourceVector": {
+                "members": 259,
+                "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 29073568,
+              "mode": 448,
+              "module": "chart",
+              "name": "office-rpc",
+              "package": "./cmd/rpc/office-rpc",
+              "sha256": "3fc6ab21c7778ae9f9cb55edab2b1bf711e4439c32b2c6cce2fc3e5d7481a354",
+              "sourceVector": {
+                "members": 259,
+                "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+              }
+            }
+          ],
+          "buildResources": {
+            "admin-api": {
+              "exit": 0,
+              "resourceSHA256": "2fa2b6d652ce2f7b47ff07b4e00c97bebcce4ad15586bb3a8c989152bbe07ace",
+              "status": "passed"
+            },
+            "admin-rpc": {
+              "exit": 0,
+              "resourceSHA256": "ccf4c7278df67f9cfa6362c66d88d413fed18220c3070253d018441017307060",
+              "status": "passed"
+            },
+            "chat-api": {
+              "exit": 0,
+              "resourceSHA256": "0640951382e7339137454e648984fcb5313fda90d91ea2652651a2ddab66a071",
+              "status": "passed"
+            },
+            "chat-rpc": {
+              "exit": 0,
+              "resourceSHA256": "cfb0c0b64482eb5d67dd5f7e7d3cb15cf6b30cbc21dee90d53d2030fc9efc949",
+              "status": "passed"
+            },
+            "office-rpc": {
+              "exit": 0,
+              "resourceSHA256": "58bef9f90c3dc88215c76cc8789c31abd9df5ca956f7cd44b207a71dcabbc0f3",
+              "status": "passed"
+            }
+          },
+          "freshChartBuilds": 5,
+          "freshRouteBuilds": 0,
+          "head": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
+          "kind": "current259-five-chart-build-only-v1",
+          "locks": {
+            "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+            "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+          },
+          "outerResourceGuardStillRequired": true,
+          "parserOracleExecuted": false,
+          "run": "42283432687",
+          "schema": 1,
+          "selectedLive4Accepted": true,
+          "source": {
+            "members": 259,
+            "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+          },
+          "sourceToolHelperPostExact": true
         },
-        "route": {
+        "bytes": 3873,
+        "evidence": "expected-derived-not-observed",
+        "sha256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2"
+      }
+    },
+    "historicalRouteFrom6": {
+      "artifact": {
+        "artifactBytes": 76891085,
+        "artifactID": 13485700505,
+        "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+        "attempt": 1,
+        "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+        "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+        "run": 42180782218
+      },
+      "originalManifestBytes": 4720,
+      "originalManifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "provider": {
+        "locks": {
+          "chart": {
+            "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+            "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+          },
+          "route": {
+            "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+            "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+          }
+        },
+        "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
+        "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7",
+        "sources": {
+          "chart": {
+            "members": 258,
+            "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+          },
+          "route": {
+            "members": 33,
+            "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+          }
+        }
+      },
+      "selectedRoute": {
+        "CGO_ENABLED": "0",
+        "GOARCH": "amd64",
+        "GOOS": "linux",
+        "bytes": 11571360,
+        "mode": 448,
+        "module": "route",
+        "name": "route-service",
+        "package": ".",
+        "sha256": "55d3bab3743fa819ba66f1fa4cf59140d19f3ddfd2d669d07582cba70ae6ce59",
+        "sourceVector": {
           "members": 33,
           "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
         }
+      }
+    },
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1"
+  },
+  "chartProvider": {
+    "locks": {
+      "chart": {
+        "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+        "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
       },
+      "route": {
+        "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+        "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+      }
+    },
+    "rootAcceptancePath": null,
+    "rootAcceptanceSHA256": null,
+    "sources": {
+      "chart": {
+        "members": 259,
+        "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+      },
+      "route": {
+        "members": 33,
+        "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+      }
+    },
+    "status": "current259-five-cloud-build-facts-accepted-expected-manifest-only-route33-original-producer-receive-required"
+  },
+  "controllers": [
+    "ci/product20/run.py",
+    "ci/product20/inputs.json",
+    ".github/workflows/product20-targeted.yml",
+    "ci/product20/source/server/internal/runtimeacceptance/product20_linux.go",
+    "ci/product20/source/server/cmd/tools/product20-acceptance/main.go",
+    "ci/product20/test_receiver.py"
+  ],
+  "derivedHarnessSource": {
+    "digest": "d0b43980beb966c57669535a9f63a27b692c8cc655c540d2e7e1536e6d3434f5",
+    "members": 1584
+  },
+  "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
+  "executionBinding": null,
+  "fixtureConfiguration": {
+    "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
+    "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
+    "constructorPrefix": "\tfixtureSQL,e := product20FixtureSQL(b); if e != nil { return \"\",e }\n",
+    "exactSingleAnchor": "\"secret\": c[\"serviceSecret\"], \"multiLoginPolicy\": 1",
+    "purpose": "Task real tenant issuer, actual schema-only SQL policy DB, explicit friendVerify=false before every role config/bootstrap generation; auxiliary-only derivative, product14 and old four scenarios untouched",
+    "replacement": "\"secret\": c[\"serviceSecret\"], \"adminDelegation\": map[string]any{\"issuer\": b.Header.Tenant}, \"mysql\": fixtureSQL, \"messageVerify\": map[string]bool{\"friendVerify\": false}, \"multiLoginPolicy\": 1",
+    "target": "server/internal/runtimeacceptance/bootstrap_linux.go"
+  },
+  "fixtureMinIOProvider": {
+    "artifactBytes": 70210047,
+    "artifactID": 13474215432,
+    "artifactSHA256": "41cd1ae1525a601b7436efef8446137743fd88178903373fee9e88d84661ca76",
+    "attempt": 1,
+    "head": "aab27f77458418b0c7276764665f31e0c4144067",
+    "jobConclusion": "failure",
+    "jobID": 127679246498,
+    "manifestSHA256": "ed84605ccc523ae5f41d6b82584765b6a04aac3f685d6cd9ecf44b3784c2ead5",
+    "receipt": {
+      "binaryBytes": 146777192,
+      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
+      "cgoEnabled": "0",
+      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
+      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
+      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
+      "repository": "https://github.com/minio/minio",
+      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
+      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "version": "owned-minio-source-build-receipt-v1"
+    },
+    "repository": "damaowoaini/LuoboIM",
+    "rootAcceptanceSHA256": "cd1010e6e2429d2dfb594072e07b24d79918d33451a5fc3a220276f0e1237495",
+    "rootFixtureAccepted": true,
+    "run": 42152637741,
+    "runConclusion": "failure"
+  },
+  "fixtureSourceBuildRequiredWhenNoVerifiedProvider": true,
+  "fixtureSourceBuilder": "ci/backend-fullgraph/minio_build.py",
+  "graphProvider": {
+    "path": "ci/backend-fullgraph/run.py",
+    "source": {
+      "digest": "b65c289d84894acbada54492c0323084aa07865b8dbf2ea244decc1cdf03a4b8",
+      "members": 1582
+    },
+    "status": "owned-resolver-scheme-source-fix-only-await-current-core14-acceptance"
+  },
+  "helpers": {
+    "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
+    "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
+    "ci/backend-fullgraph/inputs.json": "c9ddc473c39914c38597566014dfe11cd472464fa9ba7abdcb463f9e7cdf59f0",
+    "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
+    "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
+    "ci/backend-fullgraph/rtc_panic_probe.py": "db870170fd137ec9c0ebc8ee29688f2cecfa4c61c270b50bc9f9559f071d510a",
+    "ci/backend-fullgraph/run.py": "0a67c55c2bfc70c5065ba974503e4355d3c22e31a54ba8619412378a1fc23ec1",
+    "ci/backend-fullgraph/service_selectors.py": "0606aeaabf2d586b579878ed11c170a33db543fb90f9549ecf0566ddc1da07e7",
+    "ci/chart-route-build/inputs.json": "c2224155e5acf34f693427986c043dc7daf795209b5aa61d02f8f4b6f8e3af03",
+    "ci/chart-route-build/run.py": "2b6a3f66f761181fc693502f6c910ffd5b24ee3c38badabb54627b5518b1bb9d",
+    "ci/group-effects/capture.py": "d8f7dd31925857d5042e3c89a07a0bc127d1371e6063b4b186b8200d9f93c199",
+    "ci/group-effects/resource_guard.py": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c"
+  },
+  "historicalAcceptedChartArtifact": {
+    "acceptedForCurrentChartSource": false,
+    "artifact": {
+      "artifactBytes": 76891085,
+      "artifactID": 13485700505,
+      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+      "attempt": 1,
+      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "run": 42180782218
+    },
+    "provider": {
       "locks": {
         "chart": {
           "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
@@ -227,17 +366,84 @@
         }
       },
       "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
-      "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7"
-    },
-    "artifact": {
-      "run": 42180782218,
-      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
-      "attempt": 1,
-      "artifactID": 13485700505,
-      "artifactBytes": 76891085,
-      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
-      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9"
-    },
-    "acceptedForCurrentChartSource": false
-  }
+      "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7",
+      "sources": {
+        "chart": {
+          "members": 258,
+          "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+        },
+        "route": {
+          "members": 33,
+          "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+        }
+      }
+    }
+  },
+  "mysql": {
+    "actualImageRuntimeAccepted": false,
+    "configDigest": "sha256:efb212ddf03576a6c0b02b8d364e6a46f21e628308a719db0b0450f8817c0517",
+    "defaultAuth": "caching_sha2_password",
+    "image": "docker.io/library/mysql@sha256:1f8411cc085d2f2f92060fca926746cbf97f87b76c3008e9741ad62e604c4ffa",
+    "noDefaultAuthenticationPluginOverride": true,
+    "nonrootOwnedDirectories": [
+      "/var/lib/mysql",
+      "/var/run/mysqld"
+    ],
+    "officialSourceReviewSHA256": "4f99e06c2d5217369d9872dd59ee8ad3d32ffdffeabb4d7bf271313f1e0bfaa0",
+    "rootHost": "127.0.0.1",
+    "sourceVersion": "8.4.11"
+  },
+  "oldTestsToRerun": [],
+  "overlay": {
+    "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
+    "server/internal/runtimeacceptance/product20_linux.go": "d3c0ea49d5c733e15fa81133ec734614d7c901e8673591827c4c3138503e6c4f"
+  },
+  "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
+  "permissionsSourceReview": {
+    "MySQL": "one admin prepares two fresh nonce schemas/users; chart/core use chart schema-only user, route uses route schema-only user; no synthetic user/chat rows or tokens",
+    "runtimeRedis": {
+      "actualPermissionChecks": "PrepareFresh original runtime/legacy actual NOPERM, Kafka31/29 retained",
+      "channels": [
+        "sensitive_word_reload"
+      ],
+      "finitePrefixesAndExactKeys": 33,
+      "management": "only inherited exact ACL WHOAMI and CLIENT INFO; no ACL management/CONFIG/MODULE/SHUTDOWN/MIGRATE",
+      "newExactRequiredKey": "GLOBAL_CONFIG:FORBID_NEW_MEMBER_HISTORY",
+      "nonceCallers": [
+        "chart/internal/api/registration_receipt.go:68",
+        "server/internal/admincapability/guard.go:215",
+        "server/pkg/common/registrationproof/rpc.go:130"
+      ],
+      "proofCallers": [
+        "chart/internal/rpc/admin/admin.go:79",
+        "chart/pkg/common/db/database/admin.go:249",
+        "server/pkg/common/db/cache",
+        "chart/pkg/common/db/cache",
+        "github.com/dtm-labs/rockscache@v0.1.1"
+      ],
+      "requiredNoncePrefixes": [
+        "ROUTE_REGISTRATION_NONCE:*",
+        "LUOBO_SERVICE_NONCE:*"
+      ],
+      "scope": "new-fresh20-only",
+      "scriptCommands": [
+        "eval",
+        "evalsha"
+      ]
+    }
+  },
+  "productRebuilds": 0,
+  "resource": {
+    "allocatedMiB": 16384,
+    "controllerSeconds": 10800,
+    "floorMiB": 1024,
+    "initialBytes": 4294967296,
+    "operatorCleanupSeconds": 120,
+    "operatorContextSeconds": 1200,
+    "operatorPhaseSeconds": 1380,
+    "pollSeconds": 0.2
+  },
+  "schema": 1,
+  "scope": "one-fresh-product20-http-ws-only",
+  "state": "SOURCE_ONLY_SPLIT_CHART5_ORIGINAL_ROUTE1_EXPECTED_MANIFEST_LOCKED_PENDING_CURRENT_CORE14_ROOT_ACCEPTANCE"
 }
