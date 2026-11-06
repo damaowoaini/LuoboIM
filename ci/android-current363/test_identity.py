@@ -26,14 +26,31 @@ class Current363SourceTests(unittest.TestCase):
             with self.subTest(mode=mode), self.assertRaises(ValueError):
                 controller.validate_inputs(value, c)
 
-    def test_fresh_core_mode_cannot_select_old_artifact_restore_or_old_context(self):
+    def test_explicit_current_core_reuse_rejects_other_producer_and_fresh_bind(self):
         context, inputs, tools = controller.metadata()
-        self.assertEqual(context['core_build_mode'], 'fresh-fixed-source')
-        self.assertFalse(context['restore_fallback'])
-        self.assertIn('core', controller.STAGES)
-        self.assertNotIn('restore', controller.STAGES)
-        self.assertFalse(hasattr(controller.Job, 'restore'))
-        self.assertIs(controller.Job.builder, controller.generic.old.Job.builder)
+        self.assertEqual(context['core_build_mode'], 'restore-verified-current363')
+        self.assertEqual(controller.STAGES, ['setup','restore','preseal','gradle-setup','apk'])
+        spec = controller.read(HERE / 'core-reuse.json')
+        self.assertEqual(spec['parent']['run'], 42183531372)
+        self.assertEqual(spec['source']['members'], 539)
+        self.assertFalse(spec['producer_top_activation_included'])
+        for case in ('old-producer', 'raw-sha', 'product-sha', 'missing-product', 'missing-marker', 'wrong-source', 'wrong-CA'):
+            value = copy.deepcopy(spec)
+            if case == 'old-producer': value['parent']['run'] = 38970232673
+            elif case == 'raw-sha': value['parent']['artifacts'][0]['sha256'] = '0' * 64
+            elif case == 'product-sha': value['product_pins'][0]['sha256'] = '0' * 64
+            elif case == 'missing-product': value['product_pins'].pop()
+            elif case == 'missing-marker': value['raw_markers'].pop()
+            elif case == 'wrong-source': value['source']['members'] = 530
+            else: value['publicCoreCASHA256'] = '0' * 64
+            with self.subTest(case=case), self.assertRaises(ValueError):
+                controller.core_restore.validate(value, context, inputs, tools)
+        for name in ('build_core', 'builder'):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                getattr(controller.Job, name)(None)
+        resolver = (HERE / 'resolve.gradle').read_text()
+        self.assertIn('toolingWitness.scoped(rootForTooling,bouncyConfiguration)', resolver)
+        self.assertNotIn('    def p=gradle.rootProject', resolver)
         self.assertEqual(controller.require_reviewed_consumer(context, controller.s.sha(HERE / 'cohort.json')), None)
         with self.assertRaises(ValueError):
             controller.require_reviewed_consumer(context, '0' * 64)

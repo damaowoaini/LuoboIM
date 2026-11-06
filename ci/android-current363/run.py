@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Current363/source539 Android: one fresh fixed-source ARM64 debug-QA build."""
+"""Current363/source539 Android: one explicitly restored verified ARM64 debug-QA core."""
 import argparse
 import copy
 import hashlib
@@ -20,6 +20,7 @@ import current_app as generic
 sys.path.append(str(REPO/'ci/android-current359'))
 import support as s
 import verify_inputs
+import core_restore
 import rich_current
 import maven_file_origins
 import plugin_scope
@@ -33,12 +34,12 @@ home_admission=generic.home_admission
 check_flutter_environment_sources=generic.check_flutter_environment_sources
 check_current_packages=generic.check_current_packages
 
-COHORT='current363-fresh-fixed-core-arm64-debug-v1'
+COHORT='current363-verified-core-reuse-arm64-debug-v2'
 SOURCE_REF='3942c2acadd0b6343b9f64e3a444a52d0a28e3d7'
 SOURCE_DIGEST='07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f'
 BUSINESS_DIGEST='a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475'
 PORTABLE_DIGEST='0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f'
-STAGES=['setup','core','preseal','gradle-setup','apk']
+STAGES=['setup','restore','preseal','gradle-setup','apk']
 
 
 def read(path):return json.loads(Path(path).read_bytes())
@@ -54,7 +55,7 @@ def validate_inputs(inputs,context):
             'packages/flutter_openim_sdk/pubspec.yaml',
             'packages/flutter_openim_sdk/tool/fixture_native_endpoint_messenger.dart',
             'migration/legacy_personal_export/legacy_personal_export.dart')]
-    if (context.get('core_build_mode')!='fresh-fixed-source' or context.get('restore_fallback')is not False
+    if (context.get('core_build_mode')!='restore-verified-current363' or context.get('restore_fallback')is not False
             or inputs['schema']!='luobo.android.current363-inputs.v1'
             or context['schema']!='luobo.android.current363-context.v1'
             or inputs['cohort']!=COHORT or context['cohort']!=COHORT
@@ -118,8 +119,8 @@ def require_reviewed_consumer(context,approved_context_sha256):
 
 
 def metadata():
-    # Read-only source/lock validation of the existing fresh-bind libraries.
-    # No artifact importer, old binary token or restore fallback is involved.
+    # Read-only source/lock/library validation plus one frozen new producer.
+    # This is not the old354 restore cohort and permits no fresh-bind fallback.
     old_context,original,tools=generic.metadata()
     context=read(HERE/'cohort.json');inputs=validate_inputs(read(HERE/'inputs.json'),context)
     for row in context['controller_inputs']+context['borrowed_inputs']:
@@ -130,6 +131,7 @@ def metadata():
     plugin_scope.contract(HERE,inputs)
     plugin_scope_fixture.writer_bytes(HERE)
     check_catalogue(context)
+    core_restore.validate(read(HERE/'core-reuse.json'),context,inputs,tools)
     if (context['original_context_sha256']!=s.sha(generic.HERE/'current-app-cohort.json')
             or context['pub_lock_after']!=old_context['pub_lock_after']
             or context['flutter_environment_sources']!=old_context['flutter_environment_sources']
@@ -174,37 +176,121 @@ class Job(generic.Job):
             'archive_sha256':s.sha(archive),'old354_source_not_relabelled':True})
 
     def build_core(self):
-        # This invokes the original observed bind, generated-module lock checks,
-        # callback/API/AAR/ELF audits and source/lock postconditions once.
-        generic.old.Job.build_core(self)
-        source=self.w/'artifacts/core-current257-arm64.aar'
-        for a,b in [(source,self.w/'artifacts/core-current363-arm64.aar'),
-                (source.with_suffix('.build.json'),self.w/'artifacts/core-current363-arm64.build.json'),
-                (source.with_name(source.stem+'-sources.jar'),self.w/'artifacts/core-current363-arm64-sources.jar')]:
-            s.put(b,a.read_bytes())
-        s.write_json(self.w/'evidence/current363-core-build.json',{'cohort':COHORT,
-            'source_members':539,'App_members':363,'source_digest':self.inputs['source_digest'],
-            'source_ref':SOURCE_REF,'fresh_Go_bind_executed':True,'restored_binary':False,
-            'internal_helper_filename_is_not_historical_App_identity':True,
-            'AAR_sha256':s.sha(source),'build_receipt_sha256':s.sha(source.with_suffix('.build.json')),
-            'only_debug_QA':True,'production_replacement':False,'device_acceptance':False})
+        raise ValueError('fresh Go bind disabled for explicit verified current363 restore')
+
+    def builder(self,*args,**kwargs):
+        raise ValueError('core builder disabled; no restore fallback')
+
+    def restore(self):
+        core_restore.restore(self,read(HERE/'core-reuse.json'))
 
 
 
     def prepare(self):
-        # Original fresh setup installs the exact official Go/mobile/Android/
-        # Flutter tools and prewarms the observed generated module once.
-        super().prepare()
+        w, t = self.w, self.tools
+        for name in ['evidence', 'artifacts', 'downloads', 'tmp', 'home', 'config', 'pub-cache',
+                     'gradle-cache', 'job-private']:
+            s.mkdir(w / name)
+        e = parent.environment(w, False)
+        self.source(e)
+        for key in ['jdk', 'gradle']:
+            self.tool(key, t[key], w / key, e)
+        self.tool('commandline', t['android_commandline_tools'], w / 'android/cmdline-tools/22.0', e)
+        self.tool('ndk', t['ndk'], w / 'android/ndk/28.2.13676358', e)
+        for label, args in [('java-version', [w / 'jdk/bin/java', '-version']),
+                            ('gradle-version', [w / 'gradle/bin/gradle', '--version'])]:
+            self.cmd(args, w, e, label)
+        if '17.0.20.1' not in (w / 'evidence/java-version.log').read_text():
+            raise ValueError('JDK version mismatch')
+        sdk = w / 'android/cmdline-tools/22.0/bin/sdkmanager'
+        self.cmd([sdk, '--sdk_root=' + str(w / 'android'), '--licenses'], w, e, 'sdk-licenses', stdin=b'y\n' * 1000)
+        extra = t['cloud_dependency_additions']
+        packages = t['android_sdk']['required_packages'] + extra['required_SDK_packages']
+        catalog = w / 'evidence/official-SDK-repository2-3.xml'
+        catalog_receipt = s.download({'url': 'https://dl.google.com/android/repository/repository2-3.xml',
+                                     'max_bytes': 16 * 1024 ** 2}, catalog, self.b)
+        selected_archives = parent.sdk_catalog(catalog.read_bytes(), packages)
+        self.cmd([sdk, '--verbose', '--sdk_root=' + str(w / 'android')] + [x['path'] for x in packages], w, e, 'sdk-packages', 1200)
+        sdk_rows = []
+        for item in packages:
+            root = w / 'android' / item['path'].replace(';', '/')
+            prop = (root / 'source.properties').read_text()
+            if not re.search(r'^Pkg.Revision\s*=\s*' + re.escape(item['revision']) + r'\s*$', prop, re.M):
+                raise ValueError('SDK package revision mismatch: ' + item['path'])
+            sdk_rows.append({'package': item['path'], 'revision': item['revision'],
+                'source_properties_sha256': s.sha(root / 'source.properties'),
+                'installed_package_xml_sha256': s.sha(root / 'package.xml')})
+        for pin in t['android_sdk']['same_crossplatform_API_inputs'] + extra['crossplatform_API_inputs']:
+            if s.sha(w / 'android' / pin['path']) != pin['sha256']:
+                raise ValueError('Android platform API input SHA mismatch')
+        s.write_json(w / 'evidence/sdk-packages.json', {'packages': sdk_rows,
+            'official_repository_metadata': catalog_receipt, 'selected_official_Linux_archives': selected_archives,
+            'source': 'hash-verified sdkmanager22.0 validates archive checksums; verbose log and exact platform bytes corroborate installation',
+            'Linux_archive_SHA256_preexisting_lock': False})
+        flutter = t['flutter']
+        self.git(w / 'flutter', flutter['repository'], flutter['framework_revision'], e, 'flutter')
+        self.cmd(['git', '-C', w / 'flutter', 'fetch', '--depth=1', 'origin', 'refs/tags/' + flutter['tag'] + ':refs/tags/' + flutter['tag']], w, e, 'flutter-tag')
+        self.cmd(['git', '-C', w / 'flutter', 'checkout', '--quiet', '--detach', 'refs/tags/' + flutter['tag']], w, e, 'flutter-checkout')
+        if (w / 'flutter/bin/internal/engine.version').read_text().strip() != flutter['engine_revision']:
+            raise ValueError('Flutter engine revision mismatch')
+        f = w / 'flutter/bin/flutter'
+        self.cmd([f, 'config', '--no-analytics'], w, e, 'flutter-config')
+        version = self.cmd([f, '--version', '--machine'], w, e, 'flutter-version')
+        v = json.loads(version.read_text())
+        for key, want in [('frameworkVersion', flutter['tag']), ('frameworkRevision', flutter['framework_revision']),
+                          ('engineRevision', flutter['engine_revision']), ('dartSdkVersion', flutter['dart_version'])]:
+            if v.get(key) != want:
+                raise ValueError('official Flutter version mismatch: ' + key)
+        self.cmd([f, 'precache', '--android'], w, e, 'android-engine', 1200)
+        self.cmd([f, 'pub', 'get', '--enforce-lockfile'], w / 'source/app', e, 'pub-get', 1200)
+        self.check_packages()
+        for pin in extra['locked_pub_source_evidence']:
+            if s.sha(w / 'pub-cache/hosted/pub.dev' / pin['path']) != pin['sha256']:
+                raise ValueError('locked native dependency build source differs')
+        asset = t['sqlite_Android_ARM64_if_hook_reachable']
+        package = w / 'pub-cache/hosted/pub.dev/sqlite3-3.5.2'
+        if ("'" + asset['filename'] + "': '" + asset['sha256'] + "'") not in (package / 'lib/src/hook/asset_hashes.dart').read_text():
+            raise ValueError('locked SQLite Android native hash differs')
+        target = w / 'source' / asset['fresh_seed_relative']
+        s.mkdir(target.parent)
+        receipt = s.download(asset, target, self.b)
+        s.write_json(w / 'evidence/sqlite-Android-native.json', {**receipt, 'old_hook_snapshot_or_stamp': False})
+        generator_files = ['packages/flutter_tools/lib/src/' + name for name in
+                           ['commands/packages.dart', 'project.dart', 'android/gradle_utils.dart', 'base/utils.dart']]
+        parent.update_job_local_properties(w, {'Flutter_commit': flutter['framework_revision'],
+            'pub_get_resource_sha256': s.sha(w / 'evidence/pub-get.resource.json'),
+            'generator_sources': [{'path': name, 'sha256': s.sha(w / 'flutter' / name)} for name in generator_files]})
+        self.verify()
+        ca = w / 'job-private/job-ca.pem'
+        key = w / 'job-private/job-ca.key'
+        self.cmd(['openssl', 'version'], w, e, 'openssl-version')
+        if not (w / 'evidence/openssl-version.log').read_text().startswith('OpenSSL 3.'):
+            raise ValueError('OpenSSL3 required for reviewed job CA generation')
+        self.cmd(['openssl', 'req', '-x509', '-newkey', 'rsa:3072', '-sha256', '-noenc', '-days', '2',
+                  '-keyout', key, '-out', ca, '-subj', '/CN=LuoboIM-current363-cloud-App-job',
+                  '-addext', 'basicConstraints=critical,CA:TRUE', '-addext', 'keyUsage=critical,keyCertSign,cRLSign'], w, e, 'job-CA')
+        key.chmod(0o600)
+        key.unlink()
+        s.sync(key.parent)
+        s.put(w / 'artifacts/job-ca-public.pem', ca.read_bytes())
+        s.write_json(w / 'evidence/job-CA.json', {'public_SHA256': s.sha(ca), 'private_key_deleted': True,
+            'source': 'fresh job-only2day CA, not old fixture CA', 'system_trust_modified': False})
+        s.write_json(w / 'evidence/runner-system.json', {'ImageOS': os.environ.get('ImageOS'),
+            'ImageVersion': os.environ.get('ImageVersion'), 'RUNNER_ARCH': os.environ.get('RUNNER_ARCH'),
+            'Python': sys.version, 'openssl_version_log_sha256': s.sha(w / 'evidence/openssl-version.log')})
+        s.write_json(w/'evidence/current363-setup-scope.json',{'cohort':COHORT,
+            'current_tools':'JDK/Gradle/Android/Flutter/Pub/SQLite only',
+            'Go_acquisition_or_command':False,'gomobile_or_gobind_acquisition_or_command':False,
+            'core_builder_or_metadata_warm':False,'original_core_tool_identity_from_imported_receipts':True})
         self.verify()
         plugin_scope.produce(self,HERE)
-        s.write_json(self.w/'evidence/current363-setup-scope.json',{'cohort':COHORT,
-            'core_build_mode':'fresh-fixed-source','restore_fallback':False,
-            'Go_and_gomobile_acquired_for_original_bind':True,
-            'only_debug_QA':True,'production_replacement':False})
 
     def cmd(self,args,cwd,env,label,timeout=900,reject=None,stdin=None):
         # Original helper calls provide legacy *intent* env. Validate those
         # boundaries first, then use the explicit effective env at dispatch.
+        executable=Path(args[0])
+        if executable in (self.w/'go/bin/go',self.w/'mobile-tools/gomobile',self.w/'mobile-tools/gobind'):
+            raise ValueError('Go and bind tools are forbidden in verified current363 restore scope')
         binding=None;plugin_before=None
         if label=='flutter-init':sdk_sources.produce(self,args,cwd,env,timeout,reject,stdin)
         if label=='flutter-config':
@@ -349,8 +435,11 @@ class Job(generic.Job):
         s.write_json(self.w/'evidence/current363-APK-audit.json',{**proof,'cohort':COHORT,
             'source_members':539,'App_members':363,'source_ref':SOURCE_REF,
             'published_APK':str(target.relative_to(self.w)),'published_SHA256':s.sha(target),
-            'inherited_template_SHA256':s.sha(inherited),'fresh_core_origin':read(self.w/'evidence/current363-core-build.json'),
-            'fresh_Go_bind_and_current_App_compile':True,'only_debug_QA':True,'production_replacement':False,
+            'inherited_template_SHA256':s.sha(inherited),'restored_core_origin':read(self.w/'evidence/current363-core-import.json'),
+            'Go_bind_executed_in_this_job':False,'verified_current363_core_restored':True,
+            'core_import_receipt_sha256':s.sha(self.w/'evidence/current363-core-import.json'),
+            'new_setup_CA_installed_in_recovered_core':False,
+            'only_debug_QA':True,'production_replacement':False,
             'device_or_service_or_fixture_TLS_accepted':False})
 
 
@@ -362,7 +451,7 @@ def main():
     context,inputs,tools=metadata()
     if a.stage=='readonly':
         print(json.dumps({'cohort':COHORT,'source_members':539,'App_members':363,
-            'state':'source_identity_and_approved_JVM18_only','native_execution':False}));return
+            'state':'source_identity_frozen_core_binding_and_approved_JVM18_only','native_execution':False}));return
     require_reviewed_consumer(context,a.approved_context_sha256)  # BEFORE work creation, tokens or downloads.
     if a.work is None or sys.platform!='linux'or os.geteuid()==0:p.error('ordinary-user Linux fresh root required')
     w=generic.parent.work_path(str(a.work),a.stage=='setup');generic.home_admission(os.environ['HOME'])
@@ -384,10 +473,13 @@ def main():
     s.write_json(w/'evidence'/(a.stage+'-claim.json'),{'cohort':COHORT,'claimed_once':True})
     def interrupted(_number,_frame):raise InterruptedError('current363 phase interrupted')
     for number in [signal.SIGINT,signal.SIGTERM]:signal.signal(number,interrupted)
+    if a.stage=='restore':
+        def expired(_number,_frame):raise TimeoutError('verified current363 core import exceeded600seconds')
+        signal.signal(signal.SIGALRM,expired);signal.alarm(600)
     budget=s.Budget(w,REPO);failure=None
     try:
         budget.start();job=Job(w,inputs,tools,budget,context)
-        {'setup':job.prepare,'core':job.build_core,'preseal':job.preseal,'gradle-setup':job.gradle_prepare,'apk':job.build_apk}[a.stage]()
+        {'setup':job.prepare,'restore':job.restore,'preseal':job.preseal,'gradle-setup':job.gradle_prepare,'apk':job.build_apk}[a.stage]()
         metadata();generic.home_admission(os.environ['HOME'])
         for suffix in ['complete','final-resource']:
             s.write_json(w/'evidence'/(a.stage+'-'+suffix+'.json'),{'state':'passed','cohort':COHORT,**budget.record()})
@@ -396,6 +488,7 @@ def main():
     except BaseException as error:
         failure=type(error).__name__;budget.latch('phase_or_infrastructure_failed');raise
     finally:
+        if a.stage=='restore':signal.alarm(0)
         budget.stop.set()
         if budget.thread is not None:budget.thread.join()
         if failure or budget.reason:s.write_json(w/'evidence'/(a.stage+'-failure.json'),{'exception_type':failure,**budget.record()})

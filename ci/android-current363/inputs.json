@@ -1,6 +1,6 @@
 {
   "schema": "luobo.android.current363-inputs.v1",
-  "cohort": "current363-fresh-fixed-core-arm64-debug-v1",
+  "cohort": "current363-verified-core-reuse-arm64-debug-v2",
   "members": 539,
   "source_digest": "07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f",
   "files": [

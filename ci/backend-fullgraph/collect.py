@@ -197,12 +197,104 @@ def checked_current_kafka_confirm_evidence(out):
  if historical['source']==run.FINAL_SOURCE or (out/'kafka-acl-passed-reuse.json').exists() or (out/'current-image-kafka-names.json').exists():raise ValueError('current Kafka confirmation cannot alias older Kafka or image dispatch')
  return value
 
+def checked_kafka_confirm_reuse_evidence(out):
+ receipt=run.check_kafka_confirm_reuse_receipt(json.loads(run.regular(out/'kafka-confirm-passed-reuse.json',65536)))
+ post=json.loads(run.regular(out/'source-post.json',4096));before=json.loads(run.regular(out/'tools-before.json',65536));after=json.loads(run.regular(out/'tools-after.json',65536))
+ if post!={'accepted':True,'source':run.FINAL_SOURCE} or before!=after:raise ValueError('current source/tool post differs from original Kafka confirmation reuse')
+ actual={key:before.get('go',{}).get(key) for key in ('bytes','sha256','mode')}
+ if json.dumps(actual,sort_keys=True)!=json.dumps(receipt['goTool'],sort_keys=True):raise ValueError('current original Kafka confirmation Go tool differs')
+ if any((out/name).exists() for name in ('kafka-acl-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('whole-source Kafka reuse cannot alias old a41 or fresh dispatch')
+ return receipt
+
+def gateway_start_exit2(terminal):
+ predicates={'start-service-process-image-'+step+'-wait-exit-code-2' for step in ('context','before-identity','open','initial-stat','read','final-stat','size','hash','after-identity')}
+ return isinstance(terminal,dict) and terminal.get('version')=='owned-fullgraph-token-v2-result-v1' and terminal.get('accepted') is False and terminal.get('scenario') in run.SCENARIOS and terminal.get('sourceSHA256')==run.FINAL_SOURCE['digest'] and terminal.get('constructorStage')=='start' and terminal.get('constructorRole')=='msggateway' and terminal.get('constructorCallState')=='returned' and terminal.get('constructorErrorClass')=='owned-evidence' and terminal.get('constructorPredicate') in predicates
+
+def gateway_projection_empty(status):
+ return {'version':'owned-gateway-start-log-projection-v1','status':status,'headerClass':'none','errorPrefixClass':'none','sourceFrames':[],'scanTruncated':False,'rawTextExported':False,'privatePathsExported':False,'diagnosticOnly':True,'acceptanceEvidence':False,'prefixIsCauseProof':False}
+
+def project_gateway_log_bytes(raw,bodies):
+ policy=run.GATEWAY_START_LOG_POLICY
+ if not isinstance(raw,bytes) or len(raw)>policy['logLimitBytes']:raise ValueError('bounded original private gateway output required')
+ result=gateway_projection_empty('projected');source_lines={}
+ for name,body in bodies.items():
+  if isinstance(name,str) and name.startswith('server/') and name.endswith('.go') and all(part not in ('','.', '..') for part in name.split('/')) and '\\' not in name and isinstance(body,bytes):source_lines[name]=body.count(b'\n')+1
+ # Reconstruct only source inventory paths and bounded line numbers. Stack
+ # symbols/arguments, arbitrary log strings and absolute paths never escape.
+ pattern=__import__('re').compile(rb'[ \t]+([^\x00-\x1f\x7f\\]+\.go):([1-9][0-9]{0,6})(?: \+0x[0-9a-fA-F]+)?(?: fp=0x[0-9a-fA-F]+ sp=0x[0-9a-fA-F]+ pc=0x[0-9a-fA-F]+)?')
+ wrappers=(b'failed to get configuration from command: ',b'failed to initialize from config: ')
+ prefixes=((b'runtime error: invalid memory address or nil pointer dereference','runtime-nil'),(b'yaml:','config-yaml'),(b'json:','json'),(b'invalid character ','json'),(b'open ','file-open'),(b'listen ','listen'),(b'dial ','dial'),(b'tls:','tls'),(b'x509:','x509'))
+ start=0;seen=set();line_count=0
+ while start<len(raw):
+  if line_count>=policy['lineLimit']:result['scanTruncated']=True;break
+  end=raw.find(b'\n',start)
+  if end<0:end=len(raw)
+  line_count+=1
+  if end-start>policy['lineBytesLimit']:
+   result['scanTruncated']=True;start=end+1;continue
+  line=raw[start:end].rstrip(b'\r');start=end+1
+  if result['headerClass']=='none' and (line.startswith(b'panic: ') or line.startswith(b'fatal error: ')):
+   panic=line.startswith(b'panic: ');payload=line[7:] if panic else line[13:]
+   result['headerClass']='go-panic' if panic else 'go-runtime-fatal'
+   for _ in range(2):
+    wrapper=next((prefix for prefix in wrappers if payload.startswith(prefix)),None)
+    if wrapper is None:break
+    payload=payload[len(wrapper):]
+   result['errorPrefixClass']=next((kind for prefix,kind in prefixes if payload.startswith(prefix)),'other')
+  match=pattern.fullmatch(line)
+  if match is None:continue
+  try:path=match[1].decode('utf-8')
+  except UnicodeError:continue
+  if path.startswith('//') or ':' in path or any(part in ('.','..') for part in path.split('/')):continue
+  candidates=[name for name in source_lines if path==name or path.endswith('/'+name)]
+  if len(candidates)!=1:continue
+  name=candidates[0];number=int(match[2])
+  if number>source_lines[name] or (name,number) in seen:continue
+  seen.add((name,number))
+  if len(result['sourceFrames'])>=policy['framesLimit']:result['scanTruncated']=True;continue
+  result['sourceFrames'].append({'path':name,'line':number})
+ return result
+
+def project_gateway_start_log(work,terminal,bodies):
+ if not gateway_start_exit2(terminal):return None
+ result=gateway_projection_empty('unavailable');result.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
+ try:
+  work=Path(work);directory=work/'required/msggateway'
+  if work.resolve()!=work or directory.resolve()!=directory:return dict(result,status='unsafe')
+  info=directory.stat()
+  if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:return dict(result,status='unsafe')
+  matches=[]
+  with os.scandir(directory) as entries:
+   for count,entry in enumerate(entries):
+    if count>=run.GATEWAY_START_LOG_POLICY['directoryEntriesLimit']:return dict(result,status='unsafe')
+    if __import__('re').fullmatch('service-[0-9a-f]{64}\\.log',entry.name):matches.append(Path(entry.path))
+  if len(matches)!=1:return dict(result,status='absent' if not matches else 'ambiguous')
+  path=matches[0];before=path.lstat()
+  if not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or stat.S_IMODE(before.st_mode)!=0o600:return dict(result,status='unsafe')
+  raw=run.regular(path,run.GATEWAY_START_LOG_POLICY['logLimitBytes']);after=path.lstat()
+  identity=lambda v:(v.st_dev,v.st_ino,v.st_mode,v.st_uid,v.st_nlink,v.st_size,v.st_mtime_ns,v.st_ctime_ns)
+  if identity(before)!=identity(after):return dict(result,status='unsafe')
+  projected=project_gateway_log_bytes(raw,bodies);projected.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
+  return projected
+ except (OSError,ValueError,UnicodeError):return result
+
+def emit_gateway_start_log_diagnostic(out,work,terminal):
+ # Best effort after the validated original cached Wait observation. No new
+ # Wait, process probe, signal, log replay or outcome promotion is possible.
+ if not gateway_start_exit2(terminal):return False
+ try:
+  _,bodies,_,_,_,_=run.verify()
+  value=project_gateway_start_log(work,terminal,bodies)
+  if value is not None:run.write(out/('gateway-start-log-'+terminal['scenario']+'.json'),value)
+  return value is not None
+ except Exception:return False
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
   run.write(out/'collection.json',{'started':False,'accepted':False,'reason':'no-original-allocation','privateDataUploaded':False});pack(out);return 0
  if allocation.resolve()!=allocation or allocation.stat().st_uid!=os.getuid() or stat.S_IMODE(allocation.stat().st_mode)!=0o700 or json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original job allocation required')
- c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None
+ c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None
  root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False;terminals={}
  for scenario in run.SCENARIOS:
   folder=root/('plane-'+scenario);work=root/('scenario-'+scenario);entry={'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False}
@@ -223,6 +315,7 @@ def collect():
    try:
     terminal=public_terminal(run.regular(work/'result.json',1<<20),scenario);terminals[scenario]=terminal
     run.write(out/('terminal-'+scenario+'.json'),terminal)
+    if gateway_start_exit2(terminal):emit_gateway_start_log_diagnostic(out,work,terminal)
    except Exception as error:entry['terminalExceptionType']=type(error).__name__;failed=True
   if (work/'operator-intent.json').exists():
    entry['runtimeAttempted']=True
@@ -258,6 +351,10 @@ def collect():
  if (out/'current-kafka-confirm-names.json').exists():
   try:checked_current_kafka_confirm_evidence(out);current_kafka_confirm_accepted=True
   except Exception:failed=True
+ current_kafka_confirm_reuse_accepted=False
+ if (out/'kafka-confirm-passed-reuse.json').exists():
+  try:checked_kafka_confirm_reuse_evidence(out);current_kafka_confirm_reuse_accepted=True
+  except Exception:failed=True
  kafka_reuse_accepted=False
  if (out/'kafka-acl-passed-reuse.json').exists():
   try:checked_kafka_acl_evidence(out);kafka_reuse_accepted=True
@@ -271,11 +368,12 @@ def collect():
  try:
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
- if confirm_required:kafka_current_accepted=current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted
- elif fresh_required:kafka_current_accepted=current_image_kafka_accepted and not current_kafka_confirm_accepted and not kafka_reuse_accepted
- else:kafka_current_accepted=kafka_reuse_accepted and not current_image_kafka_accepted and not current_kafka_confirm_accepted
+ if confirm_reuse_required:kafka_current_accepted=current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted
+ elif confirm_required:kafka_current_accepted=current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted and not current_kafka_confirm_reuse_accepted
+ elif fresh_required:kafka_current_accepted=current_image_kafka_accepted and not current_kafka_confirm_accepted and not kafka_reuse_accepted and not current_kafka_confirm_reuse_accepted
+ else:kafka_current_accepted=kafka_reuse_accepted and not current_image_kafka_accepted and not current_kafka_confirm_accepted and not current_kafka_confirm_reuse_accepted
  accepted=launcher_accepted and kafka_current_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if confirm_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':confirm_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':confirm_required or confirm_reuse_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  emit_console_observation(rows,monitor,main,terminals,out)
  pack(out)
  return 0 if accepted else 1

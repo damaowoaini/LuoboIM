@@ -1,27 +1,37 @@
-# Current363 / source539 fresh ARM64 Debug QA
+# Current363 / source539 verified-core ARM64 Debug QA successor
 
-This new manual-only scope binds App source3942c2a / business363 / portable415.
-The original359/535 entry remains frozen. Twelve existing production Dart files
-and a new typing controller changed; an old359 APK cannot represent this App.
-All176 SDK/protocol/wrapper/native inputs and the178-package pub lock are exact.
+This explicit v2 scope keeps App ref3942c2a/business363/portable415, all176 native
+inputs, the178-package lock and all original source checks. The v1 fresh cohort
+at public62175ab performed the actual fixed-source ARM64 Go bind successfully;
+its Gradle setup failed before APK construction. Predecessor hashes in cohort.json
+preserve that history. No old359 APK or old354 artifact is selected.
 
-Both original core artifacts returned404 on2026-11-06. This scope has no restore
-stage, artifact token, importer or fallback. Setup uses the existing official
-Go/Flutter/JDK/Android source acquisition and observed generated-module producer;
-core performs the fixed7b156fc upstream+dcbc80f patch+protocol52/acquired lock ARM64
-bind once. The actual original core/API/callback/ELF/lock gates stay in that chain.
+Only producer42183531372/job127778400544, head62175ab, raw13487455046 and
+products13487350308 may be restored. Root accepted debug-core receiver eligibility,
+not a locally downloaded AAR: products were inspected by6683 metadata range bytes,
+with0 AAR/JAR/ELF payload bytes. The new cloud receiver must verify both complete
+API ZIP digests/CRC, all546 raw members and all5 exact product bodies, then rerun
+the original AAR/ARM64 ELF and153-active-API/13-callback audits against raw proof.
+The producer top-level current363-activation.json was not archived. Actual539
+source/core records and setup/core/preseal phase/cohort proofs are used explicitly;
+no activation record is invented and no source354 identity is substituted.
 
-The scoped plugin producer/resolver binds current539, preserving the21 official
-Pub archives, one local SDK,44 configurations, accepted App14/BC4 graph, original
-builtin preseal,3 real plugin controls and7 real negative APK gates. Source-neutral
-rich/Maven/KGP libraries are borrowed by exact hash. Old global identities are not
-mutated. Current pure tests and readonly verification must run before Root fills
-the complete cohort SHA in the manual workflow; an empty/old SHA fails before work.
+The resolver changes only the two outer lexical variable names that collided with
+nested p/c closure parameters. All tooling/configuration/source admission stays.
+Gradle remains9.3.1/Groovy4.0.29. The production writer and consumer bodies remain
+the same; its resolver hash is rebound in the fixture and complete cohort.
 
-Only one native job: setup -> core -> preseal -> gradle-setup -> apk. No Mobile5,
-1379 full suite, Go full regression, device/service acceptance or other jobs.
-Cold20GiB, later4GiB, continuing1GiB/.2s and owned16GiB limits remain unchanged.
-Products are only public ARM64 Debug-QA AAR/build receipt/generated-source jar/APK,
-license and public CA; no private key, production signing material or dependency cache.
-This is not production replacement, original four-ABI parity, a release-signed app,
-an accepted16KiB device run or completion of the full Mobile403/Web107/Admin89 goal.
+One manual native job: setup -> restore -> preseal -> gradle-setup -> apk.
+Setup acquires JDK/Gradle/Android/Flutter/Pub/SQLite only, without Go/mobile tools.
+build_core and builder reject execution; restore has no fallback. The original
+builtin2/plugin3 real controls, source18/21 official Pub/one SDK/44 configuration
+checks, seven actual APK negative gates and actual assembleDebug remain required.
+The artifact token exists only in restore and is never passed to child tools.
+The existing600-second restore bound and20GiB cold/4GiB phase/1GiB continuous
+floor,0.2s poll and16GiB owned budget remain unchanged.
+
+The restored public CA is artifacts/recovered-core-ca-public.pem. A fresh setup CA
+is separate; it was not installed into the restored core. No old private key is
+obtained. This successor does not assert fixture TLS, service/device operation,
+four-ABI parity, production replacement, release signing, APK success or complete
+Mobile403/Web107/Admin89 delivery. Mobile5,1379 and full regression are not rerun.

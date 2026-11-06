@@ -844,9 +844,9 @@ class FullGraphControls(unittest.TestCase):
   for predicate in ('start-service-process-image-PRIVATE_PATH-wait-success','start-service-process-image-hash-live','start-service-process-image-hash-wait-success-extra','start-service-process-image-hash-wait-exit-code--2','start-service-process-image-hash-wait-exit-code-256','start-service-process-image-hash-wait-exit-code-01','start-service-process-image-hash-wait-exit-code-+1','start-service-process-image-hash-wait-exit-code-1.0'):
    with self.assertRaises(ValueError):collector.public_terminal(json.dumps(dict(terminal,constructorPredicate=predicate)).encode(),terminal['scenario'])
 
-  # The changed ownedcontrol package must run both exact tops in one race process.
+  # The earlier explicit fresh image/Kafka branch remains independently checked.
   control=run.CURRENT_IMAGE_KAFKA_CONTROL;package=next(iter(control['targets']));parent=run.module('ci/backend-runtime-join-r7/run.py','image_kafka_pure_auditor')
-  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package][:1]),processImageTestsToRun=list(control['targets'][package][1:]),currentImageKafkaControl=copy.deepcopy(control),currentKafkaConfirmControl=None,kafkaACLPassedReuse=None);run.check_current_image_kafka_plan(locked)
+  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package][:1]),processImageTestsToRun=list(control['targets'][package][1:]),currentImageKafkaControl=copy.deepcopy(control),currentKafkaConfirmControl=None,kafkaConfirmPassedReuse=None,kafkaACLPassedReuse=None);run.check_current_image_kafka_plan(locked)
   for change in ({'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'processImageTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentImageKafkaControl':{}}):
    with self.assertRaises(ValueError):run.check_current_image_kafka_plan(dict(locked,**change))
   events=[{'Action':'start','Package':parent.PREFIX+package}]
@@ -896,9 +896,9 @@ class FullGraphControls(unittest.TestCase):
     run.write(out/'kafka-acl-passed-reuse.json',run.KAFKA_ACL_PASSED_REUSE)
     with self.assertRaises(ValueError):collector.checked_current_image_kafka_evidence(out)
 
-  # Only the changed Kafka top and its three children execute on this source.
+  # The earlier explicit fresh Kafka branch remains independently checked.
   control=run.CURRENT_KAFKA_CONFIRM_CONTROL;package=next(iter(control['targets']));parent=run.module('ci/backend-runtime-join-r7/run.py','kafka_confirm_pure_auditor')
-  locked=json.loads(run.INPUTS.read_bytes());run.check_current_kafka_confirm_plan(locked)
+  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package]),processImageTestsToRun=[],currentImageKafkaControl=None,currentKafkaConfirmControl=copy.deepcopy(control),kafkaConfirmPassedReuse=None,kafkaACLPassedReuse=None);run.check_current_kafka_confirm_plan(locked)
   for change in ({'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']},{'kafkaACLTestsToRun':[]},{'currentKafkaConfirmControl':{}},{'processImageHistoricalPass':{}},{'currentImageKafkaControl':run.CURRENT_IMAGE_KAFKA_CONTROL}):
    with self.assertRaises(ValueError):run.check_current_kafka_confirm_plan(dict(locked,**change))
   events=[{'Action':'start','Package':parent.PREFIX+package}]
@@ -948,5 +948,75 @@ class FullGraphControls(unittest.TestCase):
      with self.assertRaises(ValueError):run.check_current_kafka_confirm_receipt(changed)
     run.write(out/'current-image-kafka-names.json',{})
     with self.assertRaises(ValueError):collector.checked_current_kafka_confirm_evidence(out)
+
+  # Same whole-source Kafka reuse preserves the original run and never dispatches.
+  locked=json.loads(run.INPUTS.read_bytes());receipt=copy.deepcopy(run.KAFKA_CONFIRM_PASSED_REUSE)
+  self.assertEqual(run.check_kafka_confirm_reuse_plan(locked),receipt)
+  self.assertEqual((receipt['originalReceipt']['topPASS'],receipt['originalReceipt']['subPASS']),(1,3))
+  self.assertEqual(receipt['originalActualKafkaTestsDispatched'],1);self.assertEqual(receipt['actualCurrentKafkaTestsDispatched'],0)
+  for change in ({'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'currentKafkaConfirmControl':run.CURRENT_KAFKA_CONFIRM_CONTROL},{'gatewayStartLogProjectionPolicy':{}},{'kafkaConfirmPassedReuse':None}):
+   with self.assertRaises(ValueError):run.check_kafka_confirm_reuse_plan(dict(locked,**change))
+  for changed in (dict(receipt,source=run.KAFKA_ACL_PASSED_REUSE['source']),dict(receipt,actualCurrentKafkaTestsDispatched=1),dict(receipt,originalActualKafkaTestsDispatched=0),dict(receipt,currentFreshPASS=True),dict(receipt,currentWholeOwnedcontrolPackagePASS=True),dict(receipt,runtimeAccepted=True)):
+   with self.assertRaises(ValueError):run.check_kafka_confirm_reuse_receipt(changed)
+  fixture={'public/whole-source':b'original'}
+  class Recipe:
+   @staticmethod
+   def rows(bodies):return dict(bodies)
+   @staticmethod
+   def digest(rows):return run.FINAL_SOURCE['digest'] if rows==fixture else 'f'*64
+  with tempfile.TemporaryDirectory() as directory:
+   out=Path(directory).resolve();go=copy.deepcopy(receipt['goTool'])
+   with mock.patch.object(run.subprocess,'run',side_effect=AssertionError('no Go dispatch')):
+    self.assertEqual(run.load_kafka_confirm_reuse(out,fixture,Recipe,go),receipt)
+   with self.assertRaises(ValueError):run.check_kafka_confirm_reuse(receipt,dict(fixture,changed=b'changed'),Recipe,go)
+   with self.assertRaises(ValueError):run.check_kafka_confirm_reuse(receipt,fixture,Recipe,dict(go,sha256='f'*64))
+   run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});run.write(out/'tools-before.json',{'go':go});run.write(out/'tools-after.json',{'go':go})
+   self.assertEqual(collector.checked_kafka_confirm_reuse_evidence(out),receipt)
+   (out/'tools-after.json').write_text('{}')
+   with self.assertRaises(ValueError):collector.checked_kafka_confirm_reuse_evidence(out)
+   (out/'tools-after.json').write_text(json.dumps({'go':go}))
+   run.write(out/'current-kafka-confirm-names.json',receipt['originalReceipt'])
+   with self.assertRaises(ValueError):collector.checked_kafka_confirm_reuse_evidence(out)
+
+  # Private output can only produce a closed class and validated source lines.
+  target='server/cmd/openim-msggateway/main.go';bodies={target:b'package main\nfunc main() {}\n'}
+  private=b'PRIVATE_SECRET'
+  raw=b'configFolderPath: /PRIVATE/config.yaml\npanic: yaml: PRIVATE_SECRET\nmain.main(PRIVATE_ARGUMENT)\n\t/PRIVATE/source/'+target.encode()+b':2 +0xabc\n\t/PRIVATE/vendor/foreign.go:2 +0xdef\n'
+  projected=collector.project_gateway_log_bytes(raw,bodies)
+  self.assertEqual((projected['headerClass'],projected['errorPrefixClass']),('go-panic','config-yaml'))
+  self.assertEqual(projected['sourceFrames'],[{'path':target,'line':2}]);self.assertFalse(projected['rawTextExported']);self.assertFalse(projected['acceptanceEvidence']);self.assertFalse(projected['prefixIsCauseProof'])
+  self.assertNotIn('PRIVATE',json.dumps(projected));self.assertNotIn('0xabc',json.dumps(projected))
+  categories=((b'runtime error: invalid memory address or nil pointer dereference','runtime-nil'),(b'failed to get configuration from command: yaml:','config-yaml'),(b'json:','json'),(b'invalid character ','json'),(b'open ','file-open'),(b'listen ','listen'),(b'dial ','dial'),(b'tls:','tls'),(b'x509:','x509'),(b'unknown private body ','other'))
+  for prefix,expected in categories:
+   value=collector.project_gateway_log_bytes(b'panic: '+prefix+private,bodies)
+   self.assertEqual(value['errorPrefixClass'],expected);self.assertNotIn('PRIVATE',json.dumps(value))
+  value=collector.project_gateway_log_bytes(b'fatal error: PRIVATE_SECRET',bodies);self.assertEqual(value['headerClass'],'go-runtime-fatal');self.assertEqual(value['errorPrefixClass'],'other')
+  for bad in (b'0',b'9999999',b'-1'):
+   value=collector.project_gateway_log_bytes(b'\t/PRIVATE/source/'+target.encode()+b':'+bad+b' +0xabc',bodies);self.assertEqual(value['sourceFrames'],[])
+  for path in ('/PRIVATE/source/server/cmd/../cmd/openim-msggateway/main.go','/PRIVATE/source/server/cmd/openim-msggateway/./main.go','//PRIVATE/source/'+target,'/PRIVATE/foreign/main.go','/PRIVATE/source/server/secret.go','/PRIVATE/source/server\\cmd\\openim-msggateway\\main.go'):
+   value=collector.project_gateway_log_bytes(('\t'+path+':2 +0xabc').encode(),bodies);self.assertEqual(value['sourceFrames'],[])
+  self.assertTrue(collector.project_gateway_log_bytes(b'X'*(run.GATEWAY_START_LOG_POLICY['lineBytesLimit']+1),bodies)['scanTruncated'])
+  self.assertTrue(collector.project_gateway_log_bytes(b'\n'*(run.GATEWAY_START_LOG_POLICY['lineLimit']+1),bodies)['scanTruncated'])
+  with self.assertRaises(ValueError):collector.project_gateway_log_bytes(b'X'*(run.GATEWAY_START_LOG_POLICY['logLimitBytes']+1),bodies)
+  many={f'server/f{i}.go':b'one\ntwo\n' for i in range(run.GATEWAY_START_LOG_POLICY['framesLimit']+1)}
+  many_raw='\n'.join('\t/PRIVATE/source/'+name+':2 +0xabc' for name in many).encode();value=collector.project_gateway_log_bytes(many_raw,many)
+  self.assertEqual(len(value['sourceFrames']),run.GATEWAY_START_LOG_POLICY['framesLimit']);self.assertTrue(value['scanTruncated'])
+  terminal={'version':'owned-fullgraph-token-v2-result-v1','scenario':run.SCENARIOS[1],'sourceSHA256':run.FINAL_SOURCE['digest'],'accepted':False,'constructorStage':'start','constructorRole':'msggateway','constructorCallState':'returned','constructorErrorClass':'owned-evidence','constructorPredicate':'start-service-process-image-after-identity-wait-exit-code-2'}
+  for change in ({'accepted':True},{'constructorRole':'api'},{'constructorCallState':'in-progress'},{'constructorPredicate':'start-service-process-image-after-identity-wait-unobserved'},{'sourceSHA256':'f'*64}):
+   with mock.patch.object(collector.run,'regular',side_effect=AssertionError('ineligible output must not be read')):
+    self.assertIsNone(collector.project_gateway_start_log(Path('/not-read'),dict(terminal,**change),bodies))
+  with tempfile.TemporaryDirectory() as directory:
+   work=Path(directory).resolve();folder=work/'required/msggateway';folder.mkdir(mode=0o700,parents=True)
+   self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'absent')
+   path=folder/('service-'+'a'*64+'.log');path.write_bytes(raw);path.chmod(0o600)
+   value=collector.project_gateway_start_log(work,terminal,bodies);self.assertEqual(value['status'],'projected');self.assertEqual(value['sourceFrames'],[{'path':target,'line':2}]);self.assertNotIn('PRIVATE',json.dumps(value));self.assertNotIn('originalPrivateLogSHA256',value);self.assertNotIn('originalPrivateLogBytes',value)
+   duplicate=folder/('service-'+'b'*64+'.log');duplicate.write_bytes(raw);duplicate.chmod(0o600)
+   self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'ambiguous');duplicate.unlink()
+   path.chmod(0o644);self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');path.chmod(0o600)
+   original=work/'original-private-log';path.rename(original);path.symlink_to(original)
+   self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');path.unlink();original.rename(path)
+   folder.chmod(0o755);self.assertEqual(collector.project_gateway_start_log(work,terminal,bodies)['status'],'unsafe');folder.chmod(0o700)
+   with mock.patch.object(collector.run,'verify',return_value=({},bodies,None,None,None,None)),mock.patch.object(collector.run,'write',side_effect=OSError('PRIVATE_ERROR')):
+    self.assertFalse(collector.emit_gateway_start_log_diagnostic(work,work,terminal))
 
 if __name__=='__main__':unittest.main()

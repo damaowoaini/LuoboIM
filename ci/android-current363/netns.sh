@@ -8,9 +8,9 @@ stage=$4
 approved=$5
 [[ "$approved" =~ ^[0-9a-f]{64}$ ]]
 [[ "$repo" == /* && "$work" == /* && -d "$repo" && -d "$work" ]]
-[[ "$stage" == core || "$stage" == preseal || "$stage" == apk ]]
+[[ "$stage" == preseal || "$stage" == apk ]]
 ip link set lo up
 [[ $(ip -o link show | wc -l) == 1 ]]
 [[ -z $(ip -4 route show default) && -z $(ip -6 route show default) ]]
 exec runuser -u "$owner" -- python3 -B "$repo/ci/android-current363/run.py" \
-  --cohort current363-fresh-fixed-core-arm64-debug-v1 --stage "$stage" --work "$work" --approved-context-sha256 "$approved"
+  --cohort current363-verified-core-reuse-arm64-debug-v2 --stage "$stage" --work "$work" --approved-context-sha256 "$approved"

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "state": "FROZEN_FINAL_SOURCE",
-  "scope": "original_graph2top3sub_four_planes_current_kafka1top3sub_prior_image_fact_only",
+  "scope": "original_graph2top3sub_four_planes_same_whole_source_kafka1top3sub_reuse_finite_gateway_exit2_diagnostic_only",
   "source": {
     "members": 1576,
     "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 86091,
-      "sha256": "01d7abf371d6569dec4e61de1d303f1a312fdc2bc29e86cb0e2d5a1253db0b62"
+      "bytes": 100896,
+      "sha256": "85b2f9716bca49716ffbaad7ed716c8a7dbd98271b9c573b7d1573c32ea6d303"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 56336,
-      "sha256": "d6720c5bce430d5c91b50c62743d074bd2dc8a01411033caeae405aed38526ab"
+      "bytes": 64097,
+      "sha256": "b17a3d953f47193ae22675fd1a8eed5d8c11599a6e642be25c03efb45afdb851"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 102677,
-      "sha256": "b2b7bcbacb41b2baddd032d990b7e38efaf15c3a1bb2a2495195644145fa260c"
+      "bytes": 111024,
+      "sha256": "a80991fcbd05a2b632a8e38654c9f518546dc18037748652c235a3858894430b"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -4497,9 +4497,7 @@
     "otherKafkaOrRedisTestsDispatched": false
   },
   "kafkaACLPassedReuse": null,
-  "kafkaACLTestsToRun": [
-    "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-  ],
+  "kafkaACLTestsToRun": [],
   "kafkaACLHistoricalPass": {
     "schema": 1,
     "kind": "root-accepted-kafka-acl-source-bound-reuse-v1",
@@ -4702,34 +4700,16 @@
     "unchangedProcessImageBodies": true,
     "processImagePriorIndividualPassOnly": true,
     "currentProcessImageTestsDispatched": 0,
-    "currentKafkaParentThreeChildrenMustRun": true,
+    "currentKafkaParentThreeChildrenMustRun": false,
     "historicalCleanupAndLauncherReceiptsAreNotCurrentPackagePASS": true,
     "currentWholeOwnedcontrolPackagePASS": false,
-    "originalCrossSourceObligationsKept": true
+    "originalCrossSourceObligationsKept": true,
+    "originalSameWholeSourceKafkaParentThreeChildrenPassed": true,
+    "originalKafkaActualTestsDispatched": 1,
+    "currentKafkaActualTestsDispatched": 0,
+    "sameWholeSourceKafkaReuseRequiresExactGoExecutable": true
   },
-  "currentKafkaConfirmControl": {
-    "phase": "current-kafka-confirm",
-    "targets": {
-      "internal/namespaceimport/ownedcontrol": [
-        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-      ]
-    },
-    "requiredSubtests": {
-      "internal/namespaceimport/ownedcontrol": {
-        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
-          "create-reply-error-and-shape-cannot-be-a-success",
-          "describe-reply-error-and-shape-cannot-replace-exact-deny",
-          "new-deny-visibility-is-bounded-without-grace-for-existing-denies"
-        ]
-      }
-    },
-    "goTimeoutSeconds": 180,
-    "phaseGuardSeconds": 240,
-    "topPASS": 1,
-    "subPASS": 3,
-    "samePackageSingleRaceInvocation": true,
-    "newDatabaseFixtures": 0
-  },
+  "currentKafkaConfirmControl": null,
   "processImageHistoricalPass": {
     "run": 42180539532,
     "job": 127768872346,
@@ -4776,5 +4756,272 @@
     "currentPackagePASS": false,
     "actualCurrentTestsDispatched": 0,
     "runtimeAccepted": false
+  },
+  "kafkaConfirmPassedReuse": {
+    "schema": 1,
+    "kind": "root-accepted-current-whole-source-kafka-confirmation-reuse-v1",
+    "run": 42183524424,
+    "job": 127778379574,
+    "attempt": 1,
+    "head": "62175ab20f5f87a66c124517fc8a260ba1cddea5",
+    "source": {
+      "members": 1576,
+      "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
+    },
+    "rootReviewSHA256": "640cd61969d65965a235d11880dc0a2a8828bf8a76424049728e5e586da38e2b",
+    "artifact": {
+      "id": 13487280335,
+      "bytes": 50105,
+      "sha256": "6bd18d0e03313cde74a56754bb0d66445a809f0417a8ee19f57938307c3de6ab",
+      "exactAPIDigest": true,
+      "files": 65,
+      "binariesDownloaded": false
+    },
+    "originalReceipt": {
+      "topPASS": 1,
+      "subPASS": 3,
+      "skip": 0,
+      "fail": 0,
+      "packages": 1,
+      "namedCompletions": [
+        {
+          "package": "internal/namespaceimport/ownedcontrol",
+          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+        },
+        {
+          "package": "internal/namespaceimport/ownedcontrol",
+          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+        },
+        {
+          "package": "internal/namespaceimport/ownedcontrol",
+          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+        },
+        {
+          "package": "internal/namespaceimport/ownedcontrol",
+          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+        }
+      ],
+      "source": {
+        "members": 1576,
+        "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
+      },
+      "accepted": true,
+      "newDatabaseFixtures": 0,
+      "scope": {
+        "phase": "current-kafka-confirm",
+        "targets": {
+          "internal/namespaceimport/ownedcontrol": [
+            "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+          ]
+        },
+        "requiredSubtests": {
+          "internal/namespaceimport/ownedcontrol": {
+            "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
+              "create-reply-error-and-shape-cannot-be-a-success",
+              "describe-reply-error-and-shape-cannot-replace-exact-deny",
+              "new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+            ]
+          }
+        },
+        "goTimeoutSeconds": 180,
+        "phaseGuardSeconds": 240,
+        "topPASS": 1,
+        "subPASS": 3,
+        "samePackageSingleRaceInvocation": true,
+        "newDatabaseFixtures": 0
+      },
+      "actualKafkaACLTestsDispatched": 1,
+      "actualProcessImageTestsDispatched": 0,
+      "samePackageSingleRaceInvocation": true,
+      "runtimeAccepted": false,
+      "wholeSourceAccepted": false
+    },
+    "originalEvents": [
+      {
+        "Time": "2026-11-06T07:52:50.182787218Z",
+        "Action": "start",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201536753Z",
+        "Action": "run",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201623554Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.20166067Z",
+        "Action": "run",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201664005Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201716815Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201724837Z",
+        "Action": "pass",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201770295Z",
+        "Action": "run",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201776314Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201831338Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201840441Z",
+        "Action": "pass",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny",
+        "Elapsed": 0
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201870386Z",
+        "Action": "run",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.201875354Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.42300866Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.423076442Z",
+        "Action": "pass",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies",
+        "Elapsed": 0.22
+      },
+      {
+        "Time": "2026-11-06T07:52:50.423089582Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+      },
+      {
+        "Time": "2026-11-06T07:52:50.423094049Z",
+        "Action": "pass",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Test": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny",
+        "Elapsed": 0.22
+      },
+      {
+        "Time": "2026-11-06T07:52:50.423156854Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+      },
+      {
+        "Time": "2026-11-06T07:52:51.426959618Z",
+        "Action": "output",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+      },
+      {
+        "Time": "2026-11-06T07:52:51.427018557Z",
+        "Action": "pass",
+        "Package": "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol",
+        "Elapsed": 1.244
+      }
+    ],
+    "originalPhase": {
+      "phase": "current-kafka-confirm",
+      "exitCode": 0,
+      "resource": {
+        "status": "passed",
+        "exit_code": 0
+      }
+    },
+    "originalSourcePost": {
+      "accepted": true,
+      "source": {
+        "members": 1576,
+        "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
+      }
+    },
+    "originalEvidencePins": {
+      "current-kafka-confirm-names.json": {
+        "bytes": 1568,
+        "sha256": "e79ed22518ea4d7702e0837e5bcb6ed10e4529ddbd445d2af08c024885916d83"
+      },
+      "current-kafka-confirm-events.json": {
+        "bytes": 4639,
+        "sha256": "f269359a79caee47ede0a51bbc997713bb089602d40d2de7cb59c2a6fea1e2d9"
+      },
+      "phase-0004.json": {
+        "bytes": 2522,
+        "sha256": "4b48809a66cefd4d605933ba8598a04a568dc7947b27d7ace5031ea19da7de14"
+      },
+      "source-post.json": {
+        "bytes": 120,
+        "sha256": "91f451c87df02cfd2455a44ed47f54d4dc5e7240db1dff95ce75ada2fae43626"
+      },
+      "tools-before.json": {
+        "bytes": 1277,
+        "sha256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f"
+      },
+      "tools-after.json": {
+        "bytes": 1277,
+        "sha256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f"
+      }
+    },
+    "goTool": {
+      "bytes": 17164055,
+      "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "mode": 493
+    },
+    "sourceToolsPostExact": true,
+    "originalActualKafkaTestsDispatched": 1,
+    "actualCurrentKafkaTestsDispatched": 0,
+    "currentFreshPASS": false,
+    "currentWholeOwnedcontrolPackagePASS": false,
+    "runtimeAccepted": false
+  },
+  "gatewayStartLogProjectionPolicy": {
+    "version": "owned-gateway-start-log-projection-v1",
+    "logLimitBytes": 8388608,
+    "lineLimit": 16384,
+    "lineBytesLimit": 4096,
+    "framesLimit": 8,
+    "directoryEntriesLimit": 64,
+    "onlyRole": "msggateway",
+    "onlyCachedWaitExitCode": 2,
+    "rawTextExported": false,
+    "acceptanceEvidence": false
   }
 }
