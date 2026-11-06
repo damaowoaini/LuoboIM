@@ -1455,7 +1455,7 @@ class FullGraphControls(unittest.TestCase):
   with mock.patch.dict(run.CRON_FIXTURE_DEPENDENCY_CONTROL,packagesLimit=8),self.assertRaises(ValueError):run.project_cron_fixture_dependencies(raw(rows))
 
  def test_cron_fixture_scope_reuse_requires_actual_dependencies_and_fresh_contract(self):
-  collector=load('collect');control=run.CURRENT_CRON_FIXTURE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());self.assertEqual(run.check_current_cron_fixture_plan(locked),control);run.check_locked(locked)
+  collector=load('collect');control=run.CURRENT_CRON_FIXTURE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked.update(currentCronFixtureControl=copy.deepcopy(control),cronFixtureTestsToRun=control['targets']['internal/runtimeacceptance'],cronFixtureScopeReuse=copy.deepcopy(run.CRON_FIXTURE_SCOPE_REUSE),cronFixtureDependencyControl=copy.deepcopy(run.CRON_FIXTURE_DEPENDENCY_CONTROL));self.assertEqual(run.check_current_cron_fixture_plan(locked),control);run.check_locked(locked)
   for fields in ({'cronFixtureTestsToRun':[]},{'currentCacheTestDeltaControl':run.CURRENT_CACHE_TEST_DELTA_CONTROL},{'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'cronFixtureDependencyControl':{}},{'cronFixtureScopeReuse':{}}):
    with self.assertRaises(ValueError):run.check_current_cron_fixture_plan(dict(locked,**fields))
   class Recipe:
@@ -1510,5 +1510,83 @@ class FullGraphControls(unittest.TestCase):
       with self.assertRaises(ValueError):collector.checked_current_cron_fixture_evidence(out)
       (out/alias).unlink()
      run.write_current_cron_fixture_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':3,'subPASS':6,'includesOriginalGraph':True});self.assertFalse(summary['sameWholeSource'])
+
+
+ def test_same_current_go_named_scope_reuse_keeps_original_counts_without_dispatch(self):
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());self.assertTrue(run.current_go_named_scope_reuse_selected(locked));run.check_locked(locked)
+  for key in ('currentCronFixtureControl','currentCacheTestDeltaControl','currentGroupRecoveryControl','currentProducerControl','currentManagedShapeControl','currentReleaseControl','currentImageKafkaControl','currentKafkaConfirmControl'):
+   self.assertFalse(run.current_go_named_scope_reuse_selected(dict(locked,**{key:{'legacy':'explicit'}})))
+  self.assertEqual(locked['cronFixtureTestsToRun'],[]);self.assertEqual(locked['kafkaACLTestsToRun'],[])
+  value=copy.deepcopy(run.CURRENT_GO_NAMED_SCOPES_REUSE)
+  for fields in ({'actualCurrentContractCommands':1},{'actualCurrentDependencyGoListInvocations':1},{'wholePackagePASS':True},{'source':run.CRON_FIXTURE_SCOPE_REUSE['originalSource']}):
+   with self.assertRaises(ValueError):run.check_current_go_named_scope_reuse(dict(value,**fields))
+  class Recipe:
+   def rows(self,bodies):return [{'path':name,'sha256':run.sha(raw)} for name,raw in sorted(bodies.items())]
+   def digest(self,rows):return run.sha(json.dumps(rows,sort_keys=True).encode())
+  recipe=Recipe();bodies={'server/fixture.go':b'package fixture\n'};source={'members':1,'digest':recipe.digest(recipe.rows(bodies))};value['source']=source;value['binding']['source']=source;value['binding']['freshContractReceipt']['source']=source;previous=copy.deepcopy(value['binding']['previousCompatibility']);previous['currentSource']=source;value['binding']['previousCompatibility']=previous;go=value['binding']['GoToolBodyAndMode']
+  with mock.patch.object(run,'FINAL_SOURCE',source),mock.patch.object(run,'CURRENT_GO_NAMED_SCOPES_REUSE',value),mock.patch.object(run,'CRON_FIXTURE_SCOPE_REUSE',previous),mock.patch.object(collector.run,'FINAL_SOURCE',source),mock.patch.object(collector.run,'CURRENT_GO_NAMED_SCOPES_REUSE',value),mock.patch.object(collector.run,'CRON_FIXTURE_SCOPE_REUSE',previous),mock.patch.object(collector.run,'verify',return_value=(None,bodies,recipe,None,None,None)),tempfile.TemporaryDirectory() as directory:
+   out=Path(directory).resolve();self.assertEqual(run.load_current_go_named_scope_reuse(out,bodies,recipe,go),value);self.assertEqual(len(list(out.iterdir())),1)
+   with self.assertRaises(ValueError):run.check_current_go_named_scope_reuse(value,{'server/fixture.go':b'changed'},recipe,go)
+   with self.assertRaises(ValueError):run.check_current_go_named_scope_reuse(value,bodies,recipe,dict(go,sha256='f'*64))
+   run.write(out/'source-post.json',{'accepted':True,'source':source});run.write(out/'tools-before.json',{'go':go});run.write(out/'tools-after.json',{'go':go});self.assertEqual(collector.checked_current_go_named_scope_reuse_evidence(out),value)
+   for name in ('current-cron-fixture-contract-names.json','cron-fixture-reused-scope-deps.json','kafka-acl-passed-reuse.json'):
+    run.write(out/name,{})
+    with self.assertRaises(ValueError):collector.checked_current_go_named_scope_reuse_evidence(out)
+    (out/name).unlink()
+   run.write_current_go_named_scope_reuse_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':2,'subPASS':3,'includesOriginalGraph':True});self.assertEqual(summary['actualDependencyGoListInvocations'],0)
+
+ def test_rpc_group_registration_done_binds_original_owner_log_without_inventing_exit(self):
+  collector=load('collect');terminal={'version':'owned-fullgraph-token-v2-result-v1','accepted':False,'scenario':run.SCENARIOS[1],'sourceSHA256':run.FINAL_SOURCE['digest'],'constructorRole':'rpc-group','constructorStage':'observe-registration','constructorCallState':'returned','constructorErrorClass':'owned-evidence','constructorPredicate':'done'};main='server/cmd/openim-rpc/openim-rpc-group/main.go';bodies={main:b'line\n'*40}
+  self.assertTrue(collector.rpc_group_registration_done(terminal));self.assertFalse(collector.rpc_group_start_exit2(terminal))
+  for fields in ({'constructorRole':'crontask'},{'constructorPredicate':'registration-absent'},{'constructorStage':'start'},{'accepted':True},{'sourceSHA256':'f'*64}):self.assertFalse(collector.rpc_group_registration_done(dict(terminal,**fields)))
+  with tempfile.TemporaryDirectory() as directory:
+   work=Path(directory).resolve();work.chmod(0o700)
+   for folder in (work/'services',work/'services/required',work/'services/required/rpc-group',work/'runtime-owners'):folder.mkdir(mode=0o700)
+   nonce='a'*64;owner={'role':'rpc-group','pid':123,'uid':os.getuid(),'startToken':'123','bootID':'synthetic-original-boot','executable':str(work.parent/'bin/rpc-group'),'binarySHA256':'b'*64,'sourceSHA256':run.FINAL_SOURCE['digest'],'buildReceiptSHA256':'c'*64,'bootstrapSHA256':'d'*64,'ownerNonce':nonce};owner_path=work/'runtime-owners/rpc-group-runtime-actual-owner.json';owner_path.write_text(json.dumps(owner));owner_path.chmod(0o600)
+   path=work/'services/required/rpc-group'/('service-'+nonce+'.log');path.write_bytes(b'panic: owned group receiver initialization failed: PRIVATE_TOKEN\n\ngoroutine 1 [running]:\nmain.main()\n\t/private/work/'+main.encode()+b':31 +0x1\n');path.chmod(0o600)
+   value=collector.project_rpc_group_start_log(work,terminal,bodies);self.assertEqual(value['status'],'projected');self.assertEqual(value['errorPrefixClass'],'group-receiver-initialization');self.assertTrue(value['originalWaitReturned']);self.assertTrue(value['stdoutSyncAndCloseCallsReturned']);self.assertEqual(value['originalWaitResult'],'not-exported');self.assertEqual(value['stdoutFinalizationResult'],'not-exported');self.assertFalse(value['exitCodeInferredFromLog']);self.assertNotIn('PRIVATE',json.dumps(value));self.assertNotIn('/private',json.dumps(value));self.assertNotIn(nonce,json.dumps(value))
+   for fields in ({'ownerNonce':'e'*64},{'sourceSHA256':'f'*64},{'uid':os.getuid()+1},{'role':'push'}):
+    owner_path.write_text(json.dumps(dict(owner,**fields)));self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unsafe')
+   owner_path.write_text(json.dumps(owner));owner_path.chmod(0o644);self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unsafe');owner_path.chmod(0o600)
+   saved=work/'saved-owner';owner_path.rename(saved);owner_path.symlink_to(saved);self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unsafe');owner_path.unlink();saved.rename(owner_path)
+   owner_path.unlink();self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unavailable')
+
+ def test_unaccepted_compile_cache_snapshot_matches_original_receipt_without_runtime_promotion(self):
+  collector=load('collect');body=bytearray(128);body[:6]=b'\x7fELF\x02\x01';body[16:20]=b'\x02\x00\x3e\x00';body=bytes(body)
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory).resolve();root.chmod(0o700);source=root/'rpc-group';source.write_bytes(body);source.chmod(0o700);snapshot=root/'snapshot';snapshot.mkdir(mode=0o700);expected={'bytes':len(body),'sha256':run.sha(body)}
+   value=collector.snapshot_compile_cache_elf(source,snapshot/'rpc-group',expected,1<<20);self.assertEqual((snapshot/'rpc-group').read_bytes(),body);self.assertEqual(value['snapshotMode'],0o500);self.assertEqual(source.stat().st_mode&0o777,0o700)
+   for name,wanted,remaining in [('bad-hash',dict(expected,sha256='f'*64),1<<20),('too-small',expected,1),('bad-bytes',dict(expected,bytes=True),1<<20)]:
+    with self.assertRaises(ValueError):collector.snapshot_compile_cache_elf(source,snapshot/name,wanted,remaining)
+   linked=root/'linked';os.link(source,linked)
+   with self.assertRaises(ValueError):collector.snapshot_compile_cache_elf(source,snapshot/'hardlink-refused',expected,1<<20)
+   linked.unlink()
+   fifo=root/'fifo';os.mkfifo(fifo,0o700)
+   with self.assertRaises(ValueError):collector.snapshot_compile_cache_elf(fifo,snapshot/'fifo-refused',expected,1<<20)
+   self.assertFalse((snapshot/'fifo-refused').exists())
+   with mock.patch.object(collector.os,'statvfs',return_value=type('Space',(),{'f_bavail':0,'f_frsize':4096})()),self.assertRaises(ValueError):collector.snapshot_compile_cache_elf(source,snapshot/'no-space',expected,1<<20)
+  # Separate evidence kind preserves original canonical-cleanup rejection.
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory).resolve();allocation=root/'allocation';allocation.mkdir();compact=root/'compact';compact.mkdir();c=json.loads(run.INPUTS.read_bytes());guard={'guard_revision':2,'environment_values_recorded':False,'allocated_root':str(allocation),'minimum_free_required_bytes':1<<30,'minimum_observed_free_bytes':2<<30,'max_allocated_allowed_bytes':16<<30,'maximum_observed_task_allocated_bytes':1,'status':'failed','exit_code':1};records={'source-post.json':{'accepted':True,'source':c['source']},'tools-before.json':{'go':{'sha256':'a'*64}},'tools-after.json':{'go':{'sha256':'a'*64}},'backend-fullgraph-controller.resource.json':guard};phases=[]
+   for index,role in enumerate((*run.ROLES,'acceptance-operator','msgtransfer-legacy'),1):
+    phases.append({'phase':'compile-'+role,'exitCode':0,'resource':dict(guard,allocated_root=str(allocation/'work'),status='passed',exit_code=0)})
+    if role in run.ROLES:
+     entry=next(row for row in c['entrypointContract']['entrypoints'] if row['role']==role);records['compiled-'+role+'.json']={'source':c['source'],'role':role,'package':entry['package'],'executed':False,'sha256':'b'*64,'bytes':128}
+   phases.append({'phase':'runtime-'+run.SCENARIOS[1],'exitCode':1,'resource':dict(guard,allocated_root=str(allocation/'work'))})
+   for index,phase in enumerate(phases,1):records['phase-%04d.json'%index]=phase
+   rows=[]
+   for index,scenario in enumerate(run.SCENARIOS):
+    attempted=index<2;rows.append({'scenario':scenario,'resourceStarted':attempted,'runtimeAttempted':attempted,'runtimeCleanupAccepted':index==0,**({'resourceCleanup':{'accepted':True,'unconfirmedIDs':[]}} if attempted else {}),**({'actualAbsentRoles':2} if index==0 else {})})
+    if attempted:records['terminal-'+scenario+'.json']={'version':'owned-fullgraph-token-v2-result-v1','scenario':scenario,'accepted':index==0,'rawErrorText':False,'sourceSHA256':c['source']['digest'],'phase':'actual-twelve-other-source-constructors','actualStartedRoles':14}
+   records['collection.json']={'started':True,'controllerPassed':False,'originalRetainedRuntimeJoinRequired':True,'containerAbsenceIsNotRuntimeDrain':True,'scenarios':rows}
+   def persist():
+    manifest=[]
+    for name,value in records.items():
+     raw=(json.dumps(value)+'\n').encode();(compact/name).write_bytes(raw);manifest.append({'path':name,'bytes':len(raw),'sha256':run.sha(raw)})
+    (compact/'custody.json').write_text(json.dumps({'files':manifest,'bodyBytes':sum(row['bytes'] for row in manifest),'binaries':0,'credentials':0,'privateLogs':0}))
+   persist();proof=collector.checked_compile_cache_evidence(compact,c,allocation);self.assertEqual(proof['cleanup'][1]['runtimeBoundary'],'runtime-cleanup-unconfirmed')
+   with self.assertRaises(ValueError):collector.checked_build_only_evidence(compact,c,allocation)
+   records['collection.json']['scenarios'][1]['resourceCleanup']['accepted']=False;persist()
+   with self.assertRaises(ValueError):collector.checked_compile_cache_evidence(compact,c,allocation)
 
 if __name__=='__main__':unittest.main()

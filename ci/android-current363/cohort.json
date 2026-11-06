@@ -178,6 +178,11 @@
       "sha256": "d4ceedeed13b66e7b29048003aa850ba3ecba6a7cb0538e50972c7d209912efb"
     },
     {
+      "bytes": 7257,
+      "path": "ci/android-current363/apk_audit.py",
+      "sha256": "bdce22cf72bc2d0ec44ff0f85936eb73d943b3dc361ad2b05bd4da1739aed81c"
+    },
+    {
       "bytes": 8534,
       "path": "ci/android-current363/classpaths_current.py",
       "sha256": "4e840c0f158f1a211997db6f6c8b7b541a9e1553ae31fed88ab5208bb14d120a"
@@ -258,14 +263,14 @@
       "sha256": "4846a1d6fd256dc2a13f6f54a692801c771df1379f4db066f1437a921bd1c0b0"
     },
     {
-      "bytes": 32611,
+      "bytes": 32613,
       "path": "ci/android-current363/run.py",
-      "sha256": "54f407a11b54864a04802ed58f6b87db0f858acb5baba57321874cc45f7d9a01"
+      "sha256": "e109fbde389ad0d095ce32ed0649b020dd3e3d6aa46271127b72b2be8a8c32d8"
     },
     {
-      "bytes": 15984,
+      "bytes": 19832,
       "path": "ci/android-current363/test_identity.py",
-      "sha256": "2fb59f13e9160b87d5eb1dbfb419f7aedf949da2ecd645213585b5fc7f44e396"
+      "sha256": "a74871f8ed9239bd62493628edfc5fddc8ce5089ac847c9de56528b45bdd38a7"
     },
     {
       "bytes": 3621,

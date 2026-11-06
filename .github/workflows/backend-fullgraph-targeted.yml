@@ -166,3 +166,40 @@ jobs:
           if-no-files-found: error
           compression-level: 1
           retention-days: 7
+      - id: compile_cache_seal
+        name: Snapshot compiled14 only as separate UNACCEPTED cache with PID cleanup unconfirmed
+        if: ${{ failure() && !cancelled() && steps.controller.outcome == 'failure' && steps.cleanup.outcome != 'skipped' && steps.build_only_seal.outcome == 'failure' }}
+        run: |
+          umask 077
+          python3 -B ci/group-effects/resource_guard.py \
+            --cwd "$GITHUB_WORKSPACE" \
+            --log "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/compile-cache-private.log" \
+            --record "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/compile-cache.resource.json" \
+            --min-free-mib 1024 --timeout 60 --poll-interval .2 \
+            --allocated-root "$RUNNER_TEMP/backend-fullgraph-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --max-allocated-mib 16384 \
+            -- python3 -B ci/backend-fullgraph/collect.py --prepare-compile-cache-artifact
+      - name: Preserve only read-only compiled14 snapshots and independent UNACCEPTED cache manifest
+        if: ${{ failure() && !cancelled() && steps.compile_cache_seal.outcome == 'success' }}
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: backend-fullgraph-compile14-unaccepted-cache-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/api
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/crontask
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/msggateway
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/msgtransfer-managed
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/push
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-auth
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-conversation
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-encryption
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-friend
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-group
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-msg
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-rtc
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-third
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/rpc-user
+            ${{ runner.temp }}/backend-fullgraph-${{ github.run_id }}-${{ github.run_attempt }}/compile-cache-snapshot/compile-cache-manifest.json
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 7

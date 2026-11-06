@@ -350,30 +350,67 @@ def project_rpc_group_log_bytes(raw,bodies):
 
 
 
+def rpc_group_registration_done(terminal):
+ return isinstance(terminal,dict) and terminal.get('version')=='owned-fullgraph-token-v2-result-v1' and terminal.get('accepted') is False and terminal.get('scenario') in run.SCENARIOS and terminal.get('sourceSHA256')==run.FINAL_SOURCE['digest'] and terminal.get('constructorRole')=='rpc-group' and terminal.get('constructorStage')=='observe-registration' and terminal.get('constructorCallState')=='returned' and terminal.get('constructorErrorClass')=='owned-evidence' and terminal.get('constructorPredicate')=='done'
+
+def rpc_group_output_failure(terminal):return rpc_group_start_exit2(terminal) or rpc_group_registration_done(terminal)
+
+def rpc_group_original_owner_nonce(work):
+ directory=work/'runtime-owners';path=directory/'rpc-group-runtime-actual-owner.json'
+ if directory.resolve()!=directory or path.resolve()!=path:raise ValueError('original owner record must be canonical')
+ folder=directory.lstat();before=path.lstat()
+ if not stat.S_ISDIR(folder.st_mode) or folder.st_uid!=os.getuid() or stat.S_IMODE(folder.st_mode)!=0o700 or not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or stat.S_IMODE(before.st_mode)!=0o600:raise ValueError('original private owner record required')
+ def unique(pairs):
+  value={}
+  for key,item in pairs:
+   if key in value:raise ValueError('duplicate owner record field')
+   value[key]=item
+  return value
+ raw=run.regular(path,run.RPC_GROUP_START_LOG_POLICY['ownerRecordLimitBytes']);owner=json.loads(raw,object_pairs_hook=unique);after=path.lstat();again=directory.lstat();identity=lambda v:(v.st_dev,v.st_ino,v.st_mode,v.st_uid,v.st_nlink,v.st_size,v.st_mtime_ns,v.st_ctime_ns)
+ keys={'role','pid','uid','startToken','bootID','executable','binarySHA256','sourceSHA256','buildReceiptSHA256','bootstrapSHA256','ownerNonce'}
+ if identity(before)!=identity(after) or (folder.st_dev,folder.st_ino,folder.st_mode,folder.st_uid)!=(again.st_dev,again.st_ino,again.st_mode,again.st_uid) or not isinstance(owner,dict) or set(owner)!=keys or owner['role']!='rpc-group' or owner['sourceSHA256']!=run.FINAL_SOURCE['digest'] or type(owner['pid']) is not int or owner['pid']<=1 or type(owner['uid']) is not int or owner['uid']!=os.getuid() or owner['executable']!=str(work.parent/'bin/rpc-group'):raise ValueError('original role/source/owner record differs')
+ if any(not isinstance(owner[key],str) or not __import__('re').fullmatch('[0-9a-f]{64}',owner[key]) for key in ('binarySHA256','buildReceiptSHA256','bootstrapSHA256','ownerNonce')) or any(not isinstance(owner[key],str) or not owner[key] for key in ('startToken','bootID')):raise ValueError('finite original owner identity required')
+ return owner['ownerNonce']
+
+def rpc_group_output_boundary(terminal):
+ done=rpc_group_registration_done(terminal)
+ return {'failureBoundary':'observe-registration-done' if done else 'startup-cached-wait-exit2','originalWaitReturned':True,'originalWaitResult':'not-exported' if done else 'exit-code-2','stdoutSyncAndCloseCallsReturned':True,'stdoutFinalizationResult':'not-exported','stdoutOverflowResult':'not-exported','originalOwnerRecordStatus':'matched' if done else 'not-required-for-startup','exitCodeInferredFromLog':False}
+
 def project_service_start_log(work,terminal,bodies,role):
  if role=='msggateway':predicate,empty,project,policy=gateway_start_exit2,gateway_projection_empty,project_gateway_log_bytes,run.GATEWAY_START_LOG_POLICY
- elif role=='rpc-group':predicate,empty,project,policy=rpc_group_start_exit2,rpc_group_projection_empty,project_rpc_group_log_bytes,run.RPC_GROUP_START_LOG_POLICY
+ elif role=='rpc-group':predicate,empty,project,policy=rpc_group_output_failure,rpc_group_projection_empty,project_rpc_group_log_bytes,run.RPC_GROUP_START_LOG_POLICY
  else:return None
  if not predicate(terminal):return None
  result=empty('unavailable');result.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
+ if role=='rpc-group':
+  result.update(rpc_group_output_boundary(terminal))
+  if rpc_group_registration_done(terminal):result['originalOwnerRecordStatus']='not-observed'
  try:
   work=Path(work);directory=work/'services/required'/role
   if work.resolve()!=work or directory.resolve()!=directory:return dict(result,status='unsafe')
   for folder in (work,work/'services',work/'services/required',directory):
    info=folder.lstat()
    if not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:return dict(result,status='unsafe')
+  owner_nonce=None
+  if role=='rpc-group' and rpc_group_registration_done(terminal):
+   try:owner_nonce=rpc_group_original_owner_nonce(work)
+   except OSError:return dict(result,status='unavailable',originalOwnerRecordStatus='unavailable')
+   except (ValueError,RuntimeError):return dict(result,status='unsafe',originalOwnerRecordStatus='invalid')
   matches=[]
   with os.scandir(directory) as entries:
    for count,entry in enumerate(entries):
     if count>=policy['directoryEntriesLimit']:return dict(result,status='unsafe')
     if __import__('re').fullmatch('service-[0-9a-f]{64}\\.log',entry.name):matches.append(Path(entry.path))
   if len(matches)!=1:return dict(result,status='absent' if not matches else 'ambiguous')
-  path=matches[0];before=path.lstat()
+  path=matches[0]
+  if owner_nonce is not None and path.name!='service-'+owner_nonce+'.log':return dict(result,status='unsafe',originalOwnerRecordStatus='log-nonce-mismatch')
+  before=path.lstat()
   if not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or stat.S_IMODE(before.st_mode)!=0o600:return dict(result,status='unsafe')
   raw=run.regular(path,policy['logLimitBytes']);after=path.lstat()
   identity=lambda v:(v.st_dev,v.st_ino,v.st_mode,v.st_uid,v.st_nlink,v.st_size,v.st_mtime_ns,v.st_ctime_ns)
   if identity(before)!=identity(after):return dict(result,status='unsafe')
   projected=project(raw,bodies);projected.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
+  if role=='rpc-group':projected.update(rpc_group_output_boundary(terminal))
   return projected
  except RuntimeError:return dict(result,status='unsafe')  # A cyclic intermediate symlink cannot be canonical.
  except (OSError,ValueError,UnicodeError):return result
@@ -398,11 +435,11 @@ def emit_gateway_start_log_diagnostic(out,work,terminal):
 def emit_rpc_group_start_log_diagnostic(out,work,terminal):
  # Best effort after the validated original cached Wait observation. No new
  # Wait, process probe, signal, log replay or outcome promotion is possible.
- if not rpc_group_start_exit2(terminal):return False
+ if not rpc_group_output_failure(terminal):return False
  try:
   _,bodies,_,_,_,_=run.verify()
   value=project_rpc_group_start_log(work,terminal,bodies)
-  if value is not None:run.write(out/('rpc-group-start-log-'+terminal['scenario']+'.json'),value)
+  if value is not None:run.write(out/(('rpc-group-registration-done-log-' if rpc_group_registration_done(terminal) else 'rpc-group-start-log-')+terminal['scenario']+'.json'),value)
   return value is not None
  except Exception:return False
 
@@ -572,12 +609,19 @@ def checked_current_cron_fixture_evidence(out):
  if any((out/name).exists() for name in ('completed-package-test-delta-reuse.json','current-cache-test-delta-controls-names.json','current-group-recovery-controls-names.json','current-managed-producer-control-names.json','same-source-completed-kafka-package-reuse.json','current-managed-shape-controls-names.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('new fixture-only branch must not alias prior controls or redispatch unaffected scopes')
  return value
 
+def checked_current_go_named_scope_reuse_evidence(out):
+ value=json.loads(run.regular(out/'same-source-current-go-named-scopes-reuse.json',65536));post=json.loads(run.regular(out/'source-post.json',4096));before=json.loads(run.regular(out/'tools-before.json',65536));after=json.loads(run.regular(out/'tools-after.json',65536))
+ if post!={'accepted':True,'source':run.FINAL_SOURCE} or before!=after:raise ValueError('same current complete Go source and tool post required')
+ _,bodies,recipe,*_=run.verify();run.check_current_go_named_scope_reuse(value,bodies,recipe,before.get('go',{}))
+ if any((out/name).exists() for name in ('cron-fixture-named-scope-reuse.json','current-cron-fixture-contract-names.json','cron-fixture-reused-scope-deps.json','completed-package-test-delta-reuse.json','current-cache-test-delta-controls-names.json','current-group-recovery-controls-names.json','current-managed-producer-control-names.json','same-source-completed-kafka-package-reuse.json','current-managed-shape-controls-names.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('same-source facts cannot masquerade as fresh current invocations')
+ return value
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
   run.write(out/'collection.json',{'started':False,'accepted':False,'reason':'no-original-allocation','privateDataUploaded':False});pack(out);return 0
  if allocation.resolve()!=allocation or allocation.stat().st_uid!=os.getuid() or stat.S_IMODE(allocation.stat().st_mode)!=0o700 or json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original job allocation required')
- c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None;producer_required=c.get('currentProducerControl') is not None;group_recovery_required=c.get('currentGroupRecoveryControl') is not None;cache_test_delta_required=c.get('currentCacheTestDeltaControl') is not None;cron_fixture_required=c.get('currentCronFixtureControl') is not None
+ c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None;producer_required=c.get('currentProducerControl') is not None;group_recovery_required=c.get('currentGroupRecoveryControl') is not None;cache_test_delta_required=c.get('currentCacheTestDeltaControl') is not None;cron_fixture_required=c.get('currentCronFixtureControl') is not None;named_scope_reuse_required=run.current_go_named_scope_reuse_selected(c)
  root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False;terminals={}
  for scenario in run.SCENARIOS:
   folder=root/('plane-'+scenario);work=root/('scenario-'+scenario);entry={'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False}
@@ -599,7 +643,7 @@ def collect():
     terminal=public_terminal(run.regular(work/'result.json',1<<20),scenario);terminals[scenario]=terminal
     run.write(out/('terminal-'+scenario+'.json'),terminal)
     if gateway_start_exit2(terminal):emit_gateway_start_log_diagnostic(out,work,terminal)
-    if rpc_group_start_exit2(terminal):emit_rpc_group_start_log_diagnostic(out,work,terminal)
+    if rpc_group_output_failure(terminal):emit_rpc_group_start_log_diagnostic(out,work,terminal)
    except Exception as error:entry['terminalExceptionType']=type(error).__name__;failed=True
   if (work/'operator-intent.json').exists():
    entry['runtimeAttempted']=True
@@ -627,6 +671,10 @@ def collect():
    run.write(out/'source-post-recovery-inspection.json',post)
   else:post=json.loads(run.regular(postpath))
   failed=failed or post.get('accepted') is not True
+ current_named_scope_reuse_accepted=False
+ if (out/'same-source-current-go-named-scopes-reuse.json').exists():
+  try:checked_current_go_named_scope_reuse_evidence(out);current_named_scope_reuse_accepted=True
+  except Exception:failed=True
  cron_fixture_reuse_accepted=False
  if (out/'cron-fixture-named-scope-reuse.json').exists():
   try:checked_cron_fixture_scope_reuse_evidence(out);cron_fixture_reuse_accepted=True
@@ -688,7 +736,8 @@ def collect():
  try:
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
- if cron_fixture_required:kafka_current_accepted=current_cron_fixture_accepted and cron_fixture_reuse_accepted and not any((current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
+ if named_scope_reuse_required:kafka_current_accepted=current_named_scope_reuse_accepted and not any((current_cron_fixture_accepted,cron_fixture_reuse_accepted,current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
+ elif cron_fixture_required:kafka_current_accepted=current_cron_fixture_accepted and cron_fixture_reuse_accepted and not any((current_cache_test_delta_accepted,cache_test_delta_reuse_accepted,current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
  elif cache_test_delta_required:kafka_current_accepted=current_cache_test_delta_accepted and cache_test_delta_reuse_accepted and not any((current_group_recovery_accepted,current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
  elif group_recovery_required:kafka_current_accepted=current_group_recovery_accepted and not any((current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
  elif producer_required:kafka_current_accepted=current_producer_accepted and completed_kafka_reuse_accepted and not any((current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
@@ -699,7 +748,7 @@ def collect():
  elif fresh_required:kafka_current_accepted=current_image_kafka_accepted and not current_kafka_confirm_accepted and not kafka_reuse_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  else:kafka_current_accepted=kafka_reuse_accepted and not current_image_kafka_accepted and not current_kafka_confirm_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  accepted=launcher_accepted and kafka_current_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentCronFixtureContractAccepted':current_cron_fixture_accepted,'freshCronFixtureContractRequired':cron_fixture_required,'cronFixtureNamedScopeCompatibilityAccepted':cron_fixture_reuse_accepted,'actualDependencyGoListInvocations':(1 if cron_fixture_reuse_accepted else None) if cron_fixture_required else 0,'actualCronFixtureTopDispatched':(1 if current_cron_fixture_accepted else None) if cron_fixture_required else 0,'currentCacheTestDeltaControlsAccepted':current_cache_test_delta_accepted,'freshCacheTestDeltaControlsRequired':cache_test_delta_required,'cacheTestDeltaPackageCompatibilityAccepted':cache_test_delta_reuse_accepted,'sameWholeSource':False,'originalGoCommandPassed':False,'cacheCommandInvocations':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'cachePackageExecutions':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'currentGroupRecoveryControlsAccepted':current_group_recovery_accepted,'freshGroupRecoveryControlsRequired':group_recovery_required,'groupRecoveryCommandInvocations':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'groupRecoveryPackageExecutions':(3 if current_group_recovery_accepted else None) if group_recovery_required else 0,'actualCacheTopsDispatched':(2 if current_cache_test_delta_accepted else None) if cache_test_delta_required else ((2 if current_group_recovery_accepted else None) if group_recovery_required else 0),'actualManagedShapeTopsDispatched':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'currentProducerControlAccepted':current_producer_accepted,'freshProducerControlRequired':producer_required,'producerCommandInvocations':(1 if current_producer_accepted else None) if producer_required else 0,'producerPackageExecutions':(1 if current_producer_accepted else None) if producer_required else 0,'sameSourceCompletedKafkaPackageReuseAccepted':completed_kafka_reuse_accepted,'originalTwoPackageScopeAccepted':False,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required and not producer_required and not group_recovery_required and not cache_test_delta_required and not cron_fixture_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_group_recovery_accepted or current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'sameSourceCurrentGoNamedScopesReuseAccepted':current_named_scope_reuse_accepted,'sameSourceCurrentGoNamedScopesReuseRequired':named_scope_reuse_required,'currentCronFixtureContractAccepted':current_cron_fixture_accepted,'freshCronFixtureContractRequired':cron_fixture_required,'cronFixtureNamedScopeCompatibilityAccepted':cron_fixture_reuse_accepted,'actualDependencyGoListInvocations':(1 if cron_fixture_reuse_accepted else None) if cron_fixture_required else 0,'actualCronFixtureTopDispatched':(1 if current_cron_fixture_accepted else None) if cron_fixture_required else 0,'currentCacheTestDeltaControlsAccepted':current_cache_test_delta_accepted,'freshCacheTestDeltaControlsRequired':cache_test_delta_required,'cacheTestDeltaPackageCompatibilityAccepted':cache_test_delta_reuse_accepted,'sameWholeSource':False,'originalGoCommandPassed':False,'cacheCommandInvocations':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'cachePackageExecutions':(1 if current_cache_test_delta_accepted else None) if cache_test_delta_required else 0,'currentGroupRecoveryControlsAccepted':current_group_recovery_accepted,'freshGroupRecoveryControlsRequired':group_recovery_required,'groupRecoveryCommandInvocations':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'groupRecoveryPackageExecutions':(3 if current_group_recovery_accepted else None) if group_recovery_required else 0,'actualCacheTopsDispatched':(2 if current_cache_test_delta_accepted else None) if cache_test_delta_required else ((2 if current_group_recovery_accepted else None) if group_recovery_required else 0),'actualManagedShapeTopsDispatched':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'currentProducerControlAccepted':current_producer_accepted,'freshProducerControlRequired':producer_required,'producerCommandInvocations':(1 if current_producer_accepted else None) if producer_required else 0,'producerPackageExecutions':(1 if current_producer_accepted else None) if producer_required else 0,'sameSourceCompletedKafkaPackageReuseAccepted':completed_kafka_reuse_accepted,'originalTwoPackageScopeAccepted':False,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required and not producer_required and not group_recovery_required and not cache_test_delta_required and not cron_fixture_required and not named_scope_reuse_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_group_recovery_accepted or current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if named_scope_reuse_required or cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':named_scope_reuse_required or cron_fixture_required or cache_test_delta_required or group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  emit_console_observation(rows,monitor,main,terminals,out)
  pack(out)
  return 0 if accepted else 1
@@ -900,7 +949,138 @@ def prepare_build_only_product_artifact():
  print(json.dumps({'kind':'fullgraph-build-only-unaccepted-artifact-prepared-v1','runtimeAccepted':False,'readyPermit':False,'manifestSHA256':digest,'binaryCount':14,'totalBinaryBytes':total,'uploadedOrDeployedByScript':False},separators=(',',':')))
  return 0
 
+def checked_compile_cache_evidence(compact,c,allocation):
+ # Separate from accepted producer. A normal runtime failure does not become
+ # a successful graph or canonical exclusion, even when its public ELF builds
+ # are perfectly reusable. Existing compact custody is never rewritten.
+ custody=json.loads(run.regular(compact/'custody.json',1<<20));names=[r['path'] for r in custody['files']]
+ if len(names)>256 or len(names)!=len(set(names)) or any(Path(n).name!=n for n in names) or {p.name for p in compact.iterdir()}!=set(names)|{'custody.json'}:raise ValueError('exact original compact custody required')
+ evidence={};total=0
+ for row in custody['files']:
+  raw=run.regular(compact/row['path'],1<<20);total+=len(raw)
+  if len(raw)!=row['bytes'] or run.sha(raw)!=row['sha256']:raise ValueError('compact evidence body drift')
+  evidence[row['path']]=raw
+ if total>8<<20 or total!=custody['bodyBytes'] or any(custody[k]!=0 for k in ('binaries','credentials','privateLogs')):raise ValueError('bounded public metadata required')
+ def read(name):return json.loads(evidence[name])
+ post=read('source-post.json');before=read('tools-before.json');after=read('tools-after.json');monitor=read('backend-fullgraph-controller.resource.json');collection=read('collection.json')
+ if post.get('accepted') is not True or post.get('source')!=c['source'] or before!=after:raise ValueError('source/mode/locks/config/controller/tools post exact required')
+ def guard(record,root,failed=False):
+  floor=record.get('minimum_observed_free_bytes');size=record.get('maximum_observed_task_allocated_bytes')
+  if record.get('guard_revision')!=2 or record.get('environment_values_recorded') is not False or record.get('allocated_root')!=str(root) or record.get('minimum_free_required_bytes')!=1<<30 or type(floor) is not int or floor<1<<30 or record.get('max_allocated_allowed_bytes')!=16<<30 or type(size) is not int or not 0<=size<=16<<30:raise ValueError('original healthy resource/owner boundary required')
+  if failed:
+   if record.get('status')!='failed' or type(record.get('exit_code')) is not int or not 1<=record['exit_code']<=125:raise ValueError('normal finite nonzero controller/runtime only')
+  elif record.get('status')!='passed' or record.get('exit_code')!=0:raise ValueError('actual build phase success required')
+ guard(monitor,allocation,True)
+ phases=[read(name) for name in names if __import__('re').fullmatch('phase-[0-9]{4}\\.json',name)]
+ failed=[row for row in phases if row.get('exitCode')!=0]
+ if len(failed)!=1 or failed[0].get('phase') not in {'runtime-'+s for s in run.SCENARIOS}:raise ValueError('one actual runtime failure after complete builds required')
+ for row in phases:
+  guard(row['resource'],allocation/'work',row in failed)
+  if type(row.get('exitCode')) is not int or row['exitCode']!=row['resource']['exit_code']:raise ValueError('original command and resource exits differ')
+ for role in run.ROLES:
+  compiled=read('compiled-'+role+'.json');actual=[p for p in phases if p.get('phase')=='compile-'+role]
+  entry=next(r for r in c['entrypointContract']['entrypoints'] if r['role']==role)
+  if len(actual)!=1 or actual[0]['exitCode']!=0 or compiled.get('source')!=c['source'] or compiled.get('role')!=role or compiled.get('package')!=entry['package'] or compiled.get('executed') is not False:raise ValueError('fourteen exact actual compilation receipts required')
+  guard(actual[0]['resource'],allocation/'work')
+ if collection.get('started') is not True or collection.get('controllerPassed') is not False or collection.get('originalRetainedRuntimeJoinRequired') is not True or collection.get('containerAbsenceIsNotRuntimeDrain') is not True:raise ValueError('original always collection required')
+ rows=collection['scenarios']
+ if [r['scenario'] for r in rows]!=list(run.SCENARIOS) or not any(r.get('runtimeAttempted') for r in rows):raise ValueError('actual scenario attempt required')
+ finite=[]
+ for row in rows:
+  started=row.get('resourceStarted');attempted=row.get('runtimeAttempted');runtime=row.get('runtimeCleanupAccepted')
+  if any(type(x) is not bool for x in (started,attempted,runtime)):raise ValueError('actual cleanup booleans required')
+  if started:
+   cleanup=row.get('resourceCleanup',{})
+   if cleanup.get('accepted') is not True or cleanup.get('unconfirmedIDs')!=[]:raise ValueError('original owned container cleanup unresolved')
+  elif attempted:raise ValueError('runtime without original resource owner')
+  boundary='not-started'
+  if attempted:
+   terminal=read('terminal-'+row['scenario']+'.json')
+   if 'terminalExceptionType' in row or terminal.get('version')!='owned-fullgraph-token-v2-result-v1' or terminal.get('scenario')!=row['scenario'] or type(terminal.get('accepted')) is not bool or terminal.get('rawErrorText') is not False or terminal.get('sourceSHA256') not in ('',c['source']['digest']):raise ValueError('actual finite runtime terminal required')
+   failed_here=failed[0]['phase']=='runtime-'+row['scenario']
+   if terminal['accepted']==failed_here:raise ValueError('actual runtime terminal and command outcome differ')
+   if runtime:
+    if type(row.get('actualAbsentRoles')) is not int or not 0<row['actualAbsentRoles']<=14:raise ValueError('original collector PID absence required')
+    boundary='canonical-runtime-cleanup'
+   else:
+    boundary='runtime-cleanup-unconfirmed'
+  finite.append({'scenario':row['scenario'],'resourceStarted':started,'runtimeAttempted':attempted,'resourceCleanupAccepted':bool(started and row.get('resourceCleanup',{}).get('accepted')),'runtimeCleanupAccepted':runtime,'runtimeBoundary':boundary,'canonicalRuntimeAccepted':False})
+ for auxiliary in ('acceptance-operator','msgtransfer-legacy'):
+  matching=[row for row in phases if row.get('phase')=='compile-'+auxiliary]
+  if len(matching)!=1 or matching[0].get('exitCode')!=0:raise ValueError('both original auxiliary builds must have completed')
+ return {'tools':before,'custodySHA256':run.sha(run.regular(compact/'custody.json',1<<20)),'collectionSHA256':run.sha(evidence['collection.json']),'sourcePostSHA256':run.sha(evidence['source-post.json']),'controllerStatus':monitor['status'],'controllerExitCode':monitor['exit_code'],'failedRuntimePhase':failed[0]['phase'],'cleanup':finite,'compiled':{role:read('compiled-'+role+'.json') for role in run.ROLES}}
+
+
+COMPILE_CACHE_POLICY=run.COMPILE_CACHE_POLICY
+
+def snapshot_compile_cache_elf(source,destination,expected,remaining):
+ source,destination=Path(source),Path(destination)
+ if source.resolve()!=source or destination.parent.resolve()!=destination.parent or destination.exists() or destination.is_symlink() or type(expected.get('bytes')) is not int or not 64<=expected['bytes']<=min(PRODUCT_FILE_LIMIT,remaining) or not __import__('re').fullmatch('[0-9a-f]{64}',expected.get('sha256','')):raise ValueError('exact bounded original ELF and exclusive snapshot path required')
+ parent=destination.parent.lstat()
+ if not stat.S_ISDIR(parent.st_mode) or parent.st_uid!=os.getuid() or stat.S_IMODE(parent.st_mode)!=0o700:raise ValueError('private snapshot directory required')
+ fd=os.open(source,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC);output=None
+ try:
+  before=os.fstat(fd)
+  if not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or before.st_size!=expected['bytes'] or before.st_mode&(stat.S_ISUID|stat.S_ISGID|stat.S_ISVTX|0o022) or not before.st_mode&0o111:raise ValueError('original owned executable mode/size required')
+  output=os.open(destination,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);digest=hashlib.sha256();size=0;header=b''
+  while True:
+   block=os.read(fd,1<<20)
+   if not block:break
+   if not header:header=block[:20]
+   size+=len(block)
+   if size>expected['bytes'] or size>remaining:raise ValueError('snapshot exceeds reviewed binary bound')
+   space=os.statvfs(destination.parent)
+   if space.f_bavail*space.f_frsize<1<<30:raise ValueError('snapshot disk floor exhausted')
+   digest.update(block);view=memoryview(block)
+   while view:
+    written=os.write(output,view)
+    if written<=0:raise ValueError('short snapshot write')
+    view=view[written:]
+  after=os.fstat(fd);current=source.lstat();identity=lambda v:(v.st_dev,v.st_ino,v.st_uid,v.st_gid,v.st_mode,v.st_nlink,v.st_size,v.st_mtime_ns,v.st_ctime_ns)
+  if identity(before)!=identity(after) or identity(before)!=identity(current) or size!=expected['bytes'] or digest.hexdigest()!=expected['sha256']:raise ValueError('original ELF changed or differs from original compile receipt')
+  if header[:6]!=b'\x7fELF\x02\x01' or header[16:18] not in (b'\x02\x00',b'\x03\x00') or header[18:20]!=b'\x3e\x00':raise ValueError('Linux amd64 ELF snapshot required')
+  os.fsync(output);os.fchmod(output,0o500);os.close(output);output=None
+  actual=product_elf_metadata(destination)
+  if actual['bytes']!=expected['bytes'] or actual['sha256']!=expected['sha256'] or actual['mode']!=0o500:raise ValueError('closed read-only snapshot differs')
+  return dict(actual,originalMode=stat.S_IMODE(before.st_mode),snapshotMode=0o500,originalCompileHashMatched=True)
+ finally:
+  if output is not None:os.close(output)
+  os.close(fd)
+
+def prepare_compile_cache_artifact():
+ c,bodies,_,_,_,_=run.verify();inputs_raw=run.regular(run.INPUTS,1<<20)
+ if c.get('compileCacheArtifactPolicy')!=COMPILE_CACHE_POLICY:raise ValueError('explicit independent unaccepted compile-cache policy required')
+ allocation=run.allocation_root();root=allocation/'work';directory=root/'bin';private=root/'private';snapshot=allocation/'compile-cache-snapshot'
+ for path in (allocation,root,directory,private):
+  info=path.lstat()
+  if path.resolve()!=path or not stat.S_ISDIR(info.st_mode) or info.st_uid!=os.getuid() or stat.S_IMODE(info.st_mode)!=0o700:raise ValueError('original private task allocation required')
+ if json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original task owner required')
+ proof=checked_compile_cache_evidence(run.REPO/'ci-results/backend-fullgraph-compact',c,allocation)
+ if run.tool_snapshot()!=proof['tools']:raise ValueError('source tools changed before cache snapshot')
+ builds=json.loads(run.regular(private/'builds.json',1<<20));original_names=set(run.ROLES)|{'acceptance-operator','msgtransfer-legacy'};expected_names=original_names|{name+'-receipt.json' for name in original_names}
+ if builds.get('version')!='source-bound-fullgraph-builds-v1' or builds.get('sourceSHA256')!=c['source']['digest'] or [row['role'] for row in builds['binaries']]!=list(run.ROLES) or {p.name for p in directory.iterdir()}!=expected_names:raise ValueError('closed original sixteen-build inventory required')
+ declared=sum(proof['compiled'][role]['bytes'] for role in run.ROLES)
+ if type(declared) is not int or declared>PRODUCT_TOTAL_LIMIT:raise ValueError('fourteen cache snapshots exceed2GiB')
+ snapshot.mkdir(mode=0o700,exist_ok=False);products=[];total=0;entries={row['role']:row for row in c['entrypointContract']['entrypoints']}
+ for row in builds['binaries']:
+  role=row['role'];path=directory/role;rp=directory/(role+'-receipt.json');compiled=proof['compiled'][role]
+  if row['path']!=str(path) or row['receiptPath']!=str(rp) or row['sourceSHA256']!=c['source']['digest']:raise ValueError('original compile paths and source required')
+  receipt_raw=run.regular(rp,65536);wanted={'schema':1,'sourceSHA256':c['source']['digest'],'binarySHA256':compiled['sha256'],'binaryBytes':compiled['bytes'],'toolchainSHA256':proof['tools']['go']['sha256']}
+  if run.sha(receipt_raw)!=row['receiptSHA256'] or json.loads(receipt_raw)!=wanted or row['sha256']!=compiled['sha256']:raise ValueError('public and private original compile receipts differ')
+  product=snapshot_compile_cache_elf(path,snapshot/role,{'bytes':compiled['bytes'],'sha256':compiled['sha256']},PRODUCT_TOTAL_LIMIT-total);total+=product['bytes'];products.append(dict(product,package=entries[role]['package'],buildReceiptSHA256=row['receiptSHA256'],mayHaveExecutedInOriginalTask=True))
+ staged_post=run.source_post(root,bodies,c,bodies['server/config/config.example.yaml']);after_c,after_bodies,_,_,_,_=run.verify()
+ if staged_post.get('accepted') is not True or after_c!=c or after_bodies!=bodies or run.regular(run.INPUTS,1<<20)!=inputs_raw or run.tool_snapshot()!=proof['tools'] or {p.name for p in directory.iterdir()}!=expected_names or {p.name for p in snapshot.iterdir()}!=set(run.ROLES):raise ValueError('source/controller/tools/inventory changed during snapshot')
+ for product in products:
+  actual=product_elf_metadata(snapshot/product['name'])
+  if actual['sha256']!=product['sha256'] or actual['bytes']!=product['bytes'] or actual['mode']!=0o500:raise ValueError('sealed snapshot changed before manifest')
+ job=run.job_identity();manifest={'schema':1,'kind':COMPILE_CACHE_POLICY['kind'],'runtimeAccepted':False,'pidAbsenceAccepted':False,'readyPermit':False,'product20ProviderAccepted':False,'receiverImplemented':False,'deploymentABIValidated':False,'source':c['source'],'head':job['head'],'runID':job['runID'],'attempt':job['attempt'],'controllerStatus':proof['controllerStatus'],'controllerExitCode':proof['controllerExitCode'],'failedRuntimePhase':proof['failedRuntimePhase'],'cleanup':proof['cleanup'],'pidCleanupMayBeUnconfirmed':True,'liveOriginalPathsUploaded':False,'snapshotOriginalELFs':True,'sourcePostSHA256':proof['sourcePostSHA256'],'compactCustodySHA256':proof['custodySHA256'],'independentCollectionSHA256':proof['collectionSHA256'],'controllerInputsSHA256':run.sha(inputs_raw),'controllerPins':c['controllerPins'],'toolSHA256':{name:value['sha256'] for name,value in proof['tools'].items()},'locks':{name:run.sha(bodies['server/'+name]) for name in ('go.mod','go.sum')},'binaries':products,'totalBinaryBytes':total,'perBinaryLimitBytes':PRODUCT_FILE_LIMIT,'totalBinaryLimitBytes':PRODUCT_TOTAL_LIMIT,'GOOS':'linux','GOARCH':'amd64','CGO_ENABLED':'1','configsLogsKeysAuxiliariesIncluded':False,'uploadedOrDeployedByScript':False}
+ digest=run.write(snapshot/'compile-cache-manifest.json',manifest)
+ if {p.name for p in snapshot.iterdir()}!=set(COMPILE_CACHE_POLICY['allowedBasenames']):raise ValueError('only fourteen snapshots and new cache manifest may be uploaded')
+ print(json.dumps({'kind':'unaccepted-compile-cache-snapshot-prepared-v1','runtimeAccepted':False,'readyPermit':False,'pidAbsenceAccepted':False,'binaryCount':14,'totalBinaryBytes':total,'manifestSHA256':digest,'liveOriginalPathsUploaded':False},separators=(',',':')))
+ return 0
+
 if __name__=='__main__':
+ if sys.argv[1:]==['--prepare-compile-cache-artifact']:raise SystemExit(prepare_compile_cache_artifact())
  if sys.argv[1:]==['--prepare-build-only-product-artifact']:raise SystemExit(prepare_build_only_product_artifact())
  if sys.argv[1:]==['--prepare-product-artifact']:raise SystemExit(prepare_product_artifact())
  if sys.argv[1:]:raise SystemExit('unsupported collector arguments')

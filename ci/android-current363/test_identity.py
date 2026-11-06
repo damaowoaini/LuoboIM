@@ -1,13 +1,16 @@
 """Current363 source admission only; never runs native tools or phases."""
+import ast
 import copy
 import hashlib
 import io
+import inspect
 import json
 import importlib.util
 from pathlib import Path
 import sys
 import struct
 import tempfile
+import textwrap
 import unittest
 import zipfile
 from unittest.mock import patch
@@ -248,6 +251,63 @@ class Current363SourceTests(unittest.TestCase):
             source.write_text('a changed original must also refuse')
             with self.assertRaisesRegex(ValueError, 'plugin source body differs'):
                 plugins.check_tree(root, expected)
+
+
+    def test_current_badging_labels_and_faithful_audit_plan_fail_closed(self):
+        adapter = controller.apk_audit
+        header = "package: name='com.luoboduihua.imapp' versionCode='2001'\napplication-label:'萝卜对话'\napplication-debuggable\n"
+        target = "targetSdkVersion:'36'\n"
+        for label in ('sdkVersion', 'minSdkVersion'):
+            text = header + label + ":'24'\n" + target
+            self.assertEqual(adapter.validate_badging_identity(text),
+                {'min_sdk_label': label, 'min_sdk': 24, 'target_sdk': 36})
+        minimum = "minSdkVersion:'24'\n"
+        invalid = {
+            'missing': header + target,
+            'duplicate': header + minimum + minimum + target,
+            'both-aliases': header + "sdkVersion:'24'\n" + minimum + target,
+            'conflict': header + minimum + "sdkVersion:'25'\n" + target,
+            'wrong-min': header + "minSdkVersion:'25'\n" + target,
+            'malformed': header + "minSdkVersion:'24' junk\n" + target,
+            'unknown-label': header + "minimumSdkVersion:'24'\n" + target,
+            'wrong-case': header + "MinSdkVersion:'24'\n" + target,
+            'padded': header + " minSdkVersion:'24'\n" + target,
+            'missing-target': header + minimum,
+            'duplicate-target': header + minimum + target + target,
+            'wrong-target': header + minimum + "targetSdkVersion:'35'\n",
+            'package': header.replace('com.luoboduihua.imapp', 'com.other.app') + minimum + target,
+            'not-debug': header.replace('application-debuggable\n', '') + minimum + target,
+        }
+        for case, text in invalid.items():
+            with self.subTest(case=case), self.assertRaises(ValueError):
+                adapter.validate_badging_identity(text)
+        for name in ('checked_zip', 'elf', 'put', 'sha'):
+            self.assertIs(getattr(adapter, name), getattr(controller.parent.audit, name))
+        self.assertIs(adapter.s, controller.parent.s)
+        self.assertIsNot(adapter.apk, controller.parent.audit.apk)
+        original = ast.parse(textwrap.dedent(inspect.getsource(controller.parent.audit.apk))).body[0]
+        current = ast.parse(textwrap.dedent(inspect.getsource(adapter.apk))).body[0]
+        matches = [index for index, node in enumerate(original.body) if isinstance(node, ast.If)
+            and any(isinstance(value, ast.Constant) and value.value == "sdkVersion:'24'" for value in ast.walk(node))]
+        self.assertEqual(len(matches), 1)
+        original.body[matches[0]] = ast.parse('validate_badging_identity(badging)').body[0]
+        def body_dump(nodes):
+            return ast.dump(ast.Module(body=nodes, type_ignores=[]), include_attributes=False)
+        self.assertEqual(body_dump(original.body), body_dump(current.body))
+        old_plan = ast.parse(textwrap.dedent(inspect.getsource(controller.parent.Job.build_apk))).body[0]
+        new_plan = ast.parse(textwrap.dedent(inspect.getsource(adapter.build_apk))).body[0]
+        aliases = ast.parse('netns = parent.netns\nenvironment = parent.environment').body
+        self.assertEqual(body_dump(new_plan.body[:2]), body_dump(aliases))
+        class CurrentAuditCall(ast.NodeTransformer):
+            def visit_Call(self, node):
+                self.generic_visit(node)
+                if (isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name)
+                        and node.func.value.id == 'audit' and node.func.attr == 'apk'):
+                    node.func = ast.Name(id='apk', ctx=ast.Load())
+                return node
+        normalized = CurrentAuditCall().visit(old_plan)
+        self.assertEqual(body_dump(normalized.body), body_dump(new_plan.body[2:]))
+        self.assertIn('apk_audit.build_apk(self,parent)', inspect.getsource(controller.Job.build_apk))
 
 
 if __name__ == '__main__':

@@ -28,6 +28,7 @@ import plugin_scope
 import plugin_scope_fixture
 import classpaths_current as classpaths
 import aapt2_tool
+import apk_audit
 
 parent=generic.parent
 sdk_sources=generic.sdk_sources
@@ -444,7 +445,7 @@ class Job(generic.Job):
 
     def build_apk(self):
         check_catalogue(self.context)
-        generic.parent.Job.build_apk(self)  # Retain actual seven gates, wrapper/App compilation, AAR-matched ELF audit.
+        apk_audit.build_apk(self,parent)  # Faithful seven-gate plan; current-only strict badging labels.
         inherited=self.w/'evidence/APK-audit.json';proof=read(inherited)
         if proof['source_members']!=427 or proof['source_digest']!=self.inputs['source_digest']:
             raise ValueError('unexpected original audit template')

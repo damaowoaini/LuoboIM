@@ -96,9 +96,9 @@
       "sha256": "128ddc6508ddcfa879c477c0cdb7bd2a165b17c4ffc094527e1f75d6721cd2c4"
     },
     {
-      "bytes": 28041,
+      "bytes": 31770,
       "path": "ci/personal-multipart.py",
-      "sha256": "67a48899547a0193a467c845fd1d03582be19b9e5d3303726fd58cb3f01577e6"
+      "sha256": "8213e412a92f18e4063b59eaa94aa93c59b902885b43aa82f75366a5aea3e6a8"
     }
   ],
   "delta8": [

@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import stat
 import subprocess
 import threading
 from urllib.parse import unquote, urlparse
@@ -19,6 +20,9 @@ from urllib.parse import unquote, urlparse
 REPO = Path(__file__).resolve().parent.parent
 INPUTS = 'ci/personal-multipart/inputs.json'
 CANDIDATE_PREFIX = 'ci/candidates/personal-multipart/after'
+CHROME_PATH = Path('/opt/google/chrome/chrome')
+CHROME_LIMIT = 1 << 30
+CHROME_CHUNK = 1 << 20
 PARENT_HEAD = '1ef9d4920278da3aa407a2c8f6d4fc37fd12896b'
 CODEC = 'app/lib/features/personal/data/personal_migration.dart'
 HELPER = 'migration/legacy_personal_export/legacy_personal_export.dart'
@@ -157,6 +161,75 @@ def candidate_head():
                                     '--verify', 'HEAD^{commit}'], text=True, timeout=10).strip()
 
 
+def chrome_pin(path=CHROME_PATH, *, limit=CHROME_LIMIT):
+    """Pin one stable installed Linux64 executable without reading it into RAM.
+
+    Production callers always use the fixed default path. A smaller limit and
+    real small ELF fixture can exercise bounds locally without a large file.
+    """
+    path = Path(path)
+    if type(limit) is not int or not 64 <= limit <= CHROME_LIMIT:
+        raise ValueError('Chrome pin limit must be64..1GiB')
+    if not path.is_absolute() or path.resolve(strict=True) != path:
+        raise ValueError('Chrome path is not canonical without symlink ancestors')
+
+    def identity(info):
+        return {'dev': info.st_dev, 'ino': info.st_ino, 'mode': info.st_mode,
+                'uid': info.st_uid, 'gid': info.st_gid, 'nlink': info.st_nlink,
+                'size': info.st_size, 'mtime_ns': info.st_mtime_ns, 'ctime_ns': info.st_ctime_ns}
+
+    def validate(info):
+        if not stat.S_ISREG(info.st_mode):
+            raise ValueError('Chrome type is not regular: mode=' + str(info.st_mode))
+        if info.st_uid not in (0, os.getuid()) or info.st_mode & 0o022:
+            raise ValueError('Chrome requires root/runner owner and no group/other write: uid=' +
+                             str(info.st_uid) + ' mode=' + oct(stat.S_IMODE(info.st_mode)))
+        if not info.st_mode & 0o111:
+            raise ValueError('Chrome has no executable permission: mode=' + oct(stat.S_IMODE(info.st_mode)))
+        if not 64 <= info.st_size <= limit:
+            raise ValueError('Chrome size=' + str(info.st_size) + ' outside64..' + str(limit))
+
+    path_before = path.lstat()
+    validate(path_before)
+    if not os.access(path, os.X_OK):
+        raise ValueError('Chrome is not executable by the original runner')
+    flags = os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW | os.O_NONBLOCK
+    descriptor = os.open(path, flags)
+    try:
+        before = os.fstat(descriptor)
+        validate(before)
+        if identity(before) != identity(path_before):
+            raise ValueError('Chrome path identity changed while opening')
+        digest = hashlib.sha256()
+        header = bytearray()
+        remaining = before.st_size
+        while remaining:
+            chunk = os.read(descriptor, min(CHROME_CHUNK, remaining))
+            if not chunk:
+                raise ValueError('Chrome ended before its pinned size')
+            digest.update(chunk)
+            header.extend(chunk[:max(0, 64 - len(header))])
+            remaining -= len(chunk)
+        after = os.fstat(descriptor)
+        path_after = path.lstat()
+        if (identity(before) != identity(after) or identity(before) != identity(path_after)
+                or path.resolve(strict=True) != path or not os.access(path, os.X_OK)):
+            raise ValueError('Chrome descriptor/path identity, size or times changed')
+        machine = int.from_bytes(header[18:20], 'little')
+        elf_type = int.from_bytes(header[16:18], 'little')
+        if (header[:4] != b'\x7fELF' or header[4:7] != b'\x02\x01\x01'
+                or header[7] not in (0, 3) or machine != 62 or elf_type not in (2, 3)
+                or int.from_bytes(header[20:24], 'little') != 1
+                or int.from_bytes(header[52:54], 'little') != 64):
+            raise ValueError('Chrome requires Linux64 little-endian x86_64 ELF executable: class=' +
+                             str(header[4]) + ' data=' + str(header[5]) + ' osabi=' +
+                             str(header[7]) + ' machine=' + str(machine) + ' type=' + str(elf_type))
+        return {'path': str(path), 'bytes': before.st_size, 'sha256': digest.hexdigest(),
+                'identity': identity(before), 'elf64_linux_x86_64': True}
+    finally:
+        os.close(descriptor)
+
+
 def verify_work(work, cfg, tag, files, receipt):
     tag.canonical_work(work)
     helper_config = 'source/migration/legacy_personal_export/.dart_tool/package_config.json'
@@ -189,6 +262,18 @@ def setup(parent, allocation):
     head = candidate_head()
     if not re.fullmatch('[a-f0-9]{40}', os.environ.get('GITHUB_SHA', '')) or head != os.environ['GITHUB_SHA']:
         raise ValueError('candidate checkout must be the workflow event commit')
+    # Do not create the original allocation on a failed Chrome admission.
+    try:
+        chrome = chrome_pin()
+    except (OSError, ValueError, RuntimeError) as error:
+        print(json.dumps({'event': 'personal_chrome_preflight', 'accepted': False,
+                          'exceptionType': type(error).__name__, 'reason': str(error)[:512]},
+                         sort_keys=True), flush=True)
+        raise
+    print(json.dumps({'event': 'personal_chrome_preflight', 'accepted': True,
+                      'path': chrome['path'], 'bytes': chrome['bytes'],
+                      'sha256': chrome['sha256'], 'elf64_linux_x86_64': True},
+                     sort_keys=True), flush=True)
     # Exactly one inherited setup. It fetches verified Flutter, enforces the old
     # app lock and seeds original hash-bound SQLite; it never enters old tests.
     tag.setup(allocation)
@@ -203,15 +288,6 @@ def setup(parent, allocation):
     write_body(work / 'source' / SIBLING_CODEC, files[CODEC])
     helper_config = 'source/migration/legacy_personal_export/.dart_tool/package_config.json'
     write_body(work / helper_config, config_body(work))
-    # Only already-installed runner Chrome; do not download a browser or relax
-    # sandbox flags. Actual Chrome/namespace integration is still unverified.
-    chrome_path = Path('/opt/google/chrome/chrome')
-    if not chrome_path.is_file() or chrome_path.is_symlink():
-        raise ValueError('existing runner Chrome missing; browser1 unverified')
-    chrome = str(chrome_path.resolve(strict=True))
-    chrome_body = tag.regular(Path(chrome), 256 << 20)
-    if not chrome_body.startswith(b'\x7fELF'):
-        raise ValueError('actual existing Chrome ELF required, not a launcher script')
     env = dict(os.environ, PUB_CACHE=str(work / 'pub-cache'), TMPDIR=str(work / 'tmp'),
                XDG_CONFIG_HOME=str(work / 'config'), XDG_CACHE_HOME=str(work / 'config/cache'),
                FLUTTER_SUPPRESS_ANALYTICS='true', DART_SUPPRESS_ANALYTICS='true', CI='true')
@@ -226,7 +302,7 @@ def setup(parent, allocation):
                'helper_config': helper_config, 'inputs_sha256': sha(raw),
                'package_configs': {name: sha(tag.regular(work / name)) for name in
                    ['source/app/.dart_tool/package_config.json', helper_config]},
-               'chrome': {'path': chrome, 'bytes': len(chrome_body), 'sha256': sha(chrome_body)},
+               'chrome': chrome,
                'setup_calls': 1, 'new_pub_get_calls': 0, 'old_generated_outputs_copied': 0,
                'old_device_io_verified': False, 'native_acceptance': False}
     verify_work(work, cfg, tag, files, receipt)
@@ -331,7 +407,7 @@ def run(parent, work):
     try:
         tools = tag.tool_snapshot(work)
         chrome = receipt['chrome']
-        if len(tag.regular(Path(chrome['path']), 256 << 20)) != chrome['bytes'] or sha(tag.regular(Path(chrome['path']), 256 << 20)) != chrome['sha256']:
+        if chrome_pin() != chrome:
             raise ValueError('setup Chrome executable changed')
         os.environ['CHROME_EXECUTABLE'] = chrome['path']
         tag.write(work / 'evidence/personal-tools-before.json', tools)
@@ -388,7 +464,8 @@ def run(parent, work):
                     raise ValueError('formatted source artifact differs')
             after = tag.tool_snapshot(work)
             tag.write(work / 'evidence/personal-tools-after.json', after)
-            if tools is None or after != tools or sha(tag.regular(Path(receipt['chrome']['path']), 256 << 20)) != receipt['chrome']['sha256']:
+            chrome_after = chrome_pin()
+            if tools is None or after != tools or chrome_after != receipt['chrome']:
                 raise ValueError('original Flutter/Dart/Chrome tools changed')
             post = {'accepted': True, 'input_source': cfg['source_after'],
                     'input_portable': cfg['portable_after'],

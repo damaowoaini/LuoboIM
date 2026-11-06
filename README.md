@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端普通源码仅修验收fixture将HH:MM误当cron表达式的问题，保留23:59/23:58每日时刻与原生产scheduler。新graph `1577/6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115` 仅fresh实际配置生成/默认解析器合同1top3sub；先以固定三roots的实际go list -deps -test证明不含变更的runtimeacceptance，再用精确两literal反转及移除独立新test重建旧f2来源，才兼容复用cache2top7sub与原producer1top13sub/Kafka1top3sub来源链（0重派、sameWholeSource=false）。原fdec已通过cache、16编译和首场景，第二场景crontask注册观察done；该值未证明唯一实际首错。原图与清理、二十服务联调仍待验收。
+- 后端Go来源1577/6a65保持不变。750来源已实际通过固定GoList1123包闭包证明、配置/cron合同1top3sub、16编译和首场景；第二场景rpc-group在observe-registration/done拒绝，具体退出结果未导出，整体服务图与清理仍未通过。本CI批只复用同完整Go来源/工具的已过命名事实链，0重派这些Go子集；原4场景/2top3sub仍fresh。done日志只报告原Wait与stdout Sync/Close调用已返回，结果not-exported；不从panic头推断退出码。新增独立UNACCEPTED编译缓存仅在source/tools/原compile receipts/ELF与容器清理均核实后保存只读快照，PID/runtime/Ready/P20仍未接受，旧accepted/build-only门禁不改。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 
