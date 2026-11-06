@@ -7,9 +7,9 @@
     "path": "ci/backend-fullgraph/run.py",
     "source": {
       "members": 1576,
-      "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
+      "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
     },
-    "status": "formatted-process-image-wait-observation-source-only-locked-no-current-core14-artifact"
+    "status": "formatted-kafka-new-deny-confirmation-source-only-locked-no-current-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -32,17 +32,17 @@
         "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
       }
     },
-    "rootAcceptancePath": ".qa/backend-capture-cleanup-six-build-batch-1/root-chart-six-build-parser-acceptance.json",
-    "rootAcceptanceSHA256": "8bf1bb421b0764994678c3aa2eeb1081164c5c0976fe6f63bf94ff14dd929945"
+    "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
+    "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7"
   },
   "acceptedChartArtifact": {
-    "run": 39056324162,
-    "head": "bbb59602ada7de1a88d260ea39153962add29e46",
+    "run": 42180782218,
+    "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
     "attempt": 1,
-    "artifactID": 12109771057,
-    "artifactBytes": 76891084,
-    "artifactSHA256": "ed16b8a057a8e994f315af65112be43baa51480942f8fc2e04ca662b4e6f2c60",
-    "manifestSHA256": "39098991547556dbce7cb33d4586902d8414fe20d0ba2cecd8fd65a22e4d3636"
+    "artifactID": 13485700505,
+    "artifactBytes": 76891085,
+    "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+    "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9"
   },
   "executionBinding": null,
   "mysql": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "be8eec70f278acfd1ea6a695eec1b6bfd9a0ea87b701472c4f2f4cba41fa81e4",
-    "ci/backend-fullgraph/inputs.json": "5b23fb684545d785d3c2533fb273e0fb2c49f319cd9e9f074710185659d02cbf",
+    "ci/backend-fullgraph/run.py": "01d7abf371d6569dec4e61de1d303f1a312fdc2bc29e86cb0e2d5a1253db0b62",
+    "ci/backend-fullgraph/inputs.json": "20036dbd8f0c59e93bd9aa25352a894c89e11040a2c9b02870433af994448eca",
     "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "ab233d389211e7eab830789475ccb1d7ae8c87bb22e62e5e4296d2ca090e62c6",
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1578,
-    "digest": "c747e89b2db10ce06ca702a55450354fcb1f86bd3018ebd724c56f7eb6ad28ce"
+    "digest": "b3f231630844ce5dbbe950d6dcf2c897c294ab139a068261156aa1bf521c4c30"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

@@ -1,0 +1,90 @@
+name: Android current363 source539 fresh fixed-core ARM64 Debug QA
+
+on:
+  workflow_dispatch:
+    inputs:
+      cohort:
+        type: choice
+        required: true
+        options: [current363-fresh-fixed-core-arm64-debug-v1]
+      context_sha256:
+        description: Exact complete ci/android-current363/cohort.json SHA after Root source and affected-control review
+        type: string
+        required: true
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-current363-${{ github.ref }}-${{ inputs.cohort }}
+  cancel-in-progress: false
+
+jobs:
+  production-arm64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ANDROID_COHORT: ${{ inputs.cohort }}
+      APPROVED_CONTEXT_SHA256: ${{ inputs.context_sha256 }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Select one fresh private parent
+        run: |
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/android-production-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "ANDROID_WORK=$RUNNER_TEMP/android-production-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/current363" >> "$GITHUB_ENV"
+      - name: Exact current363 source identity without native execution
+        run: python3 -B ci/android-current363/run.py --cohort "$ANDROID_COHORT" --stage readonly
+      - name: Setup fixed tools and current locked packages
+        run: python3 -B ci/android-current363/run.py --cohort "$ANDROID_COHORT" --stage setup --work "$ANDROID_WORK" --approved-context-sha256 "$APPROVED_CONTEXT_SHA256"
+      - name: Actual fresh ARM64 core bind offline with generated-source evidence
+        run: sudo unshare --net -- bash ci/android-current363/netns.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" core "$APPROVED_CONTEXT_SHA256"
+      - name: Two necessary builtin classpath producers without app models or network
+        run: sudo unshare --net -- bash ci/android-current363/netns.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" preseal "$APPROVED_CONTEXT_SHA256"
+      - name: Actual current production graph and accepted finite3 source18 consumer
+        run: python3 -B ci/android-current363/run.py --cohort "$ANDROID_COHORT" --stage gradle-setup --work "$ANDROID_WORK" --approved-context-sha256 "$APPROVED_CONTEXT_SHA256"
+      - name: Original seven fresh-AAR gates and real current363 Debug APK offline
+        run: sudo unshare --net -- bash ci/android-current363/netns.sh "$(id -un)" "$GITHUB_WORKSPACE" "$ANDROID_WORK" apk "$APPROVED_CONTEXT_SHA256"
+      - name: Bound exact platform archive publication
+        id: sdk_source_budget
+        if: always()
+        run: python3 -B ci/android-native/sdk_platform_producer.py --archive-upload-admission "$ANDROID_WORK"
+      - name: Keep exact official SDK archives separately
+        if: always() && steps.sdk_source_budget.outcome == 'success'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current363-platform-sources-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-37.0.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-36.zip
+            ${{ env.ANDROID_WORK }}/sdk-platform-source-proof/archives/android-35.zip
+          compression-level: 0
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve compact raw evidence first
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current363-production-raw-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/activation.json
+            ${{ env.ANDROID_WORK }}/evidence/
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Preserve only explicitly labelled newly built public products separately
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: android-current363-production-products-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.ANDROID_WORK }}/artifacts/core-current363-arm64.aar
+            ${{ env.ANDROID_WORK }}/artifacts/core-current363-arm64.build.json
+            ${{ env.ANDROID_WORK }}/artifacts/core-current363-arm64-sources.jar
+            ${{ env.ANDROID_WORK }}/artifacts/luobo-current363-auditable-arm64-debug.apk
+            ${{ env.ANDROID_WORK }}/artifacts/NOTICE-public-core.txt
+            ${{ env.ANDROID_WORK }}/artifacts/job-ca-public.pem
+          retention-days: 14
+          if-no-files-found: warn

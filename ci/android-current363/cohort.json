@@ -1,0 +1,490 @@
+{
+  "App_full_regression": "1379 inventory expectation only; this native build runs no full App regression. Mobile403/Web107/Admin89 goal retained.",
+  "borrowed_inputs": [
+    {
+      "bytes": 4458,
+      "path": ".github/workflows/android-current-debug.yml",
+      "sha256": "c6ea1f44b2653761f27ae6cc04e4de2fef0727094ed5899fa9fc7a9521dfd019"
+    },
+    {
+      "path": "ci/android-current359/kgp_owner_model.py",
+      "bytes": 6009,
+      "sha256": "e17967ae814e6bb6fd68e1d31a3cd6a9902e85aefd3523cd04cd16429ac9c500"
+    },
+    {
+      "path": "ci/android-current359/maven_file_origins.py",
+      "bytes": 26260,
+      "sha256": "83c99b203bc8e78ce5abd7aaf2b355da6d189412ad404af879530d4a5addaf3e"
+    },
+    {
+      "path": "ci/android-current359/rich_current.py",
+      "bytes": 10464,
+      "sha256": "7db6e5a21b7c318d6477a6f0755dd93d0e083857fd74b035a219048277402930"
+    },
+    {
+      "bytes": 3347,
+      "path": "ci/android-native/README-current.md",
+      "sha256": "f76e525808a1401ffd47a1608af49bd20f5b646811555e5b66abdb010a75994c"
+    },
+    {
+      "bytes": 8531,
+      "path": "ci/android-native/audit.py",
+      "sha256": "1edf23b5ce32258e3e37d7af615b672e764de8193540aaa7de8a6fc03888d974"
+    },
+    {
+      "bytes": 130088,
+      "path": "ci/android-native/bindings.json",
+      "sha256": "6833a16883a6ae43b91b7400ecd49af6f44dd0d85adcc1b4e98f45213302f4fd"
+    },
+    {
+      "bytes": 7362,
+      "path": "ci/android-native/current-app-cohort.json",
+      "sha256": "ee8bf199ae2993f572a639d9d8392214cb6f81e802ffa1f4b1cf0408e5d51cf9"
+    },
+    {
+      "bytes": 100841,
+      "path": "ci/android-native/current-app-inputs.json",
+      "sha256": "5e76c6201c28762612de349a9be9a09f0701c1038bc386054c049967b6329f54"
+    },
+    {
+      "bytes": 3746,
+      "path": "ci/android-native/current-environment-source.json",
+      "sha256": "f3310bdbec7593947614e704d8985af6a7e1d1dfc8a31dbc8f60699348dc8ce2"
+    },
+    {
+      "bytes": 19684,
+      "path": "ci/android-native/current_app.py",
+      "sha256": "f50f03b98766c7d5d5e0cab673b98e43dec8d33a1973c391989255c75c149ded"
+    },
+    {
+      "bytes": 4741,
+      "path": "ci/android-native/gradle-producer-sources.json",
+      "sha256": "e3dd7e85b7de17ccc41505d4bd03e1b000bc7206d4c7970209c89425fa12c60f"
+    },
+    {
+      "bytes": 8282,
+      "path": "ci/android-native/gradle_classpath_catalog.py",
+      "sha256": "d5607a481e4eff833ffc4d7b18923483383dad3032613d92f3d14df11c450c49"
+    },
+    {
+      "bytes": 533,
+      "path": "ci/android-native/netns-current.sh",
+      "sha256": "b7c1f4240b8c7fe1548875727d4a5b129cacd3e40074ee26a59fe4de8311ae2e"
+    },
+    {
+      "bytes": 9978,
+      "path": "ci/android-native/observed-cohort.json",
+      "sha256": "5fd3cfc422b98cf89718e526ff9edc0ccdee8063162e836b1ab96bd08f915e75"
+    },
+    {
+      "bytes": 27167,
+      "path": "ci/android-native/observed_bind.py",
+      "sha256": "5607c6862da980c4f30b5b591124168fad393fe393b29739181bd1a9495fdd67"
+    },
+    {
+      "bytes": 3343,
+      "path": "ci/android-native/owned-outputs.gradle",
+      "sha256": "a27ab7ef35c6562e06eb61673a488c56f9c66fde695275eb84656df1fbf13631"
+    },
+    {
+      "bytes": 4995,
+      "path": "ci/android-native/preseal-classpaths.gradle",
+      "sha256": "d6c69402fc5b6de5de6f279f3a6137e9b8cb018a5924f25b8e6dbcf22d83f96a"
+    },
+    {
+      "bytes": 34084,
+      "path": "ci/android-native/resolve-observed.gradle",
+      "sha256": "85e79a582a84898711e72f974da6cdc08f34129b7b6fb6c80f58c2f60c10add3"
+    },
+    {
+      "bytes": 63745,
+      "path": "ci/android-native/rich-catalog.json",
+      "sha256": "db185c038d3c490e2b1edee4592bac448b9f2765d092aa1b8c079a3cb1bc1dbe"
+    },
+    {
+      "bytes": 8235,
+      "path": "ci/android-native/rich-consumer.gradle",
+      "sha256": "3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3"
+    },
+    {
+      "bytes": 10081,
+      "path": "ci/android-native/rich_consumer.py",
+      "sha256": "2084090e1f6e126f4c7cc9f7877a64f3c7a4832d2237bef2f85c81a8d1059955"
+    },
+    {
+      "bytes": 42548,
+      "path": "ci/android-native/run.py",
+      "sha256": "e714f8de746c46354a674594158a028da1ce9d55390a8ec1e1d454c399e91bcb"
+    },
+    {
+      "bytes": 10754,
+      "path": "ci/android-native/sdk-platform-sources.json",
+      "sha256": "52a293fde26a65cf5c3a57942a96ccba5944dcd21350973105b665291130eb71"
+    },
+    {
+      "bytes": 33162,
+      "path": "ci/android-native/sdk_platform_producer.py",
+      "sha256": "97a97361e141b37d2f771711b12387a44bd6111395474b49b19b73ef33be6371"
+    },
+    {
+      "bytes": 11876,
+      "path": "ci/android-native/support.py",
+      "sha256": "818ed812deab20b25d4e8352f7d31b637039c0a881c8fc0fa070bc2ce1ea8fbd"
+    },
+    {
+      "bytes": 7128,
+      "path": "ci/android-native/test_current_app.py",
+      "sha256": "155dc85bb86ef13e8f37aacf116912cae262a31594ce9ef0f23fd870b857f020"
+    },
+    {
+      "bytes": 8934,
+      "path": "ci/android-native/test_rich_consumer.py",
+      "sha256": "a6e44fa58de245b9fc254c63c4256a3355e09de9ffbb2880ebe3135f712cb02b"
+    }
+  ],
+  "business_members": 363,
+  "business_rows_digest": "a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475",
+  "catalogue_approval": {
+    "catalog_sha256": "00d559f734c28560b9f18a27ef2fedfd5488c7eb9fa0a6d8d18930d0927d2cc7",
+    "graph_sha256": "e70247c7426c9c0afc7891eac6e10a3cb49b7fccc0ec99e17ffc041bc87c4c5e",
+    "native_or_App_accepted": false,
+    "root_acceptance_sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
+  },
+  "cohort": "current363-fresh-fixed-core-arm64-debug-v1",
+  "controller_inputs": [
+    {
+      "path": ".github/workflows/android-current363-debug.yml",
+      "bytes": 4751,
+      "sha256": "0227302b0e728d13e9ebb5dc6f1cbafd2639acd1de8f0782aa0d7baefbbd9842"
+    },
+    {
+      "path": "ci/android-current363/README.md",
+      "bytes": 1855,
+      "sha256": "2c19f514d795147c2e455690f1f6c9052a0909c99defe366cd609faa92c98fc6"
+    },
+    {
+      "path": "ci/android-current363/classpaths_current.py",
+      "bytes": 8534,
+      "sha256": "4e840c0f158f1a211997db6f6c8b7b541a9e1553ae31fed88ab5208bb14d120a"
+    },
+    {
+      "path": "ci/android-current363/inputs.json",
+      "bytes": 102573,
+      "sha256": "76c4d8b88cf3da41ea2659529b25acf2b116924a4d1ad05341c75d2e2e4e1ff9"
+    },
+    {
+      "path": "ci/android-current363/kgp-owner-witness.gradle",
+      "bytes": 4445,
+      "sha256": "83b3e7368636455766e7da0b3db4e7be8349cf83f972049c08804e33ca616174"
+    },
+    {
+      "path": "ci/android-current363/netns.sh",
+      "bytes": 617,
+      "sha256": "8c07a2193cb90f7af04aef6f33787ec1900f587b9fd87efa9bec1fc98f242a8c"
+    },
+    {
+      "path": "ci/android-current363/plugin-rich-consumer.gradle",
+      "bytes": 10593,
+      "sha256": "b7f3571cce6289303a9916aaeecb0d9afae899ed1e8f74ec72f90b803f59b545"
+    },
+    {
+      "path": "ci/android-current363/plugin-scope-inputs.json",
+      "bytes": 35983,
+      "sha256": "cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625"
+    },
+    {
+      "path": "ci/android-current363/plugin_scope.py",
+      "bytes": 20848,
+      "sha256": "959382229dedcefcbfca7767d4da412914a9e4855e0e43281c89a3cc355f8ae1"
+    },
+    {
+      "path": "ci/android-current363/plugin_scope_fixture.py",
+      "bytes": 11062,
+      "sha256": "6b8b1015927755fb77af93136c8de74189a6e51920b67745f8f11e609d6cc4d8"
+    },
+    {
+      "path": "ci/android-current363/projection-acceptance.json",
+      "bytes": 1384,
+      "sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
+    },
+    {
+      "path": "ci/android-current363/resolve.gradle",
+      "bytes": 46753,
+      "sha256": "c2b9a8b14edb0f5e4d96abe4bafc74a5c3ebcaa37ab83d79acb332c2320fc0fc"
+    },
+    {
+      "path": "ci/android-current363/rich-catalog.json",
+      "bytes": 71217,
+      "sha256": "00d559f734c28560b9f18a27ef2fedfd5488c7eb9fa0a6d8d18930d0927d2cc7"
+    },
+    {
+      "path": "ci/android-current363/rich-consumer.gradle",
+      "bytes": 8235,
+      "sha256": "3f53eb18ea0731665edc2f00c111743fef37dcec011c931344110c9946912fa3"
+    },
+    {
+      "path": "ci/android-current363/run.py",
+      "bytes": 24752,
+      "sha256": "dd77f79020ddaba6d08543d6ff81e3dd503d41b10023d7ba8c0c640d86907675"
+    },
+    {
+      "path": "ci/android-current363/test_identity.py",
+      "bytes": 2161,
+      "sha256": "1e0890d8fd63de19ac312367588cb9caef00988327222e14cb88c1ba40e13e96"
+    }
+  ],
+  "controller_revision": "current363-fresh-fixed-source-ARM64-Debug-QA-v1",
+  "core_compatibility": {
+    "nonbusiness176_digest": "cad2c5e45083a9845826efe1432a3cf2a8ae42efd3d2bd44739e6cd1e286f6d5",
+    "source176SameAsHistorical354And359": true,
+    "freshActualGoBuildRequired": true,
+    "oldArtifactsUsed": false,
+    "productionReplacement": false
+  },
+  "execution_gate": "Root supplies exact complete new cohort SHA after source/affected-control review; this is scope binding, not a user approval request.",
+  "flutter_environment_sources": [
+    {
+      "bytes": 6531,
+      "path": "packages/flutter_tools/lib/src/base/config.dart",
+      "sha256": "307ce29f4353b1266aeac395363db11466792ed27206ffe0dda778f81c132367"
+    },
+    {
+      "bytes": 3141,
+      "path": "packages/flutter_tools/lib/src/reporting/unified_analytics.dart",
+      "sha256": "0c00849a26def8083855bb76df741f6ce6d1be9dba0b6d3ed956d03728b20710"
+    },
+    {
+      "bytes": 4576,
+      "path": "packages/flutter_tools/lib/src/persistent_tool_state.dart",
+      "sha256": "33f9ad8c1b60140746aafe6b0988c9b18f1779d5a7ee0394f964be46e7ce273b"
+    }
+  ],
+  "locked_packages": 178,
+  "mobile_source_declaration_at_ref": {
+    "bytes": 193400,
+    "path": "ci/mobile/inputs.json",
+    "sha256": "df60daca701faef61c14eed46ce86f760062002f6b4e417e287c58f133f75df4"
+  },
+  "native_source_snapshot": {
+    "Kotlin_compile_Swift_parse_typecheck_passed": true,
+    "R1_manifest_sha256": "e8795862c794e6feb2eadbc5bc15a37f654dc0c8db49188dab1329228c38a894",
+    "Root_type_API_acceptance": {
+      "bytes": 616,
+      "path": "references/integration/mobile-location-once-native-r1-candidate-20261017/root-type-api-acceptance.json",
+      "sha256": "ed85b0c8456de99f36f4ef1038e9c5e3ecdd834432acb1c68ae3568c1556bdc9"
+    },
+    "digest": "7cca8d5e6005c3ff3f6c3a6f2524bd8b523226bc0dbbacaa8c7b1dc28206a426",
+    "files": [
+      {
+        "bytes": 3343,
+        "path": "app/android/app/src/main/AndroidManifest.xml",
+        "sha256": "5a4b4585cfa73575ed82c4e3e32fb9062036c96d0009a674e72ba21d9de78aa6"
+      },
+      {
+        "bytes": 10666,
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/LocationOnceBridge.kt",
+        "sha256": "f10fa7b56779bbb5d347f063fa961b462172ca6e916ce32b26556e4eeb3d1c07"
+      },
+      {
+        "bytes": 2135,
+        "path": "app/android/app/src/main/kotlin/com/luoboduihua/imapp/MainActivity.kt",
+        "sha256": "2ff99269679e8d63ba96af433db370623a5f0e654978a77bfd97b5b81c7ba1d1"
+      },
+      {
+        "bytes": 32985,
+        "path": "app/ios/Runner.xcodeproj/project.pbxproj",
+        "sha256": "cb6ee3082bba34b3946415b92f7b7006167d0535b3efbeae5424d69d25b8324c"
+      },
+      {
+        "bytes": 849,
+        "path": "app/ios/Runner/AppDelegate.swift",
+        "sha256": "f0595cf79a3efaca51b85895cacc6b9f01f13438fee6f5a3c201f796bb71cb7c"
+      },
+      {
+        "bytes": 2916,
+        "path": "app/ios/Runner/Info.plist",
+        "sha256": "94e2ab712ea1e6882d4c5b77adcc25ec552956dc300bb60e82d6b181780df152"
+      },
+      {
+        "bytes": 13055,
+        "path": "app/ios/Runner/LocationOnceBridge.swift",
+        "sha256": "13de6890dad64e4a12c17d02f3ac32dbd3e9cb11dde8caff12f5ec35ab413ee8"
+      }
+    ],
+    "members": 7,
+    "scene8_device_GPS_accepted": false,
+    "scope": "Android consumes 3 paths; 4 iOS paths preserve exact native7 identity only, not iOS build inputs or acceptance."
+  },
+  "original_context_sha256": "ee8bf199ae2993f572a639d9d8392214cb6f81e802ffa1f4b1cf0408e5d51cf9",
+  "plugin_builtin_controls": {
+    "Gradle_home": "selector-gradle-home",
+    "actual_Gradle_executed": false,
+    "cases": [
+      "two-projects-positive",
+      "changed-plugin-source",
+      "unregistered-project"
+    ],
+    "complete": "evidence/plugin-controls-complete.json",
+    "completion_requires": "actual guarded exit/resource/log SHA plus unchanged original fixture.check for every case",
+    "fixture": {
+      "path": "ci/android-current363/plugin_scope_fixture.py",
+      "bytes": 11062,
+      "sha256": "6b8b1015927755fb77af93136c8de74189a6e51920b67745f8f11e609d6cc4d8"
+    },
+    "mandatory_preseal_after_builtin_before_production_models": true,
+    "owned_outputs_policy_unchanged": true,
+    "production_Gradle_home_unchanged": "gradle-cache"
+  },
+  "plugin_source_scope": {
+    "App_original18_still_required": true,
+    "actual_plugin_graphs_accepted": false,
+    "changed_business_rows": 21,
+    "contract_sha256": "cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625",
+    "localSDK": 1,
+    "nonbusiness176_unchanged": true,
+    "project_bound_configurations_expected": 44,
+    "pub_packages": 21,
+    "source539_bound": true
+  },
+  "portable_digest": "0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f",
+  "portable_members": 415,
+  "pub_lock_after": {
+    "bytes": 42399,
+    "path": "app/pubspec.lock",
+    "sha256": "0e678e98a6efc7cbb34c6c3a58f8b890171bd443c2b61e6f5ec525853c4f34fa"
+  },
+  "pub_lock_before": {
+    "bytes": 40663,
+    "path": "app/pubspec.lock",
+    "sha256": "dd9f75df4899be9c6aaca509d39e259a14164ce8be7b8ed693860bce7df4b648"
+  },
+  "repository_lifecycle": {
+    "JitPack": [
+      "com.github.davidliu",
+      "audioswitch",
+      "039a35aefab7747c557242fa216c9ea11743b604"
+    ],
+    "after_use": "read-only URL/object/filter/scope validation",
+    "early_once": "beforeSettings/beforeProject existing+whenObjectAdded;fixedfilter freeze",
+    "fixed_Gradle": "9.3.1",
+    "new_actual_Gradle1": "required in this explicit native batch; source preparation is not execution",
+    "current_source539_fresh_AAR_required": true
+  },
+  "schema": "luobo.android.current363-context.v1",
+  "shared_source_identity": "Current363 App is new; exact SDK/protocol/native176 may share source provenance, never old APK or binary results.",
+  "source_digest": "07de9d07dcd2a9da2b98a29194d3442a174d60fc46a6dcd472276d80171d4c3f",
+  "source_members": 539,
+  "source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+  "source_successor": {
+    "previous_source_ref": "0e1cb1ae5f3edc3db8a0a94970b363a4cd6ae3b1",
+    "previous_business_members": 359,
+    "current_source_ref": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+    "production_Dart_existing_changed": [
+      "app/lib/core/im/im_event.dart",
+      "app/lib/core/im/open_im_gateway.dart",
+      "app/lib/features/chat/data/chat_repository.dart",
+      "app/lib/features/chat/data/message_mapper.dart",
+      "app/lib/features/chat/domain/chat_message.dart",
+      "app/lib/features/chat/presentation/chat_controller.dart",
+      "app/lib/features/chat/presentation/chat_forward_page.dart",
+      "app/lib/features/chat/presentation/chat_page.dart",
+      "app/lib/features/chat/presentation/mention_text_controller.dart",
+      "app/lib/features/chat/presentation/message_media.dart",
+      "app/lib/features/contacts/presentation/user_profile_page.dart",
+      "app/lib/features/favorite/presentation/favorite_forward_page.dart"
+    ],
+    "production_Dart_added": [
+      "app/lib/features/chat/presentation/chat_typing_controller.dart"
+    ],
+    "test_existing_changed": [
+      "app/test/core/im/sdk_harness.dart",
+      "app/test/features/chat/batch_media_access_test.dart",
+      "app/test/features/chat/chat_favorite_test.dart",
+      "app/test/features/chat/chat_forward_page_test.dart",
+      "app/test/features/chat/chat_location_fixture.dart",
+      "app/test/features/chat/group_revoke_fixture.dart",
+      "app/test/features/chat/group_revoke_workflow_test.dart",
+      "app/test/features/chat/legacy_custom_summary_test.dart",
+      "app/test/features/favorite/favorite_forward_privacy_test.dart"
+    ],
+    "test_added": [
+      "app/test/features/chat/chat_input_fixture.dart",
+      "app/test/features/chat/chat_reedit_workflow_test.dart",
+      "app/test/features/chat/chat_typing_workflow_test.dart"
+    ],
+    "native_or_new_App_result_inherited": false,
+    "current_363_native_build_executed": false
+  },
+  "webview_archive_identities": [
+    {
+      "archive_sha256": "d53e1ccf5516f25017e3c9d44c39034db352d20fa34fe200674270242c2c5111",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter-4.14.1.tar.gz",
+      "dependency": "direct main",
+      "lock_block_sha256": "d8aa746cb1b38e99a49f8c245dedfad01d44e807545ec27c6b4691c099cd7dfd",
+      "name": "webview_flutter",
+      "version": "4.14.1"
+    },
+    {
+      "archive_sha256": "ad5182eff9a550925330cb9f0cb038eddfdd5712aba8b77aa0f0400e50f6e688",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter_android-4.12.0.tar.gz",
+      "dependency": "direct main",
+      "lock_block_sha256": "923c3bd68d0a69502144cf873a7c40d06f3773e38f8af645bc89fe46b0d576ab",
+      "name": "webview_flutter_android",
+      "version": "4.12.0"
+    },
+    {
+      "archive_sha256": "1221c1b12f5278791042f2ec2841743784cf25c5a644e23d6680e5d718824f04",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter_platform_interface-2.15.1.tar.gz",
+      "dependency": "direct dev",
+      "lock_block_sha256": "7f1d1c926540773e6e36f893c57d47aacfbdc7c1c0927b77631696c067ff03e7",
+      "name": "webview_flutter_platform_interface",
+      "version": "2.15.1"
+    },
+    {
+      "archive_sha256": "82648217f537573e1ca9ae9952d3eacedca6ab5aee69dc84445fc763766dcea2",
+      "archive_url": "https://pub.dev/api/archives/webview_flutter_wkwebview-3.25.1.tar.gz",
+      "dependency": "transitive",
+      "lock_block_sha256": "1a4119d3c7d0141b158904b074c01638d33cde30b25755ad2633ca37424033d9",
+      "name": "webview_flutter_wkwebview",
+      "version": "3.25.1"
+    }
+  ],
+  "publishing_owner_scope": {
+    "AppABI": true,
+    "registered_pluginABI": 22,
+    "tooling_owner": "fixed Flutter Gradle included build",
+    "source18": "unchanged full14+4",
+    "compilation_BC4_claim": false,
+    "runtime_or_APK_accepted": false
+  },
+  "core_build_mode": "fresh-fixed-source",
+  "restore_fallback": false,
+  "official_source_core": {
+    "base_repository": "https://github.com/openimsdk/openim-sdk-core",
+    "base_commit": "7b156fc5557878ad6e6a07e572694af5699c6624",
+    "patch_sha256": "dcbc80f89ce07eaac8a2c28c23e1cbaef0db9c2c79cacffdaa020d61a356e1f7",
+    "source_builder": "packages/flutter_openim_sdk/tool/native_core/build_observed_candidate.py",
+    "borrowed_fresh_Job": "ci/android-native/current_app.py -> observed_bind.py -> run.py",
+    "core_dependency_and_generated_module_locks_unchanged": true,
+    "actualGoBindExecuted": false,
+    "onlyDebugQA": true,
+    "productionReplacement": false
+  },
+  "old_core_artifacts_unavailable": {
+    "observation": {
+      "path": ".qa/backend-process-image-batch-20261106/next-native-core-artifacts-observation.json",
+      "bytes": 265,
+      "sha256": "2cfd7b1f3b97498776772b59b4d141750ffdf328fdbb6a63840d6c43c04e46ce"
+    },
+    "ids": [
+      12077301123,
+      12076871588
+    ],
+    "HTTP": [
+      404,
+      404
+    ],
+    "selected_mode": "fresh-fixed-source",
+    "fallback": false
+  }
+}

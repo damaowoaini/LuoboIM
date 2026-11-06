@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/IBM/sarama"
 )
@@ -78,6 +79,54 @@ func kafkaACLDescribeResponseRows(reply *sarama.DescribeAclsResponse, callErr er
 		rows = append(rows, *row)
 	}
 	return rows, nil
+}
+
+// Kafka's DescribeAcls contract allows a successful CreateAcls to become
+// visible later. A newly written deny may be confirmed by bounded reads of
+// the original broker. An existing deny disappearing is still an immediate
+// failure. Every successful result needs the original exact row, a live caller
+// and a valid hold after the read; broker/transport/shape errors are not retried.
+func confirmKafkaDeny(ctx context.Context, resource sarama.Resource, principal string, newlyWritten bool, validate func() error, describe func() ([]sarama.ResourceAcls, error)) error {
+	if ctx == nil || validate == nil || describe == nil {
+		return ErrOwnedEvidence
+	}
+	var tick *time.Ticker
+	if newlyWritten {
+		bounded, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+		ctx = bounded
+		tick = time.NewTicker(100 * time.Millisecond)
+		defer tick.Stop()
+	}
+	for {
+		if e := ctx.Err(); e != nil {
+			return e
+		}
+		if validate() != nil {
+			return ErrOwnedEvidence
+		}
+		rows, e := describe()
+		if e != nil {
+			return e
+		}
+		if e = ctx.Err(); e != nil {
+			return e
+		}
+		if validate() != nil {
+			return ErrOwnedEvidence
+		}
+		if exactDeny(rows, resource, principal) {
+			return nil
+		}
+		if !newlyWritten {
+			return ErrOwnedEvidence
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-tick.C:
+		}
+	}
 }
 
 // Optional trace of one original call; no identity, error text or authority.
@@ -177,21 +226,24 @@ func (p *KafkaProbe) excludeLegacy(ctx context.Context, hold *AdmissionHold, old
 		if callErr != nil {
 			return out, ErrOwnedEvidence
 		}
-		observation.resource(resource, "read-call")
-		reply, callErr := aclBroker.DescribeAcls(&sarama.DescribeAclsRequest{Version: 1, AclFilter: sarama.AclFilter{Version: 1, ResourceType: resource.ResourceType, ResourceName: &name, ResourcePatternTypeFilter: sarama.AclPatternLiteral, Principal: &principal, Host: &host, Operation: sarama.AclOperationAll, PermissionType: sarama.AclPermissionDeny}})
-		if observation != nil && callErr == nil {
-			observation.resource(resource, "read-response")
+		read := func() ([]sarama.ResourceAcls, error) {
+			observation.resource(resource, "read-call")
+			reply, callErr := aclBroker.DescribeAcls(&sarama.DescribeAclsRequest{Version: 1, AclFilter: sarama.AclFilter{Version: 1, ResourceType: resource.ResourceType, ResourceName: &name, ResourcePatternTypeFilter: sarama.AclPatternLiteral, Principal: &principal, Host: &host, Operation: sarama.AclOperationAll, PermissionType: sarama.AclPermissionDeny}})
+			if observation != nil && callErr == nil {
+				observation.resource(resource, "read-response")
+			}
+			rows, e := kafkaACLDescribeResponseRows(reply, callErr)
+			if callErr != nil {
+				return nil, ErrOwnedEvidence
+			}
+			if e != nil {
+				return nil, e
+			}
+			observation.resource(resource, "exact-deny")
+			return rows, nil
 		}
-		rows, e := kafkaACLDescribeResponseRows(reply, callErr)
-		if callErr != nil {
-			return out, ErrOwnedEvidence
-		}
-		if e != nil {
+		if e = confirmKafkaDeny(ctx, resource, principal, apply, hold.Validate, read); e != nil {
 			return out, e
-		}
-		observation.resource(resource, "exact-deny")
-		if !exactDeny(rows, resource, principal) {
-			return out, ErrOwnedEvidence
 		}
 	}
 	// Open the original legacy SASL credentials and demand a broker-produced

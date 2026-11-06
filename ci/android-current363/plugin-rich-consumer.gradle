@@ -1,0 +1,155 @@
+// Finite accepted-R12 gate library. No repository/selection mutation.
+import groovy.json.JsonOutput
+import org.gradle.api.GradleException
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.component.ModuleComponentSelector
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
+
+return { File owned, Map source, Closure localRef, Closure fileDigest, String catalogSha ->
+    def vc = { x -> [required:x.requiredVersion,strict:x.strictVersion,preferred:x.preferredVersion,
+                    rejected:x.rejectedVersions,branch:x.branch] }
+    def attrs = { x -> x.keySet().collectEntries { [(it.name):[type:it.type.name,value:String.valueOf(x.getAttribute(it))]] } }
+    def caps = { x -> x.collect { [group:it.group,name:it.name,version:it.version] }.sort { JsonOutput.toJson(it) } }
+    def module = { x ->
+        if (!(x instanceof ModuleComponentIdentifier)) throw new GradleException('rich selected non-module refused')
+        [group:x.group,module:x.module,version:x.version]
+    }
+    def request = { x ->
+        if (!(x instanceof ModuleComponentSelector)) throw new GradleException('rich requested type refused')
+        [group:x.group,module:x.module,version:x.version,constraint:vc(x.versionConstraint),
+         attributes:attrs(x.attributes),requestedCapabilities:caps(x.requestedCapabilities),
+         capabilitySelectors:x.capabilitySelectors.collect { [type:it.class.name,value:it.toString()] }.sort { JsonOutput.toJson(it) }]
+    }
+    def fixed = { v -> v == null || v == '' || (v ==~ /[A-Za-z0-9][A-Za-z0-9_.-]{0,127}/ &&
+                         !v.toLowerCase().contains('snapshot') && !v.toLowerCase().contains('latest')) }
+    def isRich = { x -> ![x.requiredVersion,x.strictVersion,x.preferredVersion].every(fixed) ||
+                          !x.rejectedVersions.empty || x.branch!=null }
+    def spec = { c -> source.configurations.find { it.name==c.name } }
+    def scoped = { p,c ->
+        if (spec(c)==null || p.path!=source.scope.project ||
+                p.rootProject.projectDir.absoluteFile!=new File(owned,source.scope.root_relative) ||
+                p.projectDir.absoluteFile!=new File(owned,source.scope.project_relative) ||
+                !p.configurations.any { it.is(c) }) return false
+        def directory=p.projectDir.absoluteFile
+        if (directory.canonicalFile!=directory ||
+                !Files.isDirectory(directory.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+                Files.getOwner(directory.toPath(),LinkOption.NOFOLLOW_LINKS)!=Files.getOwner(owned.toPath(),LinkOption.NOFOLLOW_LINKS))
+            throw new GradleException('plugin rich registered project directory differs')
+        source.scope.sources.each { path,sha ->
+            def f=new File(owned,path)
+            if (f.canonicalFile!=f.absoluteFile || !Files.isRegularFile(f.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+                    Files.getAttribute(f.toPath(),'unix:nlink',LinkOption.NOFOLLOW_LINKS)!=1 ||
+                    Files.getOwner(f.toPath(),LinkOption.NOFOLLOW_LINKS)!=Files.getOwner(owned.toPath(),LinkOption.NOFOLLOW_LINKS) || fileDigest(f)!=sha)
+                throw new GradleException('plugin rich independently sealed source differs')
+        }
+        if (p.gradle.gradleVersion!='9.3.1') throw new GradleException('rich Gradle source differs')
+        true
+    }
+    def normalize
+    normalize = { x -> x instanceof Map ? x.keySet().sort().collectEntries { [(it):normalize(x[it])] } :
+                        x instanceof List ? x.collect { normalize(it) } : x }
+    def canonical = { x -> JsonOutput.toJson(normalize(x)) }
+    def declarations = { p,c ->
+        if (!scoped(p,c)) throw new GradleException('rich scoped configuration refused')
+        if (!c.resolutionStrategy.forcedModules.empty || attrs(c.attributes)!=spec(c).attributes)
+            throw new GradleException('rich forced/configuration attributes refused')
+        def actual=c.allDependencies.collect { d ->
+            if (!(d instanceof ExternalModuleDependency) || d.changing)
+                throw new GradleException('rich declared dependency type/force refused')
+            [group:d.group,module:d.name,constraint:vc(d.versionConstraint),attributes:attrs(d.attributes),
+             requestedCapabilities:caps(d.requestedCapabilities)]
+        }
+        if (actual.collect(canonical).sort()!=spec(c).declared.collect(canonical).sort())
+            throw new GradleException('rich declared roots/generator differ')
+    }
+    def allowRequested = { p,c,x ->
+        if (!scoped(p,c)) throw new GradleException('dynamic dependency version refused')
+        def q=request(x)
+        def matches=source.rich.findAll { it.configuration==c.name && it.group==q.group &&
+            it.module==q.module && it.constraint==q.constraint }
+        if (matches.size()!=1 || q.attributes!=[:] || !q.requestedCapabilities.empty || !q.capabilitySelectors.empty)
+            throw new GradleException('rich fourth or changed complete selector refused')
+        // Parent identity is unavailable in substitution; it is mandatory in
+        // the complete resolved-edge audit before the consumer returns.
+        q
+    }
+    def variant
+    variant = { v -> [owner:module(v.owner),attributes:attrs(v.attributes),capabilities:caps(v.capabilities),
+        external:v.externalVariant.present ? [display:v.externalVariant.get().displayName,
+            owner:module(v.externalVariant.get().owner),attributes:attrs(v.externalVariant.get().attributes),
+            capabilities:caps(v.externalVariant.get().capabilities)] : null] }
+    def audit = { p,c,Closure recordRefusal = null ->
+        declarations(p,c)
+        def graph=c.incoming.resolutionResult
+        def edges=graph.allDependencies.collect { e ->
+            if (e instanceof UnresolvedDependencyResult) throw new GradleException('rich actual unresolved',e.failure)
+            if (!(e instanceof ResolvedDependencyResult)) throw new GradleException('rich unknown edge')
+            if (e.selected.selectionReason.forced || e.selected.selectionReason.selectedByRule)
+                throw new GradleException('rich forced/substituted result refused')
+            def from=e.from.id==graph.root.id ? [kind:'producer-root'] : module(e.from.id)
+            [from:from,requested:request(e.requested),selected:module(e.selected.id)]
+        }
+        if (edges.collect(canonical).sort()!=spec(c).edges.collect(canonical).sort())
+            throw new GradleException('rich parent/constraint/selected complete graph differs')
+        def artifacts=c.incoming.artifacts.artifacts.collect { a ->
+            def f=localRef(a.file)
+            [id:module(a.id.componentIdentifier),filename:a.file.name,bytes:f.bytes,sha256:f.sha256,variant:variant(a.variant)]
+        }
+        def projected=spec(c).artifacts.collect { a -> a.findAll { k,v -> k!='origin' } }
+        if (artifacts.collect(canonical).sort()!=projected.collect(canonical).sort()) {
+            def refusal = new GradleException('rich artifact18 selected/body differs')
+            // This observation grants nothing. The original exact comparison,
+            // graph/source gates and failure remain mandatory.
+            if (recordRefusal != null) {
+                try {
+                    def proof = [kind:'rich-artifact-refusal-v1',accepted:false,
+                        catalog_sha256:catalogSha,project:p.path,configuration:c.name,
+                        scope_sources:source.scope.sources,no_force_or_substitution:true,
+                        edges:edges,expected_artifacts:projected,actual_artifacts:artifacts]
+                    def encoded = JsonOutput.toJson(proof).getBytes('UTF-8')
+                    if (artifacts.size()>64 || encoded.length>128*1024) {
+                        proof = [kind:'rich-artifact-refusal-v1',accepted:false,
+                            catalog_sha256:catalogSha,project:p.path,configuration:c.name,
+                            actual_artifact_count:artifacts.size(),snapshot_omitted:'bounded-evidence-cap']
+                    }
+                    recordRefusal(proof)
+                } catch (Exception evidenceFailure) {
+                    refusal.addSuppressed(evidenceFailure)
+                }
+            }
+            throw refusal
+        }
+        [catalog_sha256:catalogSha,project:p.path,configuration:c.name,scope_sources:source.scope.sources,
+         no_force_or_substitution:true,edges:edges,artifacts:artifacts]
+    }
+    def diagnostic = { p,c,String reason ->
+        if (!(reason in ['declaration','graph'])) throw new GradleException('finite plugin refusal reason required')
+        def result=[kind:'plugin-rich-refusal-v1',accepted:false,reason:reason,catalog_sha256:catalogSha,
+            project:p.path,configuration:c.name,scope_sources:source.scope.sources,
+            expected_declared:spec(c)?.declared,actual_declared:c.allDependencies.take(16).collect { d ->
+                d instanceof ExternalModuleDependency ? [group:d.group,module:d.name,constraint:vc(d.versionConstraint),
+                    attributes:attrs(d.attributes),requestedCapabilities:caps(d.requestedCapabilities)] : [unknown_type:d.class.name.take(256)] },
+            declarations_truncated:c.allDependencies.size()>16,
+            expected_configuration_attributes:spec(c)?.attributes,actual_configuration_attributes:attrs(c.attributes),
+            forced_modules:c.resolutionStrategy.forcedModules.take(16).collect { [group:it.group,module:it.name,version:it.version] },
+            forced_modules_truncated:c.resolutionStrategy.forcedModules.size()>16]
+        if (reason=='graph') {
+            def graph=c.incoming.resolutionResult
+            def actual=graph.allDependencies
+            result.expected_edges=spec(c)?.edges
+            result.actual_edges=actual.take(64).collect { e ->
+                if (!(e instanceof ResolvedDependencyResult)) return [unresolved_type:e.class.name.take(256)]
+                [from:e.from.id==graph.root.id ? [kind:'producer-root'] : module(e.from.id),
+                 requested:request(e.requested),selected:module(e.selected.id)]
+            }
+            result.edges_truncated=actual.size()>64
+        }
+        result
+    }
+    [isRich:isRich,scoped:scoped,declarations:declarations,requested:allowRequested,audit:audit,diagnostic:diagnostic]
+}

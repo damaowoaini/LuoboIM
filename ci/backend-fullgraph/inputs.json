@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "state": "FROZEN_FINAL_SOURCE",
-  "scope": "original_graph2top3sub_and_four_planes_redis122c1top3sub_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
+  "scope": "original_graph2top3sub_four_planes_current_kafka1top3sub_prior_image_fact_only",
   "source": {
     "members": 1576,
-    "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
+    "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 77632,
-      "sha256": "be8eec70f278acfd1ea6a695eec1b6bfd9a0ea87b701472c4f2f4cba41fa81e4"
+      "bytes": 86091,
+      "sha256": "01d7abf371d6569dec4e61de1d303f1a312fdc2bc29e86cb0e2d5a1253db0b62"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 52980,
-      "sha256": "16e2a22fcd7e1e69f31447f219d210ea59f7b4467e9eef7192a30f062b536f37"
+      "bytes": 56336,
+      "sha256": "d6720c5bce430d5c91b50c62743d074bd2dc8a01411033caeae405aed38526ab"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 96514,
-      "sha256": "2a5817e729f27fba31210eedcfd57684329a9030c7785fa85bfbb3938e7d7b39"
+      "bytes": 102677,
+      "sha256": "b2b7bcbacb41b2baddd032d990b7e38efaf15c3a1bb2a2495195644145fa260c"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -1704,15 +1704,15 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
-      "bytes": 8858,
-      "sha256": "2aa5e33413371f40e103fbda1064a58acace7eda1197f0073d1e2adf08dbef3c",
+      "bytes": 10313,
+      "sha256": "251a04573421ffaaea68d0935c60b9342db9c87b673797cba9a5ad28b0d94aea",
       "beforeSHA256": "d26782b41f648e98030a56bbccd0417e3bcd1cbe9fab06e55680aaa1cd653719"
     },
     {
       "target": "server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
-      "bytes": 4167,
-      "sha256": "6556ed40b1e60c8d24f8c8dbf83446a6e1a802c0d4409a09874a81c7840ec890",
+      "bytes": 7832,
+      "sha256": "a6799a677ccc7d9eb99edab36636a28213979666be86d8331c0a839a95dca1b7",
       "beforeSHA256": "9a8605dba4dacfdc8f81b714f1ee8c51b4b5e555ad8ada2d9420d9aaf48f68ae"
     }
   ],
@@ -4345,26 +4345,32 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-process-image-batch-20261106/formatted-r2.json",
-      "bytes": 837,
-      "sha256": "d22a11fa23c50e9b779368b0a7bcf56d94401f8ac16e4d934dfbe47119def9c2"
-    },
-    "singleChangedSource": {
-      "path": ".qa/backend-process-image-batch-20261106/formatted-r2/ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/process_linux.go",
-      "bytes": 28188,
-      "sha256": "d413c338a3b42786f206f1575e570c390a8814a9c702a1b87c5eed2a06f9eee9"
+      "path": ".qa/backend-kafka-visibility-batch-20261106/go-freeze.json",
+      "bytes": 2496,
+      "sha256": "486550e305cbfd8e69849359379483862b9f4e3951ade125b060ec7b37d04459"
     },
     "toolSHA256": "5894006a03afafb375c8dcde9eeae1e6e5bd292d5e6d8a5eaac9ff0974694482",
+    "changedSourcePins": [
+      {
+        "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
+        "bytes": 10313,
+        "sha256": "251a04573421ffaaea68d0935c60b9342db9c87b673797cba9a5ad28b0d94aea"
+      },
+      {
+        "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go",
+        "bytes": 7832,
+        "sha256": "a6799a677ccc7d9eb99edab36636a28213979666be86d8331c0a839a95dca1b7"
+      }
+    ],
     "source": {
       "members": 1576,
-      "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
+      "digest": "7ac7af67952b4245dd5fc454494d7760f72b776bec4fe2a830fe4ea3c1496961"
     },
     "unchangedOtherSourceBodiesFrom": {
       "members": 1576,
-      "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
+      "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
     },
-    "GoTestsExecuted": 0,
-    "RootAcceptanceRequired": true
+    "GoBuildTestOrListExecuted": 0
   },
   "targetedRedisParser": {
     "phase": "redis-parser",
@@ -4686,44 +4692,89 @@
     "currentFreshPASS": false,
     "runtimeAccepted": false
   },
-  "processImageTestsToRun": [
-    "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
-  ],
-  "currentImageKafkaControl": {
-    "phase": "current-image-kafka",
+  "processImageTestsToRun": [],
+  "currentImageKafkaControl": null,
+  "historicalCleanupDependencyBoundary": {
+    "changedSourceTargets": [
+      "server/internal/namespaceimport/ownedcontrol/kafka_credential.go",
+      "server/internal/namespaceimport/ownedcontrol/kafka_credential_test.go"
+    ],
+    "unchangedProcessImageBodies": true,
+    "processImagePriorIndividualPassOnly": true,
+    "currentProcessImageTestsDispatched": 0,
+    "currentKafkaParentThreeChildrenMustRun": true,
+    "historicalCleanupAndLauncherReceiptsAreNotCurrentPackagePASS": true,
+    "currentWholeOwnedcontrolPackagePASS": false,
+    "originalCrossSourceObligationsKept": true
+  },
+  "currentKafkaConfirmControl": {
+    "phase": "current-kafka-confirm",
     "targets": {
       "internal/namespaceimport/ownedcontrol": [
-        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny",
-        "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
+        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
       ]
     },
     "requiredSubtests": {
       "internal/namespaceimport/ownedcontrol": {
         "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
           "create-reply-error-and-shape-cannot-be-a-success",
-          "describe-reply-error-and-shape-cannot-replace-exact-deny"
-        ],
-        "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation": [
-          "actual-original-image-and-bounded-file-pins",
-          "real-fd-path-stability-and-mid-read-cancellation"
+          "describe-reply-error-and-shape-cannot-replace-exact-deny",
+          "new-deny-visibility-is-bounded-without-grace-for-existing-denies"
         ]
       }
     },
     "goTimeoutSeconds": 180,
     "phaseGuardSeconds": 240,
-    "topPASS": 2,
-    "subPASS": 4,
+    "topPASS": 1,
+    "subPASS": 3,
     "samePackageSingleRaceInvocation": true,
     "newDatabaseFixtures": 0
   },
-  "historicalCleanupDependencyBoundary": {
-    "changedSourceTarget": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
-    "unchangedOriginalStopAndJoinBodies": true,
-    "nilObservationPathOriginalChecksAndEffectsPreserved": true,
-    "currentProcessImageParentChildrenMustRun": true,
-    "historicalProcessImageNamesAreNotCurrentPASS": true,
-    "historicalCleanupAndLauncherReceiptsAreNotCurrentPackagePASS": true,
-    "currentWholeOwnedcontrolPackagePASS": false,
-    "originalCrossSourceObligationsKept": true
+  "processImageHistoricalPass": {
+    "run": 42180539532,
+    "job": 127768872346,
+    "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+    "attempt": 1,
+    "source": {
+      "members": 1576,
+      "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
+    },
+    "rootReviewSHA256": "eebbe9f2a571f467390d017ead3abc7f80174356c7cba75ee25592fda8390de8",
+    "originalScope": "current-image-kafka",
+    "topPASS": 1,
+    "subPASS": 2,
+    "skip": 0,
+    "fail": 0,
+    "namedCompletions": [
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/actual-original-image-and-bounded-file-pins"
+      },
+      {
+        "package": "internal/namespaceimport/ownedcontrol",
+        "name": "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/real-fd-path-stability-and-mid-read-cancellation"
+      }
+    ],
+    "sourcePins": [
+      {
+        "target": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
+        "bytes": 28188,
+        "sha256": "d413c338a3b42786f206f1575e570c390a8814a9c702a1b87c5eed2a06f9eee9"
+      },
+      {
+        "target": "server/internal/namespaceimport/ownedcontrol/process_image_stream_linux_test.go",
+        "bytes": 3908,
+        "sha256": "80b653eb9cf2a943bc70da2eb81751891ceade8a6258ee3b16fd9e609d79217e"
+      }
+    ],
+    "sourceToolsPostExact": true,
+    "currentSourcePASS": false,
+    "currentPackagePASS": false,
+    "actualCurrentTestsDispatched": 0,
+    "runtimeAccepted": false
   }
 }

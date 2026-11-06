@@ -112,7 +112,7 @@ def console_observation(rows,monitor,main,terminals,phases):
  statuses|={prefix+gate for prefix in ('not_started_','stopped_','failed_final_') for gate in ('disk_gate','task_allocation_gate')}
  def status(value):return value if value in statuses else 'unobserved'
  def code(value):return value if type(value) is int and -128<=value<=255 else None
- names={'go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
+ names={'go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase'],run.CURRENT_KAFKA_CONFIRM_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
  def phase(value):
   label=value.get('phase');result={'phase':'unobserved','role':'none','scenario':'none','exitCode':code(value.get('exitCode')),'resourceStatus':status(value.get('resource',{}).get('status'))}
   if label in names:result['phase']=label
@@ -173,12 +173,36 @@ def checked_current_image_kafka_evidence(out):
  if historical['source']==run.FINAL_SOURCE or (out/'kafka-acl-passed-reuse.json').exists():raise ValueError('fresh current scope cannot alias historical Kafka reuse')
  return value
 
+def checked_current_kafka_confirm_evidence(out):
+ value=run.check_current_kafka_confirm_receipt(json.loads(run.regular(out/'current-kafka-confirm-names.json',65536)))
+ control=run.CURRENT_KAFKA_CONFIRM_CONTROL;package=next(iter(control['targets']));prefix='github.com/openimsdk/open-im-server/v3/'
+ events=json.loads(run.regular(out/'current-kafka-confirm-events.json',1<<20))
+ expected={(row['package'],row['name']) for row in value['namedCompletions']}
+ if not isinstance(events,list) or not events or any(set(row)-{'Time','Action','Package','Test','Elapsed'} or row.get('Package')!=prefix+package or row.get('Action') in ('fail','skip') for row in events):raise ValueError('exact finite current Kafka confirmation events required')
+ for action in ('run','pass'):
+  actual=[(package,row['Test']) for row in events if row.get('Test') and row.get('Action')==action]
+  if len(actual)!=4 or set(actual)!=expected:raise ValueError('current Kafka parent and all three child run/pass pairs required')
+ if len([row for row in events if row.get('Action')=='pass' and not row.get('Test')])!=1:raise ValueError('original current package completion required')
+ phases=[]
+ for path in sorted(out.glob('phase-*.json')):
+  phase=json.loads(run.regular(path,1<<20))
+  if phase.get('phase')==control['phase']:phases.append(phase)
+ if len(phases)!=1:raise ValueError('one original current Kafka confirmation phase required')
+ phase=phases[0];resource=phase.get('resource',{})
+ if type(phase.get('exitCode')) is not int or phase['exitCode']!=0 or resource.get('status')!='passed' or type(resource.get('exit_code')) is not int or resource['exit_code']!=0:raise ValueError('actual successful original Kafka confirmation process required')
+ post=json.loads(run.regular(out/'source-post.json',4096));before=json.loads(run.regular(out/'tools-before.json',65536));after=json.loads(run.regular(out/'tools-after.json',65536))
+ if post!={'accepted':True,'source':run.FINAL_SOURCE} or before!=after:raise ValueError('current original source/tool post differs')
+ historical=run.check_kafka_acl_receipt(json.loads(run.regular(out/'kafka-acl-historical-pass.json',65536)))
+ run.check_process_image_prior(json.loads(run.regular(out/'process-image-historical-pass.json',65536)))
+ if historical['source']==run.FINAL_SOURCE or (out/'kafka-acl-passed-reuse.json').exists() or (out/'current-image-kafka-names.json').exists():raise ValueError('current Kafka confirmation cannot alias older Kafka or image dispatch')
+ return value
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
   run.write(out/'collection.json',{'started':False,'accepted':False,'reason':'no-original-allocation','privateDataUploaded':False});pack(out);return 0
  if allocation.resolve()!=allocation or allocation.stat().st_uid!=os.getuid() or stat.S_IMODE(allocation.stat().st_mode)!=0o700 or json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original job allocation required')
- c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[]
+ c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None
  root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False;terminals={}
  for scenario in run.SCENARIOS:
   folder=root/('plane-'+scenario);work=root/('scenario-'+scenario);entry={'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False}
@@ -230,6 +254,10 @@ def collect():
  if (out/'current-image-kafka-names.json').exists():
   try:checked_current_image_kafka_evidence(out);current_image_kafka_accepted=True
   except Exception:failed=True
+ current_kafka_confirm_accepted=False
+ if (out/'current-kafka-confirm-names.json').exists():
+  try:checked_current_kafka_confirm_evidence(out);current_kafka_confirm_accepted=True
+  except Exception:failed=True
  kafka_reuse_accepted=False
  if (out/'kafka-acl-passed-reuse.json').exists():
   try:checked_kafka_acl_evidence(out);kafka_reuse_accepted=True
@@ -243,9 +271,11 @@ def collect():
  try:
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
- kafka_current_accepted=current_image_kafka_accepted and not kafka_reuse_accepted if fresh_required else kafka_reuse_accepted and not current_image_kafka_accepted
+ if confirm_required:kafka_current_accepted=current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted
+ elif fresh_required:kafka_current_accepted=current_image_kafka_accepted and not current_kafka_confirm_accepted and not kafka_reuse_accepted
+ else:kafka_current_accepted=kafka_reuse_accepted and not current_image_kafka_accepted and not current_kafka_confirm_accepted
  accepted=launcher_accepted and kafka_current_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required,'actualKafkaACLTestsDispatched':(1 if current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':(1 if current_image_kafka_accepted else None) if fresh_required else 0,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if confirm_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':confirm_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  emit_console_observation(rows,monitor,main,terminals,out)
  pack(out)
  return 0 if accepted else 1

@@ -846,7 +846,7 @@ class FullGraphControls(unittest.TestCase):
 
   # The changed ownedcontrol package must run both exact tops in one race process.
   control=run.CURRENT_IMAGE_KAFKA_CONTROL;package=next(iter(control['targets']));parent=run.module('ci/backend-runtime-join-r7/run.py','image_kafka_pure_auditor')
-  locked=json.loads(run.INPUTS.read_bytes());run.check_current_image_kafka_plan(locked)
+  locked=json.loads(run.INPUTS.read_bytes());locked.update(kafkaACLTestsToRun=list(control['targets'][package][:1]),processImageTestsToRun=list(control['targets'][package][1:]),currentImageKafkaControl=copy.deepcopy(control),currentKafkaConfirmControl=None,kafkaACLPassedReuse=None);run.check_current_image_kafka_plan(locked)
   for change in ({'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'processImageTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentImageKafkaControl':{}}):
    with self.assertRaises(ValueError):run.check_current_image_kafka_plan(dict(locked,**change))
   events=[{'Action':'start','Package':parent.PREFIX+package}]
@@ -895,5 +895,58 @@ class FullGraphControls(unittest.TestCase):
      with self.assertRaises(ValueError):run.check_current_image_kafka_receipt(changed)
     run.write(out/'kafka-acl-passed-reuse.json',run.KAFKA_ACL_PASSED_REUSE)
     with self.assertRaises(ValueError):collector.checked_current_image_kafka_evidence(out)
+
+  # Only the changed Kafka top and its three children execute on this source.
+  control=run.CURRENT_KAFKA_CONFIRM_CONTROL;package=next(iter(control['targets']));parent=run.module('ci/backend-runtime-join-r7/run.py','kafka_confirm_pure_auditor')
+  locked=json.loads(run.INPUTS.read_bytes());run.check_current_kafka_confirm_plan(locked)
+  for change in ({'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']},{'kafkaACLTestsToRun':[]},{'currentKafkaConfirmControl':{}},{'processImageHistoricalPass':{}},{'currentImageKafkaControl':run.CURRENT_IMAGE_KAFKA_CONTROL}):
+   with self.assertRaises(ValueError):run.check_current_kafka_confirm_plan(dict(locked,**change))
+  events=[{'Action':'start','Package':parent.PREFIX+package}]
+  for top in control['targets'][package]:
+   events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
+   for child in control['requiredSubtests'][package][top]:
+    name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+   events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
+  events.append({'Action':'pass','Package':parent.PREFIX+package})
+  for mode in ('complete','missing-new-child','skip','image-redispatch','missing-footer','phase-error'):
+   with self.subTest(currentKafkaConfirmation=mode),tempfile.TemporaryDirectory() as directory:
+    out=Path(directory).resolve();seen=[];environment={'GOPROXY':'off','GOSUMDB':'off','GOCACHE':'/owned/race-cache'}
+    def command(label,argv,seconds,actual_environment):
+     seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,240);self.assertEqual(actual_environment,environment)
+     self.assertEqual(argv[:3],['/owned/go','test','-mod=readonly']);self.assertIn('-race',argv);self.assertIn('-timeout=180s',argv);self.assertEqual(argv[-1],'./'+package)
+     pattern=__import__('re').compile(argv[argv.index('-run')+1])
+     self.assertTrue(all(pattern.fullmatch(top) for top in control['targets'][package]));self.assertIsNone(pattern.fullmatch('TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation'))
+     if mode=='phase-error':raise ValueError('original phase failure')
+     rows=copy.deepcopy(events)
+     if mode=='missing-new-child':rows=[r for r in rows if r.get('Test')!='TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies']
+     elif mode=='skip':rows[2]['Action']='skip'
+     elif mode=='image-redispatch':rows.insert(1,{'Action':'run','Package':parent.PREFIX+package,'Test':'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation'})
+     elif mode=='missing-footer':rows=rows[:-1]
+     return ('\n'.join(json.dumps(r) for r in rows)+'\n').encode()
+    if mode!='complete':
+     with self.assertRaises(ValueError):run.run_current_kafka_confirm_control('/owned/go',environment,command,parent,out)
+     self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-kafka-confirm-names.json').exists());continue
+    value=run.run_current_kafka_confirm_control('/owned/go',environment,command,parent,out)
+    self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS']),(1,3));self.assertEqual(value['actualProcessImageTestsDispatched'],0)
+    self.assertEqual(value['source'],run.FINAL_SOURCE);self.assertFalse(value['runtimeAccepted']);self.assertFalse(value['wholeSourceAccepted'])
+    projected,_=run.project_go_test_events(('\n'.join(json.dumps(r) for r in events)+'\n').encode(),control['phase'])
+    run.write(out/'current-kafka-confirm-events.json',projected);run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}})
+    run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':{'bytes':1,'sha256':'a'*64,'mode':0o755}};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+    self.assertEqual(collector.checked_current_kafka_confirm_evidence(out),value)
+    original={name:(out/name).read_bytes() for name in ('current-kafka-confirm-events.json','phase-0001.json','source-post.json','tools-after.json','kafka-acl-historical-pass.json','process-image-historical-pass.json')}
+    for changed in ('events','phase','source-post','tools','historical-kafka','historical-image'):
+     for name,raw in original.items():(out/name).write_bytes(raw)
+     if changed=='events':(out/'current-kafka-confirm-events.json').write_text(json.dumps(projected[:-1]))
+     elif changed=='phase':(out/'phase-0001.json').write_text(json.dumps({'phase':control['phase'],'exitCode':0,'resource':{'status':'failed','exit_code':0}}))
+     elif changed=='source-post':(out/'source-post.json').write_text(json.dumps({'accepted':False,'source':run.FINAL_SOURCE}))
+     elif changed=='tools':(out/'tools-after.json').write_text('{}')
+     elif changed=='historical-kafka':(out/'kafka-acl-historical-pass.json').write_text('{}')
+     else:(out/'process-image-historical-pass.json').write_text('{}')
+     with self.subTest(currentKafkaCustody=changed),self.assertRaises(ValueError):collector.checked_current_kafka_confirm_evidence(out)
+    for name,raw in original.items():(out/name).write_bytes(raw)
+    for changed in (dict(value,source=run.PROCESS_IMAGE_PRIOR_PASS['source']),dict(value,topPASS=True),dict(value,subPASS=2),dict(value,actualProcessImageTestsDispatched=1),dict(value,runtimeAccepted=True),dict(value,wholeSourceAccepted=True),dict(value,namedCompletions=value['namedCompletions'][:-1])):
+     with self.assertRaises(ValueError):run.check_current_kafka_confirm_receipt(changed)
+    run.write(out/'current-image-kafka-names.json',{})
+    with self.assertRaises(ValueError):collector.checked_current_kafka_confirm_evidence(out)
 
 if __name__=='__main__':unittest.main()

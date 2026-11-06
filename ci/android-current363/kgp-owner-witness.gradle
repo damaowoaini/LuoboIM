@@ -1,0 +1,62 @@
+// Actual declaring-build and FileCollection identity witness. No publishing
+// task execution, version mutation, substitution or credential/property reads.
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import org.gradle.api.GradleException
+
+return { File owned, Map sealed, Closure localRef, Closure digestFile ->
+    def expectedOwner=[build_root_relative:'flutter/packages/flutter_tools/gradle',
+        project:':',project_relative:'flutter/packages/flutter_tools/gradle']
+    def expectedSources=['flutter/packages/flutter_tools/gradle/build.gradle.kts':['bytes':2867,'sha256':'8bce67c561f7a91bb743b443242b8d804ddc4190dc5524278bdecf8797515008'],'flutter/packages/flutter_tools/gradle/settings.gradle.kts':['bytes':165,'sha256':'56fe45270044d31615e1d9b8aa1410511a05b83ef431c24613b7907f225f9779']]
+    if (sealed.schema!=1 || sealed.owner!=expectedOwner || sealed.source_files!=expectedSources)
+        throw new GradleException('fixed declaring-build registry required')
+    def shape = {p,c ->
+        if (c.name!='kotlinBouncyCastleConfiguration' || p.path!=':' ||
+            p.rootProject.projectDir.absoluteFile!=new File(owned,expectedOwner.build_root_relative) ||
+            p.projectDir.absoluteFile!=new File(owned,expectedOwner.project_relative) ||
+            !p.configurations.any {it.is(c)}) return false
+        expectedSources.each {name,pin ->
+            def file=new File(owned,name)
+            if (file.canonicalFile!=file.absoluteFile ||
+                !Files.isRegularFile(file.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+                Files.getOwner(file.toPath(),LinkOption.NOFOLLOW_LINKS)!=Files.getOwner(owned.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+                Files.getAttribute(file.toPath(),'unix:nlink',LinkOption.NOFOLLOW_LINKS)!=1 ||
+                file.length()!=pin.bytes || digestFile(file)!=pin.sha256)
+                throw new GradleException('fixed Flutter declaring-build source differs')
+        }
+        if (p.gradle.gradleVersion!='9.3.1') throw new GradleException('fixed Gradle9.3.1 required')
+        true
+    }
+    def audit = {p,c,Map report ->
+        if (!shape(p,c)) throw new GradleException('foreign tooling configuration owner')
+        def wrappers=p.plugins.collect {plugin ->
+            def type=plugin.class
+            while(type!=null && type.name!='org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper') type=type.superclass
+            type
+        }.findAll {it!=null}.unique()
+        if (wrappers.size()!=1) throw new GradleException('one actual KGP base class required')
+        def type=wrappers[0]
+        if (type.classLoader.class.name!='org.gradle.internal.classloader.VisitableURLClassLoader$InstrumentingVisitableURLClassLoader')
+            throw new GradleException('unreviewed KGP classloading path')
+        def location=type.protectionDomain?.codeSource?.location
+        if (location==null || location.protocol!='file') throw new GradleException('actual original KGP CodeSource missing')
+        def source=localRef(new File(location.toURI()))
+        if (!source.path.startsWith('gradle-cache/')) throw new GradleException('owned actual KGP CodeSource required')
+        def taskClasses=[generatePgpKeys:'org.jetbrains.kotlin.gradle.tasks.publishing.GeneratePgpKeys',
+            checkSigningConfiguration:'org.jetbrains.kotlin.gradle.tasks.publishing.CheckSigningTask']
+        def consumers=taskClasses.collect {name,className ->
+            def task=p.tasks.named(name).get();def taskType=task.class
+            while(taskType!=null && taskType.name!=className) taskType=taskType.superclass
+            if (taskType==null || taskType.protectionDomain?.codeSource?.location!=location)
+                throw new GradleException('actual KGP publishing task implementation differs')
+            def from=task.bouncyCastleClasspath.getFrom()
+            if (from.size()!=1 || !from.iterator().next().is(c))
+                throw new GradleException('actual publishing FileCollection binding differs')
+            [task:name,implementation_class:className,same_code_source:true,configuration_bound_by_identity:true]
+        }
+        [schema:1,owner:expectedOwner,configuration:c.name,registered_by_identity:true,
+            source_files:expectedSources,implementation:[class_name:type.name,
+            classloader:type.classLoader.class.name,code_source:source],consumers:consumers,report:report]
+    }
+    [scoped:shape,audit:audit]
+}
