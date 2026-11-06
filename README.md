@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端普通源码仅修正cluster测试对go-redis v9.23.0 MaxRetries的期望0→-1，生产重试参数及两份owned recovery实现未改。新来源 `1576/f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f` 只fresh cache2top7sub；旧BFF来源已完成producer1top13sub和Kafka1top3sub，但cache一child失败、整命令未通过且未进入16编译/运行。两完成包仅通过精确测试差异桥兼容复用，sameWholeSource=false；新缓存控制、原16编译/4场景/graph2top3sub与清理验收仍须独立完成。二十服务联调尚未通过。
+- 后端普通源码仅修验收fixture将HH:MM误当cron表达式的问题，保留23:59/23:58每日时刻与原生产scheduler。新graph `1577/6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115` 仅fresh实际配置生成/默认解析器合同1top3sub；先以固定三roots的实际go list -deps -test证明不含变更的runtimeacceptance，再用精确两literal反转及移除独立新test重建旧f2来源，才兼容复用cache2top7sub与原producer1top13sub/Kafka1top3sub来源链（0重派、sameWholeSource=false）。原fdec已通过cache、16编译和首场景，第二场景crontask注册观察done；该值未证明唯一实际首错。原图与清理、二十服务联调仍待验收。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

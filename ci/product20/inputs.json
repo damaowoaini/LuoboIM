@@ -6,10 +6,10 @@
   "graphProvider": {
     "path": "ci/backend-fullgraph/run.py",
     "source": {
-      "members": 1576,
-      "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
+      "members": 1577,
+      "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
     },
-    "status": "formatted-cache-test-delta-source-only-no-current-core14-artifact"
+    "status": "formatted-cron-fixture-contract-source-only-no-current-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "77261c8507ca4985d0fe0c98ace7ac077326c1ccfb56f9860db4afbce5261ab1",
-    "ci/backend-fullgraph/inputs.json": "9a146261f69b357d1c0f181b6c9372acc3b47cb0ed1a553be8a061526bd76655",
+    "ci/backend-fullgraph/run.py": "fce7fc3ddc8b6a31eea0a0584f588ea86f288888abaa2790f3bd42a5fa4b3d0e",
+    "ci/backend-fullgraph/inputs.json": "74773906f29a109b569c1b5d0f75667ba95c8991e33559f4dcd18890ade9784a",
     "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "ab233d389211e7eab830789475ccb1d7ae8c87bb22e62e5e4296d2ca090e62c6",
@@ -85,16 +85,16 @@
   },
   "fixtureConfiguration": {
     "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
-    "beforeSHA256": "724892450bb0d412f80af390c3ccb252aafee7437c02b0105111e757fc73909c",
-    "afterSHA256": "f70a551e9b4f57859bc17e5bbb61a89b7bc9e4b5e27fd0e0820123c147d0a950",
+    "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
+    "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
     "exactSingleAnchor": "\"secret\": c[\"serviceSecret\"], \"multiLoginPolicy\": 1",
     "replacement": "\"secret\": c[\"serviceSecret\"], \"adminDelegation\": map[string]any{\"issuer\": b.Header.Tenant}, \"mysql\": fixtureSQL, \"messageVerify\": map[string]bool{\"friendVerify\": false}, \"multiLoginPolicy\": 1",
     "purpose": "Task real tenant issuer, actual schema-only SQL policy DB, explicit friendVerify=false before every role config/bootstrap generation; auxiliary-only derivative, product14 and old four scenarios untouched",
     "constructorPrefix": "\tfixtureSQL,e := product20FixtureSQL(b); if e != nil { return \"\",e }\n"
   },
   "derivedHarnessSource": {
-    "members": 1578,
-    "digest": "306924ec52dcb60d1b0d23b7f4365a53124ef4f21033787c8e6dcfbe27909645"
+    "members": 1579,
+    "digest": "ee5c80f0d41ae41d01430d59824fa56b88e18cefebcc2f3c6aeb004617054983"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

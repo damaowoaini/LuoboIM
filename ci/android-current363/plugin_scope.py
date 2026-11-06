@@ -162,6 +162,95 @@ def check_tree(root, expected, budget=None):
             raise ValueError('plugin source body differs from independent origin')
 
 
+def tree_delta(expected, actual):
+    """Diagnostic only; unknown generated names are hashed, never admitted."""
+    wanted, present = set(expected), set(actual)
+    added, missing = sorted(present - wanted), sorted(wanted - present)
+    prefixes = ('android/.cxx/', '.cxx/', 'android/.externalNativeBuild/',
+                'android/.gradle/', 'android/build/')
+    families = {key: 0 for key in (*prefixes, 'other')}
+    for name in added:
+        family = next((key for key in prefixes if name.startswith(key)), 'other')
+        families[family] += 1
+    return {'added_count': len(added), 'missing_count': len(missing),
+            'added_families': families,
+            'added_path_SHA256_sample': [rich.sha(name.encode()) for name in added[:12]],
+            'missing_public_source_sample': missing[:12],
+            'sample_limit': 12, 'source_body_verification_complete': False,
+            'original_gate_still_refused': True}
+
+
+def _record_tree_refusal(work, entry, expected, budget):
+    # First failure wins. A diagnostic error must not replace/relax check_tree.
+    try:
+        root = Path(work) / entry['package_relative']
+        if root.resolve(strict=True) != root:
+            return
+        actual = []
+        for directory, names, files in os.walk(root, followlinks=False):
+            if budget is not None:
+                budget.check()
+            if len(actual) + len(files) > 100000:
+                return
+            actual.extend(str((Path(directory) / name).relative_to(root)) for name in files)
+        value = {'schema': 1, 'kind': 'plugin-tree-refusal-v1',
+                 'project': entry['project'], 'slot': entry['slot'],
+                 **tree_delta([row['path'] for row in expected], actual)}
+        s.write_json(Path(work) / 'evidence/plugin-tree-refusal' / (entry['slot'] + '.json'), value)
+    except Exception:
+        pass
+
+
+def native_staging_scopes(spec):
+    app = {'project': ':app', 'slot': rich.sha(b':app'),
+           'project_relative': 'source/app/android/app'}
+    return sorted([app] + [{key: row[key] for key in ('project', 'slot', 'project_relative')}
+                          for row in spec['projects']], key=lambda row: row['project'])
+
+
+def validate_native_staging(value, spec, phase, seal_sha):
+    if (phase not in {'metadata', 'apk'} or set(value) != {'schema', 'kind', 'phase', 'source_digest',
+            'plugin_contract_sha256', 'plugin_seal_sha256', 'projects'}
+            or value['schema'] != 1 or value['kind'] != 'current363-native-staging-model-v1'
+            or value['phase'] != phase or value['source_digest'] != SOURCE_DIGEST
+            or value['plugin_contract_sha256'] != CONTRACT_SHA or value['plugin_seal_sha256'] != seal_sha):
+        raise ValueError('source-bound native staging phase/model required')
+    expected = native_staging_scopes(spec)
+    if len(value['projects']) != len(expected):
+        raise ValueError('complete finite native staging projects required')
+    for row, scope in zip(value['projects'], expected):
+        if (set(row) != {'project', 'slot', 'project_relative', 'engines'}
+                or any(row[key] != scope[key] for key in scope)
+                or set(row['engines']) != {'cmake', 'ndkBuild'}):
+            raise ValueError('native staging project differs from independent source scope')
+        for engine, leaf in [('cmake', 'cmake'), ('ndkBuild', 'ndk-build')]:
+            actual = row['engines'][engine]
+            if (set(actual) != {'path', 'active'} or type(actual['active']) is not bool
+                    or actual['path'] != 'native-staging/' + scope['slot'] + '/' + leaf):
+                raise ValueError('external native staging must use the exact owned output path')
+        if row['project'] == ':jni' and row['engines']['cmake']['active'] is not True:
+            raise ValueError('locked JNI source requires its active CMake model')
+    return expected
+
+
+def verify_native_staging(work, here, inputs, phase):
+    if phase not in {'metadata', 'apk'}:
+        raise ValueError('finite native staging phase required')
+    work = Path(work)
+    spec = contract(here, inputs)
+    value = json.loads(rich.read(work / ('evidence/native-staging-model-' + phase + '.json'), 64 << 10))
+    scopes = validate_native_staging(value, spec, phase, rich.sha(rich.read(work / SEAL, 16 << 20)))
+    for scope in scopes:
+        for leaf in ('cmake', 'ndk-build'):
+            path = work
+            for part in ('native-staging', scope['slot'], leaf):
+                path = path / part
+                if (path.resolve(strict=True) != path or not path.is_dir()
+                        or path.lstat().st_uid != os.getuid()):
+                    raise ValueError('native staging directory alias/type/owner refused')
+    return value
+
+
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         return None
@@ -273,7 +362,11 @@ def verified(work, here, inputs, budget=None):
             files = archive_rows(archive, spec['archive_limits'], approved['archive_sha256'], budget)
         if value['files'] != files:
             raise ValueError('source manifest must derive from exact independent origin')
-        check_tree(work / entry['package_relative'], files, budget)
+        try:
+            check_tree(work / entry['package_relative'], files, budget)
+        except (ValueError, OSError):
+            _record_tree_refusal(work, entry, files, budget)
+            raise
         expected = {'source/' + p: h for p, h in spec['App_scope_sources'].items()}
         for row in files:
             path = row['path']

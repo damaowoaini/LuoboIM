@@ -327,6 +327,7 @@ class Job(generic.Job):
                 raise ValueError('fixed production APK dispatch required')
             rich_origins.require_origin_binding(self.w,HERE)
             aapt2_tool.require(self.w,HERE)
+            plugin_scope.verify_native_staging(self.w,HERE,self.inputs,'metadata')
             plugin_scope.require_origin_binding(self.w,HERE,self.inputs)
             plugin_before=plugin_scope.verified(self.w,HERE,self.inputs,self.b)[1]
             binding=classpaths.verified_catalog(self.w);args=list(args)+['-I',HERE/'resolve.gradle']
@@ -342,6 +343,9 @@ class Job(generic.Job):
             'catalog_sha256':None if binding is None else binding[1]})
         try:
             result=s.run(args,cwd,effective,self.w,self.b,label,timeout,reject,stdin)
+            if label in ('gradle-dependency-setup','assemble-debug'):
+                plugin_scope.verify_native_staging(self.w,HERE,self.inputs,
+                    'metadata' if label=='gradle-dependency-setup' else 'apk')
             if label=='pub-get':
                 s.write_json(self.w/'evidence/current-webview-archive-metadata.json',
                     check_current_packages(self.w,self.context))

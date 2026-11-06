@@ -1,0 +1,41 @@
+{
+  "state": "private_candidate_multipart_resume_not_formatted_analyzed_tested_signed_or_device_verified",
+  "purpose": "旧版全局 SharedPreferences 资料通过用户明确导出后导入萝卜对话，不能跨包名直接读取沙箱",
+  "source_application_id": "com.jrtxa.wanfeng.app",
+  "target_application_id": "com.luoboduihua.imapp",
+  "integration": [
+    "将 legacy_personal_export.dart 和 app/lib/features/personal/data/personal_migration.dart（正文不变）复制进旧项目 lib/migration/；不修改只读 references 基线",
+    "旧项目必须显式核对并接入兼容的 package:crypto 3.x；其余组件继续使用 SharedPreferences/path_provider/share_plus 7.2.x，尚未验证旧依赖解析/编译",
+    "在旧笔记或待办入口加入 LegacyPersonalExportButton；必须保留原 application ID、签名/Team 和升级权限，不可先卸载旧 App",
+    "先把原始偏好字符串流式写入独立备份目录的 original.json，关闭并 flush 后记录 raw-complete；不删除原键/旧文件。之后分卷、拒绝报告和 SHA 清单最后写入",
+    "通过系统分享保存 manifest.json、original.json、unmigrated.json 与全部 part-N.json；保持文件名。系统真实多文件分享和保存成功需要设备核实",
+    "新 App 登录资料实际归属账号，在资料管理 → 导入分卷资料，首次同时选择清单、原始备份、拒绝报告与要导入的卷，显式确认 unknown-owner 归属",
+    "同账号再次选择同一 manifest.json 与未完成卷可续传；首导 raw/report SHA 验证收据只在该账号 SQLite 中有效，其他账号需重新选择原始备份/报告并确认",
+    "每卷哈希/来源序号校验，数据和来源→目标 ID 收据同一事务；事务内检测到账号失效整卷回滚，进程中断按SQLite原子事务恢复；已完成卷不重放，不覆盖后来编辑/删除的记录",
+    "核对已完成/待导入卷与拒绝报告；拒绝记录原文仍在 original.json，完整原件与旧 App 应继续保留，不能把部分导入称作完整迁移",
+    "历史单文件 legacy 与 luobo-personal-data/v1 路径保留，不要求历史文件补清单；新版专用分卷格式必须走分卷入口"
+  ],
+  "limits": [
+    "当前仅私有源码候选；当前 App539/native 构建输入未改变，未执行格式/静态/测试/旧签名升级/新旧端实际构建或设备验收",
+    "无法签名升级原 Bundle/application ID 时，当前不能访问其已有沙箱；新 Bundle 不能假定直接读取旧资料",
+    "旧 App 原始字段样本、真实历史数据与系统多文件选择/分享行为缺少证据。适配器只支持当前已知字段；其他字段/无效/超长单项保留 raw，明确未迁移",
+    "单卷仍最多16MiB和10000条，按含转义/信封的实际UTF8字节分卷；当前模型toJson正常化后的合法单项可容纳；原始超大表示仍受边界约束，超大单项不截断/不拆成虚假笔记",
+    "分卷器逐项解码，但 SharedPreferences 本身仍把两条原始 String 载入内存；源跨度列表占用随条目数增加。无限大输入/低内存旧设备仍需实机证据",
+    "无法可靠解析根数组时整类原文保全、sourceCount未知并标记结构错误；不把可见前缀或部分卷算成该类完整迁移",
+    "最多10000个分卷且清单仍受16MiB上限；超出时完整raw仍保留，仅可分享raw，不能宣称完成分卷",
+    "来源顺序按 kind+sourceIndex 和收据保留，原ID保留；与现有数据冲突时新ID写入稳定映射。正常列表仍沿现有置顶/更新时间排序",
+    "备份与拒绝报告是明文，本地不删除副本且不自动上传；raw-complete只是本地完整写入标记，不证明用户已把系统分享文件保存到外部",
+    "恢复收据在新 App 账号数据库内，正常重启可续传；卸载/清空新 App 数据后需由原备份重新恢复，不能声称跨沙箱自动继承收据",
+    "两张收据表按可重复事务附加，不修改原表且保留user_version1；源码保留旧reader兼容路径，实际SQLite/回退测试尚未执行",
+    "共用codec和其4条测试不使用dart:io；仅源码portable审查，浏览器单条定向验证尚未执行，不能称Web或设备全功能验收"
+  ],
+  "format": {
+    "manifest": "luobo-personal-migration/v1",
+    "part": "luobo-personal-migration-part/v1",
+    "owner": null,
+    "legacy_single_and_owned_v1": "unchanged",
+    "raw_offsets": "UTF16 indices into decoded local_notes/local_todos String, not byte offsets in envelope",
+    "receipt": "Additive SQLite migration_sets + migration_parts, user_version remains1 for old reader compatibility; per-part ordered sourceIndex/originalId/targetId/action with exact manifest/part/account pins",
+    "portable_codec": "dart:convert + crypto only; bounded Stream writer callback; File/Directory/fsync remain in old helper"
+  }
+}

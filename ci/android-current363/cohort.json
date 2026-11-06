@@ -218,14 +218,14 @@
       "sha256": "cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625"
     },
     {
-      "bytes": 21705,
+      "bytes": 26610,
       "path": "ci/android-current363/plugin_scope.py",
-      "sha256": "7a3c9621a275f996593bb937369d21580ce0c92c3045b2a078f458742a656fee"
+      "sha256": "3d4c32c3e1a635f2c0d67534ab06f0fc0d1fcee3188335d6fe51b50910ef46c9"
     },
     {
       "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "4e472c659f2d0c9f01ea1a9fff4d806b73a5991b16ca53d21c9c69cfa4ac29e8"
+      "sha256": "3bb2852837ff3b87a97b014b2c6896a373f54736edbfaa21a30878eceefbb4ab"
     },
     {
       "bytes": 1384,
@@ -233,9 +233,9 @@
       "sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
     },
     {
-      "bytes": 61482,
+      "bytes": 67116,
       "path": "ci/android-current363/resolve.gradle",
-      "sha256": "a4a1ed2f83b19508428b8fca0a1e0529b19732b4c5204dde4b55621de32cf352"
+      "sha256": "e68ef15af1d67164d1ffb12aa74367a0f946a45dec0c01255655c3cb9a0b25f1"
     },
     {
       "bytes": 71217,
@@ -258,14 +258,14 @@
       "sha256": "4846a1d6fd256dc2a13f6f54a692801c771df1379f4db066f1437a921bd1c0b0"
     },
     {
-      "bytes": 32303,
+      "bytes": 32611,
       "path": "ci/android-current363/run.py",
-      "sha256": "12abed1389f51005364cecebb5ea49f20bd76e03983d15fa018e2b56507a25be"
+      "sha256": "54f407a11b54864a04802ed58f6b87db0f858acb5baba57321874cc45f7d9a01"
     },
     {
-      "bytes": 12307,
+      "bytes": 15984,
       "path": "ci/android-current363/test_identity.py",
-      "sha256": "11fccf63bc986ed5c83389c5703c2fb29765032bfcb3c523397daf05ddd594a0"
+      "sha256": "2fb59f13e9160b87d5eb1dbfb419f7aedf949da2ecd645213585b5fc7f44e396"
     },
     {
       "bytes": 3621,
@@ -408,7 +408,7 @@
     "fixture": {
       "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "4e472c659f2d0c9f01ea1a9fff4d806b73a5991b16ca53d21c9c69cfa4ac29e8"
+      "sha256": "3bb2852837ff3b87a97b014b2c6896a373f54736edbfaa21a30878eceefbb4ab"
     },
     "mandatory_preseal_after_builtin_before_production_models": true,
     "owned_outputs_policy_unchanged": true,

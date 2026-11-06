@@ -1,0 +1,384 @@
+{
+  "acceptance_limits": [
+    "No candidate CLI/pure/format/analyze/test/build/network/cloud execution performed",
+    "No old SDK/signing upgrade/real legacy fields/fsync/OS picker or file share verification",
+    "No native App539/M/E adoption or modification",
+    "No fresh old34/39 or full Mobile403/Web107/Admin89 regression"
+  ],
+  "analysis_paths6": [
+    "lib/features/personal/data/personal_migration.dart",
+    "lib/features/personal/data/personal_repository.dart",
+    "lib/features/personal/presentation/personal_page.dart",
+    "test/features/personal/personal_action_epoch_test.dart",
+    "test/features/personal/personal_migration_repository_test.dart",
+    "test/features/personal/personal_migration_test.dart"
+  ],
+  "auxiliary": [
+    {
+      "meaning": "exact eighth source JSON parsed; outside canonical portable closure",
+      "path": "migration/legacy_personal_export/integration.json"
+    },
+    {
+      "derived_from": "app/lib/features/personal/data/personal_migration.dart",
+      "meaning": "owned static adapter context only; no old-device or real filesystem acceptance",
+      "path": "migration/legacy_personal_export/personal_migration.dart",
+      "sha256": "c5fe1339d28041a1e1bcc5db44d5ca0b295f42a8d2f6e82e5a28c7b36ebd255a"
+    }
+  ],
+  "browser_name": "part/body source-index manifest and cross-account claims fail closed",
+  "candidateInputPaths": [
+    {
+      "bytes": 15368,
+      "originalPath": "app/lib/features/personal/data/personal_migration.dart",
+      "path": "ci/candidates/personal-multipart/after/app/lib/features/personal/data/personal_migration.dart",
+      "sha256": "c5fe1339d28041a1e1bcc5db44d5ca0b295f42a8d2f6e82e5a28c7b36ebd255a"
+    },
+    {
+      "bytes": 13901,
+      "originalPath": "app/lib/features/personal/data/personal_repository.dart",
+      "path": "ci/candidates/personal-multipart/after/app/lib/features/personal/data/personal_repository.dart",
+      "sha256": "c85fab3c7a35f5777a593980d87b16146d94362d51cfc23a5c0e06a842e595ba"
+    },
+    {
+      "bytes": 33733,
+      "originalPath": "app/lib/features/personal/presentation/personal_page.dart",
+      "path": "ci/candidates/personal-multipart/after/app/lib/features/personal/presentation/personal_page.dart",
+      "sha256": "bcc0dfe0a42fe0e8de4379f7f3b20cb65abf011a9d942b8c0520a7e912244c05"
+    },
+    {
+      "bytes": 14783,
+      "originalPath": "app/test/features/personal/personal_action_epoch_test.dart",
+      "path": "ci/candidates/personal-multipart/after/app/test/features/personal/personal_action_epoch_test.dart",
+      "sha256": "c7a02b6dc6df635a4c204b7f44306fbca7631b4cc17a0ca18d5ea06b2e9c2f02"
+    },
+    {
+      "bytes": 9329,
+      "originalPath": "app/test/features/personal/personal_migration_repository_test.dart",
+      "path": "ci/candidates/personal-multipart/after/app/test/features/personal/personal_migration_repository_test.dart",
+      "sha256": "f92ef8f88f88a62c2a4702f6bb9440b1a52fdb293f1b12e3dda57c77d4cde989"
+    },
+    {
+      "bytes": 6716,
+      "originalPath": "app/test/features/personal/personal_migration_test.dart",
+      "path": "ci/candidates/personal-multipart/after/app/test/features/personal/personal_migration_test.dart",
+      "sha256": "aeffbc2251765d7be6ad984f553f2df5c7091325ee041c7c56200220be21422f"
+    },
+    {
+      "bytes": 4963,
+      "originalPath": "migration/legacy_personal_export/integration.json",
+      "path": "ci/candidates/personal-multipart/after/migration/legacy_personal_export/integration.json",
+      "sha256": "add5be3db4385a71bf34ea51c9ff23a0480e5f6bfe00883204c63f0dfa61bddd"
+    },
+    {
+      "bytes": 5188,
+      "originalPath": "migration/legacy_personal_export/legacy_personal_export.dart",
+      "path": "ci/candidates/personal-multipart/after/migration/legacy_personal_export/legacy_personal_export.dart",
+      "sha256": "e713c7880f6de0294865086cab0e4ca942b9b83be50661b7d7c09aae2e23e461"
+    }
+  ],
+  "candidate_input_prefix": "ci/candidates/personal-multipart/after",
+  "canonical_head": {
+    "App539Adopted": false,
+    "legacy8CanonicalTargetsModified": false,
+    "portable": {
+      "digest": "0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f",
+      "members": 415
+    },
+    "source": {
+      "digest": "a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475",
+      "members": 363
+    }
+  },
+  "controller_pins": [
+    {
+      "bytes": 2586,
+      "path": ".github/workflows/personal-multipart-targeted.yml",
+      "sha256": "128ddc6508ddcfa879c477c0cdb7bd2a165b17c4ffc094527e1f75d6721cd2c4"
+    },
+    {
+      "bytes": 28041,
+      "path": "ci/personal-multipart.py",
+      "sha256": "67a48899547a0193a467c845fd1d03582be19b9e5d3303726fd58cb3f01577e6"
+    }
+  ],
+  "delta8": [
+    {
+      "after": {
+        "bytes": 15368,
+        "path": "app/lib/features/personal/data/personal_migration.dart",
+        "sha256": "c5fe1339d28041a1e1bcc5db44d5ca0b295f42a8d2f6e82e5a28c7b36ebd255a"
+      },
+      "before": null,
+      "path": "app/lib/features/personal/data/personal_migration.dart"
+    },
+    {
+      "after": {
+        "bytes": 13901,
+        "path": "app/lib/features/personal/data/personal_repository.dart",
+        "sha256": "c85fab3c7a35f5777a593980d87b16146d94362d51cfc23a5c0e06a842e595ba"
+      },
+      "before": {
+        "bytes": 6353,
+        "path": "app/lib/features/personal/data/personal_repository.dart",
+        "sha256": "2dabc8df3d748e2e4046ff0d2c7baeb2cb548d62e497373d887a802269df6473"
+      },
+      "path": "app/lib/features/personal/data/personal_repository.dart"
+    },
+    {
+      "after": {
+        "bytes": 33733,
+        "path": "app/lib/features/personal/presentation/personal_page.dart",
+        "sha256": "bcc0dfe0a42fe0e8de4379f7f3b20cb65abf011a9d942b8c0520a7e912244c05"
+      },
+      "before": {
+        "bytes": 27726,
+        "path": "app/lib/features/personal/presentation/personal_page.dart",
+        "sha256": "c3bbd8ff492ad9d73d17846e56c891aa09ea06f4a4509a1686364c95d9dafd91"
+      },
+      "path": "app/lib/features/personal/presentation/personal_page.dart"
+    },
+    {
+      "after": {
+        "bytes": 14783,
+        "path": "app/test/features/personal/personal_action_epoch_test.dart",
+        "sha256": "c7a02b6dc6df635a4c204b7f44306fbca7631b4cc17a0ca18d5ea06b2e9c2f02"
+      },
+      "before": {
+        "bytes": 9574,
+        "path": "app/test/features/personal/personal_action_epoch_test.dart",
+        "sha256": "827a18f8fe272057a1dea989703962c29bc001f1b714c84ceefb50fe9af769f2"
+      },
+      "path": "app/test/features/personal/personal_action_epoch_test.dart"
+    },
+    {
+      "after": {
+        "bytes": 9329,
+        "path": "app/test/features/personal/personal_migration_repository_test.dart",
+        "sha256": "f92ef8f88f88a62c2a4702f6bb9440b1a52fdb293f1b12e3dda57c77d4cde989"
+      },
+      "before": null,
+      "path": "app/test/features/personal/personal_migration_repository_test.dart"
+    },
+    {
+      "after": {
+        "bytes": 6716,
+        "path": "app/test/features/personal/personal_migration_test.dart",
+        "sha256": "aeffbc2251765d7be6ad984f553f2df5c7091325ee041c7c56200220be21422f"
+      },
+      "before": null,
+      "path": "app/test/features/personal/personal_migration_test.dart"
+    },
+    {
+      "after": {
+        "bytes": 4963,
+        "path": "migration/legacy_personal_export/integration.json",
+        "sha256": "add5be3db4385a71bf34ea51c9ff23a0480e5f6bfe00883204c63f0dfa61bddd"
+      },
+      "before": {
+        "bytes": 1666,
+        "path": "migration/legacy_personal_export/integration.json",
+        "sha256": "3964ea5367d1c5b72b92e05b47d43239fe2c4b1cbb7b9cf3a3c82f60edfcd488"
+      },
+      "path": "migration/legacy_personal_export/integration.json"
+    },
+    {
+      "after": {
+        "bytes": 5188,
+        "path": "migration/legacy_personal_export/legacy_personal_export.dart",
+        "sha256": "e713c7880f6de0294865086cab0e4ca942b9b83be50661b7d7c09aae2e23e461"
+      },
+      "before": {
+        "bytes": 2942,
+        "path": "migration/legacy_personal_export/legacy_personal_export.dart",
+        "sha256": "1a842c3376d4b5f59e9279b0ee6eb8546f80675c20e4f37569390540744508ce"
+      },
+      "path": "migration/legacy_personal_export/legacy_personal_export.dart"
+    }
+  ],
+  "format_notice": "HEAD remains canonical363/415. Read legacy8 after only from the fixed candidate prefix; one cloud-owned official format --output=write derives7 Dart for same-source analysis/12+browser1. Adopt only strictly bound formatted artifacts plus unchanged JSON after success; no raw App adoption or extra setup.",
+  "format_paths7": [
+    "lib/features/personal/data/personal_migration.dart",
+    "lib/features/personal/data/personal_repository.dart",
+    "lib/features/personal/presentation/personal_page.dart",
+    "test/features/personal/personal_action_epoch_test.dart",
+    "test/features/personal/personal_migration_repository_test.dart",
+    "test/features/personal/personal_migration_test.dart",
+    "../migration/legacy_personal_export/legacy_personal_export.dart"
+  ],
+  "formatter_successor": {
+    "analysis_and_tests_use": "same formatter-derived source",
+    "binding_receipt": "evidence/personal-formatter-derived.json",
+    "change_location": "fresh owned source only",
+    "command": "official pinned dart format --output=write",
+    "dart_text_artifact_cap_bytes": 1048576,
+    "derived_sibling_codec": "copy byte-identical formatted App codec after proving original scope",
+    "extra_formatter_paths": 0,
+    "formatter_calls": 1,
+    "formatter_output_artifact": "evidence/formatted-source/{same7DartPaths}",
+    "full_input_and_output_pins": true,
+    "input_HEAD_direct_PASS": false,
+    "input_dart_paths": 7,
+    "source_manifest_or_lock_or_original_setup_rewritten": false
+  },
+  "legacy_manifest": {
+    "bytes": 3958,
+    "path": "references/integration/personal-multipart-resume-20261106-candidate/manifest.json",
+    "sha256": "bf9d9b1b13e494ad2119c62a0369a2911883fa069b2876686474c0d3576e261a"
+  },
+  "old_tests_redispatched": 0,
+  "parent_head": "1ef9d4920278da3aa407a2c8f6d4fc37fd12896b",
+  "parent_pins": [
+    {
+      "bytes": 36320,
+      "path": "ci/mobile-source.py",
+      "sha256": "4b974b5a5f4de270affe25313ef97b8c6eea8cc2b81e85ca0d6332b26340d35b"
+    },
+    {
+      "bytes": 36251,
+      "path": "ci/mobile-check.py",
+      "sha256": "c73873d8dc22bd256a9a5aab7831f5da6e8e75b90646a9f1300ef7ccb8387081"
+    },
+    {
+      "bytes": 35598,
+      "path": "ci/mobile-announcement.py",
+      "sha256": "c591483c07277305974b1964aa1a235a0f78c51f8d18ba6a677564001f959035"
+    },
+    {
+      "bytes": 193400,
+      "path": "ci/mobile/inputs.json",
+      "sha256": "df60daca701faef61c14eed46ce86f760062002f6b4e417e287c58f133f75df4"
+    },
+    {
+      "bytes": 2425409,
+      "path": "ci/mobile/required-test-names.json",
+      "sha256": "159823b546a914fe5bcb2570d666d6f4da43629ce450b2521772f2c096d80f92"
+    },
+    {
+      "bytes": 7411,
+      "path": "ci/mobile-setup.sh",
+      "sha256": "d200b959cfd3e6f7f0b5353ea756bbe4facd8a45e27227f8a9c13bc72883b82e"
+    },
+    {
+      "bytes": 7390,
+      "path": "ci/mobile-input-setup.sh",
+      "sha256": "49866848bf88c7877352caee2f77e20a37b67f79d03fbb54db9ad43f11a9740e"
+    },
+    {
+      "bytes": 1687,
+      "path": ".github/workflows/mobile-input.yml",
+      "sha256": "937b8cf202126345d1cef16aa716a3cbfb3d0d5345cadee578fd45d3d7d6e9e8"
+    },
+    {
+      "bytes": 2732,
+      "path": ".github/workflows/mobile-ci.yml",
+      "sha256": "72724f6325d93da3b20e91788177461fab832f71adf2677c89c863c74c08d801"
+    },
+    {
+      "bytes": 39925,
+      "path": "ci/mobile-input.py",
+      "sha256": "2e1993f28be8de964f680e4c48359086a703fcbe2ca0cc9339896cc44fe9db04"
+    },
+    {
+      "bytes": 29374,
+      "path": "ci/mobile-input-vm.py",
+      "sha256": "ae45ee63b40bb6363bc0e32a17be7654a19b51a4ffc80a258898b520ad0becd4"
+    },
+    {
+      "bytes": 1726,
+      "path": ".github/workflows/mobile-input-vm-diagnostic.yml",
+      "sha256": "9a476f746db69f0695cd6fb2acaed2c2e5282958f166a6cdbfc73f2ee163ecbe"
+    },
+    {
+      "bytes": 150186,
+      "path": "ci/mobile-input/inputs.json",
+      "sha256": "ad4399fee6290949734a9e97b70dbb26ca198829ecdc770e4ab3502c28642d7d"
+    },
+    {
+      "bytes": 343998,
+      "path": "ci/mobile-input/required-test-names.json",
+      "sha256": "703aae589ce0f8e80e0cea26347d6404c2b85f68f0c9f81ab1774ae347ed6052"
+    },
+    {
+      "bytes": 69866,
+      "path": "ci/mobile-tag903.py",
+      "sha256": "e9ded1964f2293c8e90de2b970e505198bd2e1b9707de692f9675eb0bcdfe55e"
+    },
+    {
+      "bytes": 2731,
+      "path": ".github/workflows/mobile-tag903.yml",
+      "sha256": "ea3692800c67c7b86286528a6d3d56b069a5b9ed176392c620ed0dd4c0207b17"
+    },
+    {
+      "bytes": 5671,
+      "path": "ci/mobile-tag903/test_progress.py",
+      "sha256": "671870f96a19025e0c1883c69572003a20ef4b7a1833783895d7d485632dea47"
+    },
+    {
+      "bytes": 70647,
+      "path": "ci/mobile-tag903/inputs.json",
+      "sha256": "3f08d98b36a782b790da0767664f30ef19c1710c1a4907fdb0b104558a38e094"
+    }
+  ],
+  "portable_after": {
+    "digest": "0472b11bb2a5dcaa94d2ed6d233b68527f508c84d208540388de780137d14ce0",
+    "members": 418
+  },
+  "portable_before": {
+    "digest": "0b855344a87445abe3e9235e5a629da6bc83b658477d760b70095561f0c7ea6f",
+    "members": 415
+  },
+  "ready_to_dispatch": true,
+  "resource": {
+    "allocated_cap_bytes": 805306368,
+    "floor_bytes": 1073741824,
+    "initial_bytes": 4294967296,
+    "phase_seconds": 120,
+    "poll_seconds": 0.2
+  },
+  "schema": 1,
+  "selected_names12": [
+    "legacy export partitions 10001 items and preserves IDs and source order",
+    "actual multibyte envelope stays bounded beyond the old 16MiB total",
+    "oversized invalid and unknown-field items retain exact raw text without truncation",
+    "part/body source-index manifest and cross-account claims fail closed",
+    "multipart receipts preserve ordered duplicate IDs and stable aliases across resume and accounts",
+    "logout during a part rolls back both rows and receipt then resumes only that part",
+    "additive v1 receipts retain old single imports and rollback reader compatibility",
+    "late multipart picker cannot import or confirm the replacement account",
+    "multipart ownership confirmation expires on account switch",
+    "multipart unknown owner needs explicit consent before same-account writes",
+    "an old OS picker result cannot import into the replacement account",
+    "same-account OS picker confirmation still imports once"
+  ],
+  "setup_successor": {
+    "browser_downloads": 0,
+    "existing_chrome_elf": "/opt/google/chrome/chrome",
+    "fresh_dependencies_reused_only_within_same_allocation": true,
+    "inherited_setup": "ci/mobile-tag903.py setup -> exact original mobile-input-setup.sh current363 -> original explicit14 projection",
+    "inherited_setup_calls": 1,
+    "lockfile_changes": 0,
+    "new_pub_get_calls": 0,
+    "only_added_toolchain_operation": "same exact fresh Flutter precache --web during setup",
+    "runner_chrome_missing": "hard failure, not skip/pass"
+  },
+  "source_after": {
+    "digest": "6e80974b79d66274f4018ce3fa199eb9c39cb0e146ab6b312f68674c027b9aa0",
+    "members": 366
+  },
+  "source_before": {
+    "digest": "a187df95c16c9d177d0160e0d4d393cb0f346c68c11c009128e9ac9d69e05475",
+    "members": 363
+  },
+  "state": "SOURCE_REVIEWED_READY_FOR_ONE_TARGETED_CLOUD_FORMAT_AND_TEST",
+  "test_paths": [
+    "test/features/personal/personal_migration_test.dart",
+    "test/features/personal/personal_migration_repository_test.dart",
+    "test/features/personal/personal_action_epoch_test.dart"
+  ],
+  "toolchain": {
+    "dartSdkVersion": "3.13.5",
+    "engineRevision": "deb287481e3ce9468f3434937ced4240a70539ca",
+    "frameworkRevision": "abaf9c523780a608bd46686fd5e53740a07077f8",
+    "frameworkVersion": "3.47.7"
+  }
+}

@@ -372,6 +372,88 @@ if (pluginEntries.size()!=22 || pluginSlots.size()!=22 ||
         pluginRegistry.entries.any { it.slot!=digestBytes(it.project.getBytes('UTF-8')) ||
             !(it.project ==~ /:[a-z][a-z0-9_]*/) })
     throw new GradleException('finite exact plugin slots required')
+// AGP external-native staging defaults to module/.cxx, independently of the
+// relocated buildDirectory. Keep it outside every sealed source/package tree.
+def nativeStagingModels=[:]
+def nativeStagingScope = { targetProject ->
+    if (targetProject.rootProject.projectDir.canonicalFile!=new File(owned,'source/app/android'))
+        throw new GradleException('native staging requires the fixed App build')
+    def scope=targetProject.path==':app' ?
+        [project:':app',slot:digestBytes(':app'.getBytes('UTF-8')),project_relative:'source/app/android/app'] :
+        pluginEntries[targetProject.path]
+    if (scope==null || targetProject.projectDir.canonicalFile!=new File(owned,scope.project_relative))
+        throw new GradleException('native staging requires an independently sealed project')
+    scope
+}
+def nativeStagingDirectory = { scope,String engine ->
+    if (!(engine in ['cmake','ndkBuild'])) throw new GradleException('finite native staging engine required')
+    def current=owned
+    ['native-staging',scope.slot,engine=='ndkBuild' ? 'ndk-build' : 'cmake'].each { part ->
+        current=new File(current,part)
+        if (!Files.exists(current.toPath(),LinkOption.NOFOLLOW_LINKS)) Files.createDirectory(current.toPath())
+        if (current.canonicalFile!=current || !Files.isDirectory(current.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+                Files.getOwner(current.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal)
+            throw new GradleException('owned canonical native staging directory required')
+    }
+    current
+}
+def configureNativeStaging = { targetProject ->
+    def scope=nativeStagingScope(targetProject)
+    targetProject.extensions.getByName('androidComponents').finalizeDsl({ nativeDsl ->
+        if (nativeStagingModels.containsKey(targetProject.path))
+            throw new GradleException('one native staging model per sealed project required')
+        ['cmake','ndkBuild'].each { engine ->
+            def destination=nativeStagingDirectory(scope,engine)
+            if (destination.toPath().startsWith(targetProject.layout.buildDirectory.get().asFile.canonicalFile.toPath()))
+                throw new GradleException('persistent native staging must be outside temporary build directory')
+            nativeDsl.externalNativeBuild."$engine".buildStagingDirectory=destination
+        }
+        nativeStagingModels[targetProject.path]=[project:targetProject,scope:scope]
+    } as org.gradle.api.Action)
+}
+def persistNativeStagingModel = {
+    def expected=(pluginEntries.keySet()+[':app']) as Set
+    if (nativeStagingModels.keySet()!=expected)
+        throw new GradleException('complete source-bound Android native staging models required')
+    def rows=nativeStagingModels.values().collect { model ->
+        def modelRow
+        model.project.getOwner().applyToMutableState {
+            def scope=nativeStagingScope(model.project)
+            def android=model.project.extensions.getByName('android')
+            def engines=[:]
+            ['cmake','ndkBuild'].each { engine ->
+                def actual=android.externalNativeBuild."$engine"
+                def destination=nativeStagingDirectory(scope,engine)
+                if (!(actual.buildStagingDirectory instanceof File) ||
+                        actual.buildStagingDirectory.absoluteFile!=destination ||
+                        actual.buildStagingDirectory.canonicalFile!=destination ||
+                        destination.toPath().startsWith(model.project.layout.buildDirectory.get().asFile.canonicalFile.toPath()))
+                    throw new GradleException('final native staging DSL differs from the owned destination')
+                engines[engine]=[path:owned.toPath().relativize(destination.toPath()).toString(),active:actual.path!=null]
+            }
+            modelRow=[project:scope.project,slot:scope.slot,project_relative:scope.project_relative,engines:engines]
+        }
+        modelRow
+    }.sort { left,right -> left.project<=>right.project }
+    def body=(JsonOutput.toJson([schema:1,kind:'current363-native-staging-model-v1',phase:richPhase,
+        source_digest:pluginRegistry.source_digest,plugin_contract_sha256:pluginField.contract_sha256,
+        plugin_seal_sha256:pluginField.seal_sha256,projects:rows])+'\n').getBytes('UTF-8')
+    if (body.length>64*1024) throw new GradleException('bounded native staging model required')
+    def parentDir=new File(owned,'evidence')
+    if (parentDir.canonicalFile!=parentDir || !Files.isDirectory(parentDir.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+            Files.getOwner(parentDir.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal)
+        throw new GradleException('owned native staging evidence directory required')
+    def output=new File(parentDir,'native-staging-model-'+richPhase+'.json')
+    def channel=java.nio.channels.FileChannel.open(output.toPath(),
+        java.nio.file.StandardOpenOption.CREATE_NEW,java.nio.file.StandardOpenOption.WRITE,LinkOption.NOFOLLOW_LINKS)
+    try {
+        def buffer=java.nio.ByteBuffer.wrap(body)
+        while(buffer.hasRemaining()) channel.write(buffer)
+        channel.force(true)
+    } finally { channel.close() }
+    def parentChannel=java.nio.channels.FileChannel.open(parentDir.toPath(),java.nio.file.StandardOpenOption.READ)
+    try { parentChannel.force(true) } finally { parentChannel.close() }
+}
 def pluginFactory = new GroovyShell(getClass().classLoader).evaluate(new String(pluginScript,'UTF-8'))
 def toolingField=catalog.actual_kgp_tooling_owner
 if (toolingField==null || toolingField.script_sha256!='83b3e7368636455766e7da0b3db4e7be8349cf83f972049c08804e33ca616174')
@@ -726,6 +808,9 @@ gradle.settingsEvaluated { s ->
 }
 gradle.beforeProject { p ->
     checkedProject(p)
+    ['com.android.application','com.android.library'].each { androidPlugin ->
+        p.pluginManager.withPlugin(androidPlugin) { configureNativeStaging(p) }
+    }
     observeRepositories(p.repositories)
     observeRepositories(p.buildscript.repositories)
     [p.configurations,p.buildscript.configurations].each { configs -> configs.all { c ->
@@ -778,6 +863,8 @@ gradle.beforeProject { p ->
     } }
 }
 gradle.projectsEvaluated {
+    if (gradle.rootProject.projectDir.canonicalFile==new File(owned,'source/app/android'))
+        persistNativeStagingModel()
     def rootForTooling=gradle.rootProject
     // Fixed Gradle9.3.1 requires the configuration owner's actual project lock.
     rootForTooling.getOwner().applyToMutableState {

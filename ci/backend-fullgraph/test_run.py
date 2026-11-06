@@ -1126,7 +1126,7 @@ class FullGraphControls(unittest.TestCase):
  def test_release_controls_keep_one_race_and_exact_named_evidence(self):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']):
-   control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],currentReleaseControl=copy.deepcopy(control),currentReleaseTestsToRun=control['targets'][package][:-1],kafkaACLTestsToRun=control['targets'][package][-1:])
+   control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],currentReleaseControl=copy.deepcopy(control),currentReleaseTestsToRun=control['targets'][package][:-1],kafkaACLTestsToRun=control['targets'][package][-1:])
    self.assertEqual(run.check_current_release_plan(locked),control);run.check_locked(locked)
    self.assertNotEqual(run.FINAL_SOURCE,run.KAFKA_CONFIRM_PRIOR_PASS['source']);self.assertIsNone(locked['kafkaConfirmPassedReuse']);self.assertEqual(run.check_kafka_confirm_prior_pass(locked['kafkaConfirmHistoricalPass']),run.KAFKA_CONFIRM_PRIOR_PASS)
    rows=[{'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False} for scenario in run.SCENARIOS]
@@ -1183,7 +1183,7 @@ class FullGraphControls(unittest.TestCase):
 
  def test_managed_shape_controls_keep_two_packages_one_command_and_exact_subsets(self):
   collector=load('collect');control=run.CURRENT_MANAGED_SHAPE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());owned='internal/namespaceimport/ownedcontrol';managed='internal/msgtransfer'
-  locked.update(currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=copy.deepcopy(control),currentManagedShapeTestsToRun=control['targets'][managed],kafkaACLTestsToRun=control['targets'][owned])
+  locked.update(currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=copy.deepcopy(control),currentManagedShapeTestsToRun=control['targets'][managed],kafkaACLTestsToRun=control['targets'][owned])
   self.assertEqual(run.check_current_managed_shape_plan(locked),control);run.check_locked(locked);self.assertIsNone(locked['currentReleaseControl']);self.assertNotEqual(run.FINAL_SOURCE,run.RELEASE_CONTROLS_PRIOR_PASS['source'])
   for fields in ({'currentManagedShapeTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentReleaseControl':run.CURRENT_RELEASE_CONTROL},{'releaseControlsHistoricalPass':{}},{'kafkaConfirmPassedReuse':run.KAFKA_CONFIRM_PRIOR_PASS},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
    with self.assertRaises(ValueError):run.check_current_managed_shape_plan(dict(locked,**fields))
@@ -1243,7 +1243,7 @@ class FullGraphControls(unittest.TestCase):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.COMPLETED_KAFKA_PACKAGE_BINDING['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.COMPLETED_KAFKA_PACKAGE_BINDING['source']):
    control=run.CURRENT_PRODUCER_CONTROL;locked=json.loads(run.INPUTS.read_bytes());package=next(iter(control['targets']));top=control['targets'][package][0]
-   locked.update(source=run.FINAL_SOURCE,currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=copy.deepcopy(control),currentProducerTestsToRun=control['targets'][package],kafkaACLTestsToRun=[],sameSourceCompletedKafkaPackageReuse=copy.deepcopy(run.COMPLETED_KAFKA_PACKAGE_REUSE))
+   locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=copy.deepcopy(control),currentProducerTestsToRun=control['targets'][package],kafkaACLTestsToRun=[],sameSourceCompletedKafkaPackageReuse=copy.deepcopy(run.COMPLETED_KAFKA_PACKAGE_REUSE))
    self.assertEqual(run.check_current_producer_plan(locked),control);run.check_locked(locked);self.assertEqual(control['phaseGuardSeconds'],600);self.assertEqual(control['goTimeoutSeconds'],180)
    self.assertEqual(locked['kafkaACLTestsToRun'],[]);self.assertIsNone(locked['currentManagedShapeControl']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalGoCommandPassed']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalTwoPackageScopeAccepted'])
    for fields in ({'currentProducerTestsToRun':[]},{'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'currentManagedShapeControl':run.CURRENT_MANAGED_SHAPE_CONTROL},{'currentReleaseControl':run.CURRENT_RELEASE_CONTROL},{'sameSourceCompletedKafkaPackageReuse':{}},{'managedShapeTwoPackageHistoricalAttempt':{}},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
@@ -1306,7 +1306,7 @@ class FullGraphControls(unittest.TestCase):
  def test_group_recovery_controls_use_real_event_hook_and_exact_three_package_scope(self):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.CACHE_TEST_DELTA_PACKAGE_REUSE['originalSource']),mock.patch.object(collector.run,'FINAL_SOURCE',run.CACHE_TEST_DELTA_PACKAGE_REUSE['originalSource']):
-   control=run.CURRENT_GROUP_RECOVERY_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=copy.deepcopy(control),currentGroupRecoveryTargets=control['targets'],kafkaACLTestsToRun=control['targets']['internal/namespaceimport/ownedcontrol']);self.assertEqual(run.check_current_group_recovery_plan(locked),control);run.check_locked(locked)
+   control=run.CURRENT_GROUP_RECOVERY_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=copy.deepcopy(control),currentGroupRecoveryTargets=control['targets'],kafkaACLTestsToRun=control['targets']['internal/namespaceimport/ownedcontrol']);self.assertEqual(run.check_current_group_recovery_plan(locked),control);run.check_locked(locked)
    self.assertEqual((control['topPASS'],control['subPASS'],control['packages'],control['phaseGuardSeconds'],control['goTimeoutSeconds']),(4,23,3,600,180))
    for fields in ({'kafkaACLTestsToRun':[]},{'currentGroupRecoveryTargets':{}},{'currentProducerControl':run.CURRENT_PRODUCER_CONTROL},{'sameSourceCompletedKafkaPackageReuse':run.COMPLETED_KAFKA_PACKAGE_REUSE},{'groupRecoveryHistoricalFacts':{}},{'rpcGroupStartLogProjectionPolicy':{}}):
     with self.assertRaises(ValueError):run.check_current_group_recovery_plan(dict(locked,**fields))
@@ -1378,62 +1378,137 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_cache_test_delta_bridge_preserves_completed_packages_and_requires_fresh_cache(self):
-  collector=load('collect');control=run.CURRENT_CACHE_TEST_DELTA_CONTROL;locked=json.loads(run.INPUTS.read_bytes());self.assertEqual(run.check_cache_test_delta_plan(locked),control);run.check_locked(locked)
-  self.assertEqual((control['topPASS'],control['subPASS'],control['packages'],control['phaseGuardSeconds'],control['goTimeoutSeconds']),(2,7,1,600,180));self.assertEqual(locked['kafkaACLTestsToRun'],[])
-  for fields in ({'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'currentGroupRecoveryControl':run.CURRENT_GROUP_RECOVERY_CONTROL},{'cacheTestDeltaPackageReuse':{}},{'cacheTestDeltaTestsToRun':[]}):
-   with self.assertRaises(ValueError):run.check_cache_test_delta_plan(dict(locked,**fields))
-  parsed=ast.parse(Path(run.__file__).read_text());actual_run=next(node for node in parsed.body if isinstance(node,ast.FunctionDef) and node.name=='run');actual_command=next(node for node in ast.walk(actual_run) if isinstance(node,ast.FunctionDef) and node.name=='command');calls=[node.value for node in actual_command.body if isinstance(node,ast.Expr) and isinstance(node.value,ast.Call) and isinstance(node.value.func,ast.Name) and node.value.func.id=='persist_go_test_projection'];self.assertEqual(len(calls),1)
+  collector=load('collect')
+  with mock.patch.object(run,'FINAL_SOURCE',run.CRON_FIXTURE_SCOPE_REUSE['originalSource']),mock.patch.object(collector.run,'FINAL_SOURCE',run.CRON_FIXTURE_SCOPE_REUSE['originalSource']):
+   control=run.CURRENT_CACHE_TEST_DELTA_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=copy.deepcopy(control),cacheTestDeltaTestsToRun=control['targets'][next(iter(control['targets']))],cacheTestDeltaPackageReuse=copy.deepcopy(run.CACHE_TEST_DELTA_PACKAGE_REUSE));self.assertEqual(run.check_cache_test_delta_plan(locked),control);run.check_locked(locked)
+   self.assertEqual((control['topPASS'],control['subPASS'],control['packages'],control['phaseGuardSeconds'],control['goTimeoutSeconds']),(2,7,1,600,180));self.assertEqual(locked['kafkaACLTestsToRun'],[])
+   for fields in ({'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'currentGroupRecoveryControl':run.CURRENT_GROUP_RECOVERY_CONTROL},{'cacheTestDeltaPackageReuse':{}},{'cacheTestDeltaTestsToRun':[]}):
+    with self.assertRaises(ValueError):run.check_cache_test_delta_plan(dict(locked,**fields))
+   parsed=ast.parse(Path(run.__file__).read_text());actual_run=next(node for node in parsed.body if isinstance(node,ast.FunctionDef) and node.name=='run');actual_command=next(node for node in ast.walk(actual_run) if isinstance(node,ast.FunctionDef) and node.name=='command');calls=[node.value for node in actual_command.body if isinstance(node,ast.Expr) and isinstance(node.value,ast.Call) and isinstance(node.value.func,ast.Name) and node.value.func.id=='persist_go_test_projection'];self.assertEqual(len(calls),1)
+   class Recipe:
+    def rows(self,bodies):return [{'path':name,'bytes':len(raw),'sha256':run.sha(raw)} for name,raw in sorted(bodies.items())]
+    def digest(self,rows):return run.sha(b''.join(row['path'].encode()+b'\0'+row['sha256'].encode()+b'\n' for row in sorted(rows,key=lambda row:row['path'])))
+   recipe=Recipe();reuse=copy.deepcopy(run.CACHE_TEST_DELTA_PACKAGE_REUSE);delta=reuse['delta'];raw=run.regular(run.REPO/'ci/candidates/backend-fullgraph/source'/delta['target']);bodies={delta['target']:raw,'server/pkg/common/db/cache/fixture.go':b'package cache\n','server/go.mod':b'module fixture\n'}
+   left,right=raw.index(delta['contextStart'].encode()),raw.index(delta['contextEnd'].encode());prior=raw[:left]+raw[left:right].replace(delta['newLiteral'].encode(),delta['oldLiteral'].encode(),1)+raw[right:];old_bodies=dict(bodies);old_bodies[delta['target']]=prior
+   current={'members':len(bodies),'digest':recipe.digest(recipe.rows(bodies))};original={'members':len(old_bodies),'digest':recipe.digest(recipe.rows(old_bodies))};reuse.update(currentSource=current,originalSource=original);reuse['originalBinding']['source']=original
+   for value in reuse['originalBinding']['completedPackages'].values():value['source']=original
+   parent=run.module('ci/backend-runtime-join-r7/run.py','cache_delta_pure_auditor');package=next(iter(control['targets']));events=[{'Action':'start','Package':parent.PREFIX+package}]
+   for top in control['targets'][package]:
+    events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
+    for child in control['requiredSubtests'][package].get(top,[]):
+     name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+    events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
+   events.append({'Action':'pass','Package':parent.PREFIX+package})
+   with mock.patch.object(run,'FINAL_SOURCE',current),mock.patch.object(run,'CACHE_TEST_DELTA_PACKAGE_REUSE',reuse),mock.patch.object(collector.run,'FINAL_SOURCE',current),mock.patch.object(collector.run,'CACHE_TEST_DELTA_PACKAGE_REUSE',reuse),mock.patch.object(collector.run,'verify',return_value=(None,bodies,recipe,None,None,None)):
+    self.assertEqual(run.check_cache_test_delta_reuse(reuse,bodies,recipe,reuse['originalBinding']['GoToolBodyAndMode']),reuse)
+    for fields in ({'sameWholeSource':True},{'originalGoCommandPassed':True},{'originalWholeScopeAccepted':True},{'actualCurrentKafkaCommands':1},{'oldCachePackagePassed':True},{'currentSource':original}):
+     with self.assertRaises(ValueError):run.check_cache_test_delta_reuse(dict(reuse,**fields),bodies,recipe)
+    for changed in ({},{**bodies,'server/go.mod':b'changed'},{**bodies,delta['target']:raw+b'\n'},{**bodies,'server/extra.go':b'package extra'}):
+     with self.assertRaises(ValueError):run.check_cache_test_delta_reuse(reuse,changed,recipe)
+    with self.assertRaises(ValueError):run.check_cache_test_delta_reuse(reuse,bodies,recipe,dict(reuse['originalBinding']['GoToolBodyAndMode'],sha256='f'*64))
+    for mode in ('complete','missing-child','skip','missing-footer','phase-error'):
+     with self.subTest(cacheDelta=mode),tempfile.TemporaryDirectory() as directory:
+      out=Path(directory).resolve();seen=[]
+      def command(label,argv,seconds,environment):
+       seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,600);self.assertEqual(argv[-1],'./'+package);self.assertIn('-race',argv);self.assertIn('-timeout=180s',argv);self.assertEqual(len([value for value in argv if value.startswith('./')]),1)
+       if mode=='phase-error':raise ValueError('original cache phase failed')
+       selected=copy.deepcopy(events)
+       if mode=='missing-child':selected=[row for row in selected if row.get('Test')!=events[-3]['Test']]
+       if mode=='skip':selected[-2]['Action']='skip'
+       if mode=='missing-footer':selected=selected[:-1]
+       raw=('\n'.join(json.dumps(row) for row in selected)+'\n').encode();stdout=out/'private-stdout';stdout.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,stdout,label,1));stdout.unlink();return raw
+      if mode!='complete':
+       with self.assertRaises(ValueError):run.run_current_cache_test_delta_control('/owned/go',{},command,parent,out,bodies,recipe,reuse['originalBinding']['GoToolBodyAndMode'])
+       self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-cache-test-delta-controls-names.json').exists());continue
+      value=run.run_current_cache_test_delta_control('/owned/go',{},command,parent,out,bodies,recipe,reuse['originalBinding']['GoToolBodyAndMode']);self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS'],value['packages']),(2,7,1));self.assertEqual(value['actualKafkaACLTestsDispatched'],0)
+      projected=json.loads((out/'current-cache-test-delta-controls-events.json').read_bytes());self.assertNotIn('PRIVATE_OUTPUT',json.dumps(projected));run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}});run.write(out/'source-post.json',{'accepted':True,'source':current});tools={'go':reuse['originalBinding']['GoToolBodyAndMode']};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+      self.assertEqual(collector.checked_current_cache_test_delta_evidence(out),value)
+      checked=('current-cache-test-delta-controls-events.json','completed-package-test-delta-reuse.json','phase-0001.json','source-post.json','tools-after.json');saved={name:(out/name).read_bytes() for name in checked}
+      for changed in checked:
+       for name,body in saved.items():(out/name).write_bytes(body)
+       (out/changed).write_text(json.dumps(projected[:-1]) if changed.endswith('-events.json') else '{}')
+       with self.subTest(cacheCustody=changed),self.assertRaises(ValueError):collector.checked_current_cache_test_delta_evidence(out)
+      for name,body in saved.items():(out/name).write_bytes(body)
+      for alias in ('current-group-recovery-controls-names.json','current-managed-producer-control-names.json','kafka-acl-passed-reuse.json'):
+       run.write(out/alias,{})
+       with self.assertRaises(ValueError):collector.checked_current_cache_test_delta_evidence(out)
+       (out/alias).unlink()
+      run.write_current_cache_test_delta_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':4,'subPASS':10,'includesOriginalGraph':True});self.assertFalse(summary['sameWholeSource']);self.assertFalse(summary['originalGoCommandPassed'])
+   # Even a self-consistent old/new source vector cannot bridge a cache embed.
+   embedded=dict(bodies);embedded['server/pkg/common/db/cache/fixture.go']=b'package cache\n//go:embed *.go\n';old_embedded=dict(embedded);old_embedded[delta['target']]=prior;bad=copy.deepcopy(reuse);bad['currentSource']={'members':len(embedded),'digest':recipe.digest(recipe.rows(embedded))};bad['originalSource']={'members':len(old_embedded),'digest':recipe.digest(recipe.rows(old_embedded))};bad['originalBinding']['source']=bad['originalSource']
+   with mock.patch.object(run,'FINAL_SOURCE',bad['currentSource']),mock.patch.object(run,'CACHE_TEST_DELTA_PACKAGE_REUSE',bad),self.assertRaises(ValueError):run.check_cache_test_delta_reuse(bad,embedded,recipe)
+
+
+ def test_cron_fixture_dependency_projection_is_complete_bounded_and_excludes_fixture(self):
+  policy=run.CRON_FIXTURE_DEPENDENCY_CONTROL;roots=policy['roots'];rows=[]
+  for root in roots:rows.extend([{'ImportPath':root},{'ImportPath':root+' ['+root+'.test]','ForTest':root},{'ImportPath':root+'.test'}])
+  raw=lambda rows:('\n'.join(json.dumps(row) for row in rows)+'\n').encode()
+  value=run.project_cron_fixture_dependencies(raw(rows));self.assertEqual(value['packageCount'],9);self.assertFalse(value['runtimeAccepted']);self.assertEqual(len(value['packages']),9)
+  with_private=copy.deepcopy(rows);with_private[0]['Dir']='/PRIVATE/cache';with_private[0]['Module']={'Dir':'/PRIVATE/mod'};self.assertNotIn('PRIVATE',json.dumps(run.project_cron_fixture_dependencies(raw(with_private))))
+  forbidden=policy['forbiddenPackage']
+  for added in ({'ImportPath':forbidden},{'ImportPath':forbidden+'.test'},{'ImportPath':forbidden+' ['+forbidden+'.test]','ForTest':forbidden},{'ImportPath':forbidden+'_test'},{'ImportPath':roots[0],'Error':{'Err':'PRIVATE'}},{'ImportPath':'unsafe','Incomplete':True},{'ImportPath':'unsafe','DepsErrors':[{'Err':'PRIVATE'}]},{'ImportPath':'/PRIVATE/path'},{'ImportPath':'unsafe','ForTest':'foreign'},rows[0]):
+   with self.subTest(dependency=added),self.assertRaises(ValueError):run.project_cron_fixture_dependencies(raw(rows+[added]))
+  for bad in (b'',raw(rows)[:-2],raw(rows[:-1]),raw(rows)+b'{bad}\n',b'{"ImportPath":"unsafe","ImportPath":"other"}\n',raw(rows)+b'{"ImportPath":NaN}\n'):
+   with self.assertRaises(ValueError):run.project_cron_fixture_dependencies(bad)
+  bad=copy.deepcopy(value);bad['packageCount']=True
+  with self.assertRaises(ValueError):run.check_cron_fixture_dependency_receipt(bad)
+  with mock.patch.dict(run.CRON_FIXTURE_DEPENDENCY_CONTROL,packagesLimit=8),self.assertRaises(ValueError):run.project_cron_fixture_dependencies(raw(rows))
+
+ def test_cron_fixture_scope_reuse_requires_actual_dependencies_and_fresh_contract(self):
+  collector=load('collect');control=run.CURRENT_CRON_FIXTURE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());self.assertEqual(run.check_current_cron_fixture_plan(locked),control);run.check_locked(locked)
+  for fields in ({'cronFixtureTestsToRun':[]},{'currentCacheTestDeltaControl':run.CURRENT_CACHE_TEST_DELTA_CONTROL},{'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'cronFixtureDependencyControl':{}},{'cronFixtureScopeReuse':{}}):
+   with self.assertRaises(ValueError):run.check_current_cron_fixture_plan(dict(locked,**fields))
   class Recipe:
    def rows(self,bodies):return [{'path':name,'bytes':len(raw),'sha256':run.sha(raw)} for name,raw in sorted(bodies.items())]
    def digest(self,rows):return run.sha(b''.join(row['path'].encode()+b'\0'+row['sha256'].encode()+b'\n' for row in sorted(rows,key=lambda row:row['path'])))
-  recipe=Recipe();reuse=copy.deepcopy(run.CACHE_TEST_DELTA_PACKAGE_REUSE);delta=reuse['delta'];raw=run.regular(run.REPO/'ci/candidates/backend-fullgraph/source'/delta['target']);bodies={delta['target']:raw,'server/pkg/common/db/cache/fixture.go':b'package cache\n','server/go.mod':b'module fixture\n'}
-  left,right=raw.index(delta['contextStart'].encode()),raw.index(delta['contextEnd'].encode());prior=raw[:left]+raw[left:right].replace(delta['newLiteral'].encode(),delta['oldLiteral'].encode(),1)+raw[right:];old_bodies=dict(bodies);old_bodies[delta['target']]=prior
-  current={'members':len(bodies),'digest':recipe.digest(recipe.rows(bodies))};original={'members':len(old_bodies),'digest':recipe.digest(recipe.rows(old_bodies))};reuse.update(currentSource=current,originalSource=original);reuse['originalBinding']['source']=original
-  for value in reuse['originalBinding']['completedPackages'].values():value['source']=original
-  parent=run.module('ci/backend-runtime-join-r7/run.py','cache_delta_pure_auditor');package=next(iter(control['targets']));events=[{'Action':'start','Package':parent.PREFIX+package}]
-  for top in control['targets'][package]:
-   events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
-   for child in control['requiredSubtests'][package].get(top,[]):
-    name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
-   events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
-  events.append({'Action':'pass','Package':parent.PREFIX+package})
-  with mock.patch.object(run,'FINAL_SOURCE',current),mock.patch.object(run,'CACHE_TEST_DELTA_PACKAGE_REUSE',reuse),mock.patch.object(collector.run,'FINAL_SOURCE',current),mock.patch.object(collector.run,'CACHE_TEST_DELTA_PACKAGE_REUSE',reuse),mock.patch.object(collector.run,'verify',return_value=(None,bodies,recipe,None,None,None)):
-   self.assertEqual(run.check_cache_test_delta_reuse(reuse,bodies,recipe,reuse['originalBinding']['GoToolBodyAndMode']),reuse)
-   for fields in ({'sameWholeSource':True},{'originalGoCommandPassed':True},{'originalWholeScopeAccepted':True},{'actualCurrentKafkaCommands':1},{'oldCachePackagePassed':True},{'currentSource':original}):
-    with self.assertRaises(ValueError):run.check_cache_test_delta_reuse(dict(reuse,**fields),bodies,recipe)
-   for changed in ({},{**bodies,'server/go.mod':b'changed'},{**bodies,delta['target']:raw+b'\n'},{**bodies,'server/extra.go':b'package extra'}):
-    with self.assertRaises(ValueError):run.check_cache_test_delta_reuse(reuse,changed,recipe)
-   with self.assertRaises(ValueError):run.check_cache_test_delta_reuse(reuse,bodies,recipe,dict(reuse['originalBinding']['GoToolBodyAndMode'],sha256='f'*64))
-   for mode in ('complete','missing-child','skip','missing-footer','phase-error'):
-    with self.subTest(cacheDelta=mode),tempfile.TemporaryDirectory() as directory:
+  recipe=Recipe();compat=copy.deepcopy(run.CRON_FIXTURE_SCOPE_REUSE);delta=compat['bootstrapDelta'];added=compat['newTest'];bodies={delta['target']:run.regular(run.REPO/'ci/candidates/backend-fullgraph/source'/delta['target']),added['target']:run.regular(run.REPO/'ci/candidates/backend-fullgraph/source'/added['target']),'server/go.mod':b'module fixture\n'};old=dict(bodies);del old[added['target']]
+  for item in delta['replacements']:old[delta['target']]=old[delta['target']].replace(item['new'].encode(),item['old'].encode(),1)
+  current={'members':len(bodies),'digest':recipe.digest(recipe.rows(bodies))};prior={'members':len(old),'digest':recipe.digest(recipe.rows(old))};compat.update(currentSource=current,originalSource=prior);compat['cacheFact']['source']=prior;compat['priorProducerKafkaCompatibility']['currentSource']=prior
+  dep_rows=[]
+  for root in run.CRON_FIXTURE_DEPENDENCY_CONTROL['roots']:dep_rows.extend([{'ImportPath':root},{'ImportPath':root+' ['+root+'.test]','ForTest':root},{'ImportPath':root+'.test'}])
+  dep_raw=('\n'.join(json.dumps(row) for row in dep_rows)+'\n').encode();parent=run.module('ci/backend-runtime-join-r7/run.py','cron_fixture_pure_auditor');package=next(iter(control['targets']));top=control['targets'][package][0];events=[{'Action':'start','Package':parent.PREFIX+package},{'Action':'run','Package':parent.PREFIX+package,'Test':top}]
+  for child in control['requiredSubtests'][package][top]:
+   name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+  events.extend([{'Action':'pass','Package':parent.PREFIX+package,'Test':top},{'Action':'pass','Package':parent.PREFIX+package}])
+  with mock.patch.object(run,'FINAL_SOURCE',current),mock.patch.object(run,'CRON_FIXTURE_SCOPE_REUSE',compat),mock.patch.object(collector.run,'FINAL_SOURCE',current),mock.patch.object(collector.run,'CRON_FIXTURE_SCOPE_REUSE',compat),mock.patch.object(collector.run,'verify',return_value=(None,bodies,recipe,None,None,None)):
+   self.assertEqual(run.check_cron_fixture_scope_source(compat,bodies,recipe),compat)
+   for changed in ({},{**bodies,'server/go.mod':b'changed'},{**bodies,delta['target']:bodies[delta['target']]+b'\n'},{**bodies,added['target']:b'changed'},{**bodies,'server/extra.go':b'package extra'}):
+    with self.assertRaises(ValueError):run.check_cron_fixture_scope_source(compat,changed,recipe)
+   for fields in ({'sameWholeSource':True},{'actualCurrentCacheTestCommands':1},{'runtimeAccepted':True}):
+    with self.assertRaises(ValueError):run.check_cron_fixture_scope_source(dict(compat,**fields),bodies,recipe)
+   for mode in ('complete','dependency-error','dependency-truncated','dependency-fixture','missing-child','missing-footer','contract-error'):
+    with self.subTest(cronFixture=mode),tempfile.TemporaryDirectory() as directory:
      out=Path(directory).resolve();seen=[]
      def command(label,argv,seconds,environment):
-      seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,600);self.assertEqual(argv[-1],'./'+package);self.assertIn('-race',argv);self.assertIn('-timeout=180s',argv);self.assertEqual(len([value for value in argv if value.startswith('./')]),1)
-      if mode=='phase-error':raise ValueError('original cache phase failed')
+      seen.append(label);self.assertEqual(seconds,600)
+      if label==run.CRON_FIXTURE_DEPENDENCY_CONTROL['phase']:
+       self.assertEqual(argv,['/owned/go','list','-deps','-test','-mod=readonly','-json=ImportPath,ForTest,Error,DepsErrors,Incomplete']+['./'+p for p in run.CRON_FIXTURE_DEPENDENCY_CONTROL['relativeRoots']])
+       if mode=='dependency-error':raise ValueError('original go list failed')
+       if mode=='dependency-truncated':return dep_raw[:-2]
+       if mode=='dependency-fixture':return dep_raw+json.dumps({'ImportPath':run.CRON_FIXTURE_DEPENDENCY_CONTROL['forbiddenPackage']}).encode()+b'\n'
+       return dep_raw
+      self.assertEqual(label,control['phase']);self.assertEqual(argv[-1],'./'+package);self.assertIn('-timeout=180s',argv);self.assertIn('-race',argv)
+      if mode=='contract-error':raise ValueError('actual contract failed')
       selected=copy.deepcopy(events)
-      if mode=='missing-child':selected=[row for row in selected if row.get('Test')!=events[-3]['Test']]
-      if mode=='skip':selected[-2]['Action']='skip'
+      if mode=='missing-child':selected=[row for row in selected if row.get('Test')==top or row.get('Test')!=top+'/'+control['requiredSubtests'][package][top][-1]]
       if mode=='missing-footer':selected=selected[:-1]
-      raw=('\n'.join(json.dumps(row) for row in selected)+'\n').encode();stdout=out/'private-stdout';stdout.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,stdout,label,1));stdout.unlink();return raw
+      raw=('\n'.join(json.dumps(row) for row in selected)+'\n').encode();stdout=out/'private-stdout';stdout.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,stdout,label,2));stdout.unlink();return raw
      if mode!='complete':
-      with self.assertRaises(ValueError):run.run_current_cache_test_delta_control('/owned/go',{},command,parent,out,bodies,recipe,reuse['originalBinding']['GoToolBodyAndMode'])
-      self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-cache-test-delta-controls-names.json').exists());continue
-     value=run.run_current_cache_test_delta_control('/owned/go',{},command,parent,out,bodies,recipe,reuse['originalBinding']['GoToolBodyAndMode']);self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS'],value['packages']),(2,7,1));self.assertEqual(value['actualKafkaACLTestsDispatched'],0)
-     projected=json.loads((out/'current-cache-test-delta-controls-events.json').read_bytes());self.assertNotIn('PRIVATE_OUTPUT',json.dumps(projected));run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}});run.write(out/'source-post.json',{'accepted':True,'source':current});tools={'go':reuse['originalBinding']['GoToolBodyAndMode']};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
-     self.assertEqual(collector.checked_current_cache_test_delta_evidence(out),value)
-     checked=('current-cache-test-delta-controls-events.json','completed-package-test-delta-reuse.json','phase-0001.json','source-post.json','tools-after.json');saved={name:(out/name).read_bytes() for name in checked}
-     for changed in checked:
+      with self.assertRaises(ValueError):run.run_current_cron_fixture_control('/owned/go',{},command,parent,out,bodies,recipe,compat['cacheFact']['GoToolBodyAndMode'])
+      self.assertEqual(seen[0],run.CRON_FIXTURE_DEPENDENCY_CONTROL['phase']);self.assertLessEqual(len(seen),2);self.assertFalse((out/'current-cron-fixture-contract-names.json').exists());continue
+     value=run.run_current_cron_fixture_control('/owned/go',{},command,parent,out,bodies,recipe,compat['cacheFact']['GoToolBodyAndMode']);self.assertEqual(seen,[run.CRON_FIXTURE_DEPENDENCY_CONTROL['phase'],control['phase']]);self.assertEqual((value['topPASS'],value['subPASS'],value['packages']),(1,3,1));self.assertEqual(value['actualCacheTopsDispatched'],0)
+     for index,label in enumerate(seen,1):run.write(out/('phase-%04d.json'%index),{'phase':label,'exitCode':0,'resource':{'status':'passed','exit_code':0}})
+     run.write(out/'source-post.json',{'accepted':True,'source':current});tools={'go':compat['cacheFact']['GoToolBodyAndMode']};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools);self.assertEqual(collector.checked_current_cron_fixture_evidence(out),value)
+     names=('cron-fixture-reused-scope-deps.json','cron-fixture-named-scope-reuse.json','current-cron-fixture-contract-events.json','phase-0001.json','phase-0002.json','source-post.json','tools-after.json');saved={name:(out/name).read_bytes() for name in names}
+     for changed in names:
       for name,body in saved.items():(out/name).write_bytes(body)
-      (out/changed).write_text(json.dumps(projected[:-1]) if changed.endswith('-events.json') else '{}')
-      with self.subTest(cacheCustody=changed),self.assertRaises(ValueError):collector.checked_current_cache_test_delta_evidence(out)
+      (out/changed).write_text('{}')
+      with self.subTest(cronCustody=changed),self.assertRaises(ValueError):collector.checked_current_cron_fixture_evidence(out)
      for name,body in saved.items():(out/name).write_bytes(body)
-     for alias in ('current-group-recovery-controls-names.json','current-managed-producer-control-names.json','kafka-acl-passed-reuse.json'):
+     for alias in ('current-cache-test-delta-controls-names.json','current-group-recovery-controls-names.json','kafka-acl-passed-reuse.json'):
       run.write(out/alias,{})
-      with self.assertRaises(ValueError):collector.checked_current_cache_test_delta_evidence(out)
+      with self.assertRaises(ValueError):collector.checked_current_cron_fixture_evidence(out)
       (out/alias).unlink()
-     run.write_current_cache_test_delta_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':4,'subPASS':10,'includesOriginalGraph':True});self.assertFalse(summary['sameWholeSource']);self.assertFalse(summary['originalGoCommandPassed'])
-  # Even a self-consistent old/new source vector cannot bridge a cache embed.
-  embedded=dict(bodies);embedded['server/pkg/common/db/cache/fixture.go']=b'package cache\n//go:embed *.go\n';old_embedded=dict(embedded);old_embedded[delta['target']]=prior;bad=copy.deepcopy(reuse);bad['currentSource']={'members':len(embedded),'digest':recipe.digest(recipe.rows(embedded))};bad['originalSource']={'members':len(old_embedded),'digest':recipe.digest(recipe.rows(old_embedded))};bad['originalBinding']['source']=bad['originalSource']
-  with mock.patch.object(run,'FINAL_SOURCE',bad['currentSource']),mock.patch.object(run,'CACHE_TEST_DELTA_PACKAGE_REUSE',bad),self.assertRaises(ValueError):run.check_cache_test_delta_reuse(bad,embedded,recipe)
+     run.write_current_cron_fixture_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':3,'subPASS':6,'includesOriginalGraph':True});self.assertFalse(summary['sameWholeSource'])
 
 if __name__=='__main__':unittest.main()

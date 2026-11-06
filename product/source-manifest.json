@@ -8641,11 +8641,18 @@
       "sha256": "49d97ef35dc996ed6378e5bdf3b364e01f000a1897b58ab7ab56835230826f0d"
     },
     {
-      "bytes": 32521,
+      "bytes": 32533,
       "mode": 420,
       "path": "server/internal/runtimeacceptance/bootstrap_linux.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "724892450bb0d412f80af390c3ccb252aafee7437c02b0105111e757fc73909c"
+      "sha256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46"
+    },
+    {
+      "path": "server/internal/runtimeacceptance/bootstrap_schedule_linux_test.go",
+      "bytes": 4033,
+      "sha256": "283d0ebfa042fc93d8229bd84532fcd9a3f8592639aebde18e8e4974c17ce5ba",
+      "mode": 420,
+      "provider": "ci/backend-fullgraph/run.py:verify"
     },
     {
       "bytes": 6706,
@@ -13177,7 +13184,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "9c441624e19f9aa8551c790c50f9d30e681edce43960cfd26433b60f1e83519b",
+  "filesSHA256": "723a6625e5702369dfd8104a86de8ac2d0bae5747e564157cf148fb11a6f03aa",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13234,8 +13241,8 @@
       "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
     },
     "server": {
-      "members": 1576,
-      "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
+      "members": 1577,
+      "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
     }
   },
   "state": "MATERIALIZED_SOURCE_ONLY"

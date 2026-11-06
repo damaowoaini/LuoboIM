@@ -1,0 +1,58 @@
+name: Manual personal migration new10 picker2 and portable browser1
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: personal-multipart-targeted-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  targeted:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: candidate
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 1ef9d4920278da3aa407a2c8f6d4fc37fd12896b
+          path: personal-parent
+          fetch-depth: 2
+          persist-credentials: false
+      - name: One fresh owned allocation and existing runner Chrome
+        run: echo "PERSONAL_ROOT=$RUNNER_TEMP/personal-multipart-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+      - name: Same Linux tester runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
+      - name: One exact original setup then explicit legacy8 successor and web precache
+        run: |
+          set -euo pipefail
+          parent="$GITHUB_WORKSPACE/personal-parent"
+          test "$(git -C "$parent" rev-parse --verify 'HEAD^{commit}')" = '1ef9d4920278da3aa407a2c8f6d4fc37fd12896b'
+          timeout --kill-after=5s 30s git -C "$parent" fetch --quiet \
+            --no-tags --no-recurse-submodules --depth=1 --no-write-fetch-head --no-auto-maintenance \
+            origin 2f17d99d2f32c4fc72b9b922f8d2a8783938b665:refs/tag903/source-parent
+          python3 -B "$GITHUB_WORKSPACE/candidate/ci/personal-multipart.py" setup \
+            --parent "$parent" --allocation "$PERSONAL_ROOT"
+      - name: Only format7 static8 exact12 and Chrome codec1 with no business network
+        run: |
+          set -euo pipefail
+          sudo unshare --net -- python3 -B "$GITHUB_WORKSPACE/candidate/ci/personal-multipart.py" netns \
+            --parent "$GITHUB_WORKSPACE/personal-parent" --run-as "$(id -un)" \
+            --work "$PERSONAL_ROOT/work" 2>&1 | tee "$PERSONAL_ROOT/work/evidence/personal-controller.log"
+      - name: Preserve finite receipts and original setup failures
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: personal-multipart-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.PERSONAL_ROOT }}/work/evidence/
+          if-no-files-found: warn
+          retention-days: 14

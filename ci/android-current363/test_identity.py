@@ -197,5 +197,58 @@ class Current363SourceTests(unittest.TestCase):
             self.assertNotIn(':app:dependencies', job.gradle('dependencies', offline=False))
 
 
+    def test_native_staging_closed_scope_and_full_plugin_tree_still_refuse_pollution(self):
+        plugins = controller.plugin_scope
+        spec = plugins.contract(HERE, controller.read(HERE / 'inputs.json'))
+        scopes = plugins.native_staging_scopes(spec)
+        model = {'schema': 1, 'kind': 'current363-native-staging-model-v1', 'phase': 'apk',
+            'source_digest': plugins.SOURCE_DIGEST, 'plugin_contract_sha256': plugins.CONTRACT_SHA,
+            'plugin_seal_sha256': 'a' * 64, 'projects': []}
+        for scope in scopes:
+            model['projects'].append({**scope, 'engines': {
+                engine: {'path': 'native-staging/' + scope['slot'] + '/' + leaf,
+                         'active': scope['project'] == ':jni' and engine == 'cmake'}
+                for engine, leaf in [('cmake', 'cmake'), ('ndkBuild', 'ndk-build')]}})
+        self.assertEqual(len(plugins.validate_native_staging(model, spec, 'apk', 'a' * 64)), 23)
+        for case in ('unknown-project', 'missing-project', 'inside-package', 'wrong-slot',
+                     'wrong-phase', 'wrong-seal', 'wrong-source', 'nonbool-active', 'missing-jni-cmake'):
+            value = copy.deepcopy(model)
+            if case == 'unknown-project': value['projects'][0]['project'] = ':unregistered'
+            elif case == 'missing-project': value['projects'].pop()
+            elif case == 'inside-package': value['projects'][0]['engines']['cmake']['path'] = 'pub-cache/hosted/pub.dev/jni-1.1.0/android/.cxx'
+            elif case == 'wrong-slot': value['projects'][0]['slot'] = '0' * 64
+            elif case == 'wrong-phase': value['phase'] = 'metadata'
+            elif case == 'wrong-seal': value['plugin_seal_sha256'] = '0' * 64
+            elif case == 'wrong-source': value['source_digest'] = '0' * 64
+            elif case == 'nonbool-active': value['projects'][0]['engines']['cmake']['active'] = 0
+            else:
+                next(row for row in value['projects'] if row['project'] == ':jni')['engines']['cmake']['active'] = False
+            with self.subTest(case=case), self.assertRaises(ValueError):
+                plugins.validate_native_staging(value, spec, 'apk', 'a' * 64)
+        with tempfile.TemporaryDirectory(prefix='current363-full-tree-') as directory:
+            root = Path(directory).resolve()
+            source = root / 'android/build.gradle'
+            source.parent.mkdir()
+            source.write_text('independently inventoried source')
+            expected = [{'path': 'android/build.gradle', **plugins.file_row(source)}]
+            plugins.check_tree(root, expected)
+            generated = root / 'android/.cxx/Debug/opaque/CMakeCache.txt'
+            generated.parent.mkdir(parents=True)
+            generated.write_text('synthetic output, not a native payload')
+            with self.assertRaisesRegex(ValueError, 'installed plugin differs'):
+                plugins.check_tree(root, expected)
+            delta = plugins.tree_delta(['android/build.gradle'], ['android/build.gradle',
+                'android/.cxx/Debug/opaque/CMakeCache.txt'])
+            self.assertEqual(delta['added_count'], 1)
+            self.assertEqual(delta['added_families']['android/.cxx/'], 1)
+            self.assertNotIn('android/.cxx/Debug/opaque/CMakeCache.txt', json.dumps(delta))
+            self.assertFalse(delta['source_body_verification_complete'])
+            self.assertTrue(delta['original_gate_still_refused'])
+            generated.unlink()
+            source.write_text('a changed original must also refuse')
+            with self.assertRaisesRegex(ValueError, 'plugin source body differs'):
+                plugins.check_tree(root, expected)
+
+
 if __name__ == '__main__':
     unittest.main()
