@@ -594,6 +594,7 @@ class _PersonalPageState extends ConsumerState<PersonalPage> {
             manifest.parts[i]['file'] as String,
       ];
       var confirmed = false;
+      if (!mounted || !repository.isCurrent()) return;
       final proceed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => StatefulBuilder(

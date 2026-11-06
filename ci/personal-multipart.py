@@ -28,6 +28,11 @@ CODEC = 'app/lib/features/personal/data/personal_migration.dart'
 HELPER = 'migration/legacy_personal_export/legacy_personal_export.dart'
 INTEGRATION = 'migration/legacy_personal_export/integration.json'
 SIBLING_CODEC = 'migration/legacy_personal_export/personal_migration.dart'
+UI_PATH = 'app/lib/features/personal/presentation/personal_page.dart'
+REUSE6_BINDING = {'path': '.qa/personal-analysis-batch-20261106/verified-0111-personal-six-analysis-facts.json',
+                  'bytes': 7566, 'sha256': '3bd673cf9584d4e3d4a9da774e3989a9d1efce0e8f709dd2e05dd4ade6f7a590'}
+REUSE6_FACTS_SHA = 'fd4a18b55bcb4deb5245695a826a41b637aa6bda6b2c4c4b62cea82b50962fa2'
+GUARDED_UI_SHA = '4075034954b2c3f70af01fcfef9fa604246ea561575b1d9b910662ae9ca5c7fc'
 BROWSER_NAME = 'part/body source-index manifest and cross-account claims fail closed'
 NAMES12 = [
     'legacy export partitions 10001 items and preserves IDs and source order',
@@ -383,6 +388,65 @@ def format_owned(work, cfg, tag, files, receipt, check, guard, command):
     return derived, derivation
 
 
+def personal_analysis_plan(cfg, files, tools, tag):
+    """Only fresh7 or the exact0111 six-fact/private-UI-guard bridge."""
+    mode = cfg.get('analysis_mode', 'fresh7')
+    if mode == 'fresh7':
+        if cfg.get('analysis_reuse6') is not None or cfg.get('analysis_reuse6_binding') is not None:
+            raise ValueError('fresh7 does not consume reuse facts')
+        return {'fresh': [1, 2, 3, 4, 5, 6, 7], 'reused': [], 'receipt': None}
+    if mode != 'reuse6-ui3':
+        raise ValueError('unknown personal analysis mode; no fallback')
+    facts = cfg.get('analysis_reuse6')
+    canonical = json.dumps(facts, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+    if cfg.get('analysis_reuse6_binding') != REUSE6_BINDING or sha(canonical) != REUSE6_FACTS_SHA:
+        raise ValueError('exact Root0111 six-analysis provenance required')
+    expected_paths = [row['path'][4:] for row in facts['formatted7Pins'] if row['path'].startswith('app/')]
+    if cfg['analysis_paths6'] != expected_paths or cfg['toolchain'] != facts['toolchain']:
+        raise ValueError('same original analysis order and SDK required')
+    bodies = {name: {key: row[key] for key in ('bytes', 'sha256', 'mode')}
+              for name, row in tools.items()}
+    if bodies != facts['toolsBodyAndMode']:
+        raise ValueError('same original Dart/Flutter body and mode required')
+    for row in facts['passed6']:
+        value = files.get(row['originalPath'])
+        if (not isinstance(value, bytes) or len(value) != row['formattedAfter']['bytes']
+                or sha(value) != row['formattedAfter']['sha256']):
+            raise ValueError('original six-analysis formatted pin differs: ' + row['originalPath'])
+    page = files.get(UI_PATH)
+    if not isinstance(page, bytes) or len(page) != 34663 or sha(page) != GUARDED_UI_SHA:
+        raise ValueError('exact private guarded UI after pin required')
+    original_anchor = b'      var confirmed = false;\n      final proceed = await showDialog<bool>(\n'
+    guarded_anchor = (b'      var confirmed = false;\n'
+                      b'      if (!mounted || !repository.isCurrent()) return;\n'
+                      b'      final proceed = await showDialog<bool>(\n')
+    if page.count(guarded_anchor) != 1:
+        raise ValueError('exact private import-dialog guard anchor required')
+    original_page = page.replace(guarded_anchor, original_anchor, 1)
+    original_pin = next(row for row in facts['formatted7Pins'] if row['path'] == UI_PATH)
+    if len(original_page) != original_pin['bytes'] or sha(original_page) != original_pin['sha256']:
+        raise ValueError('original UI bytes not reconstructed by exact guard inverse')
+    if (sha(files.get(INTEGRATION, b'')) != 'add5be3db4385a71bf34ea51c9ff23a0480e5f6bfe00883204c63f0dfa61bddd'
+            or files.get(SIBLING_CODEC) != files.get(CODEC)):
+        raise ValueError('original auxiliary JSON or derived codec differs')
+    restored = dict(files)
+    restored[UI_PATH] = original_page
+    source = {name: value for name, value in restored.items() if name.startswith('app/')}
+    portable = {name: value for name, value in restored.items() if name not in (INTEGRATION, SIBLING_CODEC)}
+    for values, expected in [(source, facts['formatterDerivedSource']),
+                             (portable, facts['formatterDerivedPortable'])]:
+        if len(values) != expected['members'] or tag.digest(values) != expected['digest']:
+            raise ValueError('original full formatted source/portable not reconstructed')
+    return {'fresh': [3], 'reused': [1, 2, 4, 5, 6, 7], 'receipt': {
+        'status': 'original-six-analysis-PASS-exact-private-guard-bridge',
+        'binding': REUSE6_BINDING, 'origin': facts['origin'], 'originJob': facts['originJob'],
+        'originalFullFormattedSource': facts['formatterDerivedSource'],
+        'originalFullFormattedPortable': facts['formatterDerivedPortable'],
+        'exactGuardInverse': True, 'originalIndividualAnalyses': facts['passed6'],
+        'freshAnalysisIndices': [3], 'reusedOriginalIndices': [1, 2, 4, 5, 6, 7],
+        'freshAnalysis7Executed': False, 'runtimeAcceptance': False}}
+
+
 def run(parent, work):
     cfg, raw, tag, c, old, original, base, files = descriptor(parent)
     input_files = dict(files)
@@ -403,6 +467,8 @@ def run(parent, work):
     summaries = {}
     derivation = None
     derivation_raw = None
+    analysis_plan = None
+    analysis_completed = []
     post = {'accepted': False}
     try:
         tools = tag.tool_snapshot(work)
@@ -421,8 +487,13 @@ def run(parent, work):
         fmt, analyses, helper, selected, browser = phase_commands(work, cfg)
         files, derivation = format_owned(work, cfg, tag, files, receipt, check, guard, fmt)
         derivation_raw = tag.regular(work / 'evidence/personal-formatter-derived.json')
+        analysis_plan = personal_analysis_plan(cfg, files, tools, tag)
+        if analysis_plan['receipt'] is not None:
+            tag.write(work / 'evidence/personal-analysis-reused6.json', analysis_plan['receipt'])
         analysis_failures = []
         for index, command in enumerate(analyses + [helper], 1):
+            if index not in analysis_plan['fresh']:
+                continue
             verify_work(work, cfg, tag, files, receipt)
             cwd = work / 'source/migration/legacy_personal_export' if command == helper else None
             label = 'personal-analyze-' + str(index)
@@ -431,10 +502,14 @@ def run(parent, work):
             record = json.loads(tag.regular(work / 'evidence' / (label + '.resource.json')))
             result = old.ANALYSIS.analysis_outcome(record, log.read_text(), label, command)
             tag.write(work / 'evidence' / (label + '.summary.json'), result)
+            analysis_completed.append(result)
             if not result['passed']:
                 analysis_failures.append(result)
         tag.write(work / 'evidence/personal-analysis-batch.json', {
-            'analysed_paths': len(analyses) + 1,
+            'analysed_paths': len(analysis_completed),
+            'reused_original_paths': len(analysis_plan['reused']),
+            'fresh_analysis_indices': analysis_plan['fresh'],
+            'reused_original_indices': analysis_plan['reused'],
             'all_passed': not analysis_failures,
             'failed_paths': [row['path'] for row in analysis_failures]})
         if analysis_failures:
@@ -518,7 +593,12 @@ def run(parent, work):
               'tools_after_sha256': sha(tag.regular(work / 'evidence/personal-tools-after.json')),
               'new_tests': 10, 'affected_existing_picker_tests': 2,
               'browser_reused_codec_tests': 1, 'old34_or39_redispatched': 0,
-              'format_dart_paths': 7, 'analysis_dart_paths': 7, 'integration_json': 1,
+              'format_dart_paths': 7, 'analysis_dart_paths': len(analysis_completed),
+              'analysis_original_paths_reused': len(analysis_plan['reused']),
+              'fresh_analysis_indices': analysis_plan['fresh'],
+              'reused_original_indices': analysis_plan['reused'],
+              'analysis_union_paths': len(analysis_completed) + len(analysis_plan['reused']),
+              'fresh_analysis7_executed': len(analysis_completed) == 7, 'integration_json': 1,
               'old_sdk_compile_or_device_io_verified': False, 'full_regression': False,
               'native_acceptance': False, 'whole_goal_complete': False})
 

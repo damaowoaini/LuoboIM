@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 263487,
-      "sha256": "a078c9631280a734b7ddc299c293e67e1ac5811fee8da32967129f362100dcad"
+      "bytes": 291177,
+      "sha256": "c7f2e4b7620cef87fb1e93202eb2a76c8469822dabcd96290b61222225f0ac3f"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 129179,
-      "sha256": "093d18330803a420072a836acdfb139d268802e96485a41b5c64c1d64c5024c6"
+      "bytes": 140555,
+      "sha256": "9e32ca6855ffc37c016b74d4948e5b72254a8b57f97cfc98df387623fed4e7a4"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 198026,
-      "sha256": "0c57525b4b3317caa9493e571dcfb70a29a2187aeba062eb363b487124731ac2"
+      "bytes": 207498,
+      "sha256": "057826dfaaaa10a160f565d11296346796535eb1465f91085c056dca047acdf4"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -5717,558 +5717,671 @@
       "rpc-user"
     ]
   },
-  "currentGroupRegistryFixtureControl": {
-    "phase": "current-group-registry-fixture-contract",
-    "targets": {
-      "internal/runtimeacceptance": [
-        "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader"
-      ]
-    },
-    "requiredSubtests": {
-      "internal/runtimeacceptance": {
-        "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader": [
-          "actual-role-inputs-accepted-and-separated",
-          "cross-role-registry-is-rejected",
-          "profile-absence-and-transport-drift-are-rejected"
-        ]
-      }
-    },
-    "goTimeoutSeconds": 180,
-    "phaseGuardSeconds": 600,
-    "topPASS": 1,
-    "subPASS": 3,
-    "packages": 1,
-    "goCommandInvocations": 1,
-    "packageExecutions": 1,
-    "newDatabaseFixtures": 0,
-    "wholePackagePASS": false
-  },
-  "groupRegistryFixtureTestsToRun": [
-    "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader"
-  ],
-  "groupRegistryFixtureDependencyControl": {
-    "phase": "group-registry-fixture-reused-scope-deps",
-    "relativeRoots": [
-      "pkg/common/db/cache",
-      "internal/msgtransfer",
-      "internal/namespaceimport/ownedcontrol"
-    ],
-    "roots": [
-      "github.com/openimsdk/open-im-server/v3/pkg/common/db/cache",
-      "github.com/openimsdk/open-im-server/v3/internal/msgtransfer",
-      "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
-    ],
-    "forbiddenPackage": "github.com/openimsdk/open-im-server/v3/internal/runtimeacceptance",
-    "jsonFields": [
-      "ImportPath",
-      "ForTest",
-      "Error",
-      "DepsErrors",
-      "Incomplete"
-    ],
-    "phaseGuardSeconds": 600,
-    "rawLimitBytes": 33554432,
-    "packagesLimit": 2048,
-    "projectionLimitBytes": 1048576,
-    "importPathLimitBytes": 512,
-    "goListTestDependencies": true,
-    "originalGoCommandInvocations": 1,
-    "noFallbackRedispatch": true
-  },
-  "groupRegistryFixtureScopeReuse": {
-    "version": "exact-group-registry-fixture-named-scope-compatibility-v1",
-    "currentSource": {
+  "currentGroupRegistryFixtureControl": null,
+  "groupRegistryFixtureTestsToRun": [],
+  "groupRegistryFixtureDependencyControl": null,
+  "groupRegistryFixtureScopeReuse": null,
+  "passedGroupRegistryAndNamedScopes": {
+    "version": "same-complete-go1578-group-and-prior-named-facts-reuse-v1",
+    "source": {
       "members": 1578,
       "digest": "6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3"
     },
-    "originalSource": {
-      "members": 1577,
-      "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
-    },
-    "fixtureDelta": {
-      "target": "server/internal/runtimeacceptance/service_plan_linux.go",
-      "before": {
-        "bytes": 17560,
-        "sha256": "7b3bf7862cce32367bd2f71386c945ec81b96bcb0cf9040c2cb359b9cb778cfa"
+    "facts": {
+      "version": "verified-current-group-registry-contract-named-facts-v1",
+      "source": {
+        "members": 1578,
+        "digest": "6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3"
       },
-      "after": {
-        "bytes": 18672,
-        "sha256": "0a27673e427afd8eded5a8c3e09aeda3611fab7c452afaddb482774ac647fc8d"
-      },
-      "replacements": [
-        {
-          "old": "",
-          "new": "\t\"github.com/openimsdk/open-im-server/v3/internal/deliveryprofile\"\n"
-        },
-        {
-          "old": "\t\tgroup := msgtransfer.OwnedGroupReceiverBootstrap{Version: \"owned-group-receiver-bootstrap-v1\", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, BadgeEvidenceSHA256: in.BadgeEvidenceSHA256, VendorPath: registryPath, VendorSHA256: registrySHA}",
-          "new": "\t\t// Group action receipts have a distinct production registry and typed\n\t\t// profile. The ordinary consumer above keeps its original registry.\n\t\tprofile, e := deliveryprofile.FreezeGroup(in.Header.Database, in.Header.Epoch, in.Header.ActivationSHA256, \"\")\n\t\tif e != nil {\n\t\t\treturn e\n\t\t}\n\t\tgroupPolicy := messagedelivery.KafkaDeliveryPolicy(profile.Transport)\n\t\tgroupFingerprint, e := groupPolicy.Fingerprint()\n\t\tif e != nil {\n\t\t\treturn e\n\t\t}\n\t\tgroupRegistryPath := filepath.Join(in.Work, \"group-none-registry.json\")\n\t\tgroupRegistry := aliasvendor.OwnedOfflinePolicyRegistry{Version: \"group-owned-offline-policies-v1\", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, CurrentPolicySHA256: groupFingerprint, Entries: []aliasvendor.OwnedOfflinePolicySpec{{GroupProfile: &profile, Policy: groupPolicy, Fingerprint: groupFingerprint, BindingSeedSHA256: policy.ConfigurationSHA256}}}\n\t\tgroupRegistrySHA, e := writePrivate(groupRegistryPath, groupRegistry)\n\t\tif e != nil {\n\t\t\treturn e\n\t\t}\n\t\tgroup := msgtransfer.OwnedGroupReceiverBootstrap{Version: \"owned-group-receiver-bootstrap-v1\", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, BadgeEvidenceSHA256: in.BadgeEvidenceSHA256, VendorPath: groupRegistryPath, VendorSHA256: groupRegistrySHA}"
-        }
-      ]
-    },
-    "newTest": {
-      "target": "server/internal/runtimeacceptance/group_registry_contract_linux_test.go",
-      "bytes": 9258,
-      "sha256": "dc0285b2fcfe0d0b65f550ae5165c97784a2e0848c75d09cfd0d07d394bc8c56"
-    },
-    "priorAcceptedNamedScopeFacts": {
-      "version": "same-whole-go-source-original-named-scopes-reuse-v1",
       "binding": {
-        "schema": 1,
-        "kind": "root-accepted-same-Go-source-named-scopes-and-dependency-facts-v1",
-        "head": "75047bc4b42fd72500967b2f684d29e9ad598be4",
-        "run": 42226312448,
-        "job": 127920598182,
+        "head": "3fb83ea24d68243e808ddef94734314f94fe2e0a",
+        "run": 42239197222,
+        "job": 127964699032,
         "attempt": 1,
+        "artifact": {
+          "run": 42239197222,
+          "head": "3fb83ea24d68243e808ddef94734314f94fe2e0a",
+          "attempt": 1,
+          "artifactID": 13513812915,
+          "bytes": 79824,
+          "sha256": "37ea087a82642fafda57bbbad2b838d3dcaef3ef66d33649e9e3a4cc6d196549",
+          "exactAPIDigest": true,
+          "files": 71,
+          "binaryDownloaded": false
+        },
+        "GoToolBodyAndMode": {
+          "bytes": 17164055,
+          "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+          "mode": 493
+        },
+        "sourcePostSHA256": "df2bd0b329388b7a6a408d3e8d2a9489d50607a78f92ed1aef268391f5d5c31a",
+        "toolsBeforeSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+        "toolsAfterSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+        "contractNamesSHA256": "83a6194c4eff31eb0413afd6e48ede808caeb9622ccd09d1f0cc21439b212e86",
+        "contractEventsSHA256": "2d406894b3238a3d1d788fb38d45e879426477f8488682520e2c1e95fec80324",
+        "contractPhaseSHA256": "c8ee0f7c9463ff2eccbb5359e9505a2fba5279e8b12c1b5d772a07892ff74618",
+        "actualContractPhase": "current-group-registry-fixture-contract",
+        "actualContractExitCode": 0,
+        "dependencyReceiptSHA256": "ca3a278d6163c84a9db826bc1307fcbc0cc2ab930933f0f9e971f65c39f8aabb",
+        "dependencyPhaseSHA256": "856b67f12ae7f6191f58d8432637420c4d8d2532f0141a4fa9f68881c2cefd76",
+        "dependencyActualExitCode": 0,
+        "dependencyPackageCount": 1123,
+        "dependencyTestClosureComplete": true,
+        "changedFixturePackageAbsentFromAllReusedRoots": true,
+        "scopeCompatibilityReceiptSHA256": "3145d3bd3119f728419bd6dcf638bc1890b8f8270b8fd20ae482102ddea9725a"
+      },
+      "contractFact": {
+        "topPASS": 1,
+        "subPASS": 3,
+        "skip": 0,
+        "fail": 0,
+        "packages": 1,
+        "namedCompletions": [
+          {
+            "package": "internal/runtimeacceptance",
+            "name": "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader"
+          },
+          {
+            "package": "internal/runtimeacceptance",
+            "name": "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader/actual-role-inputs-accepted-and-separated"
+          },
+          {
+            "package": "internal/runtimeacceptance",
+            "name": "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader/cross-role-registry-is-rejected"
+          },
+          {
+            "package": "internal/runtimeacceptance",
+            "name": "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader/profile-absence-and-transport-drift-are-rejected"
+          }
+        ],
         "source": {
+          "members": 1578,
+          "digest": "6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3"
+        },
+        "accepted": true,
+        "newDatabaseFixtures": 0,
+        "scope": {
+          "phase": "current-group-registry-fixture-contract",
+          "targets": {
+            "internal/runtimeacceptance": [
+              "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader"
+            ]
+          },
+          "requiredSubtests": {
+            "internal/runtimeacceptance": {
+              "TestFreshFixtureGroupReceiverRegistryMatchesProductionReader": [
+                "actual-role-inputs-accepted-and-separated",
+                "cross-role-registry-is-rejected",
+                "profile-absence-and-transport-drift-are-rejected"
+              ]
+            }
+          },
+          "goTimeoutSeconds": 180,
+          "phaseGuardSeconds": 600,
+          "topPASS": 1,
+          "subPASS": 3,
+          "packages": 1,
+          "goCommandInvocations": 1,
+          "packageExecutions": 1,
+          "newDatabaseFixtures": 0,
+          "wholePackagePASS": false
+        },
+        "actualGoCommandInvocations": 1,
+        "actualPackageExecutions": 1,
+        "actualKafkaACLTestsDispatched": 0,
+        "actualManagedShapeTopsDispatched": 0,
+        "actualCacheTopsDispatched": 0,
+        "wholePackagePASS": false,
+        "runtimeAccepted": false,
+        "wholeSourceAccepted": false
+      },
+      "originalScopeCompatibility": {
+        "version": "exact-group-registry-fixture-named-scope-compatibility-v1",
+        "currentSource": {
+          "members": 1578,
+          "digest": "6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3"
+        },
+        "originalSource": {
           "members": 1577,
           "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
         },
-        "artifactID": 13506064970,
-        "artifactSHA256": "598e72da6b3d8f1a5d22b5e6237aa9b9ae7a035b9b58a6e3ba61e876abfb6f3f",
-        "rootReviewSHA256": "7a969d536e10c13b31dfc2d814e2fcf7735628fc5d1e992d9d28e6112bbfc6ff",
-        "dependencyReceiptSHA256": "1994f17ac9defc3b9ef21d708ee008e7c4245a784443dcbd3c23d7e43e995249",
-        "dependencyPackageCount": 1123,
-        "dependencyScope": {
-          "phase": "cron-fixture-reused-scope-deps",
-          "relativeRoots": [
-            "pkg/common/db/cache",
-            "internal/msgtransfer",
-            "internal/namespaceimport/ownedcontrol"
-          ],
-          "roots": [
-            "github.com/openimsdk/open-im-server/v3/pkg/common/db/cache",
-            "github.com/openimsdk/open-im-server/v3/internal/msgtransfer",
-            "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
-          ],
-          "forbiddenPackage": "github.com/openimsdk/open-im-server/v3/internal/runtimeacceptance",
-          "jsonFields": [
-            "ImportPath",
-            "ForTest",
-            "Error",
-            "DepsErrors",
-            "Incomplete"
-          ],
-          "phaseGuardSeconds": 600,
-          "rawLimitBytes": 33554432,
-          "packagesLimit": 2048,
-          "projectionLimitBytes": 1048576,
-          "importPathLimitBytes": 512,
-          "goListTestDependencies": true,
-          "originalGoCommandInvocations": 1,
-          "noFallbackRedispatch": true
-        },
-        "dependencyPhaseSHA256": "20474244c373ab36be0b8007034f5f7fd3938e110b4eb262618d331f4756da1a",
-        "freshContractEventsSHA256": "0e0b9d3138b2080e4f69c17be703dd65671a9e3282750036813c38e4ebb349a8",
-        "freshContractNamesSHA256": "77c62ffe2a748e5c70332f147ead01faba808bed319413fc328fe625ac7b6a3a",
-        "freshContractReceipt": {
-          "topPASS": 1,
-          "subPASS": 3,
-          "skip": 0,
-          "fail": 0,
-          "packages": 1,
-          "namedCompletions": [
+        "fixtureDelta": {
+          "target": "server/internal/runtimeacceptance/service_plan_linux.go",
+          "before": {
+            "bytes": 17560,
+            "sha256": "7b3bf7862cce32367bd2f71386c945ec81b96bcb0cf9040c2cb359b9cb778cfa"
+          },
+          "after": {
+            "bytes": 18672,
+            "sha256": "0a27673e427afd8eded5a8c3e09aeda3611fab7c452afaddb482774ac647fc8d"
+          },
+          "replacements": [
             {
-              "package": "internal/runtimeacceptance",
-              "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler"
+              "old": "",
+              "new": "\t\"github.com/openimsdk/open-im-server/v3/internal/deliveryprofile\"\n"
             },
             {
-              "package": "internal/runtimeacceptance",
-              "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler/hour-minute-shorthand-is-rejected"
-            },
-            {
-              "package": "internal/runtimeacceptance",
-              "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler/legacy-configuration"
-            },
-            {
-              "package": "internal/runtimeacceptance",
-              "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler/runtime-configuration"
+              "old": "\t\tgroup := msgtransfer.OwnedGroupReceiverBootstrap{Version: \"owned-group-receiver-bootstrap-v1\", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, BadgeEvidenceSHA256: in.BadgeEvidenceSHA256, VendorPath: registryPath, VendorSHA256: registrySHA}",
+              "new": "\t\t// Group action receipts have a distinct production registry and typed\n\t\t// profile. The ordinary consumer above keeps its original registry.\n\t\tprofile, e := deliveryprofile.FreezeGroup(in.Header.Database, in.Header.Epoch, in.Header.ActivationSHA256, \"\")\n\t\tif e != nil {\n\t\t\treturn e\n\t\t}\n\t\tgroupPolicy := messagedelivery.KafkaDeliveryPolicy(profile.Transport)\n\t\tgroupFingerprint, e := groupPolicy.Fingerprint()\n\t\tif e != nil {\n\t\t\treturn e\n\t\t}\n\t\tgroupRegistryPath := filepath.Join(in.Work, \"group-none-registry.json\")\n\t\tgroupRegistry := aliasvendor.OwnedOfflinePolicyRegistry{Version: \"group-owned-offline-policies-v1\", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, CurrentPolicySHA256: groupFingerprint, Entries: []aliasvendor.OwnedOfflinePolicySpec{{GroupProfile: &profile, Policy: groupPolicy, Fingerprint: groupFingerprint, BindingSeedSHA256: policy.ConfigurationSHA256}}}\n\t\tgroupRegistrySHA, e := writePrivate(groupRegistryPath, groupRegistry)\n\t\tif e != nil {\n\t\t\treturn e\n\t\t}\n\t\tgroup := msgtransfer.OwnedGroupReceiverBootstrap{Version: \"owned-group-receiver-bootstrap-v1\", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, BadgeEvidenceSHA256: in.BadgeEvidenceSHA256, VendorPath: groupRegistryPath, VendorSHA256: groupRegistrySHA}"
             }
-          ],
-          "source": {
-            "members": 1577,
-            "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
-          },
-          "accepted": true,
-          "newDatabaseFixtures": 0,
-          "scope": {
-            "phase": "current-cron-fixture-contract",
-            "targets": {
-              "internal/runtimeacceptance": [
-                "TestFreshFixtureCronConfigurationMatchesDefaultScheduler"
-              ]
-            },
-            "requiredSubtests": {
-              "internal/runtimeacceptance": {
-                "TestFreshFixtureCronConfigurationMatchesDefaultScheduler": [
-                  "runtime-configuration",
-                  "legacy-configuration",
-                  "hour-minute-shorthand-is-rejected"
-                ]
-              }
-            },
-            "goTimeoutSeconds": 180,
-            "phaseGuardSeconds": 600,
-            "topPASS": 1,
-            "subPASS": 3,
-            "packages": 1,
-            "goCommandInvocations": 1,
-            "packageExecutions": 1,
-            "newDatabaseFixtures": 0,
-            "wholePackagePASS": false
-          },
-          "actualGoCommandInvocations": 1,
-          "actualPackageExecutions": 1,
-          "actualKafkaACLTestsDispatched": 0,
-          "actualManagedShapeTopsDispatched": 0,
-          "actualCacheTopsDispatched": 0,
-          "wholePackagePASS": false,
-          "runtimeAccepted": false,
-          "wholeSourceAccepted": false
+          ]
         },
-        "freshContractPhaseSHA256": "77ca9cfe2fd2446dc20a03beeb51fecbd022b4fbba95387197886910fca6c26e",
-        "previousCompatibilityReceiptSHA256": "362f114a782e99537cb118f62bb9b1c74c017371fe0b19e8cbf26b1ac585cdbb",
-        "previousCompatibility": {
-          "version": "exact-cron-fixture-scope-compatibility-v1",
-          "currentSource": {
-            "members": 1577,
-            "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
-          },
-          "originalSource": {
-            "members": 1576,
-            "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
-          },
-          "bootstrapDelta": {
-            "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
-            "before": {
-              "bytes": 32521,
-              "sha256": "724892450bb0d412f80af390c3ccb252aafee7437c02b0105111e757fc73909c"
-            },
-            "after": {
-              "bytes": 32533,
-              "sha256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46"
-            },
-            "replacements": [
-              {
-                "old": "\"chatRecordsClearTime\": \"23:59\"",
-                "new": "\"chatRecordsClearTime\": \"59 23 * * *\""
-              },
-              {
-                "old": "\"msgDestructTime\": \"23:58\"",
-                "new": "\"msgDestructTime\": \"58 23 * * *\""
-              }
-            ]
-          },
-          "newTest": {
-            "target": "server/internal/runtimeacceptance/bootstrap_schedule_linux_test.go",
-            "bytes": 4033,
-            "sha256": "283d0ebfa042fc93d8229bd84532fcd9a3f8592639aebde18e8e4974c17ce5ba"
-          },
-          "cacheFact": {
+        "newTest": {
+          "target": "server/internal/runtimeacceptance/group_registry_contract_linux_test.go",
+          "bytes": 9258,
+          "sha256": "dc0285b2fcfe0d0b65f550ae5165c97784a2e0848c75d09cfd0d07d394bc8c56"
+        },
+        "priorAcceptedNamedScopeFacts": {
+          "version": "same-whole-go-source-original-named-scopes-reuse-v1",
+          "binding": {
             "schema": 1,
-            "kind": "root-verified-current-cache-named-completion-facts-v1",
-            "head": "fdec879949ff03f29ea76e85f7cc1521c0c2ad24",
-            "run": 42220064947,
-            "job": 127899598193,
+            "kind": "root-accepted-same-Go-source-named-scopes-and-dependency-facts-v1",
+            "head": "75047bc4b42fd72500967b2f684d29e9ad598be4",
+            "run": 42226312448,
+            "job": 127920598182,
             "attempt": 1,
             "source": {
-              "members": 1576,
-              "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
+              "members": 1577,
+              "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
             },
-            "artifactID": 13503123543,
-            "artifactSHA256": "8047b7b7b869c9c6e0f503cf9f2c344a1f4d03add8165959d9031d5814320fc8",
-            "rootReviewSHA256": "3c772aca7091075345fe51580dbdf72a8ada58524e6d4a03a11043adc44a88ff",
-            "eventsSHA256": "5369a0bf74af0b2fd0fc13381950c1d2e2239ee33641b7e27fae5c8361cbb076",
-            "namesSHA256": "01661280ed7a6c20881ac9a1e786e16cfda044497e0aec5d05c1c417e3d8d767",
-            "phaseSHA256": "adecd3a836db5d1e9ca7bc06757c10ef698f7ea2163e021442710b2058e7d49c",
-            "sourcePostSHA256": "a87624c2825b20baa5569c322facf11fda5803e2b4f102e5ea57445e6041b35c",
+            "artifactID": 13506064970,
+            "artifactSHA256": "598e72da6b3d8f1a5d22b5e6237aa9b9ae7a035b9b58a6e3ba61e876abfb6f3f",
+            "rootReviewSHA256": "7a969d536e10c13b31dfc2d814e2fcf7735628fc5d1e992d9d28e6112bbfc6ff",
+            "dependencyReceiptSHA256": "1994f17ac9defc3b9ef21d708ee008e7c4245a784443dcbd3c23d7e43e995249",
+            "dependencyPackageCount": 1123,
+            "dependencyScope": {
+              "phase": "cron-fixture-reused-scope-deps",
+              "relativeRoots": [
+                "pkg/common/db/cache",
+                "internal/msgtransfer",
+                "internal/namespaceimport/ownedcontrol"
+              ],
+              "roots": [
+                "github.com/openimsdk/open-im-server/v3/pkg/common/db/cache",
+                "github.com/openimsdk/open-im-server/v3/internal/msgtransfer",
+                "github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
+              ],
+              "forbiddenPackage": "github.com/openimsdk/open-im-server/v3/internal/runtimeacceptance",
+              "jsonFields": [
+                "ImportPath",
+                "ForTest",
+                "Error",
+                "DepsErrors",
+                "Incomplete"
+              ],
+              "phaseGuardSeconds": 600,
+              "rawLimitBytes": 33554432,
+              "packagesLimit": 2048,
+              "projectionLimitBytes": 1048576,
+              "importPathLimitBytes": 512,
+              "goListTestDependencies": true,
+              "originalGoCommandInvocations": 1,
+              "noFallbackRedispatch": true
+            },
+            "dependencyPhaseSHA256": "20474244c373ab36be0b8007034f5f7fd3938e110b4eb262618d331f4756da1a",
+            "freshContractEventsSHA256": "0e0b9d3138b2080e4f69c17be703dd65671a9e3282750036813c38e4ebb349a8",
+            "freshContractNamesSHA256": "77c62ffe2a748e5c70332f147ead01faba808bed319413fc328fe625ac7b6a3a",
+            "freshContractReceipt": {
+              "topPASS": 1,
+              "subPASS": 3,
+              "skip": 0,
+              "fail": 0,
+              "packages": 1,
+              "namedCompletions": [
+                {
+                  "package": "internal/runtimeacceptance",
+                  "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler"
+                },
+                {
+                  "package": "internal/runtimeacceptance",
+                  "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler/hour-minute-shorthand-is-rejected"
+                },
+                {
+                  "package": "internal/runtimeacceptance",
+                  "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler/legacy-configuration"
+                },
+                {
+                  "package": "internal/runtimeacceptance",
+                  "name": "TestFreshFixtureCronConfigurationMatchesDefaultScheduler/runtime-configuration"
+                }
+              ],
+              "source": {
+                "members": 1577,
+                "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
+              },
+              "accepted": true,
+              "newDatabaseFixtures": 0,
+              "scope": {
+                "phase": "current-cron-fixture-contract",
+                "targets": {
+                  "internal/runtimeacceptance": [
+                    "TestFreshFixtureCronConfigurationMatchesDefaultScheduler"
+                  ]
+                },
+                "requiredSubtests": {
+                  "internal/runtimeacceptance": {
+                    "TestFreshFixtureCronConfigurationMatchesDefaultScheduler": [
+                      "runtime-configuration",
+                      "legacy-configuration",
+                      "hour-minute-shorthand-is-rejected"
+                    ]
+                  }
+                },
+                "goTimeoutSeconds": 180,
+                "phaseGuardSeconds": 600,
+                "topPASS": 1,
+                "subPASS": 3,
+                "packages": 1,
+                "goCommandInvocations": 1,
+                "packageExecutions": 1,
+                "newDatabaseFixtures": 0,
+                "wholePackagePASS": false
+              },
+              "actualGoCommandInvocations": 1,
+              "actualPackageExecutions": 1,
+              "actualKafkaACLTestsDispatched": 0,
+              "actualManagedShapeTopsDispatched": 0,
+              "actualCacheTopsDispatched": 0,
+              "wholePackagePASS": false,
+              "runtimeAccepted": false,
+              "wholeSourceAccepted": false
+            },
+            "freshContractPhaseSHA256": "77ca9cfe2fd2446dc20a03beeb51fecbd022b4fbba95387197886910fca6c26e",
+            "previousCompatibilityReceiptSHA256": "362f114a782e99537cb118f62bb9b1c74c017371fe0b19e8cbf26b1ac585cdbb",
+            "previousCompatibility": {
+              "version": "exact-cron-fixture-scope-compatibility-v1",
+              "currentSource": {
+                "members": 1577,
+                "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
+              },
+              "originalSource": {
+                "members": 1576,
+                "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
+              },
+              "bootstrapDelta": {
+                "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
+                "before": {
+                  "bytes": 32521,
+                  "sha256": "724892450bb0d412f80af390c3ccb252aafee7437c02b0105111e757fc73909c"
+                },
+                "after": {
+                  "bytes": 32533,
+                  "sha256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46"
+                },
+                "replacements": [
+                  {
+                    "old": "\"chatRecordsClearTime\": \"23:59\"",
+                    "new": "\"chatRecordsClearTime\": \"59 23 * * *\""
+                  },
+                  {
+                    "old": "\"msgDestructTime\": \"23:58\"",
+                    "new": "\"msgDestructTime\": \"58 23 * * *\""
+                  }
+                ]
+              },
+              "newTest": {
+                "target": "server/internal/runtimeacceptance/bootstrap_schedule_linux_test.go",
+                "bytes": 4033,
+                "sha256": "283d0ebfa042fc93d8229bd84532fcd9a3f8592639aebde18e8e4974c17ce5ba"
+              },
+              "cacheFact": {
+                "schema": 1,
+                "kind": "root-verified-current-cache-named-completion-facts-v1",
+                "head": "fdec879949ff03f29ea76e85f7cc1521c0c2ad24",
+                "run": 42220064947,
+                "job": 127899598193,
+                "attempt": 1,
+                "source": {
+                  "members": 1576,
+                  "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
+                },
+                "artifactID": 13503123543,
+                "artifactSHA256": "8047b7b7b869c9c6e0f503cf9f2c344a1f4d03add8165959d9031d5814320fc8",
+                "rootReviewSHA256": "3c772aca7091075345fe51580dbdf72a8ada58524e6d4a03a11043adc44a88ff",
+                "eventsSHA256": "5369a0bf74af0b2fd0fc13381950c1d2e2239ee33641b7e27fae5c8361cbb076",
+                "namesSHA256": "01661280ed7a6c20881ac9a1e786e16cfda044497e0aec5d05c1c417e3d8d767",
+                "phaseSHA256": "adecd3a836db5d1e9ca7bc06757c10ef698f7ea2163e021442710b2058e7d49c",
+                "sourcePostSHA256": "a87624c2825b20baa5569c322facf11fda5803e2b4f102e5ea57445e6041b35c",
+                "toolsSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+                "GoToolBodyAndMode": {
+                  "bytes": 17164055,
+                  "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+                  "mode": 493
+                },
+                "namedCompletions": [
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorOwnsFiniteClientWithoutChangingSharedOptions"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/actual-driver-ack-keeps-original-owner"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/actual-driver-lost-ack-retires-only-recovery"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/closing-base-keeps-existing-recovery"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/cluster-independent-options-and-close"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/foreign-and-malformed-owned-clients-refused"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/parent-cancel-refuses-rebuild"
+                  },
+                  {
+                    "package": "pkg/common/db/cache",
+                    "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/single-node-independent-options-and-close"
+                  }
+                ],
+                "topPASS": 2,
+                "subPASS": 7,
+                "skip": 0,
+                "fail": 0,
+                "originalPackageFooterPASS": true,
+                "wholePackagePASS": false,
+                "runtimeAccepted": false,
+                "wholeSourceAccepted": false,
+                "doesNotAuthorizeReuseAcrossUnprovedProductionChanges": true
+              },
+              "priorProducerKafkaCompatibility": {
+                "version": "exact-cache-test-delta-completed-package-compatibility-v1",
+                "originalBinding": {
+                  "schema": 1,
+                  "kind": "root-accepted-two-completed-packages-in-failed-cache-command-v1",
+                  "run": 42215107940,
+                  "job": 127883050593,
+                  "head": "1ef9d4920278da3aa407a2c8f6d4fc37fd12896b",
+                  "attempt": 1,
+                  "source": {
+                    "members": 1576,
+                    "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+                  },
+                  "rootReviewSHA256": "3b0ff325cd616925e89c1d36b69a2c3e9f4a8c92469195171b14eded0837d02f",
+                  "artifactID": 13501560279,
+                  "artifactSHA256": "170825c7e45f76c38a9af6ace929f13464512823850ae339d8936af27140389b",
+                  "eventsSHA256": "5830ce62ab57d7560dce479259cc5356309a08ae867cf4e1e46df63915eaee81",
+                  "phaseSHA256": "489ea6a494e0ba87d4d4659418eb1676161e7dcc47945148870dee31416aeebd",
+                  "sourcePostSHA256": "ec0213a4e905f6acdd29b214d0371027e50b16014876e1407f9a202bd2f36824",
+                  "toolsSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+                  "GoToolBodyAndMode": {
+                    "bytes": 17164055,
+                    "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+                    "mode": 493
+                  },
+                  "completedPackages": {
+                    "internal/msgtransfer": {
+                      "source": {
+                        "members": 1576,
+                        "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+                      },
+                      "topPASS": 1,
+                      "subPASS": 13,
+                      "skip": 0,
+                      "fail": 0,
+                      "namedCompletions": [
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/alphabetic-map-reorder"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/duplicate-field"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/hardlink-file"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-field"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-file"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/null-string"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/producer-and-child-loader-roundtrip"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/public-file"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/symlink-file"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/trailing-json"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/unknown-field"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-pin"
+                        },
+                        {
+                          "package": "internal/msgtransfer",
+                          "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-value-type"
+                        }
+                      ],
+                      "originalPackageFooterPASS": true,
+                      "wholePackagePASS": false,
+                      "runtimeAccepted": false
+                    },
+                    "internal/namespaceimport/ownedcontrol": {
+                      "source": {
+                        "members": 1576,
+                        "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+                      },
+                      "topPASS": 1,
+                      "subPASS": 3,
+                      "skip": 0,
+                      "fail": 0,
+                      "namedCompletions": [
+                        {
+                          "package": "internal/namespaceimport/ownedcontrol",
+                          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+                        },
+                        {
+                          "package": "internal/namespaceimport/ownedcontrol",
+                          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+                        },
+                        {
+                          "package": "internal/namespaceimport/ownedcontrol",
+                          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+                        },
+                        {
+                          "package": "internal/namespaceimport/ownedcontrol",
+                          "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+                        }
+                      ],
+                      "originalPackageFooterPASS": true,
+                      "wholePackagePASS": false,
+                      "runtimeAccepted": false
+                    }
+                  },
+                  "originalGoCommandPassed": false,
+                  "originalWholeScopeAccepted": false,
+                  "cachePackagePassed": false,
+                  "sameWholeSourceForLaterTestDelta": false,
+                  "onlyExplicitExactTestDeltaCompatibilityMayConsume": true,
+                  "currentFreshCacheRequired": true,
+                  "runtimeAccepted": false
+                },
+                "currentSource": {
+                  "members": 1576,
+                  "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
+                },
+                "originalSource": {
+                  "members": 1576,
+                  "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
+                },
+                "delta": {
+                  "target": "server/pkg/common/db/cache/group_authority_invalidator_test.go",
+                  "before": {
+                    "bytes": 12325,
+                    "sha256": "b19daee1eb934bd08e079487f730b0da9f125dc6d5bdb528695b28290a9427c6"
+                  },
+                  "after": {
+                    "bytes": 12326,
+                    "sha256": "21d806aef240c2953b682848dbb622e44e1c86ea2a730d3603e13416f72115e9"
+                  },
+                  "contextStart": "\tt.Run(\"cluster-independent-options-and-close\", func(t *testing.T) {",
+                  "contextEnd": "\tt.Run(\"closing-base-keeps-existing-recovery\", func(t *testing.T) {",
+                  "oldLiteral": "opts.MaxRetries != 0",
+                  "newLiteral": "opts.MaxRetries != -1",
+                  "occurrences": 1
+                },
+                "sameWholeSource": false,
+                "originalGoCommandPassed": false,
+                "originalWholeScopeAccepted": false,
+                "oldCachePackagePassed": false,
+                "compatibilityOnlyForNamedCompletedPackages": true,
+                "actualCurrentProducerCommands": 0,
+                "actualCurrentKafkaCommands": 0,
+                "actualCurrentPackageExecutionsForReusedFacts": 0,
+                "runtimeAccepted": false,
+                "wholeSourceAccepted": false,
+                "wholePackagePASS": false
+              },
+              "sameWholeSource": false,
+              "actualCurrentCacheTestCommands": 0,
+              "actualCurrentProducerTestCommands": 0,
+              "actualCurrentKafkaTestCommands": 0,
+              "dependencyProofRequired": true,
+              "noFallbackRedispatch": true,
+              "wholePackagePASS": false,
+              "wholeSourceAccepted": false,
+              "runtimeAccepted": false
+            },
+            "sourcePostSHA256": "86917bdb523e4b96ce7e477db0e5e1b313302a516411c317336ddf39c9330854",
             "toolsSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
             "GoToolBodyAndMode": {
               "bytes": 17164055,
               "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
               "mode": 493
             },
-            "namedCompletions": [
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorOwnsFiniteClientWithoutChangingSharedOptions"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/actual-driver-ack-keeps-original-owner"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/actual-driver-lost-ack-retires-only-recovery"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/closing-base-keeps-existing-recovery"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/cluster-independent-options-and-close"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/foreign-and-malformed-owned-clients-refused"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/parent-cancel-refuses-rebuild"
-              },
-              {
-                "package": "pkg/common/db/cache",
-                "name": "TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime/single-node-independent-options-and-close"
-              }
-            ],
-            "topPASS": 2,
-            "subPASS": 7,
-            "skip": 0,
-            "fail": 0,
-            "originalPackageFooterPASS": true,
-            "wholePackagePASS": false,
+            "actualOriginalDependencyClosureAccepted": true,
+            "actualOriginalFreshContractAccepted": true,
+            "mayOnlyReuseWhenCurrentWholeGoSourceExact": true,
+            "doesNotRewriteOriginalCrossSourceCompatibilityAsSameSource": true,
+            "wholePackagesOrSuitesAccepted": false,
             "runtimeAccepted": false,
-            "wholeSourceAccepted": false,
-            "doesNotAuthorizeReuseAcrossUnprovedProductionChanges": true
+            "wholeGoalAccepted": false
           },
-          "priorProducerKafkaCompatibility": {
-            "version": "exact-cache-test-delta-completed-package-compatibility-v1",
-            "originalBinding": {
-              "schema": 1,
-              "kind": "root-accepted-two-completed-packages-in-failed-cache-command-v1",
-              "run": 42215107940,
-              "job": 127883050593,
-              "head": "1ef9d4920278da3aa407a2c8f6d4fc37fd12896b",
-              "attempt": 1,
-              "source": {
-                "members": 1576,
-                "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
-              },
-              "rootReviewSHA256": "3b0ff325cd616925e89c1d36b69a2c3e9f4a8c92469195171b14eded0837d02f",
-              "artifactID": 13501560279,
-              "artifactSHA256": "170825c7e45f76c38a9af6ace929f13464512823850ae339d8936af27140389b",
-              "eventsSHA256": "5830ce62ab57d7560dce479259cc5356309a08ae867cf4e1e46df63915eaee81",
-              "phaseSHA256": "489ea6a494e0ba87d4d4659418eb1676161e7dcc47945148870dee31416aeebd",
-              "sourcePostSHA256": "ec0213a4e905f6acdd29b214d0371027e50b16014876e1407f9a202bd2f36824",
-              "toolsSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
-              "GoToolBodyAndMode": {
-                "bytes": 17164055,
-                "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
-                "mode": 493
-              },
-              "completedPackages": {
-                "internal/msgtransfer": {
-                  "source": {
-                    "members": 1576,
-                    "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
-                  },
-                  "topPASS": 1,
-                  "subPASS": 13,
-                  "skip": 0,
-                  "fail": 0,
-                  "namedCompletions": [
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/alphabetic-map-reorder"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/duplicate-field"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/hardlink-file"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-field"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-file"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/null-string"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/producer-and-child-loader-roundtrip"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/public-file"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/symlink-file"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/trailing-json"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/unknown-field"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-pin"
-                    },
-                    {
-                      "package": "internal/msgtransfer",
-                      "name": "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-value-type"
-                    }
-                  ],
-                  "originalPackageFooterPASS": true,
-                  "wholePackagePASS": false,
-                  "runtimeAccepted": false
-                },
-                "internal/namespaceimport/ownedcontrol": {
-                  "source": {
-                    "members": 1576,
-                    "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
-                  },
-                  "topPASS": 1,
-                  "subPASS": 3,
-                  "skip": 0,
-                  "fail": 0,
-                  "namedCompletions": [
-                    {
-                      "package": "internal/namespaceimport/ownedcontrol",
-                      "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-                    },
-                    {
-                      "package": "internal/namespaceimport/ownedcontrol",
-                      "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
-                    },
-                    {
-                      "package": "internal/namespaceimport/ownedcontrol",
-                      "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
-                    },
-                    {
-                      "package": "internal/namespaceimport/ownedcontrol",
-                      "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
-                    }
-                  ],
-                  "originalPackageFooterPASS": true,
-                  "wholePackagePASS": false,
-                  "runtimeAccepted": false
-                }
-              },
-              "originalGoCommandPassed": false,
-              "originalWholeScopeAccepted": false,
-              "cachePackagePassed": false,
-              "sameWholeSourceForLaterTestDelta": false,
-              "onlyExplicitExactTestDeltaCompatibilityMayConsume": true,
-              "currentFreshCacheRequired": true,
-              "runtimeAccepted": false
-            },
-            "currentSource": {
-              "members": 1576,
-              "digest": "f2de06c0b25c49735db974b9a726adbfae66612a4b3f35962b9e1a73207d3e6f"
-            },
-            "originalSource": {
-              "members": 1576,
-              "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
-            },
-            "delta": {
-              "target": "server/pkg/common/db/cache/group_authority_invalidator_test.go",
-              "before": {
-                "bytes": 12325,
-                "sha256": "b19daee1eb934bd08e079487f730b0da9f125dc6d5bdb528695b28290a9427c6"
-              },
-              "after": {
-                "bytes": 12326,
-                "sha256": "21d806aef240c2953b682848dbb622e44e1c86ea2a730d3603e13416f72115e9"
-              },
-              "contextStart": "\tt.Run(\"cluster-independent-options-and-close\", func(t *testing.T) {",
-              "contextEnd": "\tt.Run(\"closing-base-keeps-existing-recovery\", func(t *testing.T) {",
-              "oldLiteral": "opts.MaxRetries != 0",
-              "newLiteral": "opts.MaxRetries != -1",
-              "occurrences": 1
-            },
-            "sameWholeSource": false,
-            "originalGoCommandPassed": false,
-            "originalWholeScopeAccepted": false,
-            "oldCachePackagePassed": false,
-            "compatibilityOnlyForNamedCompletedPackages": true,
-            "actualCurrentProducerCommands": 0,
-            "actualCurrentKafkaCommands": 0,
-            "actualCurrentPackageExecutionsForReusedFacts": 0,
-            "runtimeAccepted": false,
-            "wholeSourceAccepted": false,
-            "wholePackagePASS": false
+          "source": {
+            "members": 1577,
+            "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
           },
-          "sameWholeSource": false,
+          "actualCurrentDependencyGoListInvocations": 0,
+          "actualCurrentContractCommands": 0,
           "actualCurrentCacheTestCommands": 0,
           "actualCurrentProducerTestCommands": 0,
           "actualCurrentKafkaTestCommands": 0,
-          "dependencyProofRequired": true,
-          "noFallbackRedispatch": true,
           "wholePackagePASS": false,
           "wholeSourceAccepted": false,
           "runtimeAccepted": false
         },
-        "sourcePostSHA256": "86917bdb523e4b96ce7e477db0e5e1b313302a516411c317336ddf39c9330854",
-        "toolsSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
-        "GoToolBodyAndMode": {
-          "bytes": 17164055,
-          "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
-          "mode": 493
-        },
-        "actualOriginalDependencyClosureAccepted": true,
-        "actualOriginalFreshContractAccepted": true,
-        "mayOnlyReuseWhenCurrentWholeGoSourceExact": true,
-        "doesNotRewriteOriginalCrossSourceCompatibilityAsSameSource": true,
-        "wholePackagesOrSuitesAccepted": false,
-        "runtimeAccepted": false,
-        "wholeGoalAccepted": false
+        "unchangedHistoricalCronBodies": [
+          {
+            "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
+            "bytes": 32533,
+            "sha256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46"
+          },
+          {
+            "target": "server/internal/runtimeacceptance/bootstrap_schedule_linux_test.go",
+            "bytes": 4033,
+            "sha256": "283d0ebfa042fc93d8229bd84532fcd9a3f8592639aebde18e8e4974c17ce5ba"
+          }
+        ],
+        "historicalCronContractOnly": true,
+        "currentCronContractCommands": 0,
+        "sameWholeSource": false,
+        "actualCurrentCacheTestCommands": 0,
+        "actualCurrentProducerTestCommands": 0,
+        "actualCurrentKafkaTestCommands": 0,
+        "dependencyProofRequired": true,
+        "noFallbackRedispatch": true,
+        "wholePackagePASS": false,
+        "wholeSourceAccepted": false,
+        "runtimeAccepted": false
       },
-      "source": {
-        "members": 1577,
-        "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
-      },
-      "actualCurrentDependencyGoListInvocations": 0,
-      "actualCurrentContractCommands": 0,
-      "actualCurrentCacheTestCommands": 0,
-      "actualCurrentProducerTestCommands": 0,
-      "actualCurrentKafkaTestCommands": 0,
-      "wholePackagePASS": false,
-      "wholeSourceAccepted": false,
-      "runtimeAccepted": false
+      "sameWholeSourceRequiredForReuse": true,
+      "sameGoToolRequiredForReuse": true,
+      "wholePackagesAccepted": false,
+      "runtimeAccepted": false,
+      "PIDAbsenceAccepted": false,
+      "P20Accepted": false
     },
-    "unchangedHistoricalCronBodies": [
-      {
-        "target": "server/internal/runtimeacceptance/bootstrap_linux.go",
-        "bytes": 32533,
-        "sha256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46"
-      },
-      {
-        "target": "server/internal/runtimeacceptance/bootstrap_schedule_linux_test.go",
-        "bytes": 4033,
-        "sha256": "283d0ebfa042fc93d8229bd84532fcd9a3f8592639aebde18e8e4974c17ce5ba"
-      }
-    ],
-    "historicalCronContractOnly": true,
-    "currentCronContractCommands": 0,
-    "sameWholeSource": false,
-    "actualCurrentCacheTestCommands": 0,
-    "actualCurrentProducerTestCommands": 0,
-    "actualCurrentKafkaTestCommands": 0,
-    "dependencyProofRequired": true,
-    "noFallbackRedispatch": true,
+    "actualCurrentGoListInvocations": 0,
+    "actualCurrentGroupContractCommands": 0,
+    "actualCurrentCronContractCommands": 0,
+    "actualCurrentCacheCommands": 0,
+    "actualCurrentProducerCommands": 0,
+    "actualCurrentKafkaCommands": 0,
     "wholePackagePASS": false,
-    "wholeSourceAccepted": false,
-    "runtimeAccepted": false
+    "runtimeAccepted": false,
+    "wholeSourceAccepted": false
+  },
+  "originalConstructorLogProjectionPolicy": {
+    "version": "owned-original-constructor-log-projection-v1",
+    "logLimitBytes": 8388608,
+    "lineLimit": 16384,
+    "lineBytesLimit": 4096,
+    "framesLimit": 8,
+    "directoryEntriesLimit": 64,
+    "onlyRole": "rpc-group",
+    "onlyCachedWaitExitCode": 2,
+    "rawTextExported": false,
+    "acceptanceEvidence": false,
+    "panicPrefixClassesLimit": 8,
+    "wrapperLimit": 8,
+    "allowRegistrationDone": true,
+    "waitResultForRegistrationDone": "not-exported",
+    "ownerRecordLimitBytes": 16384,
+    "roles": [
+      "api",
+      "crontask",
+      "msggateway",
+      "msgtransfer-managed",
+      "push",
+      "rpc-auth",
+      "rpc-encryption",
+      "rpc-friend",
+      "rpc-group",
+      "rpc-rtc",
+      "rpc-third",
+      "rpc-user"
+    ],
+    "acceptedCachedExitCodes": {
+      "minimum": -1,
+      "maximum": 255
+    },
+    "onlyActualFailedRole": true
   }
 }

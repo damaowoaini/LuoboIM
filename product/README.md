@@ -12,4 +12,4 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
-本批修fixture的角色registry混用：ordinary consumer原输入保留；rpc-group使用真实FreezeGroup产生独立profile/group-effect policy及原seed绑定，生产reader不改。fresh实际PrepareServicePlan→bootstrap/registry reader合同1top3sub，覆盖正常分离/交叉拒绝/profile漂移拒绝。固定三roots实际go-list闭包和精确逆转旧1577全向量通过后，原cache/prod/Kafka与未改cron事实0重派，仅保留原来源，不称新全包PASS。cb5实际16编译/首场景PASS，第二rpc-group退出2/固定类group-receiver-initialization，尚未证明唯一实际首错。原16编译/4场景/graph2top3及cleanup/PID/ELF门禁保留，独立cache无receiver且不赋予runtime/Ready/P20接受。
+本批仅CI诊断及同完整Go1578/工具的原命名事实复用，ordinary1884源码不变。3fb实际group writer/parser1/3、三roots1123包test依赖闭包、16编译及首场景通过，第二rpc-third observe-registration/done，原Wait/Sync/Close仅知返回、结果未导出。固定12constructor的实际失败role沿原owner记录读取exact私有log，仅投影闭合类别和白名单源码帧；不推断退出码，不新增生命周期调用。已过group/list/cron/cache/producer/Kafka0重派，原服务图/oracles/清理独立fresh，cache/runtime/PID/Ready/P20接受边界不变。

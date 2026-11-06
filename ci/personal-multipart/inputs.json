@@ -5,6 +5,7 @@
     "No native App539/M/E adoption or modification",
     "No fresh old34/39 or full Mobile403/Web107/Admin89 regression"
   ],
+  "analysis_mode": "reuse6-ui3",
   "analysis_paths6": [
     "lib/features/personal/data/personal_migration.dart",
     "lib/features/personal/data/personal_repository.dart",
@@ -13,6 +14,193 @@
     "test/features/personal/personal_migration_repository_test.dart",
     "test/features/personal/personal_migration_test.dart"
   ],
+  "analysis_reuse6": {
+    "canonicalAppAdopted": false,
+    "formatted7Pins": [
+      {
+        "bytes": 16410,
+        "path": "app/lib/features/personal/data/personal_migration.dart",
+        "sha256": "c60daa6d6422c66d2cec56ec220ca71a51dc661a162660a5c27bd3ad41379b31"
+      },
+      {
+        "bytes": 14766,
+        "path": "app/lib/features/personal/data/personal_repository.dart",
+        "sha256": "2c32b383c8697e650190939baaf76ac9fb950e713d0c2e5cda40424e80a7427c"
+      },
+      {
+        "bytes": 34608,
+        "path": "app/lib/features/personal/presentation/personal_page.dart",
+        "sha256": "59d73522be54a6e43cbcfa3e71c454a764c278bb83130566b96560853c06bdbc"
+      },
+      {
+        "bytes": 15438,
+        "path": "app/test/features/personal/personal_action_epoch_test.dart",
+        "sha256": "13361ae7bed1bc51e6f804c21c07ce7487f58eddda9520a2ef53fd748b06fb44"
+      },
+      {
+        "bytes": 10385,
+        "path": "app/test/features/personal/personal_migration_repository_test.dart",
+        "sha256": "365ff97da33a303d8308fc843ffb2d6735761a99f2a66d3228c239326db9f595"
+      },
+      {
+        "bytes": 7470,
+        "path": "app/test/features/personal/personal_migration_test.dart",
+        "sha256": "0139973810276717737936679c412331694f0d1d91f0c1c5e84dae71b38efd45"
+      },
+      {
+        "bytes": 5483,
+        "path": "migration/legacy_personal_export/legacy_personal_export.dart",
+        "sha256": "293525253d3ea97430c5837a7fa0b2580fe95061a86daef211da45105f712fdf"
+      }
+    ],
+    "formatterDerivationSHA256": "c33266e7c9fccd752cfad1d8dac99d45bae5692ff1375ba23fd487dd4fd0363a",
+    "formatterDerivedPortable": {
+      "digest": "075f4465776d1d223ca403aecf3e1f3ecd8852062dab7a3ce2c588433978b2a6",
+      "members": 418
+    },
+    "formatterDerivedSource": {
+      "digest": "9d4bf11fdc039fd1f1bbe3f33427724aa216c577e96c5ead429ba3957f5335f4",
+      "members": 366
+    },
+    "inputPortable": {
+      "digest": "ba51bbd1aee59f7c960e3f3f7f876a1e242b4697ef5353b64f12bb52ab22b84f",
+      "members": 418
+    },
+    "inputSource": {
+      "digest": "a399bdcf038dd55742922d18ed213c1d2cc734221a269f2b63264c34694d0c85",
+      "members": 366
+    },
+    "onlyPlannedChange": "one explicit mounted/captured-repository guard in private import method before showDialog",
+    "origin": {
+      "artifactID": 13515950498,
+      "attempt": 1,
+      "binaryDownloaded": false,
+      "bytes": 73766,
+      "exactAPIDigest": true,
+      "files": 49,
+      "head": "0111bb92575bdbb2f62520d0cf002ecf89231a8b",
+      "run": 42241051862,
+      "sha256": "7d8f63be0119731f4de6d53b29591c4ed75301c7f0935a67d7c75365e8a3e1fa"
+    },
+    "originJob": 127971129979,
+    "passed6": [
+      {
+        "childExitCode": 0,
+        "diagnostics": 0,
+        "formattedAfter": {
+          "bytes": 16410,
+          "sha256": "c60daa6d6422c66d2cec56ec220ca71a51dc661a162660a5c27bd3ad41379b31"
+        },
+        "logSHA256": "0b7bcddf014faa578b51c055b3018025c0b89917f14abe0e08632923da676cd7",
+        "originalPath": "app/lib/features/personal/data/personal_migration.dart",
+        "path": "lib/features/personal/data/personal_migration.dart",
+        "phase": "personal-analyze-1",
+        "resourceSHA256": "38512b9f25dc7fa11ed59ac1f4c2ac3c0176d5ed809474007453068f2e4e0d86",
+        "summarySHA256": "1bebf68c6ea8b4124628ed82d110b7a9afecb3441398d1cf406987fb8841a64e"
+      },
+      {
+        "childExitCode": 0,
+        "diagnostics": 0,
+        "formattedAfter": {
+          "bytes": 14766,
+          "sha256": "2c32b383c8697e650190939baaf76ac9fb950e713d0c2e5cda40424e80a7427c"
+        },
+        "logSHA256": "8df4f6d7c2dbbb194ff359834fdfeb04d1c07017ec00c55b6f82a73ee6ae3f75",
+        "originalPath": "app/lib/features/personal/data/personal_repository.dart",
+        "path": "lib/features/personal/data/personal_repository.dart",
+        "phase": "personal-analyze-2",
+        "resourceSHA256": "af3325c3924ea66b8106f4d60648a7e83a3ecc1847cdedbd49348761a68c9aa1",
+        "summarySHA256": "5763a0591546a852b21b8a9e71169d4f10b9451e8548c49cc39eb42187c064d3"
+      },
+      {
+        "childExitCode": 0,
+        "diagnostics": 0,
+        "formattedAfter": {
+          "bytes": 15438,
+          "sha256": "13361ae7bed1bc51e6f804c21c07ce7487f58eddda9520a2ef53fd748b06fb44"
+        },
+        "logSHA256": "c2fd56ab81caa35725a86e05587b4e60f87ab0e24b33c444d4f308fa3ce95a45",
+        "originalPath": "app/test/features/personal/personal_action_epoch_test.dart",
+        "path": "test/features/personal/personal_action_epoch_test.dart",
+        "phase": "personal-analyze-4",
+        "resourceSHA256": "f4010413b62c9f95fea450ae8fb2ed60f7be69bff0be518cfc487165e73a1888",
+        "summarySHA256": "65e3aa51f70636c3aa160383f90f4278a8ce2d393047f49adde284cc806ef866"
+      },
+      {
+        "childExitCode": 0,
+        "diagnostics": 0,
+        "formattedAfter": {
+          "bytes": 10385,
+          "sha256": "365ff97da33a303d8308fc843ffb2d6735761a99f2a66d3228c239326db9f595"
+        },
+        "logSHA256": "5725ad8526d4dc6c74bf174272a55d755c3e74cf9e957af211a9ea08a9677835",
+        "originalPath": "app/test/features/personal/personal_migration_repository_test.dart",
+        "path": "test/features/personal/personal_migration_repository_test.dart",
+        "phase": "personal-analyze-5",
+        "resourceSHA256": "671db8b721711001110ab19598d55bc806d038824c6326e25182a219a05586ba",
+        "summarySHA256": "ee4a59090b1b6aa2a0318b3d3a12a0bf88c7fad00754190f32f6616e437c10a5"
+      },
+      {
+        "childExitCode": 0,
+        "diagnostics": 0,
+        "formattedAfter": {
+          "bytes": 7470,
+          "sha256": "0139973810276717737936679c412331694f0d1d91f0c1c5e84dae71b38efd45"
+        },
+        "logSHA256": "990b00d6dfbe36837d74d0d33876f86210119e8ca0941dcb5f2856507da13fe3",
+        "originalPath": "app/test/features/personal/personal_migration_test.dart",
+        "path": "test/features/personal/personal_migration_test.dart",
+        "phase": "personal-analyze-6",
+        "resourceSHA256": "31554e303f6ebd3972880b68481085b705df925b55b9a108c7e19c20396484ce",
+        "summarySHA256": "14e92c0c99ab0199e190d6972faaaf07805dd98f80d7ef687b1cfc5b3e0908e8"
+      },
+      {
+        "childExitCode": 0,
+        "diagnostics": 0,
+        "formattedAfter": {
+          "bytes": 5483,
+          "sha256": "293525253d3ea97430c5837a7fa0b2580fe95061a86daef211da45105f712fdf"
+        },
+        "logSHA256": "1079b0c65118bfe67a619a7d93afe1ceb9f4d574f909e6cc5ce68bd41526b2fe",
+        "originalPath": "migration/legacy_personal_export/legacy_personal_export.dart",
+        "path": "legacy_personal_export.dart",
+        "phase": "personal-analyze-7",
+        "resourceSHA256": "566ac091a2faf2837e14f97664785e93f0a3127f35df84a07b8136c300dd3237",
+        "summarySHA256": "ada1a614dbbf95ed99c32d812052cb989ab75c114fd3f23b8e658620e73a5066"
+      }
+    ],
+    "requiresAll6SameFormattedBytesAndSameDartTools": true,
+    "requiresSameFullFormattedSourceExceptExactPrivateGuard": true,
+    "runtimeAccepted": false,
+    "sourcePostSHA256": "26e848a9880dd427f9260857b13d02fd8a2bd599d33391af014121099f66211d",
+    "testsEverExecuted": false,
+    "toolchain": {
+      "dartSdkVersion": "3.13.5",
+      "engineRevision": "deb287481e3ce9468f3434937ced4240a70539ca",
+      "frameworkRevision": "abaf9c523780a608bd46686fd5e53740a07077f8",
+      "frameworkVersion": "3.47.7"
+    },
+    "toolsAfterSHA256": "4b6a4ff4a7ae317a3a3e298ec75030e08ba977f018ec7fd62e03a3742114af1f",
+    "toolsBeforeSHA256": "4b6a4ff4a7ae317a3a3e298ec75030e08ba977f018ec7fd62e03a3742114af1f",
+    "toolsBodyAndMode": {
+      "dart": {
+        "bytes": 4792704,
+        "mode": 493,
+        "sha256": "85261d86cfb808e762d7b951f2d9745d8746eb9f1f2f62547d87753fd001ea89"
+      },
+      "flutter": {
+        "bytes": 2385,
+        "mode": 448,
+        "sha256": "7d486c33b30a0cf1ea5146231c68bb8f966cdb4e087c5cd8b37e14513f536e7d"
+      }
+    },
+    "version": "verified-personal-six-analysis-facts-v1"
+  },
+  "analysis_reuse6_binding": {
+    "bytes": 7566,
+    "path": ".qa/personal-analysis-batch-20261106/verified-0111-personal-six-analysis-facts.json",
+    "sha256": "3bd673cf9584d4e3d4a9da774e3989a9d1efce0e8f709dd2e05dd4ade6f7a590"
+  },
   "auxiliary": [
     {
       "meaning": "exact eighth source JSON parsed; outside canonical portable closure",
@@ -40,10 +228,10 @@
       "sha256": "2c32b383c8697e650190939baaf76ac9fb950e713d0c2e5cda40424e80a7427c"
     },
     {
-      "bytes": 34608,
+      "bytes": 34663,
       "originalPath": "app/lib/features/personal/presentation/personal_page.dart",
       "path": "ci/candidates/personal-multipart/after/app/lib/features/personal/presentation/personal_page.dart",
-      "sha256": "59d73522be54a6e43cbcfa3e71c454a764c278bb83130566b96560853c06bdbc"
+      "sha256": "4075034954b2c3f70af01fcfef9fa604246ea561575b1d9b910662ae9ca5c7fc"
     },
     {
       "bytes": 14783,
@@ -107,9 +295,9 @@
       "sha256": "946362446d22ff3ab23c0d912c12c633cb75d2dba00b7ffa477d9c33f3690c50"
     },
     {
-      "bytes": 32201,
+      "bytes": 37805,
       "path": "ci/personal-multipart.py",
-      "sha256": "2f7b1c4ac27a28400575c0dac1db21678936e77fc2bff80ac7ed298b4d082cb7"
+      "sha256": "bf489c3bc3455619d1c10ab8e7b0e729b735ca583143513906fd8c3a00f1f1b9"
     }
   ],
   "delta8": [
@@ -137,9 +325,9 @@
     },
     {
       "after": {
-        "bytes": 34608,
+        "bytes": 34663,
         "path": "app/lib/features/personal/presentation/personal_page.dart",
-        "sha256": "59d73522be54a6e43cbcfa3e71c454a764c278bb83130566b96560853c06bdbc"
+        "sha256": "4075034954b2c3f70af01fcfef9fa604246ea561575b1d9b910662ae9ca5c7fc"
       },
       "before": {
         "bytes": 27726,
@@ -331,7 +519,7 @@
     }
   ],
   "portable_after": {
-    "digest": "ba51bbd1aee59f7c960e3f3f7f876a1e242b4697ef5353b64f12bb52ab22b84f",
+    "digest": "fc0962ef164c2a4ef05666cdf7d98a5b5755bdbdb066c2da32e2b0a2fd160b04",
     "members": 418
   },
   "portable_before": {
@@ -373,7 +561,7 @@
     "runner_chrome_missing": "hard failure, not skip/pass"
   },
   "source_after": {
-    "digest": "a399bdcf038dd55742922d18ed213c1d2cc734221a269f2b63264c34694d0c85",
+    "digest": "50763413a90d29e6cab496d6d870e2fee97516a080c65b64342c2d336f7bee48",
     "members": 366
   },
   "source_before": {

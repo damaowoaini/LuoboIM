@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端graph `1578/6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3` 仅修fixture误把ordinary registry交group receiver；新group registry保留真实profile、group-effect指纹和原seed，生产校验不变。fresh实际writer→生产parser合同1top3sub；固定三roots实际依赖闭包与精确逆转旧1577向量通过后，原cache/producer/Kafka及未改cron事实0重派、不称新全包PASS。cb5实际16编译/首场景PASS，第二rpc-group退出2/固定类group-receiver-initialization；fixture必拒已确认，唯一实际首错未证。原16编译/4场景/2top3及清理门禁保留；独立cache仍UNACCEPTED、无receiver，P20binding=null。
+- 后端Go1578/6fa、P20派生1580/824f和ordinary1884保持不变。3fb实际group writer/parser1top3、三roots完整1123包test闭包及原命名兼容链、16编译和首场景通过；第二已推进rpc-third observe-registration/done，精确退出结果未知。本CI批同完整Go/工具复用原控制和list，0重派；只对原固定12constructor实际失败role读取原owner绑定log，有限公开类别/源码帧，不新增Wait/probe或输出私文。原16编译/4场景/2top3及PID/cleanup/ELF门禁保留，独立cache仍无receiver，P20binding=null。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 
