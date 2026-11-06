@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_four_scenarios_managed_producer1top13sub_kafka1top3sub_two_packages_one_command",
   "source": {
     "members": 1583,
-    "digest": "36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5"
+    "digest": "f5b048a3862e994c02f258474ee901c171d81ce2e6899905ec16fc34c66a42c8"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,8 +42,8 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 590681,
-      "sha256": "1600027638f1137a9fd6eeb160d9292f99fdad51a69e93eb2f26923af76922e8"
+      "bytes": 595894,
+      "sha256": "3f090f322ae7022b6a7380eeee69383cb4e6a8646502e75c608aba0c23738c9d"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 265489,
-      "sha256": "04b73c6098a8f34d750ce612ad92885566ab9a40d18f8138037d84bd9d319e4b"
+      "bytes": 270067,
+      "sha256": "d4bb9db2ae8afde9d6ef98e63d5212681a6641e101a77eeefaa795c32e71b3e7"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -1801,8 +1801,8 @@
       "target": "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
       "beforeSHA256": null,
-      "bytes": 9812,
-      "sha256": "5cc88debea06169957c9caef3955c65d3f12f29e0f6b4802ceb9f20ba02e2511"
+      "bytes": 9830,
+      "sha256": "70396b82aa3f4213c209ee46c049bb8615e428ebc62fa7727b2c62bd274cd904"
     }
   ],
   "allowedOverlayTargets": [
@@ -7716,7 +7716,7 @@
     "version": "exact-owned-redis-null-ack-two-body-source-history-v1",
     "currentSource": {
       "members": 1583,
-      "digest": "36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5"
+      "digest": "f5b048a3862e994c02f258474ee901c171d81ce2e6899905ec16fc34c66a42c8"
     },
     "originalSource": {
       "members": 1582,
@@ -7726,8 +7726,8 @@
       {
         "target": "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
         "after": {
-          "bytes": 9812,
-          "sha256": "5cc88debea06169957c9caef3955c65d3f12f29e0f6b4802ceb9f20ba02e2511"
+          "bytes": 9830,
+          "sha256": "70396b82aa3f4213c209ee46c049bb8615e428ebc62fa7727b2c62bd274cd904"
         }
       }
     ],
@@ -9037,5 +9037,17 @@
   },
   "redisNullTestsToRun": [
     "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown"
-  ]
+  ],
+  "redisNullFailureProjectionPolicy": {
+    "version": "redis-null-named-source-failure-observation-v1",
+    "target": "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
+    "basename": "owned_source_redis_null_ack_test.go",
+    "rawLimitBytes": 33554432,
+    "lineLimit": 16384,
+    "lineBytesLimit": 8192,
+    "failureLimit": 32,
+    "rawOutput": false,
+    "dynamicErrorText": false,
+    "acceptanceEvidence": false
+  }
 }

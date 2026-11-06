@@ -112,7 +112,7 @@ func (w *ownedNullAckWire) serve(mode string) error {
 	}
 	for _, option := range []string{"lib-name", "lib-ver"} {
 		args, err = read()
-		if err != nil || len(args) != 4 || args[0] != "client" || args[1] != "setinfo" || args[2] != option {
+		if err != nil || len(args) != 4 || args[0] != "client" || args[1] != "setinfo" || !strings.EqualFold(args[2], option) {
 			return errors.New("original identity initialization differs")
 		}
 	}

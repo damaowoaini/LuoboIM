@@ -1991,4 +1991,26 @@ class FullGraphControls(unittest.TestCase):
    path.write_bytes(saved);run.write(out/'current-owned-resolver-scheme-names.json',{})
    with self.assertRaises(ValueError):collector.checked_redis_null_ack_evidence(out)
 
+ def test_redis_null_named_failure_observation_exports_only_exact_source_classes(self):
+  locked=json.loads(run.INPUTS.read_bytes());run.check_redis_null_ack_plan(locked)
+  with self.assertRaises(ValueError):run.check_redis_null_ack_plan(dict(locked,redisNullFailureProjectionPolicy={}))
+  body=run.regular(run.REPO/'product'/run.REDIS_NULL_FAILURE_POLICY['target']);sites=run.redis_null_failure_sites(body);by_kind={value[1]:(line,value) for line,values in sites.items() for value in values};policy=run.REDIS_NULL_FAILURE_POLICY;control=run.CURRENT_REDIS_NULL_ACK_CONTROL;package=next(iter(control['targets']));top=control['targets'][package][0];child=top+'/'+control['requiredSubtests'][package][top][0];prefix='github.com/openimsdk/open-im-server/v3/'+package;private='PRIVATE_PASSWORD /private/local.log';number,(literal,kind,_)=by_kind['cold-warm-fetch'];peer,(peer_literal,_,_)=by_kind['fixture-protocol']
+  def event(text,**extra):return dict({'Action':'output','Package':prefix,'Test':child,'Output':text},**extra)
+  rows=[event('    '+policy['basename']+':'+str(number)+': '+literal+'\n'),event('\t'+policy['basename']+':'+str(peer)+': '+peer_literal+' '+private+'\n'),{'Action':'fail','Package':prefix,'Test':child}];raw=b''.join((json.dumps(v)+'\n').encode() for v in rows);value=run.project_redis_null_failure_output(raw,body);self.assertEqual(value['status'],'observed');self.assertEqual(value['failures'],[{'test':child,'file':policy['basename'],'line':number,'class':'cold-warm-fetch'},{'test':child,'file':policy['basename'],'line':peer,'class':'fixture-protocol'}]);self.assertNotIn(private,json.dumps(value));self.assertNotIn(literal,json.dumps(value));self.assertFalse(value['acceptanceEvidence']);self.assertFalse(value['sourceCoordinatesAreCauseProof'])
+  for text in ('    /private/'+policy['basename']+':'+str(number)+': '+literal+'\n','    foreign_test.go:'+str(number)+': '+literal+'\n','    '+policy['basename']+':999999: '+literal+'\n','    '+policy['basename']+':'+str(number)+': '+literal+' '+private+'\n','    '+policy['basename']+':'+str(number)+': '+private+'\n'):
+   result=run.project_redis_null_failure_output((json.dumps(event(text))+'\n').encode(),body);self.assertEqual(result['failures'],[]);self.assertNotIn(private,json.dumps(result))
+  for extra in ({'Package':prefix+'-foreign'},{'Test':top+'/foreign'},{'Action':'pass'}):self.assertEqual(run.project_redis_null_failure_output((json.dumps(event(rows[0]['Output'],**extra))+'\n').encode(),body)['failures'],[])
+  helper_line,(helper_literal,_,_)=by_kind['owner-binding'];helper_output='    '+policy['basename']+':'+str(helper_line)+': '+helper_literal+'\n';helper_value=run.project_redis_null_failure_output((json.dumps(event(helper_output))+'\n').encode(),body);self.assertEqual(helper_value['failures'],[{'test':child,'file':policy['basename'],'line':helper_line,'class':'owner-binding'}])
+  wrong_helper='    '+policy['basename']+':'+str(helper_line)+': '+literal+'\n';self.assertEqual(run.project_redis_null_failure_output((json.dumps(event(wrong_helper))+'\n').encode(),body)['failures'],[])
+  with self.assertRaises(ValueError):run.project_redis_null_failure_output(raw,body+b'\n')
+  for raw_limit in (b'x'*(policy['rawLimitBytes']+1),):
+   with self.assertRaises(ValueError):run.project_redis_null_failure_output(raw_limit,body)
+  oversized=(json.dumps(event(' '*policy['lineBytesLimit']))+'\n').encode();self.assertTrue(run.project_redis_null_failure_output(oversized,body)['scanTruncated'])
+  duplicate=run.project_redis_null_failure_output(raw+raw,body);self.assertEqual(duplicate['failures'],value['failures'])
+  with tempfile.TemporaryDirectory() as directory:
+   out=Path(directory).resolve();path=out/'stdout';path.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,path,control['phase'],1));observed=json.loads((out/'redis-null-named-failure-observation.json').read_bytes());self.assertEqual(observed,value);projected=json.loads((out/(control['phase']+'-events.json')).read_bytes());self.assertTrue(all('Output' not in row for row in projected));self.assertNotIn(private,json.dumps(projected));self.assertNotIn(private,(out/'redis-null-named-failure-observation.json').read_text())
+  with tempfile.TemporaryDirectory() as directory,mock.patch.object(run,'emit_redis_null_failure_observation',side_effect=ValueError('PRIVATE_FAILURE')):
+   out=Path(directory).resolve();path=out/'stdout';path.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,path,control['phase'],1));self.assertTrue((out/(control['phase']+'-events.json')).exists())
+
+
 if __name__=='__main__':unittest.main()

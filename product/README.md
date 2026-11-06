@@ -2,7 +2,7 @@
 
 这里的 `server/`、`chart/`、`route/` 是独立的普通 Go 模块。源码已经从固定来源完整物化；从这些目录构建不需要运行 CI 胶囊、source loader 或验收程序。
 
-当前选定来源为 graph `1583/36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5`、chart `259/432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1890 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
+当前选定来源为 graph `1583/f5b048a3862e994c02f258474ee901c171d81ce2e6899905ec16fc34c66a42c8`、chart `259/432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1890 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
 
 使用 Go 1.27.2，在各模块目录独立构建，并显式设置 `GOWORK=off GOTOOLCHAIN=local GOENV=off GOAUTH=off`。保留原 `server/go.work`、`go.work.sum` 和所有模块锁；server 原本地 protocol 替换模块位于 `server/pkg/protocol`。不要用新的跨模块 workspace、统一协议版本或重新生成锁文件代替这些来源。
 
@@ -12,4 +12,4 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
-本批保留owned Redis完整Null响应的原redis.Nil语义；单命令及所有结果完整的nil/Nil-only pipeline观察为ACK，wrapped/joined、Lua错误、丢回包仍保留原unknown/关池。fresh真实driver+rockscache1top3使用有界RESP3 peer，无真实Lua引擎声明，原图用真实Redis。已过resolver1/2及cachedWait/RTC/probe仅保留来源，2体逆转全旧1582/工具exact后0重派，不称新Go全体PASS；原oracle2top3历史、16编译/4场景/cleanup/8产物门保持，P20split策略和两binding=null保持。
+本批仅修正新RESP夹具对SETINFO选项大小写的契约；上轮1top3全部失败，生产Null ACK逻辑不变且仍待实际控制通过。失败观察只含该test的固定类别、basename及精确源行，不导原Output或动态错误、不赋予验收权。只重试失败1top3，旧resolver/cachedWait/RTC/probe保留精确历史来源0重派；16编译/4场景/cleanup/8产物门与P20split策略、两binding=null保持。

@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端graph 1583/36a1d6e8c2d5ec0fa16d2cc3e2ec3dc9e8d73ce7742164e051e112654db83fd5 修复owned Redis把合法Null ACK当unknown的问题：单命令保留直接redis.Nil，pipeline仅全项已确认nil/Nil才认可，原sentinel交回caller；混合Lua错误、丢尾回复、joined Nil+EOF仍原unknown/关池，不增重试/超时/权限。fresh仅真实driver+rockscache Null1top3（有界RESP3非真实Lua引擎），原4场景仍用真Redis验证；已过resolver/cachedWait/RTC/probe仅精确2体逆向/工具绑定历史沿用0派，当前整Go未宣称通过。fresh1top3，原oracle2top3仅历史。16编译/4scene/cleanup/8产物门不变，chart259/Admin/Web/Native不改，P20两binding=null且保留split assembly。
+- 后端graph 1583/f5b048a3862e994c02f258474ee901c171d81ce2e6899905ec16fc34c66a42c8：上轮Null1top3因新RESP夹具把go-redis v9.23.0的SETINFO大写LIB-NAME/LIB-VER按小写严格比较而全部失败，生产Null ACK修复尚未通过实际控制。本批只纠正fixture选项大小写，并在原失败路径投影精确新test的basename/源行号/封闭Fatal或Error类别，原Output与动态错误不导出；诊断不改变原outcome。仅重试失败1top3（真实driver/rockscache+有界RESP3，非真实Lua引擎）；通过后原16编译/4scene/cleanup/8产物门保持。已过resolver/cachedWait/RTC/probe均仅精确原源逆转及工具绑定历史沿用0派，原oracle2top3历史，新全Go未宣称通过。chart259/Admin/Web/Native不变，P20两binding=null及split assembly保持。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 
