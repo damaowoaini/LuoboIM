@@ -1,0 +1,87 @@
+name: Manual UI render evidence only (Web dist47 and AuthPage)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ui-render-evidence-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: current
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Exact descriptor and renderer only; no local browser surface
+        run: |
+          set -euo pipefail
+          umask 077
+          python3 -c "import hashlib,pathlib; assert hashlib.sha256(pathlib.Path('current/ci/visual-render/inputs.json').read_bytes()).hexdigest() == '97a39a84155bda97d23c6b885e88c0ebc7316e957be2640c50a8914df075cd86'"
+          echo "UI_ROOT=$RUNNER_TEMP/ui-render-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          echo "UI_NODE=$(command -v node)" >> "$GITHUB_ENV"
+          # Same known0777 -> root0755 normalization of the already-installed
+          # Chrome inode; no browser download, no no-sandbox flag.
+          sudo -n -- "$(command -v node)" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" normalize-chrome
+      - name: Fail early if installed Chrome or CJK font is unavailable
+        run: |
+          set -euo pipefail
+          "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" preflight "$UI_ROOT"
+      - name: Receive only the exact accepted original Web ZIP; never npm or Vite
+        env:
+          UI_ARTIFACT_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 "$GITHUB_WORKSPACE/current/ci/group-effects/resource_guard.py" --cwd "$GITHUB_WORKSPACE/current" --allocated-root "$UI_ROOT" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 180 --log "$UI_ROOT/evidence/web-receive.log" --record "$UI_ROOT/evidence/web-receive.resource.json" -- "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" receive "$UI_ROOT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: d4adc8cb54200a8a02f58569cc478f4132d4485b
+          path: original-mobile
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Exact original setup parent and immutable original helper bodies
+        run: |
+          set -euo pipefail
+          legacy="$GITHUB_WORKSPACE/original-mobile"
+          timeout --kill-after=5s 30s git -C "$legacy" fetch --quiet --no-tags --no-recurse-submodules --depth=1 --no-write-fetch-head --no-auto-maintenance origin 2f17d99d2f32c4fc72b9b922f8d2a8783938b665:refs/tag903/source-parent
+          "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" legacy "$UI_ROOT" "$legacy"
+      - name: Original Linux Flutter tester runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
+      - name: One original SDK and lock-enforced setup; no old tests or APK
+        run: |
+          set -euo pipefail
+          python3 "$GITHUB_WORKSPACE/current/ci/group-effects/resource_guard.py" --cwd "$GITHUB_WORKSPACE/original-mobile" --allocated-root "$UI_ROOT" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 1200 --log "$UI_ROOT/evidence/original-setup.log" --record "$UI_ROOT/evidence/original-setup.resource.json" -- python3 -B "$GITHUB_WORKSPACE/original-mobile/ci/mobile-tag903.py" setup --allocation "$UI_ROOT/mobile"
+      - name: Exact canonical366/418 successor and single CI test overlay
+        run: |
+          set -euo pipefail
+          "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" prepare "$UI_ROOT" "$GITHUB_WORKSPACE/original-mobile"
+      - name: Three UI screenshots with no business network; existing Chrome sandbox
+        run: |
+          set -euo pipefail
+          outside="$(readlink /proc/self/ns/net)"
+          sudo -n unshare --net -- /bin/bash -euc '
+            /usr/sbin/ip link set lo up
+            exec /usr/sbin/runuser -u "$1" -- /usr/bin/env -i PATH=/usr/bin:/bin HOME="$2" USER="$1" RUNNER_TEMP="$3" GITHUB_RUN_ID="$4" GITHUB_RUN_ATTEMPT="$5" GITHUB_SHA="$6" UI_OUTSIDE_NETNS="$7" /usr/bin/python3 "$8/ci/group-effects/resource_guard.py" --cwd "$8" --allocated-root "$9" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 240 --log "$9/evidence/render.log" --record "$9/evidence/render.resource.json" -- "${10}" "$8/ci/visual-render.mjs" capture "$9"
+          ' ui-render "$(id -un)" "$HOME" "$RUNNER_TEMP" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_SHA" "$outside" "$GITHUB_WORKSPACE/current" "$UI_ROOT" "$UI_NODE"
+      - name: Preserve small actual render evidence; never publish source/SDK/dist
+        if: always()
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: ui-render-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.UI_ROOT }}/evidence/
+          if-no-files-found: warn
+          retention-days: 14
