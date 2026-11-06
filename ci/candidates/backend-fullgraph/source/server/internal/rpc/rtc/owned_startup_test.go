@@ -3,12 +3,16 @@ package rtc
 import (
 	"context"
 	"errors"
+	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/protocol/sdkws"
 	"github.com/OpenIMSDK/protocol/user"
+	"github.com/OpenIMSDK/tools/errs"
+	"github.com/openimsdk/open-im-server/v3/pkg/common/rpcmiddleware"
 	"github.com/openimsdk/open-im-server/v3/pkg/rpcclient"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -199,6 +203,183 @@ func TestOwnedRTCOriginalSDKLookupWaitsForActualUserServeAndOwnerCancel(t *testi
 			}
 		case <-time.After(time.Second):
 			t.Fatal("SDK request escaped original owner cancellation")
+		}
+	})
+}
+
+type rtcActivationPrivateCodeError struct{ code int }
+
+func (e rtcActivationPrivateCodeError) Error() string { panic("private cause must not be serialized") }
+func (e rtcActivationPrivateCodeError) Code() int     { return e.code }
+
+type rtcActivationMiddlewareUserFixture struct {
+	user.UnimplementedUserServer
+	calls atomic.Int32
+	want  string
+	deny  bool
+}
+
+func (f *rtcActivationMiddlewareUserFixture) GetDesignateUsers(ctx context.Context, r *user.GetDesignateUsersReq) (*user.GetDesignateUsersResp, error) {
+	f.calls.Add(1)
+	if len(r.UserIDs) != 1 || r.UserIDs[0] != f.want || ctx.Value(constant.OpUserID) != f.want {
+		return nil, errs.ErrArgs.Wrap("synthetic exact metadata required")
+	}
+	if f.deny {
+		return nil, errs.ErrNoPermission.Wrap("synthetic private permission details")
+	}
+	return &user.GetDesignateUsersResp{}, nil
+}
+
+func TestOwnedRTCActivationPhasePreservesRealSDKCauseWithoutPrivateTextOrReplay(t *testing.T) {
+	check := func(t *testing.T, err error, phase ownedRTCActivationPhase, cause error, class string) {
+		t.Helper()
+		var failure *ownedRTCActivationFailure
+		if !errors.Is(err, errOwnedRTCUserActivation) || !errors.As(err, &failure) || failure.phase != phase || failure.cause != cause || failure.causeClass != class {
+			t.Fatal("closed phase or original error identity changed")
+		}
+		if cause != nil && !errors.Is(err, cause) {
+			t.Fatal("original cause is not retained")
+		}
+	}
+	t.Run("parent-and-admission-guards-retain-cause-without-lookup", func(t *testing.T) {
+		parent, cancel := context.WithCancel(context.Background())
+		cancel()
+		queries := 0
+		start := newOwnedRTCUserActivation(parent, func() error { return nil }, func(context.Context) error { queries++; return nil })
+		check(t, start(), rtcActivationParent, context.Canceled, "context-cancelled")
+		check(t, start(), rtcActivationAttempted, nil, "none")
+		if queries != 0 {
+			t.Fatal("canceled parent exposed a lookup")
+		}
+		live, stop := context.WithCancel(context.Background())
+		defer stop()
+		check(t, newOwnedRTCUserActivation(nil, func() error { return nil }, func(context.Context) error { return nil })(), rtcActivationParent, nil, "none")
+		check(t, newOwnedRTCUserActivation(context.Background(), func() error { return nil }, func(context.Context) error { return nil })(), rtcActivationParent, nil, "none")
+		check(t, newOwnedRTCUserActivation(live, nil, func(context.Context) error { return nil })(), rtcActivationCallbacks, nil, "none")
+		private := rtcActivationPrivateCodeError{code: errs.ErrUserIDNotFound.Code()}
+		err := newOwnedRTCUserActivation(live, func() error { return private }, func(context.Context) error { queries++; return nil })()
+		check(t, err, rtcActivationAdmitted, private, "sdk-user-missing")
+		if strings.Contains(err.Error(), "synthetic") || queries != 0 {
+			t.Fatal("admission guard serialized private data or queried")
+		}
+		unknown := rtcActivationPrivateCodeError{code: 987654321}
+		err = newOwnedRTCUserActivation(live, func() error { return nil }, func(context.Context) error { return unknown })()
+		check(t, err, rtcActivationLookup, unknown, "other")
+		if strings.Contains(err.Error(), "987654321") {
+			t.Fatal("unknown numeric code escaped")
+		}
+		callParent, callCancel := context.WithCancel(context.Background())
+		defer callCancel()
+		err = newOwnedRTCUserActivation(callParent, func() error { return nil }, func(context.Context) error { callCancel(); return nil })()
+		check(t, err, rtcActivationCallContext, context.Canceled, "context-cancelled")
+	})
+	t.Run("real-middleware-and-sdk-errors-remain-one-original-lookup", func(t *testing.T) {
+		for _, deny := range []bool{false, true} {
+			func() {
+				listener, err := net.Listen("tcp", "127.0.0.1:0")
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer listener.Close()
+				fixture := &rtcActivationMiddlewareUserFixture{want: "synthetic-rtc-owner", deny: deny}
+				server := grpc.NewServer(rpcmiddleware.GrpcServer())
+				user.RegisterUserServer(server, fixture)
+				served := make(chan error, 1)
+				go func() { served <- server.Serve(listener) }()
+				defer func() {
+					server.Stop()
+					select {
+					case <-served:
+					case <-time.After(time.Second):
+						t.Error("real USER Serve did not join")
+					}
+				}()
+				connection, err := grpc.DialContext(context.Background(), listener.Addr().String(), grpc.WithTransportCredentials(insecure.NewCredentials()), rpcmiddleware.GrpcClient())
+				if err != nil {
+					t.Fatal(err)
+				}
+				defer connection.Close()
+				client := rpcclient.UserRpcClient{Client: &ownedRTCReadyUserClient{UserClient: user.NewUserClient(connection)}}
+				parent, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+				defer cancel()
+				parent = context.WithValue(parent, constant.OperationID, "rtc-activation-source-control")
+				parent = context.WithValue(parent, constant.OpUserID, fixture.want)
+				var original error
+				lookups := 0
+				start := newOwnedRTCUserActivation(parent, func() error { return nil }, func(call context.Context) error {
+					lookups++
+					_, original = client.GetUserInfo(call, fixture.want)
+					return original
+				})
+				failure := start()
+				class := "sdk-user-missing"
+				want := errs.ErrUserIDNotFound.Code()
+				if deny {
+					class = "permission"
+					want = errs.ErrNoPermission.Code()
+				}
+				check(t, failure, rtcActivationLookup, original, class)
+				code, ok := errs.Unwrap(original).(interface{ Code() int })
+				if !ok || code.Code() != want || fixture.calls.Load() != 1 || lookups != 1 {
+					t.Fatal("actual SDK/middleware code or one exact request changed")
+				}
+				if strings.Contains(failure.Error(), fixture.want) || strings.Contains(failure.Error(), "private permission") {
+					t.Fatal("private RPC details escaped typed startup failure")
+				}
+				check(t, start(), rtcActivationAttempted, nil, "none")
+				if fixture.calls.Load() != 1 || lookups != 1 {
+					t.Fatal("failed original lookup was replayed")
+				}
+			}()
+		}
+	})
+	t.Run("real-unserved-peer-cancellation-retains-lookup-cause", func(t *testing.T) {
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer listener.Close()
+		connection, err := grpc.DialContext(context.Background(), listener.Addr().String(), grpc.WithTransportCredentials(insecure.NewCredentials()), rpcmiddleware.GrpcClient())
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer connection.Close()
+		client := rpcclient.UserRpcClient{Client: &ownedRTCReadyUserClient{UserClient: user.NewUserClient(connection)}}
+		parent, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		parent = context.WithValue(parent, constant.OperationID, "rtc-activation-cancel-control")
+		parent = context.WithValue(parent, constant.OpUserID, "synthetic-rtc-owner")
+		entered := make(chan struct{})
+		done := make(chan error, 1)
+		var original error
+		lookups := 0
+		start := newOwnedRTCUserActivation(parent, func() error { return nil }, func(call context.Context) error {
+			lookups++
+			close(entered)
+			_, original = client.GetUserInfo(call, "synthetic-rtc-owner")
+			return original
+		})
+		go func() { done <- start() }()
+		select {
+		case <-entered:
+		case <-time.After(time.Second):
+			t.Fatal("original SDK lookup not entered")
+		}
+		select {
+		case <-done:
+			t.Fatal("unserved lookup completed without cancellation")
+		default:
+		}
+		cancel()
+		select {
+		case failure := <-done:
+			check(t, failure, rtcActivationLookup, original, "grpc-cancelled")
+		case <-time.After(time.Second):
+			t.Fatal("original cancelled lookup did not join")
+		}
+		check(t, start(), rtcActivationAttempted, nil, "none")
+		if lookups != 1 {
+			t.Fatal("cancelled original request replayed")
 		}
 	})
 }

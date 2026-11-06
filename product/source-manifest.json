@@ -8473,18 +8473,18 @@
       "sha256": "e9177494f9d129236813bec6e54b375f1e8508e8889034dc44522ff531227e5f"
     },
     {
-      "bytes": 1894,
+      "bytes": 5355,
       "mode": 420,
       "path": "server/internal/rpc/rtc/owned_startup.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "fdb3d0cd18a71afbb48facbb5243b876740799d9ee1982f31480e5ccc87a93b9"
+      "sha256": "2c166a16a5577333aedacc064181fc6093eaca29f8e31944eb65e8562e001361"
     },
     {
-      "bytes": 6333,
+      "bytes": 14153,
       "mode": 420,
       "path": "server/internal/rpc/rtc/owned_startup_test.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "66b7432c7c119e7882ad9293ced77dcb07eec3d113c3c57b3f57e1f5cf2fae81"
+      "sha256": "369e7dc6593a729c5b7d442a3bb74dea45727bc930e0ebc979adc9d6f5d4306e"
     },
     {
       "bytes": 3490,
@@ -13198,7 +13198,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "3790688a7fcb829fa4a7c1c7c83a83182f9b38c1732cc13d8d3a477f1f374383",
+  "filesSHA256": "937103b7042302fce95ba2cfd1e2415daa1545b465ef73c45e497dd7918316a7",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13256,7 +13256,7 @@
     },
     "server": {
       "members": 1579,
-      "digest": "2296d8a9b79ec6e6a1c48008ebb14610f21d90f679002dcbedf9fdc6d47c2bd6"
+      "digest": "08fa16062f31b2a9f0aca757daf8b25090a36c4bb035e82d5860d76af0a09154"
     }
   },
   "state": "MATERIALIZED_SOURCE_ONLY"

@@ -1126,7 +1126,7 @@ class FullGraphControls(unittest.TestCase):
  def test_release_controls_keep_one_race_and_exact_named_evidence(self):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']):
-   control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],currentReleaseControl=copy.deepcopy(control),currentReleaseTestsToRun=control['targets'][package][:-1],kafkaACLTestsToRun=control['targets'][package][-1:])
+   control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],currentReleaseControl=copy.deepcopy(control),currentReleaseTestsToRun=control['targets'][package][:-1],kafkaACLTestsToRun=control['targets'][package][-1:])
    self.assertEqual(run.check_current_release_plan(locked),control);run.check_locked(locked)
    self.assertNotEqual(run.FINAL_SOURCE,run.KAFKA_CONFIRM_PRIOR_PASS['source']);self.assertIsNone(locked['kafkaConfirmPassedReuse']);self.assertEqual(run.check_kafka_confirm_prior_pass(locked['kafkaConfirmHistoricalPass']),run.KAFKA_CONFIRM_PRIOR_PASS)
    rows=[{'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False} for scenario in run.SCENARIOS]
@@ -1182,7 +1182,7 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_managed_shape_controls_keep_two_packages_one_command_and_exact_subsets(self):
-  collector=load('collect');control=run.CURRENT_MANAGED_SHAPE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;owned='internal/namespaceimport/ownedcontrol';managed='internal/msgtransfer'
+  collector=load('collect');control=run.CURRENT_MANAGED_SHAPE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;owned='internal/namespaceimport/ownedcontrol';managed='internal/msgtransfer'
   locked.update(currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=copy.deepcopy(control),currentManagedShapeTestsToRun=control['targets'][managed],kafkaACLTestsToRun=control['targets'][owned])
   self.assertEqual(run.check_current_managed_shape_plan(locked),control);run.check_locked(locked);self.assertIsNone(locked['currentReleaseControl']);self.assertNotEqual(run.FINAL_SOURCE,run.RELEASE_CONTROLS_PRIOR_PASS['source'])
   for fields in ({'currentManagedShapeTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentReleaseControl':run.CURRENT_RELEASE_CONTROL},{'releaseControlsHistoricalPass':{}},{'kafkaConfirmPassedReuse':run.KAFKA_CONFIRM_PRIOR_PASS},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
@@ -1242,7 +1242,7 @@ class FullGraphControls(unittest.TestCase):
  def test_producer_only_reuses_same_source_completed_kafka_without_accepting_timeout_scope(self):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.COMPLETED_KAFKA_PACKAGE_BINDING['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.COMPLETED_KAFKA_PACKAGE_BINDING['source']):
-   control=run.CURRENT_PRODUCER_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;package=next(iter(control['targets']));top=control['targets'][package][0]
+   control=run.CURRENT_PRODUCER_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;package=next(iter(control['targets']));top=control['targets'][package][0]
    locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=copy.deepcopy(control),currentProducerTestsToRun=control['targets'][package],kafkaACLTestsToRun=[],sameSourceCompletedKafkaPackageReuse=copy.deepcopy(run.COMPLETED_KAFKA_PACKAGE_REUSE))
    self.assertEqual(run.check_current_producer_plan(locked),control);run.check_locked(locked);self.assertEqual(control['phaseGuardSeconds'],600);self.assertEqual(control['goTimeoutSeconds'],180)
    self.assertEqual(locked['kafkaACLTestsToRun'],[]);self.assertIsNone(locked['currentManagedShapeControl']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalGoCommandPassed']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalTwoPackageScopeAccepted'])
@@ -1306,7 +1306,7 @@ class FullGraphControls(unittest.TestCase):
  def test_group_recovery_controls_use_real_event_hook_and_exact_three_package_scope(self):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.CACHE_TEST_DELTA_PACKAGE_REUSE['originalSource']),mock.patch.object(collector.run,'FINAL_SOURCE',run.CACHE_TEST_DELTA_PACKAGE_REUSE['originalSource']):
-   control=run.CURRENT_GROUP_RECOVERY_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=copy.deepcopy(control),currentGroupRecoveryTargets=control['targets'],kafkaACLTestsToRun=control['targets']['internal/namespaceimport/ownedcontrol']);self.assertEqual(run.check_current_group_recovery_plan(locked),control);run.check_locked(locked)
+   control=run.CURRENT_GROUP_RECOVERY_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=None,cacheTestDeltaPackageReuse=None,cacheTestDeltaTestsToRun=[],currentGroupRecoveryControl=copy.deepcopy(control),currentGroupRecoveryTargets=control['targets'],kafkaACLTestsToRun=control['targets']['internal/namespaceimport/ownedcontrol']);self.assertEqual(run.check_current_group_recovery_plan(locked),control);run.check_locked(locked)
    self.assertEqual((control['topPASS'],control['subPASS'],control['packages'],control['phaseGuardSeconds'],control['goTimeoutSeconds']),(4,23,3,600,180))
    for fields in ({'kafkaACLTestsToRun':[]},{'currentGroupRecoveryTargets':{}},{'currentProducerControl':run.CURRENT_PRODUCER_CONTROL},{'sameSourceCompletedKafkaPackageReuse':run.COMPLETED_KAFKA_PACKAGE_REUSE},{'groupRecoveryHistoricalFacts':{}},{'rpcGroupStartLogProjectionPolicy':{}}):
     with self.assertRaises(ValueError):run.check_current_group_recovery_plan(dict(locked,**fields))
@@ -1380,7 +1380,7 @@ class FullGraphControls(unittest.TestCase):
  def test_cache_test_delta_bridge_preserves_completed_packages_and_requires_fresh_cache(self):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.CRON_FIXTURE_SCOPE_REUSE['originalSource']),mock.patch.object(collector.run,'FINAL_SOURCE',run.CRON_FIXTURE_SCOPE_REUSE['originalSource']):
-   control=run.CURRENT_CACHE_TEST_DELTA_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=copy.deepcopy(control),cacheTestDeltaTestsToRun=control['targets'][next(iter(control['targets']))],cacheTestDeltaPackageReuse=copy.deepcopy(run.CACHE_TEST_DELTA_PACKAGE_REUSE));self.assertEqual(run.check_cache_test_delta_plan(locked),control);run.check_locked(locked)
+   control=run.CURRENT_CACHE_TEST_DELTA_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=run.FINAL_SOURCE,currentCronFixtureControl=None,cronFixtureScopeReuse=None,cronFixtureTestsToRun=[],currentCacheTestDeltaControl=copy.deepcopy(control),cacheTestDeltaTestsToRun=control['targets'][next(iter(control['targets']))],cacheTestDeltaPackageReuse=copy.deepcopy(run.CACHE_TEST_DELTA_PACKAGE_REUSE));self.assertEqual(run.check_cache_test_delta_plan(locked),control);run.check_locked(locked)
    self.assertEqual((control['topPASS'],control['subPASS'],control['packages'],control['phaseGuardSeconds'],control['goTimeoutSeconds']),(2,7,1,600,180));self.assertEqual(locked['kafkaACLTestsToRun'],[])
    for fields in ({'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'currentGroupRecoveryControl':run.CURRENT_GROUP_RECOVERY_CONTROL},{'cacheTestDeltaPackageReuse':{}},{'cacheTestDeltaTestsToRun':[]}):
     with self.assertRaises(ValueError):run.check_cache_test_delta_plan(dict(locked,**fields))
@@ -1455,7 +1455,7 @@ class FullGraphControls(unittest.TestCase):
   with mock.patch.dict(run.CRON_FIXTURE_DEPENDENCY_CONTROL,packagesLimit=8),self.assertRaises(ValueError):run.project_cron_fixture_dependencies(raw(rows))
 
  def test_cron_fixture_scope_reuse_requires_actual_dependencies_and_fresh_contract(self):
-  collector=load('collect');control=run.CURRENT_CRON_FIXTURE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(currentCronFixtureControl=copy.deepcopy(control),cronFixtureTestsToRun=control['targets']['internal/runtimeacceptance'],cronFixtureScopeReuse=copy.deepcopy(run.CRON_FIXTURE_SCOPE_REUSE),cronFixtureDependencyControl=copy.deepcopy(run.CRON_FIXTURE_DEPENDENCY_CONTROL));self.assertEqual(run.check_current_cron_fixture_plan(locked),control);run.check_locked(locked)
+  collector=load('collect');control=run.CURRENT_CRON_FIXTURE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(currentCronFixtureControl=copy.deepcopy(control),cronFixtureTestsToRun=control['targets']['internal/runtimeacceptance'],cronFixtureScopeReuse=copy.deepcopy(run.CRON_FIXTURE_SCOPE_REUSE),cronFixtureDependencyControl=copy.deepcopy(run.CRON_FIXTURE_DEPENDENCY_CONTROL));self.assertEqual(run.check_current_cron_fixture_plan(locked),control);run.check_locked(locked)
   for fields in ({'cronFixtureTestsToRun':[]},{'currentCacheTestDeltaControl':run.CURRENT_CACHE_TEST_DELTA_CONTROL},{'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'cronFixtureDependencyControl':{}},{'cronFixtureScopeReuse':{}}):
    with self.assertRaises(ValueError):run.check_current_cron_fixture_plan(dict(locked,**fields))
   class Recipe:
@@ -1513,7 +1513,7 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_same_current_go_named_scope_reuse_keeps_original_counts_without_dispatch(self):
-  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=copy.deepcopy(run.CURRENT_GO_NAMED_SCOPES_REUSE['source']),passedCurrentGoNamedScopes=copy.deepcopy(run.CURRENT_GO_NAMED_SCOPES_REUSE),currentGroupRegistryFixtureControl=None,groupRegistryFixtureTestsToRun=[])
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(source=copy.deepcopy(run.CURRENT_GO_NAMED_SCOPES_REUSE['source']),passedCurrentGoNamedScopes=copy.deepcopy(run.CURRENT_GO_NAMED_SCOPES_REUSE),currentGroupRegistryFixtureControl=None,groupRegistryFixtureTestsToRun=[])
   with mock.patch.object(run,'FINAL_SOURCE',run.CURRENT_GO_NAMED_SCOPES_REUSE['source']):self.assertTrue(run.current_go_named_scope_reuse_selected(locked));run.check_locked(locked)
   for key in ('currentCronFixtureControl','currentCacheTestDeltaControl','currentGroupRecoveryControl','currentProducerControl','currentManagedShapeControl','currentReleaseControl','currentImageKafkaControl','currentKafkaConfirmControl'):
    self.assertFalse(run.current_go_named_scope_reuse_selected(dict(locked,**{key:{'legacy':'explicit'}})))
@@ -1599,7 +1599,7 @@ class FullGraphControls(unittest.TestCase):
    with self.assertRaises(ValueError):run.project_group_registry_fixture_dependencies(bad)
 
  def test_group_registry_fixture_reuse_requires_exact_delta_dependency_and_real_event_hook(self):
-  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(currentGroupRegistryFixtureControl=copy.deepcopy(run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL),groupRegistryFixtureTestsToRun=run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL['targets']['internal/runtimeacceptance'],groupRegistryFixtureDependencyControl=copy.deepcopy(run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL),groupRegistryFixtureScopeReuse=copy.deepcopy(run.GROUP_REGISTRY_FIXTURE_SCOPE_REUSE));self.assertTrue(run.current_group_registry_fixture_selected(locked));run.check_locked(locked);control=run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked['passedGroupRegistryAndNamedScopes']=None;locked.update(currentGroupRegistryFixtureControl=copy.deepcopy(run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL),groupRegistryFixtureTestsToRun=run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL['targets']['internal/runtimeacceptance'],groupRegistryFixtureDependencyControl=copy.deepcopy(run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL),groupRegistryFixtureScopeReuse=copy.deepcopy(run.GROUP_REGISTRY_FIXTURE_SCOPE_REUSE));self.assertTrue(run.current_group_registry_fixture_selected(locked));run.check_locked(locked);control=run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL
   for fields in ({'groupRegistryFixtureTestsToRun':[]},{'groupRegistryFixtureScopeReuse':{}},{'cronFixtureTestsToRun':['TestFreshFixtureCronConfigurationMatchesDefaultScheduler']},{'passedCurrentGoNamedScopes':run.CURRENT_GO_NAMED_SCOPES_REUSE}):
    with self.assertRaises(ValueError):run.check_current_group_registry_fixture_plan(dict(locked,**fields))
   class Recipe:
@@ -1648,7 +1648,7 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_same_go1578_completed_group_dependency_and_named_scopes_reuse_without_dispatch(self):
-  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked.update(source=copy.deepcopy(run.CURRENT_GROUP_FIXTURE_PASSED_REUSE['source']),passedGroupRegistryAndNamedScopes=copy.deepcopy(run.CURRENT_GROUP_FIXTURE_PASSED_REUSE))
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked['currentRuntimeReleaseControl']=None;locked.update(source=copy.deepcopy(run.CURRENT_GROUP_FIXTURE_PASSED_REUSE['source']),passedGroupRegistryAndNamedScopes=copy.deepcopy(run.CURRENT_GROUP_FIXTURE_PASSED_REUSE))
   with mock.patch.object(run,'FINAL_SOURCE',run.CURRENT_GROUP_FIXTURE_PASSED_REUSE['source']):run.check_locked(locked)
   value=copy.deepcopy(run.CURRENT_GROUP_FIXTURE_PASSED_REUSE);self.assertEqual(value['facts']['binding']['dependencyPackageCount'],1123)
   for mode in ('currentGroupRegistryFixtureControl','passedCurrentGoNamedScopes','currentCronFixtureControl','currentCacheTestDeltaControl','currentGroupRecoveryControl','currentProducerControl','currentManagedShapeControl','currentReleaseControl','currentImageKafkaControl','currentKafkaConfirmControl','kafkaConfirmPassedReuse','kafkaACLPassedReuse','sameSourceCompletedKafkaPackageReuse'):
@@ -1712,7 +1712,7 @@ class FullGraphControls(unittest.TestCase):
   untouched=dict(base,constructorStage='not-entered',constructorRole='none',constructorCallState='not-entered',constructorErrorClass='none',constructorPredicate='none');self.assertEqual(parse(untouched)['constructorStage'],'not-entered');parsed=parse(base);self.assertTrue(collector.original_constructor_output_failure(parsed));boundary=collector.constructor_output_boundary(parsed);self.assertEqual(boundary['originalWaitResult'],'not-exported');self.assertFalse(boundary['exitCodeInferredFromLog'])
 
  def test_runtime_release_control_requires_exact_source_inverse_and_real_fresh_events(self):
-  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['passedRuntimeReleaseControl']=None;locked.update(currentRuntimeReleaseControl=copy.deepcopy(run.CURRENT_RUNTIME_RELEASE_CONTROL),runtimeReleaseTestsToRun=run.CURRENT_RUNTIME_RELEASE_CONTROL['targets']['internal/namespaceimport/ownedcontrol']);run.check_locked(locked);control=run.CURRENT_RUNTIME_RELEASE_CONTROL
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked['passedRuntimeReleaseControl']=None;locked.update(currentRuntimeReleaseControl=copy.deepcopy(run.CURRENT_RUNTIME_RELEASE_CONTROL),runtimeReleaseTestsToRun=run.CURRENT_RUNTIME_RELEASE_CONTROL['targets']['internal/namespaceimport/ownedcontrol']);run.check_locked(locked);control=run.CURRENT_RUNTIME_RELEASE_CONTROL
   for mode in ('passedGroupRegistryAndNamedScopes','currentGroupRegistryFixtureControl','passedCurrentGoNamedScopes','currentCronFixtureControl','currentCacheTestDeltaControl','currentGroupRecoveryControl','currentProducerControl','currentManagedShapeControl','currentReleaseControl','currentImageKafkaControl','currentKafkaConfirmControl'):
    with self.assertRaises(ValueError):run.check_locked(dict(locked,**{mode:{'old':'explicit'}}))
   class Recipe:
@@ -1763,7 +1763,9 @@ class FullGraphControls(unittest.TestCase):
   wrapped=project(b'panic: failed to get configuration from command: owned RTC service user activation incomplete\nrpc error: code = Unavailable desc = '+private+b'\n');self.assertEqual(wrapped['execErrorStage'],'configuration');self.assertEqual(wrapped['errorPrefixClass'],'rtc-user-activation');self.assertEqual(wrapped['panicPrefixClasses'],['rtc-user-activation','grpc-unavailable'])
 
  def test_same_go1579_runtime_control_reuse_refuses_drift_mixed_modes_and_fresh_aliases(self):
-  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());run.check_locked(locked);value=copy.deepcopy(run.CURRENT_RUNTIME_RELEASE_PASSED_REUSE)
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked['currentRTCActivationControl']=None;locked.update(source=copy.deepcopy(run.CURRENT_RUNTIME_RELEASE_PASSED_REUSE['source']),passedRuntimeReleaseControl=copy.deepcopy(run.CURRENT_RUNTIME_RELEASE_PASSED_REUSE))
+  with mock.patch.object(run,'FINAL_SOURCE',run.CURRENT_RUNTIME_RELEASE_PASSED_REUSE['source']):run.check_locked(locked)
+  value=copy.deepcopy(run.CURRENT_RUNTIME_RELEASE_PASSED_REUSE)
   for name in ('currentRuntimeReleaseControl','passedGroupRegistryAndNamedScopes','currentGroupRegistryFixtureControl','passedCurrentGoNamedScopes','currentCronFixtureControl','currentCacheTestDeltaControl','currentGroupRecoveryControl','currentProducerControl','currentManagedShapeControl','currentReleaseControl','currentImageKafkaControl','currentKafkaConfirmControl'):
    with self.assertRaises(ValueError):run.check_locked(dict(locked,**{name:{'legacy':'explicit'}}))
   for fields in ({'actualCurrentContextControlCommands':1},{'actualCurrentGoListCommands':1},{'fallbackRedispatch':True},{'wholePackagePASS':True},{'source':run.RUNTIME_RELEASE_SOURCE_BRIDGE['originalSource']}):
@@ -1782,5 +1784,55 @@ class FullGraphControls(unittest.TestCase):
     with self.assertRaises(ValueError):collector.checked_current_runtime_release_passed_evidence(out)
     (out/name).unlink()
    run.write_current_runtime_release_passed_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':2,'subPASS':3,'includesOriginalGraph':True});self.assertEqual(summary['actualCurrentContextControlCommands'],0);self.assertFalse(summary['wholePackagePASS'])
+
+
+ def test_rtc_source_phase_cause_projection_inverse_and_fresh_event_contract(self):
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());run.check_locked(locked);control=run.CURRENT_RTC_ACTIVATION_CONTROL
+  for mode in ('passedRuntimeReleaseControl','currentRuntimeReleaseControl','passedGroupRegistryAndNamedScopes','currentGroupRegistryFixtureControl','passedCurrentGoNamedScopes','currentCronFixtureControl','currentCacheTestDeltaControl','currentGroupRecoveryControl','currentProducerControl','currentManagedShapeControl','currentReleaseControl'):
+   with self.assertRaises(ValueError):run.check_locked(dict(locked,**{mode:{'old':'explicit'}}))
+  class Recipe:
+   def rows(self,bodies):return [{'path':name,'bytes':len(raw),'sha256':run.sha(raw)} for name,raw in sorted(bodies.items())]
+   def digest(self,rows):return run.sha(b''.join(row['path'].encode()+b'\0'+row['sha256'].encode()+b'\n' for row in sorted(rows,key=lambda row:row['path'])))
+  recipe=Recipe();bridge=copy.deepcopy(run.RTC_ACTIVATION_SOURCE_BRIDGE);paths=[r['target'] for r in bridge['modifiedBodies']]+[r['target'] for r in bridge['unchangedPriorEntryFiles']];bodies={p:run.regular(run.REPO/'product'/p) for p in paths};bodies['server/go.mod']=b'module fixture\n';previous=dict(bodies);decode=__import__('base64').b64decode
+  for delta in bridge['modifiedBodies']:
+   raw=bodies[delta['target']];restored=bytearray();cursor=0
+   for edit in delta['edits']:restored.extend(raw[cursor:edit['afterStart']]);restored.extend(decode(edit['beforeBase64']));cursor=edit['afterEnd']
+   restored.extend(raw[cursor:]);previous[delta['target']]=bytes(restored)
+  startup=bodies['server/internal/rpc/rtc/owned_startup.go'].decode();pattern=__import__('re');markers=pattern.findall(r'"\\n(owned RTC activation [^"\r\n]+)"',startup);self.assertEqual(len(markers),2);sentinel=pattern.findall(r'var errOwnedRTCUserActivation = errors.New\("([^"\r\n]+)"\)',startup);self.assertEqual(len(sentinel),1);lookup=pattern.findall(r'case rtcActivationLookup:\s*return "([^"\r\n]+)"',startup);self.assertEqual(lookup,['lookup']);missing=pattern.findall(r'case errs.ErrUserIDNotFound.Code\(\):\s*return "([^"\r\n]+)"',startup);self.assertEqual(missing,['sdk-user-missing']);private='PRIVATE_USER_PASSWORD /private/config'
+  project=lambda text:collector.project_service_log_bytes(text.encode(),{},run.ORIGINAL_CONSTRUCTOR_LOG_POLICY,lambda status:collector.constructor_projection_empty(status,'rpc-rtc'),collector.constructor_error_prefix)
+  value=project('panic: '+sentinel[0]+'\n'+markers[0]+lookup[0]+'\n'+markers[1]+missing[0]+'\n'+private+'\n');self.assertEqual(value['panicPrefixClasses'],['rtc-user-activation','rtc-phase-lookup','rtc-cause-sdk-user-missing']);self.assertNotIn(private,json.dumps(value));self.assertFalse(value['prefixIsCauseProof']);self.assertFalse(value['acceptanceEvidence'])
+  for phase in ('attempted','parent','callbacks','admitted','lookup','call-context'):
+   value=project('panic: '+sentinel[0]+'\n'+markers[0]+phase+'\n'+markers[1]+'other\n');self.assertIn('rtc-phase-'+phase,value['panicPrefixClasses']);self.assertIn('rtc-cause-other',value['panicPrefixClasses'])
+  for cause in ('context-cancelled','context-deadline','namespace-evidence','record-missing','permission','argument','internal','grpc-cancelled','grpc-unavailable'):
+   value=project('panic: '+sentinel[0]+'\n'+markers[0]+'lookup\n'+markers[1]+cause+'\n');self.assertIn('rtc-cause-'+cause,value['panicPrefixClasses'])
+  value=project('panic: '+sentinel[0]+'\n'+markers[0]+private+'\n'+markers[1]+'987654321\n');self.assertEqual(value['panicPrefixClasses'],['rtc-user-activation']);self.assertNotIn(private,json.dumps(value));self.assertNotIn('987654321',json.dumps(value))
+  current={'members':len(bodies),'digest':recipe.digest(recipe.rows(bodies))};prior={'members':len(previous),'digest':recipe.digest(recipe.rows(previous))};bridge.update(currentSource=current,originalSource=prior);facts=copy.deepcopy(bridge['priorGo1579Facts']);facts['source']=prior;bridge['priorGo1579Facts']=facts;go=facts['facts']['GoToolBodyAndMode'];parent=run.module('ci/backend-runtime-join-r7/run.py','rtc_phase_pure_auditor');package=next(iter(control['targets']));top=control['targets'][package][0];events=[{'Action':'start','Package':parent.PREFIX+package},{'Action':'run','Package':parent.PREFIX+package,'Test':top}]
+  for child in control['requiredSubtests'][package][top]:
+   name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':private},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+  events.extend([{'Action':'pass','Package':parent.PREFIX+package,'Test':top},{'Action':'pass','Package':parent.PREFIX+package}])
+  with mock.patch.object(run,'FINAL_SOURCE',current),mock.patch.object(run,'RTC_ACTIVATION_SOURCE_BRIDGE',bridge),mock.patch.object(run,'CURRENT_RUNTIME_RELEASE_PASSED_REUSE',facts),mock.patch.object(collector.run,'FINAL_SOURCE',current),mock.patch.object(collector.run,'RTC_ACTIVATION_SOURCE_BRIDGE',bridge),mock.patch.object(collector.run,'CURRENT_RUNTIME_RELEASE_PASSED_REUSE',facts),mock.patch.object(collector.run,'verify',return_value=(None,bodies,recipe,None,None,None)):
+   self.assertEqual(run.check_rtc_activation_source_bridge(bridge,bodies,recipe,go),bridge)
+   for changed in ({**bodies,'server/go.mod':b'changed'},{**bodies,bridge['modifiedBodies'][0]['target']:b'changed'}):
+    with self.assertRaises(ValueError):run.check_rtc_activation_source_bridge(bridge,changed,recipe,go)
+   with self.assertRaises(ValueError):run.check_rtc_activation_source_bridge(bridge,bodies,recipe,dict(go,sha256='f'*64))
+   for mode in ('complete','missing-child','missing-footer','command-failure'):
+    with self.subTest(rtcPhase=mode),tempfile.TemporaryDirectory() as directory:
+     out=Path(directory).resolve();seen=[]
+     def command(label,argv,seconds,environment):
+      seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,600);self.assertIn('-timeout=180s',argv);self.assertIn('-race',argv);self.assertEqual(argv[-1],'./'+package)
+      if mode=='command-failure':raise ValueError('actual original RTC control failed')
+      selected=copy.deepcopy(events)
+      if mode=='missing-child':selected=[r for r in selected if r.get('Test')!=top+'/'+control['requiredSubtests'][package][top][-1]]
+      if mode=='missing-footer':selected=selected[:-1]
+      raw=('\n'.join(json.dumps(r) for r in selected)+'\n').encode();stdout=out/'private-stdout';stdout.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,stdout,label,2));stdout.unlink();return raw
+     if mode!='complete':
+      with self.assertRaises(ValueError):run.run_current_rtc_activation_control('/owned/go',{},command,parent,out,bodies,recipe,go)
+      self.assertEqual(seen,[control['phase']]);continue
+     value=run.run_current_rtc_activation_control('/owned/go',{},command,parent,out,bodies,recipe,go);self.assertEqual((value['topPASS'],value['subPASS']),(1,3));self.assertNotIn(private,(out/'current-rtc-activation-phase-events.json').read_text());run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}});run.write(out/'source-post.json',{'accepted':True,'source':current});run.write(out/'tools-before.json',{'go':go});run.write(out/'tools-after.json',{'go':go});self.assertEqual(collector.checked_current_rtc_activation_evidence(out),value)
+     saved=(out/'current-rtc-activation-phase-events.json').read_bytes();(out/'current-rtc-activation-phase-events.json').write_text('[]')
+     with self.assertRaises(ValueError):collector.checked_current_rtc_activation_evidence(out)
+     (out/'current-rtc-activation-phase-events.json').write_bytes(saved);run.write(out/'same-go1579-runtime-release-controls-reuse.json',{})
+     with self.assertRaises(ValueError):collector.checked_current_rtc_activation_evidence(out)
+     (out/'same-go1579-runtime-release-controls-reuse.json').unlink();run.write_current_rtc_activation_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertFalse(summary['sameWholeGo1579']);self.assertFalse(summary['oldControlCurrentActualPASS']);self.assertEqual(summary['currentFreshGo'],{'topPASS':3,'subPASS':6,'includesOriginalGraph':True})
 
 if __name__=='__main__':unittest.main()
