@@ -91,9 +91,9 @@
   },
   "controller_pins": [
     {
-      "bytes": 2586,
+      "bytes": 5633,
       "path": ".github/workflows/personal-multipart-targeted.yml",
-      "sha256": "128ddc6508ddcfa879c477c0cdb7bd2a165b17c4ffc094527e1f75d6721cd2c4"
+      "sha256": "946362446d22ff3ab23c0d912c12c633cb75d2dba00b7ffa477d9c33f3690c50"
     },
     {
       "bytes": 31770,

@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端Go来源1577/6a65保持不变。750来源已实际通过固定GoList1123包闭包证明、配置/cron合同1top3sub、16编译和首场景；第二场景rpc-group在observe-registration/done拒绝，具体退出结果未导出，整体服务图与清理仍未通过。本CI批只复用同完整Go来源/工具的已过命名事实链，0重派这些Go子集；原4场景/2top3sub仍fresh。done日志只报告原Wait与stdout Sync/Close调用已返回，结果not-exported；不从panic头推断退出码。新增独立UNACCEPTED编译缓存仅在source/tools/原compile receipts/ELF与容器清理均核实后保存只读快照，PID/runtime/Ready/P20仍未接受，旧accepted/build-only门禁不改。
+- 后端graph `1578/6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3` 仅修fixture误把ordinary registry交group receiver；新group registry保留真实profile、group-effect指纹和原seed，生产校验不变。fresh实际writer→生产parser合同1top3sub；固定三roots实际依赖闭包与精确逆转旧1577向量通过后，原cache/producer/Kafka及未改cron事实0重派、不称新全包PASS。cb5实际16编译/首场景PASS，第二rpc-group退出2/固定类group-receiver-initialization；fixture必拒已确认，唯一实际首错未证。原16编译/4场景/2top3及清理门禁保留；独立cache仍UNACCEPTED、无receiver，P20binding=null。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

@@ -8683,6 +8683,13 @@
       "sha256": "d995e0e4dd74c887f7395337d7cdfc674b700d9822350853a0e7a720f806cd87"
     },
     {
+      "path": "server/internal/runtimeacceptance/group_registry_contract_linux_test.go",
+      "bytes": 9258,
+      "sha256": "dc0285b2fcfe0d0b65f550ae5165c97784a2e0848c75d09cfd0d07d394bc8c56",
+      "mode": 420,
+      "provider": "ci/backend-fullgraph/run.py:verify"
+    },
+    {
       "bytes": 4877,
       "mode": 420,
       "path": "server/internal/runtimeacceptance/listener_linux.go",
@@ -8718,11 +8725,11 @@
       "sha256": "558d7915b4630a6575592022323cd137532f72a775362581fb0c6ef09d6b3fb8"
     },
     {
-      "bytes": 17560,
+      "bytes": 18672,
       "mode": 420,
       "path": "server/internal/runtimeacceptance/service_plan_linux.go",
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "7b3bf7862cce32367bd2f71386c945ec81b96bcb0cf9040c2cb359b9cb778cfa"
+      "sha256": "0a27673e427afd8eded5a8c3e09aeda3611fab7c452afaddb482774ac647fc8d"
     },
     {
       "bytes": 5150,
@@ -13184,7 +13191,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "723a6625e5702369dfd8104a86de8ac2d0bae5747e564157cf148fb11a6f03aa",
+  "filesSHA256": "7b6bacb1672d18a24a6b2d6fd375eba865f0b4c30083f37284bf98155de1d657",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13241,8 +13248,8 @@
       "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
     },
     "server": {
-      "members": 1577,
-      "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
+      "members": 1578,
+      "digest": "6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3"
     }
   },
   "state": "MATERIALIZED_SOURCE_ONLY"

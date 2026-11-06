@@ -17,6 +17,7 @@ import (
 
 	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/google/uuid"
+	"github.com/openimsdk/open-im-server/v3/internal/deliveryprofile"
 	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
 	"github.com/openimsdk/open-im-server/v3/internal/msgtransfer"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
@@ -270,7 +271,24 @@ func PrepareServicePlan(in ServicePlanInputs) (ServicePlan, error) {
 		if e != nil {
 			return e
 		}
-		group := msgtransfer.OwnedGroupReceiverBootstrap{Version: "owned-group-receiver-bootstrap-v1", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, BadgeEvidenceSHA256: in.BadgeEvidenceSHA256, VendorPath: registryPath, VendorSHA256: registrySHA}
+		// Group action receipts have a distinct production registry and typed
+		// profile. The ordinary consumer above keeps its original registry.
+		profile, e := deliveryprofile.FreezeGroup(in.Header.Database, in.Header.Epoch, in.Header.ActivationSHA256, "")
+		if e != nil {
+			return e
+		}
+		groupPolicy := messagedelivery.KafkaDeliveryPolicy(profile.Transport)
+		groupFingerprint, e := groupPolicy.Fingerprint()
+		if e != nil {
+			return e
+		}
+		groupRegistryPath := filepath.Join(in.Work, "group-none-registry.json")
+		groupRegistry := aliasvendor.OwnedOfflinePolicyRegistry{Version: "group-owned-offline-policies-v1", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, CurrentPolicySHA256: groupFingerprint, Entries: []aliasvendor.OwnedOfflinePolicySpec{{GroupProfile: &profile, Policy: groupPolicy, Fingerprint: groupFingerprint, BindingSeedSHA256: policy.ConfigurationSHA256}}}
+		groupRegistrySHA, e := writePrivate(groupRegistryPath, groupRegistry)
+		if e != nil {
+			return e
+		}
+		group := msgtransfer.OwnedGroupReceiverBootstrap{Version: "owned-group-receiver-bootstrap-v1", Database: in.Header.Database, Epoch: in.Header.Epoch, ActivationSHA256: in.Header.ActivationSHA256, BadgeEvidenceSHA256: in.BadgeEvidenceSHA256, VendorPath: groupRegistryPath, VendorSHA256: groupRegistrySHA}
 		groupBootSHA, e = writePrivate(groupBootPath, group)
 		return e
 	})

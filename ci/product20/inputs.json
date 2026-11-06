@@ -6,10 +6,10 @@
   "graphProvider": {
     "path": "ci/backend-fullgraph/run.py",
     "source": {
-      "members": 1577,
-      "digest": "6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115"
+      "members": 1578,
+      "digest": "6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3"
     },
-    "status": "formatted-cron-fixture-contract-source-only-no-current-core14-artifact"
+    "status": "formatted-group-registry-fixture-contract-source-only-no-current-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "3f383ea8162d90cdbfcc377c13a9fbb415e9014d4124d986c58802faa4fafc10",
-    "ci/backend-fullgraph/inputs.json": "329949342103f37ebd119ceaf63e0154d08a45682d143d0bb9d5988abc0cf38b",
+    "ci/backend-fullgraph/run.py": "a078c9631280a734b7ddc299c293e67e1ac5811fee8da32967129f362100dcad",
+    "ci/backend-fullgraph/inputs.json": "bfa0f8a3eedb05f20a1faf2c8dd99d20c6823c36ca2150a9d3a9ff0ae9fb2054",
     "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "ab233d389211e7eab830789475ccb1d7ae8c87bb22e62e5e4296d2ca090e62c6",
@@ -93,8 +93,8 @@
     "constructorPrefix": "\tfixtureSQL,e := product20FixtureSQL(b); if e != nil { return \"\",e }\n"
   },
   "derivedHarnessSource": {
-    "members": 1579,
-    "digest": "ee5c80f0d41ae41d01430d59824fa56b88e18cefebcc2f3c6aeb004617054983"
+    "members": 1580,
+    "digest": "824f7baa88d4a23b11c76c334d5bbee4fcb3b1087c804962ca4342cfdc1f9a8a"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

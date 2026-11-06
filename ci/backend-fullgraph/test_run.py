@@ -1513,7 +1513,8 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_same_current_go_named_scope_reuse_keeps_original_counts_without_dispatch(self):
-  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());self.assertTrue(run.current_go_named_scope_reuse_selected(locked));run.check_locked(locked)
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());locked.update(source=copy.deepcopy(run.CURRENT_GO_NAMED_SCOPES_REUSE['source']),passedCurrentGoNamedScopes=copy.deepcopy(run.CURRENT_GO_NAMED_SCOPES_REUSE),currentGroupRegistryFixtureControl=None,groupRegistryFixtureTestsToRun=[])
+  with mock.patch.object(run,'FINAL_SOURCE',run.CURRENT_GO_NAMED_SCOPES_REUSE['source']):self.assertTrue(run.current_go_named_scope_reuse_selected(locked));run.check_locked(locked)
   for key in ('currentCronFixtureControl','currentCacheTestDeltaControl','currentGroupRecoveryControl','currentProducerControl','currentManagedShapeControl','currentReleaseControl','currentImageKafkaControl','currentKafkaConfirmControl'):
    self.assertFalse(run.current_go_named_scope_reuse_selected(dict(locked,**{key:{'legacy':'explicit'}})))
   self.assertEqual(locked['cronFixtureTestsToRun'],[]);self.assertEqual(locked['kafkaACLTestsToRun'],[])
@@ -1588,5 +1589,61 @@ class FullGraphControls(unittest.TestCase):
    with self.assertRaises(ValueError):collector.checked_build_only_evidence(compact,c,allocation)
    records['collection.json']['scenarios'][1]['resourceCleanup']['accepted']=False;persist()
    with self.assertRaises(ValueError):collector.checked_compile_cache_evidence(compact,c,allocation)
+
+
+ def test_group_registry_fixture_dependency_projection_rejects_foreign_or_incomplete_scope(self):
+  rows=[]
+  for root in run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['roots']:rows.extend([{'ImportPath':root},{'ImportPath':root+' ['+root+'.test]','ForTest':root},{'ImportPath':root+'.test'}])
+  raw=('\n'.join(json.dumps(row) for row in rows)+'\n').encode();value=run.project_group_registry_fixture_dependencies(raw);self.assertTrue(value['fixturePackageAbsent']);self.assertEqual(value['packageCount'],9)
+  for bad in (raw[:-2],raw+json.dumps({'ImportPath':run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['forbiddenPackage']}).encode()+b'\n',raw+json.dumps({'ImportPath':'foreign.test'}).encode()+b'\n',raw+json.dumps(rows[0]).encode()+b'\n',b'{"ImportPath":"x","Error":{"Err":"PRIVATE"}}\n'):
+   with self.assertRaises(ValueError):run.project_group_registry_fixture_dependencies(bad)
+
+ def test_group_registry_fixture_reuse_requires_exact_delta_dependency_and_real_event_hook(self):
+  collector=load('collect');locked=json.loads(run.INPUTS.read_bytes());self.assertTrue(run.current_group_registry_fixture_selected(locked));run.check_locked(locked);control=run.CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL
+  for fields in ({'groupRegistryFixtureTestsToRun':[]},{'groupRegistryFixtureScopeReuse':{}},{'cronFixtureTestsToRun':['TestFreshFixtureCronConfigurationMatchesDefaultScheduler']},{'passedCurrentGoNamedScopes':run.CURRENT_GO_NAMED_SCOPES_REUSE}):
+   with self.assertRaises(ValueError):run.check_current_group_registry_fixture_plan(dict(locked,**fields))
+  class Recipe:
+   def rows(self,bodies):return [{'path':name,'bytes':len(raw),'sha256':run.sha(raw)} for name,raw in sorted(bodies.items())]
+   def digest(self,rows):return run.sha(b''.join(row['path'].encode()+b'\0'+row['sha256'].encode()+b'\n' for row in sorted(rows,key=lambda row:row['path'])))
+  recipe=Recipe();compat=copy.deepcopy(run.GROUP_REGISTRY_FIXTURE_SCOPE_REUSE);delta=compat['fixtureDelta'];added=compat['newTest'];paths=[delta['target'],added['target']]+[row['target'] for row in compat['unchangedHistoricalCronBodies']];bodies={path:run.regular(run.REPO/'ci/candidates/backend-fullgraph/source'/path) for path in paths};bodies['server/go.mod']=b'module fixture\n';previous=dict(bodies);del previous[added['target']]
+  for item in delta['replacements']:previous[delta['target']]=previous[delta['target']].replace(item['new'].encode(),item['old'].encode(),1)
+  current={'members':len(bodies),'digest':recipe.digest(recipe.rows(bodies))};prior={'members':len(previous),'digest':recipe.digest(recipe.rows(previous))};compat.update(currentSource=current,originalSource=prior);named=copy.deepcopy(compat['priorAcceptedNamedScopeFacts']);named['source']=prior;named['binding']['source']=prior;compat['priorAcceptedNamedScopeFacts']=named;go=named['binding']['GoToolBodyAndMode'];dep_rows=[]
+  for root in run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['roots']:dep_rows.extend([{'ImportPath':root},{'ImportPath':root+' ['+root+'.test]','ForTest':root},{'ImportPath':root+'.test'}])
+  dep_raw=('\n'.join(json.dumps(row) for row in dep_rows)+'\n').encode();parent=run.module('ci/backend-runtime-join-r7/run.py','group_registry_fixture_pure_auditor');package=next(iter(control['targets']));top=control['targets'][package][0];events=[{'Action':'start','Package':parent.PREFIX+package},{'Action':'run','Package':parent.PREFIX+package,'Test':top}]
+  for child in control['requiredSubtests'][package][top]:
+   name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+  events.extend([{'Action':'pass','Package':parent.PREFIX+package,'Test':top},{'Action':'pass','Package':parent.PREFIX+package}])
+  with mock.patch.object(run,'FINAL_SOURCE',current),mock.patch.object(run,'GROUP_REGISTRY_FIXTURE_SCOPE_REUSE',compat),mock.patch.object(run,'CURRENT_GO_NAMED_SCOPES_REUSE',named),mock.patch.object(collector.run,'FINAL_SOURCE',current),mock.patch.object(collector.run,'GROUP_REGISTRY_FIXTURE_SCOPE_REUSE',compat),mock.patch.object(collector.run,'CURRENT_GO_NAMED_SCOPES_REUSE',named),mock.patch.object(collector.run,'verify',return_value=(None,bodies,recipe,None,None,None)):
+   self.assertEqual(run.check_group_registry_fixture_scope_source(compat,bodies,recipe,go),compat)
+   for bad in ({**bodies,'server/go.mod':b'changed'},{**bodies,delta['target']:bodies[delta['target']]+b'\n'},{**bodies,added['target']:b'changed'}):
+    with self.assertRaises(ValueError):run.check_group_registry_fixture_scope_source(compat,bad,recipe,go)
+   with self.assertRaises(ValueError):run.check_group_registry_fixture_scope_source(compat,bodies,recipe,dict(go,sha256='f'*64))
+   for mode in ('complete','dependency-fixture','dependency-error','missing-child','missing-footer','contract-error'):
+    with self.subTest(groupRegistry=mode),tempfile.TemporaryDirectory() as directory:
+     out=Path(directory).resolve();seen=[]
+     def command(label,argv,seconds,environment):
+      seen.append(label);self.assertEqual(seconds,600)
+      if label==run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['phase']:
+       self.assertEqual(argv,['/owned/go','list','-deps','-test','-mod=readonly','-json=ImportPath,ForTest,Error,DepsErrors,Incomplete']+['./'+p for p in run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['relativeRoots']])
+       if mode=='dependency-error':raise ValueError('actual dependency command failed')
+       if mode=='dependency-fixture':return dep_raw+json.dumps({'ImportPath':run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['forbiddenPackage']}).encode()+b'\n'
+       return dep_raw
+      self.assertEqual(label,control['phase']);self.assertIn('-timeout=180s',argv);self.assertIn('-race',argv);self.assertEqual(argv[-1],'./'+package)
+      if mode=='contract-error':raise ValueError('actual contract command failed')
+      selected=copy.deepcopy(events)
+      if mode=='missing-child':selected=[row for row in selected if row.get('Test')!=top+'/'+control['requiredSubtests'][package][top][-1]]
+      if mode=='missing-footer':selected=selected[:-1]
+      raw=('\n'.join(json.dumps(row) for row in selected)+'\n').encode();stdout=out/'private-stdout';stdout.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,stdout,label,2));stdout.unlink();return raw
+     if mode!='complete':
+      with self.assertRaises(ValueError):run.run_current_group_registry_fixture_control('/owned/go',{},command,parent,out,bodies,recipe,go)
+      self.assertLessEqual(len(seen),2);self.assertFalse((out/'current-group-registry-fixture-contract-names.json').exists());continue
+     value=run.run_current_group_registry_fixture_control('/owned/go',{},command,parent,out,bodies,recipe,go);self.assertEqual(seen,[run.GROUP_REGISTRY_FIXTURE_DEPENDENCY_CONTROL['phase'],control['phase']]);self.assertEqual((value['topPASS'],value['subPASS']),(1,3));self.assertNotIn('PRIVATE',(out/'current-group-registry-fixture-contract-events.json').read_text())
+     for index,label in enumerate(seen,1):run.write(out/('phase-%04d.json'%index),{'phase':label,'exitCode':0,'resource':{'status':'passed','exit_code':0}})
+     run.write(out/'source-post.json',{'accepted':True,'source':current});run.write(out/'tools-before.json',{'go':go});run.write(out/'tools-after.json',{'go':go});self.assertEqual(collector.checked_current_group_registry_fixture_evidence(out),value)
+     saved=(out/'current-group-registry-fixture-contract-events.json').read_bytes();(out/'current-group-registry-fixture-contract-events.json').write_text('[]')
+     with self.assertRaises(ValueError):collector.checked_current_group_registry_fixture_evidence(out)
+     (out/'current-group-registry-fixture-contract-events.json').write_bytes(saved);run.write(out/'same-source-current-go-named-scopes-reuse.json',{})
+     with self.assertRaises(ValueError):collector.checked_current_group_registry_fixture_evidence(out)
+     (out/'same-source-current-go-named-scopes-reuse.json').unlink();run.write_current_group_registry_fixture_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':3,'subPASS':6,'includesOriginalGraph':True});self.assertTrue(summary['historicalCronContractOnly']);self.assertEqual(summary['actualCronFixtureTopDispatched'],0)
 
 if __name__=='__main__':unittest.main()

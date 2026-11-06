@@ -2,7 +2,7 @@
 
 这里的 `server/`、`chart/`、`route/` 是独立的普通 Go 模块。源码已经从固定来源完整物化；从这些目录构建不需要运行 CI 胶囊、source loader 或验收程序。
 
-当前选定来源为 graph `1576/6a65a3419f7d6a9e5fbd258e6159262f7018f35b79a141d5027980e0b76b4115`、chart `258/3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1883 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
+当前选定来源为 graph `1578/6fa52b41b8201bb197ab48a570fc479cf3cf94cd648c4f8ed588a14d5ae2e8f3`、chart `258/3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1884 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
 
 使用 Go 1.27.2，在各模块目录独立构建，并显式设置 `GOWORK=off GOTOOLCHAIN=local GOENV=off GOAUTH=off`。保留原 `server/go.work`、`go.work.sum` 和所有模块锁；server 原本地 protocol 替换模块位于 `server/pkg/protocol`。不要用新的跨模块 workspace、统一协议版本或重新生成锁文件代替这些来源。
 
@@ -12,4 +12,4 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
-本批仅CI诊断和未接受编译缓存改进，Go来源1577/6a65及全部1883文件不变。750已实际通过固定GoList1123包闭包、cron合同1top3sub、16编译与首场景；第二场景rpc-group注册观察done拒绝，不能推断唯一原因或退出码。原Wait和stdout Sync/Close调用已返回，结果仅在内存、未导出；CI用原owner记录绑定原私有log，投影固定错误类与公开源码帧，不导出正文/路径/nonce/PID。同完整Go来源和工具下复用已通过的原命名事实链，保留各自run来源，0重派这些Go子集；原服务图与清理继续fresh。独立UNACCEPTED compile-cache只上传源/工具/compile receipt/hash/模式一致且容器已清理的14个只读快照及新manifest，PID/runtime/Ready/P20仍未接受，无receiver或自动部署；旧accepted/build-only及复制策略原样保留。
+本批修fixture的角色registry混用：ordinary consumer原输入保留；rpc-group使用真实FreezeGroup产生独立profile/group-effect policy及原seed绑定，生产reader不改。fresh实际PrepareServicePlan→bootstrap/registry reader合同1top3sub，覆盖正常分离/交叉拒绝/profile漂移拒绝。固定三roots实际go-list闭包和精确逆转旧1577全向量通过后，原cache/prod/Kafka与未改cron事实0重派，仅保留原来源，不称新全包PASS。cb5实际16编译/首场景PASS，第二rpc-group退出2/固定类group-receiver-initialization，尚未证明唯一实际首错。原16编译/4场景/graph2top3及cleanup/PID/ELF门禁保留，独立cache无receiver且不赋予runtime/Ready/P20接受。

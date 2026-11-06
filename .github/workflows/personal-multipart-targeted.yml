@@ -32,6 +32,55 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
+      - name: Normalize only the preinstalled hosted-runner Chrome executable mode
+        run: |
+          set -euo pipefail
+          timeout --kill-after=2s 10s sudo -n -- python3 -B - <<'PY'
+          import json, os, stat
+          from pathlib import Path
+
+          def normalize_chrome(path, *, owner_uid=0):
+              path = Path(path)
+              if not path.is_absolute() or path.resolve(strict=True) != path:
+                  raise ValueError('fixed Chrome path must be canonical without symlinks')
+              before = path.lstat()
+              descriptor = os.open(path, os.O_RDONLY | os.O_CLOEXEC | os.O_NOFOLLOW | os.O_NONBLOCK)
+              try:
+                  opened = os.fstat(descriptor)
+                  mode = stat.S_IMODE(opened.st_mode)
+                  if not stat.S_ISREG(opened.st_mode) or opened.st_uid != owner_uid or mode not in (0o777, 0o755):
+                      raise ValueError('installed Chrome must be root regular with known0777 or0755: uid=' +
+                                       str(opened.st_uid) + ' mode=' + oct(mode))
+                  def identity(info):
+                      return (info.st_dev, info.st_ino, info.st_uid, info.st_gid, info.st_size, info.st_mtime_ns)
+                  if (identity(before) != identity(opened) or before.st_mode != opened.st_mode
+                          or before.st_ctime_ns != opened.st_ctime_ns):
+                      raise ValueError('installed Chrome changed while opening')
+                  if mode == 0o777:
+                      os.fchmod(descriptor, 0o755)
+                  after = os.fstat(descriptor)
+                  current = path.lstat()
+                  if (identity(opened) != identity(after) or identity(after) != identity(current)
+                          or stat.S_IMODE(after.st_mode) != 0o755 or after.st_mode != current.st_mode
+                          or after.st_ctime_ns != current.st_ctime_ns or path.resolve(strict=True) != path):
+                      raise ValueError('installed Chrome identity or normalized mode changed')
+                  return {'path': str(path), 'uid': after.st_uid, 'before_mode': oct(mode),
+                          'after_mode': oct(stat.S_IMODE(after.st_mode)), 'bytes': after.st_size}
+              finally:
+                  os.close(descriptor)
+
+          try:
+              if os.geteuid() != 0:
+                  raise ValueError('hosted-runner Chrome normalization requires root')
+              observation = normalize_chrome(Path('/opt/google/chrome/chrome'))
+          except (OSError, ValueError, RuntimeError) as error:
+              print(json.dumps({'event': 'personal_chrome_mode_normalization', 'accepted': False,
+                                'exceptionType': type(error).__name__, 'reason': str(error)[:512]},
+                               sort_keys=True), flush=True)
+              raise
+          print(json.dumps(dict(observation, event='personal_chrome_mode_normalization', accepted=True),
+                           sort_keys=True), flush=True)
+          PY
       - name: One exact original setup then explicit legacy8 successor and web precache
         run: |
           set -euo pipefail
