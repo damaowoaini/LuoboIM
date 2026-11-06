@@ -7,9 +7,9 @@
     "path": "ci/backend-fullgraph/run.py",
     "source": {
       "members": 1576,
-      "digest": "3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea"
+      "digest": "bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08"
     },
-    "status": "formatted-managed-bootstrap-canonical-shape-source-only-no-current-core14-artifact"
+    "status": "formatted-group-owned-recovery-source-only-no-current-core14-artifact"
   },
   "chartProvider": {
     "sources": {
@@ -60,8 +60,8 @@
     "noDefaultAuthenticationPluginOverride": true
   },
   "helpers": {
-    "ci/backend-fullgraph/run.py": "d08f839374c0c7a6e8da634eff8ffb1f79505b699137896805f4537a83ef3299",
-    "ci/backend-fullgraph/inputs.json": "aebea5b5a6c3767038bc656a50c6ccb53735e0bed1be2751de27c81fb324e799",
+    "ci/backend-fullgraph/run.py": "b6d9aa26d7c0c74999be9a961387776d4b055f079a5c84d323547989573082ca",
+    "ci/backend-fullgraph/inputs.json": "0369ae7082a1889a57f7f5f60f6171340f4aeebad6a3d6ed40011b9773500a7f",
     "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
     "ci/backend-fullgraph/minio_build.py": "a814d2bf436f440bdcac111fc05caf813acab1e5da88a43090a2a6013471c8a3",
     "ci/backend-fullgraph/service_selectors.py": "ab233d389211e7eab830789475ccb1d7ae8c87bb22e62e5e4296d2ca090e62c6",
@@ -94,7 +94,7 @@
   },
   "derivedHarnessSource": {
     "members": 1578,
-    "digest": "c1a6ea01e59e4b7ffd2988e883444f20fe86c1be008426aa43360a0f7fd9ebf9"
+    "digest": "e8fe774172ceec89502de30eb93bc4624206aadf59c9ab16a4e55f07fbe2a43a"
   },
   "productRebuilds": 0,
   "auxiliaryBuilds": [

@@ -580,6 +580,81 @@ def richWrite = { p,c ->
     }
 }
 // END independent R12 consumer.
+// One fixed build tool is acquired online before offline tasks lazily create
+// AGP's detached configuration. This is not an App18/rich component grant.
+def acquireFixedAapt2 = { toolProject ->
+    if (richPhase!='metadata' || toolProject.path!=':' ||
+            toolProject.projectDir.canonicalFile!=new File(owned,'source/app/android'))
+        throw new GradleException('fixed online App-root AAPT2 acquisition required')
+    def toolConfiguration
+    toolProject.getOwner().applyToMutableState {
+        def name='luoboFixedAapt2Linux'
+        if (toolProject.configurations.findByName(name)!=null)
+            throw new GradleException('reserved AAPT2 tool configuration already exists')
+        toolConfiguration=toolProject.configurations.create(name)
+        toolConfiguration.canBeResolved=true
+        toolConfiguration.canBeConsumed=false
+        toolConfiguration.visible=false
+        toolConfiguration.transitive=false
+        // Same fixed factory/classifier as AGP9.1.1 Aapt2FromMaven, with an
+        // independently reviewed named acquisition scope and no override flag.
+        def dependency=toolProject.dependencyFactory.create(
+            'com.android.tools.build','aapt2','9.1.1-14792394','linux',null)
+        toolConfiguration.dependencies.add(dependency)
+        if (toolConfiguration.allDependencies.size()!=1 ||
+                toolConfiguration.allDependencyConstraints.size()!=0 ||
+                !toolConfiguration.resolutionStrategy.forcedModules.empty ||
+                !toolConfiguration.attributes.keySet().empty || toolConfiguration.transitive)
+            throw new GradleException('closed fixed AAPT2 tool declaration required')
+        def graph=toolConfiguration.incoming.resolutionResult
+        def edges=graph.allDependencies.toList()
+        if (edges.size()!=1 || !(edges[0] instanceof ResolvedDependencyResult) ||
+                !(edges[0].requested instanceof ModuleComponentSelector) ||
+                edges[0].requested.group!='com.android.tools.build' ||
+                edges[0].requested.module!='aapt2' || edges[0].requested.version!='9.1.1-14792394')
+            throw new GradleException('one actual fixed AAPT2 tool edge required')
+        def artifacts=toolConfiguration.incoming.artifactView { view ->
+            view.setLenient(false)
+        }.artifacts.artifacts.toList()
+        if (artifacts.size()!=1)
+            throw new GradleException('one fixed Linux AAPT2 artifact required')
+        def identity=artifacts[0].id.componentIdentifier
+        if (!(identity instanceof ModuleComponentIdentifier) ||
+                identity.group!='com.android.tools.build' || identity.module!='aapt2' ||
+                identity.version!='9.1.1-14792394' ||
+                artifacts[0].file.name!='aapt2-9.1.1-14792394-linux.jar')
+            throw new GradleException('fixed AAPT2 tool component/classifier differs')
+        def artifact=localRef(artifacts[0].file)
+        if (artifact.bytes!=2331128 ||
+                artifact.sha256!='e7ae17af6e4093c771243e82d66462353de87befaac206bfb43e557ac1c34440')
+            throw new GradleException('official fixed AAPT2 Linux JAR body differs')
+        toolProject.repositories.each(checkRepo)
+        if (!toolConfiguration.resolutionStrategy.forcedModules.empty ||
+                !toolConfiguration.attributes.keySet().empty || toolConfiguration.transitive ||
+                toolConfiguration.allDependencies.size()!=1 ||
+                toolConfiguration.allDependencyConstraints.size()!=0)
+            throw new GradleException('fixed AAPT2 declaration changed during resolution')
+        def report=[schema:1,kind:'fixed-aapt2-tool-graph-v1',owner:'source/app/android',
+            configuration:name,coordinate:'com.android.tools.build:aapt2:9.1.1-14792394',
+            classifier:'linux',no_force:true,no_attributes:true,no_transitive:true,artifact:artifact]
+        def output=new File(owned,'evidence/fixed-aapt2-tool-graph.json')
+        if (output.parentFile.canonicalFile!=output.parentFile ||
+                !Files.isDirectory(output.parentFile.toPath(),LinkOption.NOFOLLOW_LINKS) ||
+                Files.getOwner(output.parentFile.toPath(),LinkOption.NOFOLLOW_LINKS)!=ownedPrincipal)
+            throw new GradleException('owned fixed AAPT2 evidence directory required')
+        def channel=java.nio.channels.FileChannel.open(output.toPath(),
+            java.nio.file.StandardOpenOption.CREATE_NEW,java.nio.file.StandardOpenOption.WRITE,
+            LinkOption.NOFOLLOW_LINKS)
+        try {
+            def buffer=java.nio.ByteBuffer.wrap((JsonOutput.toJson(report)+'\n').getBytes('UTF-8'))
+            while(buffer.hasRemaining()) channel.write(buffer)
+            channel.force(true)
+        } finally { channel.close() }
+        def parentChannel=java.nio.channels.FileChannel.open(output.parentFile.toPath(),java.nio.file.StandardOpenOption.READ)
+        try { parentChannel.force(true) } finally { parentChannel.close() }
+    }
+    toolConfiguration
+}
 def selectorIdentity = { selector ->
     if (selector instanceof ProjectComponentSelector) {
         return [kind:'project', identity:selector.displayName, buildPath:selector.buildPath,
@@ -711,13 +786,17 @@ gradle.projectsEvaluated {
     }
     gradle.rootProject.tasks.named('dependencies').configure {
         doLast {
+            def fixedAapt2Configuration=null
+            if (gradle.rootProject.projectDir.canonicalFile==new File(owned,'source/app/android'))
+                fixedAapt2Configuration=acquireFixedAapt2(gradle.rootProject)
             def rows = []
             def selections = []
             def projects = []
             gradle.rootProject.allprojects.each { p ->
                 projects.add(checkedProject(p))
                 [p.configurations, p.buildscript.configurations].each { configs ->
-                    configs.findAll { it.canBeResolved && !(it.name.toLowerCase() =~ /release|profile|test|lint/) }.each { c ->
+                    configs.findAll { it.canBeResolved && !it.is(fixedAapt2Configuration) &&
+                        !(it.name.toLowerCase() =~ /release|profile|test|lint/) }.each { c ->
                         // Inspect the complete graph, including dependencies
                         // below local projects, before filtering any artifacts.
                         def resolution = c.incoming.resolutionResult

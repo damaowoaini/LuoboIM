@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端普通源码已同步修复 managed bootstrap 的 producer struct 与 consumer map 重编码顺序不一致，保持严格15字段、原hash及全部准入检查。旧ffd来源已实际通过16编译、release4top22sub（同次Kafka1top3sub）和首场景；第二场景已越过先前网关，现被managed shape拒绝。当前349来源在16编译前两包控制命令超时；其中Kafka指定1top3sub及所属包footer已实际通过，但整命令和两包scope未通过，producer尚未开始。后继复用该同源Kafka个别完成包事实，仅fresh producer1top13sub（阶段600秒、Go执行180秒）；完整服务图和二十服务联调仍待验证。
+- 后端普通源码已修复group recovery拒绝owned Redis包装池的类型合同缺陷：从原固定配置重建独立池，保留同一观察器、物理写入hook与独立关闭/取消。新graph来源 `1576/bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08` 尚待fresh cache2top7sub＋producer1top13sub＋Kafka1top3sub（三包一命令），以及原16编译/4场景/graph2top3sub和清理验收。旧349来源实际完成16编译、首场景并推进到第二场景rpc-group退出2；producer命令exit0且命名receipt1top13，但漏导出独立events，collector明确拒绝，不能补造或复用为新源通过。二十服务联调仍未通过。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

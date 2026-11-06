@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE = {'members': 1576, 'digest': '3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea'}
+FINAL_SOURCE = {'members': 1576, 'digest': 'bff341cc7732a07aecea9e14254d53d7bdd509a4f537b4cf414e079f1c248c08'}
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -343,12 +343,59 @@ def write_current_producer_summary(out,receipt,cleanup_audit,launcher_reuse,redi
  check_current_producer_receipt(receipt)
  write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'targetedTopPASS':2,'targetedSubPASS':3,'managedProducerControlTopPASS':1,'managedProducerControlSubPASS':13,'managedProducerCommandInvocations':1,'managedProducerPackageExecutions':1,'actualKafkaACLTestsDispatched':0,'actualManagedShapeTopsDispatched':1,'currentProducerScope':receipt,'sameSourceCompletedKafkaPackageReuse':COMPLETED_KAFKA_PACKAGE_REUSE,'managedShapeTwoPackageHistoricalAttempt':MANAGED_SHAPE_TWO_PACKAGE_PRIOR_ATTEMPT,'currentWholeOwnedcontrolPackagePASS':False,'currentWholeMsgtransferPackagePASS':False,'actualProcessImageTestsDispatched':0,'processImageHistoricalPass':PROCESS_IMAGE_PRIOR_PASS,'releaseControlsHistoricalPass':RELEASE_CONTROLS_PRIOR_PASS,'kafkaConfirmHistoricalPass':KAFKA_CONFIRM_PRIOR_PASS,'kafkaConfirmPassedReuse':None,'kafkaACLPassedReuse':None,'kafkaACLHistoricalPass':KAFKA_ACL_PASSED_REUSE,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'launcherPassedReuse':launcher_reuse,'actualLauncherTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'actualRedisParserTestsDispatched':0,'unaffectedHistoricalBatchesRedispatched':False,'historicalCleanupSourceFactsOnly':True,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'originalNewSafetyContract':{'topCount':2,'subCount':4,'crossSource':True},'originalCompleteObligation':{'topCount':7,'subCount':16,'crossSource':True},'currentFreshGo':{'topPASS':3,'subPASS':16,'includesOriginalGraph':True},'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
 
+CURRENT_GROUP_RECOVERY_CONTROL = {'phase': 'current-group-recovery-controls', 'targets': {'pkg/common/db/cache': ['TestGroupAuthorityInvalidatorOwnsFiniteClientWithoutChangingSharedOptions', 'TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime'], 'internal/msgtransfer': ['TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape'], 'internal/namespaceimport/ownedcontrol': ['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']}, 'requiredSubtests': {'pkg/common/db/cache': {'TestGroupAuthorityInvalidatorRebuildsOwnedPoolWithoutMovingSourceOrLifetime': ['single-node-independent-options-and-close', 'cluster-independent-options-and-close', 'closing-base-keeps-existing-recovery', 'actual-driver-ack-keeps-original-owner', 'actual-driver-lost-ack-retires-only-recovery', 'parent-cancel-refuses-rebuild', 'foreign-and-malformed-owned-clients-refused']}, 'internal/msgtransfer': {'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape': ['producer-and-child-loader-roundtrip', 'alphabetic-map-reorder', 'unknown-field', 'missing-field', 'duplicate-field', 'wrong-value-type', 'null-string', 'wrong-pin', 'public-file', 'symlink-file', 'hardlink-file', 'trailing-json', 'missing-file']}, 'internal/namespaceimport/ownedcontrol': {'TestOwnedKafkaExclusionRequiresEveryWildcardDeny': ['create-reply-error-and-shape-cannot-be-a-success', 'describe-reply-error-and-shape-cannot-replace-exact-deny', 'new-deny-visibility-is-bounded-without-grace-for-existing-denies']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 600, 'topPASS': 4, 'subPASS': 23, 'packages': 3, 'goCommandInvocations': 1, 'packageExecutions': 3, 'samePackageInvocation': False, 'newDatabaseFixtures': 0, 'wholePackagePASS': False}
+GROUP_RECOVERY_HISTORICAL_FACTS = {'kind': 'group-recovery-original-349-controls-historical-facts-v1', 'source': {'members': 1576, 'digest': '3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea'}, 'completedKafkaPackage': {'version': 'same-source-completed-kafka-package-reuse-v1', 'binding': {'schema': 1, 'kind': 'root-accepted-same-source-completed-kafka-package-in-timeout-command-v1', 'run': 42206676039, 'job': 127854974346, 'attempt': 1, 'head': 'cdd8f236614ba32f575367748b52137abf9bc63a', 'source': {'members': 1576, 'digest': '3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea'}, 'rootReviewSHA256': '9b556b4d4ff96a6c52047803e9b713b7fb77548930a3ca0a4457f8a83b58edf0', 'artifactID': 13496927972, 'artifactSHA256': '7e6fa52a27545c51ec846235a498a9d3d1168b5aa786488cbfe85632805b70e6', 'eventsSHA256': '2c6b853aa4b39d1cabeb897e2b3f996deb57ab449621a8e1927dfad8574db06a', 'phaseSHA256': '9df468c689f414756aa6f9a5751d9583b941f8184795762cbc1d39126b6dc734', 'sourcePostSHA256': 'd3bbe21afff29a4e07926c3b53ce225790840422fd1fe7c7bde17e9b631a63fc', 'toolsSHA256': '162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f', 'originalPackageReceipt': {'source': {'members': 1576, 'digest': '3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea'}, 'package': 'internal/namespaceimport/ownedcontrol', 'topPASS': 1, 'subPASS': 3, 'skip': 0, 'fail': 0, 'namedCompletions': [{'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny'}, {'package': 'internal/namespaceimport/ownedcontrol', 'name': 'TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies'}], 'originalPackageFooterPASS': True, 'originalGoCommandPassed': False, 'originalTwoPackageScopeAccepted': False, 'producerPackageStarted': False, 'wholeOwnedcontrolPackagePASS': False, 'runtimeAccepted': False}, 'originalGoCommandPassed': False, 'originalWholeScopeAccepted': False, 'requiresExactSameSource': True, 'mayReuseOnlyKafkaNamedSubset': True}, 'originalGoCommandPassed': False, 'originalTwoPackageScopeAccepted': False, 'actualCurrentGoCommandInvocations': 0, 'actualCurrentKafkaACLTestsDispatched': 0, 'reusedTopPASS': 1, 'reusedSubPASS': 3, 'wholeOwnedcontrolPackagePASS': False, 'wholeSourceAccepted': False, 'runtimeAccepted': False}, 'producerEventGap': {'run': 42208550310, 'job': 127861195844, 'head': 'd1f835974da5ccae3ec3e17f98816560084c422f', 'rootReviewSHA256': '07c159206a79fb494dd182dc6ba38f6f368c1fddfb192e0b8f2b5789dfd4ddc8', 'phaseExitCode': 0, 'namedReceipt': {'topPASS': 1, 'subPASS': 13, 'skip': 0, 'fail': 0, 'packages': 1, 'namedCompletions': [{'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/alphabetic-map-reorder'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/duplicate-field'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/hardlink-file'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-field'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/missing-file'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/null-string'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/producer-and-child-loader-roundtrip'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/public-file'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/symlink-file'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/trailing-json'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/unknown-field'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-pin'}, {'package': 'internal/msgtransfer', 'name': 'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape/wrong-value-type'}], 'source': {'members': 1576, 'digest': '3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea'}, 'accepted': True, 'newDatabaseFixtures': 0, 'scope': {'phase': 'current-managed-producer-control', 'targets': {'internal/msgtransfer': ['TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape']}, 'requiredSubtests': {'internal/msgtransfer': {'TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape': ['producer-and-child-loader-roundtrip', 'alphabetic-map-reorder', 'unknown-field', 'missing-field', 'duplicate-field', 'wrong-value-type', 'null-string', 'wrong-pin', 'public-file', 'symlink-file', 'hardlink-file', 'trailing-json', 'missing-file']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 600, 'topPASS': 1, 'subPASS': 13, 'packages': 1, 'goCommandInvocations': 1, 'packageExecutions': 1, 'newDatabaseFixtures': 0, 'wholePackagePASS': False}, 'actualGoCommandInvocations': 1, 'actualPackageExecutions': 1, 'actualKafkaACLTestsDispatched': 0, 'actualManagedShapeTopsDispatched': 1, 'actualProcessImageTestsDispatched': 0, 'wholeMsgtransferPackagePASS': False, 'runtimeAccepted': False, 'wholeSourceAccepted': False}, 'namedReceiptPin': {'bytes': 2882, 'sha256': '5809d73ecbc5e25bb8a8efd73b505b874b708233220856ae3a148a7ff334ffb3'}, 'independentEventsPresent': False, 'collectorAccepted': False, 'mayReuseAsCurrentControl': False}, 'currentSourcePASS': False, 'wholePackagePASS': False, 'runtimeAccepted': False}
+RPC_GROUP_START_LOG_POLICY = {'version': 'owned-rpc-group-start-log-projection-v1', 'logLimitBytes': 8388608, 'lineLimit': 16384, 'lineBytesLimit': 4096, 'framesLimit': 8, 'directoryEntriesLimit': 64, 'onlyRole': 'rpc-group', 'onlyCachedWaitExitCode': 2, 'rawTextExported': False, 'acceptanceEvidence': False, 'panicPrefixClassesLimit': 8, 'wrapperLimit': 8}
+
+def check_group_recovery_historical_facts(value):
+ if json.dumps(value,sort_keys=True,separators=(',',':'))!=json.dumps(GROUP_RECOVERY_HISTORICAL_FACTS,sort_keys=True,separators=(',',':')) or value['source']==FINAL_SOURCE:raise ValueError('original 349 Kafka subset and producer event gap are historical only')
+ return value
+
+def check_current_group_recovery_plan(c):
+ control=CURRENT_GROUP_RECOVERY_CONTROL;owned='internal/namespaceimport/ownedcontrol'
+ if json.dumps(c.get('currentGroupRecoveryControl'),sort_keys=True)!=json.dumps(control,sort_keys=True) or c.get('currentGroupRecoveryTargets')!=control['targets'] or c.get('kafkaACLTestsToRun')!=control['targets'][owned]:raise ValueError('exact fresh cache/producer/Kafka three-package scope required')
+ if any(c.get(key) is not None for key in ('currentProducerControl','sameSourceCompletedKafkaPackageReuse','currentManagedShapeControl','currentReleaseControl','kafkaACLPassedReuse','currentImageKafkaControl','currentKafkaConfirmControl','kafkaConfirmPassedReuse')) or any(c.get(key)!=[] for key in ('currentProducerTestsToRun','currentManagedShapeTestsToRun','currentReleaseTestsToRun','processImageTestsToRun')):raise ValueError('new source requires all four named tops fresh without prior-source reuse')
+ if c.get('gatewayStartLogProjectionPolicy')!=GATEWAY_START_LOG_POLICY or c.get('rpcGroupStartLogProjectionPolicy')!=RPC_GROUP_START_LOG_POLICY:raise ValueError('exact bounded cached-Wait diagnostic policies required')
+ check_group_recovery_historical_facts(c.get('groupRecoveryHistoricalFacts'));check_release_controls_prior_pass(c.get('releaseControlsHistoricalPass'));check_kafka_confirm_prior_pass(c.get('kafkaConfirmHistoricalPass'));check_kafka_acl_receipt(c.get('kafkaACLHistoricalPass'));check_process_image_prior(c.get('processImageHistoricalPass'))
+ return control
+
+def group_recovery_package_facts(value):
+ control=CURRENT_GROUP_RECOVERY_CONTROL
+ return {package:{'source':FINAL_SOURCE,'topPASS':len(tops),'subPASS':sum(len(control['requiredSubtests'][package].get(top,[])) for top in tops),'namedCompletions':sorted([dict(row) for row in value['namedCompletions'] if row['package']==package],key=lambda row:row['name']),'withinCommand':control['phase'],'packageExecutions':1,'wholePackagePASS':False,'runtimeAccepted':False} for package,tops in control['targets'].items()}
+
+def check_current_group_recovery_receipt(value):
+ keys={'topPASS','subPASS','skip','fail','packages','namedCompletions','source','accepted','newDatabaseFixtures','scope','actualGoCommandInvocations','actualPackageExecutions','actualKafkaACLTestsDispatched','actualManagedShapeTopsDispatched','actualCacheTopsDispatched','actualProcessImageTestsDispatched','packageFacts','runtimeAccepted','wholeSourceAccepted'}
+ control=CURRENT_GROUP_RECOVERY_CONTROL
+ if not isinstance(value,dict) or set(value)!=keys or value['source']!=FINAL_SOURCE or json.dumps(value['scope'],sort_keys=True)!=json.dumps(control,sort_keys=True) or value['accepted'] is not True or value['runtimeAccepted'] is not False or value['wholeSourceAccepted'] is not False:raise ValueError('exact fresh three-package named-subset receipt required')
+ for key,want in [('topPASS',4),('subPASS',23),('skip',0),('fail',0),('packages',3),('newDatabaseFixtures',0),('actualGoCommandInvocations',1),('actualPackageExecutions',3),('actualKafkaACLTestsDispatched',1),('actualManagedShapeTopsDispatched',1),('actualCacheTopsDispatched',2),('actualProcessImageTestsDispatched',0)]:
+  if type(value[key]) is not int or value[key]!=want:raise ValueError('exact original command/package/subset counts required')
+ expected={(package,top) for package,tops in control['targets'].items() for top in tops}|{(package,top+'/'+child) for package,parents in control['requiredSubtests'].items() for top,children in parents.items() for child in children}
+ names=value['namedCompletions']
+ if not isinstance(names,list) or len(names)!=27 or any(not isinstance(row,dict) or set(row)!={'package','name'} for row in names) or {(row['package'],row['name']) for row in names}!=expected or json.dumps(value['packageFacts'],sort_keys=True)!=json.dumps(group_recovery_package_facts(value),sort_keys=True):raise ValueError('all four exact tops/twenty-three children and original package facts required')
+ return value
+
+def run_current_group_recovery_control(go,environment,command,parent,out):
+ control=CURRENT_GROUP_RECOVERY_CONTROL;tops=[top for names in control['targets'].values() for top in names];pattern='^('+'|'.join(re.escape(top) for top in tops)+')$'
+ raw=command(control['phase'],[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run',pattern]+['./'+package for package in control['targets']],control['phaseGuardSeconds'],environment)
+ events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()];result=parent.audit(events,0,control['targets'])
+ value=dict(result,source=FINAL_SOURCE,accepted=True,newDatabaseFixtures=0,scope=control,actualGoCommandInvocations=1,actualPackageExecutions=3,actualKafkaACLTestsDispatched=1,actualManagedShapeTopsDispatched=1,actualCacheTopsDispatched=2,actualProcessImageTestsDispatched=0,runtimeAccepted=False,wholeSourceAccepted=False)
+ value['packageFacts']=group_recovery_package_facts(value);check_current_group_recovery_receipt(value);write(out/'current-group-recovery-controls-names.json',value)
+ write(out/'group-recovery-historical-facts.json',check_group_recovery_historical_facts(dict(GROUP_RECOVERY_HISTORICAL_FACTS)))
+ write(out/'release-controls-historical-pass.json',check_release_controls_prior_pass(dict(RELEASE_CONTROLS_PRIOR_PASS)));write(out/'kafka-confirm-historical-pass.json',check_kafka_confirm_prior_pass(dict(KAFKA_CONFIRM_PRIOR_PASS)))
+ write(out/'kafka-acl-historical-pass.json',check_kafka_acl_receipt(dict(KAFKA_ACL_PASSED_REUSE)));write(out/'process-image-historical-pass.json',check_process_image_prior(dict(PROCESS_IMAGE_PRIOR_PASS)))
+ return value
+
+def write_current_group_recovery_summary(out,receipt,cleanup_audit,launcher_reuse,redis_parser_reuse):
+ check_current_group_recovery_receipt(receipt)
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'targetedTopPASS':2,'targetedSubPASS':3,'groupRecoveryControlTopPASS':4,'groupRecoveryControlSubPASS':23,'groupRecoveryCommandInvocations':1,'groupRecoveryPackageExecutions':3,'actualKafkaACLTestsDispatched':1,'actualManagedShapeTopsDispatched':1,'actualCacheTopsDispatched':2,'currentGroupRecoveryScope':receipt,'packageFacts':receipt['packageFacts'],'groupRecoveryHistoricalFacts':GROUP_RECOVERY_HISTORICAL_FACTS,'currentWholeOwnedcontrolPackagePASS':False,'currentWholeMsgtransferPackagePASS':False,'currentWholeCachePackagePASS':False,'actualProcessImageTestsDispatched':0,'processImageHistoricalPass':PROCESS_IMAGE_PRIOR_PASS,'releaseControlsHistoricalPass':RELEASE_CONTROLS_PRIOR_PASS,'kafkaConfirmHistoricalPass':KAFKA_CONFIRM_PRIOR_PASS,'kafkaConfirmPassedReuse':None,'kafkaACLPassedReuse':None,'kafkaACLHistoricalPass':KAFKA_ACL_PASSED_REUSE,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'launcherPassedReuse':launcher_reuse,'actualLauncherTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'actualRedisParserTestsDispatched':0,'unaffectedHistoricalBatchesRedispatched':False,'historicalCleanupSourceFactsOnly':True,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'originalNewSafetyContract':{'topCount':2,'subCount':4,'crossSource':True},'originalCompleteObligation':{'topCount':7,'subCount':16,'crossSource':True},'currentFreshGo':{'topPASS':6,'subPASS':26,'includesOriginalGraph':True},'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+
 def check_locked(c):
  if FINAL_SOURCE is None or c.get('state')!='FROZEN_FINAL_SOURCE' or c.get('source')!=FINAL_SOURCE or c.get('sourceReviewAccepted') is not True:raise ValueError('Root final formatted whole-source identity required; prepare-only cannot execute')
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
  if c.get('targetedKafkaACLControl')!=KAFKA_ACL_CONTROL:raise ValueError('exact original Kafka ACL parent and two new children required')
- if c.get('currentProducerControl') is not None:check_current_producer_plan(c)
+ if c.get('currentGroupRecoveryControl') is not None:check_current_group_recovery_plan(c)
+ elif c.get('currentProducerControl') is not None:check_current_producer_plan(c)
  elif c.get('currentManagedShapeControl') is not None:check_current_managed_shape_plan(c)
  elif c.get('currentReleaseControl') is not None:check_current_release_plan(c)
  elif c.get('kafkaConfirmPassedReuse') is not None:check_kafka_confirm_reuse_plan(c)
@@ -405,7 +452,9 @@ def verify():
  for row in c['controllerPins']:pin(row)
  check_redis_parser_reuse(c.get('redisParserPassedReuse'),bodies)
  if c.get('redisParserTestsToRun')!=[]:raise ValueError('unchanged Redis parser must not be redispatched')
- if c.get('currentProducerControl') is not None:
+ if c.get('currentGroupRecoveryControl') is not None:
+  check_current_group_recovery_plan(c);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
+ elif c.get('currentProducerControl') is not None:
   check_current_producer_plan(c);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
  elif c.get('currentManagedShapeControl') is not None:
   check_current_managed_shape_plan(c);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
@@ -422,8 +471,22 @@ def verify():
  module('ci/backend-fullgraph/minio_build.py','fullgraph_fixed_fixture_policy').fixture_policy(c)
  return c,bodies,recipe,parent,old,catalog
 
+def go_test_projection_phase(label):
+ return label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',CURRENT_IMAGE_KAFKA_CONTROL['phase'],CURRENT_KAFKA_CONFIRM_CONTROL['phase'],CURRENT_RELEASE_CONTROL['phase'],CURRENT_MANAGED_SHAPE_CONTROL['phase'],CURRENT_PRODUCER_CONTROL['phase'],CURRENT_GROUP_RECOVERY_CONTROL['phase']} or label in {scope['label'] for scope in CLEANUP_SCOPES}
+
+def persist_go_test_projection(out,stdout_path,label,command_index):
+ if not go_test_projection_phase(label):return False
+ raw_events=regular(stdout_path,32<<20)
+ if label=='cleanup-runtimeacceptance':
+  fixture_observations=runtime_cleanup_observations(raw_events,label)
+  write(out/'runtime-cleanup-observations.json',dict(fixture_observations,source=FINAL_SOURCE))
+ events,diagnostic=project_go_test_events(raw_events,label)
+ if diagnostic is not None:write(out/(f'go-test-compile-diagnostic-{command_index:04d}.json'),diagnostic)
+ write(out/('oracle-events.json' if label=='pending-two-original-oracles' else label+'-events.json'),events)
+ return True
+
 def project_go_test_events(raw,phase):
- if phase not in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',CURRENT_IMAGE_KAFKA_CONTROL['phase'],CURRENT_KAFKA_CONFIRM_CONTROL['phase'],CURRENT_RELEASE_CONTROL['phase'],CURRENT_MANAGED_SHAPE_CONTROL['phase'],CURRENT_PRODUCER_CONTROL['phase']}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
+ if not go_test_projection_phase(phase):raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
  events=[];digest=hashlib.sha256();total=0;head=bytearray()
  for line in raw.splitlines():
   event=json.loads(line)
@@ -782,15 +845,7 @@ def run():
     # resource credentials/configs exist. No operator/DB/SDK text is selected.
     raw=regular(folder/'stderr',32<<20) if (folder/'stderr').exists() else b''
     write(out/(f'compile-failure-{command_index:04d}.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
-   fixture_observations=None
-   if label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',CURRENT_IMAGE_KAFKA_CONTROL['phase'],CURRENT_KAFKA_CONFIRM_CONTROL['phase'],CURRENT_RELEASE_CONTROL['phase'],CURRENT_MANAGED_SHAPE_CONTROL['phase']} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
-    raw_events=regular(folder/'stdout',32<<20)
-    if label=='cleanup-runtimeacceptance':
-     fixture_observations=runtime_cleanup_observations(raw_events,label)
-     write(out/'runtime-cleanup-observations.json',dict(fixture_observations,source=FINAL_SOURCE))
-    events,diagnostic=project_go_test_events(raw_events,label)
-    if diagnostic is not None:write(out/(f'go-test-compile-diagnostic-{command_index:04d}.json'),diagnostic)
-    write(out/('oracle-events.json' if label=='pending-two-original-oracles' else label+'-events.json'),events)
+   persist_go_test_projection(out,folder/'stdout',label,command_index)
    if failed:raise ValueError('actual phase failed; private raw retained')
    return regular(folder/'stdout',32<<20)
   env={'PATH':os.environ['PATH'],'HOME':os.environ['HOME'],'GOTOOLCHAIN':'local','GOWORK':'off','GOENV':'off','GOAUTH':'off','GOMAXPROCS':'2','GOMEMLIMIT':'900MiB','CGO_ENABLED':'1'}
@@ -810,8 +865,9 @@ def run():
   redis_parser_reuse=load_redis_parser_reuse(out,bodies)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
-  kafka_acl_reuse=None;current_image_kafka=None;current_kafka_confirm=None;kafka_confirm_reuse=None;current_release=None;current_managed_shape=None;current_producer=None
-  if c.get('currentProducerControl') is not None:current_producer=run_current_producer_control(go,offline,command,parent,out,tools['go'])
+  kafka_acl_reuse=None;current_image_kafka=None;current_kafka_confirm=None;kafka_confirm_reuse=None;current_release=None;current_managed_shape=None;current_producer=None;current_group_recovery=None
+  if c.get('currentGroupRecoveryControl') is not None:current_group_recovery=run_current_group_recovery_control(go,offline,command,parent,out)
+  elif c.get('currentProducerControl') is not None:current_producer=run_current_producer_control(go,offline,command,parent,out,tools['go'])
   elif c.get('currentManagedShapeControl') is not None:current_managed_shape=run_current_managed_shape_control(go,offline,command,parent,out)
   elif c.get('currentReleaseControl') is not None:current_release=run_current_release_control(go,offline,command,parent,out)
   elif c.get('kafkaConfirmPassedReuse') is not None:kafka_confirm_reuse=load_kafka_confirm_reuse(out,bodies,recipe,tools['go'])
@@ -881,7 +937,9 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- if current_producer is not None:
+ if current_group_recovery is not None:
+  write_current_group_recovery_summary(out,current_group_recovery,cleanup_audit,launcher_reuse,redis_parser_reuse)
+ elif current_producer is not None:
   write_current_producer_summary(out,current_producer,cleanup_audit,launcher_reuse,redis_parser_reuse)
  elif current_managed_shape is not None:
   write_current_managed_shape_summary(out,current_managed_shape,cleanup_audit,launcher_reuse,redis_parser_reuse)

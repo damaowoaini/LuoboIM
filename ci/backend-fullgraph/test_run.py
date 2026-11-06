@@ -1126,7 +1126,7 @@ class FullGraphControls(unittest.TestCase):
  def test_release_controls_keep_one_race_and_exact_named_evidence(self):
   collector=load('collect')
   with mock.patch.object(run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.RELEASE_CONTROLS_PRIOR_PASS['source']):
-   control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],currentReleaseControl=copy.deepcopy(control),currentReleaseTestsToRun=control['targets'][package][:-1],kafkaACLTestsToRun=control['targets'][package][-1:])
+   control=run.CURRENT_RELEASE_CONTROL;package=next(iter(control['targets']));locked=json.loads(run.INPUTS.read_bytes());locked.update(source=run.FINAL_SOURCE,currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=None,currentManagedShapeTestsToRun=[],currentReleaseControl=copy.deepcopy(control),currentReleaseTestsToRun=control['targets'][package][:-1],kafkaACLTestsToRun=control['targets'][package][-1:])
    self.assertEqual(run.check_current_release_plan(locked),control);run.check_locked(locked)
    self.assertNotEqual(run.FINAL_SOURCE,run.KAFKA_CONFIRM_PRIOR_PASS['source']);self.assertIsNone(locked['kafkaConfirmPassedReuse']);self.assertEqual(run.check_kafka_confirm_prior_pass(locked['kafkaConfirmHistoricalPass']),run.KAFKA_CONFIRM_PRIOR_PASS)
    rows=[{'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False} for scenario in run.SCENARIOS]
@@ -1183,7 +1183,7 @@ class FullGraphControls(unittest.TestCase):
 
  def test_managed_shape_controls_keep_two_packages_one_command_and_exact_subsets(self):
   collector=load('collect');control=run.CURRENT_MANAGED_SHAPE_CONTROL;locked=json.loads(run.INPUTS.read_bytes());owned='internal/namespaceimport/ownedcontrol';managed='internal/msgtransfer'
-  locked.update(currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=copy.deepcopy(control),currentManagedShapeTestsToRun=control['targets'][managed],kafkaACLTestsToRun=control['targets'][owned])
+  locked.update(currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=None,sameSourceCompletedKafkaPackageReuse=None,currentManagedShapeControl=copy.deepcopy(control),currentManagedShapeTestsToRun=control['targets'][managed],kafkaACLTestsToRun=control['targets'][owned])
   self.assertEqual(run.check_current_managed_shape_plan(locked),control);run.check_locked(locked);self.assertIsNone(locked['currentReleaseControl']);self.assertNotEqual(run.FINAL_SOURCE,run.RELEASE_CONTROLS_PRIOR_PASS['source'])
   for fields in ({'currentManagedShapeTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentReleaseControl':run.CURRENT_RELEASE_CONTROL},{'releaseControlsHistoricalPass':{}},{'kafkaConfirmPassedReuse':run.KAFKA_CONFIRM_PRIOR_PASS},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
    with self.assertRaises(ValueError):run.check_current_managed_shape_plan(dict(locked,**fields))
@@ -1240,57 +1240,138 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_producer_only_reuses_same_source_completed_kafka_without_accepting_timeout_scope(self):
-  collector=load('collect');control=run.CURRENT_PRODUCER_CONTROL;locked=json.loads(run.INPUTS.read_bytes());package=next(iter(control['targets']));top=control['targets'][package][0]
-  self.assertEqual(run.check_current_producer_plan(locked),control);run.check_locked(locked);self.assertEqual(control['phaseGuardSeconds'],600);self.assertEqual(control['goTimeoutSeconds'],180)
-  self.assertEqual(locked['kafkaACLTestsToRun'],[]);self.assertIsNone(locked['currentManagedShapeControl']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalGoCommandPassed']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalTwoPackageScopeAccepted'])
-  for fields in ({'currentProducerTestsToRun':[]},{'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'currentManagedShapeControl':run.CURRENT_MANAGED_SHAPE_CONTROL},{'currentReleaseControl':run.CURRENT_RELEASE_CONTROL},{'sameSourceCompletedKafkaPackageReuse':{}},{'managedShapeTwoPackageHistoricalAttempt':{}},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
-   with self.assertRaises(ValueError):run.check_current_producer_plan(dict(locked,**fields))
-  for fields in ({'originalGoCommandPassed':True},{'originalTwoPackageScopeAccepted':True},{'actualCurrentGoCommandInvocations':1},{'actualCurrentKafkaACLTestsDispatched':1},{'reusedTopPASS':True},{'runtimeAccepted':True}):
-   with self.assertRaises(ValueError):run.check_completed_kafka_package_reuse(dict(run.COMPLETED_KAFKA_PACKAGE_REUSE,**fields))
-  bad=copy.deepcopy(run.COMPLETED_KAFKA_PACKAGE_REUSE);bad['binding']['source']=run.RELEASE_CONTROLS_PRIOR_PASS['source']
-  with self.assertRaises(ValueError):run.check_completed_kafka_package_reuse(bad)
-  with self.assertRaises(ValueError):run.check_completed_kafka_package_reuse(run.COMPLETED_KAFKA_PACKAGE_REUSE,dict(run.COMPLETED_KAFKA_PACKAGE_GO,sha256='0'*64))
-  parent=run.module('ci/backend-runtime-join-r7/run.py','producer_only_pure_auditor');names=[top]+[top+'/'+child for child in control['requiredSubtests'][package][top]]
-  events=[{'Action':'start','Package':parent.PREFIX+package},{'Action':'run','Package':parent.PREFIX+package,'Test':top}]
-  for name in names[1:]:events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
-  events.extend([{'Action':'pass','Package':parent.PREFIX+package,'Test':top},{'Action':'pass','Package':parent.PREFIX+package}])
-  for mode in ('complete','missing-child','foreign-child','skip','missing-footer','foreign-package','phase-error'):
-   with self.subTest(producer=mode),tempfile.TemporaryDirectory() as directory:
+  collector=load('collect')
+  with mock.patch.object(run,'FINAL_SOURCE',run.COMPLETED_KAFKA_PACKAGE_BINDING['source']),mock.patch.object(collector.run,'FINAL_SOURCE',run.COMPLETED_KAFKA_PACKAGE_BINDING['source']):
+   control=run.CURRENT_PRODUCER_CONTROL;locked=json.loads(run.INPUTS.read_bytes());package=next(iter(control['targets']));top=control['targets'][package][0]
+   locked.update(source=run.FINAL_SOURCE,currentGroupRecoveryControl=None,currentGroupRecoveryTargets={},currentProducerControl=copy.deepcopy(control),currentProducerTestsToRun=control['targets'][package],kafkaACLTestsToRun=[],sameSourceCompletedKafkaPackageReuse=copy.deepcopy(run.COMPLETED_KAFKA_PACKAGE_REUSE))
+   self.assertEqual(run.check_current_producer_plan(locked),control);run.check_locked(locked);self.assertEqual(control['phaseGuardSeconds'],600);self.assertEqual(control['goTimeoutSeconds'],180)
+   self.assertEqual(locked['kafkaACLTestsToRun'],[]);self.assertIsNone(locked['currentManagedShapeControl']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalGoCommandPassed']);self.assertFalse(run.COMPLETED_KAFKA_PACKAGE_REUSE['originalTwoPackageScopeAccepted'])
+   for fields in ({'currentProducerTestsToRun':[]},{'kafkaACLTestsToRun':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny']},{'currentManagedShapeControl':run.CURRENT_MANAGED_SHAPE_CONTROL},{'currentReleaseControl':run.CURRENT_RELEASE_CONTROL},{'sameSourceCompletedKafkaPackageReuse':{}},{'managedShapeTwoPackageHistoricalAttempt':{}},{'processImageTestsToRun':['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']}):
+    with self.assertRaises(ValueError):run.check_current_producer_plan(dict(locked,**fields))
+   for fields in ({'originalGoCommandPassed':True},{'originalTwoPackageScopeAccepted':True},{'actualCurrentGoCommandInvocations':1},{'actualCurrentKafkaACLTestsDispatched':1},{'reusedTopPASS':True},{'runtimeAccepted':True}):
+    with self.assertRaises(ValueError):run.check_completed_kafka_package_reuse(dict(run.COMPLETED_KAFKA_PACKAGE_REUSE,**fields))
+   bad=copy.deepcopy(run.COMPLETED_KAFKA_PACKAGE_REUSE);bad['binding']['source']=run.RELEASE_CONTROLS_PRIOR_PASS['source']
+   with self.assertRaises(ValueError):run.check_completed_kafka_package_reuse(bad)
+   with self.assertRaises(ValueError):run.check_completed_kafka_package_reuse(run.COMPLETED_KAFKA_PACKAGE_REUSE,dict(run.COMPLETED_KAFKA_PACKAGE_GO,sha256='0'*64))
+   parsed=ast.parse(Path(run.__file__).read_text());actual_run=next(node for node in parsed.body if isinstance(node,ast.FunctionDef) and node.name=='run');actual_command=next(node for node in ast.walk(actual_run) if isinstance(node,ast.FunctionDef) and node.name=='command')
+   direct=[node.value for node in actual_command.body if isinstance(node,ast.Expr) and isinstance(node.value,ast.Call) and isinstance(node.value.func,ast.Name) and node.value.func.id=='persist_go_test_projection']
+   self.assertEqual(len(direct),1);self.assertEqual(ast.dump(direct[0],include_attributes=False),ast.dump(ast.parse("persist_go_test_projection(out,folder/'stdout',label,command_index)").body[0].value,include_attributes=False))
+   self.assertTrue(run.go_test_projection_phase(control['phase']));self.assertFalse(run.go_test_projection_phase('runtime-reader-writer-fence-cancel'));self.assertFalse(run.go_test_projection_phase('PRIVATE_PHASE'))
+   parent=run.module('ci/backend-runtime-join-r7/run.py','producer_only_pure_auditor');names=[top]+[top+'/'+child for child in control['requiredSubtests'][package][top]]
+   events=[{'Action':'start','Package':parent.PREFIX+package},{'Action':'run','Package':parent.PREFIX+package,'Test':top}]
+   for name in names[1:]:events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+   events.extend([{'Action':'pass','Package':parent.PREFIX+package,'Test':top},{'Action':'pass','Package':parent.PREFIX+package}])
+   for mode in ('complete','missing-child','foreign-child','skip','missing-footer','foreign-package','phase-error'):
+    with self.subTest(producer=mode),tempfile.TemporaryDirectory() as directory:
+     out=Path(directory).resolve();seen=[];environment={'GOPROXY':'off','GOSUMDB':'off'}
+     def command(label,argv,seconds,actual_environment):
+      seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,600);self.assertEqual(actual_environment,environment)
+      self.assertEqual(argv,['/owned/go','test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run','^'+top+'$','./'+package])
+      if mode=='phase-error':raise ValueError('original producer phase failed')
+      selected=copy.deepcopy(events)
+      if mode=='missing-child':selected=[row for row in selected if row.get('Test')!=names[-1]]
+      if mode=='foreign-child':selected[-2]['Test']=top+'/foreign'
+      if mode=='skip':selected[-2]['Action']='skip'
+      if mode=='missing-footer':selected=selected[:-1]
+      if mode=='foreign-package':selected[-1]['Package']=parent.PREFIX+'internal/namespaceimport/ownedcontrol'
+      raw=('\n'.join(json.dumps(row) for row in selected)+'\n').encode();stdout=out/'private-stdout';stdout.write_bytes(raw)
+      self.assertTrue(run.persist_go_test_projection(out,stdout,label,1));stdout.unlink()
+      return raw
+     if mode!='complete':
+      with self.assertRaises(ValueError):run.run_current_producer_control('/owned/go',environment,command,parent,out,run.COMPLETED_KAFKA_PACKAGE_GO)
+      self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-managed-producer-control-names.json').exists())
+      if mode=='phase-error':
+       run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':run.COMPLETED_KAFKA_PACKAGE_GO};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+       self.assertEqual(collector.checked_completed_kafka_package_reuse_evidence(out),run.COMPLETED_KAFKA_PACKAGE_REUSE)
+      continue
+     value=run.run_current_producer_control('/owned/go',environment,command,parent,out,run.COMPLETED_KAFKA_PACKAGE_GO);self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS'],value['packages']),(1,13,1));self.assertEqual(value['actualKafkaACLTestsDispatched'],0)
+     projected=json.loads((out/'current-managed-producer-control-events.json').read_bytes());self.assertNotIn('PRIVATE_OUTPUT',json.dumps(projected));self.assertFalse(run.persist_go_test_projection(out,out/'missing-private-stdout','PRIVATE_PHASE',2))
+     run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}});run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':run.COMPLETED_KAFKA_PACKAGE_GO};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+     self.assertEqual(collector.checked_current_producer_evidence(out),value)
+     checked=('current-managed-producer-control-events.json','same-source-completed-kafka-package-reuse.json','managed-shape-two-package-historical-attempt.json','phase-0001.json','source-post.json','tools-after.json','release-controls-historical-pass.json','kafka-confirm-historical-pass.json','kafka-acl-historical-pass.json','process-image-historical-pass.json');original={name:(out/name).read_bytes() for name in checked}
+     for changed in checked:
+      for name,raw in original.items():(out/name).write_bytes(raw)
+      (out/changed).write_text(json.dumps(projected[:-1]) if changed.endswith('-events.json') else '{}')
+      with self.subTest(producerCustody=changed),self.assertRaises(ValueError):collector.checked_current_producer_evidence(out)
+     for name,raw in original.items():(out/name).write_bytes(raw)
+     for fields in ({'topPASS':True},{'subPASS':12},{'packages':2},{'actualKafkaACLTestsDispatched':1},{'actualPackageExecutions':2},{'wholeMsgtransferPackagePASS':True},{'runtimeAccepted':True},{'source':run.RELEASE_CONTROLS_PRIOR_PASS['source']}):
+      with self.assertRaises(ValueError):run.check_current_producer_receipt(dict(value,**fields))
+     for alias in ('current-managed-shape-controls-names.json','current-managed-shape-kafka-individual.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json'):
+      run.write(out/alias,{})
+      with self.assertRaises(ValueError):collector.checked_current_producer_evidence(out)
+      (out/alias).unlink()
+     run.write_current_producer_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':3,'subPASS':16,'includesOriginalGraph':True});self.assertFalse(summary['managedShapeTwoPackageHistoricalAttempt']['originalTwoPackageScopeAccepted'])
+
+
+ def test_group_recovery_controls_use_real_event_hook_and_exact_three_package_scope(self):
+  collector=load('collect');control=run.CURRENT_GROUP_RECOVERY_CONTROL;locked=json.loads(run.INPUTS.read_bytes());self.assertEqual(run.check_current_group_recovery_plan(locked),control);run.check_locked(locked)
+  self.assertEqual((control['topPASS'],control['subPASS'],control['packages'],control['phaseGuardSeconds'],control['goTimeoutSeconds']),(4,23,3,600,180))
+  for fields in ({'kafkaACLTestsToRun':[]},{'currentGroupRecoveryTargets':{}},{'currentProducerControl':run.CURRENT_PRODUCER_CONTROL},{'sameSourceCompletedKafkaPackageReuse':run.COMPLETED_KAFKA_PACKAGE_REUSE},{'groupRecoveryHistoricalFacts':{}},{'rpcGroupStartLogProjectionPolicy':{}}):
+   with self.assertRaises(ValueError):run.check_current_group_recovery_plan(dict(locked,**fields))
+  parsed=ast.parse(Path(run.__file__).read_text());actual_run=next(node for node in parsed.body if isinstance(node,ast.FunctionDef) and node.name=='run');actual_command=next(node for node in ast.walk(actual_run) if isinstance(node,ast.FunctionDef) and node.name=='command')
+  direct=[node.value for node in actual_command.body if isinstance(node,ast.Expr) and isinstance(node.value,ast.Call) and isinstance(node.value.func,ast.Name) and node.value.func.id=='persist_go_test_projection']
+  self.assertEqual(len(direct),1);self.assertEqual(ast.dump(direct[0],include_attributes=False),ast.dump(ast.parse("persist_go_test_projection(out,folder/'stdout',label,command_index)").body[0].value,include_attributes=False))
+  parent=run.module('ci/backend-runtime-join-r7/run.py','group_recovery_pure_auditor');events=[]
+  for package,tops in control['targets'].items():
+   events.append({'Action':'start','Package':parent.PREFIX+package})
+   for top in tops:
+    events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
+    for child in control['requiredSubtests'][package].get(top,[]):
+     name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'output','Package':parent.PREFIX+package,'Test':name,'Output':'PRIVATE_OUTPUT'},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+    events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
+   events.append({'Action':'pass','Package':parent.PREFIX+package})
+  for mode in ('complete','missing-child','foreign-top','skip','missing-footer','phase-error'):
+   with self.subTest(groupRecovery=mode),tempfile.TemporaryDirectory() as directory:
     out=Path(directory).resolve();seen=[];environment={'GOPROXY':'off','GOSUMDB':'off'}
     def command(label,argv,seconds,actual_environment):
-     seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,600);self.assertEqual(actual_environment,environment)
-     self.assertEqual(argv,['/owned/go','test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run','^'+top+'$','./'+package])
-     if mode=='phase-error':raise ValueError('original producer phase failed')
+     seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,600);self.assertEqual(actual_environment,environment);self.assertEqual(argv[-3:],['./'+package for package in control['targets']]);self.assertIn('-race',argv);self.assertIn('-timeout=180s',argv)
+     pattern=__import__('re').compile(argv[argv.index('-run')+1]);self.assertTrue(all(pattern.fullmatch(top) for tops in control['targets'].values() for top in tops));self.assertIsNone(pattern.fullmatch('TestUnrelated'))
+     if mode=='phase-error':raise ValueError('original three-package phase failed')
      selected=copy.deepcopy(events)
-     if mode=='missing-child':selected=[row for row in selected if row.get('Test')!=names[-1]]
-     if mode=='foreign-child':selected[-2]['Test']=top+'/foreign'
+     if mode=='missing-child':selected=[row for row in selected if row.get('Test')!=events[-3]['Test']]
+     if mode=='foreign-top':selected[-2]['Test']='TestForeign'
      if mode=='skip':selected[-2]['Action']='skip'
      if mode=='missing-footer':selected=selected[:-1]
-     if mode=='foreign-package':selected[-1]['Package']=parent.PREFIX+'internal/namespaceimport/ownedcontrol'
-     return ('\n'.join(json.dumps(row) for row in selected)+'\n').encode()
+     raw=('\n'.join(json.dumps(row) for row in selected)+'\n').encode();stdout=out/'private-stdout';stdout.write_bytes(raw);self.assertTrue(run.persist_go_test_projection(out,stdout,label,1));stdout.unlink();return raw
     if mode!='complete':
-     with self.assertRaises(ValueError):run.run_current_producer_control('/owned/go',environment,command,parent,out,run.COMPLETED_KAFKA_PACKAGE_GO)
-     self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-managed-producer-control-names.json').exists())
-     if mode=='phase-error':
-      run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':run.COMPLETED_KAFKA_PACKAGE_GO};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
-      self.assertEqual(collector.checked_completed_kafka_package_reuse_evidence(out),run.COMPLETED_KAFKA_PACKAGE_REUSE)
-     continue
-    value=run.run_current_producer_control('/owned/go',environment,command,parent,out,run.COMPLETED_KAFKA_PACKAGE_GO);self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS'],value['packages']),(1,13,1));self.assertEqual(value['actualKafkaACLTestsDispatched'],0)
-    projected,_=run.project_go_test_events(('\n'.join(json.dumps(row) for row in events)+'\n').encode(),control['phase']);self.assertNotIn('PRIVATE_OUTPUT',json.dumps(projected))
-    run.write(out/'current-managed-producer-control-events.json',projected);run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}});run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':run.COMPLETED_KAFKA_PACKAGE_GO};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
-    self.assertEqual(collector.checked_current_producer_evidence(out),value)
-    checked=('current-managed-producer-control-events.json','same-source-completed-kafka-package-reuse.json','managed-shape-two-package-historical-attempt.json','phase-0001.json','source-post.json','tools-after.json','release-controls-historical-pass.json','kafka-confirm-historical-pass.json','kafka-acl-historical-pass.json','process-image-historical-pass.json');original={name:(out/name).read_bytes() for name in checked}
+     with self.assertRaises(ValueError):run.run_current_group_recovery_control('/owned/go',environment,command,parent,out)
+     self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-group-recovery-controls-names.json').exists());continue
+    value=run.run_current_group_recovery_control('/owned/go',environment,command,parent,out);self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS'],value['packages']),(4,23,3));self.assertEqual(value['packageFacts']['pkg/common/db/cache']['topPASS'],2);self.assertFalse(value['wholeSourceAccepted'])
+    projected=json.loads((out/'current-group-recovery-controls-events.json').read_bytes());self.assertNotIn('PRIVATE_OUTPUT',json.dumps(projected));self.assertFalse(run.persist_go_test_projection(out,out/'absent-stdout','PRIVATE_PHASE',2))
+    run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}});run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':run.COMPLETED_KAFKA_PACKAGE_GO};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+    self.assertEqual(collector.checked_current_group_recovery_evidence(out),value)
+    checked=('current-group-recovery-controls-events.json','phase-0001.json','source-post.json','tools-after.json','group-recovery-historical-facts.json','release-controls-historical-pass.json','kafka-confirm-historical-pass.json','kafka-acl-historical-pass.json','process-image-historical-pass.json');original={name:(out/name).read_bytes() for name in checked}
     for changed in checked:
      for name,raw in original.items():(out/name).write_bytes(raw)
      (out/changed).write_text(json.dumps(projected[:-1]) if changed.endswith('-events.json') else '{}')
-     with self.subTest(producerCustody=changed),self.assertRaises(ValueError):collector.checked_current_producer_evidence(out)
+     with self.subTest(custody=changed),self.assertRaises(ValueError):collector.checked_current_group_recovery_evidence(out)
     for name,raw in original.items():(out/name).write_bytes(raw)
-    for fields in ({'topPASS':True},{'subPASS':12},{'packages':2},{'actualKafkaACLTestsDispatched':1},{'actualPackageExecutions':2},{'wholeMsgtransferPackagePASS':True},{'runtimeAccepted':True},{'source':run.RELEASE_CONTROLS_PRIOR_PASS['source']}):
-     with self.assertRaises(ValueError):run.check_current_producer_receipt(dict(value,**fields))
-    for alias in ('current-managed-shape-controls-names.json','current-managed-shape-kafka-individual.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json'):
+    events_path=out/'current-group-recovery-controls-events.json';saved=events_path.read_bytes();events_path.unlink()
+    with self.assertRaises(OSError):collector.checked_current_group_recovery_evidence(out)
+    events_path.write_bytes(saved)
+    for fields in ({'topPASS':True},{'subPASS':22},{'packages':2},{'actualKafkaACLTestsDispatched':0},{'actualPackageExecutions':1},{'runtimeAccepted':True},{'source':run.GROUP_RECOVERY_HISTORICAL_FACTS['source']}):
+     with self.assertRaises(ValueError):run.check_current_group_recovery_receipt(dict(value,**fields))
+    for alias in ('same-source-completed-kafka-package-reuse.json','current-managed-producer-control-names.json','current-managed-shape-controls-names.json','current-release-controls-names.json','kafka-acl-passed-reuse.json'):
      run.write(out/alias,{})
-     with self.assertRaises(ValueError):collector.checked_current_producer_evidence(out)
+     with self.assertRaises(ValueError):collector.checked_current_group_recovery_evidence(out)
      (out/alias).unlink()
-    run.write_current_producer_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':3,'subPASS':16,'includesOriginalGraph':True});self.assertFalse(summary['managedShapeTwoPackageHistoricalAttempt']['originalTwoPackageScopeAccepted'])
+    run.write_current_group_recovery_summary(out,value,None,{},{});summary=json.loads((out/'summary.json').read_bytes());self.assertEqual(summary['currentFreshGo'],{'topPASS':6,'subPASS':26,'includesOriginalGraph':True});self.assertFalse(summary['groupRecoveryHistoricalFacts']['producerEventGap']['collectorAccepted'])
+
+ def test_rpc_group_cached_exit2_projection_keeps_fixed_source_classes_and_private_file_fences(self):
+  collector=load('collect');scenario=run.SCENARIOS[1];main='server/cmd/openim-rpc/openim-rpc-group/main.go';bodies={main:b'one\n'*35}
+  terminal={'version':'owned-fullgraph-token-v2-result-v1','accepted':False,'scenario':scenario,'sourceSHA256':run.FINAL_SOURCE['digest'],'constructorStage':'start','constructorRole':'rpc-group','constructorCallState':'returned','constructorErrorClass':'owned-evidence','constructorPredicate':'start-service-process-image-after-identity-wait-exit-code-2'}
+  self.assertTrue(collector.rpc_group_start_exit2(terminal));self.assertFalse(collector.gateway_start_exit2(terminal))
+  raw=b'panic: group cache recovery initialization failed: PRIVATE_TOKEN\ngroup authority storage is not ready: PRIVATE_PATH\n\ngoroutine 1 [running]:\nmain.main()\n\t/private/work/'+main.encode()+b':31 +0x1\n'
+  value=collector.project_rpc_group_log_bytes(raw,bodies);self.assertEqual(value['errorPrefixClass'],'group-cache-recovery');self.assertEqual(value['panicPrefixClasses'],['group-cache-recovery','group-authority-storage']);self.assertEqual(value['sourceFrames'],[{'path':main,'line':31}]);self.assertFalse(value['prefixIsCauseProof']);self.assertNotIn('PRIVATE',json.dumps(value));self.assertNotIn('/private',json.dumps(value))
+  for fields in ({'constructorRole':'push'},{'constructorPredicate':'start-service-process-image-after-identity-wait-exit-code-1'},{'sourceSHA256':'f'*64},{'accepted':True},{'constructorCallState':'unknown'}):self.assertFalse(collector.rpc_group_start_exit2(dict(terminal,**fields)))
+  with tempfile.TemporaryDirectory() as directory:
+   work=Path(directory).resolve();work.chmod(0o700)
+   for folder in (work/'services',work/'services/required',work/'services/required/rpc-group'):folder.mkdir(mode=0o700)
+   folder=work/'services/required/rpc-group';path=folder/('service-'+'a'*64+'.log');path.write_bytes(raw);path.chmod(0o600)
+   self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'projected');self.assertIsNone(collector.project_service_start_log(work,terminal,bodies,'push'))
+   path.chmod(0o644);self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unsafe');path.chmod(0o600)
+   link=folder/'hardlink';os.link(path,link);self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unsafe');link.unlink()
+   saved=work/'saved-log';path.rename(saved);path.symlink_to(saved);self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unsafe');path.unlink();saved.rename(path)
+   real=work/'real-rpc-group';folder.rename(real);folder.symlink_to(real,target_is_directory=True);self.assertEqual(collector.project_rpc_group_start_log(work,terminal,bodies)['status'],'unsafe')
 
 if __name__=='__main__':unittest.main()

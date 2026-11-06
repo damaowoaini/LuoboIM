@@ -112,7 +112,7 @@ def console_observation(rows,monitor,main,terminals,phases):
  statuses|={prefix+gate for prefix in ('not_started_','stopped_','failed_final_') for gate in ('disk_gate','task_allocation_gate')}
  def status(value):return value if value in statuses else 'unobserved'
  def code(value):return value if type(value) is int and -128<=value<=255 else None
- names={'go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase'],run.CURRENT_KAFKA_CONFIRM_CONTROL['phase'],run.CURRENT_RELEASE_CONTROL['phase'],run.CURRENT_MANAGED_SHAPE_CONTROL['phase'],run.CURRENT_PRODUCER_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
+ names={'go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase'],run.CURRENT_KAFKA_CONFIRM_CONTROL['phase'],run.CURRENT_RELEASE_CONTROL['phase'],run.CURRENT_MANAGED_SHAPE_CONTROL['phase'],run.CURRENT_PRODUCER_CONTROL['phase'],run.CURRENT_GROUP_RECOVERY_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
  def phase(value):
   label=value.get('phase');result={'phase':'unobserved','role':'none','scenario':'none','exitCode':code(value.get('exitCode')),'resourceStatus':status(value.get('resource',{}).get('status'))}
   if label in names:result['phase']=label
@@ -279,10 +279,9 @@ def gateway_error_prefix(payload,sites):
  kind=next((kind for prefix,kind in prefixes if payload.startswith(prefix)),'other')
  return stage,kind,frames,truncated
 
-def project_gateway_log_bytes(raw,bodies):
- policy=run.GATEWAY_START_LOG_POLICY
+def project_service_log_bytes(raw,bodies,policy,empty,prefix_classify):
  if not isinstance(raw,bytes) or len(raw)>policy['logLimitBytes']:raise ValueError('bounded original private gateway output required')
- result=gateway_projection_empty('projected');source_lines={}
+ result=empty('projected');source_lines={}
  for name,body in bodies.items():
   if isinstance(name,str) and name.startswith('server/') and name.endswith('.go') and all(part not in ('','.', '..') for part in name.split('/')) and '\\' not in name and isinstance(body,bytes):source_lines[name]=body.count(b'\n')+1
  sites=gateway_wrapper_sites({name:bodies[name] for name in source_lines})
@@ -310,7 +309,7 @@ def project_gateway_log_bytes(raw,bodies):
    if stack_header.fullmatch(line) or line in (b'runtime stack:',b'stack trace:'):panic_region=False
    elif line:payload=line
   if payload is not None:
-   stage,kind,frames,truncated=gateway_error_prefix(payload,sites)
+   stage,kind,frames,truncated=prefix_classify(payload,sites)
    if first:result['execErrorStage']=stage;result['errorPrefixClass']=kind
    if kind!='other' and kind not in classes:
     classes.add(kind)
@@ -329,12 +328,36 @@ def project_gateway_log_bytes(raw,bodies):
   if number<=source_lines[name]:add_frame({'path':name,'line':number})
  return result
 
+def project_gateway_log_bytes(raw,bodies):
+ return project_service_log_bytes(raw,bodies,run.GATEWAY_START_LOG_POLICY,gateway_projection_empty,gateway_error_prefix)
 
-def project_gateway_start_log(work,terminal,bodies):
- if not gateway_start_exit2(terminal):return None
- result=gateway_projection_empty('unavailable');result.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
+def rpc_group_start_exit2(terminal):
+ return isinstance(terminal,dict) and terminal.get('constructorRole')=='rpc-group' and gateway_start_exit2(dict(terminal,constructorRole='msggateway'))
+
+def rpc_group_projection_empty(status):
+ return dict(gateway_projection_empty(status),version=run.RPC_GROUP_START_LOG_POLICY['version'],role='rpc-group')
+
+def rpc_group_error_prefix(payload,sites):
+ stage,kind,frames,truncated=gateway_error_prefix(payload,sites)
+ if kind=='other':
+  fixed=((b'group storage initialization failed','group-storage'),(b'group cache initialization failed','group-cache'),(b'group cache recovery initialization failed','group-cache-recovery'),(b'group authority initialization failed','group-authority'),(b'group authority storage is not ready','group-authority-storage'),(b'group authority cache is not ready','group-authority-cache'),(b'group model initialization failed','group-model'),(b'group member model initialization failed','group-member-model'),(b'group request model initialization failed','group-request-model'),(b'owned group receiver manifest is required','group-receiver-manifest'),(b'group membership reader activation mismatch','group-membership-activation'),(b'owned group membership reader unavailable','group-membership-reader'),(b'owned group membership reader unprepared','group-membership-unprepared'),(b'new group namespace initializer unavailable','group-seed-initializer'),(b'new group namespace migration and complete writer admission required','group-seed-admission'),(b'owned gateway service identity unavailable','group-service-identity'),(b'owned group receiver initialization failed','group-receiver-initialization'),(b'owned group source profile initialization failed','group-source-profile'),(b'owned group receiver readiness rejected','group-receiver-readiness'))
+  kind=next((label for prefix,label in fixed if payload.startswith(prefix)),'other')
+ return stage,kind,frames,truncated
+
+def project_rpc_group_log_bytes(raw,bodies):
+ return project_service_log_bytes(raw,bodies,run.RPC_GROUP_START_LOG_POLICY,rpc_group_projection_empty,rpc_group_error_prefix)
+
+
+
+
+def project_service_start_log(work,terminal,bodies,role):
+ if role=='msggateway':predicate,empty,project,policy=gateway_start_exit2,gateway_projection_empty,project_gateway_log_bytes,run.GATEWAY_START_LOG_POLICY
+ elif role=='rpc-group':predicate,empty,project,policy=rpc_group_start_exit2,rpc_group_projection_empty,project_rpc_group_log_bytes,run.RPC_GROUP_START_LOG_POLICY
+ else:return None
+ if not predicate(terminal):return None
+ result=empty('unavailable');result.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
  try:
-  work=Path(work);directory=work/'services/required/msggateway'
+  work=Path(work);directory=work/'services/required'/role
   if work.resolve()!=work or directory.resolve()!=directory:return dict(result,status='unsafe')
   for folder in (work,work/'services',work/'services/required',directory):
    info=folder.lstat()
@@ -342,18 +365,24 @@ def project_gateway_start_log(work,terminal,bodies):
   matches=[]
   with os.scandir(directory) as entries:
    for count,entry in enumerate(entries):
-    if count>=run.GATEWAY_START_LOG_POLICY['directoryEntriesLimit']:return dict(result,status='unsafe')
+    if count>=policy['directoryEntriesLimit']:return dict(result,status='unsafe')
     if __import__('re').fullmatch('service-[0-9a-f]{64}\\.log',entry.name):matches.append(Path(entry.path))
   if len(matches)!=1:return dict(result,status='absent' if not matches else 'ambiguous')
   path=matches[0];before=path.lstat()
   if not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or stat.S_IMODE(before.st_mode)!=0o600:return dict(result,status='unsafe')
-  raw=run.regular(path,run.GATEWAY_START_LOG_POLICY['logLimitBytes']);after=path.lstat()
+  raw=run.regular(path,policy['logLimitBytes']);after=path.lstat()
   identity=lambda v:(v.st_dev,v.st_ino,v.st_mode,v.st_uid,v.st_nlink,v.st_size,v.st_mtime_ns,v.st_ctime_ns)
   if identity(before)!=identity(after):return dict(result,status='unsafe')
-  projected=project_gateway_log_bytes(raw,bodies);projected.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
+  projected=project(raw,bodies);projected.update(source=run.FINAL_SOURCE,scenario=terminal['scenario'])
   return projected
  except RuntimeError:return dict(result,status='unsafe')  # A cyclic intermediate symlink cannot be canonical.
  except (OSError,ValueError,UnicodeError):return result
+
+def project_gateway_start_log(work,terminal,bodies):
+ return project_service_start_log(work,terminal,bodies,'msggateway')
+
+def project_rpc_group_start_log(work,terminal,bodies):
+ return project_service_start_log(work,terminal,bodies,'rpc-group')
 
 def emit_gateway_start_log_diagnostic(out,work,terminal):
  # Best effort after the validated original cached Wait observation. No new
@@ -363,6 +392,17 @@ def emit_gateway_start_log_diagnostic(out,work,terminal):
   _,bodies,_,_,_,_=run.verify()
   value=project_gateway_start_log(work,terminal,bodies)
   if value is not None:run.write(out/('gateway-start-log-'+terminal['scenario']+'.json'),value)
+  return value is not None
+ except Exception:return False
+
+def emit_rpc_group_start_log_diagnostic(out,work,terminal):
+ # Best effort after the validated original cached Wait observation. No new
+ # Wait, process probe, signal, log replay or outcome promotion is possible.
+ if not rpc_group_start_exit2(terminal):return False
+ try:
+  _,bodies,_,_,_,_=run.verify()
+  value=project_rpc_group_start_log(work,terminal,bodies)
+  if value is not None:run.write(out/('rpc-group-start-log-'+terminal['scenario']+'.json'),value)
   return value is not None
  except Exception:return False
 
@@ -444,12 +484,37 @@ def checked_current_producer_evidence(out):
  if any((out/name).exists() for name in ('current-managed-shape-controls-names.json','current-managed-shape-kafka-individual.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('fresh producer cannot alias old two-package or Kafka invocations')
  return value
 
+def checked_current_group_recovery_evidence(out):
+ value=run.check_current_group_recovery_receipt(json.loads(run.regular(out/'current-group-recovery-controls-names.json',65536)))
+ control=run.CURRENT_GROUP_RECOVERY_CONTROL;prefix='github.com/openimsdk/open-im-server/v3/';packages={prefix+package for package in control['targets']}
+ events=json.loads(run.regular(out/'current-group-recovery-controls-events.json',1<<20));expected={(row['package'],row['name']) for row in value['namedCompletions']}
+ if not isinstance(events,list) or not events or any(not isinstance(row,dict) or set(row)-{'Time','Action','Package','Test','Elapsed'} or row.get('Package') not in packages or row.get('Action') not in ('start','run','output','pass','pause','cont') for row in events):raise ValueError('finite fresh three-package original events required')
+ for action in ('run','pass'):
+  actual=[(row['Package'][len(prefix):],row['Test']) for row in events if row.get('Test') and row.get('Action')==action]
+  if len(actual)!=27 or set(actual)!=expected:raise ValueError('all four original tops/twenty-three children run/pass pairs required')
+ for package in packages:
+  if len([row for row in events if row.get('Package')==package and row.get('Action')=='start' and not row.get('Test')])!=1 or len([row for row in events if row.get('Package')==package and row.get('Action')=='pass' and not row.get('Test')])!=1:raise ValueError('one original start/footer for each package required')
+ phases=[]
+ for path in sorted(out.glob('phase-*.json')):
+  phase=json.loads(run.regular(path,1<<20))
+  if phase.get('phase')==control['phase']:phases.append(phase)
+ if len(phases)!=1:raise ValueError('one original three-package Go command phase required')
+ phase=phases[0];resource=phase.get('resource',{})
+ if type(phase.get('exitCode')) is not int or phase['exitCode']!=0 or resource.get('status')!='passed' or type(resource.get('exit_code')) is not int or resource['exit_code']!=0:raise ValueError('original fresh three-package command must have succeeded')
+ post=json.loads(run.regular(out/'source-post.json',4096));before=json.loads(run.regular(out/'tools-before.json',65536));after=json.loads(run.regular(out/'tools-after.json',65536))
+ if post!={'accepted':True,'source':run.FINAL_SOURCE} or before!=after:raise ValueError('new-source three-package source/tool post differs')
+ run.check_group_recovery_historical_facts(json.loads(run.regular(out/'group-recovery-historical-facts.json',65536)))
+ run.check_release_controls_prior_pass(json.loads(run.regular(out/'release-controls-historical-pass.json',65536)));run.check_kafka_confirm_prior_pass(json.loads(run.regular(out/'kafka-confirm-historical-pass.json',65536)))
+ run.check_kafka_acl_receipt(json.loads(run.regular(out/'kafka-acl-historical-pass.json',65536)));run.check_process_image_prior(json.loads(run.regular(out/'process-image-historical-pass.json',65536)))
+ if any((out/name).exists() for name in ('same-source-completed-kafka-package-reuse.json','current-managed-producer-control-names.json','current-managed-shape-controls-names.json','current-managed-shape-kafka-individual.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('new source cannot alias prior completed packages or older scopes')
+ return value
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
   run.write(out/'collection.json',{'started':False,'accepted':False,'reason':'no-original-allocation','privateDataUploaded':False});pack(out);return 0
  if allocation.resolve()!=allocation or allocation.stat().st_uid!=os.getuid() or stat.S_IMODE(allocation.stat().st_mode)!=0o700 or json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original job allocation required')
- c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None;producer_required=c.get('currentProducerControl') is not None
+ c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None;producer_required=c.get('currentProducerControl') is not None;group_recovery_required=c.get('currentGroupRecoveryControl') is not None
  root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False;terminals={}
  for scenario in run.SCENARIOS:
   folder=root/('plane-'+scenario);work=root/('scenario-'+scenario);entry={'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False}
@@ -471,6 +536,7 @@ def collect():
     terminal=public_terminal(run.regular(work/'result.json',1<<20),scenario);terminals[scenario]=terminal
     run.write(out/('terminal-'+scenario+'.json'),terminal)
     if gateway_start_exit2(terminal):emit_gateway_start_log_diagnostic(out,work,terminal)
+    if rpc_group_start_exit2(terminal):emit_rpc_group_start_log_diagnostic(out,work,terminal)
    except Exception as error:entry['terminalExceptionType']=type(error).__name__;failed=True
   if (work/'operator-intent.json').exists():
    entry['runtimeAttempted']=True
@@ -498,6 +564,10 @@ def collect():
    run.write(out/'source-post-recovery-inspection.json',post)
   else:post=json.loads(run.regular(postpath))
   failed=failed or post.get('accepted') is not True
+ current_group_recovery_accepted=False
+ if (out/'current-group-recovery-controls-names.json').exists():
+  try:checked_current_group_recovery_evidence(out);current_group_recovery_accepted=True
+  except Exception:failed=True
  current_image_kafka_accepted=False
  if (out/'current-image-kafka-names.json').exists():
   try:checked_current_image_kafka_evidence(out);current_image_kafka_accepted=True
@@ -539,7 +609,8 @@ def collect():
  try:
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
- if producer_required:kafka_current_accepted=current_producer_accepted and completed_kafka_reuse_accepted and not any((current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
+ if group_recovery_required:kafka_current_accepted=current_group_recovery_accepted and not any((current_producer_accepted,completed_kafka_reuse_accepted,current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
+ elif producer_required:kafka_current_accepted=current_producer_accepted and completed_kafka_reuse_accepted and not any((current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
  elif managed_required:kafka_current_accepted=current_managed_shape_accepted and not current_release_accepted and not current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted
  elif release_required:kafka_current_accepted=current_release_accepted and not current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted and not current_managed_shape_accepted
  elif confirm_reuse_required:kafka_current_accepted=current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
@@ -547,7 +618,7 @@ def collect():
  elif fresh_required:kafka_current_accepted=current_image_kafka_accepted and not current_kafka_confirm_accepted and not kafka_reuse_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  else:kafka_current_accepted=kafka_reuse_accepted and not current_image_kafka_accepted and not current_kafka_confirm_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  accepted=launcher_accepted and kafka_current_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentProducerControlAccepted':current_producer_accepted,'freshProducerControlRequired':producer_required,'producerCommandInvocations':(1 if current_producer_accepted else None) if producer_required else 0,'producerPackageExecutions':(1 if current_producer_accepted else None) if producer_required else 0,'sameSourceCompletedKafkaPackageReuseAccepted':completed_kafka_reuse_accepted,'originalTwoPackageScopeAccepted':False,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required and not producer_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if producer_required or managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':producer_required or managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentGroupRecoveryControlsAccepted':current_group_recovery_accepted,'freshGroupRecoveryControlsRequired':group_recovery_required,'groupRecoveryCommandInvocations':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'groupRecoveryPackageExecutions':(3 if current_group_recovery_accepted else None) if group_recovery_required else 0,'actualCacheTopsDispatched':(2 if current_group_recovery_accepted else None) if group_recovery_required else 0,'actualManagedShapeTopsDispatched':(1 if current_group_recovery_accepted else None) if group_recovery_required else 0,'currentProducerControlAccepted':current_producer_accepted,'freshProducerControlRequired':producer_required,'producerCommandInvocations':(1 if current_producer_accepted else None) if producer_required else 0,'producerPackageExecutions':(1 if current_producer_accepted else None) if producer_required else 0,'sameSourceCompletedKafkaPackageReuseAccepted':completed_kafka_reuse_accepted,'originalTwoPackageScopeAccepted':False,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required and not producer_required and not group_recovery_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_group_recovery_accepted or current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':group_recovery_required or producer_required or managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  emit_console_observation(rows,monitor,main,terminals,out)
  pack(out)
  return 0 if accepted else 1

@@ -27,6 +27,7 @@ import maven_file_origins
 import plugin_scope
 import plugin_scope_fixture
 import classpaths_current as classpaths
+import aapt2_tool
 
 parent=generic.parent
 sdk_sources=generic.sdk_sources
@@ -131,6 +132,7 @@ def metadata():
     require_core_equivalence(inputs,original,context)
     plugin_scope.contract(HERE,inputs)
     plugin_scope_fixture.writer_bytes(HERE)
+    aapt2_tool.load_policy(HERE)
     check_catalogue(context)
     rich_origins.validate_scope(rich_origins.load_policy(HERE),context,inputs)
     core_restore.validate(read(HERE/'core-reuse.json'),context,inputs,tools)
@@ -317,6 +319,7 @@ class Job(generic.Job):
                     or timeout!=1800 or reject is not None or stdin is not None):
                 raise ValueError('fixed production APK dispatch required')
             rich_origins.require_origin_binding(self.w,HERE)
+            aapt2_tool.require(self.w,HERE)
             plugin_scope.require_origin_binding(self.w,HERE,self.inputs)
             plugin_before=plugin_scope.verified(self.w,HERE,self.inputs,self.b)[1]
             binding=classpaths.verified_catalog(self.w);args=list(args)+['-I',HERE/'resolve.gradle']
@@ -336,6 +339,7 @@ class Job(generic.Job):
                 s.write_json(self.w/'evidence/current-webview-archive-metadata.json',
                     check_current_packages(self.w,self.context))
             if label=='assemble-debug':
+                aapt2_tool.require(self.w,HERE)
                 s.write_json(self.w/'evidence/rich-apk-consumed.json',{'actual_configurations':
                     rich_origins.check_apk_reports(self.w,HERE),
                     'actual_plugin_configurations':plugin_scope.reports(self.w,HERE,self.inputs,'apk',False),
@@ -418,6 +422,7 @@ class Job(generic.Job):
             proof['verification_metadata_sha256']=hashlib.sha256(verification).hexdigest()
             proof['preexisting_hermetic_lock']=False
             s.write_json(self.w/'evidence/dependency-origin-audit.json',proof)
+            aapt2_tool.bind(self.w,HERE,s.write_json)
             self.verify()
             result=None
             if self._typed_resolver_dispatch is not True:raise ValueError('production resolver not dispatched')

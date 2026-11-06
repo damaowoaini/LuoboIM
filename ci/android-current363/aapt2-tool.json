@@ -1,0 +1,30 @@
+{
+  "AGP": "9.1.1",
+  "classifier": "linux",
+  "configuration": "luoboFixedAapt2Linux",
+  "coordinate": "com.android.tools.build:aapt2:9.1.1-14792394",
+  "extension": "jar",
+  "files": [
+    {
+      "bytes": 1096,
+      "filename": "aapt2-9.1.1-14792394.pom",
+      "sha256": "7892b466ff80a9e5e11f976e2defad6de0d4062c77c533939fb75ed91ba174b5",
+      "url": "https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/9.1.1-14792394/aapt2-9.1.1-14792394.pom"
+    },
+    {
+      "bytes": 2331128,
+      "filename": "aapt2-9.1.1-14792394-linux.jar",
+      "sha256": "e7ae17af6e4093c771243e82d66462353de87befaac206bfb43e557ac1c34440",
+      "url": "https://dl.google.com/dl/android/maven2/com/android/tools/build/aapt2/9.1.1-14792394/aapt2-9.1.1-14792394-linux.jar"
+    }
+  ],
+  "kind": "current363-fixed-aapt2-linux-tool-v1",
+  "owner": "source/app/android",
+  "pin_authority": {
+    "POM": "direct official body",
+    "linux_JAR_SHA256": "official same-filename .sha256 sidecar",
+    "linux_JAR_size": "official HEAD; no native body downloaded locally"
+  },
+  "purpose": "tool cache acquisition only; not original App18/rich model admission; no SDK executable override",
+  "schema": 1
+}

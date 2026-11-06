@@ -1,11 +1,14 @@
 """Current363 source admission only; never runs native tools or phases."""
 import copy
 import hashlib
+import io
 import importlib.util
 from pathlib import Path
 import sys
+import struct
 import tempfile
 import unittest
+import zipfile
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('android_current363_identity', HERE / 'run.py')
@@ -83,6 +86,44 @@ class Current363SourceTests(unittest.TestCase):
             (Path(directory) / 'resolve.gradle').write_text(resolver + '\n')
             with self.assertRaises(ValueError):
                 fixture.phase_bytes(Path(directory))
+
+
+    def test_fixed_aapt2_tool_origin_and_native_structure_fail_closed(self):
+        tool = controller.aapt2_tool
+        policy = tool.load_policy(HERE)
+        proof = {'all_actual_artifact_sources_accounted': True,
+            'artifacts': [{'coordinate': tool.COORDINATE, 'filename': row['filename'],
+                'bytes': row['bytes'], 'sha256': row['sha256'],
+                'observed_sources': [row['url']]} for row in policy['files']]}
+        self.assertEqual(len(tool.origin_rows(policy, proof)), 2)
+        for case in ('body', 'URL', 'dual-source', 'classifier', 'duplicate', 'incomplete'):
+            value = copy.deepcopy(proof)
+            if case == 'body': value['artifacts'][1]['sha256'] = '0' * 64
+            elif case == 'URL': value['artifacts'][1]['observed_sources'] = ['https://repo.maven.apache.org/unapproved.jar']
+            elif case == 'dual-source': value['artifacts'][1]['observed_sources'].append(value['artifacts'][1]['observed_sources'][0])
+            elif case == 'classifier': value['artifacts'][1]['filename'] = 'aapt2-9.1.1-14792394-osx.jar'
+            elif case == 'duplicate': value['artifacts'].append(copy.deepcopy(value['artifacts'][1]))
+            else: value['all_actual_artifact_sources_accounted'] = False
+            with self.subTest(case=case), self.assertRaises(ValueError):
+                tool.origin_rows(policy, value)
+        # Tiny structure-only controls are not the pinned official executable.
+        elf = bytearray(120)
+        elf[:7] = b'\x7fELF\x02\x01\x01'
+        struct.pack_into('<HHI', elf, 16, 2, 62, 1)
+        struct.pack_into('<Q', elf, 32, 64)
+        struct.pack_into('<HHH', elf, 52, 64, 56, 1)
+        struct.pack_into('<IIQQQQQQ', elf, 64, 1, 5, 0, 0, 0, 120, 120, 4096)
+        def packed(name, data):
+            output = io.BytesIO()
+            with zipfile.ZipFile(output, 'w') as archive:
+                archive.writestr(name, data)
+            return output.getvalue()
+        synthetic = packed('aapt2', elf)
+        self.assertNotEqual(tool.digest(synthetic), policy['files'][1]['sha256'])
+        self.assertEqual(tool.archive(synthetic)['ELF']['machine'], 62)
+        with self.assertRaises(ValueError): tool.archive(packed('../aapt2', elf))
+        struct.pack_into('<H', elf, 18, 183)
+        with self.assertRaises(ValueError): tool.archive(packed('aapt2', elf))
 
 
 if __name__ == '__main__':

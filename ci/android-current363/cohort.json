@@ -168,6 +168,16 @@
       "sha256": "ff225d739602ca849347717b8109d74b5c25b060bf5e8ff6b48194fe3271d0a0"
     },
     {
+      "bytes": 1196,
+      "path": "ci/android-current363/aapt2-tool.json",
+      "sha256": "4e13f5fbe7351a8d2e511e152b65e0397346d145a3ac6c9612514c8c2362bd1f"
+    },
+    {
+      "bytes": 9774,
+      "path": "ci/android-current363/aapt2_tool.py",
+      "sha256": "d4ceedeed13b66e7b29048003aa850ba3ecba6a7cb0538e50972c7d209912efb"
+    },
+    {
       "bytes": 8534,
       "path": "ci/android-current363/classpaths_current.py",
       "sha256": "4e840c0f158f1a211997db6f6c8b7b541a9e1553ae31fed88ab5208bb14d120a"
@@ -215,7 +225,7 @@
     {
       "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "a9f35b590a2ffff1ff5eb0a8f840b2d2098ff99688a1e82f6294dc25be38264e"
+      "sha256": "4e472c659f2d0c9f01ea1a9fff4d806b73a5991b16ca53d21c9c69cfa4ac29e8"
     },
     {
       "bytes": 1384,
@@ -223,9 +233,9 @@
       "sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
     },
     {
-      "bytes": 56214,
+      "bytes": 61482,
       "path": "ci/android-current363/resolve.gradle",
-      "sha256": "c827abdbfa2cf539bbc8fbfc50ef5560e3d8b14d3f128fedbedfe188840dcac2"
+      "sha256": "a4a1ed2f83b19508428b8fca0a1e0529b19732b4c5204dde4b55621de32cf352"
     },
     {
       "bytes": 71217,
@@ -248,14 +258,14 @@
       "sha256": "4846a1d6fd256dc2a13f6f54a692801c771df1379f4db066f1437a921bd1c0b0"
     },
     {
-      "bytes": 31696,
+      "bytes": 31893,
       "path": "ci/android-current363/run.py",
-      "sha256": "a903d61112f92770b5401fdeac312d355d9d72af4925116b5a0b8c70cfa32a96"
+      "sha256": "45f79b263fae02e82f467738ba86262de2b6861909d11fe0e930cec0ef498387"
     },
     {
-      "bytes": 5272,
+      "bytes": 7680,
       "path": "ci/android-current363/test_identity.py",
-      "sha256": "f39233c1527235bd26f74c73d4185426514c5ccc3896741f4d91f294f86fc726"
+      "sha256": "7bcfb6f99b657437ecbfa0e7b25f9831b65e9602951054fd6db28cc2df7ab295"
     },
     {
       "bytes": 3621,
@@ -398,7 +408,7 @@
     "fixture": {
       "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "a9f35b590a2ffff1ff5eb0a8f840b2d2098ff99688a1e82f6294dc25be38264e"
+      "sha256": "4e472c659f2d0c9f01ea1a9fff4d806b73a5991b16ca53d21c9c69cfa4ac29e8"
     },
     "mandatory_preseal_after_builtin_before_production_models": true,
     "owned_outputs_policy_unchanged": true,

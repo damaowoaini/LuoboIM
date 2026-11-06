@@ -24,6 +24,12 @@ type GroupAuthorityInvalidator struct {
 func NewGroupAuthorityInvalidator(base redis.UniversalClient) (*GroupAuthorityInvalidator, error) {
 	var bounded redis.UniversalClient
 	switch original := base.(type) {
+	case *ownedRedisPool:
+		pool, err := original.newGroupInvalidationPool()
+		if err != nil {
+			return nil, err
+		}
+		bounded = pool
 	case *redis.Client:
 		if original == nil {
 			return nil, errors.New("group cache client unavailable")
