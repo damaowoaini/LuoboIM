@@ -36,8 +36,8 @@
   "controllerPins": [
     {
       "path": "ci/visual-render.mjs",
-      "bytes": 30308,
-      "sha256": "36f8cddc4e5c24cc91af151622df76467c09bbe4782e49e22e55457a9f335776"
+      "bytes": 37439,
+      "sha256": "9963177f5d74f130da340c795e1517007aca9648e2a49d5b207a451d986e1045"
     },
     {
       "path": "ci/visual-render/source/test/auth_capture_test.dart",

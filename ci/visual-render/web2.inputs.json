@@ -1,0 +1,403 @@
+{
+  "schema": 1,
+  "cohort": "ui-render-web2-evidence-v1",
+  "dispatchReady": true,
+  "scope": "Exactly two current Web frames; historical App image reference only. No legacy checkout, Flutter setup/test, Web/APK build, old tests, business-network or interaction/design acceptance.",
+  "nativeInput": "ci/android-current363/inputs.json",
+  "mobileInput": "ci/mobile/inputs.json",
+  "inputPins": [
+    {
+      "path": "ci/android-current363/inputs.json",
+      "bytes": 103160,
+      "sha256": "e8f17b0d76a88b4d1bb9d84469a35f5bcdb284596508bb8e40071cf5e4d0ae1d"
+    },
+    {
+      "path": "ci/mobile/inputs.json",
+      "bytes": 193400,
+      "sha256": "df60daca701faef61c14eed46ce86f760062002f6b4e417e287c58f133f75df4"
+    },
+    {
+      "path": "ci/group-effects/resource_guard.py",
+      "bytes": 6736,
+      "sha256": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c"
+    }
+  ],
+  "controllerPins": [
+    {
+      "path": "ci/visual-render.mjs",
+      "bytes": 37439,
+      "sha256": "9963177f5d74f130da340c795e1517007aca9648e2a49d5b207a451d986e1045"
+    }
+  ],
+  "canonical": {
+    "app": {
+      "members": 366,
+      "digest": "2be96d98e4193ee4919e47b828c46af498a26704e2bfe93207537d6d428b1827"
+    },
+    "portable": {
+      "members": 418,
+      "digest": "d8898207e1a1fa11ef9d5f5c71c91fcb0bd02f067992d294ce2ab92a81f4a47d"
+    },
+    "native": {
+      "members": 542,
+      "digest": "a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0"
+    }
+  },
+  "cjkPaths": [
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+  ],
+  "cjkBinding": {
+    "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+    "bytes": 19484784,
+    "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
+  },
+  "historicalAppBaseline": {
+    "kind": "reviewed-historical-App-PNG-reference-v1",
+    "head": "f9a41b429453f7c4f9c816332ae3b4a2db85d3c5",
+    "run": 42302449440,
+    "job": 128183379362,
+    "canonical": {
+      "app": {
+        "members": 366,
+        "digest": "2be96d98e4193ee4919e47b828c46af498a26704e2bfe93207537d6d428b1827"
+      },
+      "portable": {
+        "members": 418,
+        "digest": "d8898207e1a1fa11ef9d5f5c71c91fcb0bd02f067992d294ce2ab92a81f4a47d"
+      },
+      "native": {
+        "members": 542,
+        "digest": "a77ef520041def4a881b33913d049574bc9cb77c4756fc6db1c56c6be1156da0"
+      }
+    },
+    "derived": {
+      "app": {
+        "members": 367,
+        "digest": "85699a6dc47c10bb0863ec9f945cfe8e5b7eaa531ec6b09a67772144874d693e"
+      },
+      "portable": {
+        "members": 419,
+        "digest": "1e9990dab102c5983f8c5985ec99e85add681c8bc0a635b6ca2a3c010ff67c78"
+      },
+      "kind": "one test-only overlay; canonical366/native542 unchanged; not new native source acceptance"
+    },
+    "PNG": {
+      "path": "03-app-auth-375.png",
+      "bytes": 32515,
+      "sha256": "cd91bedfa99b87ff035c8c493d9648fe1b4152af7bb36cb60198e930682d71ff",
+      "width": 375,
+      "height": 812
+    },
+    "CJKFont": {
+      "path": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      "bytes": 19484784,
+      "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
+    },
+    "rootReview": {
+      "path": ".qa/push-observation-font-batch-20261107/root-f9a41b4-three-render-frames-and-design-findings.json",
+      "sha256": "ef6233a250e9c3e51c0d5999a1eef931249c1f0163810ef7267ec388d364b5c8"
+    },
+    "scene": "actual AuthPage in explicit test-only initial login state; no bootstrap traversal and0 backend requests",
+    "sourcePrePostAccepted": true,
+    "notNewScreenshot": true,
+    "loginOrInteractionAccepted": false
+  },
+  "web": {
+    "sourceInput": "ci/web-build.inputs.json",
+    "sourceInputPin": {
+      "path": "ci/web-build.inputs.json",
+      "bytes": 819705,
+      "sha256": "4c6ae637e0634d81da5fe013169269dc5bb0e3ee27ed0cedbe05a01e4e76b1f2"
+    },
+    "source": {
+      "members": 4341,
+      "digest": "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90"
+    },
+    "artifact": {
+      "id": 13548627840,
+      "run": 42311832417,
+      "head": "c327a6e01f17feedad4bab10cbcc26f2b2b591a3",
+      "bytes": 10499860,
+      "sha256": "26a74b07efd4bd6b2771c20dae80446ee48b1055a1222782683b68ad4eb32d7c"
+    },
+    "inventory": {
+      "distFiles": 47,
+      "metadataFiles": 2,
+      "totalFiles": 49
+    },
+    "decodedBytes": 42630772,
+    "distRows": [
+      {
+        "path": "dist/assets/ApplicationItem-nVNmXfTX.js",
+        "bytes": 4057,
+        "sha256": "3c241bea4400f2e59f8dc3076246351157d74092b4bcaae313400922c1a9a95d"
+      },
+      {
+        "path": "dist/assets/FlexibleSider-Bnsu3_Zd.css",
+        "bytes": 332,
+        "sha256": "c74b6205370201e03a9291d230bbd3db13ca8162e3b67b56071f04be9fd02dee"
+      },
+      {
+        "path": "dist/assets/FlexibleSider-CzE3WgHM.js",
+        "bytes": 635,
+        "sha256": "58d5ac06d9d6a85f349461d61c44e8703b4ec8683ba72205ea8487d8a270e953"
+      },
+      {
+        "path": "dist/assets/about-C1cmOMuK.js",
+        "bytes": 241,
+        "sha256": "a3b32e7f656f23f0916fad85653d9b36474abfa4b1a0f940b349f0bf311b3278"
+      },
+      {
+        "path": "dist/assets/blackList-CxqANuIy.js",
+        "bytes": 242,
+        "sha256": "eea9974b3defe2d3cbecb28c2103a4978503760893d877a18eccbda83f7339f9"
+      },
+      {
+        "path": "dist/assets/card_bg-_qxB6bNH.png",
+        "bytes": 193016,
+        "sha256": "abf0a2947928bd0a3923a48e27cc1c3c31334093cce46398160f9bcf585929c3"
+      },
+      {
+        "path": "dist/assets/changePassword-DGHUeWeG.js",
+        "bytes": 248,
+        "sha256": "351483fdd387a78d74b39ba0258940dc9a5aa2bf7edd82d78e919d7bf0276496"
+      },
+      {
+        "path": "dist/assets/chat-DgjZIEzq.css",
+        "bytes": 520,
+        "sha256": "f8d8a4200e5d8ec7b6c9711f6bdb55072d97ecd94543f902df3181f3172c4d65"
+      },
+      {
+        "path": "dist/assets/chat-U93S-6t-.js",
+        "bytes": 9245,
+        "sha256": "957470833e4de9da3f56c238a4ca20d1245f734538772d98053587324183124c"
+      },
+      {
+        "path": "dist/assets/chooseContact-D0UtGSFT.js",
+        "bytes": 1592,
+        "sha256": "c91dbbf2087d434057c1d75fade150a756ee69ff5471b6f2887c30de1b43629d"
+      },
+      {
+        "path": "dist/assets/contact-Bf1HNl4A.js",
+        "bytes": 8521,
+        "sha256": "ee317b6e47a3af1af1e87c81faf42f8a5692c6e5f23f83c0558f97bf472e6751"
+      },
+      {
+        "path": "dist/assets/empty_announcement-DEQynhES.png",
+        "bytes": 11325,
+        "sha256": "a9de6b9b73590d621520ce9e3a1ef855bfb596e6f6bc21c0182ce8b9d33ffe2b"
+      },
+      {
+        "path": "dist/assets/empty_chat_bg-DCseQf7t.png",
+        "bytes": 62403,
+        "sha256": "95f77f22f19749bd3ac64fce73253e1f3adad998551d3a0f0e5ba3a5f9b6e258"
+      },
+      {
+        "path": "dist/assets/groupNotifications-XXDmnvzS.js",
+        "bytes": 1461,
+        "sha256": "142f009375debb9c0d7ce612cc85f0db60afd2e489147a7fdd83e1cfa49ff42e"
+      },
+      {
+        "path": "dist/assets/ic_avatar_01-CFfMZ_2_.png",
+        "bytes": 6312,
+        "sha256": "3563a5a320635fcd0d2fc87c899fb91c443da78bef10c06db5fe6a0ea5b99807"
+      },
+      {
+        "path": "dist/assets/ic_avatar_02-ovvBJaGC.png",
+        "bytes": 7074,
+        "sha256": "b90bd6f697dd1df309939d985797ebe5cb3e0fe235587b2450a1d81ff142adff"
+      },
+      {
+        "path": "dist/assets/ic_avatar_03-BlFsY7Zi.png",
+        "bytes": 6850,
+        "sha256": "0c6288e1f750d1f88b8f967571e8706b5969764b7a70cf80e06d8caf7f5ca693"
+      },
+      {
+        "path": "dist/assets/ic_avatar_04-BKSz-AQ9.png",
+        "bytes": 4432,
+        "sha256": "dc637f9c317454d577a0ec0af6f012ff62ebf43bc3115ad25b5815f979c6d981"
+      },
+      {
+        "path": "dist/assets/ic_avatar_05-0HQ3b5Z5.png",
+        "bytes": 6168,
+        "sha256": "f27ea85b618c2c2eb2b5a35a84d8ce587080dbfbf3b741bbd9a8e3dd5377010d"
+      },
+      {
+        "path": "dist/assets/ic_avatar_06-CqYVs1xH.png",
+        "bytes": 6478,
+        "sha256": "887a85423afaf5a3939a3053215f4fda2fd112fc4504a2e1de83589b77efae52"
+      },
+      {
+        "path": "dist/assets/index-BGudEslq.js",
+        "bytes": 3137272,
+        "sha256": "b916e8b4637da9f52b6cd2916f32c97557b6ac436adc04d27efb68481579f2a7"
+      },
+      {
+        "path": "dist/assets/index-X0i8KVCF.css",
+        "bytes": 112845,
+        "sha256": "91ff4419033d32e694b877855c8b134d7aca50924e1abcefe5b99097b550dcab"
+      },
+      {
+        "path": "dist/assets/login-CAplRkr-.js",
+        "bytes": 26697,
+        "sha256": "bc26c24750d50f0fdfac0319ee94dd19cd5e3a9adee72f4988a38e578373b167"
+      },
+      {
+        "path": "dist/assets/login-jOVcib8Z.css",
+        "bytes": 4364,
+        "sha256": "b4ec31b226e908d62d47d43e7c6f30871a4eb1d39be5533c3e2171dabd936fc2"
+      },
+      {
+        "path": "dist/assets/moments-TwZEWVSS.js",
+        "bytes": 103,
+        "sha256": "82fff2f22f3d9cff29b51e07070a4c4f995bde58cd1dc61daba66f22c77ca61e"
+      },
+      {
+        "path": "dist/assets/myFriends-DhXJ95U3.js",
+        "bytes": 2458,
+        "sha256": "d797e598961c66dccd32c3f35832d1cd45c51ee470ac0839aa38acf3a32292f3"
+      },
+      {
+        "path": "dist/assets/myGroups-Cmwu2tdu.js",
+        "bytes": 1451,
+        "sha256": "2767817a9e1c1a571b5cce0ed26a6c0b511e1ca8160f9495470024b142e5748c"
+      },
+      {
+        "path": "dist/assets/nav_bar_logout-BGk769Zl.png",
+        "bytes": 14139,
+        "sha256": "2132707ae2e7bbe9c70b9c5a0fbf052cb68794904393c015a2c19f6dba5e2612"
+      },
+      {
+        "path": "dist/assets/newFriends-azB-gMSr.js",
+        "bytes": 4275,
+        "sha256": "2c497b3ef8731c17d5c2290d643a61a837bda0f7de347f709d217c6da2728a92"
+      },
+      {
+        "path": "dist/assets/newMsg-CmOGn3Q0.mp3",
+        "bytes": 20640,
+        "sha256": "a82e805bf2479f6fb52126b98e92299c68ee176624607c633f9c62e0a30616a7"
+      },
+      {
+        "path": "dist/assets/personalSettings-v3q0O5Jk.js",
+        "bytes": 658,
+        "sha256": "e34b05cc68543be616b4ea743b1a1f0a72f174a783b53011b6dfe79fb2be6a85"
+      },
+      {
+        "path": "dist/assets/worker-BL8yE4L6.js",
+        "bytes": 250420,
+        "sha256": "457583dfbb0b0593d9ba3c7e86b90bd4f11fa1af3ab8c8bf383e7a49bb234efc"
+      },
+      {
+        "path": "dist/assets/worker-legacy-eRE7sddk.js",
+        "bytes": 250451,
+        "sha256": "ecdb844877b03ca4a7a753773da50fbf49ebd69c4a675a67219a05a94f3ccc0a"
+      },
+      {
+        "path": "dist/brand.svg",
+        "bytes": 339,
+        "sha256": "0c45aad2ce11535b46e6801bcf420a42dd51030af629e54481bb3a4cc0499d07"
+      },
+      {
+        "path": "dist/emojis.json",
+        "bytes": 376601,
+        "sha256": "615a64c05e73da728a9fbf4ce314f62ed47e6bb88e90eba0c8ca55674164f052"
+      },
+      {
+        "path": "dist/favicon.ico",
+        "bytes": 181310,
+        "sha256": "fa18af11934b2f4c20ef4d21663b3787bd7db7a2a1d25fd9b051c5335ee13ea9"
+      },
+      {
+        "path": "dist/font/twemoji.woff2",
+        "bytes": 470548,
+        "sha256": "6e3bec55e9280d0e837a5ee56979155534d6ea2064ec9caf044f8d1e47c60ab8"
+      },
+      {
+        "path": "dist/icons/empty_tray.png",
+        "bytes": 181310,
+        "sha256": "fa18af11934b2f4c20ef4d21663b3787bd7db7a2a1d25fd9b051c5335ee13ea9"
+      },
+      {
+        "path": "dist/icons/icon.ico",
+        "bytes": 21170,
+        "sha256": "e0d29db79353e13255a0bff07c26f3a131b093b1f0a427142352bf941ed61837"
+      },
+      {
+        "path": "dist/icons/icon.png",
+        "bytes": 181310,
+        "sha256": "fa18af11934b2f4c20ef4d21663b3787bd7db7a2a1d25fd9b051c5335ee13ea9"
+      },
+      {
+        "path": "dist/icons/tray.png",
+        "bytes": 181310,
+        "sha256": "fa18af11934b2f4c20ef4d21663b3787bd7db7a2a1d25fd9b051c5335ee13ea9"
+      },
+      {
+        "path": "dist/icons/tray@2x.png",
+        "bytes": 181310,
+        "sha256": "fa18af11934b2f4c20ef4d21663b3787bd7db7a2a1d25fd9b051c5335ee13ea9"
+      },
+      {
+        "path": "dist/index.html",
+        "bytes": 1160,
+        "sha256": "df0068ecfd3c9de33eda43207df48359a256b8a8af07715d55ace3ad459b3051"
+      },
+      {
+        "path": "dist/openIM.wasm",
+        "bytes": 35566446,
+        "sha256": "43a4a8929e01415ec9c03b6297137878c7ddab0fe03da31a90d686016396cea7"
+      },
+      {
+        "path": "dist/splash.html",
+        "bytes": 705,
+        "sha256": "62adb0ac0e6b457f6a2e5e7509196328abe2876f9d0f928330d08f1e442e9a4d"
+      },
+      {
+        "path": "dist/sql-wasm.wasm",
+        "bytes": 1105290,
+        "sha256": "806886f413da1a6acc1db373285adda1b6750c8d434c75a5a6042af0a65cbafd"
+      },
+      {
+        "path": "dist/wasm_exec.js",
+        "bytes": 16992,
+        "sha256": "0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14"
+      }
+    ],
+    "metadataRows": [
+      {
+        "path": "dist-manifest.json",
+        "bytes": 7303,
+        "sha256": "b689ac8452d1e1d4fe48692d299da7cb97ce0e572485c29ea684882054b45937"
+      },
+      {
+        "path": "dist-proof.json",
+        "bytes": 743,
+        "sha256": "305dc404081c276c9cd774b96693a5dee373f4e702738cf501cd340e6fa26583"
+      }
+    ],
+    "manifestSHA256": "b689ac8452d1e1d4fe48692d299da7cb97ce0e572485c29ea684882054b45937",
+    "filesDigest": "13b30ded2c4922b3d9b5100a7495a56a488a7de88ef8b8a5670d71eead3c4224",
+    "viewports": [
+      {
+        "name": "01-web-login-desktop",
+        "width": 1440,
+        "height": 1000,
+        "mobile": false
+      },
+      {
+        "name": "02-web-login-375",
+        "width": 375,
+        "height": 812,
+        "mobile": true
+      }
+    ],
+    "scene": "Unmodified real login form with actual configuration-unavailable warning; static /configuration probe404 recorded separately. No API success injection, login or authenticated state."
+  },
+  "outputs": {
+    "screenshots": 2,
+    "historicalAppReferences": 1,
+    "maxPNGBytesEach": 4194304,
+    "agentMustInspectSavedPNGBeforeUIFindings": true,
+    "screenshotCompletionDoesNotAcceptInteractionAudit": true
+  }
+}

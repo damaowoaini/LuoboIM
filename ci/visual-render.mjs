@@ -8,7 +8,8 @@ import {spawn, spawnSync} from 'node:child_process';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const INPUT = path.join(REPO, 'ci/visual-render/inputs.json');
+const RENDER_MODE = process.env.UI_RENDER_MODE || 'all3';
+const INPUT = path.join(REPO, RENDER_MODE === 'web2' ? 'ci/visual-render/web2.inputs.json' : 'ci/visual-render/inputs.json');
 const rawInput = fs.readFileSync(INPUT);
 const cfg = JSON.parse(rawInput);
 const CHROME = '/opt/google/chrome/chrome';
@@ -68,13 +69,18 @@ function descriptors() {
   for (const row of cfg.controllerPins) rowPin(REPO,row);
   const native = JSON.parse(fs.readFileSync(path.join(REPO,cfg.nativeInput)));
   const mobile = JSON.parse(fs.readFileSync(path.join(REPO,cfg.mobileInput)));
-  const compatibility = JSON.parse(fs.readFileSync(path.join(REPO,cfg.compatibilityInput)));
+  const compatibility = RENDER_MODE === 'all3' ? JSON.parse(fs.readFileSync(path.join(REPO,cfg.compatibilityInput))) : null;
   const app = native.files.filter(r => r.path.startsWith('app/lib/') || r.path.startsWith('app/test/')
     || r.path.startsWith('app/tool/') || ['app/analysis_options.yaml','app/pubspec.yaml','app/pubspec.lock'].includes(r.path));
   const helper = native.files.find(r => r.path === 'migration/legacy_personal_export/legacy_personal_export.dart');
   const portable = [...app,...mobile.sdk_portable.files,helper];
   check(app.length === 366 && digest(app) === cfg.canonical.app.digest && portable.length === 418
     && new Set(portable.map(r=>r.path)).size === 418 && digest(portable) === cfg.canonical.portable.digest, 'canonical366/418 metadata differs');
+  if (RENDER_MODE === 'web2') {
+    check(cfg.web.sourceInputPin.path === cfg.web.sourceInput, 'exact new Web source descriptor required');
+    rowPin(REPO,cfg.web.sourceInputPin);
+    return {app,portable,web:JSON.parse(fs.readFileSync(path.join(REPO,cfg.web.sourceInput)))};
+  }
   const old = new Map(portable.map(r=>[r.path,r]));
   for (const delta of compatibility.source_delta) delta.before === null ? old.delete(delta.path) : old.set(delta.path,delta.before);
   check(old.size === 415 && digest([...old.values()]) === cfg.originalSetup.portable.digest, 'original415 successor boundary differs');
@@ -83,7 +89,13 @@ function descriptors() {
 function sourceAdmission() {
   const d = descriptors();
   for (const row of d.portable) rowPin(REPO,row);
-  check(d.web.files.length === 4340 && d.web.sourceDigest === cfg.web.source.digest, 'Web4340 descriptor differs');
+  const members = cfg.web.source.members;
+  check(Number.isSafeInteger(members) && members > 0 && members <= 8192 && d.web.files.length === members
+    && d.web.sourceFiles === members && new Set(d.web.files.map(r=>r.path)).size === members
+    && d.web.sourceDigest === cfg.web.source.digest, 'exact configured Web source descriptor differs');
+  const sourceDigest = sha(Buffer.concat([...d.web.files].sort((a,b)=>Buffer.compare(Buffer.from(a.path),Buffer.from(b.path)))
+    .map(r=>Buffer.from(r.path+'\0'+r.sha256+'\n'))));
+  check(sourceDigest === cfg.web.source.digest, 'whole current Web source vector differs');
   for (const row of d.web.files) rowPin(path.join(REPO,'web'),row);
   check(command('/usr/bin/git',['rev-parse','HEAD']).trim() === process.env.GITHUB_SHA, 'event checkout identity differs');
   return d;
@@ -101,6 +113,8 @@ function installedTools() {
   check(cjk, 'installed CJK font missing; no font download or Ahem fallback');
   const font = pin(cjk,64<<20), h = Buffer.from(font.header,'hex').subarray(0,4).toString('hex');
   check(['74746366','4f54544f','00010000'].includes(h), 'real installed CJK font container required');
+  if (RENDER_MODE === 'web2') check(cjk === cfg.cjkBinding.path && font.bytes === cfg.cjkBinding.bytes
+    && font.sha256 === cfg.cjkBinding.sha256, 'exact reviewed historical/current CJK binding required');
   return {node:pin(fs.realpathSync(process.execPath),256<<20,true),nodeVersion:process.version,
     chrome:chromePin(),chromeVersion:command(CHROME,['--version']).trim(),cjk:font};
 }
@@ -133,17 +147,63 @@ function projectionAdmission(work, rows) {
   const expected=rows.filter(r=>r.path.startsWith('app/lib/')||r.path.startsWith('app/test/')||r.path.startsWith('app/tool/')).map(r=>r.path).sort();
   check(canonical(authored(path.join(work,'source')))===canonical(expected),'derived authored inventory differs');
 }
+function webInventory() {
+  const counts = RENDER_MODE === 'all3' ? {distFiles:47,metadataFiles:2,totalFiles:49} : cfg.web.inventory;
+  check(counts && Number.isSafeInteger(counts.distFiles) && counts.distFiles > 0 && counts.distFiles <= 128
+    && counts.metadataFiles === 2 && counts.totalFiles === counts.distFiles + 2, 'exact bounded Web inventory required');
+  const rows = [...cfg.web.distRows,...cfg.web.metadataRows];
+  check(cfg.web.distRows.length === counts.distFiles && cfg.web.metadataRows.length === counts.metadataFiles
+    && new Set(rows.map(r=>r.path)).size === counts.totalFiles
+    && canonical(cfg.web.metadataRows.map(r=>r.path).sort()) === canonical(['dist-manifest.json','dist-proof.json'])
+    && rows.every(r=>safe(r.path) && Number.isSafeInteger(r.bytes) && r.bytes >= 0 && r.bytes <= (64<<20)
+      && /^[0-9a-f]{64}$/.test(r.sha256)) && cfg.web.distRows.every(r=>r.path.startsWith('dist/')),
+    'fixed declared Web paths and body pins required');
+  return counts;
+}
+function appBaselineReference() {
+  const baseline = cfg.historicalAppBaseline;
+  check(baseline && baseline.kind === 'reviewed-historical-App-PNG-reference-v1'
+    && canonical(baseline.canonical) === canonical(cfg.canonical)
+    && Number.isSafeInteger(baseline.run) && baseline.run > 0 && /^[0-9a-f]{40}$/.test(baseline.head)
+    && safe(baseline.rootReview.path) && /^[0-9a-f]{64}$/.test(baseline.rootReview.sha256)
+    && baseline.PNG.path === '03-app-auth-375.png' && baseline.PNG.width === 375 && baseline.PNG.height === 812
+    && baseline.PNG.bytes > 24 && baseline.PNG.bytes <= (4<<20) && /^[0-9a-f]{64}$/.test(baseline.PNG.sha256)
+    && canonical(baseline.CJKFont) === canonical(cfg.cjkBinding), 'reviewed same-source App image reference required');
+  return {...baseline,currentCanonicalAppAndPortableBodyAdmissionExact:true,renderedInCurrentRun:false,
+    copiedIntoCurrentArtifact:false,FlutterSetups:0,WidgetCaptureTests:0,loginOrInteractionAccepted:false};
+}
+async function captureWeb(root,pre) {
+  check(fs.readlinkSync('/proc/self/ns/net') !== process.env.UI_OUTSIDE_NETNS, 'capture requires isolated no-business-network namespace');
+  sourceAdmission();webAdmission(root);const baseline=appBaselineReference(),counts=webInventory();
+  let web,renderError,postError,postExact=false;
+  try { web=await renderWeb(root); } catch(error) { renderError=error; }
+  try {sourceAdmission();webAdmission(root);appBaselineReference();unchanged(installedTools(),pre.tools);postExact=true;}
+  catch(error) {postError=error;}
+  finally {write(path.join(root,'evidence/source-tools-post.json'),{renderMode:'web2',sourceToolsAndFontsExact:postExact,
+    declaredWebBodies:counts.totalFiles,declaredWebBodiesPreExact:true,declaredWebBodiesPostExact:postExact,
+    currentAppAndPortableBodiesUnchanged:postExact,rendererBodyIncluded:true,renderReturned:!renderError,
+    FlutterSetups:0,WidgetCaptureTests:0,runtimeOrDesignAccepted:false});}
+  if(renderError)throw renderError;if(postError)throw postError;
+  write(path.join(root,'evidence/render-evidence.json'),{schema:1,renderMode:'web2',actualScreenshots:2,web,
+    historicalAppReference:baseline,toolsBeforeAfter:pre.tools,currentSourceAndFontsPostExact:true,
+    declaredWebBodiesPreAndPostExact:true,declaredWebBodies:counts.totalFiles,rendererBodyIncluded:true,
+    FlutterSetups:0,WidgetCaptureTests:0,WebBuilds:0,APKBuilds:0,old34Or39Redispatched:0,productMockModes:0,
+    screenshotsInspectedByAgent:false,interactionAuditAccepted:false,Web107Accepted:false,Mobile403Accepted:false,Admin89Accepted:false});
+}
 function webAdmission(root) {
   const rows=[...cfg.web.distRows,...cfg.web.metadataRows];
-  check(cfg.web.distRows.length===47&&cfg.web.metadataRows.length===2&&new Set(rows.map(r=>r.path)).size===49,'fixed Web49 body inventory required');
+  const counts=webInventory();check(rows.length===counts.totalFiles,'fixed declared Web body inventory required');
   for(const row of rows)rowPin(path.join(root,'web'),row);
 }
 const ZIP_RECEIVER = String.raw`import sys,json,zipfile,hashlib,pathlib,stat
 archive,out,config=map(pathlib.Path,sys.argv[1:])
-c=json.loads(config.read_bytes())['web']; expected={r['path']:r for r in c['distRows']+c['metadataRows']}
-assert len(expected)==49 and not out.exists()
+descriptor=json.loads(config.read_bytes()); c=descriptor['web']; expected={r['path']:r for r in c['distRows']+c['metadataRows']}
+assert descriptor['cohort'] in ('ui-render-evidence-v1','ui-render-web2-evidence-v1')
+counts=c['inventory'] if descriptor['cohort']=='ui-render-web2-evidence-v1' else {'distFiles':47,'metadataFiles':2,'totalFiles':49}
+assert counts['metadataFiles']==2 and counts['totalFiles']==counts['distFiles']+2
+assert len(c['distRows'])==counts['distFiles'] and len(c['metadataRows'])==2 and len(expected)==counts['totalFiles'] and not out.exists()
 with zipfile.ZipFile(archive) as z:
- rows=z.infolist(); assert len(rows)==49 and len({r.filename for r in rows})==49 and {r.filename for r in rows}==set(expected)
+ rows=z.infolist(); assert len(rows)==counts['totalFiles'] and len({r.filename for r in rows})==counts['totalFiles'] and {r.filename for r in rows}==set(expected)
  assert sum(r.file_size for r in rows)==c['decodedBytes']
  for r in rows:
   assert not r.is_dir() and not r.flag_bits&1 and r.compress_type in (0,8)
@@ -161,6 +221,7 @@ async function responseBytes(response, max) {
   return Buffer.concat(chunks);
 }
 async function receive(root) {
+  const counts=webInventory();
   const token=process.env.UI_ARTIFACT_TOKEN; delete process.env.UI_ARTIFACT_TOKEN;
   check(token,'ephemeral artifact-read token required');
   const headers={Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','User-Agent':'LuoboIM-owned-ui-renderer'};
@@ -179,8 +240,10 @@ async function receive(root) {
   check(body.length===cfg.web.artifact.bytes && sha(body)===cfg.web.artifact.sha256,'original Web ZIP bytes differ');
   const archive=path.join(root,'accepted-web-dist.zip');fs.writeFileSync(archive,body,{flag:'wx',mode:0o600});
   command('/usr/bin/python3',['-c',ZIP_RECEIVER,archive,path.join(root,'web'),INPUT]);
-  write(path.join(root,'evidence/web-receive.json'),{artifact:cfg.web.artifact,ZIPAndAll49BodiesChecked:true,distFiles:47,
+  if(RENDER_MODE==='all3') write(path.join(root,'evidence/web-receive.json'),{artifact:cfg.web.artifact,ZIPAndAll49BodiesChecked:true,distFiles:47,
     manifestSHA256:cfg.web.manifestSHA256,filesDigest:cfg.web.filesDigest,rebuilt:false,backendDeployed:false});
+  else write(path.join(root,'evidence/web-receive.json'),{renderMode:'web2',artifact:cfg.web.artifact,ZIPAndAllDeclaredBodiesChecked:true,
+    declaredInventory:counts,manifestSHA256:cfg.web.manifestSHA256,filesDigest:cfg.web.filesDigest,rebuilt:false,backendDeployed:false});
 }
 function prepare(root,legacy) {
   const d=sourceAdmission(),work=path.join(root,'mobile/work');
@@ -285,7 +348,20 @@ function mobileCapture(root,d,receipt) {
 }
 async function main() {
   const [mode,rootValue,legacy]=process.argv.slice(2);
-  check(cfg.schema===1&&cfg.cohort==='ui-render-evidence-v1'&&cfg.dispatchReady===true,'frozen UI renderer requires Root-admitted descriptor');
+  check(['all3','web2'].includes(RENDER_MODE),'closed renderer cohort required');
+  check(cfg.schema===1&&cfg.cohort===(RENDER_MODE==='web2'?'ui-render-web2-evidence-v1':'ui-render-evidence-v1')
+    && cfg.dispatchReady===true,'frozen UI renderer requires Root-admitted descriptor');
+  if(RENDER_MODE==='web2') {
+    check(canonical(cfg.web.viewports)===canonical([{name:'01-web-login-desktop',width:1440,height:1000,mobile:false},{name:'02-web-login-375',width:375,height:812,mobile:true}]), 'exact two Web viewport outputs required');
+    check(cfg.web.sourceInputPin && cfg.web.sourceInputPin.path===cfg.web.sourceInput && /^[0-9a-f]{64}$/.test(cfg.web.sourceInputPin.sha256)
+      && Number.isSafeInteger(cfg.web.sourceInputPin.bytes) && cfg.web.sourceInputPin.bytes>0 && Number.isSafeInteger(cfg.web.source.members)
+      && /^[0-9a-f]{64}$/.test(cfg.web.source.digest), 'new source binding must be filled after source freeze');
+    const artifact=cfg.web.artifact;check(artifact && ['id','run','bytes'].every(k=>Number.isSafeInteger(artifact[k])&&artifact[k]>0)
+      && artifact.bytes<=(16<<20) && /^[0-9a-f]{40}$/.test(artifact.head) && /^[0-9a-f]{64}$/.test(artifact.sha256)
+      && Number.isSafeInteger(cfg.web.decodedBytes) && cfg.web.decodedBytes>0 && cfg.web.decodedBytes<=(64<<20)
+      && /^[0-9a-f]{64}$/.test(cfg.web.manifestSHA256) && /^[0-9a-f]{64}$/.test(cfg.web.filesDigest), 'actual new Web artifact binding required');
+    webInventory();appBaselineReference();
+  }
   check(process.version==='v24.21.0','fixed Node24.21.0 required');
   for(const row of cfg.controllerPins)rowPin(REPO,row);
   if(mode==='normalize-chrome'){
@@ -297,12 +373,14 @@ async function main() {
   const pre=JSON.parse(fs.readFileSync(path.join(root,'evidence/preflight.json')));check(pre.inputsSHA256===sha(rawInput),'renderer input changed');unchanged(installedTools(),pre.tools);
   if(mode==='receive'){await receive(root);return;}
   if(mode==='legacy'){
+    check(RENDER_MODE==='all3','legacy setup is not permitted in Web-only mode');
     check(command('/usr/bin/git',['-C',legacy,'rev-parse','HEAD']).trim()===cfg.originalSetup.head,'original setup checkout differs');
     for(const row of cfg.originalSetup.helperPins)rowPin(legacy,row);
     check(command('/usr/bin/git',['-C',legacy,'rev-parse','refs/tag903/source-parent']).trim()===cfg.originalSetup.sourceParent,'original setup source parent differs');return;
   }
-  if(mode==='prepare'){prepare(root,legacy);return;}
-  check(mode==='capture','fixed renderer mode required');
+  if(mode==='prepare'){check(RENDER_MODE==='all3','Flutter preparation is not permitted in Web-only mode');prepare(root,legacy);return;}
+  if(mode==='capture-web'){check(RENDER_MODE==='web2','Web-only capture requires explicit cohort');await captureWeb(root,pre);return;}
+  check(RENDER_MODE==='all3'&&mode==='capture','fixed renderer mode required');
   check(fs.readlinkSync('/proc/self/ns/net')!==process.env.UI_OUTSIDE_NETNS,'capture requires isolated no-business-network namespace');
   const d=sourceAdmission(),projection=JSON.parse(fs.readFileSync(path.join(root,'evidence/mobile-projection.json'))),work=path.join(root,'mobile/work');
   unchanged(packageMap(work),projection.packageMap);

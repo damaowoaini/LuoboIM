@@ -2,6 +2,13 @@ name: Manual UI render evidence only (Web dist47 and AuthPage)
 
 on:
   workflow_dispatch:
+    inputs:
+      render_mode:
+        description: "all3 renders Web2 + App1; web2 reuses reviewed unchanged App baseline"
+        type: choice
+        required: true
+        default: all3
+        options: [all3, web2]
 
 permissions:
   contents: read
@@ -15,6 +22,8 @@ jobs:
   render:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
+    env:
+      UI_RENDER_MODE: ${{ inputs.render_mode || 'all3' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -29,12 +38,17 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          python3 -c "import hashlib,pathlib; assert hashlib.sha256(pathlib.Path('current/ci/visual-render/inputs.json').read_bytes()).hexdigest() == '3cbc5927a91097996be0dc8bdbcb8844183eecd49908ef437b54e44c18f527a5'"
+          case "$UI_RENDER_MODE" in
+            all3) input=inputs.json; expected=ba2dfb6a7d3b9c60ade4ad52dda8684f10cc1ca9b2a21908c11489a6ced50da8 ;;
+            web2) input=web2.inputs.json; expected=774f1a1edef37470f023e3f092ef6a7bde5c59141c6cf374f9e3bd85494a28f7 ;;
+            *) exit 2 ;;
+          esac
+          python3 -c 'import hashlib,pathlib,sys; assert hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest()==sys.argv[2]' "current/ci/visual-render/$input" "$expected"
           echo "UI_ROOT=$RUNNER_TEMP/ui-render-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
           echo "UI_NODE=$(command -v node)" >> "$GITHUB_ENV"
           # Same known0777 -> root0755 normalization of the already-installed
           # Chrome inode; no browser download, no no-sandbox flag.
-          sudo -n -- "$(command -v node)" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" normalize-chrome
+          sudo -n -- /usr/bin/env UI_RENDER_MODE="$UI_RENDER_MODE" "$(command -v node)" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" normalize-chrome
       - name: Install exact Ubuntu CJK font for CI rendering only
         run: |
           set -euo pipefail
@@ -51,35 +65,50 @@ jobs:
           set -euo pipefail
           python3 "$GITHUB_WORKSPACE/current/ci/group-effects/resource_guard.py" --cwd "$GITHUB_WORKSPACE/current" --allocated-root "$UI_ROOT" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 180 --log "$UI_ROOT/evidence/web-receive.log" --record "$UI_ROOT/evidence/web-receive.resource.json" -- "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" receive "$UI_ROOT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        if: inputs.render_mode == 'all3'
         with:
           ref: d4adc8cb54200a8a02f58569cc478f4132d4485b
           path: original-mobile
           fetch-depth: 2
           persist-credentials: false
       - name: Exact original setup parent and immutable original helper bodies
+        if: inputs.render_mode == 'all3'
         run: |
           set -euo pipefail
           legacy="$GITHUB_WORKSPACE/original-mobile"
           timeout --kill-after=5s 30s git -C "$legacy" fetch --quiet --no-tags --no-recurse-submodules --depth=1 --no-write-fetch-head --no-auto-maintenance origin 2f17d99d2f32c4fc72b9b922f8d2a8783938b665:refs/tag903/source-parent
           "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" legacy "$UI_ROOT" "$legacy"
       - name: Original Linux Flutter tester runtime libraries
+        if: inputs.render_mode == 'all3'
         run: |
           sudo apt-get install --no-install-recommends -y libgtk-3-dev libglu1-mesa
       - name: One original SDK and lock-enforced setup; no old tests or APK
+        if: inputs.render_mode == 'all3'
         run: |
           set -euo pipefail
           python3 "$GITHUB_WORKSPACE/current/ci/group-effects/resource_guard.py" --cwd "$GITHUB_WORKSPACE/original-mobile" --allocated-root "$UI_ROOT" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 1200 --log "$UI_ROOT/evidence/original-setup.log" --record "$UI_ROOT/evidence/original-setup.resource.json" -- python3 -B "$GITHUB_WORKSPACE/original-mobile/ci/mobile-tag903.py" setup --allocation "$UI_ROOT/mobile"
       - name: Exact canonical366/418 successor and single CI test overlay
+        if: inputs.render_mode == 'all3'
         run: |
           set -euo pipefail
           "$UI_NODE" "$GITHUB_WORKSPACE/current/ci/visual-render.mjs" prepare "$UI_ROOT" "$GITHUB_WORKSPACE/original-mobile"
       - name: Three UI screenshots with no business network; existing Chrome sandbox
+        if: inputs.render_mode == 'all3'
         run: |
           set -euo pipefail
           outside="$(readlink /proc/self/ns/net)"
           sudo -n unshare --net -- /bin/bash -euc '
             /usr/sbin/ip link set lo up
             exec /usr/sbin/runuser -u "$1" -- /usr/bin/env -i PATH=/usr/bin:/bin HOME="$2" USER="$1" RUNNER_TEMP="$3" GITHUB_RUN_ID="$4" GITHUB_RUN_ATTEMPT="$5" GITHUB_SHA="$6" UI_OUTSIDE_NETNS="$7" /usr/bin/python3 "$8/ci/group-effects/resource_guard.py" --cwd "$8" --allocated-root "$9" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 240 --log "$9/evidence/render.log" --record "$9/evidence/render.resource.json" -- "${10}" "$8/ci/visual-render.mjs" capture "$9"
+          ' ui-render "$(id -un)" "$HOME" "$RUNNER_TEMP" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_SHA" "$outside" "$GITHUB_WORKSPACE/current" "$UI_ROOT" "$UI_NODE"
+      - name: Two current Web screenshots; historical App baseline reference only
+        if: inputs.render_mode == 'web2'
+        run: |
+          set -euo pipefail
+          outside="$(readlink /proc/self/ns/net)"
+          sudo -n unshare --net -- /bin/bash -euc '
+            /usr/sbin/ip link set lo up
+            exec /usr/sbin/runuser -u "$1" -- /usr/bin/env -i PATH=/usr/bin:/bin HOME="$2" USER="$1" RUNNER_TEMP="$3" GITHUB_RUN_ID="$4" GITHUB_RUN_ATTEMPT="$5" GITHUB_SHA="$6" UI_RENDER_MODE=web2 UI_OUTSIDE_NETNS="$7" /usr/bin/python3 "$8/ci/group-effects/resource_guard.py" --cwd "$8" --allocated-root "$9" --max-allocated-mib 4096 --min-free-mib 1024 --poll-interval .2 --timeout 240 --log "$9/evidence/render.log" --record "$9/evidence/render.resource.json" -- "${10}" "$8/ci/visual-render.mjs" capture-web "$9"
           ' ui-render "$(id -un)" "$HOME" "$RUNNER_TEMP" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_SHA" "$outside" "$GITHUB_WORKSPACE/current" "$UI_ROOT" "$UI_NODE"
       - name: Preserve small actual render evidence; never publish source/SDK/dist
         if: always()
