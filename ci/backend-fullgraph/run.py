@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE = {'members': 1576, 'digest': 'a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371'}
+FINAL_SOURCE = {'members': 1576, 'digest': 'eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af'}
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -62,12 +62,50 @@ def write(path,value):
  try:os.fsync(fd)
  finally:os.close(fd)
  return sha(raw)
+CURRENT_IMAGE_KAFKA_CONTROL = {'phase':'current-image-kafka','targets':{'internal/namespaceimport/ownedcontrol':['TestOwnedKafkaExclusionRequiresEveryWildcardDeny','TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']},'requiredSubtests':{'internal/namespaceimport/ownedcontrol':{'TestOwnedKafkaExclusionRequiresEveryWildcardDeny':['create-reply-error-and-shape-cannot-be-a-success','describe-reply-error-and-shape-cannot-replace-exact-deny'],'TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation':['actual-original-image-and-bounded-file-pins','real-fd-path-stability-and-mid-read-cancellation']}},'goTimeoutSeconds':180,'phaseGuardSeconds':240,'topPASS':2,'subPASS':4,'samePackageSingleRaceInvocation':True,'newDatabaseFixtures':0}
+
+def check_current_image_kafka_plan(c):
+ expected=next(iter(KAFKA_ACL_CONTROL['targets'].values()))
+ image=['TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation']
+ if c.get('kafkaACLTestsToRun')!=expected or c.get('processImageTestsToRun')!=image or c.get('currentImageKafkaControl')!=CURRENT_IMAGE_KAFKA_CONTROL or c.get('kafkaACLPassedReuse') is not None:raise ValueError('exact fresh current image and Kafka scope required')
+ check_kafka_acl_receipt(c.get('kafkaACLHistoricalPass'))
+ return CURRENT_IMAGE_KAFKA_CONTROL
+
+def check_current_image_kafka_receipt(value):
+ control=CURRENT_IMAGE_KAFKA_CONTROL;targets=control['targets'];package=next(iter(targets))
+ keys={'topPASS','subPASS','skip','fail','packages','namedCompletions','source','accepted','newDatabaseFixtures','scope','actualKafkaACLTestsDispatched','actualProcessImageTestsDispatched','samePackageSingleRaceInvocation','runtimeAccepted','wholeSourceAccepted'}
+ if not isinstance(value,dict) or set(value)!=keys or value['source']!=FINAL_SOURCE or value['accepted'] is not True or value['runtimeAccepted'] is not False or value['wholeSourceAccepted'] is not False or value['scope']!=control or value['samePackageSingleRaceInvocation'] is not True:raise ValueError('exact current source-bound image/Kafka receipt required')
+ for name,want in [('topPASS',2),('subPASS',4),('skip',0),('fail',0),('packages',1),('newDatabaseFixtures',0),('actualKafkaACLTestsDispatched',1),('actualProcessImageTestsDispatched',1)]:
+  if type(value[name]) is not int or value[name]!=want:raise ValueError('exact fresh current image/Kafka counts required')
+ expected={(package,top) for top in targets[package]}
+ expected|={(package,top+'/'+child) for top,children in control['requiredSubtests'][package].items() for child in children}
+ names=[(row['package'],row['name']) for row in value['namedCompletions']]
+ if len(names)!=6 or set(names)!=expected:raise ValueError('every current parent and original child required')
+ return value
+
+def run_current_image_kafka_control(go,environment,command,parent,out):
+ control=CURRENT_IMAGE_KAFKA_CONTROL;targets=control['targets'];package=next(iter(targets));pattern='^('+'|'.join(re.escape(top) for top in targets[package])+')$'
+ raw=command(control['phase'],[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run',pattern,'./'+package],control['phaseGuardSeconds'],environment)
+ events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()]
+ result=parent.audit(events,0,targets)
+ receipt=dict(result,source=FINAL_SOURCE,accepted=True,newDatabaseFixtures=0,scope=control,actualKafkaACLTestsDispatched=1,actualProcessImageTestsDispatched=1,samePackageSingleRaceInvocation=True,runtimeAccepted=False,wholeSourceAccepted=False)
+ check_current_image_kafka_receipt(receipt)
+ write(out/'current-image-kafka-names.json',receipt)
+ write(out/'kafka-acl-historical-pass.json',check_kafka_acl_receipt(dict(KAFKA_ACL_PASSED_REUSE)))
+ return receipt
+
+def write_current_image_kafka_summary(out,receipt,cleanup_audit,launcher_reuse,redis_parser_reuse):
+ check_current_image_kafka_receipt(receipt)
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'kafkaACLTopPASS':1,'kafkaACLSubPASS':2,'actualKafkaACLTestsDispatched':1,'processImageTopPASS':1,'processImageSubPASS':2,'actualProcessImageTestsDispatched':1,'currentImageKafkaScope':receipt,'kafkaACLPassedReuse':None,'kafkaACLHistoricalPass':KAFKA_ACL_PASSED_REUSE,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'historicalCleanupSourceFactsOnly':True,'currentWholeOwnedcontrolPackagePASS':False,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+
 def check_locked(c):
  if FINAL_SOURCE is None or c.get('state')!='FROZEN_FINAL_SOURCE' or c.get('source')!=FINAL_SOURCE or c.get('sourceReviewAccepted') is not True:raise ValueError('Root final formatted whole-source identity required; prepare-only cannot execute')
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
  if c.get('targetedKafkaACLControl')!=KAFKA_ACL_CONTROL:raise ValueError('exact original Kafka ACL parent and two new children required')
- if c.get('kafkaACLTestsToRun')!=[] or json.dumps(c.get('kafkaACLPassedReuse'),sort_keys=True,separators=(',',':'))!=json.dumps(KAFKA_ACL_PASSED_REUSE,sort_keys=True,separators=(',',':')):raise ValueError('exact Root accepted Kafka ACL reuse without redispatch required')
+ if c.get('kafkaACLTestsToRun')==[]:
+  if json.dumps(c.get('kafkaACLPassedReuse'),sort_keys=True,separators=(',',':'))!=json.dumps(KAFKA_ACL_PASSED_REUSE,sort_keys=True,separators=(',',':')) or c.get('processImageTestsToRun',[])!=[]:raise ValueError('exact Root accepted Kafka ACL reuse without redispatch required')
+ else:check_current_image_kafka_plan(c)
  if c.get('cleanupScopes')!=CLEANUP_SCOPES or c.get('cleanupCompleteScopes')!=CLEANUP_COMPLETE_SCOPES or c.get('cleanupRecentReuse')!=CLEANUP_RECENT_REUSE or c.get('cleanupFixtureRepair')!=CLEANUP_FIXTURE_REPAIR or c.get('cleanupReuse')!=CLEANUP_REUSE or 'ownedcontrolReuse' in c or c.get('originalTargets')!=GRAPH_TARGETS or c.get('requiredOriginalSubtests')!=GRAPH_CHILDREN or c.get('cleanupPassedReuse')!=CLEANUP_PASSED_REUSE or c.get('cleanupTestsToRun')!=[]:raise ValueError('exact fresh local1/runtime2/graph2+3 with original3top9sub and unbound1 reuse required')
 def validate_entries(bodies,c):
     rows = c['entrypoints']
@@ -117,14 +155,15 @@ def verify():
  for row in c['controllerPins']:pin(row)
  check_redis_parser_reuse(c.get('redisParserPassedReuse'),bodies)
  if c.get('redisParserTestsToRun')!=[]:raise ValueError('unchanged Redis parser must not be redispatched')
- check_kafka_acl_reuse(c.get('kafkaACLPassedReuse'),bodies,recipe)
+ if c['kafkaACLTestsToRun']==[]:check_kafka_acl_reuse(c.get('kafkaACLPassedReuse'),bodies,recipe)
+ else:check_current_image_kafka_plan(c)
  if catalog['scope']!='fresh_owned_fullgraph_compatibility_fixture_only_no_production_default' or catalog['minio']['mode']!='source-elf' or catalog['minio']['status']!='historical_unmaintained_test_only':raise ValueError('explicit source-MinIO fixture required')
  if catalog['images']['minio']!=catalog['images']['redis'] or catalog['images']['keeper']!=catalog['images']['redis']:raise ValueError('known Redis base must remain explicit')
  module('ci/backend-fullgraph/minio_build.py','fullgraph_fixed_fixture_policy').fixture_policy(c)
  return c,bodies,recipe,parent,old,catalog
 
 def project_go_test_events(raw,phase):
- if phase not in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response'}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
+ if phase not in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',CURRENT_IMAGE_KAFKA_CONTROL['phase']}|{scope['label'] for scope in CLEANUP_SCOPES}:raise ValueError('only exact original and cleanup Go test phases may expose build diagnostics')
  events=[];digest=hashlib.sha256();total=0;head=bytearray()
  for line in raw.splitlines():
   event=json.loads(line)
@@ -484,7 +523,7 @@ def run():
     raw=regular(folder/'stderr',32<<20) if (folder/'stderr').exists() else b''
     write(out/(f'compile-failure-{command_index:04d}.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
    fixture_observations=None
-   if label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response'} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
+   if label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',CURRENT_IMAGE_KAFKA_CONTROL['phase']} or label in {scope['label'] for scope in CLEANUP_SCOPES}:
     raw_events=regular(folder/'stdout',32<<20)
     if label=='cleanup-runtimeacceptance':
      fixture_observations=runtime_cleanup_observations(raw_events,label)
@@ -511,7 +550,9 @@ def run():
   redis_parser_reuse=load_redis_parser_reuse(out,bodies)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
-  kafka_acl_reuse=load_kafka_acl_reuse(out,bodies,recipe,tools['go'])
+  kafka_acl_reuse=None;current_image_kafka=None
+  if c['kafkaACLTestsToRun']==[]:kafka_acl_reuse=load_kafka_acl_reuse(out,bodies,recipe,tools['go'])
+  else:current_image_kafka=run_current_image_kafka_control(go,offline,command,parent,out)
   binroot=root/'bin';binroot.mkdir(mode=0o700);binaries=[];build_start=time.monotonic()
   entries=[{'role':'acceptance-operator','package':'./cmd/tools/owned-fullgraph-acceptance'}]+c['entrypointContract']['entrypoints']+[{'role':'msgtransfer-legacy','package':'./cmd/openim-msgtransfer'}]
   for entry in entries:
@@ -575,7 +616,10 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'kafkaACLTopPASS':0,'kafkaACLSubPASS':0,'kafkaACLHistoricalTopPASS':1,'kafkaACLHistoricalSubPASS':2,'actualKafkaACLTestsDispatched':0,'kafkaACLPassedReuse':kafka_acl_reuse,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
+ if current_image_kafka is not None:
+  write_current_image_kafka_summary(out,current_image_kafka,cleanup_audit,launcher_reuse,redis_parser_reuse)
+ else:
+  write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'cleanupTopPASS':0,'cleanupSubPASS':0,'cleanupPassedReuse':CLEANUP_PASSED_REUSE,'launcherTopPASS':0,'launcherSubPASS':0,'launcherPassedReuse':LAUNCHER_PASSED_REUSE,'actualLauncherTestsDispatched':0,'targetedTopPASS':2,'targetedSubPASS':3,'kafkaACLTopPASS':0,'kafkaACLSubPASS':0,'kafkaACLHistoricalTopPASS':1,'kafkaACLHistoricalSubPASS':2,'actualKafkaACLTestsDispatched':0,'kafkaACLPassedReuse':kafka_acl_reuse,'redisParserTopPASS':0,'redisParserSubPASS':0,'redisParserHistoricalTopPASS':1,'redisParserHistoricalSubPASS':3,'actualRedisParserTestsDispatched':0,'redisParserPassedReuse':redis_parser_reuse,'cleanupReuse':dict(CLEANUP_REUSE,topPASS=0,subPASS=1),'cleanupRecentReuse':CLEANUP_RECENT_REUSE,'originalObligation':{'topCount':5,'subCount':12,'crossSource':True},'newSafety':{'topCount':2,'subCount':4,'crossSource':True},'completeObligation':{'topCount':7,'subCount':16,'crossSource':True},'old67or21TestsRerun':0,'reuseOldBinary':False,'deployment':False,'resourceCleanup':'must independently pass always collector','privateLogsUploaded':False})
  return 0
 
 if __name__=='__main__':

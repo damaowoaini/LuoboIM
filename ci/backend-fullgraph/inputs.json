@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_and_four_planes_redis122c1top3sub_launcher868e1top0sub_and_cleanup_source_bound_reuse_no_deployment",
   "source": {
     "members": 1576,
-    "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
+    "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 71736,
-      "sha256": "8afce7afeb2f4be7081b5e0bd6a4e38cd59f8f7558b4bd0390d599ed6d23665c"
+      "bytes": 77632,
+      "sha256": "be8eec70f278acfd1ea6a695eec1b6bfd9a0ea87b701472c4f2f4cba41fa81e4"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 49253,
-      "sha256": "405f6d0d869bb5dcf7beee847140f17457ddfb2182c77f113deb1d1ba652838a"
+      "bytes": 52980,
+      "sha256": "16e2a22fcd7e1e69f31447f219d210ea59f7b4467e9eef7192a30f062b536f37"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 88823,
-      "sha256": "7f784f1577aef04d4b3e4490f4ad4937239bbe2d67ef0faa66ff96455c94bb5e"
+      "bytes": 96514,
+      "sha256": "2a5817e729f27fba31210eedcfd57684329a9030c7785fa85bfbb3938e7d7b39"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -1088,8 +1088,8 @@
     {
       "target": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/process_linux.go",
-      "bytes": 25278,
-      "sha256": "fc6327fc984871a5fc14efddc2c9d263b5c8a2c7ee3548afe74699db1c473aae",
+      "bytes": 28188,
+      "sha256": "d413c338a3b42786f206f1575e570c390a8814a9c702a1b87c5eed2a06f9eee9",
       "beforeSHA256": "5802ed409efa8c3c449942f9544c033b88302921473a2bb5855c85e8364432f5"
     },
     {
@@ -4280,7 +4280,33 @@
     "copyBinary": false,
     "sameRepositoryOnly": true
   },
-  "minioFixtureBinding": null,
+  "minioFixtureBinding": {
+    "rootFixtureAccepted": true,
+    "rootAcceptanceSHA256": "cd1010e6e2429d2dfb594072e07b24d79918d33451a5fc3a220276f0e1237495",
+    "repository": "damaowoaini/LuoboIM",
+    "run": 42152637741,
+    "head": "aab27f77458418b0c7276764665f31e0c4144067",
+    "attempt": 1,
+    "jobID": 127679246498,
+    "jobConclusion": "failure",
+    "runConclusion": "failure",
+    "artifactID": 13474215432,
+    "artifactBytes": 70210047,
+    "artifactSHA256": "41cd1ae1525a601b7436efef8446137743fd88178903373fee9e88d84661ca76",
+    "manifestSHA256": "ed84605ccc523ae5f41d6b82584765b6a04aac3f685d6cd9ecf44b3784c2ead5",
+    "receipt": {
+      "version": "owned-minio-source-build-receipt-v1",
+      "repository": "https://github.com/minio/minio",
+      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
+      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
+      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
+      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
+      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "cgoEnabled": "0",
+      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
+      "binaryBytes": 146777192
+    }
+  },
   "launcherPassedReuse": {
     "run": 39075035152,
     "job": 117520306290,
@@ -4319,16 +4345,21 @@
   "launcherTestsToRun": [],
   "finalFormattedSourceProof": {
     "receipt": {
-      "path": ".qa/backend-kafka-response-batch-1/formatted.json",
-      "bytes": 6637,
-      "sha256": "61dda228b6613a908251892be8c21a4306bf0bc4c90f723d328753c27861759f"
+      "path": ".qa/backend-process-image-batch-20261106/formatted-r2.json",
+      "bytes": 837,
+      "sha256": "d22a11fa23c50e9b779368b0a7bcf56d94401f8ac16e4d934dfbe47119def9c2"
     },
-    "resource": {
-      "path": ".qa/backend-kafka-response-batch-1/format3.resource.json",
-      "bytes": 944,
-      "sha256": "8dfa1a1b50dd5496a1c2954995cde234233f689e9f7f15247d2f5d5f8aa25846"
+    "singleChangedSource": {
+      "path": ".qa/backend-process-image-batch-20261106/formatted-r2/ci/candidates/backend-fullgraph/source/server/internal/namespaceimport/ownedcontrol/process_linux.go",
+      "bytes": 28188,
+      "sha256": "d413c338a3b42786f206f1575e570c390a8814a9c702a1b87c5eed2a06f9eee9"
     },
+    "toolSHA256": "5894006a03afafb375c8dcde9eeae1e6e5bd292d5e6d8a5eaac9ff0974694482",
     "source": {
+      "members": 1576,
+      "digest": "eaf61802fc86b1ff65a08bb8b75d64a2d8813d9af1bf54d41bf2aa37b9f142af"
+    },
+    "unchangedOtherSourceBodiesFrom": {
       "members": 1576,
       "digest": "a41e244f1126427cee7b374532b4e382fa7e2d08640d01c89f29f62fccbd0371"
     },
@@ -4459,7 +4490,11 @@
     "newDatabaseFixtures": 0,
     "otherKafkaOrRedisTestsDispatched": false
   },
-  "kafkaACLPassedReuse": {
+  "kafkaACLPassedReuse": null,
+  "kafkaACLTestsToRun": [
+    "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+  ],
+  "kafkaACLHistoricalPass": {
     "schema": 1,
     "kind": "root-accepted-kafka-acl-source-bound-reuse-v1",
     "run": 39091570750,
@@ -4651,5 +4686,44 @@
     "currentFreshPASS": false,
     "runtimeAccepted": false
   },
-  "kafkaACLTestsToRun": []
+  "processImageTestsToRun": [
+    "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
+  ],
+  "currentImageKafkaControl": {
+    "phase": "current-image-kafka",
+    "targets": {
+      "internal/namespaceimport/ownedcontrol": [
+        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny",
+        "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation"
+      ]
+    },
+    "requiredSubtests": {
+      "internal/namespaceimport/ownedcontrol": {
+        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
+          "create-reply-error-and-shape-cannot-be-a-success",
+          "describe-reply-error-and-shape-cannot-replace-exact-deny"
+        ],
+        "TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation": [
+          "actual-original-image-and-bounded-file-pins",
+          "real-fd-path-stability-and-mid-read-cancellation"
+        ]
+      }
+    },
+    "goTimeoutSeconds": 180,
+    "phaseGuardSeconds": 240,
+    "topPASS": 2,
+    "subPASS": 4,
+    "samePackageSingleRaceInvocation": true,
+    "newDatabaseFixtures": 0
+  },
+  "historicalCleanupDependencyBoundary": {
+    "changedSourceTarget": "server/internal/namespaceimport/ownedcontrol/process_linux.go",
+    "unchangedOriginalStopAndJoinBodies": true,
+    "nilObservationPathOriginalChecksAndEffectsPreserved": true,
+    "currentProcessImageParentChildrenMustRun": true,
+    "historicalProcessImageNamesAreNotCurrentPASS": true,
+    "historicalCleanupAndLauncherReceiptsAreNotCurrentPackagePASS": true,
+    "currentWholeOwnedcontrolPackagePASS": false,
+    "originalCrossSourceObligationsKept": true
+  }
 }

@@ -829,4 +829,71 @@ class FullGraphControls(unittest.TestCase):
     with mock.patch('builtins.print',side_effect=error):
      collector.emit_console_observation(rows,monitor,{}, {},root/'absent')
 
+ def test_process_image_start_labels_are_closed_failed_calls_and_never_exit_or_hash_authority(self):
+  collector=load('collect')
+  terminal={'version':'owned-fullgraph-token-v2-result-v1','scenario':run.SCENARIOS[1],'accepted':False,'phase':'actual-twelve-other-source-constructors','failureClass':'owned-evidence-rejected','failureSHA256':'a'*64,'sourceSHA256':run.FINAL_SOURCE['digest'],'resourcePlaneSHA256':'b'*64,'actualStartedRoles':0,'constructorStage':'start','constructorRole':'msggateway','constructorCallState':'returned','constructorErrorClass':'owned-evidence','rawError':'PRIVATE_BODY','privatePath':'PRIVATE_PATH'}
+  for step in ('context','before-identity','open','initial-stat','read','final-stat','size','hash','after-identity'):
+   for state in ('wait-unobserved','wait-success','wait-other','wait-exit-code--1','wait-exit-code-0','wait-exit-code-1','wait-exit-code-255'):
+    predicate='start-service-process-image-'+step+'-'+state
+    value=dict(terminal,constructorPredicate=predicate)
+    observed=collector.public_terminal(json.dumps(value).encode(),value['scenario'])
+    self.assertEqual(observed['constructorPredicate'],predicate);self.assertFalse(observed['accepted']);self.assertFalse(observed['rawErrorText'])
+    self.assertNotIn('PRIVATE_',json.dumps(observed))
+    for fields in ({'constructorErrorClass':'none'},{'constructorErrorClass':'registration-pending'},{'constructorCallState':'in-progress','constructorErrorClass':'in-progress'},{'constructorRole':'none'},{'constructorRole':'rpc-msg'},{'constructorStage':'observe-registration'}):
+     with self.subTest(predicate=predicate,invalid=fields),self.assertRaises(ValueError):collector.public_terminal(json.dumps(dict(value,**fields)).encode(),value['scenario'])
+  for predicate in ('start-service-process-image-PRIVATE_PATH-wait-success','start-service-process-image-hash-live','start-service-process-image-hash-wait-success-extra','start-service-process-image-hash-wait-exit-code--2','start-service-process-image-hash-wait-exit-code-256','start-service-process-image-hash-wait-exit-code-01','start-service-process-image-hash-wait-exit-code-+1','start-service-process-image-hash-wait-exit-code-1.0'):
+   with self.assertRaises(ValueError):collector.public_terminal(json.dumps(dict(terminal,constructorPredicate=predicate)).encode(),terminal['scenario'])
+
+  # The changed ownedcontrol package must run both exact tops in one race process.
+  control=run.CURRENT_IMAGE_KAFKA_CONTROL;package=next(iter(control['targets']));parent=run.module('ci/backend-runtime-join-r7/run.py','image_kafka_pure_auditor')
+  locked=json.loads(run.INPUTS.read_bytes());run.check_current_image_kafka_plan(locked)
+  for change in ({'kafkaACLPassedReuse':run.KAFKA_ACL_PASSED_REUSE},{'processImageTestsToRun':[]},{'kafkaACLTestsToRun':[]},{'currentImageKafkaControl':{}}):
+   with self.assertRaises(ValueError):run.check_current_image_kafka_plan(dict(locked,**change))
+  events=[{'Action':'start','Package':parent.PREFIX+package}]
+  for top in control['targets'][package]:
+   events.append({'Action':'run','Package':parent.PREFIX+package,'Test':top})
+   for child in control['requiredSubtests'][package][top]:
+    name=top+'/'+child;events.extend([{'Action':'run','Package':parent.PREFIX+package,'Test':name},{'Action':'pass','Package':parent.PREFIX+package,'Test':name}])
+   events.append({'Action':'pass','Package':parent.PREFIX+package,'Test':top})
+  events.append({'Action':'pass','Package':parent.PREFIX+package})
+  for mode in ('complete','missing-child','skip','foreign-top','missing-footer','phase-error'):
+   with self.subTest(currentImageKafka=mode),tempfile.TemporaryDirectory() as directory:
+    out=Path(directory).resolve();seen=[];environment={'GOPROXY':'off','GOSUMDB':'off','GOCACHE':'/owned/race-cache'}
+    def command(label,argv,seconds,actual_environment):
+     seen.append(label);self.assertEqual(label,control['phase']);self.assertEqual(seconds,240);self.assertEqual(actual_environment,environment)
+     self.assertEqual(argv[:3],['/owned/go','test','-mod=readonly']);self.assertIn('-race',argv);self.assertIn('-timeout=180s',argv);self.assertEqual(argv[-1],'./'+package)
+     pattern=__import__('re').compile(argv[argv.index('-run')+1])
+     self.assertTrue(all(pattern.fullmatch(top) for top in control['targets'][package]));self.assertIsNone(pattern.fullmatch('TestForeign'))
+     if mode=='phase-error':raise ValueError('original phase failure')
+     rows=copy.deepcopy(events)
+     if mode=='missing-child':rows=[r for r in rows if r.get('Test')!='TestOwnedProcessImageStreamingKeepsOriginalIdentityAndCancellation/real-fd-path-stability-and-mid-read-cancellation']
+     elif mode=='skip':rows[2]['Action']='skip'
+     elif mode=='foreign-top':rows.insert(1,{'Action':'run','Package':parent.PREFIX+package,'Test':'TestForeign'})
+     elif mode=='missing-footer':rows=rows[:-1]
+     return ('\n'.join(json.dumps(r) for r in rows)+'\n').encode()
+    if mode!='complete':
+     with self.assertRaises(ValueError):run.run_current_image_kafka_control('/owned/go',environment,command,parent,out)
+     self.assertEqual(seen,[control['phase']]);self.assertFalse((out/'current-image-kafka-names.json').exists());continue
+    value=run.run_current_image_kafka_control('/owned/go',environment,command,parent,out)
+    self.assertEqual(seen,[control['phase']]);self.assertEqual((value['topPASS'],value['subPASS']),(2,4))
+    self.assertEqual(value['source'],run.FINAL_SOURCE);self.assertFalse(value['runtimeAccepted']);self.assertFalse(value['wholeSourceAccepted'])
+    projected,_=run.project_go_test_events(('\n'.join(json.dumps(r) for r in events)+'\n').encode(),control['phase'])
+    run.write(out/'current-image-kafka-events.json',projected);run.write(out/'phase-0001.json',{'phase':control['phase'],'exitCode':0,'resource':{'status':'passed','exit_code':0}})
+    run.write(out/'source-post.json',{'accepted':True,'source':run.FINAL_SOURCE});tools={'go':{'bytes':1,'sha256':'a'*64,'mode':0o755}};run.write(out/'tools-before.json',tools);run.write(out/'tools-after.json',tools)
+    self.assertEqual(collector.checked_current_image_kafka_evidence(out),value)
+    original={name:(out/name).read_bytes() for name in ('current-image-kafka-events.json','phase-0001.json','source-post.json','tools-after.json','kafka-acl-historical-pass.json')}
+    for changed in ('events','phase','source-post','tools','historical'):
+     for name,raw in original.items():(out/name).write_bytes(raw)
+     if changed=='events':(out/'current-image-kafka-events.json').write_text(json.dumps(projected[:-1]))
+     elif changed=='phase':(out/'phase-0001.json').write_text(json.dumps({'phase':control['phase'],'exitCode':0,'resource':{'status':'failed','exit_code':0}}))
+     elif changed=='source-post':(out/'source-post.json').write_text(json.dumps({'accepted':False,'source':run.FINAL_SOURCE}))
+     elif changed=='tools':(out/'tools-after.json').write_text('{}')
+     else:(out/'kafka-acl-historical-pass.json').write_text('{}')
+     with self.subTest(currentCustody=changed),self.assertRaises(ValueError):collector.checked_current_image_kafka_evidence(out)
+    for name,raw in original.items():(out/name).write_bytes(raw)
+    for changed in (dict(value,source=run.KAFKA_ACL_PASSED_REUSE['source']),dict(value,topPASS=True),dict(value,subPASS=2),dict(value,runtimeAccepted=True),dict(value,wholeSourceAccepted=True),dict(value,namedCompletions=value['namedCompletions'][:-1])):
+     with self.assertRaises(ValueError):run.check_current_image_kafka_receipt(changed)
+    run.write(out/'kafka-acl-passed-reuse.json',run.KAFKA_ACL_PASSED_REUSE)
+    with self.assertRaises(ValueError):collector.checked_current_image_kafka_evidence(out)
+
 if __name__=='__main__':unittest.main()
