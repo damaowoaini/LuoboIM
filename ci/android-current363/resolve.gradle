@@ -329,7 +329,18 @@ if (richBytes.length > 128*1024 || richScript.length > 32*1024 ||
 def richSource = new JsonSlurper().parseText(new String(richBytes,'UTF-8'))
 def richFactory = new GroovyShell(getClass().classLoader).evaluate(new String(richScript,'UTF-8'))
 def richGate = richFactory(owned,richSource,localRef,fileDigest,richField.catalog_sha256)
-def richPhase = gradle.startParameter.taskNames == ['assembleDebug'] ? 'apk' : 'metadata'
+// StartParameter.newBuild preserves the explicit -D map, but not task names.
+// Included Flutter/plugin builds must share the top-level dispatch phase.
+def richPhaseFor = { dispatch ->
+    def phases = ['gradle-dependency-setup':'metadata','assemble-debug':'apk']
+    if (!(dispatch instanceof String) || !phases.containsKey(dispatch))
+        throw new GradleException('fixed inherited production dispatch phase required')
+    phases[dispatch]
+}
+def richPhase = richPhaseFor(properties['luoboProductionDispatch'])
+logger.lifecycle('LUOBO_RICH_PHASE ' + JsonOutput.toJson(
+    [source:'StartParameter.systemPropertiesArgs',phase:richPhase,
+     dispatch:properties['luoboProductionDispatch']]))
 // Independent package archives are sealed before any application model. This
 // registry authorizes only exact source/project/configuration tuples, not a graph.
 def pluginField = catalog.registered_plugin_rich_consumer

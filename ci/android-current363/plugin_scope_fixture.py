@@ -1,6 +1,6 @@
 """Prepare three offline builtin/file-Maven controls; no tool dispatch here.
 
-Both factory scripts and the durable writer are the exact production bodies.
+Both factory scripts, inherited phase and durable writer are production bodies.
 Tiny synthetic JARs/metadata are never production18 or package source proof.
 """
 import copy
@@ -12,9 +12,11 @@ import rich_current as rich
 import rich_fixture as old_fixture
 import support as s
 
-RESOLVER_SHA = 'b5e2b253bf8c84d1c07a7174e058584a755b0b77d44ba2db83501505385a8a2e'
+RESOLVER_SHA = 'c827abdbfa2cf539bbc8fbfc50ef5560e3d8b14d3f128fedbedfe188840dcac2'
 START = 'def richPersist = '
 END = 'def richWrite = '
+PHASE_START = 'def richPhaseFor = '
+PHASE_END = 'def richPhase = richPhaseFor('
 MARKER = 'LUOBO_PLUGIN_WRITER_RETURNED '
 
 
@@ -26,6 +28,18 @@ def writer_bytes(here):
     a, z = text.index(START), text.index(END)
     if a >= z:
         raise ValueError('ordered production writer markers required')
+    return text[a:z].encode()
+
+
+def phase_bytes(here):
+    body = rich.read(Path(here) / 'resolve.gradle')
+    text = body.decode()
+    if (rich.sha(body) != RESOLVER_SHA or text.count(PHASE_START) != 1
+            or text.count(PHASE_END) != 1):
+        raise ValueError('exact production resolver and unique inherited phase required')
+    a, z = text.index(PHASE_START), text.index(PHASE_END)
+    if a >= z:
+        raise ValueError('ordered production phase markers required')
     return text[a:z].encode()
 
 
@@ -45,14 +59,45 @@ gradle.projectsEvaluated {
     def originalBytes=new File(root.projectDir,'App-library.gradle').bytes
     def pluginBytes=new File(root.projectDir,'plugin-library.gradle').bytes
     def writerBytes=new File(root.projectDir,'writer.gradle').bytes
+    def phaseBytes=new File(root.projectDir,'phase.gradle').bytes
     assert hash(originalBytes)==input.App_library_sha256
     assert hash(pluginBytes)==input.plugin_library_sha256
     assert hash(writerBytes)==input.writer_sha256
+    assert hash(phaseBytes)==input.phase_sha256
+    def phaseFor=new GroovyShell(getClass().classLoader).evaluate(
+        'import org.gradle.api.GradleException\n'+new String(phaseBytes,'UTF-8')+'\nreturn richPhaseFor\n')
+    assert phaseFor('gradle-dependency-setup')=='metadata'
+    assert phaseFor('assemble-debug')=='apk'
+    // Exercise the real fixed Gradle StartParameter.newBuild API used by an
+    // included build. Only clones change; the running control is untouched.
+    ['gradle-dependency-setup':'dependencies','assemble-debug':'assembleDebug'].each { dispatch,task ->
+        def outer=gradle.startParameter.newInstance()
+        outer.setTaskNames([task])
+        def explicit=new LinkedHashMap(outer.getSystemPropertiesArgs())
+        explicit['luoboProductionDispatch']=dispatch
+        outer.setSystemPropertiesArgs(explicit)
+        def included=outer.newBuild()
+        assert included.taskNames.empty
+        assert included.getSystemPropertiesArgs()==explicit
+        assert phaseFor(included.getSystemPropertiesArgs()['luoboProductionDispatch'])==
+            (dispatch=='assemble-debug' ? 'apk' : 'metadata')
+        def missing=new LinkedHashMap(included.getSystemPropertiesArgs())
+        missing.remove('luoboProductionDispatch')
+        def refused=false
+        try { phaseFor(missing['luoboProductionDispatch']) }
+        catch (org.gradle.api.GradleException expected) { refused=true }
+        assert refused
+    }
+    [null,'','dependencies','assembleDebug','unknown',false,['assemble-debug']].each { invalid ->
+        def rejected=false
+        try { phaseFor(invalid) } catch (org.gradle.api.GradleException expected) { rejected=true }
+        assert rejected
+    }
     def original=new GroovyShell(getClass().classLoader).evaluate(new String(originalBytes,'UTF-8'))
     def plugin=new GroovyShell(getClass().classLoader).evaluate(new String(pluginBytes,'UTF-8'))
     def richSource=input.App_source
     def pluginSlots=[(input.entry.slot):input.entry]
-    def binding=new Binding([owned:owned,richSource:richSource,richPhase:'metadata',pluginSlots:pluginSlots,
+    def binding=new Binding([owned:owned,richSource:richSource,richPhase:phaseFor('gradle-dependency-setup'),pluginSlots:pluginSlots,
         ownedPrincipal:Files.getOwner(owned.toPath(),LinkOption.NOFOLLOW_LINKS)])
     def writer=new GroovyShell(getClass().classLoader,binding).evaluate(
         """import groovy.json.JsonOutput
@@ -92,6 +137,7 @@ def prepare(work, here):
     work, here = Path(work), Path(here)
     catalog, _, old_lib = rich.approved(here)
     plugin = rich.read(here / 'plugin-rich-consumer.gradle'); writer = writer_bytes(here)
+    phase = phase_bytes(here)
     cases = []
     for mode, rejection in [('two-projects-positive', None),
                              ('changed-plugin-source', 'plugin rich independently sealed source differs'),
@@ -119,8 +165,10 @@ def prepare(work, here):
             root_relative=str(root.relative_to(owner)),project_relative=str((root/'plugin').relative_to(owner)),sources=critical)
         entry = dict(project=':plugin',slot=hashlib.sha256(b':plugin').hexdigest(),gate_sources=critical,origin={'kind':'synthetic-file-Maven-control-only'})
         s.put(root / 'App-library.gradle', old_lib);s.put(root / 'plugin-library.gradle', plugin);s.put(root / 'writer.gradle', writer)
+        s.put(root / 'phase.gradle', phase)
         s.write_json(root / 'control-input.json', dict(owned=str(owner),App_source=source,plugin_source=scoped,entry=entry,
             App_library_sha256=rich.sha(old_lib),plugin_library_sha256=rich.sha(plugin),writer_sha256=rich.sha(writer),
+            phase_sha256=rich.sha(phase),
             template_catalog_sha256=rich.CATALOG_SHA,seal_sha256='a'*64))
         s.put(root / 'control-init.gradle', INIT.encode())
         modules = {tuple(a['id'].values()):a['id'] for c in configs for a in c['artifacts']}

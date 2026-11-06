@@ -1,8 +1,10 @@
 """Current363 source admission only; never runs native tools or phases."""
 import copy
+import hashlib
 import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 HERE = Path(__file__).resolve().parent
@@ -54,6 +56,33 @@ class Current363SourceTests(unittest.TestCase):
         self.assertEqual(controller.require_reviewed_consumer(context, controller.s.sha(HERE / 'cohort.json')), None)
         with self.assertRaises(ValueError):
             controller.require_reviewed_consumer(context, '0' * 64)
+
+
+    def test_inherited_phase_fragment_and_unchanged_exclusive_writer_are_bound(self):
+        fixture = controller.plugin_scope_fixture
+        phase = fixture.phase_bytes(HERE)
+        resolver = (HERE / 'resolve.gradle').read_text()
+        self.assertIn("def richPhase = richPhaseFor(properties['luoboProductionDispatch'])", resolver)
+        for forbidden in ('taskNames', 'System.', 'getenv', 'getProperty'):
+            self.assertNotIn(forbidden, phase.decode())
+        self.assertEqual(hashlib.sha256(fixture.writer_bytes(HERE)).hexdigest(),
+            '4e65d325af40646f489734a518bdac97bb3f141f95739da434f682d6463d699b')
+        self.assertIn('java.nio.file.StandardOpenOption.CREATE_NEW', fixture.writer_bytes(HERE).decode())
+        # Actual Groovy assertions run inside the same existing three controls,
+        # using the real extracted function and fixed Gradle StartParameter API.
+        # This Python method verifies source binding, not Gradle execution.
+        for contract in ("phaseFor('gradle-dependency-setup')=='metadata'",
+                "phaseFor('assemble-debug')=='apk'", 'def included=outer.newBuild()',
+                'assert included.taskNames.empty',
+                'assert included.getSystemPropertiesArgs()==explicit',
+                "missing.remove('luoboProductionDispatch')",
+                "[null,'','dependencies','assembleDebug','unknown',false,['assemble-debug']]",
+                "phaseFor(missing['luoboProductionDispatch'])"):
+            self.assertIn(contract, fixture.INIT)
+        with tempfile.TemporaryDirectory(prefix='current363-phase-source-') as directory:
+            (Path(directory) / 'resolve.gradle').write_text(resolver + '\n')
+            with self.assertRaises(ValueError):
+                fixture.phase_bytes(Path(directory))
 
 
 if __name__ == '__main__':

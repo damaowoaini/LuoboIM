@@ -213,9 +213,9 @@
       "sha256": "7a3c9621a275f996593bb937369d21580ce0c92c3045b2a078f458742a656fee"
     },
     {
-      "bytes": 11062,
+      "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "faba6e0418d493444e4792c91855d4c856c5d0b1d0fb3179247b0b06e8831155"
+      "sha256": "a9f35b590a2ffff1ff5eb0a8f840b2d2098ff99688a1e82f6294dc25be38264e"
     },
     {
       "bytes": 1384,
@@ -223,9 +223,9 @@
       "sha256": "a2e4948524efdb24518f8cf1574dcc39c4998701bf39ca7bf168316d229814b1"
     },
     {
-      "bytes": 55608,
+      "bytes": 56214,
       "path": "ci/android-current363/resolve.gradle",
-      "sha256": "b5e2b253bf8c84d1c07a7174e058584a755b0b77d44ba2db83501505385a8a2e"
+      "sha256": "c827abdbfa2cf539bbc8fbfc50ef5560e3d8b14d3f128fedbedfe188840dcac2"
     },
     {
       "bytes": 71217,
@@ -253,9 +253,9 @@
       "sha256": "a903d61112f92770b5401fdeac312d355d9d72af4925116b5a0b8c70cfa32a96"
     },
     {
-      "bytes": 3442,
+      "bytes": 5272,
       "path": "ci/android-current363/test_identity.py",
-      "sha256": "060d5ea990bebde00e59c050db690527dd1310dbc497e329a853224d119c747e"
+      "sha256": "f39233c1527235bd26f74c73d4185426514c5ccc3896741f4d91f294f86fc726"
     },
     {
       "bytes": 3621,
@@ -396,9 +396,9 @@
     "complete": "evidence/plugin-controls-complete.json",
     "completion_requires": "actual guarded exit/resource/log SHA plus unchanged original fixture.check for every case",
     "fixture": {
-      "bytes": 11062,
+      "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "faba6e0418d493444e4792c91855d4c856c5d0b1d0fb3179247b0b06e8831155"
+      "sha256": "a9f35b590a2ffff1ff5eb0a8f840b2d2098ff99688a1e82f6294dc25be38264e"
     },
     "mandatory_preseal_after_builtin_before_production_models": true,
     "owned_outputs_policy_unchanged": true,
