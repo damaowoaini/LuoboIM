@@ -121,10 +121,16 @@ func (w *ownedNullAckWire) serve(mode string) error {
 	}
 	cached := ""
 	for {
-		args, err = read()
-		if errors.Is(err, io.EOF) || errors.Is(err, io.ErrClosedPipe) {
+		// At a frame boundary only an empty-buffer close is expected. Once any
+		// byte exists, the original bounded parser must reject a partial frame.
+		first, peekErr := reader.Peek(1)
+		if len(first) == 0 && (errors.Is(peekErr, io.EOF) || errors.Is(peekErr, io.ErrClosedPipe)) {
 			return nil
 		}
+		if peekErr != nil {
+			return peekErr
+		}
+		args, err = read()
 		if err != nil {
 			return err
 		}

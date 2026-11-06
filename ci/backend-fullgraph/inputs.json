@@ -4,7 +4,7 @@
   "scope": "original_graph2top3sub_four_scenarios_managed_producer1top13sub_kafka1top3sub_two_packages_one_command",
   "source": {
     "members": 1583,
-    "digest": "f5b048a3862e994c02f258474ee901c171d81ce2e6899905ec16fc34c66a42c8"
+    "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,8 +42,8 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 595894,
-      "sha256": "3f090f322ae7022b6a7380eeee69383cb4e6a8646502e75c608aba0c23738c9d"
+      "bytes": 595895,
+      "sha256": "128efb9f997dc6792d41f30e43f2ed7375b5e7bb7a563bf329cdbf9e8ec6248f"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
@@ -1801,8 +1801,8 @@
       "target": "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
       "path": "ci/candidates/backend-fullgraph/source/server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
       "beforeSHA256": null,
-      "bytes": 9830,
-      "sha256": "70396b82aa3f4213c209ee46c049bb8615e428ebc62fa7727b2c62bd274cd904"
+      "bytes": 10087,
+      "sha256": "5b9663fbab1186326b32e64b70519606566e8f5b6bc482e7f67e93140a9c47bf"
     }
   ],
   "allowedOverlayTargets": [
@@ -7716,7 +7716,7 @@
     "version": "exact-owned-redis-null-ack-two-body-source-history-v1",
     "currentSource": {
       "members": 1583,
-      "digest": "f5b048a3862e994c02f258474ee901c171d81ce2e6899905ec16fc34c66a42c8"
+      "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
     },
     "originalSource": {
       "members": 1582,
@@ -7726,8 +7726,8 @@
       {
         "target": "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
         "after": {
-          "bytes": 9830,
-          "sha256": "70396b82aa3f4213c209ee46c049bb8615e428ebc62fa7727b2c62bd274cd904"
+          "bytes": 10087,
+          "sha256": "5b9663fbab1186326b32e64b70519606566e8f5b6bc482e7f67e93140a9c47bf"
         }
       }
     ],

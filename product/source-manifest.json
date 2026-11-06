@@ -9365,8 +9365,8 @@
       "path": "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
       "mode": 420,
       "provider": "ci/backend-fullgraph/run.py:verify",
-      "bytes": 9830,
-      "sha256": "70396b82aa3f4213c209ee46c049bb8615e428ebc62fa7727b2c62bd274cd904"
+      "bytes": 10087,
+      "sha256": "5b9663fbab1186326b32e64b70519606566e8f5b6bc482e7f67e93140a9c47bf"
     },
     {
       "bytes": 4763,
@@ -13233,7 +13233,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "2a51916c3b50807bbb23df09fec24f334ec69f66984857e7661e082b68e60cd9",
+  "filesSHA256": "3d73fc8ce1a981d84deda2e0ef70fea9ee5a6ee3a12994aae90f1521b48a22e0",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13291,7 +13291,7 @@
     },
     "server": {
       "members": 1583,
-      "digest": "f5b048a3862e994c02f258474ee901c171d81ce2e6899905ec16fc34c66a42c8"
+      "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
     }
   },
   "state": "MATERIALIZED_SOURCE_ONLY"
