@@ -1,8 +1,12 @@
 import { clearSdkLoginFailure } from "@/core/session/loginFailure";
-import { Button, Form, Input, QRCode, Select, Space, Tabs, message } from "antd";
+import { sessionCoordinator } from "@/core/session/browser";
+import { getRouteUrl } from "@/core/session/route";
+import { ApiError, HttpApiError, TransportApiError } from "@/utils/request";
+import { DownOutlined } from "@ant-design/icons";
+import { Button, Form, Input, QRCode, Select, Space, Tabs, message, type InputRef } from "antd";
 import { t } from "i18next";
 import md5 from "md5";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { useLogin, useSendSms } from "@/api/login";
@@ -33,11 +37,34 @@ type LoginFormProps = {
   updateLoginMethod: (method: "phone" | "email") => void;
 };
 
+const isAuthenticatorRejection = (error: unknown): boolean =>
+  error instanceof ApiError && !(error instanceof HttpApiError) && !(error instanceof TransportApiError) &&
+  error.errCode === 1001 && (
+    error.errDlt === "该账户已启用谷歌验证码，请输入验证码: 1001 ArgsError" ||
+    error.errDlt === "谷歌验证码错误: 1001 ArgsError"
+  );
+
 const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormProps) => {
   const navigate = useNavigate();
   const [search, setSearch] = useSearchParams();
   const [form] = Form.useForm();
+  const authenticatorDetails = useRef<HTMLDetailsElement>(null);
+  const authenticatorInput = useRef<InputRef>(null);
   const [loginType, setLoginType] = useState<LoginType>(LoginType.Password);
+  // Presentation intent contains no password/TOTP snapshot. Any field change,
+  // mode round trip, later submission or unmount retires an old reveal callback.
+  const presentation = useRef({ mounted: true, revision: 0, attempt: 0, loginType, loginMethod });
+  presentation.current.loginType = loginType;
+  presentation.current.loginMethod = loginMethod;
+  useEffect(() => {
+    presentation.current.mounted = true;
+    return () => { presentation.current.mounted = false; presentation.current.revision++; presentation.current.attempt++; };
+  }, []);
+  useEffect(() => { presentation.current.revision++; }, [loginType, loginMethod]);
+  const revealAuthenticator = () => {
+    if (authenticatorDetails.current) authenticatorDetails.current.open = true;
+    authenticatorInput.current?.focus();
+  };
   const { mutate: login, isPending: loginLoading } = useLogin();
   const { mutate: semdSms, isPending: sending } = useSendSms();
 
@@ -57,6 +84,8 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
   }, [countdown]);
 
   const onFinish = (params: API.Login.LoginParams) => {
+    const intent = { attempt: ++presentation.current.attempt, revision: presentation.current.revision,
+      loginType, loginMethod, issuer: getRouteUrl(), generation: sessionCoordinator.generation };
     clearSdkLoginFailure();
     if (search.has("imError")) {
       const next = new URLSearchParams(search);
@@ -85,7 +114,13 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
 
         navigate("/chat");
       },
-      onError: () => {},
+      onError: (error) => {
+        const current = presentation.current;
+        if (current.mounted && current.attempt === intent.attempt && current.revision === intent.revision &&
+          current.loginType === intent.loginType && current.loginMethod === intent.loginMethod &&
+          getRouteUrl() === intent.issuer && sessionCoordinator.generation === intent.generation &&
+          isAuthenticatorRejection(error)) revealAuthenticator();
+      },
     });
   };
 
@@ -141,6 +176,7 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
   // }
 
   const onLoginMethodChange = (key: string) => {
+    presentation.current.revision++;
     updateLoginMethod(key as "phone" | "email");
   };
 
@@ -163,6 +199,12 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
         form={form}
         layout="vertical"
         onFinish={onFinish}
+        onValuesChange={() => { presentation.current.revision++; }}
+        onFinishFailed={({ errorFields }) => {
+          if (errorFields.some(({ name }) => name[0] === "googleAuthCode")) {
+            revealAuthenticator();
+          }
+        }}
         autoComplete="off"
         labelCol={{ prefixCls: "custom-form-item" }}
         initialValues={{
@@ -211,15 +253,25 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
           </Form.Item>
         )}
 
-        <Form.Item label="谷歌验证码（可选）" name="googleAuthCode">
-          <Input
-            allowClear
-            placeholder="请输入6位谷歌验证码"
-            maxLength={6}
-          />
-        </Form.Item>
+        <details className={styles.authenticator} ref={authenticatorDetails}>
+          <summary className={styles.authenticatorSummary}>
+            <span>已绑定验证器？</span><DownOutlined className={styles.authenticatorIcon} aria-hidden="true" />
+          </summary>
+          <Form.Item label="验证器动态码" name="googleAuthCode" preserve
+            rules={[{ pattern: /^\d{6}$/, message: "请输入6位验证器动态码" }]}>
+            <Input
+              ref={authenticatorInput}
+              aria-label="验证器动态码"
+              allowClear
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="请输入6位验证器动态码"
+              maxLength={6}
+            />
+          </Form.Item>
+        </details>
 
-        <div className="mb-10 flex flex-row justify-between">
+        <div className={styles.loginSecondaryActions}>
           <button type="button"
             className="text-sm text-slate-600"
             onClick={() => {
@@ -231,6 +283,7 @@ const LoginForm = ({ loginMethod, setFormType, updateLoginMethod }: LoginFormPro
           <button type="button"
             className="text-sm text-[var(--primary)]"
             onClick={() => {
+              presentation.current.revision++;
               form.setFieldsValue({ password: undefined, verifyCode: undefined });
               setLoginType(loginType === LoginType.Password ? LoginType.VerifyCode : LoginType.Password);
             }}

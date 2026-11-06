@@ -29,7 +29,7 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
-          python3 -c "import hashlib,pathlib; assert hashlib.sha256(pathlib.Path('current/ci/visual-render/inputs.json').read_bytes()).hexdigest() == '97a39a84155bda97d23c6b885e88c0ebc7316e957be2640c50a8914df075cd86'"
+          python3 -c "import hashlib,pathlib; assert hashlib.sha256(pathlib.Path('current/ci/visual-render/inputs.json').read_bytes()).hexdigest() == '3cbc5927a91097996be0dc8bdbcb8844183eecd49908ef437b54e44c18f527a5'"
           echo "UI_ROOT=$RUNNER_TEMP/ui-render-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
           echo "UI_NODE=$(command -v node)" >> "$GITHUB_ENV"
           # Same known0777 -> root0755 normalization of the already-installed

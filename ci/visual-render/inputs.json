@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "cohort": "ui-render-evidence-v1",
-  "dispatchReady": true,
+  "dispatchReady": false,
   "scope": "CI renderer only; no local browser bypass, product mock mode, Web/APK build, old34/39 dispatch or interaction/design acceptance.",
   "nativeInput": "ci/android-current363/inputs.json",
   "mobileInput": "ci/mobile/inputs.json",

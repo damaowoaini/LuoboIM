@@ -25,6 +25,7 @@ import (
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceinventory"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/rpcmiddleware"
+	"github.com/openimsdk/open-im-server/v3/pkg/msgprocessor"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
@@ -348,7 +349,7 @@ func RunAcceptance(ctx context.Context, plan PrivatePlan) (result AcceptanceResu
 	result.ActualUserReadExact = true
 	// A valid raw RPC reaches the real required-mode method and must fail. No
 	// invalid-request shortcut, replacement health server or synthetic admission.
-	raw := &pbpush.PushMsgReq{MsgData: &sdkws.MsgData{SendID: boot.ManagerID, RecvID: boot.TokenUserID, ClientMsgID: uuid.NewString(), ServerMsgID: uuid.NewString(), SessionType: constant.SingleChatType, ContentType: constant.Text, Content: []byte(`{"content":"synthetic raw path must be refused"}`), SendTime: time.Now().UnixMilli(), CreateTime: time.Now().UnixMilli(), Options: map[string]bool{constant.IsHistory: true, constant.IsPersistent: true}}}
+	raw := requiredRawPushRequest(boot.ManagerID, boot.TokenUserID)
 	if _, e = push.PushMsg(call, raw, grpc.WaitForReady(true)); e == nil || !strings.Contains(e.Error(), "original owned legacy push is unconfirmed") {
 		return result, ownedcontrol.ErrOwnedEvidence
 	}
@@ -479,4 +480,10 @@ func cleanupAcceptanceSession(ctx context.Context, s *Session) error {
 		return nil
 	}
 	return s.Cleanup(ctx)
+}
+
+// Preserve the original raw payload while satisfying its actual protocol contract.
+func requiredRawPushRequest(managerID, tokenUserID string) *pbpush.PushMsgReq {
+	message := &sdkws.MsgData{SendID: managerID, RecvID: tokenUserID, ClientMsgID: uuid.NewString(), ServerMsgID: uuid.NewString(), SessionType: constant.SingleChatType, ContentType: constant.Text, Content: []byte(`{"content":"synthetic raw path must be refused"}`), SendTime: time.Now().UnixMilli(), CreateTime: time.Now().UnixMilli(), Options: map[string]bool{constant.IsHistory: true, constant.IsPersistent: true}}
+	return &pbpush.PushMsgReq{MsgData: message, ConversationID: msgprocessor.GetConversationIDByMsg(message)}
 }

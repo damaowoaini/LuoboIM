@@ -3,8 +3,8 @@
   "state": "FROZEN_FINAL_SOURCE",
   "scope": "original_graph2top3sub_four_scenarios_managed_producer1top13sub_kafka1top3sub_two_packages_one_command",
   "source": {
-    "members": 1583,
-    "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
+    "members": 1584,
+    "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
   },
   "sourceReviewAccepted": true,
   "parent": {
@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 603470,
-      "sha256": "4b67bbf00b9e1ad3c5ab0d63c54f0c91b81782c5993ceb066f271618b52f8e57"
+      "bytes": 627194,
+      "sha256": "5645c96fd0fa3e0965ce66e922450fd834d4d342a5def189eff527eed170d56e"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 190419,
-      "sha256": "de00234f3dbaff754a5b547c323d025828dcca43c522ec6dddac70d0e85b34fb"
+      "bytes": 194445,
+      "sha256": "5a61152aa051d221f5c8ea21a8f911cd012f19cf8822a0d3fb2134a165286af8"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 278477,
-      "sha256": "a6d7b02b39edea078044778393e7da379662b8330e6927b54d7e3fe791a05925"
+      "bytes": 288742,
+      "sha256": "efc7e0c0d15b0e91469d7c2632b5f5b3d5b606e77a167a6d1495d7e16c4ba9f3"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -1436,8 +1436,8 @@
     {
       "target": "server/internal/runtimeacceptance/acceptance_linux.go",
       "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/acceptance_linux.go",
-      "bytes": 23046,
-      "sha256": "3783ad1720f9f15ea5c65a1ea27f272b4a381c2336eb1d7beb9c1438529d8726",
+      "bytes": 23409,
+      "sha256": "ee8a56fc9ed24c1079a46e42ed10b1d9c84ea18ec152ccbc6fac360867f93d7b",
       "beforeSHA256": null
     },
     {
@@ -1803,6 +1803,13 @@
       "beforeSHA256": null,
       "bytes": 10087,
       "sha256": "5b9663fbab1186326b32e64b70519606566e8f5b6bc482e7f67e93140a9c47bf"
+    },
+    {
+      "target": "server/internal/runtimeacceptance/required_push_request_linux_test.go",
+      "path": "ci/candidates/backend-fullgraph/source/server/internal/runtimeacceptance/required_push_request_linux_test.go",
+      "beforeSHA256": null,
+      "bytes": 3710,
+      "sha256": "914ba957b6427d48ba3b400ae1369352af5c1403509c6fd0b4568b85e5b2c1e0"
     }
   ],
   "allowedOverlayTargets": [
@@ -2051,7 +2058,8 @@
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_wait_observation_linux.go",
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_wait_observation_linux_test.go",
     "server/pkg/common/discoveryregister/ownedzookeeper/resolver_scheme_namespace_test.go",
-    "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go"
+    "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go",
+    "server/internal/runtimeacceptance/required_push_request_linux_test.go"
   ],
   "sourceModes": {
     "server/.dockerignore": 420,
@@ -3636,7 +3644,8 @@
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_wait_observation_linux.go": 420,
     "server/internal/namespaceimport/ownedcontrol/namespace_runtime_wait_observation_linux_test.go": 420,
     "server/pkg/common/discoveryregister/ownedzookeeper/resolver_scheme_namespace_test.go": 420,
-    "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go": 420
+    "server/pkg/common/db/cache/owned_source_redis_null_ack_test.go": 420,
+    "server/internal/runtimeacceptance/required_push_request_linux_test.go": 420
   },
   "entrypointContract": {
     "entrypoints": [
@@ -7702,113 +7711,243 @@
     "dynamicErrorText": false,
     "acceptanceEvidence": false
   },
-  "passedRedisNullAckControl": {
-    "version": "same-complete-Go5404-null-named-scope-facts-v1",
-    "source": {
+  "passedRedisNullAckControl": null,
+  "currentRawPushContract": {
+    "phase": "current-required-push-request-contract",
+    "targets": {
+      "internal/runtimeacceptance": [
+        "TestRequiredPushRawRequestPreservesProtocolValidationAndMiddlewareRefusal"
+      ]
+    },
+    "requiredSubtests": {
+      "internal/runtimeacceptance": {
+        "TestRequiredPushRawRequestPreservesProtocolValidationAndMiddlewareRefusal": [
+          "complete-real-request-reaches-refusal-and-original-error-roundtrips",
+          "missing-conversation-id-is-rejected-before-refusal"
+        ]
+      }
+    },
+    "goTimeoutSeconds": 180,
+    "phaseGuardSeconds": 600,
+    "topPASS": 1,
+    "subPASS": 2,
+    "packages": 1,
+    "goCommandInvocations": 1,
+    "packageExecutions": 1,
+    "wholePackagePASS": false
+  },
+  "rawPushSourceCompatibility": {
+    "version": "exact-runtime-acceptance-request-two-body-null-scope-compatibility-v1",
+    "currentSource": {
+      "members": 1584,
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
+    },
+    "originalSource": {
       "members": 1583,
       "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
     },
-    "originalHead": "fa6a75e7e202a7376802a12e8afd4ea51524a0ec",
-    "originalRun": 42297454212,
-    "originalGraphAccepted": false,
-    "rootReview": {
-      "path": ".qa/redis-null-fixture-eof-batch-20261107/root-fa6a75e-null-control-pass-push-evidence-rejected-review.json",
-      "sha256": "1bcfe5137fad2024dc2dc0efaa3714cc165c2f606bf765ace213adf04582e0ff"
-    },
-    "namedReceipt": {
-      "topPASS": 1,
-      "subPASS": 3,
-      "skip": 0,
-      "fail": 0,
-      "packages": 1,
-      "namedCompletions": [
-        {
-          "package": "pkg/common/db/cache",
-          "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown"
-        },
-        {
-          "package": "pkg/common/db/cache",
-          "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/complete-pipeline-null-and-value-preserve-all-original-results"
-        },
-        {
-          "package": "pkg/common/db/cache",
-          "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay"
-        },
-        {
-          "package": "pkg/common/db/cache",
-          "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/real-rockscache-cold-set-null-and-warm-hit-retain-original-owner"
-        }
-      ],
-      "source": {
-        "members": 1583,
-        "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
-      },
-      "accepted": true,
-      "newDatabaseFixtures": 0,
-      "scope": {
-        "phase": "current-owned-redis-null-ack",
-        "targets": {
-          "pkg/common/db/cache": [
-            "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown"
-          ]
-        },
-        "requiredSubtests": {
-          "pkg/common/db/cache": {
-            "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown": [
-              "real-rockscache-cold-set-null-and-warm-hit-retain-original-owner",
-              "complete-pipeline-null-and-value-preserve-all-original-results",
-              "mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay"
-            ]
-          }
-        },
-        "goTimeoutSeconds": 180,
-        "phaseGuardSeconds": 600,
-        "topPASS": 1,
-        "subPASS": 3,
-        "packages": 1,
-        "goCommandInvocations": 1,
-        "packageExecutions": 1,
-        "wholePackagePASS": false
-      },
-      "actualGoCommandInvocations": 1,
-      "actualPackageExecutions": 1,
-      "actualKafkaACLTestsDispatched": 0,
-      "actualManagedShapeTopsDispatched": 0,
-      "actualCacheTopsDispatched": 0,
-      "wholePackagePASS": false,
-      "runtimeAccepted": false,
-      "wholeSourceAccepted": false
-    },
-    "eventsSHA256": "d5b64b8549e1658eebab4cd0b625aaebc8e5e46e7b6435e069ea7e52e57c6b95",
-    "eventFacts": {
-      "run": 4,
-      "pass": 5,
-      "fail": 0,
-      "skip": 0,
-      "packageStart": 1,
-      "packagePASS": 1
-    },
-    "phaseFacts": {
-      "label": "current-owned-redis-null-ack",
-      "exitCode": 0,
-      "resourceStatus": "passed",
-      "resourceExitCode": 0
-    },
-    "sourcePost": {
-      "accepted": true,
-      "source": {
-        "members": 1583,
-        "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
+    "newTest": {
+      "target": "server/internal/runtimeacceptance/required_push_request_linux_test.go",
+      "after": {
+        "bytes": 3710,
+        "sha256": "914ba957b6427d48ba3b400ae1369352af5c1403509c6fd0b4568b85e5b2c1e0"
       }
     },
-    "GoToolBodyAndMode": {
-      "bytes": 17164055,
-      "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
-      "mode": 493
+    "modifiedBody": {
+      "target": "server/internal/runtimeacceptance/acceptance_linux.go",
+      "before": {
+        "bytes": 23046,
+        "sha256": "3783ad1720f9f15ea5c65a1ea27f272b4a381c2336eb1d7beb9c1438529d8726"
+      },
+      "after": {
+        "bytes": 23409,
+        "sha256": "ee8a56fc9ed24c1079a46e42ed10b1d9c84ea18ec152ccbc6fac360867f93d7b"
+      },
+      "edits": [
+        {
+          "afterStart": 680,
+          "afterEnd": 739,
+          "afterBase64": "IgoJImdpdGh1Yi5jb20vb3Blbmltc2RrL29wZW4taW0tc2VydmVyL3YzL3BrZy9tc2dwcm9jZXNzb3I=",
+          "beforeBase64": ""
+        },
+        {
+          "afterStart": 16295,
+          "afterEnd": 16298,
+          "afterBase64": "cmVx",
+          "beforeBase64": "JnBicA=="
+        },
+        {
+          "afterStart": 16299,
+          "afterEnd": 16306,
+          "afterBase64": "aXJlZFJhdw==",
+          "beforeBase64": "c2gu"
+        },
+        {
+          "afterStart": 16310,
+          "afterEnd": 16310,
+          "afterBase64": "",
+          "beforeBase64": "TXNn"
+        },
+        {
+          "afterStart": 16313,
+          "afterEnd": 16315,
+          "afterBase64": "dWU=",
+          "beforeBase64": "e00="
+        },
+        {
+          "afterStart": 16316,
+          "afterEnd": 16316,
+          "afterBase64": "",
+          "beforeBase64": "Z0Rh"
+        },
+        {
+          "afterStart": 16317,
+          "afterEnd": 16318,
+          "afterBase64": "KA==",
+          "beforeBase64": "YTogJnNka3dzLk1zZ0RhdGF7U2VuZElEOiA="
+        },
+        {
+          "afterStart": 16333,
+          "afterEnd": 16333,
+          "afterBase64": "",
+          "beforeBase64": "IFJlY3ZJRDo="
+        },
+        {
+          "afterStart": 16350,
+          "afterEnd": 16350,
+          "afterBase64": "",
+          "beforeBase64": "LCBDbGllbnRNc2dJRDogdXVpZC5OZXdTdHJpbmco"
+        },
+        {
+          "afterStart": 16351,
+          "afterEnd": 16351,
+          "afterBase64": "",
+          "beforeBase64": "LCBTZXJ2ZXJNc2dJRDogdXVpZC5OZXdTdHJpbmcoKSwgU2Vzc2lvblR5cGU6IGNvbnN0YW50LlNpbmdsZUNoYXRUeXBlLCBDb250ZW50VHlwZTogY29uc3RhbnQuVGV4dCwgQ29udGVudDogW11ieXRlKGB7ImNvbnRlbnQiOiJzeW50aGV0aWMgcmF3IHBhdGggbXVzdCBiZSByZWZ1c2VkIn1gKSwgU2VuZFRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIENyZWF0ZVRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIE9wdGlvbnM6IG1hcFtzdHJpbmddYm9vbHtjb25zdGFudC5Jc0hpc3Rvcnk6IHRydWUsIGNvbnN0YW50LklzUGVyc2lzdGVudDogdHJ1ZX19fQ=="
+        },
+        {
+          "afterStart": 22720,
+          "afterEnd": 23409,
+          "afterBase64": "Ci8vIFByZXNlcnZlIHRoZSBvcmlnaW5hbCByYXcgcGF5bG9hZCB3aGlsZSBzYXRpc2Z5aW5nIGl0cyBhY3R1YWwgcHJvdG9jb2wgY29udHJhY3QuCmZ1bmMgcmVxdWlyZWRSYXdQdXNoUmVxdWVzdChtYW5hZ2VySUQsIHRva2VuVXNlcklEIHN0cmluZykgKnBicHVzaC5QdXNoTXNnUmVxIHsKCW1lc3NhZ2UgOj0gJnNka3dzLk1zZ0RhdGF7U2VuZElEOiBtYW5hZ2VySUQsIFJlY3ZJRDogdG9rZW5Vc2VySUQsIENsaWVudE1zZ0lEOiB1dWlkLk5ld1N0cmluZygpLCBTZXJ2ZXJNc2dJRDogdXVpZC5OZXdTdHJpbmcoKSwgU2Vzc2lvblR5cGU6IGNvbnN0YW50LlNpbmdsZUNoYXRUeXBlLCBDb250ZW50VHlwZTogY29uc3RhbnQuVGV4dCwgQ29udGVudDogW11ieXRlKGB7ImNvbnRlbnQiOiJzeW50aGV0aWMgcmF3IHBhdGggbXVzdCBiZSByZWZ1c2VkIn1gKSwgU2VuZFRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIENyZWF0ZVRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIE9wdGlvbnM6IG1hcFtzdHJpbmddYm9vbHtjb25zdGFudC5Jc0hpc3Rvcnk6IHRydWUsIGNvbnN0YW50LklzUGVyc2lzdGVudDogdHJ1ZX19CglyZXR1cm4gJnBicHVzaC5QdXNoTXNnUmVxe01zZ0RhdGE6IG1lc3NhZ2UsIENvbnZlcnNhdGlvbklEOiBtc2dwcm9jZXNzb3IuR2V0Q29udmVyc2F0aW9uSURCeU1zZyhtZXNzYWdlKX0KfQo=",
+          "beforeBase64": ""
+        }
+      ]
     },
-    "historyBridgeCanonicalSHA256": "b41ad40645612d44dd7cae6f6d71a1edc28a6c4e76e4228eeaa040c8346a647c",
-    "wholePackagePASS": false,
+    "priorNullFacts": {
+      "version": "same-complete-Go5404-null-named-scope-facts-v1",
+      "source": {
+        "members": 1583,
+        "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
+      },
+      "originalHead": "fa6a75e7e202a7376802a12e8afd4ea51524a0ec",
+      "originalRun": 42297454212,
+      "originalGraphAccepted": false,
+      "rootReview": {
+        "path": ".qa/redis-null-fixture-eof-batch-20261107/root-fa6a75e-null-control-pass-push-evidence-rejected-review.json",
+        "sha256": "1bcfe5137fad2024dc2dc0efaa3714cc165c2f606bf765ace213adf04582e0ff"
+      },
+      "namedReceipt": {
+        "topPASS": 1,
+        "subPASS": 3,
+        "skip": 0,
+        "fail": 0,
+        "packages": 1,
+        "namedCompletions": [
+          {
+            "package": "pkg/common/db/cache",
+            "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown"
+          },
+          {
+            "package": "pkg/common/db/cache",
+            "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/complete-pipeline-null-and-value-preserve-all-original-results"
+          },
+          {
+            "package": "pkg/common/db/cache",
+            "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay"
+          },
+          {
+            "package": "pkg/common/db/cache",
+            "name": "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/real-rockscache-cold-set-null-and-warm-hit-retain-original-owner"
+          }
+        ],
+        "source": {
+          "members": 1583,
+          "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
+        },
+        "accepted": true,
+        "newDatabaseFixtures": 0,
+        "scope": {
+          "phase": "current-owned-redis-null-ack",
+          "targets": {
+            "pkg/common/db/cache": [
+              "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown"
+            ]
+          },
+          "requiredSubtests": {
+            "pkg/common/db/cache": {
+              "TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown": [
+                "real-rockscache-cold-set-null-and-warm-hit-retain-original-owner",
+                "complete-pipeline-null-and-value-preserve-all-original-results",
+                "mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay"
+              ]
+            }
+          },
+          "goTimeoutSeconds": 180,
+          "phaseGuardSeconds": 600,
+          "topPASS": 1,
+          "subPASS": 3,
+          "packages": 1,
+          "goCommandInvocations": 1,
+          "packageExecutions": 1,
+          "wholePackagePASS": false
+        },
+        "actualGoCommandInvocations": 1,
+        "actualPackageExecutions": 1,
+        "actualKafkaACLTestsDispatched": 0,
+        "actualManagedShapeTopsDispatched": 0,
+        "actualCacheTopsDispatched": 0,
+        "wholePackagePASS": false,
+        "runtimeAccepted": false,
+        "wholeSourceAccepted": false
+      },
+      "eventsSHA256": "d5b64b8549e1658eebab4cd0b625aaebc8e5e46e7b6435e069ea7e52e57c6b95",
+      "eventFacts": {
+        "run": 4,
+        "pass": 5,
+        "fail": 0,
+        "skip": 0,
+        "packageStart": 1,
+        "packagePASS": 1
+      },
+      "phaseFacts": {
+        "label": "current-owned-redis-null-ack",
+        "exitCode": 0,
+        "resourceStatus": "passed",
+        "resourceExitCode": 0
+      },
+      "sourcePost": {
+        "accepted": true,
+        "source": {
+          "members": 1583,
+          "digest": "5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947"
+        }
+      },
+      "GoToolBodyAndMode": {
+        "bytes": 17164055,
+        "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+        "mode": 493
+      },
+      "historyBridgeCanonicalSHA256": "b41ad40645612d44dd7cae6f6d71a1edc28a6c4e76e4228eeaa040c8346a647c",
+      "wholePackagePASS": false,
+      "currentWholeProjectGoPASS": false,
+      "runtimePIDReadyP20Accepted": false
+    },
+    "sameCompleteGoSource": false,
+    "oldNullCurrentActualPASS": false,
     "currentWholeProjectGoPASS": false,
+    "actualCurrentNullGoCommands": 0,
     "runtimePIDReadyP20Accepted": false
-  }
+  },
+  "rawPushTestsToRun": [
+    "TestRequiredPushRawRequestPreservesProtocolValidationAndMiddlewareRefusal"
+  ]
 }

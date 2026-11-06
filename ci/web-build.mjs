@@ -4,13 +4,16 @@ import { closeSync, existsSync, fsyncSync, lstatSync, mkdirSync, openSync, readF
 import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-import { verifyFile, verifyLinuxBindings } from "./web-ci.mjs";
+import { verifyFile, verifyLinuxBindings, validateReport } from "./web-ci.mjs";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const web = path.join(repo, "web"), output = path.join(repo, "ci-output/web-build");
 const descriptorPath = path.join(repo, "ci/web-build.inputs.json");
-const cohort = "web4340-build-only-v1";
-const sourceDigest = "3503ee773da527e252fa284c2380dcda386999012a5aa538fa60f84c42b2b636";
+const cohort = "web4341-login-alignment-v1";
+const loginFile = "src/pages/login/LoginForm.test.tsx";
+const loginSuite = "LoginForm authenticator disclosure";
+const loginName = "reveals an invalid folded MFA field and preserves values without weakening existing mode clearing";
+const sourceDigest = "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec";
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 const hash = (body) => createHash("sha256").update(body).digest("hex");
 const json = (file) => JSON.parse(readFileSync(file, "utf8"));
@@ -26,11 +29,18 @@ function writeNew(file, value) {
 const writeJSON = (file, value) => writeNew(file, JSON.stringify(value, null, 2) + "\n");
 
 export function validateDescriptor(input) {
-  assert(input.schema === "luobo.web.build-only.v1" && input.cohort === cohort && input.node === "24.21.0", "Explicit build-only identity required");
-  assert(input.sourceFiles === 4340 && input.files.length === 4340 && new Set(input.files.map((r) => r.path)).size === 4340, "Exact4340 source set required");
+  assert(input.schema === "luobo.web.login-build.v1" && input.cohort === cohort && input.node === "24.21.0", "Explicit named-login-test and build identity required");
+  assert(input.sourceFiles === 4341 && input.files.length === 4341 && new Set(input.files.map((r) => r.path)).size === 4341, "Exact4341 source set required");
   for (const row of input.files) assert(typeof row.path === "string" && !path.isAbsolute(row.path) && !row.path.split(/[\\/]/).some((p) => !p || p === "." || p === "..") && /^[0-9a-f]{64}$/.test(row.sha256) && Number.isSafeInteger(row.bytes) && row.bytes >= 0, "Bounded relative source row required");
-  assert(input.sourceDigest === sourceDigest && rowsDigest(input.files) === sourceDigest, "Reviewed4340 source digest differs");
+  assert(input.sourceDigest === sourceDigest && rowsDigest(input.files) === sourceDigest, "Reviewed4341 source digest differs");
   assert(input.files.filter((r) => r.path.startsWith("public/")).length === 13, "Exact public13 inventory required");
+  const selection = input.loginTest;
+  assert(selection && selection.file === loginFile && selection.suite === loginSuite && selection.name === loginName
+    && selection.fullName === `${loginSuite} ${loginName}` && selection.expectedTests === 1 && selection.oldFullSuiteTests === 0
+    && selection.skipOrFailAccepted === false && Number.isSafeInteger(selection.sourceLineCount)
+    && selection.sourceLineCount > 0 && selection.sourceLineCount <= 10000 && selection.runner.version === "5.0.4"
+    && selection.runner.entry === "node_modules/vitest/vitest.mjs"
+    && selection.runner.lockEntrySHA256 === "73b4f3a427a2db5968e193d3dea089c658c76514b50da3b4f74e7f790182c478", "Exact one real form case selection required");
   return input;
 }
 
@@ -58,6 +68,112 @@ export function buildPlan(node, npm, dist) {
   ];
 }
 
+export function loginTestPlan(node, report) {
+  const pattern = `(?:^| )${loginName}$`;
+  return { name: "login-form-one", command: node,
+    args: ["node_modules/vitest/vitest.mjs", "run", loginFile, "--testNamePattern", pattern,
+      "--reporter=json", `--reporter=${path.join(repo, "ci/web-ci.audit-reporter.mjs")}`, `--outputFile.json=${report}`,
+      "--maxWorkers=1", "--no-file-parallelism", "--no-fsModuleCache", "--no-cache",
+      "--maxConcurrency=1", "--testTimeout=15000", "--hookTimeout=15000"], timeout: 60000 };
+}
+
+export function loginTestSummary(report, audit, exit, expectedFile) {
+  const counted = validateReport(report, audit, exit, { exact: 1, requiredNames: [loginName] });
+  assert(audit.reason === "passed" && report.testResults.length === 1, "Exactly one completed selected file required");
+  const file = report.testResults[0];
+  assert(file.name === expectedFile && file.status === "passed" && file.assertionResults.length === 1,
+    "Exactly one selected file/assertion passed required");
+  const test = file.assertionResults[0];
+  assert(test.title === loginName && test.status === "passed", "Exact named real form assertion required");
+  assert(Array.isArray(test.failureMessages) && test.failureMessages.length === 0, "Failed assertion text cannot be PASS");
+  return { accepted: true, selectedFile: loginFile, selectedSuite: loginSuite, selectedName: loginName,
+    total: counted.total, passed: counted.passed, failed: 0, skipped: 0, todo: 0, exit: 0,
+    oldFullSuiteTests: 0, typeChecksRun: 0, E2ERun: 0, transportSyntheticOnly: true, backendMFAOrUIAccepted: false };
+}
+
+function loginRunnerPins(input) {
+  const locked = json(path.join(web, "package-lock.json")).packages["node_modules/vitest"];
+  const declared = input.loginTest.runner;
+  assert(locked.version === declared.version && hash(Buffer.from(JSON.stringify(locked))) === declared.lockEntrySHA256,
+    "Exact original Vitest lock entry required; no invented resolution or integrity fields");
+  const packageFile = path.join(web, "node_modules/vitest/package.json");
+  assert(json(packageFile).version === declared.version, "Installed locked Vitest version required");
+  return [realpathSync(process.execPath), packageFile, path.join(web, declared.entry)].map((file) => {
+    const info = lstatSync(file);
+    assert(realpathSync(file) === file && info.isFile() && info.nlink === 1 && info.size <= 256 * 1024 ** 2,
+      "Bounded real installed test runner body required");
+    return { path: file === realpathSync(process.execPath) ? "actual-node" : path.relative(web, file),
+      bytes: info.size, mode: info.mode & 0o777, sha256: hash(readFileSync(file)) };
+  });
+}
+
+export function loginFailureObservation(report, audit, processRecord, sourceExact, toolsExact, lineLimit, accepted) {
+  const categories = new Set(), tests = Array.isArray(audit?.tests) ? audit.tests : [];
+  if (processRecord?.errorCode === "ETIMEDOUT") categories.add("timeout");
+  else if (processRecord?.exit !== 0 || processRecord?.signal || processRecord?.errorCode) categories.add("command");
+  if (!Array.isArray(report?.testResults) || !["passed", "failed"].includes(audit?.reason)) categories.add("report-incomplete");
+  if (Array.isArray(audit?.suiteErrors) && audit.suiteErrors.length) categories.add("collection");
+  if (Array.isArray(audit?.unhandledErrors) && audit.unhandledErrors.length) categories.add("unhandled");
+  if (Array.isArray(audit?.failedHooks) && audit.failedHooks.length) categories.add("hook");
+  const known = tests.filter((test) => test?.name === loginName);
+  if (known.some((test) => test.state === "failed")) categories.add(known.some((test) =>
+    Array.isArray(test.errors) && test.errors.some((error) => error?.name === "AssertionError")) ? "assertion" : "execution");
+  if (!sourceExact) categories.add("source");
+  if (!toolsExact) categories.add("tools");
+  if (!accepted && categories.size === 0) categories.add("selection-or-result");
+  const messages = [], lines = new Set();
+  for (const file of Array.isArray(report?.testResults) ? report.testResults.slice(0, 2) : []) {
+    if (file?.name !== path.join(web, loginFile)) continue;
+    if (typeof file.message === "string") messages.push(file.message);
+    for (const test of Array.isArray(file.assertionResults) ? file.assertionResults.slice(0, 2) : [])
+      if (test?.title === loginName && Array.isArray(test.failureMessages)) messages.push(...test.failureMessages.slice(0, 8));
+  }
+  for (const message of messages.slice(0, 10)) if (typeof message === "string")
+    for (const text of message.slice(0, 32768).split(/\r?\n/).slice(0, 128)) {
+      const match = text.match(/(?:^|[\s\/])src\/pages\/login\/LoginForm\.test\.tsx:([1-9][0-9]{0,5}):[0-9]+\)?\s*$/);
+      if (match && Number.isSafeInteger(lineLimit) && Number(match[1]) <= lineLimit) lines.add(Number(match[1]));
+    }
+  return { categories: [...categories].sort(), knownCaseState: known.length === 1 && ["passed", "failed", "skipped"].includes(known[0].state) ? known[0].state : "unconfirmed",
+    frames: [...lines].sort((a, b) => a - b).slice(0, 8).map((line) => ({ basename: "LoginForm.test.tsx", line })),
+    framesTruncated: lines.size > 8, rawFailureMessagesStackPayloadOrUnknownNamesExported: false };
+}
+
+function runLoginTest(input) {
+  const privateDirectory = path.join(output, "private-test"); mkdirSync(privateDirectory, { mode: 0o700 });
+  const reportFile = path.join(privateDirectory, "login-form.report.json"), auditFile = path.join(privateDirectory, "login-form.audit.json");
+  const before = loginRunnerPins(input);
+  writeJSON(path.join(output, "login-test-claim.json"), { cohort, sourceDigest, selectedFile: loginFile,
+    selectedName: loginName, callsAllowed: 1, oldFullSuiteTests: 0 });
+  let commandPassed = false, exit = null, sourceAndSDKPostExact = false, toolsPostExact = false;
+  try { execute(loginTestPlan(process.execPath, reportFile), web, { WEB_CI_AUDIT_FILE: auditFile }, true); commandPassed = true; } catch {}
+  const processRecord = json(path.join(output, "login-form-one.process.json")); exit = processRecord.exit;
+  const reports = {};
+  for (const [name, file] of [["json", reportFile], ["audit", auditFile]]) try {
+    const info = lstatSync(file);
+    assert(realpathSync(file) === file && info.isFile() && info.nlink === 1 && info.size <= 1 << 20, "Bounded private machine report required");
+    const raw = readFileSync(file); assert(raw.length === info.size, "Complete machine report required");
+    reports[name] = { value: JSON.parse(raw.toString("utf8")), bytes: raw.length, sha256: hash(raw) };
+  } catch {}
+  const count = (key) => Number.isSafeInteger(reports.json?.value?.[key]) && reports.json.value[key] >= 0 && reports.json.value[key] <= 100000 ? reports.json.value[key] : null;
+  let summary = { accepted: false, selectedFile: loginFile, selectedName: loginName, pairedReportsParsed: Boolean(reports.json && reports.audit),
+    completionObserved: ["passed", "failed"].includes(reports.audit?.value?.reason),
+    total: count("numTotalTests"), passed: count("numPassedTests"), failed: count("numFailedTests"), skipped: count("numPendingTests"),
+    exit, oldFullSuiteTests: 0, rawErrorOrValuesExported: false };
+  try { summary = { ...summary, ...loginTestSummary(reports.json?.value, reports.audit?.value, exit, path.join(web, loginFile)) }; } catch {}
+  try { verifySourceTree(web, input.files, true); verifySDK(); checkedInputs(); sourceAndSDKPostExact = true; } catch {}
+  try { toolsPostExact = JSON.stringify(loginRunnerPins(input)) === JSON.stringify(before); } catch {}
+  summary = { ...summary, accepted: summary.accepted && commandPassed && sourceAndSDKPostExact && toolsPostExact,
+    sourceAndSDKPostExact, toolsPostExact, runnerBefore: before, commandPassed,
+    machineReports: Object.fromEntries(Object.entries(reports).map(([name, item]) => [name, { bytes: item.bytes, sha256: item.sha256 }])),
+    rawMachineReportsPrivate: true, processReceiptSHA256: hash(readFileSync(path.join(output, "login-form-one.process.json"))),
+    wholeBuildOrBusinessAccepted: false, outerResourceGuardPassStillRequired: true };
+  summary.failureObservation = loginFailureObservation(reports.json?.value, reports.audit?.value, processRecord,
+    sourceAndSDKPostExact, toolsPostExact, input.loginTest.sourceLineCount, summary.accepted);
+  writeJSON(path.join(output, "login-test.json"), summary);
+  assert(summary.accepted, "Selected real MFA form case or postchecks NOT PASS; no Vite/accepted dist");
+  return summary;
+}
+
 function childEnvironment() {
   const env = Object.fromEntries(["HOME", "LANG", "LC_ALL", "TZ"].filter((key) => process.env[key]).map((key) => [key, process.env[key]]));
   return { ...env, PATH: `${path.dirname(process.execPath)}:/usr/bin:/bin`, CI: "true", NODE_OPTIONS: "--max-old-space-size=2048",
@@ -66,10 +182,11 @@ function childEnvironment() {
     ELECTRON_SKIP_BINARY_DOWNLOAD: "1", PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1" };
 }
 
-function execute(step, cwd = web) {
-  const start = Date.now(), result = spawnSync(step.command, step.args, { cwd, env: childEnvironment(), timeout: step.timeout, maxBuffer: 2 * 1024 ** 2, killSignal: "SIGTERM" });
-  writeNew(path.join(output, `${step.name}.stdout.log`), result.stdout ?? Buffer.alloc(0));
-  writeNew(path.join(output, `${step.name}.stderr.log`), result.stderr ?? Buffer.alloc(0));
+function execute(step, cwd = web, extraEnvironment = {}, privateStreams = false) {
+  const start = Date.now(), result = spawnSync(step.command, step.args, { cwd, env: { ...childEnvironment(), ...extraEnvironment }, timeout: step.timeout, maxBuffer: 2 * 1024 ** 2, killSignal: "SIGTERM" });
+  const streamDirectory = privateStreams ? path.join(output, "private-test") : output;
+  writeNew(path.join(streamDirectory, `${step.name}.stdout.log`), result.stdout ?? Buffer.alloc(0));
+  writeNew(path.join(streamDirectory, `${step.name}.stderr.log`), result.stderr ?? Buffer.alloc(0));
   const record = { ...step, exit: result.status, signal: result.signal, errorCode: result.error?.code ?? null, elapsedMs: Date.now() - start };
   writeJSON(path.join(output, `${step.name}.process.json`), record);
   assert(result.status === 0 && !result.signal && !result.error, `${step.name} failed; exact raw streams retained`);
@@ -203,19 +320,21 @@ function bundleWorker() {
   assert(links.length === 1 && /: lo:/.test(links[0]), "Build requires independent loopback-only network namespace");
   for (const family of ["-4", "-6"]) assert(execute({ name: `offline-route${family}`, command: "/usr/sbin/ip", args: [family, "route", "show", "default"], timeout: 5000 }, repo).trim() === "", "External build route refused");
   verifySourceTree(web, input.files, true); verifySDK();
+  runLoginTest(input);
+  const loginReceiptSHA256 = hash(readFileSync(path.join(output, "login-test.json")));
   execute(buildPlan(process.execPath, "unused-in-worker", path.join(output, "dist"))[2]);
   verifySourceTree(web, input.files, true); verifySDK(); checkedInputs();
   const candidate = retainBuildCandidate(output, path.join(output, "dist"), input.files.filter((r) => r.path.startsWith("public/")), input.csp,
-    { cohort, commit: prepared.commit, sourceFiles: 4340, sourceDigest });
+    { cohort, commit: prepared.commit, sourceFiles: 4341, sourceDigest, namedTestsPassed: 1, loginReceiptSHA256, oldFullSuiteTests: 0 });
   assert(candidate.proof.passed, "Pinned production CSP semantic mismatch; bounded actual index/proof and candidate retained");
   const files = candidate.files;
   writeJSON(path.join(output, "dist-manifest.json"), files);
-  writeJSON(path.join(output, "dist-proof.json"), { cohort, commit: prepared.commit, sourceFiles: 4340, sourceDigest, files: files.length, bytes: files.reduce((n, r) => n + r.bytes, 0), filesDigest: rowsDigest(files), manifestSHA256: hash(readFileSync(path.join(output, "dist-manifest.json"))), opaqueWASMSameAsReviewedPublicSource: true, SDKSourceRebuilt: false, runtimeOrPreviewAcceptance: false, deployment: false, resourceGuardPassStillRequired: true });
+  writeJSON(path.join(output, "dist-proof.json"), { cohort, commit: prepared.commit, sourceFiles: 4341, sourceDigest, namedTestsPassed: 1, loginReceiptSHA256, oldFullSuiteTests: 0, files: files.length, bytes: files.reduce((n, r) => n + r.bytes, 0), filesDigest: rowsDigest(files), manifestSHA256: hash(readFileSync(path.join(output, "dist-manifest.json"))), opaqueWASMSameAsReviewedPublicSource: true, SDKSourceRebuilt: false, runtimeOrPreviewAcceptance: false, deployment: false, resourceGuardPassStillRequired: true });
   console.log("BUILD_CANDIDATE_READY; outer resource exit/status must also pass");
 }
 
 function main() {
-  assert(process.argv.length === 3 && process.argv[2] === cohort, "Only the explicit build-only cohort is accepted");
+  assert(process.argv.length === 3 && process.argv[2] === cohort, "Only the explicit named-login-test and build cohort is accepted");
   assert(process.platform === "linux" && process.getuid() !== 0 && process.version === "v24.21.0", "Fixed ordinary-user Linux Node required");
   const free = statfsSync(repo, { bigint: true }); assert(free.bavail * free.bsize >= 8n * 1024n ** 3n, "Cold8GiB admission: zero install/build");
   assert(!existsSync(output), "Fresh build output required; partial resume refused");
@@ -233,8 +352,8 @@ function main() {
     const npmVersion = execute({ name: "npm-version", command: node, args: [npm, "--version"], timeout: 10000 }, repo).trim();
     assert(/^\d+\.\d+\.\d+$/.test(npmVersion), "Exact bundled npm version query required");
     writeNew(path.join(output, "inputs.json"), readFileSync(descriptorPath));
-    writeJSON(path.join(output, "source.json"), { cohort, commit: actualHead, sourceFiles: 4340, sourceDigest, sourceDeclarationSHA256: hash(readFileSync(descriptorPath)), npmVersion,
-      node: { version: process.version, bytes: lstatSync(node).size, sha256: hash(readFileSync(node)), bundledNpmCLI_SHA256: hash(readFileSync(npm)), officialActionVersionPin: input.node }, testsRun: 0, typeChecksRun: 0, businessActions: 0, nativeOrSDKBind: 0, HOMEUnchanged: true, sourceIncludesPrivateConfiguration: false });
+    writeJSON(path.join(output, "source.json"), { cohort, commit: actualHead, sourceFiles: 4341, sourceDigest, sourceDeclarationSHA256: hash(readFileSync(descriptorPath)), npmVersion,
+      node: { version: process.version, bytes: lstatSync(node).size, sha256: hash(readFileSync(node)), bundledNpmCLI_SHA256: hash(readFileSync(npm)), officialActionVersionPin: input.node }, testsRunDuringSetup: 0, namedTestsRequiredBeforeBundle: 1, oldFullSuiteTests: 0, typeChecksRun: 0, businessActions: 0, nativeOrSDKBind: 0, HOMEUnchanged: true, sourceIncludesPrivateConfiguration: false });
     execute(plan[0]); execute(plan[1]); verifySDK(); verifySourceTree(web, input.files, true);
     checkedInputs();
     writeJSON(path.join(output, "prepared.json"), { cohort, commit: actualHead, sourceDigest, descriptorSHA256: hash(readFileSync(descriptorPath)), npmLockSHA256: hash(readFileSync(path.join(web, "package-lock.json"))) });

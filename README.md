@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端graph 1583/5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947：新Null1top3实际仍失败，有限观察已把三child共同失败定位到fixture cleanup的协议类（未发现其它主断言类别，不能据此宣称主断言通过）。本批仅在新RESP夹具每帧起点Peek(1)，空缓冲EOF/closed-pipe正常收尾；已有字节的截断帧仍原bounded parser拒绝。生产985c、原parser、有限观察和35纯检查主体不变；只重试失败1top3，旧resolver/cachedWait/RTC/probe/list0派，原oracle2top3历史。原16编译/4scene/cleanup/8产物门及chart259/Admin/Web/Native不变，P20两binding=null和split assembly保持。
+- 后端graph 1584/0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef：修正验收raw PushMsgReq缺ConversationID的问题，使用原msgprocessor生成，原payload、真实RPC拒绝literal/权限/后续DEL1不变。fresh仅实际协议Check+Client/Server合同1top2；先精确接受源一体逆转并移除新test恢复旧5404，实际GoList cache -deps -test排除runtimeacceptance后兼容复用旧Null1top3，0重派且不称same-complete-Go/全包/全项目通过。原16编译/4场景/cleanup/8产物门保持；已导出5404未验收编译缓存；本批源码改变，不启用跨源接收/复用，P20split及两null保持。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

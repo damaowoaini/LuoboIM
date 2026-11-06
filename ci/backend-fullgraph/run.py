@@ -5,7 +5,7 @@ from pathlib import Path
 from collections import Counter
 REPO=Path(__file__).resolve().parents[2]
 INPUTS=Path(__file__).with_name('inputs.json')
-FINAL_SOURCE = {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}
+FINAL_SOURCE = {'members': 1584, 'digest': '0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef'}
 SOURCE_ROOT='ci/candidates/backend-fullgraph/source/'
 REQUIRED_GRAPH_SOURCE={'server/internal/runtimeacceptance/acceptance_linux.go','server/internal/runtimeacceptance/graph_linux.go','server/internal/runtimeacceptance/cancellation_linux.go','server/cmd/tools/owned-fullgraph-acceptance/main.go','server/pkg/common/startrpc/fullgraph_evidence_linux_test.go'}
 RESOURCE={'initialBytes':4<<30,'floorMiB':1024,'allocatedMiB':16384,'pollSeconds':.2,'controllerSeconds':10800,'mainCompileTotalSeconds':1200,'scenarioSeconds':1380,'originalOperatorContextSeconds':1200,'targetGoTimeoutSeconds':180}
@@ -1086,6 +1086,119 @@ def emit_redis_null_failure_observation(out,raw):
 
 PASSED_REDIS_NULL_ACK_FACTS = {'version': 'same-complete-Go5404-null-named-scope-facts-v1', 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}, 'originalHead': 'fa6a75e7e202a7376802a12e8afd4ea51524a0ec', 'originalRun': 42297454212, 'originalGraphAccepted': False, 'rootReview': {'path': '.qa/redis-null-fixture-eof-batch-20261107/root-fa6a75e-null-control-pass-push-evidence-rejected-review.json', 'sha256': '1bcfe5137fad2024dc2dc0efaa3714cc165c2f606bf765ace213adf04582e0ff'}, 'namedReceipt': {'topPASS': 1, 'subPASS': 3, 'skip': 0, 'fail': 0, 'packages': 1, 'namedCompletions': [{'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/complete-pipeline-null-and-value-preserve-all-original-results'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/real-rockscache-cold-set-null-and-warm-hit-retain-original-owner'}], 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}, 'accepted': True, 'newDatabaseFixtures': 0, 'scope': {'phase': 'current-owned-redis-null-ack', 'targets': {'pkg/common/db/cache': ['TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown']}, 'requiredSubtests': {'pkg/common/db/cache': {'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown': ['real-rockscache-cold-set-null-and-warm-hit-retain-original-owner', 'complete-pipeline-null-and-value-preserve-all-original-results', 'mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 600, 'topPASS': 1, 'subPASS': 3, 'packages': 1, 'goCommandInvocations': 1, 'packageExecutions': 1, 'wholePackagePASS': False}, 'actualGoCommandInvocations': 1, 'actualPackageExecutions': 1, 'actualKafkaACLTestsDispatched': 0, 'actualManagedShapeTopsDispatched': 0, 'actualCacheTopsDispatched': 0, 'wholePackagePASS': False, 'runtimeAccepted': False, 'wholeSourceAccepted': False}, 'eventsSHA256': 'd5b64b8549e1658eebab4cd0b625aaebc8e5e46e7b6435e069ea7e52e57c6b95', 'eventFacts': {'run': 4, 'pass': 5, 'fail': 0, 'skip': 0, 'packageStart': 1, 'packagePASS': 1}, 'phaseFacts': {'label': 'current-owned-redis-null-ack', 'exitCode': 0, 'resourceStatus': 'passed', 'resourceExitCode': 0}, 'sourcePost': {'accepted': True, 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}}, 'GoToolBodyAndMode': {'bytes': 17164055, 'sha256': '548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0', 'mode': 493}, 'historyBridgeCanonicalSHA256': 'b41ad40645612d44dd7cae6f6d71a1edc28a6c4e76e4228eeaa040c8346a647c', 'wholePackagePASS': False, 'currentWholeProjectGoPASS': False, 'runtimePIDReadyP20Accepted': False}
 
+CURRENT_RAW_PUSH_CONTROL = {'phase': 'current-required-push-request-contract', 'targets': {'internal/runtimeacceptance': ['TestRequiredPushRawRequestPreservesProtocolValidationAndMiddlewareRefusal']}, 'requiredSubtests': {'internal/runtimeacceptance': {'TestRequiredPushRawRequestPreservesProtocolValidationAndMiddlewareRefusal': ['complete-real-request-reaches-refusal-and-original-error-roundtrips', 'missing-conversation-id-is-rejected-before-refusal']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 600, 'topPASS': 1, 'subPASS': 2, 'packages': 1, 'goCommandInvocations': 1, 'packageExecutions': 1, 'wholePackagePASS': False}
+RAW_PUSH_DEPENDENCY_CONTROL = {'phase': 'raw-push-cache-scope-deps', 'relativeRoots': ['pkg/common/db/cache'], 'roots': ['github.com/openimsdk/open-im-server/v3/pkg/common/db/cache'], 'forbiddenPackage': 'github.com/openimsdk/open-im-server/v3/internal/runtimeacceptance', 'jsonFields': ['ImportPath', 'ForTest', 'Error', 'DepsErrors', 'Incomplete'], 'phaseGuardSeconds': 600, 'rawLimitBytes': 33554432, 'packagesLimit': 2048, 'projectionLimitBytes': 1048576, 'importPathLimitBytes': 512, 'goListTestDependencies': True, 'originalGoCommandInvocations': 1, 'noFallbackRedispatch': True}
+RAW_PUSH_SOURCE_COMPATIBILITY = {'version': 'exact-runtime-acceptance-request-two-body-null-scope-compatibility-v1', 'currentSource': {'members': 1584, 'digest': '0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef'}, 'originalSource': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}, 'newTest': {'target': 'server/internal/runtimeacceptance/required_push_request_linux_test.go', 'after': {'bytes': 3710, 'sha256': '914ba957b6427d48ba3b400ae1369352af5c1403509c6fd0b4568b85e5b2c1e0'}}, 'modifiedBody': {'target': 'server/internal/runtimeacceptance/acceptance_linux.go', 'before': {'bytes': 23046, 'sha256': '3783ad1720f9f15ea5c65a1ea27f272b4a381c2336eb1d7beb9c1438529d8726'}, 'after': {'bytes': 23409, 'sha256': 'ee8a56fc9ed24c1079a46e42ed10b1d9c84ea18ec152ccbc6fac360867f93d7b'}, 'edits': [{'afterStart': 680, 'afterEnd': 739, 'afterBase64': 'IgoJImdpdGh1Yi5jb20vb3Blbmltc2RrL29wZW4taW0tc2VydmVyL3YzL3BrZy9tc2dwcm9jZXNzb3I=', 'beforeBase64': ''}, {'afterStart': 16295, 'afterEnd': 16298, 'afterBase64': 'cmVx', 'beforeBase64': 'JnBicA=='}, {'afterStart': 16299, 'afterEnd': 16306, 'afterBase64': 'aXJlZFJhdw==', 'beforeBase64': 'c2gu'}, {'afterStart': 16310, 'afterEnd': 16310, 'afterBase64': '', 'beforeBase64': 'TXNn'}, {'afterStart': 16313, 'afterEnd': 16315, 'afterBase64': 'dWU=', 'beforeBase64': 'e00='}, {'afterStart': 16316, 'afterEnd': 16316, 'afterBase64': '', 'beforeBase64': 'Z0Rh'}, {'afterStart': 16317, 'afterEnd': 16318, 'afterBase64': 'KA==', 'beforeBase64': 'YTogJnNka3dzLk1zZ0RhdGF7U2VuZElEOiA='}, {'afterStart': 16333, 'afterEnd': 16333, 'afterBase64': '', 'beforeBase64': 'IFJlY3ZJRDo='}, {'afterStart': 16350, 'afterEnd': 16350, 'afterBase64': '', 'beforeBase64': 'LCBDbGllbnRNc2dJRDogdXVpZC5OZXdTdHJpbmco'}, {'afterStart': 16351, 'afterEnd': 16351, 'afterBase64': '', 'beforeBase64': 'LCBTZXJ2ZXJNc2dJRDogdXVpZC5OZXdTdHJpbmcoKSwgU2Vzc2lvblR5cGU6IGNvbnN0YW50LlNpbmdsZUNoYXRUeXBlLCBDb250ZW50VHlwZTogY29uc3RhbnQuVGV4dCwgQ29udGVudDogW11ieXRlKGB7ImNvbnRlbnQiOiJzeW50aGV0aWMgcmF3IHBhdGggbXVzdCBiZSByZWZ1c2VkIn1gKSwgU2VuZFRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIENyZWF0ZVRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIE9wdGlvbnM6IG1hcFtzdHJpbmddYm9vbHtjb25zdGFudC5Jc0hpc3Rvcnk6IHRydWUsIGNvbnN0YW50LklzUGVyc2lzdGVudDogdHJ1ZX19fQ=='}, {'afterStart': 22720, 'afterEnd': 23409, 'afterBase64': 'Ci8vIFByZXNlcnZlIHRoZSBvcmlnaW5hbCByYXcgcGF5bG9hZCB3aGlsZSBzYXRpc2Z5aW5nIGl0cyBhY3R1YWwgcHJvdG9jb2wgY29udHJhY3QuCmZ1bmMgcmVxdWlyZWRSYXdQdXNoUmVxdWVzdChtYW5hZ2VySUQsIHRva2VuVXNlcklEIHN0cmluZykgKnBicHVzaC5QdXNoTXNnUmVxIHsKCW1lc3NhZ2UgOj0gJnNka3dzLk1zZ0RhdGF7U2VuZElEOiBtYW5hZ2VySUQsIFJlY3ZJRDogdG9rZW5Vc2VySUQsIENsaWVudE1zZ0lEOiB1dWlkLk5ld1N0cmluZygpLCBTZXJ2ZXJNc2dJRDogdXVpZC5OZXdTdHJpbmcoKSwgU2Vzc2lvblR5cGU6IGNvbnN0YW50LlNpbmdsZUNoYXRUeXBlLCBDb250ZW50VHlwZTogY29uc3RhbnQuVGV4dCwgQ29udGVudDogW11ieXRlKGB7ImNvbnRlbnQiOiJzeW50aGV0aWMgcmF3IHBhdGggbXVzdCBiZSByZWZ1c2VkIn1gKSwgU2VuZFRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIENyZWF0ZVRpbWU6IHRpbWUuTm93KCkuVW5peE1pbGxpKCksIE9wdGlvbnM6IG1hcFtzdHJpbmddYm9vbHtjb25zdGFudC5Jc0hpc3Rvcnk6IHRydWUsIGNvbnN0YW50LklzUGVyc2lzdGVudDogdHJ1ZX19CglyZXR1cm4gJnBicHVzaC5QdXNoTXNnUmVxe01zZ0RhdGE6IG1lc3NhZ2UsIENvbnZlcnNhdGlvbklEOiBtc2dwcm9jZXNzb3IuR2V0Q29udmVyc2F0aW9uSURCeU1zZyhtZXNzYWdlKX0KfQo=', 'beforeBase64': ''}]}, 'priorNullFacts': {'version': 'same-complete-Go5404-null-named-scope-facts-v1', 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}, 'originalHead': 'fa6a75e7e202a7376802a12e8afd4ea51524a0ec', 'originalRun': 42297454212, 'originalGraphAccepted': False, 'rootReview': {'path': '.qa/redis-null-fixture-eof-batch-20261107/root-fa6a75e-null-control-pass-push-evidence-rejected-review.json', 'sha256': '1bcfe5137fad2024dc2dc0efaa3714cc165c2f606bf765ace213adf04582e0ff'}, 'namedReceipt': {'topPASS': 1, 'subPASS': 3, 'skip': 0, 'fail': 0, 'packages': 1, 'namedCompletions': [{'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/complete-pipeline-null-and-value-preserve-all-original-results'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay'}, {'package': 'pkg/common/db/cache', 'name': 'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown/real-rockscache-cold-set-null-and-warm-hit-retain-original-owner'}], 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}, 'accepted': True, 'newDatabaseFixtures': 0, 'scope': {'phase': 'current-owned-redis-null-ack', 'targets': {'pkg/common/db/cache': ['TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown']}, 'requiredSubtests': {'pkg/common/db/cache': {'TestOwnedRedisNullACKPreservesRealRockscacheAndCompletePipelineWithoutClearingUnknown': ['real-rockscache-cold-set-null-and-warm-hit-retain-original-owner', 'complete-pipeline-null-and-value-preserve-all-original-results', 'mixed-lua-error-lost-tail-and-joined-null-never-clear-unknown-or-replay']}}, 'goTimeoutSeconds': 180, 'phaseGuardSeconds': 600, 'topPASS': 1, 'subPASS': 3, 'packages': 1, 'goCommandInvocations': 1, 'packageExecutions': 1, 'wholePackagePASS': False}, 'actualGoCommandInvocations': 1, 'actualPackageExecutions': 1, 'actualKafkaACLTestsDispatched': 0, 'actualManagedShapeTopsDispatched': 0, 'actualCacheTopsDispatched': 0, 'wholePackagePASS': False, 'runtimeAccepted': False, 'wholeSourceAccepted': False}, 'eventsSHA256': 'd5b64b8549e1658eebab4cd0b625aaebc8e5e46e7b6435e069ea7e52e57c6b95', 'eventFacts': {'run': 4, 'pass': 5, 'fail': 0, 'skip': 0, 'packageStart': 1, 'packagePASS': 1}, 'phaseFacts': {'label': 'current-owned-redis-null-ack', 'exitCode': 0, 'resourceStatus': 'passed', 'resourceExitCode': 0}, 'sourcePost': {'accepted': True, 'source': {'members': 1583, 'digest': '5404877b40bd33ef0c2a001213708c9448e747b873ca390abd252eef04c50947'}}, 'GoToolBodyAndMode': {'bytes': 17164055, 'sha256': '548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0', 'mode': 493}, 'historyBridgeCanonicalSHA256': 'b41ad40645612d44dd7cae6f6d71a1edc28a6c4e76e4228eeaa040c8346a647c', 'wholePackagePASS': False, 'currentWholeProjectGoPASS': False, 'runtimePIDReadyP20Accepted': False}, 'sameCompleteGoSource': False, 'oldNullCurrentActualPASS': False, 'currentWholeProjectGoPASS': False, 'actualCurrentNullGoCommands': 0, 'runtimePIDReadyP20Accepted': False}
+
+def raw_push_dependency_rows(rows):
+ policy=RAW_PUSH_DEPENDENCY_CONTROL;roots=set(policy['roots']);forbidden=policy['forbiddenPackage'];seen=set();normal=set();mains=set();tested=set()
+ if not isinstance(rows,list) or not 1<=len(rows)<=policy['packagesLimit']:raise ValueError('bounded complete fixed-root dependency closure required')
+ for row in rows:
+  if not isinstance(row,dict) or set(row)!={'importPath','forTest'} or not isinstance(row['importPath'],str) or not isinstance(row['forTest'],str):raise ValueError('only finite public dependency identities permitted')
+  path,owner=row['importPath'],row['forTest']
+  if not path or len(path.encode())>policy['importPathLimitBytes'] or path in seen or owner and owner not in roots:raise ValueError('unique bounded import paths and only the fixed cache test owner required')
+  seen.add(path);base=path
+  if ' [' in path:
+   base,tail=path.split(' [',1)
+   if tail not in {root+'.test]' for root in roots}:raise ValueError('foreign or malformed augmented test package')
+  if not re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_.+\-/]*',base) or any(part in ('','.', '..') for part in base.split('/')):raise ValueError('canonical public Go import path required')
+  if base in (forbidden,forbidden+'.test',forbidden+'_test') or base.startswith(forbidden+'/') or owner==forbidden:raise ValueError('changed fixture package is a dependency of a reused scope')
+  if base.endswith('.test') and base not in {root+'.test' for root in roots}:raise ValueError('unrequested test-main package')
+  if path in roots:normal.add(path)
+  if path in {root+'.test' for root in roots}:mains.add(path[:-5])
+  if owner:tested.add(owner)
+ if normal!=roots or mains!=roots or tested!=roots:raise ValueError('the cache root, test mains and test dependency variants must be complete')
+ return sorted(rows,key=lambda row:row['importPath'])
+
+def check_raw_push_dependency_receipt(value):
+ keys={'version','source','scope','packages','packageCount','complete','hasTestDependencies','fixturePackageAbsent','originalGoCommandInvocations','runtimeAccepted'}
+ if not isinstance(value,dict) or set(value)!=keys or value['version']!='raw-push-cache-fixed-test-root-dependencies-v1' or value['source']!=FINAL_SOURCE or value['scope']!=RAW_PUSH_DEPENDENCY_CONTROL or any(value[key] is not True for key in ('complete','hasTestDependencies','fixturePackageAbsent')) or value['runtimeAccepted'] is not False or type(value['originalGoCommandInvocations']) is not int or value['originalGoCommandInvocations']!=1:raise ValueError('exact actual fixed-root go-list dependency receipt required')
+ rows=raw_push_dependency_rows(value['packages'])
+ if value['packages']!=rows or type(value['packageCount']) is not int or value['packageCount']!=len(rows) or len(json.dumps(value,separators=(',',':')).encode())>RAW_PUSH_DEPENDENCY_CONTROL['projectionLimitBytes']:raise ValueError('complete bounded sorted dependency projection required')
+ return value
+
+def project_raw_push_dependencies(raw):
+ policy=RAW_PUSH_DEPENDENCY_CONTROL
+ if not isinstance(raw,bytes) or not raw or len(raw)>policy['rawLimitBytes'] or not raw.endswith(b'\n'):raise ValueError('complete bounded original go-list stdout required')
+ def unique(pairs):
+  result={}
+  for key,value in pairs:
+   if key in result:raise ValueError('duplicate go-list JSON field')
+   result[key]=value
+  return result
+ def invalid_constant(value):raise ValueError('nonfinite go-list JSON')
+ decoder=json.JSONDecoder(object_pairs_hook=unique,parse_constant=invalid_constant);text=raw.decode('utf-8');position=0;rows=[]
+ while position<len(text):
+  while position<len(text) and text[position].isspace():position+=1
+  if position==len(text):break
+  value,position=decoder.raw_decode(text,position)
+  if not isinstance(value,dict) or value.get('Incomplete',False) is not False or value.get('Error') is not None or value.get('DepsErrors') not in (None,[]):raise ValueError('go-list errors or incomplete dependencies cannot justify scope reuse')
+  path,owner=value.get('ImportPath'),value.get('ForTest','')
+  if not isinstance(path,str) or not isinstance(owner,str):raise ValueError('original public package identities required')
+  rows.append({'importPath':path,'forTest':owner})
+  if len(rows)>policy['packagesLimit']:raise ValueError('go-list dependency package bound exceeded')
+ rows=raw_push_dependency_rows(rows)
+ return check_raw_push_dependency_receipt({'version':'raw-push-cache-fixed-test-root-dependencies-v1','source':FINAL_SOURCE,'scope':policy,'packages':rows,'packageCount':len(rows),'complete':True,'hasTestDependencies':True,'fixturePackageAbsent':True,'originalGoCommandInvocations':1,'runtimeAccepted':False})
+
+def check_raw_push_control_receipt(value):
+ keys={'topPASS','subPASS','skip','fail','packages','namedCompletions','source','accepted','newDatabaseFixtures','scope','actualGoCommandInvocations','actualPackageExecutions','actualKafkaACLTestsDispatched','actualManagedShapeTopsDispatched','actualCacheTopsDispatched','wholePackagePASS','runtimeAccepted','wholeSourceAccepted'}
+ control=CURRENT_RAW_PUSH_CONTROL
+ if not isinstance(value,dict) or set(value)!=keys or value['source']!=FINAL_SOURCE or value['scope']!=control or value['accepted'] is not True or any(value[key] is not False for key in ('wholePackagePASS','runtimeAccepted','wholeSourceAccepted')):raise ValueError('exact fresh fixture named-subset receipt required')
+ for key,want in [('topPASS',1),('subPASS',2),('skip',0),('fail',0),('packages',1),('newDatabaseFixtures',0),('actualGoCommandInvocations',1),('actualPackageExecutions',1),('actualKafkaACLTestsDispatched',0),('actualManagedShapeTopsDispatched',0),('actualCacheTopsDispatched',0)]:
+  if type(value[key]) is not int or value[key]!=want:raise ValueError('exact fixture-only counts required')
+ package=next(iter(control['targets']));top=control['targets'][package][0];expected={(package,top)}|{(package,top+'/'+child) for child in control['requiredSubtests'][package][top]};names=value['namedCompletions']
+ if not isinstance(names,list) or len(names)!=3 or any(not isinstance(row,dict) or set(row)!={'package','name'} for row in names) or {(row['package'],row['name']) for row in names}!=expected:raise ValueError('actual required-push request top and both children required')
+ return value
+
+def check_raw_push_plan(c):
+ if c.get('currentRawPushContract')!=CURRENT_RAW_PUSH_CONTROL or c.get('rawPushSourceCompatibility')!=RAW_PUSH_SOURCE_COMPATIBILITY or c.get('rawPushTestsToRun')!=CURRENT_RAW_PUSH_CONTROL['targets']['internal/runtimeacceptance']:raise ValueError('one exact fresh required-push protocol contract required')
+ # Keep original mode-exclusion checks; this local plan never authorizes a Null dispatch.
+ fixture=dict(c,currentRawPushContract=None,rawPushSourceCompatibility=None,rawPushTestsToRun=[],passedRedisNullAckControl=None,currentRedisNullAckControl=CURRENT_REDIS_NULL_ACK_CONTROL,redisNullSourceBridge=REDIS_NULL_SOURCE_BRIDGE,redisNullTestsToRun=CURRENT_REDIS_NULL_ACK_CONTROL['targets']['pkg/common/db/cache'])
+ check_redis_null_ack_plan(fixture)
+ if any(c.get(key) is not None for key in ('passedRedisNullAckControl','currentRedisNullAckControl','redisNullSourceBridge')) or c.get('redisNullTestsToRun')!=[]:raise ValueError('fresh request contract and historical Null compatibility cannot mix explicit dispatch modes')
+ return CURRENT_RAW_PUSH_CONTROL
+
+def check_raw_push_source_compatibility(value,bodies,recipe,go_tool=None):
+ if value!=RAW_PUSH_SOURCE_COMPATIBILITY or value['currentSource']!=FINAL_SOURCE or value['originalSource']==FINAL_SOURCE or len(bodies)!=FINAL_SOURCE['members'] or recipe.digest(recipe.rows(bodies))!=FINAL_SOURCE['digest']:raise ValueError('exact current request-contract source required')
+ previous=dict(bodies);added=value['newTest'];raw=previous.pop(added['target'],None)
+ if not isinstance(raw,bytes) or {'bytes':len(raw),'sha256':sha(raw)}!=added['after'] or re.search(rb'\bfunc\s+init\s*\(',raw) or b'//go:embed' in raw:raise ValueError('exact new request test without init or embed required')
+ delta=value['modifiedBody'];raw=previous.get(delta['target']);decode=__import__('base64').b64decode
+ if delta['target']!='server/internal/runtimeacceptance/acceptance_linux.go' or not isinstance(raw,bytes) or {'bytes':len(raw),'sha256':sha(raw)}!=delta['after'] or not 1<=len(delta['edits'])<=256:raise ValueError('only exact acceptance source delta permitted')
+ restored=bytearray();cursor=0
+ for edit in delta['edits']:
+  a,b=edit['afterStart'],edit['afterEnd']
+  if type(a) is not int or type(b) is not int or not cursor<=a<=b<=len(raw) or raw[a:b]!=decode(edit['afterBase64'],validate=True):raise ValueError('original acceptance source span differs')
+  restored.extend(raw[cursor:a]);restored.extend(decode(edit['beforeBase64'],validate=True));cursor=b
+ restored.extend(raw[cursor:]);previous[delta['target']]=bytes(restored)
+ if {'bytes':len(restored),'sha256':sha(restored)}!=delta['before'] or len(previous)!=value['originalSource']['members'] or recipe.digest(recipe.rows(previous))!=value['originalSource']['digest']:raise ValueError('entire original Go5404 including all other packages tests and locks must reconstruct exactly')
+ facts=value['priorNullFacts'];source=value['originalSource'];receipt=facts['namedReceipt'];control=CURRENT_REDIS_NULL_ACK_CONTROL;package=next(iter(control['targets']));top=control['targets'][package][0];expected={(package,top)}|{(package,top+'/'+child) for child in control['requiredSubtests'][package][top]}
+ if facts!=PASSED_REDIS_NULL_ACK_FACTS or facts['source']!=source or facts['sourcePost']!={'accepted':True,'source':source} or REDIS_NULL_SOURCE_BRIDGE['currentSource']!=source or facts['historyBridgeCanonicalSHA256']!=sha(json.dumps(REDIS_NULL_SOURCE_BRIDGE,sort_keys=True,separators=(',',':')).encode()):raise ValueError('exact original completed Null named-scope and historical source required')
+ if receipt['source']!=source or receipt['scope']!=control or receipt['topPASS']!=1 or receipt['subPASS']!=3 or receipt['skip']!=0 or receipt['fail']!=0 or receipt['accepted'] is not True or len(receipt['namedCompletions'])!=4 or {(row['package'],row['name']) for row in receipt['namedCompletions']}!=expected or any(receipt[key] is not False for key in ('wholePackagePASS','runtimeAccepted','wholeSourceAccepted')):raise ValueError('original actual Null1top3 only, never a whole package or current whole source PASS')
+ if facts['eventFacts']!={'run':4,'pass':5,'fail':0,'skip':0,'packageStart':1,'packagePASS':1} or facts['phaseFacts']!={'label':control['phase'],'exitCode':0,'resourceStatus':'passed','resourceExitCode':0} or any(facts[key] is not False for key in ('originalGraphAccepted','wholePackagePASS','currentWholeProjectGoPASS','runtimePIDReadyP20Accepted')):raise ValueError('complete original Null events/footer/phase and authority boundary required')
+ if go_tool is not None and {key:go_tool.get(key) for key in facts['GoToolBodyAndMode']}!=facts['GoToolBodyAndMode']:raise ValueError('exact original Go tool body and mode required')
+ return value
+
+def check_raw_push_null_compatibility_receipt(value,bodies,recipe,go_tool):
+ keys={'version','compatibility','dependencyEvidence','acceptedForNamedScopeCompatibility','actualCurrentNullGoCommands','sameCompleteGoSource','wholePackagePASS','currentWholeProjectGoPASS','runtimePIDReadyP20Accepted'}
+ if not isinstance(value,dict) or set(value)!=keys or value['version']!='raw-push-runtime-only-null-scope-compatibility-v1' or value['acceptedForNamedScopeCompatibility'] is not True or type(value['actualCurrentNullGoCommands']) is not int or value['actualCurrentNullGoCommands']!=0 or any(value[key] is not False for key in ('sameCompleteGoSource','wholePackagePASS','currentWholeProjectGoPASS','runtimePIDReadyP20Accepted')):raise ValueError('finite source-compatible original Null scope reuse only')
+ check_raw_push_source_compatibility(value['compatibility'],bodies,recipe,go_tool);check_raw_push_dependency_receipt(value['dependencyEvidence']);return value
+
+def run_raw_push_control(go,environment,command,parent,out,bodies,recipe,go_tool):
+ check_raw_push_source_compatibility(RAW_PUSH_SOURCE_COMPATIBILITY,bodies,recipe,go_tool);dependency=RAW_PUSH_DEPENDENCY_CONTROL
+ raw=command(dependency['phase'],[go,'list','-deps','-test','-mod=readonly','-json='+','.join(dependency['jsonFields'])]+['./'+package for package in dependency['relativeRoots']],dependency['phaseGuardSeconds'],environment)
+ observed=project_raw_push_dependencies(raw);write(out/'raw-push-cache-scope-deps.json',observed)
+ reuse={'version':'raw-push-runtime-only-null-scope-compatibility-v1','compatibility':RAW_PUSH_SOURCE_COMPATIBILITY,'dependencyEvidence':observed,'acceptedForNamedScopeCompatibility':True,'actualCurrentNullGoCommands':0,'sameCompleteGoSource':False,'wholePackagePASS':False,'currentWholeProjectGoPASS':False,'runtimePIDReadyP20Accepted':False}
+ check_raw_push_null_compatibility_receipt(reuse,bodies,recipe,go_tool);write(out/'raw-push-null-scope-compatibility.json',reuse)
+ control=CURRENT_RAW_PUSH_CONTROL;package=next(iter(control['targets']));top=control['targets'][package][0]
+ raw=command(control['phase'],[go,'test','-mod=readonly','-race','-p=1','-parallel=1','-count=1','-json','-vet=off','-timeout=180s','-run','^'+re.escape(top)+'$','./'+package],control['phaseGuardSeconds'],environment)
+ events=[json.loads(line) for line in raw.decode().splitlines() if line.strip()];result=parent.audit(events,0,control['targets']);value=dict(result,source=FINAL_SOURCE,accepted=True,newDatabaseFixtures=0,scope=control,actualGoCommandInvocations=1,actualPackageExecutions=1,actualKafkaACLTestsDispatched=0,actualManagedShapeTopsDispatched=0,actualCacheTopsDispatched=0,wholePackagePASS=False,runtimeAccepted=False,wholeSourceAccepted=False)
+ check_raw_push_control_receipt(value);write(out/'current-required-push-request-names.json',value);return value
+
+def write_raw_push_summary(out,receipt,cleanup_audit,launcher_reuse,redis_parser_reuse):
+ check_raw_push_control_receipt(receipt)
+ write(out/'summary.json',{'accepted':True,'source':FINAL_SOURCE,'actualCurrentMainBuilds':14,'auxiliaryBuilds':2,'freshGraphScenarios':4,'pendingOriginalTopPASS':2,'pendingOriginalSubPASS':3,'targetedTopPASS':2,'targetedSubPASS':3,'rawPushRequestContract':receipt,'actualCurrentRawPushGoCommands':1,'actualCurrentNullGoCommands':0,'actualDependencyGoListInvocations':1,'actualCurrentResolverCommands':0,'actualCurrentCachedWaitCommands':0,'actualCurrentRTCGoTestCommands':0,'actualCurrentRuntimeProbeCommands':0,'currentFreshGo':{'topPASS':1,'subPASS':2,'includesOriginalGraph':False},'originalGraphOracleHistoricalReuse':{'topPASS':2,'subPASS':3,'currentCommands':0,'source':'cleanupPassedReuse','fresh':False},'pendingOriginalAndTargetedFieldsFresh':False,'sameCompleteGoSource':False,'wholePackagePASS':False,'currentWholeProjectGoPASS':False,'launcherPassedReuse':launcher_reuse,'redisParserPassedReuse':redis_parser_reuse,'cleanupAudit':cleanup_audit,'reuseOldBinary':False,'deployment':False,'privateLogsUploaded':False})
+
+
 def check_redis_null_passed_plan(c):
  if c.get('passedRedisNullAckControl')!=PASSED_REDIS_NULL_ACK_FACTS or c.get('currentRedisNullAckControl') is not None or c.get('redisNullSourceBridge') is not None or c.get('redisNullTestsToRun')!=[]:raise ValueError('exact same-complete-Go Null scope reuse without fresh dispatch required')
  fixture=dict(c,passedRedisNullAckControl=None,currentRedisNullAckControl=CURRENT_REDIS_NULL_ACK_CONTROL,redisNullSourceBridge=REDIS_NULL_SOURCE_BRIDGE,redisNullTestsToRun=CURRENT_REDIS_NULL_ACK_CONTROL['targets']['pkg/common/db/cache'])
@@ -1171,7 +1284,8 @@ def check_locked(c):
  if c['scenarios']!=list(SCENARIOS) or c['roles']!=list(ROLES) or c['existingGreenTestsToRerun']!=[] or c['reuseOldBinary'] is not False:raise ValueError('exact fresh graph scope required')
  if c['resource']!=RESOURCE:raise ValueError('reviewed graph resource contract differs')
  if c.get('targetedKafkaACLControl')!=KAFKA_ACL_CONTROL:raise ValueError('exact original Kafka ACL parent and two new children required')
- if c.get('passedRedisNullAckControl') is not None:check_redis_null_passed_plan(c)
+ if c.get('currentRawPushContract') is not None or c.get('rawPushSourceCompatibility') is not None or c.get('rawPushTestsToRun') not in (None,[]):check_raw_push_plan(c)
+ elif c.get('passedRedisNullAckControl') is not None:check_redis_null_passed_plan(c)
  elif c.get('currentRedisNullAckControl') is not None or c.get('redisNullSourceBridge') is not None:check_redis_null_ack_plan(c)
  elif c.get('currentOwnedResolverSchemeControl') is not None or c.get('ownedResolverSourceBridge') is not None:check_owned_resolver_scheme_plan(c)
  elif c.get('currentCachedWaitControl') is not None or c.get('cachedWaitSourceBridge') is not None:check_cached_wait_plan(c)
@@ -1242,7 +1356,9 @@ def verify():
  for row in c['controllerPins']:pin(row)
  check_redis_parser_reuse(c.get('redisParserPassedReuse'),bodies)
  if c.get('redisParserTestsToRun')!=[]:raise ValueError('unchanged Redis parser must not be redispatched')
- if c.get('passedRedisNullAckControl') is not None:
+ if c.get('currentRawPushContract') is not None:
+  check_raw_push_plan(c);check_raw_push_source_compatibility(RAW_PUSH_SOURCE_COMPATIBILITY,bodies,recipe);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
+ elif c.get('passedRedisNullAckControl') is not None:
   check_redis_null_passed_plan(c);check_redis_null_source_bridge(REDIS_NULL_SOURCE_BRIDGE,bodies,recipe);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
  elif c.get('currentRedisNullAckControl') is not None:
   check_redis_null_ack_plan(c);check_redis_null_source_bridge(c['redisNullSourceBridge'],bodies,recipe);check_process_image_prior(c.get('processImageHistoricalPass'),bodies)
@@ -1289,7 +1405,7 @@ def verify():
  return c,bodies,recipe,parent,old,catalog
 
 def go_test_projection_phase(label):
- return label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',CURRENT_IMAGE_KAFKA_CONTROL['phase'],CURRENT_KAFKA_CONFIRM_CONTROL['phase'],CURRENT_RELEASE_CONTROL['phase'],CURRENT_MANAGED_SHAPE_CONTROL['phase'],CURRENT_PRODUCER_CONTROL['phase'],CURRENT_GROUP_RECOVERY_CONTROL['phase'],CURRENT_CACHE_TEST_DELTA_CONTROL['phase'],CURRENT_CRON_FIXTURE_CONTROL['phase'],CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL['phase'],CURRENT_RUNTIME_RELEASE_CONTROL['phase'],CURRENT_RTC_ACTIVATION_CONTROL['phase'],CURRENT_CACHED_WAIT_CONTROL['phase'],CURRENT_OWNED_RESOLVER_SCHEME_CONTROL['phase'],CURRENT_REDIS_NULL_ACK_CONTROL['phase']} or label in {scope['label'] for scope in CLEANUP_SCOPES}
+ return label in {'pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',CURRENT_IMAGE_KAFKA_CONTROL['phase'],CURRENT_KAFKA_CONFIRM_CONTROL['phase'],CURRENT_RELEASE_CONTROL['phase'],CURRENT_MANAGED_SHAPE_CONTROL['phase'],CURRENT_PRODUCER_CONTROL['phase'],CURRENT_GROUP_RECOVERY_CONTROL['phase'],CURRENT_CACHE_TEST_DELTA_CONTROL['phase'],CURRENT_CRON_FIXTURE_CONTROL['phase'],CURRENT_GROUP_REGISTRY_FIXTURE_CONTROL['phase'],CURRENT_RUNTIME_RELEASE_CONTROL['phase'],CURRENT_RTC_ACTIVATION_CONTROL['phase'],CURRENT_CACHED_WAIT_CONTROL['phase'],CURRENT_OWNED_RESOLVER_SCHEME_CONTROL['phase'],CURRENT_RAW_PUSH_CONTROL['phase'],CURRENT_REDIS_NULL_ACK_CONTROL['phase']} or label in {scope['label'] for scope in CLEANUP_SCOPES}
 
 def persist_go_test_projection(out,stdout_path,label,command_index):
  if not go_test_projection_phase(label):return False
@@ -1685,8 +1801,9 @@ def run():
   redis_parser_reuse=load_redis_parser_reuse(out,bodies)
   launcher_reuse=load_launcher_reuse(out)
   cleanup_audit=load_cleanup_reuse(out)
-  kafka_acl_reuse=None;current_image_kafka=None;current_kafka_confirm=None;kafka_confirm_reuse=None;current_release=None;current_managed_shape=None;current_producer=None;current_group_recovery=None;current_cache_test_delta=None;current_cron_fixture=None;current_named_scope_reuse=None;current_group_registry_fixture=None;current_group_fixture_passed=None;current_runtime_release=None;current_runtime_release_passed=None;current_rtc_activation=None;current_rtc_panic_runtime=None;current_cached_wait=None;current_owned_resolver_scheme=None;current_redis_null_ack=None;current_redis_null_passed=None
-  if c.get('passedRedisNullAckControl') is not None:
+  kafka_acl_reuse=None;current_image_kafka=None;current_kafka_confirm=None;kafka_confirm_reuse=None;current_release=None;current_managed_shape=None;current_producer=None;current_group_recovery=None;current_cache_test_delta=None;current_cron_fixture=None;current_named_scope_reuse=None;current_group_registry_fixture=None;current_group_fixture_passed=None;current_runtime_release=None;current_runtime_release_passed=None;current_rtc_activation=None;current_rtc_panic_runtime=None;current_cached_wait=None;current_owned_resolver_scheme=None;current_redis_null_ack=None;current_redis_null_passed=None;current_raw_push=None
+  if c.get('currentRawPushContract') is not None:current_raw_push=run_raw_push_control(go,offline,command,parent,out,bodies,recipe,tools['go'])
+  elif c.get('passedRedisNullAckControl') is not None:
    check_redis_null_source_bridge(REDIS_NULL_SOURCE_BRIDGE,bodies,recipe,tools['go']);current_redis_null_passed=emit_redis_null_passed_reuse(out,tools['go'])
   elif c.get('currentRedisNullAckControl') is not None:current_redis_null_ack=run_redis_null_ack_control(go,offline,command,parent,out,bodies,recipe,tools['go'])
   elif c.get('currentOwnedResolverSchemeControl') is not None:current_owned_resolver_scheme=run_owned_resolver_scheme_control(go,offline,command,parent,out,bodies,recipe,tools['go'])
@@ -1771,7 +1888,9 @@ def run():
   except Exception:
    if primary is None:raise
   if not post['accepted'] and primary is None:raise ValueError('source-post rejected')
- if current_redis_null_passed is not None:
+ if current_raw_push is not None:
+  write_raw_push_summary(out,current_raw_push,cleanup_audit,launcher_reuse,redis_parser_reuse)
+ elif current_redis_null_passed is not None:
   write_redis_null_passed_summary(out,current_redis_null_passed,cleanup_audit,launcher_reuse,redis_parser_reuse)
  elif current_redis_null_ack is not None:
   write_redis_null_ack_summary(out,current_redis_null_ack,cleanup_audit,launcher_reuse,redis_parser_reuse)

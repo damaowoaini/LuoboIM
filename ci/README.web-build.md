@@ -1,4 +1,35 @@
-# Current4340 manual build only (prepared, not built)
+# Current4341 one login form case then manual build (prepared, unexecuted)
+
+Only `web4341-login-alignment-v1` is admitted. Exact4341 source rows contain the
+reviewed login UI3 plus its single real AntD form regression. Previous4340 source,
+accepted dist and screenshots remain before evidence; they cannot accept this UI.
+Node24.21.0, unchanged npm lock/SDK8/public13/WASM+sqlite/CSP and the original
+source/resource/offline/output gates remain. The old base buildPlan still has
+only install/SDK/Vite steps; this explicit cohort inserts one selected test in
+bundle-worker before the Vite step. No previous full suite, typecheck, E2E,
+Flutter, APK, Go or SDK bind is scheduled.
+
+The same scripts-disabled `npm ci` and SDK prepare are reused by the offline
+worker, without a second install. It runs the installed Vitest5.0.4 entry with
+one exact file and right-anchored literal case filter, one worker, JSON plus the existing
+completion/hook audit reporter. The original Vitest lock entry has no
+resolved/integrity fields; its exact entry digest/full source lock and installed
+version/body pins are retained honestly, with no guessed upstream body claim.
+Both raw reports and this case's stdout/stderr stay in `ci-output/web-build/private-test/`, outside the upload
+patterns. The bounded `login-test.json` commits report digests/counts, strict
+one-file/one-case run/PASS with zero skip/fail/hook/collection/unhandled errors,
+actual process and source/SDK/tool postconditions. The paired existing audit rejects collection, failed hooks, unhandled errors, only/skip/todo and incomplete runs; exact JSON file/title and count1 avoid relying on framework ancestor formatting. Failure stops before Vite. A bounded observation retains only fixed categories, known-case state and public test basename/source-bounded lines; no raw failure message, stack, payload or unknown name uploads.
+Successful dist-proof additionally binds that actual test receipt; neither the
+case alone nor Vite alone accepts a bundle, preview or backend/MFA authority.
+
+Current source is4341/fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec, composed from UI4r3 95d153a437758aa5b473df49b1d4f2a5b2dea4e8a9bd54854a782865cbae684e. The same private network namespace enables only lo for local worker/IPC; one-interface and zero-default-route gates remain.
+Actual run IDs, dist file rows and artifact hashes remain unknown until one
+future existing workflow run. Preview/render bindings must use that actual new
+artifact; this workflow does not claim pictures or interaction acceptance.
+
+## Historical4340 build-only identity
+
+### Original4340 source description (historical)
 
 Only `web4340-build-only-v1` is admitted by the current manual build lane. It binds all4340 tracked Web source rows at digest `3503ee773da527e252fa284c2380dcda386999012a5aa538fa60f84c42b2b636`, observed at public `8d0a844fca3f1ae17e004b23a17db3e8986781e7` (Web tree `2a359deba3cb762d912cd4a3e6c75f20844b2787`). Relative to the previous4316 descriptor,47 rows change and24 are added. Older lane successes do not establish a4340 bundle.
 
