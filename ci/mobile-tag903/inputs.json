@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "state": "FROZEN_FORMATTED_SOURCE",
+  "state": "FROZEN_SOURCE_PENDING_TARGETED_VERIFICATION",
   "parent_commit": "2f17d99d2f32c4fc72b9b922f8d2a8783938b665",
   "parent_source": {
     "members": 363,
@@ -12,19 +12,14 @@
   },
   "source": {
     "members": 363,
-    "digest": "fad51ad218053ea2cc147c0e7120548528fa0c5dc8cc2cbea74983cb8a50c0e9"
+    "digest": "8a84a1535d460aab38db8994018a0b1c262b9b30ecb37272c2efcf30bf544a33"
   },
   "portable": {
     "members": 415,
-    "digest": "8244ea62ad19aa7bb2ff1eade899d47e015b93ba113b68e903a500375e8fb367"
+    "digest": "031581d805c34e107a70aede311b7c51007c43dc60b31d0c254aeacaae2cdd27"
   },
   "analysis_paths": [
-    "lib/features/chat/data/chat_repository.dart",
-    "lib/features/chat/presentation/chat_forward_page.dart",
-    "lib/features/favorite/presentation/favorite_forward_page.dart",
-    "test/features/chat/chat_forward_page_test.dart",
-    "test/features/favorite/favorite_forward_privacy_test.dart",
-    "test/features/chat/chat_favorite_test.dart"
+    "test/features/chat/chat_forward_page_test.dart"
   ],
   "test_paths": [
     "test/features/chat/chat_forward_page_test.dart",
@@ -130,13 +125,18 @@
   "controllers": [
     {
       "path": "ci/mobile-tag903.py",
-      "bytes": 44299,
-      "sha256": "a95b5b140d371f0f41d0d75c902d33812de3daf11e4d1b0cca4431b47c7b1fbc"
+      "bytes": 50361,
+      "sha256": "8bc1acb369a7d0902719277df417503434c616296c78a77565324a966bf79d30"
     },
     {
       "path": ".github/workflows/mobile-tag903.yml",
-      "bytes": 2704,
-      "sha256": "e7cc7fb1fdd4f43e125a0662df012cfc50e701009874b34c950ebd05949045da"
+      "bytes": 2721,
+      "sha256": "9f127c1505233cb7a831ca43f019a728ab0ee9f38e33f312032c3c189f5e851f"
+    },
+    {
+      "path": "ci/mobile-tag903/test_progress.py",
+      "bytes": 4122,
+      "sha256": "4e1e332149119c6deaab7cf15eece4a4ff0ca0f15580093bc7366007001cd16c"
     }
   ],
   "provenance": {
@@ -260,6 +260,25 @@
       "path": ".qa/relationship-kafka-combined-publish-1/root-500baca-mobile15-pass-review.json",
       "bytes": 2987,
       "sha256": "170ca0e9843de6e2aa1bc9f85af72641eb23c78bceddeb4931c3fa1692d9b0db"
+    },
+    "fixtureTimeoutRecovery": {
+      "sourceCandidate": {
+        "path": "references/integration/mobile-timeout-recovery-20261106-candidate/candidate-manifest.json",
+        "bytes": 1713,
+        "sha256": "27b945872d3ccd2df24ae96673f72a1ff99235ae2fffd02641e5f228b7258d08"
+      },
+      "state": "FROZEN_SOURCE_PENDING_TARGETED_VERIFICATION",
+      "locallyDartFormatted": false,
+      "locallyDartAnalyzed": false,
+      "freshFormatPlanned": 1,
+      "freshAnalysisPlanned": 1,
+      "sameBodyBeforeTarget39BoundaryAnalysis": 5,
+      "sameBodyOldAnalysis": 7,
+      "sameBodyReusedTotal": 12,
+      "selectedTestsStillRequired": 39,
+      "prior39CompletedNamesAvailable": false,
+      "prior39Accepted": false,
+      "priorFinalSourceAndToolSnapshotsAvailable": false
     }
   },
   "historical_partial5": {
@@ -566,8 +585,8 @@
       },
       "after": {
         "path": "app/test/features/chat/chat_forward_page_test.dart",
-        "bytes": 33705,
-        "sha256": "6f97802e08cabf17bcc882e32143ced1d0bfec54532f70ef0e2725b373a40d19"
+        "bytes": 33970,
+        "sha256": "3979648795efbf399949e997d6df9339945a1e48b814fb6591df0a1c8003efcf"
       }
     },
     {
@@ -1018,5 +1037,95 @@
     "private facts learned while the at-forward merge is created still block final send",
     "tag903 forwarding retains original owner and privacy fences while native creation waits",
     "meeting905 retains original owner and privacy fences while native creation waits"
-  ]
+  ],
+  "prior_static5": {
+    "status": "same-body-analysis-pass-at-original-before-target39-boundary-only",
+    "repository": "damaowoaini/LuoboIM",
+    "head": "fd8ecc48de81ab21a9654b4ef20c25d55abe4471",
+    "run": 39094277998,
+    "job": 117577338693,
+    "originalSource": {
+      "members": 363,
+      "digest": "fad51ad218053ea2cc147c0e7120548528fa0c5dc8cc2cbea74983cb8a50c0e9"
+    },
+    "originalPortable": {
+      "members": 415,
+      "digest": "8244ea62ad19aa7bb2ff1eade899d47e015b93ba113b68e903a500375e8fb367"
+    },
+    "originalController": {
+      "path": "ci/mobile-tag903.py",
+      "bytes": 44299,
+      "sha256": "a95b5b140d371f0f41d0d75c902d33812de3daf11e4d1b0cca4431b47c7b1fbc"
+    },
+    "originalInputs": {
+      "path": "ci/mobile-tag903/inputs.json",
+      "bytes": 45835,
+      "sha256": "c6f504a37467a555cb0e52b4fe72378af9906c97ee41b0175a56f8c52fbdc510"
+    },
+    "originalPhaseEvidence": {
+      "path": ".qa/workspace-recovery-20261106/mobile-original-phase-results.json",
+      "bytes": 1419,
+      "sha256": "0e8e51182130aafff131673b7a02d5f079cae94d90fb23a505486f341399ea1f"
+    },
+    "boundary": {
+      "phase": "before-tag903-target39",
+      "allSixAnalysisOutcomesPassed": true,
+      "sourceVerifiedAfterEveryAnalysis": true,
+      "currentRunAccepted": false,
+      "finalSourceAndToolSnapshotsAvailable": false
+    },
+    "freshAnalysisOnCurrentSource": 0,
+    "rows": [
+      {
+        "path": "lib/features/chat/data/chat_repository.dart",
+        "originalPhase": "tag903-analyze-1",
+        "source": {
+          "path": "app/lib/features/chat/data/chat_repository.dart",
+          "bytes": 83600,
+          "sha256": "5fcf00dc9c4c750a69a6ba6b89212345beff4119d97f2ac784f4c7abf6b896e4"
+        },
+        "passedAtBeforeTarget39Boundary": true
+      },
+      {
+        "path": "lib/features/chat/presentation/chat_forward_page.dart",
+        "originalPhase": "tag903-analyze-2",
+        "source": {
+          "path": "app/lib/features/chat/presentation/chat_forward_page.dart",
+          "bytes": 17960,
+          "sha256": "8bac068110322ec5d8c1d6abd87d8011ee8bbb7c020b335fb49ae981ed181313"
+        },
+        "passedAtBeforeTarget39Boundary": true
+      },
+      {
+        "path": "lib/features/favorite/presentation/favorite_forward_page.dart",
+        "originalPhase": "tag903-analyze-3",
+        "source": {
+          "path": "app/lib/features/favorite/presentation/favorite_forward_page.dart",
+          "bytes": 17179,
+          "sha256": "5e6759d40a0e41e604b66326a721c4e87dea75dc4a4b1eb5b8d47358da4c9bb2"
+        },
+        "passedAtBeforeTarget39Boundary": true
+      },
+      {
+        "path": "test/features/favorite/favorite_forward_privacy_test.dart",
+        "originalPhase": "tag903-analyze-5",
+        "source": {
+          "path": "app/test/features/favorite/favorite_forward_privacy_test.dart",
+          "bytes": 12980,
+          "sha256": "263e265fbff2e8a41159dabe36e9f40bad3a1c472e42efd44821b9f57bb6823b"
+        },
+        "passedAtBeforeTarget39Boundary": true
+      },
+      {
+        "path": "test/features/chat/chat_favorite_test.dart",
+        "originalPhase": "tag903-analyze-6",
+        "source": {
+          "path": "app/test/features/chat/chat_favorite_test.dart",
+          "bytes": 12646,
+          "sha256": "e89b0857128a6b347f70f854280f731f612c69a2eef6c53c4a715965a57278e7"
+        },
+        "passedAtBeforeTarget39Boundary": true
+      }
+    ]
+  }
 }

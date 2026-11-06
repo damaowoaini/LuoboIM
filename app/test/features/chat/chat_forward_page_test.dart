@@ -522,7 +522,6 @@ void main() {
           return original(call);
         };
         await mount(tester);
-        Future<void>? exiting;
         try {
           await openConfirmation(tester);
           await awaitNativeCreate(tester, entered);
@@ -536,13 +535,19 @@ void main() {
               ),
             );
           } else {
-            exiting = harness.session.signOut();
+            // Keep teardown's serialized callbacks in the real async zone.
+            await tester.runAsync(() async {
+              final generation = harness.session.state.generation;
+              final exiting = harness.session.signOut();
+              expect(harness.session.isCurrent(generation), isFalse);
+              release.complete();
+              await exiting;
+            });
           }
-          release.complete();
+          if (!release.isCompleted) {
+            release.complete();
+          }
           await tester.pumpAndSettle();
-          if (exiting case final exit?) {
-            await tester.runAsync(() => exit);
-          }
           expect(
             harness.calls.where((c) => c.method == 'createForwardMessage'),
             hasLength(1),

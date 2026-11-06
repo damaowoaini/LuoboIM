@@ -100,12 +100,58 @@ def checked_kafka_acl_evidence(out):
  run.check_kafka_acl_go_tool(receipt,before.get('go'))
  return receipt
 
+def console_observation(rows,monitor,main,terminals,phases):
+ # Only already-validated finite observations reach this diagnostic projection.
+ # The result cannot replace the original result/cleanup/source/tool evidence.
+ if [r.get('scenario') for r in rows]!=list(run.SCENARIOS):raise ValueError('four original scenario observations required')
+ statuses={'passed','failed','stopped_timeout','stopped_remaining_process_group','infrastructure_failed'}
+ statuses|={prefix+gate for prefix in ('not_started_','stopped_','failed_final_') for gate in ('disk_gate','task_allocation_gate')}
+ def status(value):return value if value in statuses else 'unobserved'
+ def code(value):return value if type(value) is int and -128<=value<=255 else None
+ names={'go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response'}|{r['label'] for r in run.CLEANUP_SCOPES}
+ def phase(value):
+  label=value.get('phase');result={'phase':'unobserved','role':'none','scenario':'none','exitCode':code(value.get('exitCode')),'resourceStatus':status(value.get('resource',{}).get('status'))}
+  if label in names:result['phase']=label
+  elif label in {'compile-'+r for r in (*run.ROLES,'acceptance-operator','msgtransfer-legacy')}:result.update(phase='compile',role=label[8:])
+  elif label in {'runtime-'+s for s in run.SCENARIOS}:result.update(phase='runtime',scenario=label[8:])
+  elif isinstance(label,str) and label.startswith('image-acquire-'):result['phase']='image-acquire'
+  return result
+ result={'event':'backend_graph_observation','summaryAvailable':True,'acceptanceEvidence':False,'rawErrorText':False,
+  'controllerStatus':status(monitor.get('status')),'controllerExitCode':code(monitor.get('exit_code')),
+  'mainAccepted':main.get('accepted') is True,'lastPhase':phase(phases[-1]) if phases else None,'scenarios':[]}
+ runtime_keys=('accepted','bootstrapStage','bootstrapFailureTag','legacyStartupStage','legacyChildRetained','acquireStage','acquireAttempted','acquireReturned','acquireErrorClass','primaryRunErrorClass','readerStage','readerCallState','readerErrorClass','constructorStage','constructorRole','constructorCallState','constructorErrorClass','constructorPredicate','localCleanupObserved','localCleanupState','localCleanupFailureClass')
+ for row in rows:
+  scenario=row['scenario'];item={'scenario':scenario,'resourceStarted':row.get('resourceStarted') is True,
+   'runtimeAttempted':row.get('runtimeAttempted') is True,'resourceCleanupAccepted':row.get('resourceCleanup',{}).get('accepted') is True,
+   'runtimeCleanupAccepted':row.get('runtimeCleanupAccepted') is True,'resourcePreparation':None,'runtime':None}
+  if row.get('resourcePreparation') is not None:
+   observed=public_resource_preparation(json.dumps(row['resourcePreparation']).encode(),scenario)
+   item['resourcePreparation']={k:observed[k] for k in ('role','step','callState','errorClass','cliExitCode')}
+  if scenario in terminals:
+   observed=public_terminal(json.dumps(terminals[scenario]).encode(),scenario)
+   item['runtime']={k:observed[k] for k in runtime_keys}
+  result['scenarios'].append(item)
+ if len(json.dumps(result,separators=(',',':')).encode())>8192:raise ValueError('bounded console observation required')
+ return result
+
+def emit_console_observation(rows,monitor,main,terminals,out):
+ # A console failure must not replace the independent collector's outcome.
+ try:
+  paths=sorted(out.glob('phase-*.json'))
+  if len(paths)>256:raise ValueError('bounded original phase inventory required')
+  phases=[json.loads(run.regular(p,1<<20)) for p in paths]
+  value=console_observation(rows,monitor,main,terminals,phases)
+  print(json.dumps(value,separators=(',',':')),flush=True)
+ except Exception:
+  try:print('{"event":"backend_graph_observation","summaryAvailable":false,"acceptanceEvidence":false,"rawErrorText":false}',flush=True)
+  except Exception:pass
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
   run.write(out/'collection.json',{'started':False,'accepted':False,'reason':'no-original-allocation','privateDataUploaded':False});pack(out);return 0
  if allocation.resolve()!=allocation or allocation.stat().st_uid!=os.getuid() or stat.S_IMODE(allocation.stat().st_mode)!=0o700 or json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original job allocation required')
- root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False
+ root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False;terminals={}
  for scenario in run.SCENARIOS:
   folder=root/('plane-'+scenario);work=root/('scenario-'+scenario);entry={'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False}
   # Merely having a partial folder does not authorize a cleanup. Only the
@@ -122,7 +168,9 @@ def collect():
     if entry['resourcePreparation']['errorClass']!='none':failed=True
    except Exception as error:entry['resourcePreparationExceptionType']=type(error).__name__;failed=True
   if (work/'result.json').exists():
-   try:run.write(out/('terminal-'+scenario+'.json'),public_terminal(run.regular(work/'result.json',1<<20),scenario))
+   try:
+    terminal=public_terminal(run.regular(work/'result.json',1<<20),scenario);terminals[scenario]=terminal
+    run.write(out/('terminal-'+scenario+'.json'),terminal)
    except Exception as error:entry['terminalExceptionType']=type(error).__name__;failed=True
   if (work/'operator-intent.json').exists():
    entry['runtimeAttempted']=True
@@ -165,6 +213,7 @@ def collect():
  except Exception:failed=True
  accepted=launcher_accepted and kafka_reuse_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
  run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'actualKafkaACLTestsDispatched':0,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ emit_console_observation(rows,monitor,main,terminals,out)
  pack(out)
  return 0 if accepted else 1
 

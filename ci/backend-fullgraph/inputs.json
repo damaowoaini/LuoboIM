@@ -47,8 +47,8 @@
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 45031,
-      "sha256": "32bb5cb5a9b12fc3103759b960d9b1eacd0ca116270c68ca7bb72b6d8e486759"
+      "bytes": 49253,
+      "sha256": "405f6d0d869bb5dcf7beee847140f17457ddfb2182c77f113deb1d1ba652838a"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 84029,
-      "sha256": "0fd18407888c3dac3cec6a536e82777d4c1b740aba59f492ca2a5f27bf9ce985"
+      "bytes": 88823,
+      "sha256": "7f784f1577aef04d4b3e4490f4ad4937239bbe2d67ef0faa66ff96455c94bb5e"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -4280,33 +4280,7 @@
     "copyBinary": false,
     "sameRepositoryOnly": true
   },
-  "minioFixtureBinding": {
-    "rootFixtureAccepted": true,
-    "rootAcceptanceSHA256": "761f2e085d049f8a55f4fa1a418c9b6a8dea1eaddae30c2574a44c713201909c",
-    "repository": "damaowoaini/LuoboIM",
-    "run": 39075035152,
-    "head": "a6d9276c53a75e8ca19e351cab1d34b419b560e7",
-    "attempt": 1,
-    "jobID": 117520306290,
-    "jobConclusion": "failure",
-    "runConclusion": "failure",
-    "artifactID": 12116773175,
-    "artifactBytes": 70210032,
-    "artifactSHA256": "509aac21b6f81ac1221e7277b3a02a02f899a89be7e1e4a97489ae29979066bf",
-    "manifestSHA256": "de86afd4bc16bacc7bf8f320c7428068f4f32e545f6c71069f8f392ff721f5be",
-    "receipt": {
-      "version": "owned-minio-source-build-receipt-v1",
-      "repository": "https://github.com/minio/minio",
-      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
-      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
-      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
-      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
-      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
-      "cgoEnabled": "0",
-      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
-      "binaryBytes": 146777192
-    }
-  },
+  "minioFixtureBinding": null,
   "launcherPassedReuse": {
     "run": 39075035152,
     "job": 117520306290,

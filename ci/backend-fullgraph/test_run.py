@@ -785,4 +785,48 @@ class FullGraphControls(unittest.TestCase):
   bad['namedCompletions'].append({'package':'internal/namespaceimport/ownedcontrol','name':'TestOwnedCleanupSharesSingleSignalAcrossOriginalStopPaths'})
   with mock.patch.object(run,'CLEANUP_RECENT_REUSE',bad),self.assertRaises(ValueError):run.audit_target_union(original,cleanup)
 
+ def test_closed_console_observation_retains_failed_stage_without_private_fields_or_acceptance(self):
+  collector=load('collect');scenario=run.SCENARIOS[1]
+  terminal={'version':'owned-fullgraph-token-v2-result-v1','scenario':scenario,'accepted':False,'phase':'actual-resource-bootstrap','bootstrapStage':'kafka-coordinator','bootstrapFailureTag':'kafka-coordinator-unavailable','failureClass':'source-error-private','failureSHA256':'a'*64,'sourceSHA256':'','resourcePlaneSHA256':'b'*64,'actualStartedRoles':0,'rawError':'PRIVATE_RAW_ERROR'}
+  preparation={'version':'owned-fullgraph-resource-prepare-observation-v1','scenario':scenario,'role':'kafka-format','step':'format-attach','callState':'returned','errorClass':'command-nonzero','cliExitCode':1,'rawErrorText':False}
+  rows=[{'scenario':s,'resourceStarted':s==scenario,'runtimeAttempted':False,'runtimeCleanupAccepted':False,'privatePath':'PRIVATE_PATH','exceptionType':'PRIVATE_CLASS'} for s in run.SCENARIOS]
+  rows[1]['resourcePreparation']=preparation
+  monitor={'status':'failed','exit_code':1,'command':['PRIVATE_ARGV'],'log':'PRIVATE_PATH'}
+  phases=[{'phase':'runtime-'+scenario,'exitCode':1,'resource':{'status':'failed','command':['PRIVATE_ARGV']},'rawCustody':'PRIVATE_CAPTURE'}]
+  summary=collector.console_observation(rows,monitor,{'accepted':False},{scenario:terminal},phases)
+  self.assertEqual(summary['controllerStatus'],'failed');self.assertEqual(summary['controllerExitCode'],1)
+  self.assertEqual(summary['lastPhase'],{'phase':'runtime','role':'none','scenario':scenario,'exitCode':1,'resourceStatus':'failed'})
+  self.assertEqual(summary['scenarios'][1]['resourcePreparation']['errorClass'],'command-nonzero')
+  self.assertEqual(summary['scenarios'][1]['runtime']['bootstrapFailureTag'],'kafka-coordinator-unavailable')
+  self.assertFalse(summary['acceptanceEvidence']);self.assertFalse(summary['rawErrorText']);self.assertNotIn('PRIVATE_',json.dumps(summary))
+  self.assertLessEqual(len(json.dumps(summary,separators=(',',':')).encode()),8192)
+  # Unknown status/command labels cannot be echoed as newly invented enums.
+  foreign=collector.console_observation(rows,{'status':'PRIVATE_STATUS','exit_code':True},{},{scenario:dict(terminal,phase='private-stage-secret',bootstrapStage='',bootstrapFailureTag='')},[{'phase':'compile-PRIVATE_USER','exitCode':256,'resource':{'status':'PRIVATE_STATUS'}}])
+  self.assertEqual(foreign['controllerStatus'],'unobserved');self.assertIsNone(foreign['controllerExitCode'])
+  self.assertEqual(foreign['lastPhase']['phase'],'unobserved');self.assertIsNone(foreign['lastPhase']['exitCode'])
+  self.assertNotIn('private-stage-secret',json.dumps(foreign));self.assertNotIn('PRIVATE_',json.dumps(foreign))
+  for changed in (dict(preparation,role='PRIVATE_USER'),dict(preparation,step='/PRIVATE_PATH'),dict(preparation,rawErrorText=True)):
+   bad=copy.deepcopy(rows);bad[1]['resourcePreparation']=changed
+   with self.assertRaises(ValueError):collector.console_observation(bad,monitor,{}, {},phases)
+  with self.assertRaises(ValueError):collector.console_observation(rows[:-1],monitor,{}, {},phases)
+  # Actual always collector emits this projection even when no runtime started.
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory).resolve();allocation=root/'allocation';allocation.mkdir(mode=0o700)
+   owner={'fixture':'original-owned-allocation'};run.write(allocation/'allocation-owner.json',owner)
+   output=io.StringIO()
+   with mock.patch.object(collector.run,'REPO',root),mock.patch.object(collector.run,'allocation_root',return_value=allocation),mock.patch.object(collector.run,'job_identity',return_value=owner),mock.patch.object(collector.run,'module',return_value=resources),mock.patch.object(collector,'pack') as pack,mock.patch('sys.stdout',new=output):
+    self.assertEqual(collector.collect(),1)
+   observed=json.loads(output.getvalue());self.assertEqual(observed['event'],'backend_graph_observation')
+   self.assertTrue(observed['summaryAvailable']);self.assertFalse(observed['mainAccepted'])
+   self.assertEqual([r['scenario'] for r in observed['scenarios']],list(run.SCENARIOS))
+   self.assertTrue(all(not r['runtimeAttempted'] and not r['runtimeCleanupAccepted'] for r in observed['scenarios']))
+   pack.assert_called_once_with(root/'ci-results/backend-fullgraph')
+   # Summary I/O cannot replace a collector outcome or expose an exception.
+   with mock.patch('sys.stdout',new=io.StringIO()) as stream:
+    collector.emit_console_observation(rows,monitor,{}, {},root/'absent')
+    self.assertNotIn('PRIVATE_',stream.getvalue())
+   for error in (BrokenPipeError('PRIVATE_CHANNEL'),ValueError('PRIVATE_CHANNEL')):
+    with mock.patch('builtins.print',side_effect=error):
+     collector.emit_console_observation(rows,monitor,{}, {},root/'absent')
+
 if __name__=='__main__':unittest.main()
