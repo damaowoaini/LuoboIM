@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 130893,
-      "sha256": "a71e9bc90bfd91e3bb77462e2323c240abd2504cb33d195dbd532c479d8ee530"
+      "bytes": 146326,
+      "sha256": "d08f839374c0c7a6e8da634eff8ffb1f79505b699137896805f4537a83ef3299"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 77235,
-      "sha256": "803481b34cbeeca0a9aec6c8b76306e396500a85dabd762cfc231730980f3eab"
+      "bytes": 82140,
+      "sha256": "a901e63f71025d46a4623e2ce66bba4c1d30189edffc954a7849f7de6ecef85a"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 138009,
-      "sha256": "78aa906af3198f48cb03275b4a328c34a0eee46021cf969edf28af495a79172e"
+      "bytes": 145742,
+      "sha256": "77b87da0f9743c38e554c3d6b2ec4cc575a03aaa54a74d0cc1737dbff4eb8491"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -4518,9 +4518,7 @@
     "otherKafkaOrRedisTestsDispatched": false
   },
   "kafkaACLPassedReuse": null,
-  "kafkaACLTestsToRun": [
-    "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-  ],
+  "kafkaACLTestsToRun": [],
   "kafkaACLHistoricalPass": {
     "schema": 1,
     "kind": "root-accepted-kafka-acl-source-bound-reuse-v1",
@@ -5058,56 +5056,8 @@
     "currentWholeOwnedcontrolPackagePASS": false,
     "runtimeAccepted": false
   },
-  "currentManagedShapeControl": {
-    "phase": "current-managed-shape-controls",
-    "targets": {
-      "internal/namespaceimport/ownedcontrol": [
-        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
-      ],
-      "internal/msgtransfer": [
-        "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
-      ]
-    },
-    "requiredSubtests": {
-      "internal/namespaceimport/ownedcontrol": {
-        "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
-          "create-reply-error-and-shape-cannot-be-a-success",
-          "describe-reply-error-and-shape-cannot-replace-exact-deny",
-          "new-deny-visibility-is-bounded-without-grace-for-existing-denies"
-        ]
-      },
-      "internal/msgtransfer": {
-        "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape": [
-          "producer-and-child-loader-roundtrip",
-          "alphabetic-map-reorder",
-          "unknown-field",
-          "missing-field",
-          "duplicate-field",
-          "wrong-value-type",
-          "null-string",
-          "wrong-pin",
-          "public-file",
-          "symlink-file",
-          "hardlink-file",
-          "trailing-json",
-          "missing-file"
-        ]
-      }
-    },
-    "goTimeoutSeconds": 180,
-    "phaseGuardSeconds": 240,
-    "topPASS": 2,
-    "subPASS": 16,
-    "packages": 2,
-    "goCommandInvocations": 1,
-    "packageExecutions": 2,
-    "samePackageInvocation": false,
-    "newDatabaseFixtures": 0,
-    "wholePackagePASS": false
-  },
-  "currentManagedShapeTestsToRun": [
-    "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
-  ],
+  "currentManagedShapeControl": null,
+  "currentManagedShapeTestsToRun": [],
   "releaseControlsHistoricalPass": {
     "schema": 1,
     "kind": "root-accepted-f3fb-release-controls-historical-fact-v1",
@@ -5390,5 +5340,175 @@
     "currentSourcePASS": false,
     "currentPackagePASS": false,
     "runtimeAccepted": false
+  },
+  "currentProducerControl": {
+    "phase": "current-managed-producer-control",
+    "targets": {
+      "internal/msgtransfer": [
+        "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
+      ]
+    },
+    "requiredSubtests": {
+      "internal/msgtransfer": {
+        "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape": [
+          "producer-and-child-loader-roundtrip",
+          "alphabetic-map-reorder",
+          "unknown-field",
+          "missing-field",
+          "duplicate-field",
+          "wrong-value-type",
+          "null-string",
+          "wrong-pin",
+          "public-file",
+          "symlink-file",
+          "hardlink-file",
+          "trailing-json",
+          "missing-file"
+        ]
+      }
+    },
+    "goTimeoutSeconds": 180,
+    "phaseGuardSeconds": 600,
+    "topPASS": 1,
+    "subPASS": 13,
+    "packages": 1,
+    "goCommandInvocations": 1,
+    "packageExecutions": 1,
+    "newDatabaseFixtures": 0,
+    "wholePackagePASS": false
+  },
+  "currentProducerTestsToRun": [
+    "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
+  ],
+  "sameSourceCompletedKafkaPackageReuse": {
+    "version": "same-source-completed-kafka-package-reuse-v1",
+    "binding": {
+      "schema": 1,
+      "kind": "root-accepted-same-source-completed-kafka-package-in-timeout-command-v1",
+      "run": 42206676039,
+      "job": 127854974346,
+      "attempt": 1,
+      "head": "cdd8f236614ba32f575367748b52137abf9bc63a",
+      "source": {
+        "members": 1576,
+        "digest": "3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea"
+      },
+      "rootReviewSHA256": "9b556b4d4ff96a6c52047803e9b713b7fb77548930a3ca0a4457f8a83b58edf0",
+      "artifactID": 13496927972,
+      "artifactSHA256": "7e6fa52a27545c51ec846235a498a9d3d1168b5aa786488cbfe85632805b70e6",
+      "eventsSHA256": "2c6b853aa4b39d1cabeb897e2b3f996deb57ab449621a8e1927dfad8574db06a",
+      "phaseSHA256": "9df468c689f414756aa6f9a5751d9583b941f8184795762cbc1d39126b6dc734",
+      "sourcePostSHA256": "d3bbe21afff29a4e07926c3b53ce225790840422fd1fe7c7bde17e9b631a63fc",
+      "toolsSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+      "originalPackageReceipt": {
+        "source": {
+          "members": 1576,
+          "digest": "3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea"
+        },
+        "package": "internal/namespaceimport/ownedcontrol",
+        "topPASS": 1,
+        "subPASS": 3,
+        "skip": 0,
+        "fail": 0,
+        "namedCompletions": [
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/create-reply-error-and-shape-cannot-be-a-success"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/describe-reply-error-and-shape-cannot-replace-exact-deny"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestOwnedKafkaExclusionRequiresEveryWildcardDeny/new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+          }
+        ],
+        "originalPackageFooterPASS": true,
+        "originalGoCommandPassed": false,
+        "originalTwoPackageScopeAccepted": false,
+        "producerPackageStarted": false,
+        "wholeOwnedcontrolPackagePASS": false,
+        "runtimeAccepted": false
+      },
+      "originalGoCommandPassed": false,
+      "originalWholeScopeAccepted": false,
+      "requiresExactSameSource": true,
+      "mayReuseOnlyKafkaNamedSubset": true
+    },
+    "originalGoCommandPassed": false,
+    "originalTwoPackageScopeAccepted": false,
+    "actualCurrentGoCommandInvocations": 0,
+    "actualCurrentKafkaACLTestsDispatched": 0,
+    "reusedTopPASS": 1,
+    "reusedSubPASS": 3,
+    "wholeOwnedcontrolPackagePASS": false,
+    "wholeSourceAccepted": false,
+    "runtimeAccepted": false
+  },
+  "managedShapeTwoPackageHistoricalAttempt": {
+    "kind": "original-two-package-command-timeout-historical-attempt-v1",
+    "run": 42206676039,
+    "job": 127854974346,
+    "head": "cdd8f236614ba32f575367748b52137abf9bc63a",
+    "source": {
+      "members": 1576,
+      "digest": "3498242c509e6e7f75ec5e00c1392f772ba0feca5596d60a35c7320f04744fea"
+    },
+    "scope": {
+      "phase": "current-managed-shape-controls",
+      "targets": {
+        "internal/namespaceimport/ownedcontrol": [
+          "TestOwnedKafkaExclusionRequiresEveryWildcardDeny"
+        ],
+        "internal/msgtransfer": [
+          "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape"
+        ]
+      },
+      "requiredSubtests": {
+        "internal/namespaceimport/ownedcontrol": {
+          "TestOwnedKafkaExclusionRequiresEveryWildcardDeny": [
+            "create-reply-error-and-shape-cannot-be-a-success",
+            "describe-reply-error-and-shape-cannot-replace-exact-deny",
+            "new-deny-visibility-is-bounded-without-grace-for-existing-denies"
+          ]
+        },
+        "internal/msgtransfer": {
+          "TestManagedOrdinaryProducerMatchesNamespaceLaunchCanonicalShape": [
+            "producer-and-child-loader-roundtrip",
+            "alphabetic-map-reorder",
+            "unknown-field",
+            "missing-field",
+            "duplicate-field",
+            "wrong-value-type",
+            "null-string",
+            "wrong-pin",
+            "public-file",
+            "symlink-file",
+            "hardlink-file",
+            "trailing-json",
+            "missing-file"
+          ]
+        }
+      },
+      "goTimeoutSeconds": 180,
+      "phaseGuardSeconds": 240,
+      "topPASS": 2,
+      "subPASS": 16,
+      "packages": 2,
+      "goCommandInvocations": 1,
+      "packageExecutions": 2,
+      "samePackageInvocation": false,
+      "newDatabaseFixtures": 0,
+      "wholePackagePASS": false
+    },
+    "rootReviewSHA256": "9b556b4d4ff96a6c52047803e9b713b7fb77548930a3ca0a4457f8a83b58edf0",
+    "originalGoCommandPassed": false,
+    "originalTwoPackageScopeAccepted": false,
+    "producerPackageStarted": false
   }
 }

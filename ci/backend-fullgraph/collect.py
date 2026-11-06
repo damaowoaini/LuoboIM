@@ -112,7 +112,7 @@ def console_observation(rows,monitor,main,terminals,phases):
  statuses|={prefix+gate for prefix in ('not_started_','stopped_','failed_final_') for gate in ('disk_gate','task_allocation_gate')}
  def status(value):return value if value in statuses else 'unobserved'
  def code(value):return value if type(value) is int and -128<=value<=255 else None
- names={'go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase'],run.CURRENT_KAFKA_CONFIRM_CONTROL['phase'],run.CURRENT_RELEASE_CONTROL['phase'],run.CURRENT_MANAGED_SHAPE_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
+ names={'go-root','go-version','app-module-download','minio-git-init','minio-git-fetch','minio-git-checkout','minio-git-head','minio-git-tree','minio-git-files','minio-module-download','minio-source-compile','minio-post-head','minio-post-tree','pending-two-original-oracles','launcher-ownedcontrol','redis-parser','kafka-acl-response',run.CURRENT_IMAGE_KAFKA_CONTROL['phase'],run.CURRENT_KAFKA_CONFIRM_CONTROL['phase'],run.CURRENT_RELEASE_CONTROL['phase'],run.CURRENT_MANAGED_SHAPE_CONTROL['phase'],run.CURRENT_PRODUCER_CONTROL['phase']}|{r['label'] for r in run.CLEANUP_SCOPES}
  def phase(value):
   label=value.get('phase');result={'phase':'unobserved','role':'none','scenario':'none','exitCode':code(value.get('exitCode')),'resourceStatus':status(value.get('resource',{}).get('status'))}
   if label in names:result['phase']=label
@@ -415,12 +415,41 @@ def checked_current_managed_shape_evidence(out):
  if any((out/name).exists() for name in ('current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('new two-package command cannot alias prior scopes or reuse')
  return value
 
+def checked_completed_kafka_package_reuse_evidence(out):
+ post=json.loads(run.regular(out/'source-post.json',4096));before=json.loads(run.regular(out/'tools-before.json',65536));after=json.loads(run.regular(out/'tools-after.json',65536))
+ if post!={'accepted':True,'source':run.FINAL_SOURCE} or before!=after:raise ValueError('same-source completed Kafka package source/tool post differs')
+ value=run.check_completed_kafka_package_reuse(json.loads(run.regular(out/'same-source-completed-kafka-package-reuse.json',65536)),before.get('go',{}))
+ if json.dumps(json.loads(run.regular(out/'managed-shape-two-package-historical-attempt.json',65536)),sort_keys=True)!=json.dumps(run.MANAGED_SHAPE_TWO_PACKAGE_PRIOR_ATTEMPT,sort_keys=True):raise ValueError('original timed-out two-package scope must remain historical and failed')
+ return value
+
+def checked_current_producer_evidence(out):
+ value=run.check_current_producer_receipt(json.loads(run.regular(out/'current-managed-producer-control-names.json',65536)))
+ control=run.CURRENT_PRODUCER_CONTROL;package=next(iter(control['targets']));prefix='github.com/openimsdk/open-im-server/v3/'
+ events=json.loads(run.regular(out/'current-managed-producer-control-events.json',1<<20));expected={(row['package'],row['name']) for row in value['namedCompletions']}
+ if not isinstance(events,list) or not events or any(not isinstance(row,dict) or set(row)-{'Time','Action','Package','Test','Elapsed'} or row.get('Package')!=prefix+package or row.get('Action') not in ('start','run','output','pass','pause','cont') for row in events):raise ValueError('finite producer-only original events required')
+ for action in ('run','pass'):
+  actual=[(package,row['Test']) for row in events if row.get('Test') and row.get('Action')==action]
+  if len(actual)!=14 or set(actual)!=expected:raise ValueError('all producer top/thirteen children run/pass pairs required')
+ if len([row for row in events if row.get('Action')=='start' and not row.get('Test')])!=1 or len([row for row in events if row.get('Action')=='pass' and not row.get('Test')])!=1:raise ValueError('one original producer package start and completion required')
+ phases=[]
+ for path in sorted(out.glob('phase-*.json')):
+  phase=json.loads(run.regular(path,1<<20))
+  if phase.get('phase')==control['phase']:phases.append(phase)
+ if len(phases)!=1:raise ValueError('one original producer-only Go command phase required')
+ phase=phases[0];resource=phase.get('resource',{})
+ if type(phase.get('exitCode')) is not int or phase['exitCode']!=0 or resource.get('status')!='passed' or type(resource.get('exit_code')) is not int or resource['exit_code']!=0:raise ValueError('successful original producer command required')
+ checked_completed_kafka_package_reuse_evidence(out)
+ run.check_release_controls_prior_pass(json.loads(run.regular(out/'release-controls-historical-pass.json',65536)));run.check_kafka_confirm_prior_pass(json.loads(run.regular(out/'kafka-confirm-historical-pass.json',65536)))
+ run.check_kafka_acl_receipt(json.loads(run.regular(out/'kafka-acl-historical-pass.json',65536)));run.check_process_image_prior(json.loads(run.regular(out/'process-image-historical-pass.json',65536)))
+ if any((out/name).exists() for name in ('current-managed-shape-controls-names.json','current-managed-shape-kafka-individual.json','current-release-controls-names.json','kafka-acl-passed-reuse.json','kafka-confirm-passed-reuse.json','current-kafka-confirm-names.json','current-image-kafka-names.json')):raise ValueError('fresh producer cannot alias old two-package or Kafka invocations')
+ return value
+
 def collect():
  allocation=run.allocation_root();out=run.REPO/'ci-results/backend-fullgraph';out.mkdir(mode=0o700,parents=True,exist_ok=True)
  if not allocation.exists():
   run.write(out/'collection.json',{'started':False,'accepted':False,'reason':'no-original-allocation','privateDataUploaded':False});pack(out);return 0
  if allocation.resolve()!=allocation or allocation.stat().st_uid!=os.getuid() or stat.S_IMODE(allocation.stat().st_mode)!=0o700 or json.loads(run.regular(allocation/'allocation-owner.json'))!=run.job_identity():raise ValueError('original job allocation required')
- c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None
+ c=json.loads(run.regular(run.INPUTS,1<<20));run.check_locked(c);fresh_required=c['kafkaACLTestsToRun']!=[];confirm_required=c.get('currentKafkaConfirmControl') is not None;confirm_reuse_required=c.get('kafkaConfirmPassedReuse') is not None;release_required=c.get('currentReleaseControl') is not None;managed_required=c.get('currentManagedShapeControl') is not None;producer_required=c.get('currentProducerControl') is not None
  root=allocation/'work';resources=run.module('ci/backend-fullgraph/resources.py','always_original_plane');rows=[];failed=False;terminals={}
  for scenario in run.SCENARIOS:
   folder=root/('plane-'+scenario);work=root/('scenario-'+scenario);entry={'scenario':scenario,'resourceStarted':False,'runtimeAttempted':False,'runtimeCleanupAccepted':False}
@@ -473,6 +502,14 @@ def collect():
  if (out/'current-image-kafka-names.json').exists():
   try:checked_current_image_kafka_evidence(out);current_image_kafka_accepted=True
   except Exception:failed=True
+ completed_kafka_reuse_accepted=False
+ if (out/'same-source-completed-kafka-package-reuse.json').exists():
+  try:checked_completed_kafka_package_reuse_evidence(out);completed_kafka_reuse_accepted=True
+  except Exception:failed=True
+ current_producer_accepted=False
+ if (out/'current-managed-producer-control-names.json').exists():
+  try:checked_current_producer_evidence(out);current_producer_accepted=True
+  except Exception:failed=True
  current_managed_shape_accepted=False
  if (out/'current-managed-shape-controls-names.json').exists():
   try:checked_current_managed_shape_evidence(out);current_managed_shape_accepted=True
@@ -502,14 +539,15 @@ def collect():
  try:
   checked_launcher_evidence(out);launcher_accepted=True
  except Exception:failed=True
- if managed_required:kafka_current_accepted=current_managed_shape_accepted and not current_release_accepted and not current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted
+ if producer_required:kafka_current_accepted=current_producer_accepted and completed_kafka_reuse_accepted and not any((current_managed_shape_accepted,current_release_accepted,current_kafka_confirm_reuse_accepted,current_kafka_confirm_accepted,current_image_kafka_accepted,kafka_reuse_accepted))
+ elif managed_required:kafka_current_accepted=current_managed_shape_accepted and not current_release_accepted and not current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted
  elif release_required:kafka_current_accepted=current_release_accepted and not current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted and not current_managed_shape_accepted
  elif confirm_reuse_required:kafka_current_accepted=current_kafka_confirm_reuse_accepted and not current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  elif confirm_required:kafka_current_accepted=current_kafka_confirm_accepted and not current_image_kafka_accepted and not kafka_reuse_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  elif fresh_required:kafka_current_accepted=current_image_kafka_accepted and not current_kafka_confirm_accepted and not kafka_reuse_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  else:kafka_current_accepted=kafka_reuse_accepted and not current_image_kafka_accepted and not current_kafka_confirm_accepted and not current_kafka_confirm_reuse_accepted and not current_release_accepted and not current_managed_shape_accepted
  accepted=launcher_accepted and kafka_current_accepted and not failed and monitor.get('status')=='passed' and monitor.get('exit_code')==0 and main.get('accepted') is True and all(r['runtimeAttempted'] and r['runtimeCleanupAccepted'] and r.get('resourceCleanup',{}).get('accepted') is True for r in rows)
- run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
+ run.write(out/'collection.json',{'started':True,'accepted':accepted,'scenarios':rows,'controllerPassed':monitor.get('status')=='passed','launcherReuseAccepted':launcher_accepted,'kafkaACLReuseAccepted':kafka_reuse_accepted,'currentProducerControlAccepted':current_producer_accepted,'freshProducerControlRequired':producer_required,'producerCommandInvocations':(1 if current_producer_accepted else None) if producer_required else 0,'producerPackageExecutions':(1 if current_producer_accepted else None) if producer_required else 0,'sameSourceCompletedKafkaPackageReuseAccepted':completed_kafka_reuse_accepted,'originalTwoPackageScopeAccepted':False,'currentManagedShapeControlsAccepted':current_managed_shape_accepted,'freshManagedShapeControlsRequired':managed_required,'managedShapeCommandInvocations':(1 if current_managed_shape_accepted else None) if managed_required else 0,'managedShapePackageExecutions':(2 if current_managed_shape_accepted else None) if managed_required else 0,'currentReleaseControlsAccepted':current_release_accepted,'freshReleaseControlsRequired':release_required,'actualReleaseTopsDispatched':(3 if current_release_accepted else None) if release_required else 0,'sameSourceKafkaConfirmationReuseAccepted':current_kafka_confirm_reuse_accepted,'currentImageKafkaAccepted':current_image_kafka_accepted,'freshImageKafkaRequired':fresh_required and not confirm_required and not release_required and not managed_required and not producer_required,'currentKafkaConfirmationAccepted':current_kafka_confirm_accepted,'freshKafkaConfirmationRequired':confirm_required,'actualKafkaACLTestsDispatched':(1 if current_managed_shape_accepted or current_release_accepted or current_kafka_confirm_accepted or current_image_kafka_accepted else None) if fresh_required else 0,'actualProcessImageTestsDispatched':0 if producer_required or managed_required or release_required or confirm_required or confirm_reuse_required else ((1 if current_image_kafka_accepted else None) if fresh_required else 0),'processImageHistoricalFactsOnly':producer_required or managed_required or release_required or confirm_required or confirm_reuse_required,'currentWholeOwnedcontrolPackagePASS':False,'originalRetainedRuntimeJoinRequired':True,'privateDataUploaded':False,'containerAbsenceIsNotRuntimeDrain':True})
  emit_console_observation(rows,monitor,main,terminals,out)
  pack(out)
  return 0 if accepted else 1

@@ -12,4 +12,4 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
-本批修复 managed bootstrap 的 producer struct 与 consumer map 重编码顺序不一致：使用独立严格15字段 typed reader，保持原SHA、全部字段和后续角色/租户/epoch/activation/drain检查。旧ffd来源已实际通过release4top22sub及首场景，第二场景在managed shape拒绝；这些保留为原来源事实。新来源仍待两包一命令的受影响控制与真实服务图验证，不声明全包、部署或登录联调通过。
+本批修复 managed bootstrap 的 producer struct 与 consumer map 重编码顺序不一致：使用独立严格15字段 typed reader，保持原SHA、全部字段和后续角色/租户/epoch/activation/drain检查。旧ffd来源已实际通过release4top22sub及首场景，第二场景在managed shape拒绝；这些保留为原来源事实。当前349来源的两包控制命令在16编译前超时：Kafka指定1top3sub及所属包footer已实际通过，整命令与两包scope未通过，producer尚未开始。后继仅复用该精确同源Kafka个别完成包，fresh producer1top13sub采用600秒阶段上限与原180秒Go执行超时；真实服务图仍待验证，不声明全包、部署或登录联调通过。
