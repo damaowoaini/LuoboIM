@@ -240,14 +240,14 @@
       "sha256": "3fc2f44ca9c46f04437c3574e7cb23cc97ce67d069b759c0a46dc88b3737e30c"
     },
     {
-      "bytes": 26610,
+      "bytes": 26911,
       "path": "ci/android-current363/plugin_scope.py",
-      "sha256": "475e66e8d9f5b895d021336b2c503487258bdf68bd774f4b68c3418caf55fdae"
+      "sha256": "6a36e5d7e198430c97cc31e086b667c2d664fa73573aeef4960594de7f235b5e"
     },
     {
       "bytes": 13536,
       "path": "ci/android-current363/plugin_scope_fixture.py",
-      "sha256": "2c929ac5e38a62ae77bb623d49f6407ad5287d68c1e1b7fe0957d5219ef0f797"
+      "sha256": "ec209643b2a8787f6c266327f4183a8725e6a50e6f93e18abdf5891f688933a9"
     },
     {
       "bytes": 1384,
@@ -257,7 +257,7 @@
     {
       "bytes": 67116,
       "path": "ci/android-current363/resolve.gradle",
-      "sha256": "e96f3f27f6616c0d5987ff003cbba47a4bbee4a646ac7b0a86cd39d4fcaad540"
+      "sha256": "f9a9edbb688e40f7b22e4273dbf7f60bd2d44ad741f472e6f510e381c62f0d3a"
     },
     {
       "bytes": 71217,
@@ -290,9 +290,9 @@
       "sha256": "74e3f1f8ac3a8e002822800a305c5fef1ed4c2dc73da37a1ffd7cf562ad17c2d"
     },
     {
-      "bytes": 21470,
+      "bytes": 22839,
       "path": "ci/android-current363/test_identity.py",
-      "sha256": "725a617e6b0e137c8f233724d7f15d64365f5b1a23f83a13126de5f68d234bd0"
+      "sha256": "280572dcf3773a283897e8e22a1325c6c8ab0ce706dcd79c7a8c55e7b98b1f22"
     },
     {
       "bytes": 3621,
@@ -305,7 +305,7 @@
       "sha256": "5daeaadded94c519197cda264d12a8a526558867361a480f739b9633459946c6"
     }
   ],
-  "controller_revision": "current366-source542-personal-compatibility-v1",
+  "controller_revision": "current366-source542-production-registry-pin-v2",
   "core_build_mode": "restore-verified-current363",
   "core_compatibility": {
     "freshActualGoBuildRequired": false,

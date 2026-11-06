@@ -12,4 +12,4 @@ Linux ELF 不能直接在 macOS 上运行。当前 required 控制链依赖 Linu
 
 这是普通源码发布，**尚未部署或切换运行服务**。真实配置、凭据、SQL 策略、既有数据迁移、签名/排除/读写准入和完整服务图仍按原控制合同处理；源码发布不生成 Ready、token 或许可。公开示例和 SQL 文件不是可直接投入现有租户的配置/迁移授权。待验 R8 leaf `1557/a113ab40c4e125caf040446db735f2e7e632eb18f3611d810587d07f79699a84` 不在本来源中；不能用独立 R8 全树覆盖这里的 graph 源码。
 
-本批修AwaitStarted丢失原announcement deadline/cancel，先原样返回原error再保持身份与server模式严格比较；Processes、release、AwaitStarted和reader原调用增加有限返回标签，无新等待/probe/signal/Ready。fresh仅真实子进程owner/announcement控制1top3。旧命名与list事实保留原来源，精确逆转5体并移除新test重建旧1578向量只是兼容审查，不称新Go/package实际PASS。d4的16编译和前两scene已通过，ack的具体首个失败谓词未知；当前遗漏不声称是其根因。新16编译/4场景/graph2top3及清理/ELF/P20门禁均保留。
+本批仅CI有限分类与同源控制复用，Go1579/ordinary1885不变。b5实际owner控制1top3/16编译/前2scene通过，ack原rpc-rtc在AwaitStarted Observe时done，原panic投影other/main17，退出结果未知。新增只匹配公开RTC激活sentinel和封闭grpc状态前缀，desc/配置/凭据不导出，不推根因。完整Go和精确工具一致才复用b5原1/3；来源或工具失配即失败，无fallback重派，旧命名/list仍0派。原编译/四场景/oracles/清理/ELF/P20门禁不改，未接收任何缓存ELF。

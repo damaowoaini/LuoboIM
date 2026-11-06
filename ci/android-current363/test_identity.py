@@ -22,6 +22,28 @@ spec.loader.exec_module(controller)
 
 
 class Current363SourceTests(unittest.TestCase):
+    def test_production_resolver_registry_contract_rejects_stale_missing_and_duplicate_pins(self):
+        plugins = controller.plugin_scope
+        inputs = controller.read(HERE / 'inputs.json')
+        self.assertEqual(len(plugins.contract(HERE, inputs)['projects']), 22)
+        read = plugins.rich.read
+        resolver = HERE / 'resolve.gradle'
+        original = read(resolver).decode('utf-8')
+        current = "pluginField.contract_sha256 != '" + plugins.CONTRACT_SHA + "'"
+        self.assertEqual(original.count(current), 1)
+        line = next(value for value in original.splitlines() if current in value)
+        old = "pluginField.contract_sha256 != 'cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625'"
+        for case, changed in (
+            ('stale', original.replace(current, old, 1)),
+            ('missing', original.replace(line, '', 1)),
+            ('duplicate', original.replace(line, line + '\n' + line, 1)),
+        ):
+            def source(path, *args, **kwargs):
+                return changed.encode() if Path(path) == resolver else read(path, *args, **kwargs)
+            with self.subTest(case=case), patch.object(plugins.rich, 'read', side_effect=source):
+                with self.assertRaisesRegex(ValueError, 'production resolver plugin contract binding differs'):
+                    plugins.contract(HERE, inputs)
+
     def test_exact_current_source_rejects_old_scope_and_partial_inventory(self):
         context, inputs, tools = controller.metadata()
         self.assertEqual((inputs['members'], context['business_members'], context['portable_members']), (542, 366, 418))

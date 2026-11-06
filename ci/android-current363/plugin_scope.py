@@ -58,6 +58,10 @@ def contract(here, inputs):
     if rich.sha(raw) != CONTRACT_SHA:
         raise ValueError('fixed plugin source contract differs')
     value = json.loads(raw)
+    resolver = rich.read(here / 'resolve.gradle').decode('utf-8')
+    production_pins = re.findall(r"(?m)^[ \t]*pluginField\.contract_sha256 != '([0-9a-f]{64})' \|\|$", resolver)
+    if production_pins != [CONTRACT_SHA]:
+        raise ValueError('production resolver plugin contract binding differs')
     projects = value['projects']
     indexed = {x['path']: x for x in inputs['files']}
     if (value['schema'] != 1 or value['source_ref'] != SOURCE_REF or value['source542_digest'] != SOURCE_DIGEST

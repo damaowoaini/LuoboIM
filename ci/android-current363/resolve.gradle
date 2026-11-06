@@ -346,7 +346,7 @@ logger.lifecycle('LUOBO_RICH_PHASE ' + JsonOutput.toJson(
 def pluginField = catalog.registered_plugin_rich_consumer
 if (pluginField == null || pluginField.keySet() !=
         (['contract_sha256','seal_sha256','registry','script_sha256','script_base64'] as Set) ||
-        pluginField.contract_sha256 != 'cfd6b980f424dd4db1ec287c018df251175603321cd9c51b1282ab14a38b4625' ||
+        pluginField.contract_sha256 != '3fc2f44ca9c46f04437c3574e7cb23cc97ce67d069b759c0a46dc88b3737e30c' ||
         pluginField.script_sha256 != 'b7f3571cce6289303a9916aaeecb0d9afae899ed1e8f74ec72f90b803f59b545')
     throw new GradleException('fixed independent plugin source registry required')
 def pluginSealFile = new File(owned,'evidence/plugin-source-seal.json')

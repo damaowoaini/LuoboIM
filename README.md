@@ -23,7 +23,7 @@
 [GitHub Actions](https://github.com/damaowoaini/LuoboIM/actions) 按变更批次执行受影响验证。先本地验证，再统一提交推送；未改动的有效结果保留来源复用。已知问题处理完毕后，才进行一次最终完整回归。
 
 - Web 与移动端继续统一钉蓝风格；前端构建或局部测试通过不等于真实服务链路已验收。
-- 后端graph `1579/2296d8a9b79ec6e6a1c48008ebb14610f21d90f679002dcbedf9fdc6d47c2bd6` 修AwaitStarted吞失原announcement deadline/cancel，并沿同一次Processes/release/AwaitStarted/reader调用报告有限阶段；身份、服务模式、签名发布及清理判定不变。仅fresh真实原owner/announcement控制1top3；旧命名事实经5体逆转＋移除新test还原旧1578向量作来源兼容审查，0重派、不称新Go实际PASS。d4已16编译/前两场景通过，ack在私有release/等待启动阶段失败，具体首谓词未证；该超时遗漏不声称其根因。新16编译/4场景/原2top3及全部门禁仍必需，cache无receiver、P20binding=null。
+- 后端Go1579/2296、P20派生1581/7af72c、ordinary1885保持不变。b5实际新owner控制1top3、16编译/前2scene通过；ack在AwaitStarted最初Observe发现rpc-rtc done，原log仅go-panic/other/main17，内层原因与退出码未知。本CI批只增加RTC固定sentinel与封闭grpc code投影，不导出原文/desc；同完整Go/精确工具复用原1/3及旧来源链，全部已过控制/list0重派。原16编译/4scene/2top3和cleanup/PID/ELF门禁保留，cache仍无receiver、P20binding=null。
 - 移动端当前原生任务在 Gradle 配置阶段失败，尚未完成当前 APK、真机、旧版资料迁移和完整后台验收。
 - 云任务保留各自成功或失败结果；源码发布和构建产物不自动切换运行服务，也不自动取得读写或 Ready 许可。
 

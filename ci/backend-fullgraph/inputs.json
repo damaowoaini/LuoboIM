@@ -42,13 +42,13 @@
   "controllerPins": [
     {
       "path": "ci/backend-fullgraph/run.py",
-      "bytes": 345358,
-      "sha256": "5df48840dfaf1fb4ed7302237d58f8961789397a40cfd4050206d7f2865ba298"
+      "bytes": 356067,
+      "sha256": "625bf16677ddd6257fade6d1e8cef52e6995a3b0a862875888e8ae92d2cf56b2"
     },
     {
       "path": "ci/backend-fullgraph/collect.py",
-      "bytes": 148162,
-      "sha256": "beea4400d4e323ad5fff168a0fe9d75430a8a85e308988f4d5c091dde09ccfdf"
+      "bytes": 152131,
+      "sha256": "d326aa667929c93f64f1402ede9382df060e5843314cc012884343868ea835dd"
     },
     {
       "path": "ci/backend-fullgraph/minio_build.py",
@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 219732,
-      "sha256": "b2f3fa94adf87c6a3c6e5cf6e4aea9ca282c809f902216ef68158f7582436795"
+      "bytes": 226212,
+      "sha256": "ed5737afdbd5be0f0b5cf0ca5c7175380b02da8804b5783bb2d6a491b2974cca"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",
@@ -5732,7 +5732,7 @@
   "groupRegistryFixtureScopeReuse": null,
   "passedGroupRegistryAndNamedScopes": null,
   "originalConstructorLogProjectionPolicy": {
-    "version": "owned-original-constructor-log-projection-v2",
+    "version": "owned-original-constructor-log-projection-v3",
     "logLimitBytes": 8388608,
     "lineLimit": 16384,
     "lineBytesLimit": 4096,
@@ -5788,35 +5788,8 @@
       "started-announcement-await-exit"
     ]
   },
-  "currentRuntimeReleaseControl": {
-    "phase": "current-runtime-release-context",
-    "targets": {
-      "internal/namespaceimport/ownedcontrol": [
-        "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner"
-      ]
-    },
-    "requiredSubtests": {
-      "internal/namespaceimport/ownedcontrol": {
-        "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner": [
-          "deadline-returns-original-error-and-retains-owner",
-          "cancelled-returns-original-error-and-retains-owner",
-          "actual-announcement-keeps-identity-and-server-mode-fences"
-        ]
-      }
-    },
-    "goTimeoutSeconds": 180,
-    "phaseGuardSeconds": 600,
-    "topPASS": 1,
-    "subPASS": 3,
-    "packages": 1,
-    "goCommandInvocations": 1,
-    "packageExecutions": 1,
-    "newDatabaseFixtures": 0,
-    "wholePackagePASS": false
-  },
-  "runtimeReleaseTestsToRun": [
-    "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner"
-  ],
+  "currentRuntimeReleaseControl": null,
+  "runtimeReleaseTestsToRun": [],
   "runtimeReleaseSourceBridge": {
     "version": "exact-runtime-release-observation-and-context-error-source-review-v1",
     "currentSource": {
@@ -7040,5 +7013,183 @@
     "PIDAbsenceAccepted": false,
     "actualCurrentPriorNamedCommands": 0,
     "actualCurrentPriorGoListCommands": 0
+  },
+  "passedRuntimeReleaseControl": {
+    "version": "same-go1579-runtime-release-completed-control-reuse-v1",
+    "source": {
+      "members": 1579,
+      "digest": "2296d8a9b79ec6e6a1c48008ebb14610f21d90f679002dcbedf9fdc6d47c2bd6"
+    },
+    "facts": {
+      "version": "verified-same-go1579-original-runtime-release-context-control-v1",
+      "source": {
+        "members": 1579,
+        "digest": "2296d8a9b79ec6e6a1c48008ebb14610f21d90f679002dcbedf9fdc6d47c2bd6"
+      },
+      "origin": {
+        "head": "b5bd894eb54a520f94944f4030acb0ca298a7186",
+        "run": 42259036008,
+        "job": 128033827380,
+        "attempt": 1,
+        "artifact": {
+          "run": 42259036008,
+          "head": "b5bd894eb54a520f94944f4030acb0ca298a7186",
+          "attempt": 1,
+          "artifactID": 13524857547,
+          "bytes": 64173,
+          "sha256": "826920334115f65806c99edef651e7a3abd3d74efba5d862262ad5b78e0683a9",
+          "exactAPIDigest": true,
+          "files": 70,
+          "binaryDownloaded": false
+        }
+      },
+      "actualControl": {
+        "phase": "current-runtime-release-context",
+        "targets": {
+          "internal/namespaceimport/ownedcontrol": [
+            "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner"
+          ]
+        },
+        "requiredSubtests": {
+          "internal/namespaceimport/ownedcontrol": {
+            "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner": [
+              "deadline-returns-original-error-and-retains-owner",
+              "cancelled-returns-original-error-and-retains-owner",
+              "actual-announcement-keeps-identity-and-server-mode-fences"
+            ]
+          }
+        },
+        "goTimeoutSeconds": 180,
+        "phaseGuardSeconds": 600,
+        "topPASS": 1,
+        "subPASS": 3,
+        "packages": 1,
+        "goCommandInvocations": 1,
+        "packageExecutions": 1,
+        "newDatabaseFixtures": 0,
+        "wholePackagePASS": false
+      },
+      "namedReceipt": {
+        "topPASS": 1,
+        "subPASS": 3,
+        "skip": 0,
+        "fail": 0,
+        "packages": 1,
+        "namedCompletions": [
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner/actual-announcement-keeps-identity-and-server-mode-fences"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner/cancelled-returns-original-error-and-retains-owner"
+          },
+          {
+            "package": "internal/namespaceimport/ownedcontrol",
+            "name": "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner/deadline-returns-original-error-and-retains-owner"
+          }
+        ],
+        "source": {
+          "members": 1579,
+          "digest": "2296d8a9b79ec6e6a1c48008ebb14610f21d90f679002dcbedf9fdc6d47c2bd6"
+        },
+        "accepted": true,
+        "newDatabaseFixtures": 0,
+        "scope": {
+          "phase": "current-runtime-release-context",
+          "targets": {
+            "internal/namespaceimport/ownedcontrol": [
+              "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner"
+            ]
+          },
+          "requiredSubtests": {
+            "internal/namespaceimport/ownedcontrol": {
+              "TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner": [
+                "deadline-returns-original-error-and-retains-owner",
+                "cancelled-returns-original-error-and-retains-owner",
+                "actual-announcement-keeps-identity-and-server-mode-fences"
+              ]
+            }
+          },
+          "goTimeoutSeconds": 180,
+          "phaseGuardSeconds": 600,
+          "topPASS": 1,
+          "subPASS": 3,
+          "packages": 1,
+          "goCommandInvocations": 1,
+          "packageExecutions": 1,
+          "newDatabaseFixtures": 0,
+          "wholePackagePASS": false
+        },
+        "actualGoCommandInvocations": 1,
+        "actualPackageExecutions": 1,
+        "actualKafkaACLTestsDispatched": 0,
+        "actualManagedShapeTopsDispatched": 0,
+        "actualCacheTopsDispatched": 0,
+        "wholePackagePASS": false,
+        "runtimeAccepted": false,
+        "wholeSourceAccepted": false
+      },
+      "GoToolBodyAndMode": {
+        "bytes": 17164055,
+        "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+        "mode": 493
+      },
+      "actualCommandSuffixWithoutTool": [
+        "test",
+        "-mod=readonly",
+        "-race",
+        "-p=1",
+        "-parallel=1",
+        "-count=1",
+        "-json",
+        "-vet=off",
+        "-timeout=180s",
+        "-run",
+        "^TestNamespaceRuntimeStartedAnnouncementPreservesOriginalContextAndStrictOwner$",
+        "./internal/namespaceimport/ownedcontrol"
+      ],
+      "actualGoCommandInvocations": 1,
+      "actualPackageExecutions": 1,
+      "actualNamedRunAndPassPairs": 4,
+      "actualPackageStartAndSuccessFooter": true,
+      "skip": 0,
+      "fail": 0,
+      "pins": {
+        "namesSHA256": "c7839ca8c5ad1795c9e2805b77f1e4d1bc49639cfc37c15f375c64728623d5e1",
+        "eventsSHA256": "322c62cf47681df87d15e19aa4353ebedd38cf7b7a76b2fe0e4587a7e4be44ad",
+        "phaseSHA256": "0acd4157c0e81c860975d99217cf2ba6757781f821c9240be5d558f69e992a3c",
+        "sourcePostSHA256": "8f100d851cf0ad397349dfd5d6f3d82216f84ee9d6d1647bc183a2ef0f7023d5",
+        "toolsBeforeSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+        "toolsAfterSHA256": "162cbbdb16858edd435d19cdc43701020164c9248ca316909caddff7d875ee5f",
+        "RootReviewSHA256": "7e3699dc3b9851337ef2b6e5a268b44509b82b416787d76cbbcb631dbc6e279e"
+      },
+      "overallOriginalGraphRunFailed": true,
+      "originalAckFailure": [
+        "await-started",
+        "rpc-rtc",
+        "started-observe-done"
+      ],
+      "wholePackagePASS": false,
+      "wholeSourceAccepted": false,
+      "wholeBackendRuntimeAccepted": false,
+      "PIDDrainOrReadyOrP20Accepted": false,
+      "sameWholeGoAndToolRequiredForReuse": true,
+      "freshRedispatchRequiredOnSourceOrToolDrift": true
+    },
+    "actualCurrentContextControlCommands": 0,
+    "actualCurrentPriorNamedCommands": 0,
+    "actualCurrentGoListCommands": 0,
+    "sameCompleteGoSourceRequired": true,
+    "sameGoToolBodyAndModeRequired": true,
+    "fallbackRedispatch": false,
+    "wholePackagePASS": false,
+    "wholeSourceAccepted": false,
+    "runtimeAccepted": false,
+    "PIDReadyP20Accepted": false
   }
 }
