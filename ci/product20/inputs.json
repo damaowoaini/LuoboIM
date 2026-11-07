@@ -1,5 +1,25 @@
 {
-  "acceptedChartArtifact": null,
+  "acceptedChartArtifact": {
+    "currentChart5": {
+      "artifactBytes": 71865522,
+      "artifactID": 13557132820,
+      "artifactSHA256": "35dfb2db76f70611e45b55d583854be34f7633750d978fa0968c3d89b9c361b7",
+      "attempt": 1,
+      "head": "e3bb5f1c1b4413f717efabdac8bb129848b3e78b",
+      "manifestSHA256": "e33eefe59295e359668b85e1be3d94c055b75c662321229c5f1e9903afbccb99",
+      "run": 42330014610
+    },
+    "historicalRouteFrom6": {
+      "artifactBytes": 76891085,
+      "artifactID": 13485700505,
+      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+      "attempt": 1,
+      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "run": 42180782218
+    },
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1"
+  },
   "auxiliaryBuilds": [
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
@@ -41,9 +61,199 @@
   },
   "chartAssembly": {
     "currentChart5": {
-      "artifact": null,
-      "derivation": null,
-      "expectedManifest": null
+      "artifact": {
+        "artifactBytes": 71865522,
+        "artifactID": 13557132820,
+        "artifactSHA256": "35dfb2db76f70611e45b55d583854be34f7633750d978fa0968c3d89b9c361b7",
+        "attempt": 1,
+        "head": "e3bb5f1c1b4413f717efabdac8bb129848b3e78b",
+        "manifestSHA256": "e33eefe59295e359668b85e1be3d94c055b75c662321229c5f1e9903afbccb99",
+        "run": 42330014610
+      },
+      "derivation": {
+        "buildsReceiptSHA256": "4ca6556d0fb2267e3316f0f6c62d11167ab04b4ce47798caa69ccf523e2e9231",
+        "producerControllerSHA256": "7ca4d35927b36167fbbe7073e3a49bddc1f78fae3b972a8a983017e51d9b4ea3",
+        "producerInputsSHA256": "d420908a723bf6736c77019cf95615d7b16b31780f44e8c52491504673bd6d65",
+        "rootExpectedOnlyReviewSHA256": "1145497e013d1203081ad000d7d275fd00964f05dff5ceb4d67d41ea8cabbb66"
+      },
+      "expectedManifest": {
+        "body": {
+          "GoVersion": "go1.27.2 linux/amd64",
+          "ReadyOrP20OrDeploymentAccepted": false,
+          "SQLRedisFixturesStarted": 0,
+          "attempt": "1",
+          "binaries": [
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 43258016,
+              "mode": 448,
+              "module": "chart",
+              "name": "chat-api",
+              "package": "./cmd/api/chat-api",
+              "sha256": "71f7a919cc2bd1b210055c0293b3393861478916e1bee26f4fdfa1f739ca044f",
+              "sourceVector": {
+                "members": 260,
+                "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 43798688,
+              "mode": 448,
+              "module": "chart",
+              "name": "admin-api",
+              "package": "./cmd/api/admin-api",
+              "sha256": "097e7fe740497f607637d075bcceaddfa2a7f941425a3e42f3e99dddd9aae984",
+              "sourceVector": {
+                "members": 260,
+                "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 38842528,
+              "mode": 448,
+              "module": "chart",
+              "name": "chat-rpc",
+              "package": "./cmd/rpc/chat-rpc",
+              "sha256": "f71aa79342670e8acc43692bf595810943f5ed22c985056cc130aea90d89de40",
+              "sourceVector": {
+                "members": 260,
+                "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 36274336,
+              "mode": 448,
+              "module": "chart",
+              "name": "admin-rpc",
+              "package": "./cmd/rpc/admin-rpc",
+              "sha256": "b0e9a6d88764a051b21a760fe6bf9eff9a6d55f7ced56bea3b10a9e56cf074a1",
+              "sourceVector": {
+                "members": 260,
+                "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+              }
+            },
+            {
+              "CGO_ENABLED": "0",
+              "GOARCH": "amd64",
+              "GOOS": "linux",
+              "bytes": 29094048,
+              "mode": 448,
+              "module": "chart",
+              "name": "office-rpc",
+              "package": "./cmd/rpc/office-rpc",
+              "sha256": "9b3012d96dbaf5df73e3384c7a4a1509d0e2d75ef597274aebacde5ed0979686",
+              "sourceVector": {
+                "members": 260,
+                "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+              }
+            }
+          ],
+          "buildResources": {
+            "admin-api": {
+              "exit": 0,
+              "resourceSHA256": "cc38e08b2fcb850c7b98e03518860377da4bb7095a985207950b6482aef4f2ae",
+              "status": "passed"
+            },
+            "admin-rpc": {
+              "exit": 0,
+              "resourceSHA256": "3f184b83c5fa8fb2311342daa3b457b230eda596feb201383d55f85bf2593c90",
+              "status": "passed"
+            },
+            "chat-api": {
+              "exit": 0,
+              "resourceSHA256": "f3355e6f6a0a7fab584c73d6171af42c1893e27f1d31992a634d4d53ab23b963",
+              "status": "passed"
+            },
+            "chat-rpc": {
+              "exit": 0,
+              "resourceSHA256": "79d0462eaf5d158e4ae0795e5a85243789618a5847ae6d58456f0edc6a60dd84",
+              "status": "passed"
+            },
+            "office-rpc": {
+              "exit": 0,
+              "resourceSHA256": "b1e10934a7e273d8542803868fe9f8d700b3cfffc7dba53fa43e8c47ad6d5110",
+              "status": "passed"
+            }
+          },
+          "currentAdmin4TestCommands": 0,
+          "freshChartBuilds": 5,
+          "freshRouteBuilds": 0,
+          "head": "e3bb5f1c1b4413f717efabdac8bb129848b3e78b",
+          "kind": "current-chart-five-startup1-prior-admin4-compatible-v2",
+          "locks": {
+            "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+            "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+          },
+          "outerResourceGuardStillRequired": true,
+          "parserOracleExecuted": false,
+          "priorAdmin4": {
+            "closureReceiptSHA256": "a0ad900421e24b7754b03dec15f3b57b6fb590abacc8ee79edf3ffc72e2c9959",
+            "compatibilityAccepted": true,
+            "currentAdmin4TestCommands": 0,
+            "currentFreshAdmin4PASS": false,
+            "kind": "historical-selective4-source-compatible-not-fresh",
+            "originalChartSource": {
+              "members": 259,
+              "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+            },
+            "originalHead": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
+            "originalJob": 128118049210,
+            "originalReceiptPins": {
+              "builds.json": "f39f43f8dc8e22e1472bd35df78550e9583554bd51a1efc340e00fa4622e0355",
+              "cleanup-final.json": "3364a137647f1e40618938a9ca29f7b61937aa045da1e15b1fc62d5498fe57fd",
+              "cleanup.json": "3364a137647f1e40618938a9ca29f7b61937aa045da1e15b1fc62d5498fe57fd",
+              "events.json": "98cf718a3d7ed9a9f29e6e4533f656a1e0401ec64c75eb7fb80e9e375da68d4d",
+              "fixture-after.json": "f6bb7138fd7d0ad1d4f94b59ac20b22d289c953fc3d06b90175b49eef33c7373",
+              "source-tools.json": "e7c7f980256fe07b93e954f2700d25a71d7aa0368018feba4649099a3cf6cf1c",
+              "summary.json": "1eb4721422f4101659f98a91c0852dff495bf4bab9bae25b15c0fa9037c5c9d6"
+            },
+            "originalRootReviewSHA256": "e22941a1365bd9f89bc371a2fc58bb4c7a219db17533fb22871fcab0e73f232e",
+            "originalRun": 42283432687,
+            "originalSourceDigest": "40f8e478567a98cb080f107ca5eb80e05580db6b531c9108780f9815ec027647",
+            "sourceBridgeSHA256": "10cfb80e41f6130c84ddc59ed75f646e7acb6c792294838506fd23414ec1c7fc"
+          },
+          "run": "42330014610",
+          "schema": 2,
+          "source": {
+            "members": 260,
+            "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+          },
+          "sourceToolHelperPostExact": true,
+          "startupTest": {
+            "actualExitCode": 0,
+            "actualFooter": true,
+            "actualResourceGuardPassed": true,
+            "actualTopPASS": [
+              "TestStartupErrorPreservesCauseAndClosedDiagnostic"
+            ],
+            "actualTopRun": [
+              "TestStartupErrorPreservesCauseAndClosedDiagnostic"
+            ],
+            "originalMachineJSON_Bytes": 1543,
+            "originalMachineJSON_SHA256": "545c289e0b818f9b5d52b8ef0d6fdfeb912f123e8d9cf579d039ce390959b886",
+            "package": "github.com/OpenIMSDK/chat/pkg/common/chatrpcstart",
+            "packagePASS": true,
+            "rawOutputExported": false,
+            "resourceSHA256": "a53dfce3d7a95b888a244e92bc8be74d213a484410f473bbbbc3a982dd6b6b45",
+            "skips": 0,
+            "subtests": 0
+          }
+        },
+        "bytes": 6088,
+        "evidence": "expected-derived-not-observed",
+        "sha256": "e33eefe59295e359668b85e1be3d94c055b75c662321229c5f1e9903afbccb99"
+      }
     },
     "historicalRouteFrom6": {
       "artifact": {
@@ -97,56 +307,7 @@
         }
       }
     },
-    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
-    "pendingCurrent5": {
-      "entries": [
-        [
-          "chart",
-          "./cmd/api/chat-api",
-          "chat-api"
-        ],
-        [
-          "chart",
-          "./cmd/api/admin-api",
-          "admin-api"
-        ],
-        [
-          "chart",
-          "./cmd/rpc/chat-rpc",
-          "chat-rpc"
-        ],
-        [
-          "chart",
-          "./cmd/rpc/admin-rpc",
-          "admin-rpc"
-        ],
-        [
-          "chart",
-          "./cmd/rpc/office-rpc",
-          "office-rpc"
-        ]
-      ],
-      "kind": "current-chart-five-startup1-prior-admin4-compatible-v2",
-      "locks": {
-        "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
-        "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
-      },
-      "producerCohort": "chart-startup1-prior-admin4-chart5-v2",
-      "retainedCore14": {
-        "artifactBytes": 607490716,
-        "artifactID": 13548912327,
-        "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
-        "attempt": 1,
-        "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
-        "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
-        "run": 42310913329
-      },
-      "source": {
-        "members": 260,
-        "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
-      },
-      "state": "pending-current5"
-    }
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1"
   },
   "chartProvider": {
     "locks": {
@@ -171,7 +332,7 @@
         "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
       }
     },
-    "status": "current-source-pending-new-startup1-chart5-producer-no-runtime-admission"
+    "status": "current260-startup1-five-build-accepted-original-core14-route33-full-cloud-receive-required"
   },
   "controllers": [
     "ci/product20/run.py",
@@ -186,7 +347,42 @@
     "members": 1586
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
-  "executionBinding": null,
+  "executionBinding": {
+    "core14": {
+      "artifactBytes": 607490716,
+      "artifactID": 13548912327,
+      "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
+      "attempt": 1,
+      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+      "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
+      "run": 42310913329
+    },
+    "currentChart5": {
+      "artifactBytes": 71865522,
+      "artifactID": 13557132820,
+      "artifactSHA256": "35dfb2db76f70611e45b55d583854be34f7633750d978fa0968c3d89b9c361b7",
+      "attempt": 1,
+      "head": "e3bb5f1c1b4413f717efabdac8bb129848b3e78b",
+      "manifestSHA256": "e33eefe59295e359668b85e1be3d94c055b75c662321229c5f1e9903afbccb99",
+      "run": 42330014610
+    },
+    "historicalRouteFrom6": {
+      "artifactBytes": 76891085,
+      "artifactID": 13485700505,
+      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+      "attempt": 1,
+      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "run": 42180782218
+    },
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
+    "rootAcceptanceSHA256": "1145497e013d1203081ad000d7d275fd00964f05dff5ceb4d67d41ea8cabbb66",
+    "rootAccepted": true,
+    "source": {
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
+      "members": 1584
+    }
+  },
   "fixtureConfiguration": {
     "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
     "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
@@ -565,7 +761,7 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
-  "state": "PENDING_CURRENT5_SOURCE_COMPILE_AND_ROOT_ACCEPTANCE_EXECUTION_LOCKED",
+  "state": "ROOT_BOUND_CURRENT_CORE14_STARTUP_CHART260_FIVE_ROUTE33_PENDING_FRESH_PRODUCT20_HTTP_WS",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",
