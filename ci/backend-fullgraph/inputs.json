@@ -57,8 +57,8 @@
     },
     {
       "path": "ci/backend-fullgraph/test_run.py",
-      "bytes": 292008,
-      "sha256": "6882cadf301cb4793600563f101fc2633fff31b3ba1093083170c6908f229094"
+      "bytes": 292011,
+      "sha256": "12382282f8abe3d05fea6e05c5e17d18d17f24cf10928254528cc275d3f29714"
     },
     {
       "path": "ci/backend-fullgraph/resources.py",

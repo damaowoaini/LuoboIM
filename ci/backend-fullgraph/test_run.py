@@ -1723,9 +1723,9 @@ class FullGraphControls(unittest.TestCase):
 
 
  def test_third_selector_matches_both_actual_startup_grpc_descriptors(self):
-  selectors=load('service_selectors');manifest=json.loads(run.regular(run.REPO/'product/source-manifest.json',1<<20));self.assertEqual(manifest['sources']['server'],run.FINAL_SOURCE)
+  selectors=load('service_selectors');manifest=json.loads(run.regular(run.REPO/'product/source-manifest.json',1<<20));_,historical,*_=run.verify()
   def source(path):
-   rows=[row for row in manifest['files'] if row['path']==path];self.assertEqual(len(rows),1);row=rows[0];self.assertEqual(row['provider'],'ci/backend-fullgraph/run.py:verify');raw=run.regular(run.REPO/'product'/path);self.assertEqual({'bytes':len(raw),'sha256':run.sha(raw)},{key:row[key] for key in ('bytes','sha256')});return raw.decode()
+   rows=[row for row in manifest['files'] if row['path']==path];self.assertEqual(len(rows),1);row=rows[0];self.assertEqual(row['provider'],'ci/backend-fullgraph/run.py:verify');raw=run.regular(run.REPO/'product'/path);self.assertEqual(raw,historical[path]);self.assertEqual({'bytes':len(raw),'sha256':run.sha(raw)},{key:row[key] for key in ('bytes','sha256')});return raw.decode()
   startup=source('server/internal/rpc/third/third.go');generated={'third':source('server/pkg/protocol/third/third.pb.go'),'evidencepb':source('server/internal/objectverify/pb/evidence_grpc.pb.go')};pattern=__import__('re');start=startup[startup.index('func Start('):startup.index('type thirdServer struct')];registrations=pattern.findall(r'(?m)^\s*([A-Za-z_][A-Za-z0-9_]*)\.(Register[A-Za-z0-9_]+Server)\(server,',start);self.assertTrue(registrations);self.assertEqual(len(registrations),len(set(registrations)));self.assertEqual({alias for alias,_ in registrations},set(generated));services=[]
   # Resolve each real Start registration through its generated RegisterServer
   # function to the original ServiceDesc.ServiceName, without running Start/DB.

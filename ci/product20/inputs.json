@@ -24,7 +24,7 @@
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "canonicalPublicParent": "bff3ba487899c485c77aaedea695be5a167a063b",
+  "canonicalPublicParent": "777ca773a3c3c0f0c1f17a582f61d78ec4c0aaa3",
   "chain": {
     "actualBusiness": [
       "route config",
@@ -343,20 +343,12 @@
     "ci/product20/test_receiver.py"
   ],
   "derivedHarnessSource": {
-    "members": 1586,
-    "digest": "789edfca582a8ae4bc3f58a75bb28750e30dc10751ceee4445550e4e4b1e494a"
+    "members": 1587,
+    "digest": "98248fd1da4426fcb17dc630be315cca5d1512daf61eaec3ebdd91849bd313b0"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
-    "core14": {
-      "artifactBytes": 607490716,
-      "artifactID": 13548912327,
-      "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
-      "attempt": 1,
-      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
-      "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
-      "run": 42310913329
-    },
+    "core14": null,
     "currentChart5": {
       "artifactBytes": 71865522,
       "artifactID": 13557132820,
@@ -376,11 +368,11 @@
       "run": 42180782218
     },
     "mode": "core14-currentChart5-historicalRouteFrom6-v1",
-    "rootAcceptanceSHA256": "1145497e013d1203081ad000d7d275fd00964f05dff5ceb4d67d41ea8cabbb66",
+    "rootAcceptanceSHA256": "aa9ee49009f22314ec07da085eab9d178d76bec309806453d2e65a0443c2f45a",
     "rootAccepted": true,
     "source": {
-      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
-      "members": 1584
+      "members": 1585,
+      "digest": "af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a"
     }
   },
   "fixtureConfiguration": {
@@ -427,12 +419,12 @@
       "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
       "members": 1584
     },
-    "status": "root-accepted-current-core14-source-four-scenes-full-artifact-body-receive-required"
+    "status": "Frozen accepted Graph0a parent source only; current selected core is built fresh from exact Mongo delta."
   },
   "helpers": {
     "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
     "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
-    "ci/backend-fullgraph/inputs.json": "df858e6030b09dda87fbc79f2482884353dd83ba55bc168ca4274aa96102914d",
+    "ci/backend-fullgraph/inputs.json": "b97778c11e98cd6c346b4fcf66d62861f0a864def722ed04be1428e6721d9639",
     "ci/backend-fullgraph/minio_build.py": "888868f85e40ba1f306bcfcb009ac239900fff1b126264da6d9f23d0b6508122",
     "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
     "ci/backend-fullgraph/rtc_panic_probe.py": "db870170fd137ec9c0ebc8ee29688f2cecfa4c61c270b50bc9f9559f071d510a",
@@ -748,7 +740,7 @@
       ]
     }
   },
-  "productRebuilds": 0,
+  "productRebuilds": 14,
   "resource": {
     "allocatedMiB": 16384,
     "controllerSeconds": 10800,
@@ -761,11 +753,47 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
-  "state": "ROOT_BOUND_CURRENT_CORE14_STARTUP_CHART260_FIVE_ROUTE33_PENDING_FRESH_PRODUCT20_HTTP_WS",
+  "state": "current-core-mongo-normalization-selected-source-only-runtime-pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",
     "sha256": "ad0293d621376a9c304e68497e65c13cc81f0757d812dc9abaf5e71a3d210d01",
     "version": "chart-startup-error-v1"
+  },
+  "currentCoreBuild": {
+    "mode": "fresh-current-core14-before-P20-v1",
+    "baseSource": {
+      "members": 1584,
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
+    },
+    "source": {
+      "members": 1585,
+      "digest": "af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a"
+    },
+    "changes": [
+      {
+        "target": "server/pkg/common/db/unrelation/mongo.go",
+        "path": "product/server/pkg/common/db/unrelation/mongo.go",
+        "beforeSHA256": "3f22d8d730202bb987c3775aefaada3c4625b99016dcc2462d4cb35cb57874d8",
+        "bytes": 4873,
+        "sha256": "d32c553e8c22609deb7ebac81e985d667601667673d84fcb307e7ab4f175f643"
+      },
+      {
+        "target": "server/pkg/common/db/unrelation/mongo_error_test.go",
+        "path": "product/server/pkg/common/db/unrelation/mongo_error_test.go",
+        "beforeSHA256": null,
+        "bytes": 780,
+        "sha256": "4b5f9cf23d9988e99c3a0e6cc27ef9e739d2d579e595880c22f2b570da2702b7"
+      }
+    ]
+  },
+  "historicalAcceptedCoreArtifact": {
+    "artifactBytes": 607490716,
+    "artifactID": 13548912327,
+    "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
+    "attempt": 1,
+    "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+    "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
+    "run": 42310913329
   }
 }

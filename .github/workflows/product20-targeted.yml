@@ -29,7 +29,7 @@ jobs:
           go-version: '1.27.2'
           check-latest: false
           cache: false
-      - name: Reuse20 ELFs; prepare fresh task fixtures; actual HTTP then WS once
+      - name: Prepare selected core and run actual HTTP and WS once
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

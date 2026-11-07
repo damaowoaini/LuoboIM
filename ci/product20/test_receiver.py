@@ -397,4 +397,110 @@ class StartupFiveScopeContract(unittest.TestCase):
   body=bad['chartAssembly']['currentChart5']['expectedManifest']['body'];raw=(json.dumps(body,sort_keys=True,indent=2)+'\n').encode();bad['chartAssembly']['currentChart5']['expectedManifest'].update(bytes=len(raw),sha256=controller.sha(raw));bad['chartAssembly']['currentChart5']['artifact']['manifestSHA256']=controller.sha(raw)
   with self.assertRaises(ValueError):controller.chart_assembly_policy(bad)
 
+class CurrentCoreBuildContract(unittest.TestCase):
+    def test_current_core_source_binding_and_exact_mongo_test_completion(self):
+        from hashlib import sha256
+
+        mongo = "server/pkg/common/db/unrelation/mongo.go"
+        regression = "server/pkg/common/db/unrelation/mongo_error_test.go"
+        baseline = {"server/go.mod": b"module finite\n", mongo: b"package unrelation\n// old\n"}
+        replacements = {mongo: b"package unrelation\n// init mapping\n", regression: b"package unrelation\n// regression\n"}
+        selected = dict(baseline, **replacements)
+
+        def vector(bodies):
+            raw = b"".join(name.encode() + b"\0" + sha256(body).hexdigest().encode() + b"\n"
+                           for name, body in sorted(bodies.items()))
+            return {"members": len(bodies), "digest": sha256(raw).hexdigest()}
+
+        base_source, current_source = vector(baseline), vector(selected)
+        legacy = {"graphProvider": {"source": base_source}}
+        with mock.patch.object(controller, "regular", side_effect=AssertionError("legacy source read")):
+            self.assertEqual(controller.select_core_source(legacy, baseline), baseline)
+        self.assertEqual(controller.core_source(legacy), base_source)
+        self.assertEqual(controller.core_vector(selected), current_source)
+        changes = [{"target": name, "path": "product/" + name,
+                    "beforeSHA256": sha256(baseline[name]).hexdigest() if name in baseline else None,
+                    "bytes": len(body), "sha256": sha256(body).hexdigest()}
+                   for name, body in replacements.items()]
+        plan = {"mode": "fresh-current-core14-before-P20-v1", "baseSource": base_source,
+                "source": current_source, "changes": changes}
+        current = dict(legacy, currentCoreBuild=plan)
+        files = {controller.REPO / ("product/" + name): body for name, body in replacements.items()}
+        with mock.patch.object(controller, "regular", side_effect=lambda path: files[path]):
+            self.assertEqual(controller.select_core_source(current, baseline), selected)
+            self.assertEqual(controller.core_source(current), current_source)
+            self.assertNotIn(regression, baseline)
+            invalid = []
+            for key, value in (("mode", "unknown"), ("baseSource", current_source),
+                               ("source", base_source), ("changes", changes[:1])):
+                bad = copy.deepcopy(current)
+                bad["currentCoreBuild"][key] = value
+                invalid.append(bad)
+            for key, value in (("target", "server/private.go"), ("path", "private/unknown"),
+                               ("beforeSHA256", "0" * 64), ("bytes", 0),
+                               ("sha256", "0" * 64), ("extra", "unknown")):
+                bad = copy.deepcopy(current)
+                bad["currentCoreBuild"]["changes"][0][key] = value
+                invalid.append(bad)
+            duplicate = copy.deepcopy(current)
+            duplicate["currentCoreBuild"]["changes"][1] = copy.deepcopy(changes[0])
+            invalid.append(duplicate)
+            wrong_addition = copy.deepcopy(current)
+            wrong_addition["currentCoreBuild"]["changes"][1]["beforeSHA256"] = "0" * 64
+            invalid.append(wrong_addition)
+            for value in invalid:
+                with self.assertRaises(ValueError):
+                    controller.select_core_source(value, baseline)
+            drifted = dict(baseline, **{mongo: b"package unrelation\n// drift\n"})
+            with self.assertRaises(ValueError):
+                controller.select_core_source(current, drifted)
+
+        artifact = {"run": 1, "head": "a" * 40, "attempt": 1, "artifactID": 1,
+                    "artifactBytes": 1, "artifactSHA256": "b" * 64, "manifestSHA256": "c" * 64}
+        chart = {"mode": controller.ASSEMBLY_MODE, "currentChart5": artifact,
+                 "historicalRouteFrom6": dict(artifact, artifactID=2)}
+        legacy.update(chartAssembly={"mode": controller.ASSEMBLY_MODE}, acceptedChartArtifact=chart,
+                      mysql={"image": "docker.io/library/mysql@sha256:" + "d" * 64,
+                             "officialSourceReviewSHA256": "e" * 64})
+        legacy["executionBinding"] = dict(chart, rootAccepted=True, source=base_source,
+                                          rootAcceptanceSHA256="f" * 64, core14=artifact)
+        current = copy.deepcopy(legacy)
+        current["currentCoreBuild"] = copy.deepcopy(plan)
+        current["executionBinding"].update(source=current_source, core14=None)
+        with mock.patch.object(controller, "chart_artifact_binding", return_value=chart):
+            self.assertEqual(controller.require_bound(legacy), legacy["executionBinding"])
+            self.assertIsNone(controller.require_bound(current)["core14"])
+            for key, value in (("source", base_source), ("core14", artifact), ("rootAccepted", False)):
+                bad = copy.deepcopy(current)
+                bad["executionBinding"][key] = value
+                with self.assertRaises(ValueError):
+                    controller.require_bound(bad)
+
+        package = "github.com/openimsdk/open-im-server/v3/pkg/common/db/unrelation"
+        name = "TestMongoNoDocumentsMapsToOpenIMRecordNotFound"
+        events = [{"Action": "start", "Package": package},
+                  {"Action": "run", "Package": package, "Test": name},
+                  {"Action": "pass", "Package": package, "Test": name},
+                  {"Action": "pass", "Package": package}]
+        encode = lambda rows: ("\n".join(json.dumps(row) for row in rows) + "\n").encode()
+        raw = encode(events)
+        self.assertEqual(controller.check_current_core_test_events(raw),
+                         {"package": package, "name": name, "topPASS": 1, "subPASS": 0,
+                          "skip": 0, "fail": 0, "eventsSHA256": sha256(raw).hexdigest()})
+        invalid_events = [events[:1] + events[2:], events[:2] + events[3:], events[:-1],
+                          events + [events[1]], []]
+        for action in ("skip", "fail"):
+            bad = copy.deepcopy(events)
+            bad[2]["Action"] = action
+            invalid_events.append(bad)
+        for field, value in (("Test", name + "/unexpected"), ("Package", "unknown/package")):
+            bad = copy.deepcopy(events)
+            bad[2][field] = value
+            invalid_events.append(bad)
+        for rows in invalid_events:
+            with self.assertRaises(ValueError):
+                controller.check_current_core_test_events(encode(rows))
+        with self.assertRaises(ValueError):
+            controller.check_current_core_test_events(raw[:-3])
+
 if __name__=='__main__':unittest.main()

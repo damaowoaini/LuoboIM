@@ -13,6 +13,10 @@ ANCHOR='"secret": c["serviceSecret"], "multiLoginPolicy": 1'
 REPLACEMENT='"secret": c["serviceSecret"], "adminDelegation": map[string]any{"issuer": b.Header.Tenant}, "mysql": fixtureSQL, "messageVerify": map[string]bool{"friendVerify": false}, "multiLoginPolicy": 1'
 DISCOVERY_ANCHOR=b'"zookeeper": map[string]any{"schema": "fullgraph_" + b.Resource.Nonce,'
 DISCOVERY_REPLACEMENT=b'"zookeeper": map[string]any{"schema": b.Header.Tenant,'
+CORE_BUILD_MODE='fresh-current-core14-before-P20-v1'
+MONGO_SOURCE='server/pkg/common/db/unrelation/mongo.go'
+MONGO_TEST='server/pkg/common/db/unrelation/mongo_error_test.go'
+MONGO_TEST_NAME='TestMongoNoDocumentsMapsToOpenIMRecordNotFound'
 def sha(b):return hashlib.sha256(b).hexdigest()
 def regular(path,maximum=32<<20):
  p=Path(path)
@@ -47,9 +51,39 @@ def derive_bootstrap(body):
  config_prefix=b'\tfixtureSQL, e := product20FixtureSQL(b)\n\tif e != nil {\n\t\treturn "", e\n\t}\n'
  if any(body.count(anchor)!=1 for anchor in (ANCHOR.encode(),config_anchor,DISCOVERY_ANCHOR)):raise ValueError('single fixture constructor anchors required')
  return body.replace(config_anchor,config_prefix+config_anchor,1).replace(ANCHOR.encode(),REPLACEMENT.encode(),1).replace(DISCOVERY_ANCHOR,DISCOVERY_REPLACEMENT,1)
+def core_source(c):
+ return c['currentCoreBuild']['source'] if 'currentCoreBuild' in c else c['graphProvider']['source']
+def core_vector(bodies):
+ return {'members':len(bodies),'digest':sha(b''.join(path.encode()+b'\0'+sha(body).encode()+b'\n' for path,body in sorted(bodies.items())))}
+def select_core_source(c,bodies):
+ if 'currentCoreBuild' not in c:return dict(bodies)
+ plan=c['currentCoreBuild']
+ if (type(plan) is not dict or set(plan)!={'mode','baseSource','source','changes'}
+     or plan['mode']!=CORE_BUILD_MODE or plan['baseSource']!=c['graphProvider']['source']
+     or core_vector(bodies)!=plan['baseSource']):raise ValueError('explicit current core build baseline required')
+ rows=plan['changes']
+ if type(rows) is not list or len(rows)!=2 or any(type(r) is not dict for r in rows) or {r.get('target') for r in rows}!={MONGO_SOURCE,MONGO_TEST}:raise ValueError('exact Mongo normalization delta required')
+ selected=dict(bodies)
+ for row in rows:
+  target=row['target'];old=bodies.get(target)
+  if set(row)!={'target','path','beforeSHA256','bytes','sha256'} or row['path']!='product/'+target or row['beforeSHA256']!=(sha(old) if old is not None else None) or type(row['bytes']) is not int or row['bytes']<=0 or type(row['sha256']) is not str or not re.fullmatch('[0-9a-f]{64}',row['sha256']):raise ValueError('current core source preimage differs')
+  body=regular(REPO/row['path'])
+  if len(body)!=row['bytes'] or sha(body)!=row['sha256']:raise ValueError('current core source pin differs')
+  selected[target]=body
+ if core_vector(selected)!=plan['source']:raise ValueError('current core source vector differs')
+ return selected
+def check_current_core_test_events(raw):
+ events=[json.loads(line) for line in raw.splitlines() if line.strip()]
+ package='github.com/openimsdk/open-im-server/v3/pkg/common/db/unrelation'
+ relevant=[e for e in events if e.get('Action') in ('run','pass','fail','skip')]
+ if (any(e.get('Package')!=package or e.get('Action') in ('fail','skip') or e.get('Test') not in (None,MONGO_TEST_NAME) for e in relevant)
+     or sum(e.get('Action')=='run' and e.get('Test')==MONGO_TEST_NAME for e in relevant)!=1
+     or sum(e.get('Action')=='pass' and e.get('Test')==MONGO_TEST_NAME for e in relevant)!=1
+     or sum(e.get('Action')=='pass' and 'Test' not in e for e in relevant)!=1):raise ValueError('one actual Mongo normalization test and package completion required')
+ return {'package':package,'name':MONGO_TEST_NAME,'topPASS':1,'subPASS':0,'skip':0,'fail':0,'eventsSHA256':sha(raw)}
 def verify():
  c=json.loads(regular(HERE/'inputs.json'))
- if c['schema']!=1 or c['scope']!='one-fresh-product20-http-ws-only' or c['productRebuilds']!=0 or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
+ if c['schema']!=1 or c['scope']!='one-fresh-product20-http-ws-only' or c['productRebuilds']!=(14 if 'currentCoreBuild' in c else 0) or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
  for path,expected in c['helpers'].items():
   if sha(regular(REPO/path))!=expected:raise ValueError('source helper drift')
  builder=load(c['fixtureSourceBuilder'],'p20_original_fixture_policy')
@@ -57,6 +91,7 @@ def verify():
  builder.fixture_policy({'minioFixturePolicy':builder.FIXTURE_POLICY,'minioFixtureBinding':c['fixtureMinIOProvider']})
  graph=load(c['graphProvider']['path'],'p20_graph_source');g,bodies,*_=graph.verify()
  if g['source']!=c['graphProvider']['source']:raise ValueError('explicit graph source differs')
+ bodies=select_core_source(c,bodies)
  chart=load('ci/chart-route-build/run.py','p20_chart_source');cc,chart_bodies=chart.verify()
  if cc['sources']!=c['chartProvider']['sources'] or cc['locks']!=c['chartProvider']['locks']:raise ValueError('accepted chart6 source/locks differ')
  if 'historicalPreviousChart5' in c:
@@ -202,8 +237,11 @@ def chart_artifact_binding(c):
 def require_bound(c):
  if c.get('chartAssembly',{}).get('pendingCurrent5') is not None:raise ValueError('pending current5 cannot dispatch runtime')
  binding=c.get('executionBinding')
- if not isinstance(binding,dict) or set(binding)!={'rootAccepted','source','rootAcceptanceSHA256','mode','core14','currentChart5','historicalRouteFrom6'} or binding.get('rootAccepted') is not True or binding.get('source')!=c['graphProvider']['source'] or not re.fullmatch('[0-9a-f]{64}',binding.get('rootAcceptanceSHA256','')) or binding.get('mode')!=ASSEMBLY_MODE:raise ValueError('Root accepted successful current core14 artifact remains required')
- for key in ('core14','currentChart5','historicalRouteFrom6'):artifact_binding(binding[key])
+ if not isinstance(binding,dict) or set(binding)!={'rootAccepted','source','rootAcceptanceSHA256','mode','core14','currentChart5','historicalRouteFrom6'} or binding.get('rootAccepted') is not True or binding.get('source')!=core_source(c) or not re.fullmatch('[0-9a-f]{64}',binding.get('rootAcceptanceSHA256','')) or binding.get('mode')!=ASSEMBLY_MODE:raise ValueError('Root-bound current core source and products required')
+ if 'currentCoreBuild' in c:
+  if binding['core14'] is not None:raise ValueError('fresh core build cannot use a historical core artifact')
+ else:artifact_binding(binding['core14'])
+ for key in ('currentChart5','historicalRouteFrom6'):artifact_binding(binding[key])
  selected={k:binding[k] for k in ('mode','currentChart5','historicalRouteFrom6')}
  if selected!=c['acceptedChartArtifact'] or selected!=chart_artifact_binding(c):raise ValueError('original split chart and route artifact bindings differ')
  mysql=c.get('mysql')
@@ -437,7 +475,7 @@ def project_p20_original_child_exit(root,terminal,expected_plan,plan_sha,product
  plan=json.loads(raw)
  if plan!=expected_plan or plan.get('version')!='fresh-product20-http-ws-v1' or plan.get('work')!=str(root/'chain') or plan.get('products')!=products:raise ValueError('original child plan differs')
  intent=load_private(('private','operator-intent.json'),4096)
- if intent!={'pidBindingAtOriginalStart':True,'inputSHA256':plan_sha,'source':c['graphProvider']['source'],'harness':c['derivedHarnessSource']}:raise ValueError('original operator intent differs')
+ if intent!={'pidBindingAtOriginalStart':True,'inputSHA256':plan_sha,'source':core_source(c),'harness':c['derivedHarnessSource']}:raise ValueError('original operator intent differs')
  if type(products) is not list or len(products)!=6 or {p.get('name') for p in products}!=set(NAMES):raise ValueError('six received product bindings required')
  for row in products:
   name=row['name'];module='route' if name=='route-service' else 'chart';folder='historical-six' if module=='route' else 'current-chart5'
@@ -445,7 +483,7 @@ def project_p20_original_child_exit(root,terminal,expected_plan,plan_sha,product
  raw=p20_exit_private(root,('chain','product20-result.json'),128<<10)
  if sha(raw)!=terminal.get('originalResultSHA256'):raise ValueError('original failed result changed')
  original=json.loads(raw)
- if original.get('version')!='fresh-product20-http-ws-result-v1' or original.get('accepted') is not False or original.get('phase')!=phase or original.get('coreSourceSHA256')!=c['graphProvider']['source']['digest'] or project_startup_boundary(original)!=boundary:raise ValueError('original startup projection differs')
+ if original.get('version')!='fresh-product20-http-ws-result-v1' or original.get('accepted') is not False or original.get('phase')!=phase or original.get('coreSourceSHA256')!=core_source(c)['digest'] or project_startup_boundary(original)!=boundary:raise ValueError('original startup projection differs')
  pids=original.get('sixOriginalPIDs')
  if type(pids) is not list or len(pids)!=slot+1 or any(type(p) is not int or p<=1 for p in pids) or len(set(pids))!=len(pids):raise ValueError('original child pid slots differ')
  child=load_private(('chain',role,'original-child.json'),4096);product=next(p for p in products if p['name']==role)
@@ -471,7 +509,7 @@ def run():
  if root.resolve()!=root or stat.S_IMODE(root.stat().st_mode)!=0o700 or root.stat().st_uid!=os.getuid() or not {'allocation.json'}<={p.name for p in root.iterdir()}<={'allocation.json','controller-private.log'} or json.loads(regular(root/'allocation.json'))!=allocation_owner():raise ValueError('original fresh admission required')
  out.mkdir(mode=0o700,parents=True,exist_ok=False);private=root/'private';private.mkdir(mode=0o700)
  write(private/'owner.json',{'run':os.environ['GITHUB_RUN_ID'],'attempt':os.environ['GITHUB_RUN_ATTEMPT'],'head':os.environ['GITHUB_SHA'],'uid':os.getuid()})
- controls={p:sha(regular(REPO/p)) for p in c['controllers']};tools=graph.tool_snapshot();write(out/'pre.json',{'controls':controls,'tools':tools,'coreProduct':c['graphProvider']['source'],'harness':c['derivedHarnessSource'],'chart':c['chartProvider']['sources']})
+ controls={p:sha(regular(REPO/p)) for p in c['controllers']};tools=graph.tool_snapshot();write(out/'pre.json',{'controls':controls,'tools':tools,'coreProduct':core_source(c),'harness':c['derivedHarnessSource'],'chart':c['chartProvider']['sources']})
  stage=root/'source';stage.mkdir(mode=0o700)
  for target,raw in bodies.items():
   p=stage/target;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw);p.chmod(g['sourceModes'].get(target,0o644))
@@ -479,7 +517,7 @@ def run():
  env=envbase()
  for key,name in [('GOMODCACHE','modcache'),('GOCACHE','buildcache'),('GOPATH','gopath'),('TMPDIR','tmp')]:
   p=root/name;p.mkdir(mode=0o700);env[key]=str(p)
- env['GOTMPDIR']=env['TMPDIR'];index=0;started=time.monotonic();plane=None;mysql_id=None;primary=None;failure_stage='before-post-aux-records'
+ env['GOTMPDIR']=env['TMPDIR'];index=0;started=time.monotonic();plane=None;mysql_id=None;primary=None;failure_stage='before-post-aux-records';core_stage=None
  def command(label,argv,timeout,environment=None,cwd=None):
   nonlocal index
   if timeout>10800-(time.monotonic()-started):raise ValueError('controller budget exhausted')
@@ -491,7 +529,7 @@ def run():
   proc=subprocess.run(wrapped,timeout=timeout+30,check=False);record=json.loads(regular(folder/'resource.json'))
   write(out/(str(index)+'-phase.json'),{'phase':label,'exitCode':proc.returncode,'resource':record,'stdoutSHA256':sha(regular(folder/'stdout',32<<20)),'stderrSHA256':sha(regular(folder/'stderr',32<<20))})
   failed=proc.returncode!=0 or record.get('status')!='passed' or record.get('exit_code')!=0
-  if failed and (label.startswith('compile-') or label=='minio-source-compile') and not (root/'plane').exists():
+  if failed and (label.startswith('compile-') or label in ('minio-source-compile','current-core-mongo-normalization-test')) and not (root/'plane').exists():
    # Identical boundary to the reviewed fullgraph compiler projection: these
    # are only fixed public sources, before private resource config/credentials.
    raw=regular(folder/'stderr',32<<20)
@@ -504,7 +542,8 @@ def run():
   if failed:raise ValueError('phase failed; private raw retained')
   return regular(folder/'stdout',32<<20)
  try:
-  core=artifact(binding['core14'],graph.ROLES,root/'product14',2<<30,core_source=c['graphProvider']['source'])
+  core=None
+  if 'currentCoreBuild' not in c:core=artifact(binding['core14'],graph.ROLES,root/'product14',2<<30,core_source=core_source(c))
   policy=chart_assembly_policy(c)
   five=artifact(binding['currentChart5'],tuple(CHART5),root/'current-chart5',512<<20,chart5=policy['currentChart5'])
   six=artifact(binding['historicalRouteFrom6'],NAMES,root/'historical-six',512<<20,chart_sources=policy['historicalRouteFrom6']['provider']['sources'])
@@ -513,13 +552,36 @@ def run():
   # Product API reads are complete. Only the original fixture receiver keeps
   # this local token; every subsequent child sees the existing explicit env.
   fixture_token=os.environ.pop('GH_TOKEN',None)
-  if core['locks']!={n:sha(original['server/'+n]) for n in ('go.mod','go.sum')}:raise ValueError('original module locks differ from actual artifacts')
-  # Only two necessary auxiliaries are compiled; product20 are never rebuilt.
+  # Current-core builds use canonical source independently from the derived
+  # fixture/auxiliary source. The historical artifact receiver stays separate.
   go=shutil.which('go');version=command('go-version',[go,'version'],15,env).decode().strip()
   if version!='go version go1.27.2 linux/amd64':raise ValueError('exact Go1.27.2 required')
   go_sha=sha(regular(Path(go).resolve()));env['GOROOT']=command('go-root',[go,'env','GOROOT'],15,env).decode().strip()
   command('auxiliary-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off');binroot=root/'aux';binroot.mkdir(mode=0o700)
+  if 'currentCoreBuild' in c:
+   core_stage=root/'current-core-source';core_stage.mkdir(mode=0o700)
+   for target,body in original.items():
+    path=core_stage/target;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body);path.chmod(g['sourceModes'].get(target,0o644))
+   (core_stage/'server/config/config.yaml').write_bytes(original['server/config/config.example.yaml']);(core_stage/'server/config/config.yaml').chmod(0o600)
+   events=command('current-core-mongo-normalization-test',[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+MONGO_TEST_NAME+'$','./pkg/common/db/unrelation'],600,offline,core_stage/'server')
+   write(out/'current-core-test.json',check_current_core_test_events(events))
+   productdir=root/'product14';productdir.mkdir(mode=0o700)
+   rows=[]
+   entries=g['entrypointContract']['entrypoints']
+   if len(entries)!=14 or {e['role'] for e in entries}!=set(graph.ROLES):raise ValueError('canonical fourteen entrypoints required')
+   for entry in entries:
+    name=entry['role'];binary=productdir/name
+    command('compile-current-core-'+name,[go,'build','-mod=readonly','-p=1','-o',str(binary),entry['package']],1200,offline,core_stage/'server')
+    raw=regular(binary,256<<20)
+    if raw[:6]!=b'\x7fELF\x02\x01' or raw[18:20]!=b'\x3e\x00':raise ValueError('actual Linux amd64 core ELF required')
+    binary.chmod(0o700)
+    receipt={'schema':1,'sourceSHA256':core_source(c)['digest'],'binarySHA256':sha(raw),'binaryBytes':len(raw),'toolchainSHA256':go_sha}
+    receipt_bytes=(json.dumps(receipt,separators=(',',':'),ensure_ascii=False)+'\n').encode()
+    rows.append({'name':name,'bytes':len(raw),'sha256':sha(raw),'buildReceiptSHA256':sha(receipt_bytes),'mode':0o700,'GOOS':'linux','GOARCH':'amd64','CGO_ENABLED':'1'})
+   core={'source':core_source(c),'locks':{n:sha(original['server/'+n]) for n in ('go.mod','go.sum')},'toolSHA256':{'go':go_sha},'binaries':rows}
+   write(out/'current-core-build.json',{'kind':'product20-local-core14-build-only-v1',**core,'freshBuilds':14,'historicalGraphScenariosRerun':0,'runtimeAccepted':False})
+  if core['locks']!={n:sha(original['server/'+n]) for n in ('go.mod','go.sum')}:raise ValueError('original module locks differ from actual artifacts')
   for name,pkg in [('msgtransfer-legacy','./cmd/openim-msgtransfer'),('product20-acceptance','./cmd/tools/product20-acceptance')]:command('compile-'+name,[go,'build','-mod=readonly','-p=1','-o',str(binroot/name),pkg],1200,offline)
   failure_stage='core-receipt-reconstruction'
   selectors=load('ci/backend-fullgraph/service_selectors.py','p20_selectors');builds=[]
@@ -582,10 +644,17 @@ def run():
      if cleanup_error is not None:raise cleanup_error
   finally:
    checks={};failures={}
+   if core_stage is not None:
+    try:
+     expected=set(original)|{'server/config/config.yaml'}
+     checks['canonicalCoreSource']=(all(regular(core_stage/n)==body and stat.S_IMODE((core_stage/n).stat().st_mode)==g['sourceModes'].get(n,0o644) for n,body in original.items())
+       and regular(core_stage/'server/config/config.yaml')==original['server/config/config.example.yaml']
+       and {str(p.relative_to(core_stage)) for p in core_stage.rglob('*') if p.is_file() or p.is_symlink()}==expected)
+    except BaseException as e:checks['canonicalCoreSource']=False;failures['canonicalCoreSource']=type(e).__name__
    for name,fn in [('source',lambda: all(regular(stage/n)==b and stat.S_IMODE((stage/n).stat().st_mode)==g['sourceModes'].get(n,0o644) for n,b in bodies.items()) and regular(stage/'server/config/config.yaml')==bodies['server/config/config.example.yaml']),('locks',lambda: all(regular(stage/'server'/n)==original['server/'+n] for n in ('go.mod','go.sum'))),('controllers',lambda:{p:sha(regular(REPO/p)) for p in c['controllers']}==controls),('tools',lambda:graph.tool_snapshot()==tools),('providers',lambda:verify()[0]==c)]:
     try:checks[name]=fn()
     except BaseException as e:checks[name]=False;failures[name]=type(e).__name__
-   write(out/'post.json',{'exact':all(checks.values()),'checks':checks,'exceptions':failures,'coreProduct':c['graphProvider']['source'],'harness':c['derivedHarnessSource']})
+   write(out/'post.json',{'exact':all(checks.values()),'checks':checks,'exceptions':failures,'coreProduct':core_source(c),'harness':c['derivedHarnessSource']})
    if not all(checks.values()) and primary is None:raise ValueError('original source/tool/controller post failed')
  return 0
 
@@ -729,7 +798,7 @@ def export_terminal(path,output):
 
 def check_result(v,c):
  flags=('accepted','dualTokens','chatTokenSelfRead','configHTTP','wrongPasswordRejected','businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')
- if v.get('version')!='fresh-product20-http-ws-result-v1' or any(v.get(k) is not True for k in flags) or v['coreSourceSHA256']!=c['graphProvider']['source']['digest'] or v['productProcesses']!=20 or v['realRegistrations']!=2 or v['realPasswordLogins']!=2 or v['ordinaryDispatches']!=1 or v['peerMessages']!=1 or v['historyMessages']!=1 or v['messageSeq']<=0 or any(v.get(k) is not False for k in ('chartCanonicalDrainClaimed','webUIAccepted','deploymentAccepted')):raise ValueError('actual HTTP+WS result incomplete')
+ if v.get('version')!='fresh-product20-http-ws-result-v1' or any(v.get(k) is not True for k in flags) or v['coreSourceSHA256']!=core_source(c)['digest'] or v['productProcesses']!=20 or v['realRegistrations']!=2 or v['realPasswordLogins']!=2 or v['ordinaryDispatches']!=1 or v['peerMessages']!=1 or v['historyMessages']!=1 or v['messageSeq']<=0 or any(v.get(k) is not False for k in ('chartCanonicalDrainClaimed','webUIAccepted','deploymentAccepted')):raise ValueError('actual HTTP+WS result incomplete')
  pids=v.get('coreOriginalPIDs',[])+v.get('sixOriginalPIDs',[])
  if len(v.get('coreOriginalPIDs',[]))!=14 or len(v.get('sixOriginalPIDs',[]))!=6 or len(set(pids))!=20 or any(type(p) is not int or p<=1 or Path('/proc',str(p)).exists() for p in pids):raise ValueError('all original twenty process exits required')
 
@@ -756,7 +825,7 @@ def collect():
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--verify',action='store_true');p.add_argument('--collect',action='store_true');p.add_argument('--admit',action='store_true');a=p.parse_args()
  if a.verify:
-  c,*_=verify();print(json.dumps({'sourceOnly':True,'executionLocked':c.get('executionBinding') is None,'core':c['graphProvider']['source'],'harness':c['derivedHarnessSource'],'productRebuilds':0}));sys.exit(0)
+  c,*_=verify();print(json.dumps({'sourceOnly':True,'executionLocked':c.get('executionBinding') is None,'core':core_source(c),'harness':c['derivedHarnessSource'],'productRebuilds':c['productRebuilds']}));sys.exit(0)
  if a.admit:sys.exit(admit())
  if a.collect:sys.exit(collect())
  sys.exit(run())

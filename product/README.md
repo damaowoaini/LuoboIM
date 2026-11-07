@@ -2,7 +2,7 @@
 
 这里的 `server/`、`chart/`、`route/` 是独立的普通 Go 模块。源码已经从固定来源完整物化；从这些目录构建不需要运行 CI 胶囊、source loader 或验收程序。
 
-当前选定来源为 graph `1584/0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef`、chart `260/11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1892 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
+当前选定来源为 server `1585/af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a`、chart `260/11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8`、route `33/888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a`。`source-manifest.json` 的文件路径相对本目录，记录全部 1893 个源码/公开辅助文件；`build-plan.json` 列出真实 20 个产品入口和两个辅助入口、原构建参数及模块锁。辅助入口不计入 20 个产品服务。
 
 使用 Go 1.27.2，在各模块目录独立构建，并显式设置 `GOWORK=off GOTOOLCHAIN=local GOENV=off GOAUTH=off`。保留原 `server/go.work`、`go.work.sum` 和所有模块锁；server 原本地 protocol 替换模块位于 `server/pkg/protocol`。不要用新的跨模块 workspace、统一协议版本或重新生成锁文件代替这些来源。
 

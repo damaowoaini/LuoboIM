@@ -42,9 +42,13 @@ type Mongo struct {
 	db *mongo.Client
 }
 
+func init() {
+	// Both managed and legacy connections use the same RPC error contract.
+	specialerror.AddReplace(mongo.ErrNoDocuments, errs.ErrRecordNotFound)
+}
+
 // NewMongo Initialize MongoDB connection.
 func NewMongo() (*Mongo, error) {
-	specialerror.AddReplace(mongo.ErrNoDocuments, errs.ErrRecordNotFound)
 	uri := buildMongoURI()
 
 	var mongoClient *mongo.Client
