@@ -1,25 +1,5 @@
 {
-  "acceptedChartArtifact": {
-    "currentChart5": {
-      "artifactBytes": 71834348,
-      "artifactID": 13535759454,
-      "artifactSHA256": "fba7b461eec0e9504c8046f198dd13ef03e50add9ff7e30513bebcd0f6665401",
-      "attempt": 1,
-      "head": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
-      "manifestSHA256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2",
-      "run": 42283432687
-    },
-    "historicalRouteFrom6": {
-      "artifactBytes": 76891085,
-      "artifactID": 13485700505,
-      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
-      "attempt": 1,
-      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
-      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
-      "run": 42180782218
-    },
-    "mode": "core14-currentChart5-historicalRouteFrom6-v1"
-  },
+  "acceptedChartArtifact": null,
   "auxiliaryBuilds": [
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
@@ -60,6 +40,275 @@
     "productProcesses": 20
   },
   "chartAssembly": {
+    "currentChart5": {
+      "artifact": null,
+      "derivation": null,
+      "expectedManifest": null
+    },
+    "historicalRouteFrom6": {
+      "artifact": {
+        "artifactBytes": 76891085,
+        "artifactID": 13485700505,
+        "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+        "attempt": 1,
+        "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+        "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+        "run": 42180782218
+      },
+      "originalManifestBytes": 4720,
+      "originalManifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "provider": {
+        "locks": {
+          "chart": {
+            "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+            "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+          },
+          "route": {
+            "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+            "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+          }
+        },
+        "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
+        "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7",
+        "sources": {
+          "chart": {
+            "members": 258,
+            "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+          },
+          "route": {
+            "members": 33,
+            "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+          }
+        }
+      },
+      "selectedRoute": {
+        "CGO_ENABLED": "0",
+        "GOARCH": "amd64",
+        "GOOS": "linux",
+        "bytes": 11571360,
+        "mode": 448,
+        "module": "route",
+        "name": "route-service",
+        "package": ".",
+        "sha256": "55d3bab3743fa819ba66f1fa4cf59140d19f3ddfd2d669d07582cba70ae6ce59",
+        "sourceVector": {
+          "members": 33,
+          "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+        }
+      }
+    },
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
+    "pendingCurrent5": {
+      "entries": [
+        [
+          "chart",
+          "./cmd/api/chat-api",
+          "chat-api"
+        ],
+        [
+          "chart",
+          "./cmd/api/admin-api",
+          "admin-api"
+        ],
+        [
+          "chart",
+          "./cmd/rpc/chat-rpc",
+          "chat-rpc"
+        ],
+        [
+          "chart",
+          "./cmd/rpc/admin-rpc",
+          "admin-rpc"
+        ],
+        [
+          "chart",
+          "./cmd/rpc/office-rpc",
+          "office-rpc"
+        ]
+      ],
+      "kind": "current-chart-five-startup1-prior-admin4-compatible-v2",
+      "locks": {
+        "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+        "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+      },
+      "producerCohort": "chart-startup1-prior-admin4-chart5-v2",
+      "retainedCore14": {
+        "artifactBytes": 607490716,
+        "artifactID": 13548912327,
+        "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
+        "attempt": 1,
+        "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+        "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
+        "run": 42310913329
+      },
+      "source": {
+        "members": 260,
+        "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+      },
+      "state": "pending-current5"
+    }
+  },
+  "chartProvider": {
+    "locks": {
+      "chart": {
+        "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+        "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+      },
+      "route": {
+        "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+        "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+      }
+    },
+    "rootAcceptancePath": null,
+    "rootAcceptanceSHA256": null,
+    "sources": {
+      "chart": {
+        "members": 260,
+        "sha256": "11c35de987eef0c645478eac37b42ef86db4e36df979b23b418b7cf3957440b8"
+      },
+      "route": {
+        "members": 33,
+        "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+      }
+    },
+    "status": "current-source-pending-new-startup1-chart5-producer-no-runtime-admission"
+  },
+  "controllers": [
+    "ci/product20/run.py",
+    "ci/product20/inputs.json",
+    ".github/workflows/product20-targeted.yml",
+    "ci/product20/source/server/internal/runtimeacceptance/product20_linux.go",
+    "ci/product20/source/server/cmd/tools/product20-acceptance/main.go",
+    "ci/product20/test_receiver.py"
+  ],
+  "derivedHarnessSource": {
+    "digest": "6980baaad94dc9781875b84906b6799e88b5c0a64b1705b4b4151d5388534989",
+    "members": 1586
+  },
+  "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
+  "executionBinding": null,
+  "fixtureConfiguration": {
+    "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
+    "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
+    "constructorPrefix": "\tfixtureSQL,e := product20FixtureSQL(b); if e != nil { return \"\",e }\n",
+    "exactSingleAnchor": "\"secret\": c[\"serviceSecret\"], \"multiLoginPolicy\": 1",
+    "purpose": "Task real tenant issuer, actual schema-only SQL policy DB, explicit friendVerify=false before every role config/bootstrap generation; auxiliary-only derivative, product14 and old four scenarios untouched",
+    "replacement": "\"secret\": c[\"serviceSecret\"], \"adminDelegation\": map[string]any{\"issuer\": b.Header.Tenant}, \"mysql\": fixtureSQL, \"messageVerify\": map[string]bool{\"friendVerify\": false}, \"multiLoginPolicy\": 1",
+    "target": "server/internal/runtimeacceptance/bootstrap_linux.go"
+  },
+  "fixtureMinIOProvider": {
+    "artifactBytes": 70210047,
+    "artifactID": 13474215432,
+    "artifactSHA256": "41cd1ae1525a601b7436efef8446137743fd88178903373fee9e88d84661ca76",
+    "attempt": 1,
+    "head": "aab27f77458418b0c7276764665f31e0c4144067",
+    "jobConclusion": "failure",
+    "jobID": 127679246498,
+    "manifestSHA256": "ed84605ccc523ae5f41d6b82584765b6a04aac3f685d6cd9ecf44b3784c2ead5",
+    "receipt": {
+      "binaryBytes": 146777192,
+      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
+      "cgoEnabled": "0",
+      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
+      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
+      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
+      "repository": "https://github.com/minio/minio",
+      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
+      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "version": "owned-minio-source-build-receipt-v1"
+    },
+    "repository": "damaowoaini/LuoboIM",
+    "rootAcceptanceSHA256": "cd1010e6e2429d2dfb594072e07b24d79918d33451a5fc3a220276f0e1237495",
+    "rootFixtureAccepted": true,
+    "run": 42152637741,
+    "runConclusion": "failure"
+  },
+  "fixtureSourceBuildRequiredWhenNoVerifiedProvider": true,
+  "fixtureSourceBuilder": "ci/backend-fullgraph/minio_build.py",
+  "graphProvider": {
+    "path": "ci/backend-fullgraph/run.py",
+    "source": {
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
+      "members": 1584
+    },
+    "status": "root-accepted-current-core14-source-four-scenes-full-artifact-body-receive-required"
+  },
+  "helpers": {
+    "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
+    "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
+    "ci/backend-fullgraph/inputs.json": "df858e6030b09dda87fbc79f2482884353dd83ba55bc168ca4274aa96102914d",
+    "ci/backend-fullgraph/minio_build.py": "888868f85e40ba1f306bcfcb009ac239900fff1b126264da6d9f23d0b6508122",
+    "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
+    "ci/backend-fullgraph/rtc_panic_probe.py": "db870170fd137ec9c0ebc8ee29688f2cecfa4c61c270b50bc9f9559f071d510a",
+    "ci/backend-fullgraph/run.py": "5645c96fd0fa3e0965ce66e922450fd834d4d342a5def189eff527eed170d56e",
+    "ci/backend-fullgraph/service_selectors.py": "0606aeaabf2d586b579878ed11c170a33db543fb90f9549ecf0566ddc1da07e7",
+    "ci/chart-route-build/inputs.json": "ff405cd422c296afad63d0f5efaa76d53a55fd083565acff06a691845ee132fe",
+    "ci/chart-route-build/run.py": "2b6a3f66f761181fc693502f6c910ffd5b24ee3c38badabb54627b5518b1bb9d",
+    "ci/group-effects/capture.py": "d8f7dd31925857d5042e3c89a07a0bc127d1371e6063b4b186b8200d9f93c199",
+    "ci/group-effects/resource_guard.py": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c"
+  },
+  "historicalAcceptedChartArtifact": {
+    "acceptedForCurrentChartSource": false,
+    "artifact": {
+      "artifactBytes": 76891085,
+      "artifactID": 13485700505,
+      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
+      "attempt": 1,
+      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
+      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
+      "run": 42180782218
+    },
+    "provider": {
+      "locks": {
+        "chart": {
+          "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+          "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+        },
+        "route": {
+          "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+          "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+        }
+      },
+      "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
+      "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7",
+      "sources": {
+        "chart": {
+          "members": 258,
+          "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
+        },
+        "route": {
+          "members": 33,
+          "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+        }
+      }
+    }
+  },
+  "historicalPreviousChart5": {
+    "chartProvider": {
+      "locks": {
+        "chart": {
+          "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
+          "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
+        },
+        "route": {
+          "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
+          "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
+        }
+      },
+      "rootAcceptancePath": null,
+      "rootAcceptanceSHA256": null,
+      "sources": {
+        "chart": {
+          "members": 259,
+          "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
+        },
+        "route": {
+          "members": 33,
+          "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
+        }
+      },
+      "status": "current259-five-cloud-build-facts-accepted-expected-manifest-only-route33-original-producer-receive-required"
+    },
     "currentChart5": {
       "artifact": {
         "artifactBytes": 71834348,
@@ -209,9 +458,29 @@
         "evidence": "expected-derived-not-observed",
         "sha256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2"
       }
-    },
-    "historicalRouteFrom6": {
-      "artifact": {
+    }
+  },
+  "historicalPreviousExecutionBinding": {
+    "body": {
+      "core14": {
+        "artifactBytes": 607490716,
+        "artifactID": 13548912327,
+        "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
+        "attempt": 1,
+        "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+        "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
+        "run": 42310913329
+      },
+      "currentChart5": {
+        "artifactBytes": 71834348,
+        "artifactID": 13535759454,
+        "artifactSHA256": "fba7b461eec0e9504c8046f198dd13ef03e50add9ff7e30513bebcd0f6665401",
+        "attempt": 1,
+        "head": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
+        "manifestSHA256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2",
+        "run": 42283432687
+      },
+      "historicalRouteFrom6": {
         "artifactBytes": 76891085,
         "artifactID": 13485700505,
         "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
@@ -220,219 +489,15 @@
         "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
         "run": 42180782218
       },
-      "originalManifestBytes": 4720,
-      "originalManifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
-      "provider": {
-        "locks": {
-          "chart": {
-            "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
-            "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
-          },
-          "route": {
-            "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
-            "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
-          }
-        },
-        "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
-        "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7",
-        "sources": {
-          "chart": {
-            "members": 258,
-            "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
-          },
-          "route": {
-            "members": 33,
-            "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
-          }
-        }
-      },
-      "selectedRoute": {
-        "CGO_ENABLED": "0",
-        "GOARCH": "amd64",
-        "GOOS": "linux",
-        "bytes": 11571360,
-        "mode": 448,
-        "module": "route",
-        "name": "route-service",
-        "package": ".",
-        "sha256": "55d3bab3743fa819ba66f1fa4cf59140d19f3ddfd2d669d07582cba70ae6ce59",
-        "sourceVector": {
-          "members": 33,
-          "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
-        }
+      "mode": "core14-currentChart5-historicalRouteFrom6-v1",
+      "rootAcceptanceSHA256": "edf29c4e587cbf181a7e7e9d526e6fc300c0f328f32d2314b7a547854a1d7ae4",
+      "rootAccepted": true,
+      "source": {
+        "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
+        "members": 1584
       }
     },
-    "mode": "core14-currentChart5-historicalRouteFrom6-v1"
-  },
-  "chartProvider": {
-    "locks": {
-      "chart": {
-        "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
-        "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
-      },
-      "route": {
-        "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
-        "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
-      }
-    },
-    "rootAcceptancePath": null,
-    "rootAcceptanceSHA256": null,
-    "sources": {
-      "chart": {
-        "members": 259,
-        "sha256": "432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc"
-      },
-      "route": {
-        "members": 33,
-        "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
-      }
-    },
-    "status": "current259-five-cloud-build-facts-accepted-expected-manifest-only-route33-original-producer-receive-required"
-  },
-  "controllers": [
-    "ci/product20/run.py",
-    "ci/product20/inputs.json",
-    ".github/workflows/product20-targeted.yml",
-    "ci/product20/source/server/internal/runtimeacceptance/product20_linux.go",
-    "ci/product20/source/server/cmd/tools/product20-acceptance/main.go",
-    "ci/product20/test_receiver.py"
-  ],
-  "derivedHarnessSource": {
-    "digest": "1465adf2005c2f6e81f88d140c36af6bca9563700f771f7d477b2fe4db5a37c1",
-    "members": 1586
-  },
-  "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
-  "executionBinding": {
-    "core14": {
-      "artifactBytes": 607490716,
-      "artifactID": 13548912327,
-      "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
-      "attempt": 1,
-      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
-      "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
-      "run": 42310913329
-    },
-    "currentChart5": {
-      "artifactBytes": 71834348,
-      "artifactID": 13535759454,
-      "artifactSHA256": "fba7b461eec0e9504c8046f198dd13ef03e50add9ff7e30513bebcd0f6665401",
-      "attempt": 1,
-      "head": "98d6a73a3b6342bbfaf525f478bc7ccf701ceb77",
-      "manifestSHA256": "101e4a1f7e0621f033172ceca8e4347c32f7185a69c8caf68217f4afbf69dce2",
-      "run": 42283432687
-    },
-    "historicalRouteFrom6": {
-      "artifactBytes": 76891085,
-      "artifactID": 13485700505,
-      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
-      "attempt": 1,
-      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
-      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
-      "run": 42180782218
-    },
-    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
-    "rootAcceptanceSHA256": "edf29c4e587cbf181a7e7e9d526e6fc300c0f328f32d2314b7a547854a1d7ae4",
-    "rootAccepted": true,
-    "source": {
-      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
-      "members": 1584
-    }
-  },
-  "fixtureConfiguration": {
-    "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
-    "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
-    "constructorPrefix": "\tfixtureSQL,e := product20FixtureSQL(b); if e != nil { return \"\",e }\n",
-    "exactSingleAnchor": "\"secret\": c[\"serviceSecret\"], \"multiLoginPolicy\": 1",
-    "purpose": "Task real tenant issuer, actual schema-only SQL policy DB, explicit friendVerify=false before every role config/bootstrap generation; auxiliary-only derivative, product14 and old four scenarios untouched",
-    "replacement": "\"secret\": c[\"serviceSecret\"], \"adminDelegation\": map[string]any{\"issuer\": b.Header.Tenant}, \"mysql\": fixtureSQL, \"messageVerify\": map[string]bool{\"friendVerify\": false}, \"multiLoginPolicy\": 1",
-    "target": "server/internal/runtimeacceptance/bootstrap_linux.go"
-  },
-  "fixtureMinIOProvider": {
-    "artifactBytes": 70210047,
-    "artifactID": 13474215432,
-    "artifactSHA256": "41cd1ae1525a601b7436efef8446137743fd88178903373fee9e88d84661ca76",
-    "attempt": 1,
-    "head": "aab27f77458418b0c7276764665f31e0c4144067",
-    "jobConclusion": "failure",
-    "jobID": 127679246498,
-    "manifestSHA256": "ed84605ccc523ae5f41d6b82584765b6a04aac3f685d6cd9ecf44b3784c2ead5",
-    "receipt": {
-      "binaryBytes": 146777192,
-      "binarySHA256": "8f02c551e46da745c4ea0d222577e3c9999bddfb485053f8f0112aea513ec88f",
-      "cgoEnabled": "0",
-      "commit": "7aac2a2c5b7c882e68c1ce017d8256be2feea27f",
-      "goModSHA256": "673f06144e90bc045f0a20050d2874c52e551be5bfbd70dff6e76b66da0db702",
-      "goSumSHA256": "86e062349c7abdce0465561bb409d410a95b00b0969ba05d5fb5f2e3550a5cd4",
-      "repository": "https://github.com/minio/minio",
-      "sourceDigestSHA256": "961e8cadbd7f52a1d98800e9d1b2491fb06d98f936c8ccef62e081a4ef128617",
-      "toolchainSHA256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
-      "version": "owned-minio-source-build-receipt-v1"
-    },
-    "repository": "damaowoaini/LuoboIM",
-    "rootAcceptanceSHA256": "cd1010e6e2429d2dfb594072e07b24d79918d33451a5fc3a220276f0e1237495",
-    "rootFixtureAccepted": true,
-    "run": 42152637741,
-    "runConclusion": "failure"
-  },
-  "fixtureSourceBuildRequiredWhenNoVerifiedProvider": true,
-  "fixtureSourceBuilder": "ci/backend-fullgraph/minio_build.py",
-  "graphProvider": {
-    "path": "ci/backend-fullgraph/run.py",
-    "source": {
-      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
-      "members": 1584
-    },
-    "status": "root-accepted-current-core14-source-four-scenes-full-artifact-body-receive-required"
-  },
-  "helpers": {
-    "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
-    "ci/backend-fullgraph/image-catalog.json": "48b39843fdef75e7dd9cb422b1f1b217627c466e8cc0d294d0191c95c52ea699",
-    "ci/backend-fullgraph/inputs.json": "df858e6030b09dda87fbc79f2482884353dd83ba55bc168ca4274aa96102914d",
-    "ci/backend-fullgraph/minio_build.py": "888868f85e40ba1f306bcfcb009ac239900fff1b126264da6d9f23d0b6508122",
-    "ci/backend-fullgraph/resources.py": "82ab739963829cb18a4899a65488a7d66e3aa093883255f7a2ef763651a309ed",
-    "ci/backend-fullgraph/rtc_panic_probe.py": "db870170fd137ec9c0ebc8ee29688f2cecfa4c61c270b50bc9f9559f071d510a",
-    "ci/backend-fullgraph/run.py": "5645c96fd0fa3e0965ce66e922450fd834d4d342a5def189eff527eed170d56e",
-    "ci/backend-fullgraph/service_selectors.py": "0606aeaabf2d586b579878ed11c170a33db543fb90f9549ecf0566ddc1da07e7",
-    "ci/chart-route-build/inputs.json": "c2224155e5acf34f693427986c043dc7daf795209b5aa61d02f8f4b6f8e3af03",
-    "ci/chart-route-build/run.py": "2b6a3f66f761181fc693502f6c910ffd5b24ee3c38badabb54627b5518b1bb9d",
-    "ci/group-effects/capture.py": "d8f7dd31925857d5042e3c89a07a0bc127d1371e6063b4b186b8200d9f93c199",
-    "ci/group-effects/resource_guard.py": "ae0883a58b5d7c86f272829a375c837de733d12748480733e0dbadc4b8e9aa6c"
-  },
-  "historicalAcceptedChartArtifact": {
-    "acceptedForCurrentChartSource": false,
-    "artifact": {
-      "artifactBytes": 76891085,
-      "artifactID": 13485700505,
-      "artifactSHA256": "f1b4431b512f253a40f8239854089c1493eccadb95c5f33241b7a0292438c631",
-      "attempt": 1,
-      "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
-      "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
-      "run": 42180782218
-    },
-    "provider": {
-      "locks": {
-        "chart": {
-          "go.mod": "9294af33ed449188ff3794396b4db04eefb4041b4fc266396ce2950ec2944632",
-          "go.sum": "2c1dc034978ecc076bd1a240777c621e0b5f7832cf5c2f150874e98116ebc4e1"
-        },
-        "route": {
-          "go.mod": "e4ba002d7aea948616a40e36e0fc2b0562b56752a5161fc6e923fea0495c4c43",
-          "go.sum": "511199ad862024a7662dc93f98808cf53d6743595e55fcb4a1aa9671f7ae798f"
-        }
-      },
-      "rootAcceptancePath": ".qa/backend-process-image-batch-20261106/root-chart6-build-and-receiver-review.json",
-      "rootAcceptanceSHA256": "620d8e336874d88b439c0afa5f1b32ec1b445ee7634b658cb2060ffa8a4ee6c7",
-      "sources": {
-        "chart": {
-          "members": 258,
-          "sha256": "3ac25b721224e069fd052a067beb18dd139fcf68f6f96dc893604436cef3ecec"
-        },
-        "route": {
-          "members": 33,
-          "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
-        }
-      }
-    }
+    "evidence": "historical-chart259-tuple-not-current-execution"
   },
   "mysql": {
     "actualImageRuntimeAccepted": false,
@@ -451,7 +516,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "a3ca31d63040cbd21dd605960787e9bf63b64af93efa165d67107b2db1300dc6"
+    "server/internal/runtimeacceptance/product20_linux.go": "d083a10aaf259dc0c19ab767d7c865705ee78a6530dd6197a0361789c7220b8e"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
@@ -500,5 +565,11 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
-  "state": "ROOT_BOUND_CURRENT_CORE14_SPLIT_CHART5_ROUTE1_PENDING_FRESH_PRODUCT20_HTTP_WS"
+  "state": "PENDING_CURRENT5_SOURCE_COMPILE_AND_ROOT_ACCEPTANCE_EXECUTION_LOCKED",
+  "typedStartupDiagnostic": {
+    "path": "chart/pkg/common/chatrpcstart/start.go",
+    "prefix": "LUOBO_CHART_STARTUP_V1 ",
+    "sha256": "ad0293d621376a9c304e68497e65c13cc81f0757d812dc9abaf5e71a3d210d01",
+    "version": "chart-startup-error-v1"
+  }
 }

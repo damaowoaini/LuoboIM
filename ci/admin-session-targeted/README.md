@@ -1,3 +1,42 @@
+# Current startup1 and fresh chart5; historical admin4 needs proof
+
+Only `chart-startup1-prior-admin4-chart5-v2` is admitted. One current startup
+contract runs, followed by the original five CGO0 linux/amd64 build recipes in
+the same Go1.27.2 module/build cache. No route/core products, old Admin4,
+full-package/fullgraph, parser oracle or regression suite is replayed. No new
+SQL/Redis fixture/container is created; original fixture implementation and the
+historical live4 runner remain intact and are not selected by this mode.
+
+Before reuse, exact inverse rows must restore all original259 bodies, both locks
+and embedded assets. One actual readonly `go list -race -p=1 -deps -test` in the
+original CGO1 Linux environment must include the original root, augmented root
+and synthetic .test owner, with no startup/component package or ForTest edge.
+External actual versions must match the original go.sum; errors, incomplete,
+unknown versions/replacements, duplicate/truncated streams or tool body/mode
+drift reject reuse without an automatic old4 fallback. The original seven tool
+bodies and Root-accepted events/footer/resource/source/cleanup receipt pins are
+bound separately. These are historical selective4 compatible facts, never
+current-run fresh4 or whole-package acceptance.
+
+Fresh schema2 manifest kind `current-chart-five-startup1-prior-admin4-compatible-v2`
+records actual startup1/zero skip/footer/exit/resources, actual5 ELF recipes and
+stable final bodies, source/tool postconditions, closure/source-bridge receipt
+pins and explicit currentAdmin4TestCommands0/SQLRedisFixturesStarted0. All raw Go
+JSON/closure/tool errors remain private; only fixed small receipt paths upload.
+Original >=1GiB free,8GiB allocation,1800s controller/600s guarded command and
+source/tool/output gates remain. Setup-go/Actions SHA pins are unchanged.
+
+P20 remains pending-current5 with executionBinding/acceptedChartArtifact null.
+Old chart259 five bodies and chart258/route33 six bodies retain original source
+identities. Only a later real producer success and Root metadata acceptance can
+fill a new five binding/expected manifest; the cloud receiver still performs the
+original complete ZIP/API/CRC/body/ELF/FD checks. No product ELF is fetched locally.
+The new typed startup marker exposes only source-pinned closed codes, never a
+cause string; the separate bootstrap file change is private0600/admin-rpc only.
+Build-only and historical reuse do not accept HTTP/MFA/messages/Ready/P20.
+
+## Historical live4 producer (not selected by this mode)
+
 # Admin disable/re-enable session revocation: live SQL/Redis exact4
 
 This manually dispatched lane is independent of fullgraph/Product20. It runs only

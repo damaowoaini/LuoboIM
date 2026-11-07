@@ -1,11 +1,11 @@
-name: Admin session SQL Redis exact4 and current chart5 build-only
+name: Chart startup exact1 and current chart5 with historical admin4 closure
 on:
   workflow_dispatch:
     inputs:
       cohort:
         type: choice
         required: true
-        options: [admin-session-live4-chart5-v1]
+        options: [chart-startup1-prior-admin4-chart5-v2]
       inputs_sha256:
         description: Exact Root reviewed formatted source and controller inputs SHA256
         type: string
@@ -37,7 +37,7 @@ jobs:
           go-version: '1.27.2'
           check-latest: false
           cache: false
-      - name: Exact owned fixtures, four live race tests, five current chart builds
+      - name: Actual race-aware old4 closure, one startup test, five current chart builds
         id: targeted
         run: |
           umask 077
@@ -46,7 +46,7 @@ jobs:
           mkdir -m 700 "$work"
           mkdir -p ci-results
           python3 -B ci/group-effects/resource_guard.py --cwd "$GITHUB_WORKSPACE" --allocated-root "$work" --max-allocated-mib 8192 --min-free-mib 1024 --poll-interval .2 --timeout 1800 --log "$work/controller-private.log" --record "$GITHUB_WORKSPACE/ci-results/admin-session-controller.resource.json" -- python3 -B ci/admin-session-targeted/run.py --mode run --work "$work" --inputs-sha256 "$ADMIN_SESSION_INPUTS_SHA256"
-      - name: Always original owner ID cleanup and logical SQL Redis absence
+      - name: Always exact allocation cleanup; no SQL Redis fixtures in this mode
         if: always()
         run: |
           umask 077
@@ -58,13 +58,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
-          name: admin-session-live4-${{ github.run_id }}-${{ github.run_attempt }}
+          name: chart-startup1-prior4-build-raw-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ci-results/admin-session/summary.json
             ci-results/admin-session/events.json
             ci-results/admin-session/source-tools.json
             ci-results/admin-session/source-difference.json
             ci-results/admin-session/events-observation.json
+            ci-results/admin-session/source-bridge.json
+            ci-results/admin-session/test-closure.json
+            ci-results/admin-session/prior-admin4-reuse.json
             ci-results/admin-session/builds.json
             ci-results/admin-session/fixture-ready.json
             ci-results/admin-session/fixture-after.json
@@ -77,7 +80,7 @@ jobs:
         if: success() && steps.targeted.outcome == 'success'
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
-          name: admin-session-current259-chart5-${{ github.run_id }}-${{ github.run_attempt }}
+          name: chart-startup1-current-chart5-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/chat-api
             ${{ runner.temp }}/admin-session-${{ github.run_id }}-${{ github.run_attempt }}/products/admin-api

@@ -17,7 +17,7 @@ spec.loader.exec_module(controller)
 
 class SplitProducerContract(unittest.TestCase):
  def test_current5_expected_manifest_original6_route_and_locked_core_keep_exact_provenance(self):
-  c=json.loads((HERE/'inputs.json').read_bytes())
+  c=controller.historical_chart_control(json.loads((HERE/'inputs.json').read_bytes()))  # Original259 fixture, never the pending current source.
   c['executionBinding']=None;c['acceptedChartArtifact']=None  # Explicit original locked-policy fixture.
   self.assertIsNone(c['executionBinding']);self.assertIsNone(c['acceptedChartArtifact'])
   with self.assertRaises(ValueError):controller.require_bound(c)
@@ -232,5 +232,98 @@ class SplitProducerContract(unittest.TestCase):
    with self.assertRaisesRegex(ValueError,'^phase failed; private raw retained$'):namespace['actual_failed_tail']()
    with mock.patch.object(controller,'write',side_effect=RuntimeError(private)):self.assertFalse(controller.emit_p20_child_exit_observation(root,root/'out',terminal,plan,ps,products,chart_bodies,config))
 
+
+
+
+class StartupFiveScopeContract(unittest.TestCase):
+ def test_startup_five_reuse_requires_exact_source_race_closure_and_pending_typed_contract(self):
+  import sys
+  admin_path=controller.REPO/'ci/admin-session-targeted/run.py'
+  spec=importlib.util.spec_from_file_location('startup_five_scope_admin',admin_path);admin=importlib.util.module_from_spec(spec)
+  before=list(sys.path);sys.path.insert(0,str(admin_path.parent))
+  try:spec.loader.exec_module(admin)
+  finally:sys.path[:]=before
+  inputs=json.loads((admin_path.parent/'inputs.json').read_bytes())
+  class SecretFailure(Exception):
+   def __str__(self):raise AssertionError('exception formatting must never run')
+  caught=None
+  with mock.patch.object(admin,'stable',side_effect=SecretFailure('PRIVATE_SECRET_ARG')):
+   try:admin.verify(admin.sha((admin_path.parent/'inputs.json').read_bytes()),source_required=False)
+   except SecretFailure as error:caught=error
+  self.assertIsNotNone(caught)
+  projected=admin.public_controller_failure_frames(caught,inputs)
+  self.assertTrue(projected['frames']);self.assertLessEqual(len(projected['frames']),8)
+  expected={r['path']:r for r in inputs['controllerInputs']+inputs['borrowedInputs']}
+  for row in projected['frames']:
+   self.assertEqual(set(row),{'path','line','sourceSHA256'});self.assertEqual(row['path'],'ci/admin-session-targeted/run.py')
+   self.assertEqual(row['sourceSHA256'],expected[row['path']]['sha256'])
+   self.assertTrue(1<=row['line']<=len((controller.REPO/row['path']).read_bytes().splitlines()))
+  self.assertNotIn('PRIVATE_SECRET_ARG',json.dumps(projected));self.assertNotIn('SecretFailure',json.dumps(projected))
+  changed=copy.deepcopy(inputs)
+  next(r for r in changed['controllerInputs'] if r['path']=='ci/admin-session-targeted/run.py')['sha256']='0'*64
+  self.assertEqual(admin.public_controller_failure_frames(caught,changed)['frames'],[])
+  try:raise SecretFailure('PRIVATE_SECRET_ARG')
+  except SecretFailure as unknown:self.assertEqual(admin.public_controller_failure_frames(unknown,inputs)['frames'],[])
+  self.assertTrue(admin.prior_admin_source_bridge(inputs)['sourceInverseExact'])
+  changed=copy.deepcopy(inputs);changed['source'][0]['sha256']='0'*64
+  with self.assertRaises(ValueError):admin.prior_admin_source_bridge(changed)
+  tools={n:dict(r,path='/not-exported') for n,r in inputs['priorAdmin4']['toolsBodyMode'].items()}
+  sums=(controller.REPO/'product/chart/go.sum').read_bytes();pairs={tuple(line.split()[:2]):line.split()[2] for line in sums.decode().splitlines()}
+  module,version=next((m,v) for m,v in pairs if not v.endswith('/go.mod') and (m,v+'/go.mod') in pairs)
+  local={'Path':'github.com/OpenIMSDK/chat','Main':True}
+  packages=[{'ImportPath':admin.PACKAGE,'Name':'admindelegation','Module':local},
+    {'ImportPath':admin.PACKAGE+' ['+admin.PACKAGE+'.test]','Name':'admindelegation','ForTest':admin.PACKAGE,'Module':local},
+    {'ImportPath':admin.PACKAGE+'.test','Name':'main'},
+    {'ImportPath':'testing','Name':'testing','Standard':True},
+    {'ImportPath':module+'/metadata_fixture','Name':'fixture','Module':{'Path':module,'Version':version,'Sum':pairs[(module,version)],'GoModSum':pairs[(module,version+'/go.mod')]}}]
+  encode=lambda rows:(''.join(json.dumps(v)+'\n' for v in rows)).encode()
+  closure=admin.admin_test_closure(encode(packages),0,sums,tools,inputs)
+  self.assertTrue(closure['accepted']);self.assertEqual(closure['currentAdmin4TestCommands'],0)
+  self.assertEqual(admin.admin_closure_plan('/fixed/go'),['/fixed/go','list','-race','-p=1','-deps','-test','-mod=readonly','-json=ImportPath,Name,ForTest,Standard,Module,Error,DepsErrors,Incomplete','./pkg/common/admindelegation'])
+  bad_sets=[packages[:-1]+[dict(packages[-1],Error={})],packages[:-2],packages+[packages[0]],packages[:-1]+[dict(packages[-1],Module={'Path':module,'Version':'v0.0.0-unknown'})]]
+  for blocked in ('github.com/OpenIMSDK/chat/tools/component',admin.STARTUP_PACKAGE):
+   bad_sets.append(packages+[{'ImportPath':blocked+' ['+admin.PACKAGE+'.test]','ForTest':admin.PACKAGE,'Module':local}])
+  for rows in bad_sets:
+   with self.assertRaises(ValueError):admin.admin_test_closure(encode(rows),0,sums,tools,inputs)
+  altered=copy.deepcopy(tools);altered['go']['sha256']='0'*64
+  with self.assertRaises(ValueError):admin.admin_test_closure(encode(packages),0,sums,altered,inputs)
+  for raw,code in [(encode(packages)[:-2],0),(encode(packages),1),(encode(packages)+b'{}trailing\n',0)]:
+   with self.assertRaises(ValueError):admin.admin_test_closure(raw,code,sums,tools,inputs)
+  c=json.loads((HERE/'inputs.json').read_bytes());policy=controller.chart_assembly_policy(c)
+  self.assertEqual(policy['pendingCurrent5']['source'],c['chartProvider']['sources']['chart'])
+  self.assertIsNone(c['executionBinding']);self.assertIsNone(c['acceptedChartArtifact'])
+  with self.assertRaises(ValueError):controller.require_bound(c)
+  bad=copy.deepcopy(c);bad['chartAssembly']['currentChart5']=bad['historicalPreviousChart5']['currentChart5']
+  with self.assertRaises(ValueError):controller.chart_assembly_policy(bad)
+  diagnostic={'version':'chart-startup-error-v1','stage':'rpc-init','causes':[{'kind':'sdk','mysqlNumber':0,'errno':0,'grpcCode':-1,'sdkCode':1001,'redisPrefix':'none'}],'truncated':False}
+  emit=lambda d:{'stdout':b'','stderr':('panic: LUOBO_CHART_STARTUP_V1 '+json.dumps(d)+'\n').encode()}
+  source=c['typedStartupDiagnostic'];bodies={source['path']:controller.regular(controller.REPO/'product'/source['path'])}
+  typed=controller.project_chart_startup_lines(emit(diagnostic),bodies,source)
+  self.assertEqual(typed['diagnostic'],diagnostic);self.assertTrue(typed['diagnosticOnlyNotStageSuccess'])
+  flooded={'stdout':b'\n'*controller.P20_CHILD_EXIT_POLICY['lineLimit'],'stderr':emit(diagnostic)['stderr']}
+  self.assertEqual(controller.project_chart_startup_lines(flooded,bodies,source)['diagnostic'],diagnostic)
+  for key,value in [('sdkCode',1234567),('redisPrefix','PRIVATE'),('errno',True)]:
+   bad=copy.deepcopy(diagnostic);bad['causes'][0][key]=value
+   with self.assertRaises(ValueError):controller.project_chart_startup_lines(emit(bad),bodies,source)
+  bad=copy.deepcopy(diagnostic);bad['secret']='PRIVATE'
+  with self.assertRaises(ValueError):controller.project_chart_startup_lines(emit(bad),bodies,source)
+  with self.assertRaises(ValueError):controller.project_chart_startup_lines(emit(diagnostic),{},source)
+  events=[{'Action':'start','Package':admin.STARTUP_PACKAGE},{'Action':'run','Package':admin.STARTUP_PACKAGE,'Test':admin.STARTUP_NAME},{'Action':'pass','Package':admin.STARTUP_PACKAGE,'Test':admin.STARTUP_NAME},{'Action':'output','Package':admin.STARTUP_PACKAGE,'Output':'ok\t'+admin.STARTUP_PACKAGE+'\t0.001s\n'},{'Action':'pass','Package':admin.STARTUP_PACKAGE}]
+  event=admin.startup_go_events(encode(events),0);event.update(actualResourceGuardPassed=True,resourceSHA256='c'*64)
+  skipped=copy.deepcopy(events);skipped[2]['Action']='skip'
+  with self.assertRaises(ValueError):admin.startup_go_events(encode(skipped),0)
+  old=controller.historical_chart_control(c);five=copy.deepcopy(old['chartAssembly']['currentChart5']['expectedManifest']['body'])
+  five.pop('selectedLive4Accepted');five.pop('SQLRedisOriginalOwnerCleanupAccepted')
+  prior={'kind':'historical-selective4-source-compatible-not-fresh','originalHead':inputs['priorAdmin4']['head'],'originalRun':inputs['priorAdmin4']['run'],'originalJob':inputs['priorAdmin4']['job'],'originalChartSource':admin.PRIOR_CHART,'originalSourceDigest':admin.PRIOR_SOURCE,'originalRootReviewSHA256':admin.PRIOR_REVIEW,'originalReceiptPins':admin.PRIOR_RECEIPTS,'sourceBridgeSHA256':'a'*64,'closureReceiptSHA256':'b'*64,'compatibilityAccepted':True,'currentAdmin4TestCommands':0,'currentFreshAdmin4PASS':False}
+  five.update(schema=2,kind=controller.STARTUP_FIVE_KIND,source=c['chartProvider']['sources']['chart'],startupTest=event,priorAdmin4=prior,currentAdmin4TestCommands=0,SQLRedisFixturesStarted=0)
+  for r in five['binaries']:r['sourceVector']=c['chartProvider']['sources']['chart']
+  # Synthetic metadata only: no ZIP, ELF, producer success or Root acceptance.
+  new=copy.deepcopy(c);new['chartAssembly'].pop('pendingCurrent5');slot=new['chartAssembly']['currentChart5']
+  slot['artifact']=copy.deepcopy(old['chartAssembly']['currentChart5']['artifact']);raw=(json.dumps(five,sort_keys=True,indent=2)+'\n').encode();slot['artifact']['manifestSHA256']=controller.sha(raw)
+  slot['expectedManifest']={'evidence':'expected-derived-not-observed','bytes':len(raw),'sha256':controller.sha(raw),'body':five};slot['derivation']=copy.deepcopy(old['chartAssembly']['currentChart5']['derivation'])
+  self.assertEqual(controller.chart_assembly_policy(new)['currentChart5']['expectedManifest']['body']['currentAdmin4TestCommands'],0)
+  bad=copy.deepcopy(new);bad['chartAssembly']['currentChart5']['expectedManifest']['body']['priorAdmin4']['currentFreshAdmin4PASS']=True
+  body=bad['chartAssembly']['currentChart5']['expectedManifest']['body'];raw=(json.dumps(body,sort_keys=True,indent=2)+'\n').encode();bad['chartAssembly']['currentChart5']['expectedManifest'].update(bytes=len(raw),sha256=controller.sha(raw));bad['chartAssembly']['currentChart5']['artifact']['manifestSHA256']=controller.sha(raw)
+  with self.assertRaises(ValueError):controller.chart_assembly_policy(bad)
 
 if __name__=='__main__':unittest.main()

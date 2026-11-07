@@ -37,10 +37,12 @@ var (
 
 func ComponentCheck(cfgPath string, hide bool) error {
 	if config.Config.Envs.Discovery != "k8s" {
-		if _, err := checkNewZkClient(hide); err != nil {
+		zkConn, err := checkNewZkClient(hide)
+		if err != nil {
 			errorPrint(fmt.Sprintf("%v.Please check if your openIM server has started", err.Error()), hide)
 			return err
 		}
+		defer zkConn.Close()
 		// if err = checkGetCfg(zkConn, hide); err != nil {
 		// 	errorPrint(fmt.Sprintf("%v.Please check if your openIM server has started", err.Error()), hide)
 		// 	return err
@@ -73,9 +75,8 @@ func newZkClient() (*zk.Conn, error) {
 	} else {
 		if config.Config.Zookeeper.Username != "" && config.Config.Zookeeper.Password != "" {
 			if err := c.AddAuth("digest", []byte(config.Config.Zookeeper.Username+":"+config.Config.Zookeeper.Password)); err != nil {
-				return nil, errs.Wrap(err, "Zookeeper用户名错误: "+config.Config.Zookeeper.Username+
-					", Zookeeper Password: "+config.Config.Zookeeper.Password+
-					", Zookeeper Addr: "+strings.Join(config.Config.Zookeeper.ZkAddr, " "))
+				c.Close()
+				return nil, errs.Wrap(err, "Zookeeper认证失败")
 			}
 		}
 	}

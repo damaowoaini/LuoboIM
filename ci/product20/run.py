@@ -52,6 +52,9 @@ def verify():
  if g['source']!=c['graphProvider']['source']:raise ValueError('explicit graph source differs')
  chart=load('ci/chart-route-build/run.py','p20_chart_source');cc,chart_bodies=chart.verify()
  if cc['sources']!=c['chartProvider']['sources'] or cc['locks']!=c['chartProvider']['locks']:raise ValueError('accepted chart6 source/locks differ')
+ if 'historicalPreviousChart5' in c:
+  t=c.get('typedStartupDiagnostic')
+  if type(t) is not dict or set(t)!={'path','sha256','version','prefix'} or t['path']!='chart/pkg/common/chatrpcstart/start.go' or t['version']!='chart-startup-error-v1' or t['prefix']!='LUOBO_CHART_STARTUP_V1 ' or sha(chart_bodies.get(t['path'],b''))!=t['sha256']:raise ValueError('current typed startup source binding differs')
  original=dict(bodies);body=bodies[BOOT]
  if sha(body)!=c['fixtureConfiguration']['beforeSHA256'] or body.count(ANCHOR.encode())!=1:raise ValueError('single original fixture map anchor required')
  config_anchor=b'\tvalue := map[string]any{\"envs\"';config_prefix=b'\tfixtureSQL, e := product20FixtureSQL(b)\n\tif e != nil {\n\t\treturn "", e\n\t}\n'
@@ -69,7 +72,7 @@ def artifact_binding(a):
  if not isinstance(a,dict) or set(a)!={'run','head','attempt','artifactID','artifactBytes','artifactSHA256','manifestSHA256'} or any(type(a[k]) is not int or a[k]<=0 for k in ('run','artifactID','artifactBytes')) or any(not isinstance(a[n],str) or not re.fullmatch('[0-9a-f]{64}',a[n]) for n in ('artifactSHA256','manifestSHA256')) or not isinstance(a['head'],str) or not re.fullmatch('[0-9a-f]{40}',a['head']) or type(a['attempt']) is not int or a['attempt']!=1 or a['artifactBytes']>2<<30:raise ValueError('exact successful artifact binding required')
  return a
 
-def chart_assembly_policy(c):
+def legacy_chart_assembly_policy(c):
  p=c.get('chartAssembly')
  if not isinstance(p,dict) or set(p)!={'mode','currentChart5','historicalRouteFrom6'} or p['mode']!=ASSEMBLY_MODE:raise ValueError('explicit split producer assembly required')
  five,old=p['currentChart5'],p['historicalRouteFrom6']
@@ -94,11 +97,104 @@ def chart_assembly_policy(c):
  if set(r)!={'module','package','name','sourceVector','bytes','sha256','mode','GOOS','GOARCH','CGO_ENABLED'} or (r['module'],r['package'],r['name'])!=('route','.','route-service') or r['sourceVector']!=c['chartProvider']['sources']['route'] or type(r['bytes']) is not int or not 0<r['bytes']<=128<<20 or not re.fullmatch('[0-9a-f]{64}',r['sha256']) or r['mode']!=0o700 or (r['GOOS'],r['GOARCH'],r['CGO_ENABLED'])!=('linux','amd64','0'):raise ValueError('original route row differs')
  return p
 
+# Current-only schema successor; legacy artifact receiver and ELF loop stay intact.
+STARTUP_FIVE_KIND='current-chart-five-startup1-prior-admin4-compatible-v2'
+STARTUP_COHORT='chart-startup1-prior-admin4-chart5-v2'
+STARTUP_PACKAGE='github.com/OpenIMSDK/chat/pkg/common/chatrpcstart'
+STARTUP_TEST='TestStartupErrorPreservesCauseAndClosedDiagnostic'
+PRIOR_ADMIN_REVIEW='e22941a1365bd9f89bc371a2fc58bb4c7a219db17533fb22871fcab0e73f232e'
+PRIOR_ADMIN_RECEIPTS={'events.json':'98cf718a3d7ed9a9f29e6e4533f656a1e0401ec64c75eb7fb80e9e375da68d4d','summary.json':'1eb4721422f4101659f98a91c0852dff495bf4bab9bae25b15c0fa9037c5c9d6','source-tools.json':'e7c7f980256fe07b93e954f2700d25a71d7aa0368018feba4649099a3cf6cf1c','cleanup.json':'3364a137647f1e40618938a9ca29f7b61937aa045da1e15b1fc62d5498fe57fd','fixture-after.json':'f6bb7138fd7d0ad1d4f94b59ac20b22d289c953fc3d06b90175b49eef33c7373','cleanup-final.json':'3364a137647f1e40618938a9ca29f7b61937aa045da1e15b1fc62d5498fe57fd','builds.json':'f39f43f8dc8e22e1472bd35df78550e9583554bd51a1efc340e00fa4622e0355'}
+
+def historical_chart_control(c):
+ h=c.get('historicalPreviousChart5')
+ if type(h) is not dict or set(h)!={'chartProvider','currentChart5'}:raise ValueError('explicit original chart259 history required')
+ legacy=dict(c);legacy['chartProvider']=h['chartProvider'];legacy['chartAssembly']={'mode':ASSEMBLY_MODE,'currentChart5':h['currentChart5'],'historicalRouteFrom6':c['chartAssembly']['historicalRouteFrom6']}
+ if legacy['chartProvider']['sources']['chart']!={'members':259,'sha256':'432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc'} or legacy['chartProvider']['sources']['route']!=c['chartProvider']['sources']['route'] or legacy['chartProvider']['locks']!=c['chartProvider']['locks']:raise ValueError('historical provider must not be relabeled current')
+ legacy_chart_assembly_policy(legacy)
+ return legacy
+
+def startup_five_manifest(c,five,a,m):
+ keys={'schema','kind','head','run','attempt','source','locks','binaries','buildResources','freshChartBuilds','freshRouteBuilds','sourceToolHelperPostExact','GoVersion','startupTest','priorAdmin4','currentAdmin4TestCommands','SQLRedisFixturesStarted','parserOracleExecuted','ReadyOrP20OrDeploymentAccepted','outerResourceGuardStillRequired'}
+ if set(m)!=keys or type(m['schema']) is not int or m['schema']!=2 or m['kind']!=STARTUP_FIVE_KIND or m['head']!=a['head'] or m['run']!=str(a['run']) or m['attempt']!=str(a['attempt']) or m['source']!=c['chartProvider']['sources']['chart'] or m['locks']!=c['chartProvider']['locks']['chart'] or m['GoVersion']!='go1.27.2 linux/amd64':raise ValueError('new startup-five identity/source differs')
+ if any(type(m[k]) is not int or m[k]!=n for k,n in [('freshChartBuilds',5),('freshRouteBuilds',0),('currentAdmin4TestCommands',0),('SQLRedisFixturesStarted',0)]) or any(m[k] is not True for k in ('sourceToolHelperPostExact','outerResourceGuardStillRequired')) or any(m[k] is not False for k in ('parserOracleExecuted','ReadyOrP20OrDeploymentAccepted')):raise ValueError('new startup-five scope differs')
+ t=m['startupTest'];tk={'actualTopRun','actualTopPASS','package','subtests','skips','packagePASS','actualFooter','actualExitCode','originalMachineJSON_SHA256','originalMachineJSON_Bytes','rawOutputExported','actualResourceGuardPassed','resourceSHA256'}
+ if type(t) is not dict or set(t)!=tk or t['actualTopRun']!=[STARTUP_TEST] or t['actualTopPASS']!=[STARTUP_TEST] or t['package']!=STARTUP_PACKAGE or any(type(t[k]) is not int or t[k]!=0 for k in ('subtests','skips','actualExitCode')) or any(t[k] is not True for k in ('packagePASS','actualFooter','actualResourceGuardPassed')) or t['rawOutputExported'] is not False or type(t['originalMachineJSON_Bytes']) is not int or not 0<t['originalMachineJSON_Bytes']<=16<<20 or any(not re.fullmatch('[0-9a-f]{64}',t[k]) for k in ('originalMachineJSON_SHA256','resourceSHA256')):raise ValueError('actual startup1 receipt required')
+ p=m['priorAdmin4'];pk={'kind','originalHead','originalRun','originalJob','originalChartSource','originalSourceDigest','originalRootReviewSHA256','originalReceiptPins','sourceBridgeSHA256','closureReceiptSHA256','compatibilityAccepted','currentAdmin4TestCommands','currentFreshAdmin4PASS'}
+ if type(p) is not dict or set(p)!=pk or p['kind']!='historical-selective4-source-compatible-not-fresh' or p['originalHead']!='98d6a73a3b6342bbfaf525f478bc7ccf701ceb77' or p['originalRun']!=42283432687 or p['originalJob']!=128118049210 or p['originalRootReviewSHA256']!=PRIOR_ADMIN_REVIEW or p['originalChartSource']!={'members':259,'sha256':'432310bf9869e1960964c84c442e45ffbd85a7e4634b3052bb4e8dd2092ac7cc'} or p['originalSourceDigest']!='40f8e478567a98cb080f107ca5eb80e05580db6b531c9108780f9815ec027647' or p['compatibilityAccepted'] is not True or p['currentFreshAdmin4PASS'] is not False or type(p['currentAdmin4TestCommands']) is not int or p['currentAdmin4TestCommands']!=0:raise ValueError('historical four cannot become fresh/current PASS')
+ if p['originalReceiptPins']!=PRIOR_ADMIN_RECEIPTS or any(not re.fullmatch('[0-9a-f]{64}',p[k]) for k in ('sourceBridgeSHA256','closureReceiptSHA256')):raise ValueError('exact historical/actual compatibility pins required')
+
+def chart_assembly_policy(c):
+ p=c.get('chartAssembly')
+ if type(p) is not dict:raise ValueError('explicit chart assembly required')
+ if 'pendingCurrent5' in p:
+  if set(p)!={'mode','pendingCurrent5','currentChart5','historicalRouteFrom6'} or p['mode']!=ASSEMBLY_MODE or p['currentChart5']!={'artifact':None,'expectedManifest':None,'derivation':None} or c.get('executionBinding') is not None or c.get('acceptedChartArtifact') is not None:raise ValueError('pending current5 must have no execution or artifact identity')
+  wait=p['pendingCurrent5']
+  if type(wait) is not dict or set(wait)!={'state','source','locks','entries','producerCohort','kind','retainedCore14'} or wait['state']!='pending-current5' or wait['source']!=c['chartProvider']['sources']['chart'] or wait['locks']!=c['chartProvider']['locks']['chart'] or wait['entries']!=[['chart',package,name] for name,package in CHART5.items()] or wait['producerCohort']!=STARTUP_COHORT or wait['kind']!=STARTUP_FIVE_KIND:raise ValueError('pending source/build recipe must be explicit and current')
+  artifact_binding(wait['retainedCore14']);historical_chart_control(c)
+  return p
+ five=p.get('currentChart5',{});expect=five.get('expectedManifest',{})
+ if expect.get('body',{}).get('kind')!=STARTUP_FIVE_KIND:return legacy_chart_assembly_policy(c)
+ if set(p)!={'mode','currentChart5','historicalRouteFrom6'} or p['mode']!=ASSEMBLY_MODE or set(five)!={'artifact','expectedManifest','derivation'}:raise ValueError('exact new split chart assembly required')
+ a=artifact_binding(five['artifact']);raw=(json.dumps(expect['body'],sort_keys=True,indent=2)+'\n').encode()
+ if set(expect)!={'evidence','bytes','sha256','body'} or expect['evidence']!='expected-derived-not-observed' or type(expect['bytes']) is not int or not 0<expect['bytes']<=1<<20 or len(raw)!=expect['bytes'] or sha(raw)!=expect['sha256'] or expect['sha256']!=a['manifestSHA256']:raise ValueError('explicit expected new producer body required')
+ startup_five_manifest(c,five,a,expect['body']);m=expect['body'];old=p['historicalRouteFrom6']
+ if set(old)!={'artifact','provider','selectedRoute','originalManifestBytes','originalManifestSHA256'}:raise ValueError('original route policy fields differ')
+ original=artifact_binding(old['artifact'])
+ # The original common five-row/resource/derivation/historical-route policy is
+ # inserted here verbatim by the authoring splice, without legacy identities.
+ rows=m['binaries']
+ if not isinstance(rows,list) or len(rows)!=5 or {r['name'] for r in rows}!=set(CHART5) or sum(r['bytes'] for r in rows)>512<<20:raise ValueError('exact five current rows required')
+ for r in rows:
+  if set(r)!={'module','package','name','sourceVector','bytes','sha256','mode','GOOS','GOARCH','CGO_ENABLED'} or r['module']!='chart' or r['package']!=CHART5[r['name']] or r['sourceVector']!=m['source'] or type(r['bytes']) is not int or not 0<r['bytes']<=128<<20 or not re.fullmatch('[0-9a-f]{64}',r['sha256']) or r['mode']!=0o700 or (r['GOOS'],r['GOARCH'],r['CGO_ENABLED'])!=('linux','amd64','0'):raise ValueError('exact five platform or body row differs')
+ if set(m['buildResources'])!=set(CHART5):raise ValueError('five actual build resources required')
+ for r in m['buildResources'].values():
+  if set(r)!={'exit','status','resourceSHA256'} or type(r['exit']) is not int or r['exit']!=0 or r['status']!='passed' or not re.fullmatch('[0-9a-f]{64}',r['resourceSHA256']):raise ValueError('five build resource boundary differs')
+ if set(five['derivation'])!={'producerControllerSHA256','producerInputsSHA256','buildsReceiptSHA256','rootExpectedOnlyReviewSHA256'} or any(not isinstance(v,str) or not re.fullmatch('[0-9a-f]{64}',v) for v in five['derivation'].values()):raise ValueError('finite expected manifest derivation pins required')
+ historical=c['historicalAcceptedChartArtifact']
+ if original!=historical['artifact'] or old['provider']!=historical['provider'] or old['originalManifestSHA256']!=original['manifestSHA256'] or type(old['originalManifestBytes']) is not int or not 0<old['originalManifestBytes']<=1<<20 or old['provider']['sources']['route']!=c['chartProvider']['sources']['route'] or old['provider']['locks']['route']!=c['chartProvider']['locks']['route']:raise ValueError('original route source and locks must remain historical')
+ r=old['selectedRoute']
+ if set(r)!={'module','package','name','sourceVector','bytes','sha256','mode','GOOS','GOARCH','CGO_ENABLED'} or (r['module'],r['package'],r['name'])!=('route','.','route-service') or r['sourceVector']!=c['chartProvider']['sources']['route'] or type(r['bytes']) is not int or not 0<r['bytes']<=128<<20 or not re.fullmatch('[0-9a-f]{64}',r['sha256']) or r['mode']!=0o700 or (r['GOOS'],r['GOARCH'],r['CGO_ENABLED'])!=('linux','amd64','0'):raise ValueError('original route row differs')
+ return p
+
+def project_chart_startup_lines(streams,chart_bodies,policy):
+ if policy is None:return None
+ if type(streams) is not dict or set(streams)!={'stdout','stderr'} or any(type(v) is not bytes or len(v)>P20_CHILD_EXIT_POLICY['perStreamBytes'] for v in streams.values()) or sum(map(len,streams.values()))>P20_CHILD_EXIT_POLICY['totalBytes']:raise ValueError('original bounded child streams required')
+ lines=[]
+ for stream in ('stderr','stdout'):
+  for line in streams[stream].splitlines():
+   if len(lines)==P20_CHILD_EXIT_POLICY['lineLimit']:break
+   lines.append(line)
+  if len(lines)==P20_CHILD_EXIT_POLICY['lineLimit']:break
+ if not any(line.startswith(b'panic: LUOBO_CHART_STARTUP_V1 ') for line in lines):return None
+ if type(policy) is not dict or set(policy)!={'path','sha256','version','prefix'} or policy['path']!='chart/pkg/common/chatrpcstart/start.go' or policy['version']!='chart-startup-error-v1' or policy['prefix']!='LUOBO_CHART_STARTUP_V1 ' or sha(chart_bodies.get(policy['path'],b''))!=policy['sha256']:raise ValueError('source-bound typed startup emitter required')
+ sdk={500,1000,1001,1002,1003,1004,1101,90002,90004,90007};redis={'none','unknown','NOAUTH','WRONGPASS','NOPERM','NOSCRIPT','WRONGTYPE','LOADING','READONLY','OOM','EXECABORT','MISCONF','CLUSTERDOWN','BUSY','ERR'}
+ def unique(pairs):
+  d={}
+  for key,value in pairs:
+   if key in d:raise ValueError('duplicate typed startup field')
+   d[key]=value
+  return d
+ found=[];prefix=('panic: '+policy['prefix']).encode()
+ for line in lines:
+  if not line.startswith(prefix):continue
+  if len(line)>P20_CHILD_EXIT_POLICY['lineBytesLimit']:raise ValueError('typed startup marker is oversized')
+  value=json.loads(line[len(prefix):].decode('utf8'),object_pairs_hook=unique)
+  if type(value) is not dict or set(value)!={'version','stage','causes','truncated'} or value['version']!=policy['version'] or value['stage'] not in {'discovery','register-ip','rpc-init','rpc-register','listen','serve','unknown'} or type(value['truncated']) is not bool or type(value['causes']) is not list or not 1<=len(value['causes'])<=8:raise ValueError('closed typed startup body required')
+  for row in value['causes']:
+   if type(row) is not dict or set(row)!={'kind','mysqlNumber','errno','grpcCode','sdkCode','redisPrefix'} or row['kind'] not in {'context-canceled','context-deadline','mysql','errno','grpc','sdk','redis','unknown'} or any(type(row[k]) is not int for k in ('mysqlNumber','errno','grpcCode','sdkCode')):raise ValueError('typed startup cause shape differs')
+   kind=row['kind']
+   if (not 0<=row['mysqlNumber']<=65535 or kind!='mysql' and row['mysqlNumber']!=0 or not (1<=row['errno']<=4095 if kind=='errno' else row['errno']==0) or not (0<=row['grpcCode']<=16 if kind=='grpc' else row['grpcCode']==-1) or not (row['sdkCode'] in sdk if kind=='sdk' else row['sdkCode']==0) or row['redisPrefix'] not in redis or kind!='redis' and row['redisPrefix']!='none'):raise ValueError('typed startup code/prefix differs')
+  found.append({'source':{'path':policy['path'],'sha256':policy['sha256']},'diagnostic':value,'diagnosticOnlyNotStageSuccess':True})
+ if len(found)>1:raise ValueError('ambiguous typed startup marker')
+ return found[0] if found else None
+
+
 def chart_artifact_binding(c):
  p=chart_assembly_policy(c)
  return {'mode':ASSEMBLY_MODE,'currentChart5':p['currentChart5']['artifact'],'historicalRouteFrom6':p['historicalRouteFrom6']['artifact']}
 
 def require_bound(c):
+ if c.get('chartAssembly',{}).get('pendingCurrent5') is not None:raise ValueError('pending current5 cannot dispatch runtime')
  binding=c.get('executionBinding')
  if not isinstance(binding,dict) or set(binding)!={'rootAccepted','source','rootAcceptanceSHA256','mode','core14','currentChart5','historicalRouteFrom6'} or binding.get('rootAccepted') is not True or binding.get('source')!=c['graphProvider']['source'] or not re.fullmatch('[0-9a-f]{64}',binding.get('rootAcceptanceSHA256','')) or binding.get('mode')!=ASSEMBLY_MODE:raise ValueError('Root accepted successful current core14 artifact remains required')
  for key in ('core14','currentChart5','historicalRouteFrom6'):artifact_binding(binding[key])
@@ -350,7 +446,10 @@ def project_p20_original_child_exit(root,terminal,expected_plan,plan_sha,product
  if type(child) is not dict or set(child)!={'pid','startToken','path','sha256','uid'} or type(child['pid']) is not int or child['pid']!=pids[slot] or type(child['uid']) is not int or child['uid']!=os.getuid() or type(child['startToken']) is not str or not re.fullmatch('[0-9]{1,20}',child['startToken']) or child['path']!=product['path'] or child['sha256']!=product['sha256']:raise ValueError('original failed child owner differs')
  if sha(chart_bodies.get('chart/go.mod',b''))!=c['chartProvider']['locks']['chart']['go.mod']:raise ValueError('original Chart dependency identity differs')
  streams={name:p20_exit_private(root,('chain',role,name+'.private'),P20_CHILD_EXIT_POLICY['perStreamBytes']) for name in ('stdout','stderr')}
- result=project_p20_child_log_streams(streams,chart_bodies);result['role']=role;result['originalOwnerAndProductBinding']=True;return result
+ result=project_p20_child_log_streams(streams,chart_bodies);result['role']=role;result['originalOwnerAndProductBinding']=True
+ typed=project_chart_startup_lines(streams,chart_bodies,c.get('typedStartupDiagnostic'))
+ if typed is not None:result['typedStartup']=typed
+ return result
 
 def emit_p20_child_exit_observation(root,out,terminal,plan,plan_sha,products,chart_bodies,c):
  try:

@@ -834,6 +834,10 @@ func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db
 	if e != nil {
 		return "", e
 	}
+	adminBootstrapPassword, e := product20Random()
+	if e != nil {
+		return "", e
+	}
 	value["chatSecret"] = chatSecret
 	value["adminDelegation"] = map[string]any{"issuer": b.Header.Tenant}
 	value["adminList"] = []map[string]any{{"adminID": "task_product20_admin", "nickname": "任务专属管理员", "imAdmin": b.ManagerID}}
@@ -854,6 +858,9 @@ func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db
 		return "", e
 	}
 	observation.at("chart-write", "chart")
+	if _, e = writePrivate(filepath.Join(dir, "admin-bootstrap-passwords.private.json"), map[string]string{"task_product20_admin": adminBootstrapPassword}); e != nil {
+		return "", e
+	}
 	if e = os.WriteFile(filepath.Join(dir, "config.yaml"), body, 0600); e != nil {
 		return "", e
 	}
@@ -1297,6 +1304,9 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	for _, name := range product20Names {
 		args := []string{"-config_folder_path", filepath.Join(chartConfig, "config.yaml"), "-port", strconv.Itoa(ports[name])}
 		env := baseEnv
+		if name == "admin-rpc" {
+			env = append(append([]string{}, baseEnv...), "LUOBO_ADMIN_BOOTSTRAP_PASSWORDS_FILE="+filepath.Join(chartConfig, "admin-bootstrap-passwords.private.json"))
+		}
 		if name == "chat-api" {
 			env = append(append([]string{}, baseEnv...), "LUOBO_ROUTE_SHARED_SECRET="+boot.Credential["serviceSecret"])
 		}
