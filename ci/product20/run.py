@@ -14,9 +14,14 @@ REPLACEMENT='"secret": c["serviceSecret"], "adminDelegation": map[string]any{"is
 DISCOVERY_ANCHOR=b'"zookeeper": map[string]any{"schema": "fullgraph_" + b.Resource.Nonce,'
 DISCOVERY_REPLACEMENT=b'"zookeeper": map[string]any{"schema": b.Header.Tenant,'
 CORE_BUILD_MODE='fresh-current-core14-before-P20-v1'
+CORE_GATEWAY_BUILD_MODE='fresh-current-core14-managed-gateway-context-v1'
 MONGO_SOURCE='server/pkg/common/db/unrelation/mongo.go'
 MONGO_TEST='server/pkg/common/db/unrelation/mongo_error_test.go'
 MONGO_TEST_NAME='TestMongoNoDocumentsMapsToOpenIMRecordNotFound'
+GATEWAY_SOURCE='server/internal/msgtransfer/managed_ordinary_start.go'
+GATEWAY_TEST='server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go'
+GATEWAY_TEST_NAME='TestManagedOrdinaryGatewayAuthorizationProvidesRPCOperationID'
+GATEWAY_TEST_PHASE='current-core-managed-gateway-context-test'
 CORE_MONGO_TEST_REUSE = {'goTool': {'bytes': 17164055,
             'mode': 493,
             'sha256': '548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0',
@@ -82,28 +87,40 @@ def select_core_source(c,bodies):
  if 'currentCoreBuild' not in c:return dict(bodies)
  plan=c['currentCoreBuild']
  if (type(plan) is not dict or set(plan)!={'mode','baseSource','source','changes'}
-     or plan['mode']!=CORE_BUILD_MODE or plan['baseSource']!=c['graphProvider']['source']
+     or plan['mode'] not in (CORE_BUILD_MODE,CORE_GATEWAY_BUILD_MODE) or plan['baseSource']!=c['graphProvider']['source']
      or core_vector(bodies)!=plan['baseSource']):raise ValueError('explicit current core build baseline required')
+ gateway=plan['mode']==CORE_GATEWAY_BUILD_MODE
+ expected={MONGO_SOURCE,MONGO_TEST}
+ if gateway:
+  if 'coreMongoTestReuse' in c:raise ValueError('gateway build cannot claim Mongo test reuse')
+  expected.update((GATEWAY_SOURCE,GATEWAY_TEST))
+  if MONGO_SOURCE not in bodies or GATEWAY_SOURCE not in bodies or MONGO_TEST in bodies or GATEWAY_TEST in bodies:
+   raise ValueError('gateway baseline requires two original sources and two new regression files')
  rows=plan['changes']
- if type(rows) is not list or len(rows)!=2 or any(type(r) is not dict for r in rows) or {r.get('target') for r in rows}!={MONGO_SOURCE,MONGO_TEST}:raise ValueError('exact Mongo normalization delta required')
+ if (type(rows) is not list or len(rows)!=len(expected)
+     or any(type(r) is not dict or type(r.get('target')) is not str for r in rows)
+     or {r['target'] for r in rows}!=expected):raise ValueError('exact current core source delta required')
  selected=dict(bodies)
  for row in rows:
   target=row['target'];old=bodies.get(target)
   if set(row)!={'target','path','beforeSHA256','bytes','sha256'} or row['path']!='product/'+target or row['beforeSHA256']!=(sha(old) if old is not None else None) or type(row['bytes']) is not int or row['bytes']<=0 or type(row['sha256']) is not str or not re.fullmatch('[0-9a-f]{64}',row['sha256']):raise ValueError('current core source preimage differs')
   body=regular(REPO/row['path'])
-  if len(body)!=row['bytes'] or sha(body)!=row['sha256']:raise ValueError('current core source pin differs')
+  if len(body)!=row['bytes'] or sha(body)!=row['sha256'] or gateway and body==old:raise ValueError('current core source pin differs')
   selected[target]=body
  if core_vector(selected)!=plan['source']:raise ValueError('current core source vector differs')
  return selected
-def check_current_core_test_events(raw):
+def check_named_core_test_events(raw,package,name,failure,subtests=()):
  events=[json.loads(line) for line in raw.splitlines() if line.strip()]
- package='github.com/openimsdk/open-im-server/v3/pkg/common/db/unrelation'
+ expected={name,*(name+'/'+part for part in subtests)}
  relevant=[e for e in events if e.get('Action') in ('run','pass','fail','skip')]
- if (any(e.get('Package')!=package or e.get('Action') in ('fail','skip') or e.get('Test') not in (None,MONGO_TEST_NAME) for e in relevant)
-     or sum(e.get('Action')=='run' and e.get('Test')==MONGO_TEST_NAME for e in relevant)!=1
-     or sum(e.get('Action')=='pass' and e.get('Test')==MONGO_TEST_NAME for e in relevant)!=1
-     or sum(e.get('Action')=='pass' and 'Test' not in e for e in relevant)!=1):raise ValueError('one actual Mongo normalization test and package completion required')
- return {'package':package,'name':MONGO_TEST_NAME,'topPASS':1,'subPASS':0,'skip':0,'fail':0,'eventsSHA256':sha(raw)}
+ if (any(e.get('Package')!=package or e.get('Action') in ('fail','skip') or e.get('Test') not in expected|{None} for e in relevant)
+     or any(sum(e.get('Action')==action and e.get('Test')==test for e in relevant)!=1 for action in ('run','pass') for test in expected)
+     or sum(e.get('Action')=='pass' and 'Test' not in e for e in relevant)!=1):raise ValueError(failure)
+ return {'package':package,'name':name,'topPASS':1,'subPASS':len(subtests),'skip':0,'fail':0,'eventsSHA256':sha(raw)}
+def check_current_core_test_events(raw):
+ return check_named_core_test_events(raw,'github.com/openimsdk/open-im-server/v3/pkg/common/db/unrelation',MONGO_TEST_NAME,'one actual Mongo normalization test and package completion required')
+def check_gateway_core_test_events(raw):
+ return check_named_core_test_events(raw,'github.com/openimsdk/open-im-server/v3/internal/msgtransfer',GATEWAY_TEST_NAME,'one actual managed gateway context test and package completion required',('generates-operation-for-background-worker','preserves-existing-operation'))
 def verify_core_mongo_test_reuse(c,canonical):
  if 'coreMongoTestReuse' not in c:return None
  policy=c['coreMongoTestReuse']
@@ -575,7 +592,7 @@ def run():
   proc=subprocess.run(wrapped,timeout=timeout+30,check=False);record=json.loads(regular(folder/'resource.json'))
   write(out/(str(index)+'-phase.json'),{'phase':label,'exitCode':proc.returncode,'resource':record,'stdoutSHA256':sha(regular(folder/'stdout',32<<20)),'stderrSHA256':sha(regular(folder/'stderr',32<<20))})
   failed=proc.returncode!=0 or record.get('status')!='passed' or record.get('exit_code')!=0
-  if failed and (label.startswith('compile-') or label in ('minio-source-compile','current-core-mongo-normalization-test')) and not (root/'plane').exists():
+  if failed and (label.startswith('compile-') or label in ('minio-source-compile','current-core-mongo-normalization-test',GATEWAY_TEST_PHASE)) and not (root/'plane').exists():
    # Identical boundary to the reviewed fullgraph compiler projection: these
    # are only fixed public sources, before private resource config/credentials.
    raw=regular(folder/'stderr',32<<20)
@@ -613,7 +630,10 @@ def run():
    for target,body in original.items():
     path=core_stage/target;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body);path.chmod(g['sourceModes'].get(target,0o644))
    (core_stage/'server/config/config.yaml').write_bytes(original['server/config/config.example.yaml']);(core_stage/'server/config/config.yaml').chmod(0o600)
-   if 'coreMongoTestReuse' in c:
+   if c['currentCoreBuild']['mode']==CORE_GATEWAY_BUILD_MODE:
+    events=command(GATEWAY_TEST_PHASE,[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+GATEWAY_TEST_NAME+'$','./internal/msgtransfer'],600,offline,core_stage/'server')
+    write(out/'current-core-test.json',check_gateway_core_test_events(events))
+   elif 'coreMongoTestReuse' in c:
     write(out/'current-core-test-reuse.json',core_mongo_test_reuse_receipt(c,original,actual_go))
    else:
     events=command('current-core-mongo-normalization-test',[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+MONGO_TEST_NAME+'$','./pkg/common/db/unrelation'],600,offline,core_stage/'server')

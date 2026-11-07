@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
+	"github.com/OpenIMSDK/protocol/constant"
 	"github.com/OpenIMSDK/protocol/msggateway"
 	"github.com/OpenIMSDK/tools/mcontext"
 	"github.com/google/uuid"
@@ -29,6 +30,21 @@ import (
 	"os"
 	"sort"
 )
+
+// Recovery runs outside an incoming RPC. Supply the operation metadata the
+// gateway client requires while retaining the original owned context.
+func authorizeManagedOrdinaryGateway(ctx context.Context, manager string, request proto.Message) (context.Context, error) {
+	if ctx == nil || ctx.Err() != nil {
+		return nil, messagedelivery.ErrUnprepared
+	}
+	if _, ok := request.(*msggateway.OnlineBatchPushOneMsgReq); !ok {
+		return nil, messagedelivery.ErrInvalid
+	}
+	if operationID, _ := ctx.Value(constant.OperationID).(string); operationID == "" {
+		ctx = context.WithValue(ctx, constant.OperationID, uuid.NewString())
+	}
+	return mcontext.WithOpUserIDContext(ctx, manager), nil
+}
 
 // Independent managed entry. The legacy StartTransfer is deliberately not
 // edited or called. No startup path manufactures collections, Ready, namespace
@@ -139,13 +155,7 @@ func StartManagedOrdinary(parent context.Context, prometheusPort int) (*ManagedO
 	}
 	manager := config.Config.Manager.UserID[0]
 	authorize := func(ctx context.Context, request proto.Message) (context.Context, error) {
-		if ctx == nil || ctx.Err() != nil {
-			return nil, messagedelivery.ErrUnprepared
-		}
-		if _, ok := request.(*msggateway.OnlineBatchPushOneMsgReq); !ok {
-			return nil, messagedelivery.ErrInvalid
-		}
-		return mcontext.WithOpUserIDContext(ctx, manager), nil
+		return authorizeManagedOrdinaryGateway(ctx, manager, request)
 	}
 	input := aliasvendor.OwnedInputFile{Path: boot.VendorPath, ExpectedSHA256: boot.VendorSHA256}
 	registry, err := aliasvendor.LoadOwnedOfflineRegistry(ctx, input, db.Name(), boot.Epoch, boot.ActivationSHA256)

@@ -24,7 +24,7 @@
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "canonicalPublicParent": "777ca773a3c3c0f0c1f17a582f61d78ec4c0aaa3",
+  "canonicalPublicParent": "125158ee31d61df2ec32c29fe5e6067e207ab183",
   "chain": {
     "actualBusiness": [
       "route config",
@@ -343,8 +343,8 @@
     "ci/product20/test_receiver.py"
   ],
   "derivedHarnessSource": {
-    "members": 1587,
-    "digest": "bf03f2806835f659cc1929b4bd61eb4c9cb8db2ae9d78e704e636c11d33a3c53"
+    "members": 1588,
+    "digest": "25cc1b6a2772b174379017af6ef01a32ffadffe568634a26b7013db6e46903c9"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
@@ -368,11 +368,11 @@
       "run": 42180782218
     },
     "mode": "core14-currentChart5-historicalRouteFrom6-v1",
-    "rootAcceptanceSHA256": "aa9ee49009f22314ec07da085eab9d178d76bec309806453d2e65a0443c2f45a",
+    "rootAcceptanceSHA256": "a55349fff1efea7c46911b7e947a94ec05428654c2caf1c68917858369ee405c",
     "rootAccepted": true,
     "source": {
-      "members": 1585,
-      "digest": "af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a"
+      "members": 1586,
+      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd"
     }
   },
   "fixtureConfiguration": {
@@ -419,7 +419,7 @@
       "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
       "members": 1584
     },
-    "status": "Frozen accepted Graph0a parent source only; current selected core is built fresh from exact Mongo delta."
+    "status": "Frozen accepted Graph0a parent source only; current selected core builds exact Mongo and managed gateway context deltas."
   },
   "helpers": {
     "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
@@ -753,7 +753,7 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
-  "state": "same-core-mongo-pass-reused-post-ack-delivery-snapshot-runtime-pending",
+  "state": "current-managed-gateway-operation-context-source-only-runtime-pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",
@@ -761,14 +761,14 @@
     "version": "chart-startup-error-v1"
   },
   "currentCoreBuild": {
-    "mode": "fresh-current-core14-before-P20-v1",
+    "mode": "fresh-current-core14-managed-gateway-context-v1",
     "baseSource": {
       "members": 1584,
       "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
     },
     "source": {
-      "members": 1585,
-      "digest": "af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a"
+      "members": 1586,
+      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd"
     },
     "changes": [
       {
@@ -784,6 +784,20 @@
         "beforeSHA256": null,
         "bytes": 780,
         "sha256": "4b5f9cf23d9988e99c3a0e6cc27ef9e739d2d579e595880c22f2b570da2702b7"
+      },
+      {
+        "target": "server/internal/msgtransfer/managed_ordinary_start.go",
+        "path": "product/server/internal/msgtransfer/managed_ordinary_start.go",
+        "beforeSHA256": "4024a51b0f9b6546f9f0bf3a9b0893b7a44fa6687b340b193dfc3a7d15956a9c",
+        "bytes": 12683,
+        "sha256": "b28ec2de2e35b3c29469ea1821f6f17c2a07ee9b98caa26c07173cabb723e224"
+      },
+      {
+        "target": "server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go",
+        "path": "product/server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go",
+        "beforeSHA256": null,
+        "bytes": 3026,
+        "sha256": "400cc99a839bd23e78a748e0acdf4fb60ddbd95e673cce07f209ebd6eac60654"
       }
     ]
   },
@@ -795,40 +809,5 @@
     "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
     "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
     "run": 42310913329
-  },
-  "coreMongoTestReuse": {
-    "goTool": {
-      "bytes": 17164055,
-      "mode": 493,
-      "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
-      "version": "go version go1.27.2 linux/amd64"
-    },
-    "locks": {
-      "go.mod": "e12331dfa5ce70b14a99f2c4408347ca11747ebe23e19d0d9b023f634eeab029",
-      "go.sum": "97c43c12be1edc668225b2ef21c23e95c242327c310d0f05ffe84bc2d05c71c8"
-    },
-    "postReceiptSHA256": "4a4ac5cbcb5756e85c6c2189a6f246602d94e8fd0d87a4992fd19a04096c7b67",
-    "priorReceipt": {
-      "eventsSHA256": "7c7f2652dc517d038be114bc37ec92f198b1ce9317051aff048555af660ba880",
-      "fail": 0,
-      "name": "TestMongoNoDocumentsMapsToOpenIMRecordNotFound",
-      "package": "github.com/openimsdk/open-im-server/v3/pkg/common/db/unrelation",
-      "skip": 0,
-      "subPASS": 0,
-      "topPASS": 1
-    },
-    "producer": {
-      "attempt": 1,
-      "head": "35c3e12dc8be834f07e708e2d6ae3eded4782706",
-      "job": 128297421883,
-      "run": 42337430486
-    },
-    "rootReviewSHA256": "ec93a05d8abdafa94eb27e6dc19fcc94bd7713eee6e6898f7c2cf30fc369571d",
-    "source": {
-      "digest": "af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a",
-      "members": 1585
-    },
-    "testReceiptSHA256": "e82b10f270e9c590925a964735bee5f052087bca51bea8252ba30d24822d751a",
-    "version": "same-canonical-core-mongo-test-v1"
   }
 }
