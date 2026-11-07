@@ -1,5 +1,6 @@
 """One finite pure split-producer contract; no network, Go, ELF or cloud use."""
 import copy
+import os
 import ast
 import tempfile
 import urllib.error
@@ -169,6 +170,67 @@ class SplitProducerContract(unittest.TestCase):
    for bad in mutations:
     with self.assertRaises(ValueError) as caught:project(bad)
     self.assertNotIn(private,str(caught.exception))
+
+ def test_original_exited_child_projection_binds_private_owner_product_and_closed_chart_frames(self):
+  private='PRIVATE_PASSWORD https://private.invalid/token /private/task/secret-path'
+  config=json.loads((HERE/'inputs.json').read_bytes());owner={'run':'1234','attempt':'1','head':'a'*40,'uid':os.getuid()}
+  public='chart/cmd/rpc/admin-rpc/main.go';public_body=(controller.REPO/public).read_bytes();gomod=(controller.REPO/'chart/go.mod').read_bytes();chart_bodies={public:public_body,'chart/go.mod':gomod}
+  log=('panic: '+private+'\n\tgithub.com/OpenIMSDK/chat/cmd/rpc/admin-rpc/main.go:59 +0x1\n\tgithub.com/OpenIMSDK/tools@v0.0.17/log/log.go:1 +0x1\n\tgithub.com/go-zookeeper/zk@v1.0.3/conn.go:1 +0x1\n\tgoogle.golang.org/grpc@v1.84.0/server.go:1 +0x1\n\t/private/task/github.com/OpenIMSDK/chat/cmd/rpc/admin-rpc/main.go:59 +0x1\n\tgithub.com/OpenIMSDK/chat/../cmd/rpc/admin-rpc/main.go:59 +0x1\n\tgithub.com/OpenIMSDK/chat/cmd/rpc/admin-rpc/main.go:999999 +0x1\n\tgithub.com/elsewhere/secret.go:1 +0x1\n').encode()
+  with tempfile.TemporaryDirectory() as folder,mock.patch.object(controller,'allocation_owner',return_value=owner):
+   parent=Path(folder).resolve();sequence=0
+   def fixture():
+    nonlocal sequence
+    sequence+=1;root=parent/str(sequence);root.mkdir(mode=0o700)
+    for name in ('private','chain','chain/admin-rpc','current-chart5','historical-six','out'):(root/name).mkdir(mode=0o700)
+    products=[{'name':name,'path':str(root/('historical-six' if name=='route-service' else 'current-chart5')/name),'sha256':controller.sha(name.encode()),'bytes':123,'sourceSHA256':config['chartProvider']['sources']['route' if name=='route-service' else 'chart']['sha256']} for name in controller.NAMES]
+    plan={'version':'fresh-product20-http-ws-v1','work':str(root/'chain'),'products':products,'sqlRootPassword':private};ps=controller.write(root/'private/product20-input.json',plan)
+    controller.write(root/'allocation.json',owner);controller.write(root/'private/owner.json',owner);controller.write(root/'private/operator-intent.json',{'pidBindingAtOriginalStart':True,'inputSHA256':ps,'source':config['graphProvider']['source'],'harness':config['derivedHarnessSource']})
+    result={'version':'fresh-product20-http-ws-result-v1','accepted':False,'phase':'fresh-sql-and-six-real-services','failureSHA256':'b'*64,'coreSourceSHA256':config['graphProvider']['source']['digest'],'productProcesses':14,'realRegistrations':0,'realPasswordLogins':0,'ordinaryDispatches':0,'peerMessages':0,'historyMessages':0,'auxiliaryListenersJoined':True,'originalSixChildrenExited':False,'originalCoreCleanupComplete':True,'sixOriginalPIDs':[7001],'secret':private,'startupBoundary':{'version':'product20-startup-boundary-v1','entered':True,'substep':'product-wait-port','role':'admin-rpc','sixForked':1,'sixReady':0,'primaryCause':{'present':True,'classes':['other','exec-exit'],'truncated':False,'errno':0,'mysqlNumber':0,'execState':'exited','exitCode':2,'signal':0}}}
+    controller.write(root/'chain/product20-result.json',result)
+    child={'uid':os.getuid(),'pid':7001,'startToken':'123456','path':products[0]['path'],'sha256':products[0]['sha256']};controller.write(root/'chain/admin-rpc/original-child.json',child)
+    for name,raw in [('stderr',log),('stdout',('flag provided but not defined: '+private+'\n').encode())]:
+     path=root/'chain/admin-rpc'/(name+'.private');path.write_bytes(raw);path.chmod(0o600)
+    terminal=controller.export_terminal(root/'chain/product20-result.json',root/'out/actual-terminal.json');return root,plan,ps,products,terminal
+   def project(state):
+    root,plan,ps,products,terminal=state;return controller.project_p20_original_child_exit(root,terminal,plan,ps,products,chart_bodies,config)
+   state=fixture();root,plan,ps,products,terminal=state;value=project(state)
+   self.assertEqual(value['status'],'projected');self.assertEqual(value['role'],'admin-rpc');self.assertTrue(value['originalOwnerAndProductBinding']);self.assertEqual(value['sourceFrames'],[{'path':public,'line':59,'sourceSHA256':controller.sha(public_body)}]);self.assertEqual(value['headerClasses'],['flag-parser','go-panic']);self.assertEqual(value['fixedClasses'],['flag-unknown']);self.assertEqual(value['dependencyFamilies'],['grpc','tools-log','zk']);self.assertFalse(value['runtimeReadyP20Accepted']);self.assertFalse(value['prefixIsCauseProof']);self.assertFalse(value['physicalFirstFailureClaimed']);self.assertNotIn(private,json.dumps(value));self.assertNotIn(str(root),json.dumps(value));self.assertNotIn('7001',json.dumps(value));self.assertNotIn(controller.sha(log),json.dumps(value))
+   self.assertTrue(controller.emit_p20_child_exit_observation(root,root/'out',terminal,plan,ps,products,chart_bodies,config));self.assertEqual(json.loads((root/'out/original-child-exit-observation.json').read_text()),value)
+   # Unknown and externally sourced frames remain unknown; bounded scan never exports text.
+   unknown=controller.project_p20_child_log_streams({'stdout':private.encode(),'stderr':b'\t/private/secret.go:1 +0x1\n'},chart_bodies);self.assertEqual(unknown['headerClasses'],['unknown']);self.assertEqual(unknown['dependencyFamilies'],['unknown']);self.assertEqual(unknown['sourceFrames'],[])
+   frames=b''.join(('\tgithub.com/OpenIMSDK/chat/cmd/rpc/admin-rpc/main.go:'+str(i)+' +0x1\n').encode() for i in range(1,12));bounded=controller.project_p20_child_log_streams({'stdout':b'','stderr':frames},chart_bodies);self.assertEqual(len(bounded['sourceFrames']),8);self.assertTrue(bounded['scanTruncated'])
+   with self.assertRaises(ValueError):controller.project_p20_child_log_streams({'stdout':b'','stderr':b'x'*(controller.P20_CHILD_EXIT_POLICY['perStreamBytes']+1)},chart_bodies)
+   for mutation in ('owner','uid-bool','pid-slot','start-token','binary-path','binary-hash','plan-sha','plan-body','intent','source','symlink','hardlink','mode','directory-alias','fifo'):
+    state=fixture();root,plan,ps,products,terminal=state;childpath=root/'chain/admin-rpc/original-child.json';child=json.loads(childpath.read_text());logpath=root/'chain/admin-rpc/stderr.private'
+    if mutation=='owner':bad=dict(owner,head='c'*40);(root/'private/owner.json').unlink();controller.write(root/'private/owner.json',bad)
+    elif mutation=='uid-bool':child['uid']=True
+    elif mutation=='pid-slot':child['pid']=7002
+    elif mutation=='start-token':child['startToken']=private
+    elif mutation=='binary-path':child['path']=private
+    elif mutation=='binary-hash':child['sha256']='0'*64
+    elif mutation=='plan-sha':state=(root,plan,'0'*64,products,terminal)
+    elif mutation=='plan-body':(root/'private/product20-input.json').write_text(json.dumps(dict(plan,sqlRootPassword='changed')))
+    elif mutation=='intent':path=root/'private/operator-intent.json';v=json.loads(path.read_text());path.unlink();controller.write(path,dict(v,inputSHA256='0'*64))
+    elif mutation=='source':
+     products=[dict(x,sourceSHA256='0'*64) for x in products];plan=dict(plan,products=products);(root/'private/product20-input.json').unlink();ps=controller.write(root/'private/product20-input.json',plan);(root/'private/operator-intent.json').unlink();controller.write(root/'private/operator-intent.json',{'pidBindingAtOriginalStart':True,'inputSHA256':ps,'source':config['graphProvider']['source'],'harness':config['derivedHarnessSource']});state=(root,plan,ps,products,terminal)
+    elif mutation=='symlink':logpath.unlink();logpath.symlink_to(root/'private/owner.json')
+    elif mutation=='hardlink':(root/'leak').hardlink_to(logpath)
+    elif mutation=='mode':logpath.chmod(0o644)
+    elif mutation=='directory-alias':directory=root/'chain/admin-rpc';directory.rename(root/'alias');directory.symlink_to(root/'alias',target_is_directory=True)
+    elif mutation=='fifo':logpath.unlink();os.mkfifo(logpath,0o600)
+    if mutation in ('uid-bool','pid-slot','start-token','binary-path','binary-hash'):childpath.unlink();controller.write(childpath,child)
+    with self.assertRaises((ValueError,OSError)):project(state)
+   for scope,key in (('boundary','sixForked'),('boundary','sixReady'),('cause','exitCode'),('cause','signal')):
+    state=fixture();root,plan,ps,products,terminal=state;terminal=copy.deepcopy(terminal);target=terminal['startupBoundary'] if scope=='boundary' else terminal['startupBoundary']['primaryCause'];target[key]=True
+    with self.assertRaises(ValueError):controller.project_p20_original_child_exit(root,terminal,plan,ps,products,chart_bodies,config)
+   state=fixture();root,plan,ps,products,terminal=state;terminal=copy.deepcopy(terminal);terminal['startupBoundary']['primaryCause']['execState']='none';self.assertEqual(controller.project_p20_original_child_exit(root,terminal,plan,ps,products,chart_bodies,config)['status'],'not-eligible')
+   # Exact actual command failure tail: observation exceptions cannot replace phase failure.
+   tree=ast.parse((HERE/'run.py').read_text());run_node=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='run');command=next(n for n in run_node.body if isinstance(n,ast.FunctionDef) and n.name=='command');tail=[n for n in command.body if isinstance(n,ast.If) and (any(isinstance(x,ast.Compare) and isinstance(x.left,ast.Name) and x.left.id=='label' and any(isinstance(y,ast.Constant) and y.value=='actual-fresh-product20-http-ws-once' for y in x.comparators) for x in ast.walk(n.test)) or isinstance(n.test,ast.Name) and n.test.id=='failed' and any(isinstance(x,ast.Raise) for x in n.body))];self.assertEqual(len(tail),2)
+   function=ast.FunctionDef(name='actual_failed_tail',args=ast.arguments(posonlyargs=[],args=[],kwonlyargs=[],kw_defaults=[],defaults=[]),body=copy.deepcopy(tail),decorator_list=[]);module=ast.fix_missing_locations(ast.Module(body=[function],type_ignores=[]))
+   def broken_observer(*args):raise RuntimeError(private)
+   state=fixture();root,plan,ps,products,terminal=state;namespace={'root':root,'out':root/'out','p':plan,'ps':ps,'products':products,'chart_bodies':chart_bodies,'c':config,'label':'actual-fresh-product20-http-ws-once','failed':True,'export_terminal':lambda *a:terminal,'emit_p20_child_exit_observation':broken_observer};exec(compile(module,'<actual-command-tail-only>','exec'),namespace)
+   with self.assertRaisesRegex(ValueError,'^phase failed; private raw retained$'):namespace['actual_failed_tail']()
+   with mock.patch.object(controller,'write',side_effect=RuntimeError(private)):self.assertFalse(controller.emit_p20_child_exit_observation(root,root/'out',terminal,plan,ps,products,chart_bodies,config))
 
 
 if __name__=='__main__':unittest.main()

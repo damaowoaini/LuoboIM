@@ -238,6 +238,127 @@ def emit_p20_failure_observation(out,stage,error,c,controls):
  try:write(out/'pre-fixture-failure-observation.json',project_p20_failure(stage,error,c,controls));return True
  except BaseException:return False
 
+P20_CHILD_EXIT_POLICY={'version':'p20-original-six-child-exit-v1','perStreamBytes':4<<20,'totalBytes':8<<20,'lineLimit':16384,'lineBytesLimit':8192,'framesLimit':8}
+P20_CHILD_EXIT_FAMILIES={'tools-log':('github.com/OpenIMSDK/tools','v0.0.17','log/'),'zk':('github.com/go-zookeeper/zk','v1.0.3',''),'grpc':('google.golang.org/grpc','v1.84.0','')}
+def p20_exit_private(root,relative,maximum):
+ # All callers use fixed children of this exact allocation; reject aliases at
+ # every directory and again after the bounded nonblocking fd read.
+ root=Path(root)
+ if not root.is_absolute() or root.resolve()!=root or not relative or any(type(x) is not str or not x or x in ('.','..') or '/' in x or '\\' in x for x in relative):raise ValueError('original child private path rejected')
+ parents=[root];p=root
+ for name in relative[:-1]:p=p/name;parents.append(p)
+ def directories():
+  values=[]
+  for directory in parents:
+   a=directory.lstat()
+   if not stat.S_ISDIR(a.st_mode) or stat.S_IMODE(a.st_mode)!=0o700 or a.st_uid!=os.getuid() or directory.resolve()!=directory:raise ValueError('original child private directory rejected')
+   values.append((a.st_dev,a.st_ino,a.st_mode,a.st_uid))
+  return values
+ before=directories();path=p/relative[-1];fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC)
+ try:
+  a=os.fstat(fd)
+  if not stat.S_ISREG(a.st_mode) or stat.S_IMODE(a.st_mode)!=0o600 or a.st_uid!=os.getuid() or a.st_nlink!=1 or not 0<=a.st_size<=maximum:raise ValueError('original child private file rejected')
+  chunks=[];remaining=maximum+1
+  while remaining:
+   part=os.read(fd,min(remaining,65536))
+   if not part:break
+   chunks.append(part);remaining-=len(part)
+  raw=b''.join(chunks);b=os.fstat(fd);c=path.lstat();key=lambda x:(x.st_dev,x.st_ino,x.st_mode,x.st_uid,x.st_nlink,x.st_size,x.st_mtime_ns,x.st_ctime_ns)
+  if len(raw)!=a.st_size or key(a)!=key(b) or key(a)!=key(c) or directories()!=before:raise ValueError('original child private file changed')
+  return raw
+ finally:os.close(fd)
+
+def p20_exit_projection_empty(status='unavailable'):
+ return {'version':P20_CHILD_EXIT_POLICY['version'],'status':status,'role':'none','headerClasses':[],'fixedClasses':[],'dependencyFamilies':[],'sourceFrames':[],'scanTruncated':False,'originalOwnerAndProductBinding':False,'diagnosticOnly':True,'rawTextExported':False,'privatePathsPIDsOrContentHashesExported':False,'prefixIsCauseProof':False,'physicalFirstFailureClaimed':False,'runtimeReadyP20Accepted':False}
+
+def project_p20_child_log_streams(streams,chart_bodies):
+ policy=P20_CHILD_EXIT_POLICY;result=p20_exit_projection_empty('projected');headers=set();kinds=set();families=set();seen=set();lines=0
+ if type(streams) is not dict or set(streams)!={'stdout','stderr'} or any(type(x) is not bytes or len(x)>policy['perStreamBytes'] for x in streams.values()) or sum(map(len,streams.values()))>policy['totalBytes']:raise ValueError('bounded original child streams required')
+ gomod=chart_bodies.get('chart/go.mod',b'');dependency_prefixes={}
+ for family,(module,version,subdir) in P20_CHILD_EXIT_FAMILIES.items():
+  if re.search(rb'^\s*'+re.escape(module.encode())+rb'\s+'+re.escape(version.encode())+rb'\s*(?://[^\r\n]*)?$',gomod,re.M):dependency_prefixes[module+'@'+version+'/'+subdir]=family
+ frame_pattern=re.compile(rb'\t([^\s]+\.go):([1-9][0-9]{0,6})(?: \+0x[0-9a-f]{1,16})?')
+ fixed=((b'read loacl config file error:','config-read'),(b'parse loacl openIMConfig file error:','config-yaml'),(b'get env error:','config-env'),(b'incomplete MySQL configuration','mysql-config'))
+ for stream in ('stderr','stdout'):
+  raw=streams[stream];start=0;panic_region=False
+  while start<len(raw):
+   if lines>=policy['lineLimit']:result['scanTruncated']=True;break
+   end=raw.find(b'\n',start)
+   if end<0:end=len(raw)
+   lines+=1;line=raw[start:end];start=end+1
+   if len(line)>policy['lineBytesLimit']:result['scanTruncated']=True;continue
+   if line.endswith(b'\r'):line=line[:-1]
+   payload=None
+   if line.startswith(b'panic: '):headers.add('go-panic');payload=line[7:];panic_region=True
+   elif line.startswith(b'fatal error: '):headers.add('go-runtime-fatal');panic_region=True
+   elif re.fullmatch(rb'goroutine [0-9]+ \[[^\r\n]{1,160}\]:',line) or line in (b'runtime stack:',b'stack trace:'):panic_region=False
+   elif panic_region and line:payload=line[1:] if line.startswith(b'\t') else line
+   if payload is not None:
+    for prefix,kind in fixed:
+     if payload.startswith(prefix):kinds.add(kind)
+   if line.startswith(b'flag provided but not defined: '):headers.add('flag-parser');kinds.add('flag-unknown')
+   elif line.startswith(b'flag needs an argument: '):headers.add('flag-parser');kinds.add('flag-missing-argument')
+   elif line.startswith(b'invalid value ') and b' for flag -' in line:headers.add('flag-parser');kinds.add('flag-invalid-value')
+   match=frame_pattern.fullmatch(line)
+   if match is None:continue
+   try:name=match[1].decode('ascii')
+   except UnicodeError:continue
+   if name.startswith('/') or '\\' in name or ':' in name or any(x in ('','.','..') for x in name.split('/')):continue
+   for prefix,family in dependency_prefixes.items():
+    if name.startswith(prefix):families.add(family)
+   prefix='github.com/OpenIMSDK/chat/'
+   if not name.startswith(prefix):continue
+   relative=name[len(prefix):]
+   if not re.fullmatch(r'[A-Za-z0-9_./-]+\.go',relative):continue
+   target='chart/'+relative;body=chart_bodies.get(target);number=int(match[2])
+   if type(body) is not bytes or not 1<=number<=len(body.splitlines()):continue
+   key=(target,number)
+   if key in seen:continue
+   seen.add(key)
+   if len(result['sourceFrames'])>=policy['framesLimit']:result['scanTruncated']=True;continue
+   result['sourceFrames'].append({'path':target,'line':number,'sourceSHA256':sha(body)})
+ result['headerClasses']=sorted(headers) or ['unknown'];result['fixedClasses']=sorted(kinds);result['dependencyFamilies']=sorted(families) or ['unknown'];return result
+
+def project_p20_original_child_exit(root,terminal,expected_plan,plan_sha,products,chart_bodies,c):
+ result=p20_exit_projection_empty('not-eligible');phase='fresh-sql-and-six-real-services';boundary=terminal.get('startupBoundary',{});role=boundary.get('role');cause=boundary.get('primaryCause',{})
+ if terminal.get('phase')!=phase or boundary.get('substep')!='product-wait-port' or role not in NAMES or cause.get('present') is not True or cause.get('execState') not in ('exited','signaled') or 'exec-exit' not in cause.get('classes',[]) or cause.get('truncated') is not False:return result
+ slot=NAMES.index(role)
+ if any(type(boundary.get(k)) is not int for k in ('sixForked','sixReady')) or boundary.get('sixForked')!=slot+1 or boundary.get('sixReady')!=slot:raise ValueError('original failed child slot differs')
+ if type(cause.get('exitCode')) is not int or type(cause.get('signal')) is not int or (cause['execState']=='exited' and not (0<=cause['exitCode']<=255 and cause['signal']==0)) or (cause['execState']=='signaled' and not (cause['exitCode']==-1 and 1<=cause['signal']<=64)):raise ValueError('original failed child exit shape differs')
+ owner=allocation_owner();load_private=lambda relative,maximum:json.loads(p20_exit_private(root,relative,maximum))
+ for relative in (('allocation.json',),('private','owner.json')):
+  actual=load_private(relative,4096)
+  if type(actual) is not dict or set(actual)!={'run','attempt','head','uid'} or type(actual.get('uid')) is not int or any(type(actual.get(k)) is not str for k in ('run','attempt','head')) or actual!=owner:raise ValueError('original child allocation owner differs')
+ if type(owner.get('uid')) is not int or owner['uid']!=os.getuid():raise ValueError('original child allocation uid differs')
+ raw=p20_exit_private(root,('private','product20-input.json'),128<<10)
+ if type(plan_sha) is not str or not re.fullmatch('[0-9a-f]{64}',plan_sha) or sha(raw)!=plan_sha:raise ValueError('original child plan identity differs')
+ plan=json.loads(raw)
+ if plan!=expected_plan or plan.get('version')!='fresh-product20-http-ws-v1' or plan.get('work')!=str(root/'chain') or plan.get('products')!=products:raise ValueError('original child plan differs')
+ intent=load_private(('private','operator-intent.json'),4096)
+ if intent!={'pidBindingAtOriginalStart':True,'inputSHA256':plan_sha,'source':c['graphProvider']['source'],'harness':c['derivedHarnessSource']}:raise ValueError('original operator intent differs')
+ if type(products) is not list or len(products)!=6 or {p.get('name') for p in products}!=set(NAMES):raise ValueError('six received product bindings required')
+ for row in products:
+  name=row['name'];module='route' if name=='route-service' else 'chart';folder='historical-six' if module=='route' else 'current-chart5'
+  if set(row)!={'name','path','sha256','bytes','sourceSHA256'} or row['path']!=str(root/folder/name) or type(row['bytes']) is not int or not 0<row['bytes']<=128<<20 or type(row['sha256']) is not str or not re.fullmatch('[0-9a-f]{64}',row['sha256']) or row['sourceSHA256']!=c['chartProvider']['sources'][module]['sha256']:raise ValueError('original received product differs')
+ raw=p20_exit_private(root,('chain','product20-result.json'),128<<10)
+ if sha(raw)!=terminal.get('originalResultSHA256'):raise ValueError('original failed result changed')
+ original=json.loads(raw)
+ if original.get('version')!='fresh-product20-http-ws-result-v1' or original.get('accepted') is not False or original.get('phase')!=phase or original.get('coreSourceSHA256')!=c['graphProvider']['source']['digest'] or project_startup_boundary(original)!=boundary:raise ValueError('original startup projection differs')
+ pids=original.get('sixOriginalPIDs')
+ if type(pids) is not list or len(pids)!=slot+1 or any(type(p) is not int or p<=1 for p in pids) or len(set(pids))!=len(pids):raise ValueError('original child pid slots differ')
+ child=load_private(('chain',role,'original-child.json'),4096);product=next(p for p in products if p['name']==role)
+ if type(child) is not dict or set(child)!={'pid','startToken','path','sha256','uid'} or type(child['pid']) is not int or child['pid']!=pids[slot] or type(child['uid']) is not int or child['uid']!=os.getuid() or type(child['startToken']) is not str or not re.fullmatch('[0-9]{1,20}',child['startToken']) or child['path']!=product['path'] or child['sha256']!=product['sha256']:raise ValueError('original failed child owner differs')
+ if sha(chart_bodies.get('chart/go.mod',b''))!=c['chartProvider']['locks']['chart']['go.mod']:raise ValueError('original Chart dependency identity differs')
+ streams={name:p20_exit_private(root,('chain',role,name+'.private'),P20_CHILD_EXIT_POLICY['perStreamBytes']) for name in ('stdout','stderr')}
+ result=project_p20_child_log_streams(streams,chart_bodies);result['role']=role;result['originalOwnerAndProductBinding']=True;return result
+
+def emit_p20_child_exit_observation(root,out,terminal,plan,plan_sha,products,chart_bodies,c):
+ try:
+  try:value=project_p20_original_child_exit(root,terminal,plan,plan_sha,products,chart_bodies,c)
+  except BaseException:value=p20_exit_projection_empty('unavailable')
+  write(out/'original-child-exit-observation.json',value);return True
+ except BaseException:return False
+
 def run():
  c,graph,g,original,bodies,chart_bodies=verify();binding=require_bound(c)
  if any(os.environ.get(k)!=v for k,v in {'GITHUB_ACTIONS':'true','RUNNER_ENVIRONMENT':'github-hosted','RUNNER_OS':'Linux'}.items()) or os.getuid()==0:raise ValueError('fresh hosted nonroot Linux only')
@@ -271,7 +392,10 @@ def run():
    raw=regular(folder/'stderr',32<<20)
    write(out/(str(index)+'-public-compile-failure.json'),{'phase':label,'publicSourceOnly':True,'completeBytes':len(raw),'completeSHA256':sha(raw),'diagnostic':raw[:65536].decode('utf-8','replace'),'truncated':len(raw)>65536})
   if label=='actual-fresh-product20-http-ws-once' and (root/'chain/product20-result.json').exists():
-   export_terminal(root/'chain/product20-result.json',out/'actual-terminal.json')
+   terminal=export_terminal(root/'chain/product20-result.json',out/'actual-terminal.json')
+   if failed:
+    try:emit_p20_child_exit_observation(root,out,terminal,p,ps,products,chart_bodies,c)
+    except BaseException:pass
   if failed:raise ValueError('phase failed; private raw retained')
   return regular(folder/'stdout',32<<20)
  try:
@@ -428,7 +552,9 @@ def export_terminal(path,output):
  if v.get('version')!='fresh-product20-http-ws-result-v1' or v.get('phase') not in phases or type(v.get('accepted')) is not bool or any(x and not re.fullmatch('[0-9a-f]{64}',x) for x in (v.get('failureSHA256',''),v.get('coreSourceSHA256',''))):raise ValueError('finite original terminal shape rejected')
  keys=('productProcesses','realRegistrations','realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages')
  if any(type(v.get(k)) is not int or not 0<=v[k]<=20 for k in keys):raise ValueError('finite original terminal counts rejected')
- write(output,{'version':v['version'],'accepted':v['accepted'],'phase':v['phase'],'failureSHA256':v.get('failureSHA256',''),'coreSourceSHA256':v.get('coreSourceSHA256',''),'originalResultSHA256':sha(raw),'counts':{k:v[k] for k in keys},'startupBoundary':project_startup_boundary(v),'rawLogsOrDataExported':False})
+ value={'version':v['version'],'accepted':v['accepted'],'phase':v['phase'],'failureSHA256':v.get('failureSHA256',''),'coreSourceSHA256':v.get('coreSourceSHA256',''),'originalResultSHA256':sha(raw),'counts':{k:v[k] for k in keys},'startupBoundary':project_startup_boundary(v),'rawLogsOrDataExported':False}
+ write(output,value)
+ return value
 
 def check_result(v,c):
  flags=('accepted','dualTokens','chatTokenSelfRead','configHTTP','wrongPasswordRejected','businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')
