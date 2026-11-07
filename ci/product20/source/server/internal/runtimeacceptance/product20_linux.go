@@ -68,35 +68,148 @@ type Product20Plan struct {
 	Products            []Product20Binary `json:"products"`
 }
 type product20Result struct {
-	Version                     string   `json:"version"`
-	Accepted                    bool     `json:"accepted"`
-	Phase                       string   `json:"phase"`
-	CoreSourceSHA256            string   `json:"coreSourceSHA256"`
-	ProductProcesses            int      `json:"productProcesses"`
-	CoreOriginalPIDs            []int    `json:"coreOriginalPIDs"`
-	SixOriginalPIDs             []int    `json:"sixOriginalPIDs"`
-	RealRegistrations           int      `json:"realRegistrations"`
-	RealPasswordLogins          int      `json:"realPasswordLogins"`
-	DualTokens                  bool     `json:"dualTokens"`
-	ChatTokenSelfRead           bool     `json:"chatTokenSelfRead"`
-	ConfigHTTP                  bool     `json:"configHTTP"`
-	WrongPasswordRejected       bool     `json:"wrongPasswordRejected"`
-	BusinessPermissions         bool     `json:"businessPermissions"`
-	OrdinaryDispatches          int      `json:"ordinaryDispatches"`
-	PeerMessages                int      `json:"peerMessages"`
-	HistoryMessages             int      `json:"historyMessages"`
-	ClientIDHash                string   `json:"clientIDHash,omitempty"`
-	ServerIDHash                string   `json:"serverIDHash,omitempty"`
-	MessageSeq                  int64    `json:"messageSeq"`
-	UsersHash                   []string `json:"usersHash,omitempty"`
-	FreshSQLSeedOnly            bool     `json:"freshSQLSeedOnly"`
-	AuxiliaryListenersJoined    bool     `json:"auxiliaryListenersJoined"`
-	OriginalSixChildrenExited   bool     `json:"originalSixChildrenExited"`
-	OriginalCoreCleanupComplete bool     `json:"originalCoreCleanupComplete"`
-	ChartCanonicalDrainClaimed  bool     `json:"chartCanonicalDrainClaimed"`
-	WebUIAccepted               bool     `json:"webUIAccepted"`
-	DeploymentAccepted          bool     `json:"deploymentAccepted"`
-	FailureSHA256               string   `json:"failureSHA256,omitempty"`
+	Version                     string                   `json:"version"`
+	Accepted                    bool                     `json:"accepted"`
+	Phase                       string                   `json:"phase"`
+	CoreSourceSHA256            string                   `json:"coreSourceSHA256"`
+	ProductProcesses            int                      `json:"productProcesses"`
+	CoreOriginalPIDs            []int                    `json:"coreOriginalPIDs"`
+	SixOriginalPIDs             []int                    `json:"sixOriginalPIDs"`
+	RealRegistrations           int                      `json:"realRegistrations"`
+	RealPasswordLogins          int                      `json:"realPasswordLogins"`
+	DualTokens                  bool                     `json:"dualTokens"`
+	ChatTokenSelfRead           bool                     `json:"chatTokenSelfRead"`
+	ConfigHTTP                  bool                     `json:"configHTTP"`
+	WrongPasswordRejected       bool                     `json:"wrongPasswordRejected"`
+	BusinessPermissions         bool                     `json:"businessPermissions"`
+	OrdinaryDispatches          int                      `json:"ordinaryDispatches"`
+	PeerMessages                int                      `json:"peerMessages"`
+	HistoryMessages             int                      `json:"historyMessages"`
+	ClientIDHash                string                   `json:"clientIDHash,omitempty"`
+	ServerIDHash                string                   `json:"serverIDHash,omitempty"`
+	MessageSeq                  int64                    `json:"messageSeq"`
+	UsersHash                   []string                 `json:"usersHash,omitempty"`
+	FreshSQLSeedOnly            bool                     `json:"freshSQLSeedOnly"`
+	AuxiliaryListenersJoined    bool                     `json:"auxiliaryListenersJoined"`
+	OriginalSixChildrenExited   bool                     `json:"originalSixChildrenExited"`
+	OriginalCoreCleanupComplete bool                     `json:"originalCoreCleanupComplete"`
+	ChartCanonicalDrainClaimed  bool                     `json:"chartCanonicalDrainClaimed"`
+	WebUIAccepted               bool                     `json:"webUIAccepted"`
+	DeploymentAccepted          bool                     `json:"deploymentAccepted"`
+	FailureSHA256               string                   `json:"failureSHA256,omitempty"`
+	StartupBoundary             product20StartupBoundary `json:"startupBoundary"`
+}
+
+// This diagnostic observes original returns only. It never formats an error,
+// samples a live ProcessState, or authorizes readiness/cleanup.
+type product20StartupCause struct {
+	Present     bool     `json:"present"`
+	Classes     []string `json:"classes"`
+	Truncated   bool     `json:"truncated"`
+	Errno       int      `json:"errno"`
+	MySQLNumber int      `json:"mysqlNumber"`
+	ExecState   string   `json:"execState"`
+	ExitCode    int      `json:"exitCode"`
+	Signal      int      `json:"signal"`
+}
+type product20StartupBoundary struct {
+	Version      string                `json:"version"`
+	Entered      bool                  `json:"entered"`
+	Substep      string                `json:"substep"`
+	Role         string                `json:"role"`
+	SixForked    int                   `json:"sixForked"`
+	SixReady     int                   `json:"sixReady"`
+	PrimaryCause product20StartupCause `json:"primaryCause"`
+}
+
+func (o *product20StartupBoundary) at(step, role string) {
+	o.Substep, o.Role = step, role
+}
+func product20StartupCauseOf(err error) product20StartupCause {
+	out := product20StartupCause{Present: err != nil, Classes: []string{}, ExecState: "none", ExitCode: -1}
+	if err == nil {
+		return out
+	}
+	pending := []error{err}
+	seen := map[string]bool{}
+	for visited := 0; len(pending) > 0 && visited < 16; visited++ {
+		current := pending[0]
+		pending = pending[1:]
+		if current == nil {
+			continue
+		}
+		class := "other"
+		switch e := current.(type) {
+		case *exec.ExitError:
+			class = "exec-exit"
+			if e.ProcessState != nil {
+				out.ExecState = "other"
+				if state, ok := e.ProcessState.Sys().(syscall.WaitStatus); ok {
+					if state.Exited() {
+						out.ExecState, out.ExitCode, out.Signal = "exited", state.ExitStatus(), 0
+					} else if state.Signaled() {
+						out.ExecState, out.ExitCode, out.Signal = "signaled", -1, int(state.Signal())
+					}
+				}
+			}
+		case syscall.Errno:
+			class = "syscall-errno"
+			if out.Errno == 0 && e > 0 && e <= 4095 {
+				out.Errno = int(e)
+			}
+		case *os.PathError:
+			class = "os-path"
+		case *os.LinkError:
+			class = "os-link"
+		case *os.SyscallError:
+			class = "os-syscall"
+		case *net.OpError:
+			class = "net-op"
+		case *net.DNSError:
+			class = "net-dns"
+		case *strconv.NumError:
+			class = "number-parse"
+		case *mysql.MySQLError:
+			class = "mysql"
+			out.MySQLNumber = int(e.Number)
+		case x509.CertificateInvalidError, x509.UnknownAuthorityError, x509.HostnameError:
+			class = "x509"
+		case *yaml.TypeError:
+			class = "yaml"
+		case *json.UnsupportedTypeError, *json.UnsupportedValueError:
+			class = "json"
+		}
+		if current == context.Canceled {
+			class = "context-canceled"
+		}
+		if current == context.DeadlineExceeded {
+			class = "context-deadline"
+		}
+		if !seen[class] && len(out.Classes) < 8 {
+			seen[class] = true
+			out.Classes = append(out.Classes, class)
+		} else if !seen[class] {
+			out.Truncated = true
+		}
+		switch e := current.(type) {
+		case interface{ Unwrap() []error }:
+			for _, child := range e.Unwrap() {
+				if child != nil && len(pending) < 16 {
+					pending = append(pending, child)
+				} else if child != nil {
+					out.Truncated = true
+				}
+			}
+		case interface{ Unwrap() error }:
+			if child := e.Unwrap(); child != nil {
+				pending = append(pending, child)
+			}
+		}
+	}
+	if len(pending) > 0 {
+		out.Truncated = true
+	}
+	return out
 }
 
 var product20Names = []string{"admin-rpc", "chat-rpc", "office-rpc", "admin-api", "chat-api", "route-service"}
@@ -302,7 +415,7 @@ func product20WaitPort(ctx context.Context, port int, child *product20Child) err
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-child.done:
-			return errors.New("original service exited before readiness")
+			return errors.Join(errors.New("original service exited before readiness"), child.err)
 		case <-timer.C:
 			c, e := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", strconv.Itoa(port)), time.Second)
 			if e == nil {
@@ -331,16 +444,19 @@ type product20Aux struct {
 	transports   []*http.Transport
 }
 
-func product20NewAux(work, password string) (*product20Aux, error) {
+func product20NewAux(work, password string, observation *product20StartupBoundary) (*product20Aux, error) {
+	observation.at("aux-key", "aux")
 	key, e := rsa.GenerateKey(rand.Reader, 2048)
 	if e != nil {
 		return nil, e
 	}
+	observation.at("aux-serial", "aux")
 	serial, e := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 120))
 	if e != nil {
 		return nil, e
 	}
 	ca := &x509.Certificate{SerialNumber: serial, Subject: pkix.Name{CommonName: "萝卜对话 task product20 CA"}, NotBefore: time.Now().Add(-time.Minute), NotAfter: time.Now().Add(2 * time.Hour), IsCA: true, BasicConstraintsValid: true, KeyUsage: x509.KeyUsageCertSign | x509.KeyUsageDigitalSignature}
+	observation.at("aux-ca", "aux")
 	der, e := x509.CreateCertificate(rand.Reader, ca, ca, &key.PublicKey, key)
 	if e != nil {
 		return nil, e
@@ -351,34 +467,44 @@ func product20NewAux(work, password string) (*product20Aux, error) {
 	le.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment
 	le.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth}
 	le.IPAddresses = []net.IP{net.ParseIP("127.0.0.1")}
+	observation.at("aux-leaf", "aux")
 	leaf, e := x509.CreateCertificate(rand.Reader, &le, ca, &key.PublicKey, key)
 	if e != nil {
 		return nil, e
 	}
 	caPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
+	observation.at("aux-tls", "aux")
 	cert, e := tls.X509KeyPair(pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: leaf}), pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)}))
 	if e != nil {
 		return nil, e
 	}
 	path := filepath.Join(work, "task-ca.pem")
+	observation.at("aux-ca-write", "aux")
 	if e = os.WriteFile(path, caPEM, 0600); e != nil {
 		return nil, e
 	}
+	observation.at("aux-trust-pool", "aux")
 	roots := x509.NewCertPool()
 	if !roots.AppendCertsFromPEM(caPEM) {
 		return nil, errors.New("task CA rejected")
 	}
 	return &product20Aux{caPath: path, roots: roots, cert: cert, smtpPassword: password, smtpConns: map[net.Conn]bool{}, codes: map[string]string{}}, nil
 }
-func (a *product20Aux) start() error {
+func (a *product20Aux) start(observation *product20StartupBoundary) error {
+	observation.at("aux-port-floor-read", "aux")
 	portFloor, e := os.ReadFile("/proc/sys/net/ipv4/ip_unprivileged_port_start")
 	if e != nil {
 		return e
 	}
+	observation.at("aux-port-floor-parse", "aux")
 	floor, e := strconv.Atoi(strings.TrimSpace(string(portFloor)))
+	if e == nil {
+		observation.at("aux-port-floor-policy", "aux")
+	}
 	if e != nil || floor > 443 {
 		return errors.New("task netnamespace does not permit original HTTPS port")
 	}
+	observation.at("aux-https-listen", "aux")
 	ln, e := net.Listen("tcp", "127.0.0.1:443")
 	if e != nil {
 		return e
@@ -420,6 +546,7 @@ func (a *product20Aux) start() error {
 	go func() {
 		a.done <- a.server.Serve(tls.NewListener(ln, &tls.Config{Certificates: []tls.Certificate{a.cert}, MinVersion: tls.VersionTLS12}))
 	}()
+	observation.at("aux-smtp-listen", "aux")
 	a.smtp, e = net.Listen("tcp", "127.0.0.1:2587")
 	if e != nil {
 		return e
@@ -681,11 +808,13 @@ func product20FixtureSQL(b *Bootstrap) (map[string]any, error) {
 	return map[string]any{"address": []string{"127.0.0.1:3306"}, "username": value.User, "password": value.Password, "database": value.Database, "maxOpenConn": 8, "maxIdleConn": 2, "maxLifeTime": 60, "logLevel": 1}, nil
 }
 
-func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db, user, password string) (string, error) {
+func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db, user, password string, observation *product20StartupBoundary) (string, error) {
+	observation.at("chart-template-read", "chart")
 	raw, e := os.ReadFile(p.ChartTemplatePath)
 	if e != nil || digestBytes(raw) != p.ChartTemplateSHA256 {
 		return "", errors.New("public chart template differs")
 	}
+	observation.at("chart-template-decode", "chart")
 	var value map[string]any
 	if yaml.Unmarshal(raw, &value) != nil || value == nil {
 		return "", errors.New("public chart configuration shape rejected")
@@ -700,6 +829,7 @@ func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db
 	value["redis"] = map[string]any{"address": []string{"127.0.0.1:6379"}, "username": b.Credential["redisRuntimeUser"], "password": b.Credential["redisRuntimePassword"]}
 	value["mongo"] = map[string]any{"uri": mongoURI(b.Credential["mongoRuntimeUser"], b.Credential["mongoRuntimePassword"], b.Header.Database, false), "database": b.Header.Database, "maxPoolSize": 4}
 	value["secret"] = b.Credential["serviceSecret"]
+	observation.at("chart-secret", "chart")
 	chatSecret, e := product20Random()
 	if e != nil {
 		return "", e
@@ -713,14 +843,17 @@ func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db
 	value["adminProvisioning"] = map[string]any{"enabled": false}
 	value["ipTrust"] = map[string]any{"trustedProxies": []string{"127.0.0.1/32"}, "trustedForwarders": []string{"127.0.0.1/32"}}
 	value["log"] = map[string]any{"storageLocation": p.Work, "remainLogLevel": 4, "isStdout": false, "isJson": true, "withStack": false, "rotationTime": 24, "remainRotationCount": 1}
+	observation.at("chart-directory", "chart")
 	dir := filepath.Join(p.Work, "chart-config")
 	if e = os.Mkdir(dir, 0700); e != nil {
 		return "", e
 	}
+	observation.at("chart-encode", "chart")
 	body, e := yaml.Marshal(value)
 	if e != nil {
 		return "", e
 	}
+	observation.at("chart-write", "chart")
 	if e = os.WriteFile(filepath.Join(dir, "config.yaml"), body, 0600); e != nil {
 		return "", e
 	}
@@ -1010,6 +1143,8 @@ func product20BusinessRedis(ctx context.Context, p PrivatePlan) (err error) {
 }
 func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	result := product20Result{Version: "fresh-product20-http-ws-result-v1", Phase: "fresh-core-prepare", FreshSQLSeedOnly: true}
+	result.StartupBoundary = product20StartupBoundary{Version: "product20-startup-boundary-v1", Substep: "not-entered", Role: "none", PrimaryCause: product20StartupCauseOf(nil)}
+	observation := &result.StartupBoundary
 	var boot *Bootstrap
 	var session *Session
 	var aux *product20Aux
@@ -1017,6 +1152,11 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	var migration *product20Child
 	var routePool, chartPool *sql.DB
 	defer func() {
+		// Snapshot the primary return before cleanup can join secondary errors.
+		observation.SixForked = len(children)
+		if result.Phase == "fresh-sql-and-six-real-services" {
+			observation.PrimaryCause = product20StartupCauseOf(runErr)
+		}
 		cleanup, stop := context.WithTimeout(context.Background(), 120*time.Second)
 		defer stop()
 		childrenErr := product20StopChildren(cleanup, children)
@@ -1104,14 +1244,15 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	}
 	result.ProductProcesses = 14
 	result.Phase = "fresh-sql-and-six-real-services"
-	aux, e = product20NewAux(p.Work, chartPass)
+	observation.Entered = true
+	aux, e = product20NewAux(p.Work, chartPass, observation)
 	if e != nil {
 		return e
 	}
-	if e = aux.start(); e != nil {
+	if e = aux.start(observation); e != nil {
 		return e
 	}
-	chartConfig, e := product20Configuration(p, boot, aux, chartDB, chartUser, chartPass)
+	chartConfig, e := product20Configuration(p, boot, aux, chartDB, chartUser, chartPass, observation)
 	if e != nil {
 		return e
 	}
@@ -1120,19 +1261,23 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	for _, b := range p.Products {
 		products[b.Name] = b
 	}
+	observation.at("route-secret", "route-service")
 	routeSecret, e := product20Random()
 	if e != nil {
 		return e
 	}
+	observation.at("route-upstream-encode", "route-service")
 	shared, e := json.Marshal(map[string]string{boot.Header.Tenant: boot.Credential["serviceSecret"]})
 	if e != nil {
 		return e
 	}
 	routeEnv := append(append([]string{}, baseEnv...), "ROUTE_PORT=31310", "ROUTE_LISTEN_HOST=127.0.0.1", "ROUTE_MYSQL_HOST=127.0.0.1", "ROUTE_MYSQL_PORT=3306", "ROUTE_MYSQL_USER="+routeUser, "ROUTE_MYSQL_PASSWORD="+routePass, "ROUTE_MYSQL_DATABASE="+routeDB, "ROUTE_ADMIN_TOKEN="+routeSecret, "ROUTE_UPSTREAM_SECRETS="+string(shared), "ROUTE_ALLOWED_ORIGINS=https://127.0.0.1")
+	observation.at("route-migrate-start", "route-service")
 	migration, e = product20StartChild(ctx, products["route-service"], filepath.Join(p.Work, "route-migrate"), []string{"--migrate"}, routeEnv)
 	if e != nil {
 		return e
 	}
+	observation.at("route-migrate-wait", "route-service")
 	select {
 	case <-migration.done:
 		for _, f := range migration.files {
@@ -1144,6 +1289,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	case <-ctx.Done():
 		return ctx.Err()
 	}
+	observation.at("route-tenant-seed", "route-service")
 	if _, e = routePool.ExecContext(ctx, "INSERT INTO server_config(server_id,server_name,domains,is_default,status,max_users,current_users,description,created_at,updated_at) VALUES(?,?,?,1,1,0,0,?,NOW(),NOW())", boot.Header.Tenant, "萝卜对话 task tenant", "127.0.0.1", "fresh product20 fixture only"); e != nil {
 		return e
 	}
@@ -1158,6 +1304,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 			args = nil
 			env = routeEnv
 		}
+		observation.at("product-start", name)
 		child, e := product20StartChild(ctx, products[name], filepath.Join(p.Work, name), args, env)
 		if child != nil {
 			children = append(children, child)
@@ -1166,11 +1313,14 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		if e != nil {
 			return e
 		}
+		observation.at("product-wait-port", name)
 		if e = product20WaitPort(ctx, ports[name], child); e != nil {
 			return e
 		}
 		result.ProductProcesses++
+		observation.SixReady++
 	}
+	observation.at("complete", "none")
 	transport := &http.Transport{Proxy: nil, TLSClientConfig: &tls.Config{RootCAs: aux.roots, MinVersion: tls.VersionTLS12}, ResponseHeaderTimeout: 10 * time.Second}
 	defer transport.CloseIdleConnections()
 	client := &http.Client{Transport: transport, Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return errors.New("task redirect refused") }}

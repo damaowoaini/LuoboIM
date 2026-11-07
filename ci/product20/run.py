@@ -390,13 +390,45 @@ def cleanup_mysql(plane):
  plane.call(['rm','--volumes',cid])
  if plane.call(['ps','--all','--no-trunc','--filter','id='+cid,'--format','{{.ID}}']).strip():raise ValueError('original MySQL absence unconfirmed')
 
+STARTUP_AUX_STEPS=frozenset(('aux-key','aux-serial','aux-ca','aux-leaf','aux-tls','aux-ca-write','aux-trust-pool','aux-port-floor-read','aux-port-floor-parse','aux-port-floor-policy','aux-https-listen','aux-smtp-listen'))
+STARTUP_CHART_STEPS=frozenset(('chart-template-read','chart-template-decode','chart-secret','chart-directory','chart-encode','chart-write'))
+STARTUP_ROUTE_STEPS=frozenset(('route-secret','route-upstream-encode','route-migrate-start','route-migrate-wait','route-tenant-seed'))
+STARTUP_CAUSE_CLASSES=frozenset(('other','exec-exit','syscall-errno','os-path','os-link','os-syscall','net-op','net-dns','number-parse','mysql','x509','yaml','json','context-canceled','context-deadline'))
+def project_startup_boundary(v):
+ o=v.get('startupBoundary')
+ if not isinstance(o,dict) or set(o)!={'version','entered','substep','role','sixForked','sixReady','primaryCause'} or o['version']!='product20-startup-boundary-v1' or type(o['entered']) is not bool:raise ValueError('finite startup observation shape rejected')
+ step,role=o['substep'],o['role']
+ if type(step) is not str or type(role) is not str:raise ValueError('finite startup step and role required')
+ roles={'none'} if step in ('not-entered','complete') else {'aux'} if step in STARTUP_AUX_STEPS else {'chart'} if step in STARTUP_CHART_STEPS else {'route-service'} if step in STARTUP_ROUTE_STEPS else set(NAMES) if step in ('product-start','product-wait-port') else set()
+ if role not in roles or o['entered']!=(step!='not-entered'):raise ValueError('finite startup step and role rejected')
+ if any(type(o[k]) is not int or not 0<=o[k]<=6 for k in ('sixForked','sixReady')) or o['sixReady']>o['sixForked']:raise ValueError('finite fork and ready counts rejected')
+ if step=='not-entered' and (o['sixForked']!=0 or o['sixReady']!=0) or step=='complete' and (o['sixForked']!=6 or o['sixReady']!=6):raise ValueError('startup lifecycle counts differ')
+ if step not in ('product-start','product-wait-port','complete') and (o['sixForked']!=0 or o['sixReady']!=0):raise ValueError('startup pre-fork counts differ')
+ if o['entered'] and v['productProcesses']!=14+o['sixReady']:raise ValueError('original ready count differs')
+ cause=o['primaryCause']
+ if not isinstance(cause,dict) or set(cause)!={'present','classes','truncated','errno','mysqlNumber','execState','exitCode','signal'} or any(type(cause[k]) is not bool for k in ('present','truncated')):raise ValueError('finite startup cause shape rejected')
+ classes=cause['classes']
+ if type(classes) is not list or len(classes)>8 or any(type(k) is not str or k not in STARTUP_CAUSE_CLASSES for k in classes) or len(set(classes))!=len(classes) or cause['present']!=bool(classes):raise ValueError('finite startup cause classes rejected')
+ if type(cause['errno']) is not int or not 0<=cause['errno']<=4095 or cause['errno'] and 'syscall-errno' not in classes:raise ValueError('finite startup errno rejected')
+ if type(cause['mysqlNumber']) is not int or not 0<=cause['mysqlNumber']<=65535 or cause['mysqlNumber'] and 'mysql' not in classes:raise ValueError('finite startup mysql number rejected')
+ state=cause['execState'];code=cause['exitCode'];signal=cause['signal']
+ if type(state) is not str or state not in ('none','exited','signaled','other') or type(code) is not int or type(signal) is not int:raise ValueError('finite startup exec shape rejected')
+ if state=='exited':valid=0<=code<=255 and signal==0
+ elif state=='signaled':valid=code==-1 and 1<=signal<=64
+ else:valid=code==-1 and signal==0
+ if not valid or state!='none' and 'exec-exit' not in classes:raise ValueError('finite startup exec values rejected')
+ if not cause['present'] and (cause['truncated'] or cause['errno']!=0 or cause['mysqlNumber']!=0 or state!='none') or step in ('not-entered','complete') and cause['present']:raise ValueError('startup primary failure boundary differs')
+ cleanup=('auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')
+ if any(type(v.get(k)) is not bool for k in cleanup):raise ValueError('original cleanup observations required')
+ return {'version':o['version'],'entered':o['entered'],'substep':step,'role':role,'sixForked':o['sixForked'],'sixReady':o['sixReady'],'primaryCause':{k:cause[k] for k in ('present','classes','truncated','errno','mysqlNumber','execState','exitCode','signal')},'cleanup':{k:v[k] for k in cleanup},'diagnosticOnly':True,'primaryCauseCapturedBeforeCleanup':True,'physicalFirstFailureClaimed':False,'rawErrorTextExported':False,'privatePathsOrPIDsExported':False,'runtimeReadyP20Accepted':False}
+
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
  phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
  if v.get('version')!='fresh-product20-http-ws-result-v1' or v.get('phase') not in phases or type(v.get('accepted')) is not bool or any(x and not re.fullmatch('[0-9a-f]{64}',x) for x in (v.get('failureSHA256',''),v.get('coreSourceSHA256',''))):raise ValueError('finite original terminal shape rejected')
  keys=('productProcesses','realRegistrations','realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages')
  if any(type(v.get(k)) is not int or not 0<=v[k]<=20 for k in keys):raise ValueError('finite original terminal counts rejected')
- write(output,{'version':v['version'],'accepted':v['accepted'],'phase':v['phase'],'failureSHA256':v.get('failureSHA256',''),'coreSourceSHA256':v.get('coreSourceSHA256',''),'originalResultSHA256':sha(raw),'counts':{k:v[k] for k in keys},'rawLogsOrDataExported':False})
+ write(output,{'version':v['version'],'accepted':v['accepted'],'phase':v['phase'],'failureSHA256':v.get('failureSHA256',''),'coreSourceSHA256':v.get('coreSourceSHA256',''),'originalResultSHA256':sha(raw),'counts':{k:v[k] for k in keys},'startupBoundary':project_startup_boundary(v),'rawLogsOrDataExported':False})
 
 def check_result(v,c):
  flags=('accepted','dualTokens','chatTokenSelfRead','configHTTP','wrongPasswordRejected','businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')

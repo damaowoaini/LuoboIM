@@ -1,6 +1,5 @@
 {
   "acceptedChartArtifact": {
-    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
     "currentChart5": {
       "artifactBytes": 71834348,
       "artifactID": 13535759454,
@@ -18,7 +17,8 @@
       "head": "3942c2acadd0b6343b9f64e3a444a52d0a28e3d7",
       "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
       "run": 42180782218
-    }
+    },
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1"
   },
   "auxiliaryBuilds": [
     "./cmd/openim-msgtransfer",
@@ -298,18 +298,20 @@
     "ci/product20/test_receiver.py"
   ],
   "derivedHarnessSource": {
-    "members": 1586,
-    "digest": "7dc11cc40a714afae27fabdc644c82201b469b29f340ee1a11e493755c54c01b"
+    "digest": "7463f4ea88d3afe889e78d03ec94bbb795eee95f85865fba5e0bb69de94e9a76",
+    "members": 1586
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
-    "rootAccepted": true,
-    "source": {
-      "members": 1584,
-      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
+    "core14": {
+      "artifactBytes": 607490716,
+      "artifactID": 13548912327,
+      "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
+      "attempt": 1,
+      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+      "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
+      "run": 42310913329
     },
-    "rootAcceptanceSHA256": "edf29c4e587cbf181a7e7e9d526e6fc300c0f328f32d2314b7a547854a1d7ae4",
-    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
     "currentChart5": {
       "artifactBytes": 71834348,
       "artifactID": 13535759454,
@@ -328,14 +330,12 @@
       "manifestSHA256": "eb70043edd59ce14ac75e12201cd065fde2e3fcd3cba976de4cfd9921743c0e9",
       "run": 42180782218
     },
-    "core14": {
-      "run": 42310913329,
-      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
-      "attempt": 1,
-      "artifactID": 13548912327,
-      "artifactBytes": 607490716,
-      "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
-      "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e"
+    "mode": "core14-currentChart5-historicalRouteFrom6-v1",
+    "rootAcceptanceSHA256": "edf29c4e587cbf181a7e7e9d526e6fc300c0f328f32d2314b7a547854a1d7ae4",
+    "rootAccepted": true,
+    "source": {
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
+      "members": 1584
     }
   },
   "fixtureConfiguration": {
@@ -379,8 +379,8 @@
   "graphProvider": {
     "path": "ci/backend-fullgraph/run.py",
     "source": {
-      "members": 1584,
-      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
+      "members": 1584
     },
     "status": "root-accepted-current-core14-source-four-scenes-full-artifact-body-receive-required"
   },
@@ -451,7 +451,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "d3c0ea49d5c733e15fa81133ec734614d7c901e8673591827c4c3138503e6c4f"
+    "server/internal/runtimeacceptance/product20_linux.go": "65a87bd1f454a813557eb032bf8899deca7e512d21c87aa23ffa2079f5685e69"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {

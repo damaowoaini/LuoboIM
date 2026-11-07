@@ -134,5 +134,41 @@ class SplitProducerContract(unittest.TestCase):
   with self.assertRaises(ValueError) as caught:namespace['actual_except_path']()
   self.assertIs(caught.exception,original)
 
+ def test_startup_boundary_exports_only_closed_primary_and_cleanup_observations(self):
+  private='PRIVATE_PASSWORD https://private.invalid/secret /private/task/stdout.private'
+  base={'version':'fresh-product20-http-ws-result-v1','accepted':False,'phase':'fresh-sql-and-six-real-services','failureSHA256':'a'*64,'coreSourceSHA256':'b'*64,'productProcesses':14,'realRegistrations':0,'realPasswordLogins':0,'ordinaryDispatches':0,'peerMessages':0,'historyMessages':0,'auxiliaryListenersJoined':True,'originalSixChildrenExited':False,'originalCoreCleanupComplete':True,'sixOriginalPIDs':[7001],'privateLog':private,'privateURL':private,'startupBoundary':{'version':'product20-startup-boundary-v1','entered':True,'substep':'product-wait-port','role':'admin-rpc','sixForked':1,'sixReady':0,'primaryCause':{'present':True,'classes':['other','exec-exit'],'truncated':False,'errno':0,'mysqlNumber':0,'execState':'exited','exitCode':2,'signal':0}}}
+  with tempfile.TemporaryDirectory() as folder:
+   root=Path(folder).resolve();sequence=0
+   def project(value):
+    nonlocal sequence
+    sequence+=1;source=root/('input-'+str(sequence)+'.json');output=root/('public-'+str(sequence)+'.json');source.write_text(json.dumps(value));controller.export_terminal(source,output);return json.loads(output.read_text())
+   value=project(base);observation=value['startupBoundary']
+   self.assertEqual(observation['substep'],'product-wait-port');self.assertEqual(observation['role'],'admin-rpc');self.assertEqual(observation['sixForked'],1);self.assertEqual(observation['sixReady'],0);self.assertEqual(observation['primaryCause']['exitCode'],2);self.assertEqual(observation['cleanup'],{k:base[k] for k in ('auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')});self.assertTrue(observation['primaryCauseCapturedBeforeCleanup']);self.assertFalse(observation['runtimeReadyP20Accepted']);self.assertFalse(observation['physicalFirstFailureClaimed']);self.assertNotIn(private,json.dumps(value));self.assertNotIn('7001',json.dumps(value));self.assertNotIn('privateLog',json.dumps(value))
+   # Every role is finite; migration and primary numeric facts stay distinct.
+   for role in controller.NAMES:
+    good=copy.deepcopy(base);good['startupBoundary']['role']=role;self.assertEqual(project(good)['startupBoundary']['role'],role)
+   good=copy.deepcopy(base);good['startupBoundary'].update(substep='route-migrate-wait',role='route-service',sixForked=0);good['startupBoundary']['primaryCause'].update(execState='signaled',exitCode=-1,signal=15);self.assertEqual(project(good)['startupBoundary']['primaryCause']['signal'],15)
+   good=copy.deepcopy(base);good['startupBoundary'].update(substep='aux-https-listen',role='aux',sixForked=0);good['startupBoundary']['primaryCause'].update(classes=['net-op','os-syscall','syscall-errno'],errno=13,execState='none',exitCode=-1);self.assertEqual(project(good)['startupBoundary']['primaryCause']['errno'],13)
+   good=copy.deepcopy(base);good['startupBoundary'].update(substep='route-tenant-seed',role='route-service',sixForked=0);good['startupBoundary']['primaryCause'].update(classes=['mysql'],mysqlNumber=1045,execState='none',exitCode=-1);self.assertEqual(project(good)['startupBoundary']['primaryCause']['mysqlNumber'],1045)
+   # Known false and not-entered are observations; missing is rejected.
+   good=copy.deepcopy(base);good['startupBoundary'].update(entered=False,substep='not-entered',role='none',sixForked=0);good['startupBoundary']['primaryCause'].update(present=False,classes=[],execState='none',exitCode=-1);good['productProcesses']=0;self.assertFalse(project(good)['startupBoundary']['entered'])
+   good=copy.deepcopy(base);good['startupBoundary'].update(substep='complete',role='none',sixForked=6,sixReady=6);good['startupBoundary']['primaryCause'].update(present=False,classes=[],execState='none',exitCode=-1);good['productProcesses']=20;self.assertEqual(project(good)['startupBoundary']['substep'],'complete')
+   mutations=[]
+   def bad_observation(key,value):
+    bad=copy.deepcopy(base);bad['startupBoundary'][key]=value;mutations.append(bad)
+   def bad_cause(key,value):
+    bad=copy.deepcopy(base);bad['startupBoundary']['primaryCause'][key]=value;mutations.append(bad)
+   for key,value in [('substep',private),('role',private),('role','aux'),('entered',1),('sixForked',True),('sixReady',False),('sixForked',7),('sixForked',-1),('sixReady',2),('secret',private)]:bad_observation(key,value)
+   for key,value in [('classes',[private]),('classes',['other','other']),('classes',[]),('present',1),('truncated',0),('errno',True),('errno',-1),('errno',4096),('errno',13),('mysqlNumber',True),('mysqlNumber',-1),('mysqlNumber',65536),('mysqlNumber',1045),('execState',private),('exitCode',True),('exitCode',256),('exitCode',-1),('signal',True),('signal',1),('detail',private)]:bad_cause(key,value)
+   bad=copy.deepcopy(base);del bad['startupBoundary'];mutations.append(bad)
+   bad=copy.deepcopy(base);del bad['startupBoundary']['primaryCause'];mutations.append(bad)
+   for key in ('auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete'):
+    bad=copy.deepcopy(base);del bad[key];mutations.append(bad)
+    bad=copy.deepcopy(base);bad[key]=0;mutations.append(bad)
+   bad=copy.deepcopy(base);bad['productProcesses']=True;mutations.append(bad)
+   for bad in mutations:
+    with self.assertRaises(ValueError) as caught:project(bad)
+    self.assertNotIn(private,str(caught.exception))
+
 
 if __name__=='__main__':unittest.main()
