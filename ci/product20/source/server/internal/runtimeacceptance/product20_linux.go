@@ -825,7 +825,7 @@ func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db
 	value["rpcRegisterName"] = map[string]any{"openImAdminName": "admin", "openImChatName": "chat", "openImOfficeName": "office", "openImRtcName": "Rtc"}
 	value["chatApi"] = map[string]any{"openImChatApiPort": []int{31008}, "listenIP": "127.0.0.1"}
 	value["adminApi"] = map[string]any{"openImAdminApiPort": []int{31009}, "listenIP": "127.0.0.1"}
-	value["mysql"] = map[string]any{"address": []string{"127.0.0.1:3306"}, "username": user, "password": password, "database": db, "maxOpenConn": 8, "maxIdleConn": 2, "maxLifeTime": 60, "logLevel": 1}
+	value["mysql"] = map[string]any{"address": []string{"127.0.0.1:3306"}, "username": user, "password": password, "database": db, "maxOpenConn": 8, "maxIdleConn": 2, "maxLifeTime": 60, "logLevel": 1, "slowThreshold": 500}
 	value["redis"] = map[string]any{"address": []string{"127.0.0.1:6379"}, "username": b.Credential["redisRuntimeUser"], "password": b.Credential["redisRuntimePassword"]}
 	value["mongo"] = map[string]any{"uri": mongoURI(b.Credential["mongoRuntimeUser"], b.Credential["mongoRuntimePassword"], b.Header.Database, false), "database": b.Header.Database, "maxPoolSize": 4}
 	value["secret"] = b.Credential["serviceSecret"]

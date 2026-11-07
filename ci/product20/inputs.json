@@ -298,7 +298,7 @@
     "ci/product20/test_receiver.py"
   ],
   "derivedHarnessSource": {
-    "digest": "7463f4ea88d3afe889e78d03ec94bbb795eee95f85865fba5e0bb69de94e9a76",
+    "digest": "1465adf2005c2f6e81f88d140c36af6bca9563700f771f7d477b2fe4db5a37c1",
     "members": 1586
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
@@ -451,7 +451,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "65a87bd1f454a813557eb032bf8899deca7e512d21c87aa23ffa2079f5685e69"
+    "server/internal/runtimeacceptance/product20_linux.go": "a3ca31d63040cbd21dd605960787e9bf63b64af93efa165d67107b2db1300dc6"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
