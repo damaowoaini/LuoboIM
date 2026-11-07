@@ -2105,4 +2105,29 @@ class FullGraphControls(unittest.TestCase):
    with self.assertRaises(ValueError):collector.checked_raw_push_evidence(out)
 
 
+
+ def test_minio_proof_restores_original_producer_order_without_weakening_receipt_bytes(self):
+  original=json.loads(run.INPUTS.read_bytes())['minioFixtureBinding']['receipt'];catalog=json.loads(run.regular(run.REPO/'ci/backend-fullgraph/image-catalog.json'));raw=(json.dumps(original,separators=(',',':'))+'\n').encode();self.assertEqual(len(raw),606);self.assertEqual(builder.sha(raw),'d95e1d2f35ff7f7e8f404ff32ab2d98befcacc084d7152a6bdcb2e25f25478db')
+  source=ast.parse(Path(builder.__file__).read_bytes());build=next(n for n in source.body if isinstance(n,ast.FunctionDef) and n.name=='build');written=next(n.value for n in ast.walk(build) if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='receipt' for t in n.targets));self.assertEqual(tuple(k.value for k in written.keys),builder.PROOF_FIELD_ORDER)
+  variants=[copy.deepcopy(original),dict(reversed(list(original.items()))),dict(sorted(original.items()))];elf={'name':'minio','bytes':original['binaryBytes'],'sha256':original['binarySHA256'],'mode':0o700,'GOOS':'linux','GOARCH':'amd64','CGO_ENABLED':'0'}
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory).resolve();receipt=root/'build-receipt.json';receipt.write_bytes(raw);receipt.chmod(0o600)
+   with mock.patch.object(builder,'stream_static_elf',return_value=elf) as stream:
+    for variant in variants:
+     before=list(variant.items());value=builder.proof(variant,catalog,original['toolchainSHA256']);self.assertIsNot(value,variant);self.assertEqual(list(value),list(builder.PROOF_FIELD_ORDER));self.assertEqual((json.dumps(value,separators=(',',':'))+'\n').encode(),raw);self.assertEqual(list(variant.items()),before);dto=builder.fixture_dto(root,value);self.assertEqual(dto['receiptSHA256'],'d95e1d2f35ff7f7e8f404ff32ab2d98befcacc084d7152a6bdcb2e25f25478db');self.assertEqual(dto['SHA256'],original['binarySHA256']);self.assertEqual(dto['bytes'],original['binaryBytes']);self.assertEqual(receipt.read_bytes(),raw);stream.assert_called_with(root/'minio')
+    calls=stream.call_count;canonical=builder.proof(variants[-1],catalog,original['toolchainSHA256']);sorted_raw=(json.dumps(variants[-1],separators=(',',':'))+'\n').encode();self.assertEqual(builder.sha(sorted_raw),'e37bf78f988c7076416605b05055fda15972ededa823c1b2db75286b1287cacd')
+    for bad_raw in (sorted_raw,raw+b' ',raw[:-1]):
+     receipt.write_bytes(bad_raw)
+     with self.assertRaises(ValueError):builder.fixture_dto(root,canonical)
+    receipt.write_bytes(raw);receipt.chmod(0o644)
+    with self.assertRaises(ValueError):builder.fixture_dto(root,canonical)
+    self.assertEqual(stream.call_count,calls);receipt.chmod(0o600)
+    for delta in ({'sha256':'0'*64},{'bytes':original['binaryBytes']-1}):
+     stream.return_value=dict(elf,**delta)
+     with self.assertRaises(ValueError):builder.fixture_dto(root,canonical)
+  missing=dict(original);del missing['version']
+  for bad in (missing,dict(original,extra='not-allowed'),dict(original,binaryBytes=True),dict(original,binaryBytes='146777192'),dict(original,binaryBytes=(256<<20)+1),dict(original,commit=None),dict(original,cgoEnabled='1'),dict(original,binarySHA256='not-a-hash')):
+   with self.assertRaises((ValueError,TypeError)):builder.proof(bad,catalog,original['toolchainSHA256'])
+
+
 if __name__=='__main__':unittest.main()

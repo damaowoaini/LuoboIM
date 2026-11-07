@@ -2087,12 +2087,33 @@
       },
       "legacy_status": "source_present",
       "implementation": {
-        "status": "not_verified",
-        "paths": [],
-        "evidence": []
+        "status": "implemented_pending_full_ui_acceptance",
+        "paths": [
+          "web/src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx",
+          "web/src/core/voicePlayback.ts"
+        ],
+        "evidence": [
+          {
+            "source": "current GitHub Actions scoped component check",
+            "published_commit": "48f54316186cf73dca84634350da8133f74fc9e2",
+            "runURL": "https://github.com/damaowoaini/LuoboIM/actions/runs/42317450188",
+            "source4343": {
+              "members": 4343,
+              "digest": "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8"
+            },
+            "actual_counts": {
+              "total": 1,
+              "pass": 1,
+              "fail": 0,
+              "skip": 0
+            },
+            "checked": "Voice component ownership/cancellation/handoff/resume/reset and Vite/CSP with source-SDK-tool postconditions.",
+            "limits": "Media API/session boundaries are synthetic. Audible browser/Electron audio, network abort/seek, cross-account scenarios and real backend acceptance remain pending."
+          }
+        ]
       },
       "acceptance": {
-        "status": "pending",
+        "status": "targeted_components_pass_browser_and_service_pending",
         "test_levels": [
           "unit",
           "component",
@@ -2104,7 +2125,37 @@
           "不能用toast成功替代实际API受理或媒体连接",
           "角色/资源权限由服务端校验"
         ],
-        "evidence": []
+        "evidence": [
+          "web/src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx",
+          "https://github.com/damaowoaini/LuoboIM/actions/runs/42317450188"
+        ]
+      },
+      "currentVoicePlaybackCheckpoint": {
+        "state": "scoped_component_and_build_PASS",
+        "runURL": "https://github.com/damaowoaini/LuoboIM/actions/runs/42317450188",
+        "source": {
+          "members": 4343,
+          "digest": "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8"
+        },
+        "covered": "Controlled real component lifecycle, lease handoff, pause/resume and current failure feedback; actual media and service acceptance pending.",
+        "fullFeatureAcceptance": false,
+        "publicObservation": {
+          "source": "current GitHub Actions scoped component check",
+          "published_commit": "48f54316186cf73dca84634350da8133f74fc9e2",
+          "runURL": "https://github.com/damaowoaini/LuoboIM/actions/runs/42317450188",
+          "source4343": {
+            "members": 4343,
+            "digest": "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8"
+          },
+          "actual_counts": {
+            "total": 1,
+            "pass": 1,
+            "fail": 0,
+            "skip": 0
+          },
+          "checked": "Voice component ownership/cancellation/handoff/resume/reset and Vite/CSP with source-SDK-tool postconditions.",
+          "limits": "Media API/session boundaries are synthetic. Audible browser/Electron audio, network abort/seek, cross-account scenarios and real backend acceptance remain pending."
+        }
       }
     },
     {
@@ -5165,8 +5216,8 @@
     "all107Accepted": false,
     "componentBrowserSupplement": "docs/architecture/web-privacy-component-browser-v2.json"
   },
-  "last_evidence_update_utc": "2026-10-17T07:47:37.714647+00:00",
-  "latest_update_scope": "scoped actual browser image/file+preview/download and config ordering new4/strict/bundle; full107 not closed",
+  "last_evidence_update_utc": "2026-11-07T00:32:01.749601+00:00",
+  "latest_update_scope": "Current4343 voice component1 and Vite/CSP/source-SDK-tool post only; no old evidence promotion, audible browser/Electron/real-service and full107 remain pending.",
   "controlledSDKPrivateMessageCheckpoint": {
     "state": "actual_both_countdown_expiry_and_reentry_PASS",
     "evidence": "docs/architecture/web-controlled-sdk-r5-scoped.json",

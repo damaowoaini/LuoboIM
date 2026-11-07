@@ -111,8 +111,9 @@ FIXTURE_POLICY={'version':'owned-minio-fixture-artifact-v1','enabled':True,
  'downloadSeconds':300,'names':['minio','build-receipt.json','manifest.json'],
  'retentionDays':7,'compressionLevel':1,'fixtureOnly':True,'runtimeAccepted':False,
  'readyPermit':False,'copyBinary':False,'sameRepositoryOnly':True}
-PROOF_KEYS={'version','repository','commit','sourceDigestSHA256','goModSHA256','goSumSHA256',
- 'toolchainSHA256','cgoEnabled','binarySHA256','binaryBytes'}
+PROOF_FIELD_ORDER=('version','repository','commit','sourceDigestSHA256','goModSHA256','goSumSHA256',
+ 'toolchainSHA256','cgoEnabled','binarySHA256','binaryBytes')
+PROOF_KEYS=set(PROOF_FIELD_ORDER)
 
 def fixture_policy(c):
  if c.get('minioFixturePolicy')!=FIXTURE_POLICY or 'minioFixtureBinding' not in c:raise ValueError('explicit MinIO fixture policy and binding required')
@@ -134,7 +135,8 @@ def proof(value,catalog=None,toolchain_sha=None):
   c=catalog['minio']
   if c['mode']!='source-elf' or c['status']!='historical_unmaintained_test_only' or c['repository']!=value['repository'] or c['commit']!=value['commit'] or c['goMod']['sha256']!=value['goModSHA256'] or c['goSum']['sha256']!=value['goSumSHA256'] or c['cgoEnabled']!=value['cgoEnabled']:raise ValueError('current fixed fixture source/locks differ')
  if toolchain_sha is not None and value['toolchainSHA256']!=toolchain_sha:raise ValueError('original fixture Go toolchain differs')
- return value
+ # Match the original producer's byte order, independent of caller JSON order.
+ return {name:value[name] for name in PROOF_FIELD_ORDER}
 
 def stream_static_elf(path):
  # No whole-ELF allocation and no executable invocation, including on reuse.
