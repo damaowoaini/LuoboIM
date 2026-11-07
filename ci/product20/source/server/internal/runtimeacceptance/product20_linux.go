@@ -101,6 +101,8 @@ type product20Result struct {
 	StartupBoundary             product20StartupBoundary `json:"startupBoundary"`
 	HTTPExchanges               []product20HTTPExchange  `json:"httpExchanges"`
 	ConfigProxyStatus           int                      `json:"configProxyStatus"`
+
+	RegistrationFailure *product20RegistrationObservation `json:"registrationFailure,omitempty"`
 }
 
 // This diagnostic observes original returns only. It never formats an error,
@@ -446,6 +448,79 @@ type product20Aux struct {
 	smtpPassword string
 	transports   []*http.Transport
 	configStatus atomic.Int32
+
+	hopMu         sync.Mutex
+	hops          []product20RegistrationHop
+	hopsTruncated bool
+}
+
+type product20RegistrationHop struct {
+	Hop     string `json:"hop"`
+	Status  int    `json:"status"`
+	AppCode *int   `json:"appCode"`
+}
+
+// Only the finite registration dependencies are observed across this task.
+// Background work can also call these routes, so these are run-scoped events.
+func (a *product20Aux) observeRegistrationHop(path string, status int) func(*int) {
+	var hop string
+	switch path {
+	case "/chat/account/register":
+		hop = "chart-register"
+	case "/chat/internal/registration/receipt":
+		hop = "chart-receipt"
+	case "/api/auth/user_token":
+		hop = "core-token"
+	case "/api/user/get_users_info":
+		hop = "core-user-read"
+	case "/api/user/user_register":
+		hop = "core-user-create"
+	default:
+		return nil
+	}
+	a.hopMu.Lock()
+	defer a.hopMu.Unlock()
+	if len(a.hops) >= 16 {
+		a.hopsTruncated = true
+		return nil
+	}
+	index := len(a.hops)
+	a.hops = append(a.hops, product20RegistrationHop{Hop: hop, Status: status})
+	return func(code *int) {
+		a.hopMu.Lock()
+		defer a.hopMu.Unlock()
+		a.hops[index].AppCode = code
+	}
+}
+
+// Capture only complete small JSON envelopes as the original proxy reads them.
+// A partial or larger body still flows through the proxy unchanged.
+type product20EnvelopeTap struct {
+	io.ReadCloser
+	body    []byte
+	observe func(*int)
+}
+
+func (tap *product20EnvelopeTap) Read(p []byte) (int, error) {
+	n, err := tap.ReadCloser.Read(p)
+	if tap.observe == nil {
+		return n, err
+	}
+	if len(tap.body)+n > 16<<10 {
+		tap.body, tap.observe = nil, nil
+		return n, err
+	}
+	tap.body = append(tap.body, p[:n]...)
+	if err != nil {
+		var response struct {
+			Code *int `json:"errCode"`
+		}
+		if err == io.EOF && json.Unmarshal(tap.body, &response) == nil && response.Code != nil && *response.Code >= 0 && *response.Code <= 0xffffffff {
+			tap.observe(response.Code)
+		}
+		tap.body, tap.observe = nil, nil
+	}
+	return n, err
 }
 
 func product20NewAux(work, password string, observation *product20StartupBoundary) (*product20Aux, error) {
@@ -533,15 +608,23 @@ func (a *product20Aux) start(observation *product20StartupBoundary) error {
 		proxy.Transport = transport
 		a.transports = append(a.transports, transport)
 		proxy.ModifyResponse = func(response *http.Response) error {
-			if p == "/chat" && response.Request != nil && response.Request.URL.Path == "/client_config/get" {
-				a.configStatus.Store(int32(response.StatusCode))
+			if response.Request != nil {
+				path := p + response.Request.URL.Path
+				if path == "/chat/client_config/get" {
+					a.configStatus.Store(int32(response.StatusCode))
+				}
+				if observe := a.observeRegistrationHop(path, response.StatusCode); observe != nil {
+					response.Body = &product20EnvelopeTap{ReadCloser: response.Body, observe: observe}
+				}
 			}
 			return nil
 		}
 		proxy.ErrorHandler = func(w http.ResponseWriter, request *http.Request, _ error) {
-			if p == "/chat" && request.URL.Path == "/client_config/get" {
+			path := p + request.URL.Path
+			if path == "/chat/client_config/get" {
 				a.configStatus.Store(http.StatusBadGateway)
 			}
+			a.observeRegistrationHop(path, http.StatusBadGateway)
 			http.Error(w, "task upstream unavailable", http.StatusBadGateway)
 		}
 		proxies[prefix] = proxy
@@ -952,6 +1035,12 @@ func (client product20HTTPClient) post(ctx context.Context, operation, endpoint,
 			exchange.DetailClass = "route-upstream-http"
 		case "目标服务器响应格式错误", "目标服务器响应缺少状态码":
 			exchange.DetailClass = "route-upstream-envelope"
+		case "注册正在确认，请稍后重试；账号创建成功后会自动恢复绑定":
+			exchange.DetailClass = "route-registration-pending"
+		case "账号注册和路由已恢复，请返回登录":
+			exchange.DetailClass = "route-registration-recovered"
+		case "该租户尚未配置安全注册通道":
+			exchange.DetailClass = "route-registration-unconfigured"
 		}
 	}
 	return out, nil
@@ -967,6 +1056,8 @@ type product20Account struct {
 	} `json:"serverInfo"`
 }
 
+var errProduct20Registration = errors.New("actual route registration did not return dual credentials")
+
 func product20Registration(ctx context.Context, client product20HTTPClient, aux *product20Aux, email, password string) (product20Account, error) {
 	var account product20Account
 	verify, e := client.post(ctx, "verify", "http://127.0.0.1:31310/api/verify/send", "", map[string]any{"email": email, "usedFor": 1})
@@ -979,10 +1070,73 @@ func product20Registration(ctx context.Context, client product20HTTPClient, aux 
 	}
 	registration, e := client.post(ctx, "register", "http://127.0.0.1:31310/api/auth/register", "", map[string]any{"verifyCode": code, "autoLogin": true, "platform": 5, "deviceID": "product20-registration", "deviceModel": "task-Linux", "user": map[string]any{"email": email, "password": product20MD5(password), "nickname": "任务用户", "areaCode": ""}})
 	if e != nil || (registration.ErrCode == nil || *registration.ErrCode != 0) || json.Unmarshal(registration.Data, &account) != nil || account.UserID == "" || account.ChatToken == "" || account.IMToken == "" {
-		return account, errors.New("actual route registration did not return dual credentials")
+		return account, errProduct20Registration
 	}
 	return account, nil
 }
+
+type product20RegistrationObservation struct {
+	Attempt       int                        `json:"attempt"`
+	RouteState    string                     `json:"routeState"`
+	ChartState    string                     `json:"chartState"`
+	ChartReason   string                     `json:"chartReason"`
+	IMProvisioned bool                       `json:"imProvisioned"`
+	RunScopedHops []product20RegistrationHop `json:"runScopedHops"`
+	HopsTruncated bool                       `json:"hopsTruncated"`
+}
+
+func (o *product20RegistrationObservation) readState(ctx context.Context, route, chart *sql.DB, tenant, email string) {
+	sum := sha256.Sum256([]byte(strings.ToLower(email)))
+	identity := "email:" + base64.RawURLEncoding.EncodeToString(sum[:])
+	var id, state string
+	e := route.QueryRowContext(ctx, "SELECT registration_id,state FROM registration_intent WHERE account_key=? AND server_id=?", identity, tenant).Scan(&id, &state)
+	switch {
+	case errors.Is(e, sql.ErrNoRows):
+		o.RouteState = "missing"
+		return
+	case e != nil:
+		return
+	}
+	switch state {
+	case "reserved", "confirmed", "bound":
+		o.RouteState = state
+	default:
+		o.RouteState = "other"
+	}
+	o.ChartState = "unavailable"
+	var job, reason sql.NullString
+	e = chart.QueryRowContext(ctx, `SELECT j.state,j.reason,r.im_provisioned_at IS NOT NULL
+		FROM route_registration_receipts r
+		LEFT JOIN admin_provision_jobs j ON j.receipt_id=r.registration_id AND j.user_id=r.user_id AND j.source='public_creation'
+		WHERE r.registration_id=? AND r.normalized_identity=?`, id, identity).Scan(&job, &reason, &o.IMProvisioned)
+	switch {
+	case errors.Is(e, sql.ErrNoRows):
+		o.ChartState = "missing"
+		return
+	case e != nil:
+		o.IMProvisioned = false
+		return
+	}
+	switch job.String {
+	case "awaiting_im", "pending", "conflict", "direct_only", "bound":
+		o.ChartState = job.String
+	default:
+		if job.Valid {
+			o.ChartState = "other"
+		} else {
+			o.ChartState = "receipt-only"
+		}
+	}
+	switch reason.String {
+	case "":
+		o.ChartReason = "none"
+	case "defaults_unconfirmed", "payload_integrity", "unknown_creation_source", "identity_unconfirmed", "identity_changed", "public_receipt_unconfirmed", "im_owner_unconfirmed", "delivery_unconfirmed":
+		o.ChartReason = reason.String
+	default:
+		o.ChartReason = "other"
+	}
+}
+
 func product20Login(ctx context.Context, client product20HTTPClient, email, password string) (product20Account, error) {
 	var account product20Account
 	reply, e := client.post(ctx, "login", "http://127.0.0.1:31310/api/auth/login", "", map[string]any{"email": email, "password": product20MD5(password), "platform": 5, "deviceID": "product20-password", "deviceModel": "task-Linux"})
@@ -1414,6 +1568,17 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		}
 		account, e := product20Registration(ctx, client, aux, email, password)
 		if e != nil {
+			if errors.Is(e, errProduct20Registration) {
+				failure := &product20RegistrationObservation{Attempt: i + 1, RouteState: "unavailable", ChartState: "not-checked", ChartReason: "none"}
+				readCtx, stop := context.WithTimeout(context.WithoutCancel(ctx), 3*time.Second)
+				failure.readState(readCtx, routePool, chartPool, boot.Header.Tenant, email)
+				stop()
+				aux.hopMu.Lock()
+				failure.RunScopedHops = append([]product20RegistrationHop{}, aux.hops...)
+				failure.HopsTruncated = aux.hopsTruncated
+				aux.hopMu.Unlock()
+				result.RegistrationFailure = failure
+			}
 			return e
 		}
 		result.RealRegistrations++

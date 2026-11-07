@@ -31,6 +31,61 @@ class HTTPObservationContract(unittest.TestCase):
   with self.assertRaises(ValueError):
    controller.project_http_observation(dict(v,configProxyStatus=200,httpExchanges=[]))
 
+class RegistrationObservationContract(unittest.TestCase):
+ def test_exports_only_scoped_registration_failure_from_validated_terminal(self):
+  private='PRIVATE_REGISTRATION_VALUE'
+  def exchange(operation,code=0,detail='none'):
+   return {'operation':operation,'outcome':'envelope','status':200,'appCode':code,'detailClass':detail}
+  hops=[{'hop':'chart-register','status':200,'appCode':500},{'hop':'core-user-read','status':404,'appCode':None}]
+  diagnostic={'attempt':1,'routeState':'reserved','chartState':'pending','chartReason':'defaults_unconfirmed',
+              'imProvisioned':False,'runScopedHops':hops,'hopsTruncated':False}
+  terminal={
+   'version':'fresh-product20-http-ws-result-v1','accepted':False,'phase':'actual-route-config-and-registration',
+   'productProcesses':20,'realRegistrations':0,'realPasswordLogins':0,'ordinaryDispatches':0,'peerMessages':0,'historyMessages':0,
+   'auxiliaryListenersJoined':True,'originalSixChildrenExited':True,'originalCoreCleanupComplete':True,
+   'startupBoundary':{'version':'product20-startup-boundary-v1','entered':True,'substep':'complete','role':'none',
+     'sixForked':6,'sixReady':6,'primaryCause':{'present':False,'classes':[],'truncated':False,'errno':0,
+       'mysqlNumber':0,'execState':'none','exitCode':-1,'signal':0}},
+   'configProxyStatus':200,'httpExchanges':[exchange('config'),exchange('verify'),exchange('register',500,'route-registration-pending')],
+   'registrationFailure':diagnostic,'privateAccount':private,
+  }
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory).resolve();original=root/'original.json';output=root/'projected.json'
+   def project(value):
+    original.write_text(json.dumps(value));output.unlink(missing_ok=True)
+    return controller.export_terminal(original,output)
+
+   observed=project(terminal)
+   self.assertEqual(observed['registrationFailure'],{'version':'product20-registration-observation-v1',**diagnostic,
+     'diagnosticOnly':True,'rawBodiesHeadersOrIdentifiersExported':False})
+   self.assertNotIn(private,output.read_text());self.assertFalse(observed['accepted'])
+   legacy=copy.deepcopy(terminal);del legacy['registrationFailure']
+   self.assertNotIn('registrationFailure',project(legacy))
+
+   second=copy.deepcopy(terminal);second['realRegistrations']=1
+   second['httpExchanges'][2]=exchange('register')
+   second['httpExchanges']+=[exchange('verify'),exchange('register',500,'route-registration-recovered')]
+   second['registrationFailure'].update(attempt=2,runScopedHops=[])
+   self.assertEqual(project(second)['registrationFailure']['attempt'],2)
+   second['httpExchanges'][-1]['detailClass']='route-registration-unconfigured'
+   second['registrationFailure'].update(runScopedHops=[{'hop':'core-token','status':999,'appCode':0xffffffff}]*16,hopsTruncated=True)
+   self.assertEqual(len(project(second)['registrationFailure']['runScopedHops']),16)
+
+   invalid=[dict(terminal,accepted=True),dict(terminal,phase='actual-route-password-login-dual-token'),
+            dict(terminal,realRegistrations=1),dict(terminal,httpExchanges=terminal['httpExchanges'][:-1]),
+            dict(terminal,realRegistrations=1,registrationFailure=dict(diagnostic,attempt=2)),
+            dict(terminal,registrationFailure=None)]
+   missing_http=copy.deepcopy(terminal);del missing_http['httpExchanges'],missing_http['configProxyStatus'];invalid.append(missing_http)
+   for field,value in (('attempt',True),('attempt',3),('routeState',private),('chartState',private),('chartReason',private),
+                       ('imProvisioned',0),('hopsTruncated',1),('runScopedHops',None),('runScopedHops',[hops[0]]*17),('identifier',private)):
+    invalid.append(dict(terminal,registrationFailure=dict(diagnostic,**{field:value})))
+   for change in ({'hop':private},{'status':True},{'status':99},{'status':1000},{'appCode':True},{'appCode':-1},
+                  {'appCode':0x100000000},{'header':private}):
+    invalid.append(dict(terminal,registrationFailure=dict(diagnostic,runScopedHops=[dict(hops[0],**change)])))
+   for value in invalid:
+    with self.assertRaises(ValueError) as caught:project(value)
+    self.assertNotIn(private,str(caught.exception));self.assertFalse(output.exists())
+
 class SplitProducerContract(unittest.TestCase):
  def test_current5_expected_manifest_original6_route_and_locked_core_keep_exact_provenance(self):
   c=controller.historical_chart_control(json.loads((HERE/'inputs.json').read_bytes()))  # Original259 fixture, never the pending current source.

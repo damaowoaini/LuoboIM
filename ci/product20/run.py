@@ -652,7 +652,11 @@ def project_startup_boundary(v):
  return {'version':o['version'],'entered':o['entered'],'substep':step,'role':role,'sixForked':o['sixForked'],'sixReady':o['sixReady'],'primaryCause':{k:cause[k] for k in ('present','classes','truncated','errno','mysqlNumber','execState','exitCode','signal')},'cleanup':{k:v[k] for k in cleanup},'diagnosticOnly':True,'primaryCauseCapturedBeforeCleanup':True,'physicalFirstFailureClaimed':False,'rawErrorTextExported':False,'privatePathsOrPIDsExported':False,'runtimeReadyP20Accepted':False}
 
 HTTP_OPERATIONS=('config','verify','register','verify','register','login','login','self','self','wrong-password')
-HTTP_DETAIL_CLASSES=frozenset(('none','route-default-unavailable','route-domain','route-upstream-unavailable','route-upstream-http','route-upstream-envelope'))
+HTTP_DETAIL_CLASSES=frozenset((
+ 'none','route-default-unavailable','route-domain','route-upstream-unavailable',
+ 'route-upstream-http','route-upstream-envelope','route-registration-pending',
+ 'route-registration-recovered','route-registration-unconfigured',
+))
 def project_http_observation(v):
  if 'httpExchanges' not in v and 'configProxyStatus' not in v:return None
  rows=v.get('httpExchanges');proxy=v.get('configProxyStatus')
@@ -667,6 +671,48 @@ def project_http_observation(v):
   if not valid or code is not None and (outcome!='envelope' or type(code) is not int or not 0<=code<=0xffffffff) or detail!='none' and (outcome!='envelope' or code==0):raise ValueError('original HTTP outcome differs')
  return {'version':'product20-http-observation-v1','configProxyStatus':proxy,'exchanges':rows,'diagnosticOnly':True,'rawBodiesOrHeadersExported':False}
 
+def project_registration_failure(v,http):
+ if 'registrationFailure' not in v:
+  return None
+ if (v.get('accepted') is not False or v.get('phase')!='actual-route-config-and-registration'
+     or http is None or not http['exchanges'] or http['exchanges'][-1]['operation']!='register'):
+  raise ValueError('registration observation requires the original failed registration boundary')
+
+ failure=v['registrationFailure']
+ keys={'attempt','routeState','chartState','chartReason','imProvisioned','runScopedHops','hopsTruncated'}
+ if type(failure) is not dict or set(failure)!=keys:
+  raise ValueError('finite registration observation shape required')
+ attempt,completed=failure['attempt'],v.get('realRegistrations')
+ if (type(attempt) is not int or attempt not in (1,2) or type(completed) is not int
+     or attempt!=completed+1 or attempt!=sum(row['operation']=='register' for row in http['exchanges'])):
+  raise ValueError('registration attempt differs from the original count')
+
+ states={
+  'routeState':('unavailable','missing','reserved','confirmed','bound','other'),
+  'chartState':('not-checked','unavailable','missing','receipt-only','awaiting_im','pending','conflict','direct_only','bound','other'),
+  'chartReason':('none','other','defaults_unconfirmed','payload_integrity','unknown_creation_source','identity_unconfirmed','identity_changed','public_receipt_unconfirmed','im_owner_unconfirmed','delivery_unconfirmed'),
+ }
+ if any(type(failure[key]) is not str or failure[key] not in values for key,values in states.items()):
+  raise ValueError('finite registration state and reason required')
+ if any(type(failure[key]) is not bool for key in ('imProvisioned','hopsTruncated')):
+  raise ValueError('finite registration flags required')
+
+ hops=failure['runScopedHops']
+ if type(hops) is not list or len(hops)>16:
+  raise ValueError('bounded registration hops required')
+ allowed_hops=('chart-register','chart-receipt','core-token','core-user-read','core-user-create')
+ for row in hops:
+  if type(row) is not dict or set(row)!={'hop','status','appCode'}:
+   raise ValueError('finite registration hop shape required')
+  hop,status,code=row['hop'],row['status'],row['appCode']
+  if type(hop) is not str or hop not in allowed_hops or type(status) is not int or not 100<=status<=999:
+   raise ValueError('finite registration hop and HTTP status required')
+  if code is not None and (type(code) is not int or not 0<=code<=0xffffffff):
+   raise ValueError('finite registration application code required')
+
+ return {'version':'product20-registration-observation-v1',**failure,
+         'diagnosticOnly':True,'rawBodiesHeadersOrIdentifiersExported':False}
+
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
  phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
@@ -676,6 +722,8 @@ def export_terminal(path,output):
  value={'version':v['version'],'accepted':v['accepted'],'phase':v['phase'],'failureSHA256':v.get('failureSHA256',''),'coreSourceSHA256':v.get('coreSourceSHA256',''),'originalResultSHA256':sha(raw),'counts':{k:v[k] for k in keys},'startupBoundary':project_startup_boundary(v),'rawLogsOrDataExported':False}
  http=project_http_observation(v)
  if http is not None:value['httpObservation']=http
+ registration=project_registration_failure(v,http)
+ if registration is not None:value['registrationFailure']=registration
  write(output,value)
  return value
 
