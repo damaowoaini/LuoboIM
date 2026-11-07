@@ -86,6 +86,98 @@ class RegistrationObservationContract(unittest.TestCase):
     with self.assertRaises(ValueError) as caught:project(value)
     self.assertNotIn(private,str(caught.exception));self.assertFalse(output.exists())
 
+class MessageObservationContract(unittest.TestCase):
+    def test_closed_message_projection_and_same_canonical_mongo_test_reuse(self):
+        observation = {"step": "ack-read", "ackAccepted": False, "peerAccepted": False,
+                       "historyAccepted": False, "readOutcome": "nonbinary",
+                       "readTimeout": False, "readCloseCode": 0}
+        terminal = {"version": "fresh-product20-http-ws-result-v1", "accepted": False,
+                    "phase": "actual-gateway-ordinary-message-once", "productProcesses": 20,
+                    "realRegistrations": 2, "realPasswordLogins": 2, "ordinaryDispatches": 1,
+                    "peerMessages": 0, "historyMessages": 0, "messageObservation": observation,
+                    "privateText": "PRIVATE_MESSAGE_VALUE"}
+        raw = json.dumps(terminal).encode()
+        with mock.patch.object(controller, "regular", return_value=raw), \
+             mock.patch.object(controller, "project_startup_boundary", return_value={}), \
+             mock.patch.object(controller, "write") as write:
+            exported = controller.export_terminal(Path("/original"), Path("/projected"))
+            self.assertEqual(write.call_args.args[1], exported)
+        message = exported["messageObservation"]
+        self.assertEqual(message, {"version": "product20-message-observation-v1", **observation,
+                                  "diagnosticOnly": True, "rawBodiesHeadersOrIdentifiersExported": False})
+        self.assertNotIn("PRIVATE_MESSAGE_VALUE", json.dumps(exported))
+        self.assertIsNone(controller.project_message_observation({}))
+        for step in ("sender-handshake", "peer-handshake", "send-write"):
+            early = dict(terminal, ordinaryDispatches=0,
+                         messageObservation=dict(observation, step=step, readOutcome="none"))
+            self.assertEqual(controller.project_message_observation(early)["step"], step)
+        for step, flags in (("peer-read", (True, False, False)),
+                            ("history-write", (True, True, False)),
+                            ("history-read", (True, True, True)), ("complete", (True, True, True))):
+            current = dict(observation, step=step, readOutcome="none",
+                           ackAccepted=flags[0], peerAccepted=flags[1], historyAccepted=flags[2])
+            self.assertEqual(controller.project_message_observation(dict(terminal, messageObservation=current))["step"], step)
+        complete = dict(terminal, phase="ordinary-peer-history-accepted-local-cleanup-required",
+                        messageObservation=dict(observation, step="complete", readOutcome="none",
+                                                ackAccepted=True, peerAccepted=True, historyAccepted=True))
+        self.assertEqual(controller.project_message_observation(complete)["step"], "complete")
+        self.assertEqual(controller.project_message_observation(dict(complete, accepted=True))["step"], "complete")
+        for timeout, code in ((True, 0), (False, 1000), (False, 4999)):
+            value = dict(observation, readOutcome="read-error", readTimeout=timeout, readCloseCode=code)
+            self.assertEqual(controller.project_message_observation(dict(terminal, messageObservation=value))["readCloseCode"], code)
+        invalid = [dict(terminal, phase="actual-route-config-and-registration"),
+                   dict(terminal, accepted=True), dict(terminal, ordinaryDispatches=0),
+                   dict(terminal, messageObservation=None),
+                   dict(terminal, phase=complete["phase"])]
+        for key, value in (("step", "PRIVATE_MESSAGE_VALUE"), ("readOutcome", "PRIVATE_MESSAGE_VALUE"),
+                           ("ackAccepted", 1), ("peerAccepted", True), ("historyAccepted", True),
+                           ("readTimeout", 1), ("readTimeout", True), ("readCloseCode", True),
+                           ("readCloseCode", 999), ("readCloseCode", 5000),
+                           ("readCloseCode", 1000), ("identifier", "PRIVATE_MESSAGE_VALUE")):
+            invalid.append(dict(terminal, messageObservation=dict(observation, **{key: value})))
+        invalid.append(dict(terminal, messageObservation=dict(observation, readOutcome="read-error",
+                                                             readTimeout=True, readCloseCode=1000)))
+        invalid.append(dict(terminal, messageObservation=dict(observation, step="history-write",
+                                                             ackAccepted=True, peerAccepted=True)))
+        for value in invalid:
+            with self.assertRaises(ValueError) as caught:
+                controller.project_message_observation(value)
+            self.assertNotIn("PRIVATE_MESSAGE_VALUE", str(caught.exception))
+
+        policy = copy.deepcopy(controller.CORE_MONGO_TEST_REUSE)
+        config = {"currentCoreBuild": {"source": policy["source"]}, "coreMongoTestReuse": policy}
+        canonical = {"server/" + name: controller.regular(controller.REPO / "product/server" / name)
+                     for name in ("go.mod", "go.sum")}
+        # The earlier core-vector contract covers hashing. This fixture supplies
+        # its validated digest and exercises the independent source/lock/tool gates.
+        with mock.patch.object(controller, "core_vector", return_value=policy["source"]):
+            self.assertIsNone(controller.verify_core_mongo_test_reuse({}, canonical))
+            self.assertEqual(controller.verify_core_mongo_test_reuse(config, canonical), policy)
+            receipt = controller.core_mongo_test_reuse_receipt(config, canonical, policy["goTool"])
+            self.assertEqual(receipt["currentFreshTestCommands"], 0)
+            self.assertEqual(receipt["priorReceipt"]["test"], policy["priorReceipt"])
+            self.assertNotIn("topPASS", receipt)
+            for field in ("testReceiptSHA256", "postReceiptSHA256", "rootReviewSHA256"):
+                bad = copy.deepcopy(config)
+                bad["coreMongoTestReuse"][field] = "0" * 64
+                with self.assertRaises(ValueError):
+                    controller.verify_core_mongo_test_reuse(bad, canonical)
+            bad = copy.deepcopy(config)
+            bad["currentCoreBuild"]["source"] = {"members": 0, "digest": "0" * 64}
+            with self.assertRaises(ValueError):
+                controller.verify_core_mongo_test_reuse(bad, canonical)
+            drifted = dict(canonical, **{"server/go.sum": b"changed-lock\n"})
+            with self.assertRaises(ValueError):
+                controller.verify_core_mongo_test_reuse(config, drifted)
+            for field, value in (("version", "unknown"), ("sha256", "0" * 64), ("bytes", 1), ("mode", 0)):
+                tool = dict(policy["goTool"], **{field: value})
+                with self.assertRaises(ValueError):
+                    controller.core_mongo_test_reuse_receipt(config, canonical, tool)
+        with mock.patch.object(controller, "core_vector", return_value={"members": 0, "digest": "0" * 64}):
+            with self.assertRaises(ValueError):
+                controller.verify_core_mongo_test_reuse(config, canonical)
+
+
 class SplitProducerContract(unittest.TestCase):
  def test_current5_expected_manifest_original6_route_and_locked_core_keep_exact_provenance(self):
   c=controller.historical_chart_control(json.loads((HERE/'inputs.json').read_bytes()))  # Original259 fixture, never the pending current source.

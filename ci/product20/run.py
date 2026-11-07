@@ -17,6 +17,29 @@ CORE_BUILD_MODE='fresh-current-core14-before-P20-v1'
 MONGO_SOURCE='server/pkg/common/db/unrelation/mongo.go'
 MONGO_TEST='server/pkg/common/db/unrelation/mongo_error_test.go'
 MONGO_TEST_NAME='TestMongoNoDocumentsMapsToOpenIMRecordNotFound'
+CORE_MONGO_TEST_REUSE = {'goTool': {'bytes': 17164055,
+            'mode': 493,
+            'sha256': '548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0',
+            'version': 'go version go1.27.2 linux/amd64'},
+ 'locks': {'go.mod': 'e12331dfa5ce70b14a99f2c4408347ca11747ebe23e19d0d9b023f634eeab029',
+           'go.sum': '97c43c12be1edc668225b2ef21c23e95c242327c310d0f05ffe84bc2d05c71c8'},
+ 'postReceiptSHA256': '4a4ac5cbcb5756e85c6c2189a6f246602d94e8fd0d87a4992fd19a04096c7b67',
+ 'priorReceipt': {'eventsSHA256': '7c7f2652dc517d038be114bc37ec92f198b1ce9317051aff048555af660ba880',
+                  'fail': 0,
+                  'name': 'TestMongoNoDocumentsMapsToOpenIMRecordNotFound',
+                  'package': 'github.com/openimsdk/open-im-server/v3/pkg/common/db/unrelation',
+                  'skip': 0,
+                  'subPASS': 0,
+                  'topPASS': 1},
+ 'producer': {'attempt': 1,
+              'head': '35c3e12dc8be834f07e708e2d6ae3eded4782706',
+              'job': 128297421883,
+              'run': 42337430486},
+ 'rootReviewSHA256': 'ec93a05d8abdafa94eb27e6dc19fcc94bd7713eee6e6898f7c2cf30fc369571d',
+ 'source': {'digest': 'af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a',
+            'members': 1585},
+ 'testReceiptSHA256': 'e82b10f270e9c590925a964735bee5f052087bca51bea8252ba30d24822d751a',
+ 'version': 'same-canonical-core-mongo-test-v1'}
 def sha(b):return hashlib.sha256(b).hexdigest()
 def regular(path,maximum=32<<20):
  p=Path(path)
@@ -81,6 +104,28 @@ def check_current_core_test_events(raw):
      or sum(e.get('Action')=='pass' and e.get('Test')==MONGO_TEST_NAME for e in relevant)!=1
      or sum(e.get('Action')=='pass' and 'Test' not in e for e in relevant)!=1):raise ValueError('one actual Mongo normalization test and package completion required')
  return {'package':package,'name':MONGO_TEST_NAME,'topPASS':1,'subPASS':0,'skip':0,'fail':0,'eventsSHA256':sha(raw)}
+def verify_core_mongo_test_reuse(c,canonical):
+ if 'coreMongoTestReuse' not in c:return None
+ policy=c['coreMongoTestReuse']
+ encode=lambda value:json.dumps(value,sort_keys=True,separators=(',',':'))
+ if type(policy) is not dict or encode(policy)!=encode(CORE_MONGO_TEST_REUSE):
+  raise ValueError('exact prior Mongo test policy required')
+ if 'currentCoreBuild' not in c or core_source(c)!=policy['source'] or core_vector(canonical)!=policy['source']:
+  raise ValueError('Mongo reuse requires the same complete canonical source')
+ if any('server/'+name not in canonical or sha(canonical['server/'+name])!=expected for name,expected in policy['locks'].items()):
+  raise ValueError('Mongo reuse requires the original module locks')
+ return policy
+
+def core_mongo_test_reuse_receipt(c,canonical,actual_go):
+ policy=verify_core_mongo_test_reuse(c,canonical)
+ if policy is None or actual_go!=policy['goTool']:
+  raise ValueError('actual Go tool must match the original Mongo test')
+ return {'version':'product20-core-mongo-test-reuse-v1','source':policy['source'],
+         'sourceAndLocksExact':True,'actualGoToolExact':True,'currentFreshTestCommands':0,
+         'priorReceipt':{'producer':policy['producer'],'test':policy['priorReceipt'],
+           'testReceiptSHA256':policy['testReceiptSHA256'],'postReceiptSHA256':policy['postReceiptSHA256'],
+           'rootReviewSHA256':policy['rootReviewSHA256']}}
+
 def verify():
  c=json.loads(regular(HERE/'inputs.json'))
  if c['schema']!=1 or c['scope']!='one-fresh-product20-http-ws-only' or c['productRebuilds']!=(14 if 'currentCoreBuild' in c else 0) or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
@@ -92,6 +137,7 @@ def verify():
  graph=load(c['graphProvider']['path'],'p20_graph_source');g,bodies,*_=graph.verify()
  if g['source']!=c['graphProvider']['source']:raise ValueError('explicit graph source differs')
  bodies=select_core_source(c,bodies)
+ verify_core_mongo_test_reuse(c,bodies)
  chart=load('ci/chart-route-build/run.py','p20_chart_source');cc,chart_bodies=chart.verify()
  if cc['sources']!=c['chartProvider']['sources'] or cc['locks']!=c['chartProvider']['locks']:raise ValueError('accepted chart6 source/locks differ')
  if 'historicalPreviousChart5' in c:
@@ -556,7 +602,10 @@ def run():
   # fixture/auxiliary source. The historical artifact receiver stays separate.
   go=shutil.which('go');version=command('go-version',[go,'version'],15,env).decode().strip()
   if version!='go version go1.27.2 linux/amd64':raise ValueError('exact Go1.27.2 required')
-  go_sha=sha(regular(Path(go).resolve()));env['GOROOT']=command('go-root',[go,'env','GOROOT'],15,env).decode().strip()
+  go_path=Path(go).resolve();go_raw=regular(go_path);go_sha=sha(go_raw)
+  actual_go={'version':version,'bytes':len(go_raw),'sha256':go_sha,'mode':stat.S_IMODE(go_path.stat().st_mode)}
+  del go_raw
+  env['GOROOT']=command('go-root',[go,'env','GOROOT'],15,env).decode().strip()
   command('auxiliary-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off');binroot=root/'aux';binroot.mkdir(mode=0o700)
   if 'currentCoreBuild' in c:
@@ -564,8 +613,11 @@ def run():
    for target,body in original.items():
     path=core_stage/target;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body);path.chmod(g['sourceModes'].get(target,0o644))
    (core_stage/'server/config/config.yaml').write_bytes(original['server/config/config.example.yaml']);(core_stage/'server/config/config.yaml').chmod(0o600)
-   events=command('current-core-mongo-normalization-test',[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+MONGO_TEST_NAME+'$','./pkg/common/db/unrelation'],600,offline,core_stage/'server')
-   write(out/'current-core-test.json',check_current_core_test_events(events))
+   if 'coreMongoTestReuse' in c:
+    write(out/'current-core-test-reuse.json',core_mongo_test_reuse_receipt(c,original,actual_go))
+   else:
+    events=command('current-core-mongo-normalization-test',[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+MONGO_TEST_NAME+'$','./pkg/common/db/unrelation'],600,offline,core_stage/'server')
+    write(out/'current-core-test.json',check_current_core_test_events(events))
    productdir=root/'product14';productdir.mkdir(mode=0o700)
    rows=[]
    entries=g['entrypointContract']['entrypoints']
@@ -782,6 +834,46 @@ def project_registration_failure(v,http):
  return {'version':'product20-registration-observation-v1',**failure,
          'diagnosticOnly':True,'rawBodiesHeadersOrIdentifiersExported':False}
 
+def project_message_observation(v):
+ if 'messageObservation' not in v:return None
+ phases=('actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required')
+ if v.get('phase') not in phases:
+  raise ValueError('message observation requires the original message boundary')
+ observation=v['messageObservation']
+ keys={'step','ackAccepted','peerAccepted','historyAccepted','readOutcome','readTimeout','readCloseCode'}
+ if type(observation) is not dict or set(observation)!=keys:
+  raise ValueError('finite message observation shape required')
+ step=observation['step'];outcome=observation['readOutcome'];code=observation['readCloseCode']
+ steps=('sender-handshake','peer-handshake','send-write','ack-read','peer-read','history-write','history-read','complete')
+ if type(step) is not str or step not in steps or type(outcome) is not str or outcome not in ('none','read-error','nonbinary','decode-error'):
+  raise ValueError('finite message step and read outcome required')
+ if any(type(observation[key]) is not bool for key in ('ackAccepted','peerAccepted','historyAccepted','readTimeout')):
+  raise ValueError('finite message flags required')
+ if type(code) is not int or code!=0 and not 1000<=code<=4999:
+  raise ValueError('finite message close code required')
+ ack,peer,history=(observation[key] for key in ('ackAccepted','peerAccepted','historyAccepted'))
+ if history and not peer or peer and not ack:
+  raise ValueError('message observations must preserve completion order')
+ if (step in ('sender-handshake','peer-handshake','send-write') and (ack or peer or history)
+     or step=='ack-read' and (peer or history)
+     or step=='peer-read' and (not ack or history)
+     or step in ('history-write','history-read') and not (ack and peer)
+     or step=='complete' and not (ack and peer and history)):
+  raise ValueError('message completion flags differ from the original step')
+ if (v.get('accepted') is True or v['phase']==phases[1]) and step!='complete':
+  raise ValueError('completed result requires completed message observation')
+ if outcome!='read-error' and (observation['readTimeout'] or code!=0) or observation['readTimeout'] and code!=0:
+  raise ValueError('message read error values differ')
+ if outcome!='none' and step not in ('ack-read','peer-read','history-read'):
+  raise ValueError('read outcomes require an original read step')
+ count=v.get('ordinaryDispatches')
+ if (type(count) is not int or count not in (0,1)
+     or step in ('sender-handshake','peer-handshake') and count!=0
+     or step not in ('sender-handshake','peer-handshake','send-write') and count!=1):
+  raise ValueError('message observation differs from the original dispatch count')
+ return {'version':'product20-message-observation-v1',**observation,
+         'diagnosticOnly':True,'rawBodiesHeadersOrIdentifiersExported':False}
+
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
  phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
@@ -793,6 +885,8 @@ def export_terminal(path,output):
  if http is not None:value['httpObservation']=http
  registration=project_registration_failure(v,http)
  if registration is not None:value['registrationFailure']=registration
+ message=project_message_observation(v)
+ if message is not None:value['messageObservation']=message
  write(output,value)
  return value
 

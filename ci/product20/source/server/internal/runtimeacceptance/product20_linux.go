@@ -103,6 +103,7 @@ type product20Result struct {
 	ConfigProxyStatus           int                      `json:"configProxyStatus"`
 
 	RegistrationFailure *product20RegistrationObservation `json:"registrationFailure,omitempty"`
+	MessageObservation  *product20MessageObservation      `json:"messageObservation,omitempty"`
 }
 
 // This diagnostic observes original returns only. It never formats an error,
@@ -1146,6 +1147,68 @@ func product20Login(ctx context.Context, client product20HTTPClient, email, pass
 	return account, nil
 }
 
+// Only the message caller writes this diagnostic; heartbeat workers never do.
+// None of these fields contains message data, peer identity, or error text.
+type product20MessageObservation struct {
+	Step            string `json:"step"`
+	AckAccepted     bool   `json:"ackAccepted"`
+	PeerAccepted    bool   `json:"peerAccepted"`
+	HistoryAccepted bool   `json:"historyAccepted"`
+	ReadOutcome     string `json:"readOutcome"`
+	ReadTimeout     bool   `json:"readTimeout"`
+	ReadCloseCode   int    `json:"readCloseCode"`
+}
+
+func (o *product20MessageObservation) readError(err error) {
+	o.ReadOutcome = "read-error"
+	var timeout net.Error
+	if errors.As(err, &timeout) {
+		o.ReadTimeout = timeout.Timeout()
+	}
+	var closed *websocket.CloseError
+	if errors.As(err, &closed) && closed.Code >= 1000 && closed.Code <= 4999 {
+		o.ReadCloseCode = closed.Code
+	}
+}
+
+// WriteControl is safe alongside the caller's sole data writer and reader.
+// Each worker has one cancellation owner and is joined before its socket closes.
+func product20Heartbeat(ctx context.Context, conn *websocket.Conn) func() {
+	lifetime, cancel := context.WithCancel(ctx)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		ticker := time.NewTicker(10 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-lifetime.Done():
+				return
+			case <-ticker.C:
+				if lifetime.Err() != nil {
+					return
+				}
+				if conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second)) != nil {
+					return
+				}
+			}
+		}
+	}()
+	return func() {
+		cancel()
+		<-done
+	}
+}
+
+// Preserve the existing protobuf return while observing only a closed outcome.
+func product20MessageDecode(body []byte, value proto.Message, observation *product20MessageObservation) error {
+	err := proto.Unmarshal(body, value)
+	if err != nil {
+		observation.ReadOutcome = "decode-error"
+	}
+	return err
+}
+
 type product20Wire struct {
 	ReqIdentifier int32
 	Token         string
@@ -1180,16 +1243,26 @@ func product20WireWrite(conn *websocket.Conn, value product20Wire) error {
 	}
 	return conn.WriteMessage(websocket.BinaryMessage, body.Bytes())
 }
-func product20WireRead(conn *websocket.Conn) (product20Wire, error) {
+func product20WireRead(conn *websocket.Conn, observation *product20MessageObservation) (product20Wire, error) {
 	var value product20Wire
+	observation.ReadOutcome, observation.ReadTimeout, observation.ReadCloseCode = "none", false, 0
 	if e := conn.SetReadDeadline(time.Now().Add(30 * time.Second)); e != nil {
+		observation.readError(e)
 		return value, e
 	}
 	kind, body, e := conn.ReadMessage()
-	if e != nil || kind != websocket.BinaryMessage {
+	if e != nil {
+		observation.readError(e)
+		return value, errors.New("real gateway binary response absent")
+	}
+	if kind != websocket.BinaryMessage {
+		observation.ReadOutcome = "nonbinary"
 		return value, errors.New("real gateway binary response absent")
 	}
 	e = gob.NewDecoder(bytes.NewReader(body)).Decode(&value)
+	if e != nil {
+		observation.ReadOutcome = "decode-error"
+	}
 	return value, e
 }
 func product20Matches(groups map[string]*sdkws.PullMsgs, clientID string) []*sdkws.MsgData {
@@ -1203,23 +1276,30 @@ func product20Matches(groups map[string]*sdkws.PullMsgs, clientID string) []*sdk
 	}
 	return matches
 }
-func product20Message(ctx context.Context, a, b product20Account, roots *x509.CertPool, onDispatch func()) (clientID, serverID string, seq int64, err error) {
+func product20Message(ctx context.Context, a, b product20Account, roots *x509.CertPool, observation *product20MessageObservation, onDispatch func()) (clientID, serverID string, seq int64, err error) {
+	observation.Step = "sender-handshake"
 	sender, e := product20Dial(ctx, roots, a)
 	if e != nil {
 		err = e
 		return
 	}
 	defer sender.Close()
+	stopSenderHeartbeat := product20Heartbeat(ctx, sender)
+	defer stopSenderHeartbeat()
+	observation.Step = "peer-handshake"
 	peer, e := product20Dial(ctx, roots, b)
 	if e != nil {
 		err = e
 		return
 	}
 	defer peer.Close()
+	stopPeerHeartbeat := product20Heartbeat(ctx, peer)
+	defer stopPeerHeartbeat()
 	stopSender := context.AfterFunc(ctx, func() { _ = sender.Close() })
 	defer stopSender()
 	stopPeer := context.AfterFunc(ctx, func() { _ = peer.Close() })
 	defer stopPeer()
+	observation.Step = "send-write"
 	clientID = uuid.NewString()
 	payload, _ := json.Marshal(map[string]string{"content": "萝卜对话 product20 ordinary acceptance"})
 	message := &sdkws.MsgData{SendID: a.UserID, RecvID: b.UserID, ClientMsgID: clientID, SenderPlatformID: 5, SenderNickname: "任务用户", SessionType: 1, MsgFrom: 100, ContentType: 101, Content: payload, CreateTime: time.Now().UnixMilli(), Options: map[string]bool{constant.IsHistory: true, constant.IsPersistent: true, constant.IsSenderSync: true, constant.IsConversationUpdate: true, constant.IsSenderConversationUpdate: true, constant.IsUnreadCount: true, constant.IsOfflinePush: false}}
@@ -1234,9 +1314,10 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 	if err = product20WireWrite(sender, product20Wire{ReqIdentifier: 1003, SendID: a.UserID, OperationID: operation, MsgIncr: "1", Data: encoded}); err != nil {
 		return
 	}
+	observation.Step = "ack-read"
 	acknowledged := false
 	for i := 0; i < 32; i++ {
-		frame, e := product20WireRead(sender)
+		frame, e := product20WireRead(sender, observation)
 		if e != nil {
 			err = e
 			return
@@ -1245,20 +1326,22 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 			continue
 		}
 		var ack msg.SendMsgResp
-		if frame.OperationID != operation || frame.MsgIncr != "1" || frame.ErrCode != 0 || proto.Unmarshal(frame.Data, &ack) != nil || ack.GetClientMsgID() != clientID || ack.GetServerMsgID() == "" {
+		if frame.OperationID != operation || frame.MsgIncr != "1" || frame.ErrCode != 0 || product20MessageDecode(frame.Data, &ack, observation) != nil || ack.GetClientMsgID() != clientID || ack.GetServerMsgID() == "" {
 			err = errors.New("original message acknowledgement rejected")
 			return
 		}
 		serverID = ack.GetServerMsgID()
 		acknowledged = true
+		observation.AckAccepted = true
 		break
 	}
 	if !acknowledged {
 		err = errors.New("original ordinary acknowledgement missing")
 		return
 	}
+	observation.Step = "peer-read"
 	for i := 0; i < 32; i++ {
-		frame, e := product20WireRead(peer)
+		frame, e := product20WireRead(peer, observation)
 		if e != nil {
 			err = e
 			return
@@ -1267,7 +1350,7 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 			continue
 		}
 		var push sdkws.PushMessages
-		if proto.Unmarshal(frame.Data, &push) != nil {
+		if product20MessageDecode(frame.Data, &push, observation) != nil {
 			err = errors.New("actual peer push malformed")
 			return
 		}
@@ -1280,12 +1363,14 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 			return
 		}
 		seq = matches[0].GetSeq()
+		observation.PeerAccepted = true
 		break
 	}
 	if seq <= 0 {
 		err = errors.New("actual peer message absent")
 		return
 	}
+	observation.Step = "history-write"
 	uids := []string{a.UserID, b.UserID}
 	if uids[1] < uids[0] {
 		uids[0], uids[1] = uids[1], uids[0]
@@ -1301,8 +1386,9 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 	if err = product20WireWrite(peer, product20Wire{ReqIdentifier: 1002, SendID: b.UserID, OperationID: operation, MsgIncr: "2", Data: encoded}); err != nil {
 		return
 	}
+	observation.Step = "history-read"
 	for i := 0; i < 32; i++ {
-		frame, e := product20WireRead(peer)
+		frame, e := product20WireRead(peer, observation)
 		if e != nil {
 			err = e
 			return
@@ -1315,7 +1401,7 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 			return
 		}
 		var pulled sdkws.PullMessageBySeqsResp
-		if e = proto.Unmarshal(frame.Data, &pulled); e != nil {
+		if e = product20MessageDecode(frame.Data, &pulled, observation); e != nil {
 			err = e
 			return
 		}
@@ -1324,6 +1410,8 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 			err = errors.New("actual positive-sequence history identity/body differs")
 			return
 		}
+		observation.HistoryAccepted = true
+		observation.Step = "complete"
 		return
 	}
 	err = errors.New("actual positive-sequence history completion absent")
@@ -1621,7 +1709,8 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	}
 	result.WrongPasswordRejected = true
 	result.Phase = "actual-gateway-ordinary-message-once"
-	clientID, serverID, seq, e := product20Message(ctx, accounts[0], accounts[1], aux.roots, func() { result.OrdinaryDispatches++ })
+	result.MessageObservation = &product20MessageObservation{Step: "sender-handshake", ReadOutcome: "none"}
+	clientID, serverID, seq, e := product20Message(ctx, accounts[0], accounts[1], aux.roots, result.MessageObservation, func() { result.OrdinaryDispatches++ })
 	if e != nil {
 		return e
 	}

@@ -344,7 +344,7 @@
   ],
   "derivedHarnessSource": {
     "members": 1587,
-    "digest": "98248fd1da4426fcb17dc630be315cca5d1512daf61eaec3ebdd91849bd313b0"
+    "digest": "5aa56f770313231f14e8866a6d7d206c46bb19dd2dfc140f2044f9acc9fb7731"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
@@ -704,7 +704,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "843f1646365096eda4f330338da7a52b8721a34257e5b228b8b6300d090e0dc0"
+    "server/internal/runtimeacceptance/product20_linux.go": "e9d68bd024c06ef453016aeb4e9176e629198135c2949dfa84cacfad94a6705d"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
@@ -753,7 +753,7 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
-  "state": "current-core-mongo-normalization-selected-source-only-runtime-pending",
+  "state": "same-core-mongo-pass-reused-message-heartbeat-observation-runtime-pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",
@@ -795,5 +795,40 @@
     "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
     "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
     "run": 42310913329
+  },
+  "coreMongoTestReuse": {
+    "goTool": {
+      "bytes": 17164055,
+      "mode": 493,
+      "sha256": "548d3c32f83fa81152f543eb1526be7884cfe0526eb5e9ce29d3eca14786e7e0",
+      "version": "go version go1.27.2 linux/amd64"
+    },
+    "locks": {
+      "go.mod": "e12331dfa5ce70b14a99f2c4408347ca11747ebe23e19d0d9b023f634eeab029",
+      "go.sum": "97c43c12be1edc668225b2ef21c23e95c242327c310d0f05ffe84bc2d05c71c8"
+    },
+    "postReceiptSHA256": "4a4ac5cbcb5756e85c6c2189a6f246602d94e8fd0d87a4992fd19a04096c7b67",
+    "priorReceipt": {
+      "eventsSHA256": "7c7f2652dc517d038be114bc37ec92f198b1ce9317051aff048555af660ba880",
+      "fail": 0,
+      "name": "TestMongoNoDocumentsMapsToOpenIMRecordNotFound",
+      "package": "github.com/openimsdk/open-im-server/v3/pkg/common/db/unrelation",
+      "skip": 0,
+      "subPASS": 0,
+      "topPASS": 1
+    },
+    "producer": {
+      "attempt": 1,
+      "head": "35c3e12dc8be834f07e708e2d6ae3eded4782706",
+      "job": 128297421883,
+      "run": 42337430486
+    },
+    "rootReviewSHA256": "ec93a05d8abdafa94eb27e6dc19fcc94bd7713eee6e6898f7c2cf30fc369571d",
+    "source": {
+      "digest": "af917bed287806f1f44254f3be1f830456afec40fedfc12f14765898aee6220a",
+      "members": 1585
+    },
+    "testReceiptSHA256": "e82b10f270e9c590925a964735bee5f052087bca51bea8252ba30d24822d751a",
+    "version": "same-canonical-core-mongo-test-v1"
   }
 }
