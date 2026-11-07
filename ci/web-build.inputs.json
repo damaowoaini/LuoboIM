@@ -48,28 +48,28 @@
       "sha256": "22bdb3aa12a682229435de3ff39d39973d7cb6ff0cbd66734af50e84cc900b96"
     }
   ],
-  "checkoutRule": "actual GITHUB_SHA equals git HEAD; all4341 rows exact; UI4r3 plus exactly one named real form case before offline Vite; no future commit invented",
-  "cohort": "web4341-login-alignment-v1",
+  "checkoutRule": "actual GITHUB_SHA equals git HEAD; all4343 rows exact; exactly the voice5-row overlay and one named real voice component case before offline Vite; no future commit invented",
+  "cohort": "web4343-voice-retirement-v1",
   "controllerInputs": [
     {
-      "bytes": 4253,
+      "bytes": 4267,
       "path": ".github/workflows/web-build-only.yml",
-      "sha256": "d0b7a910755e2b7449a7c3668520202f307f61a76a7fc4a76e2abc711b9a8862"
+      "sha256": "7a5952e990142649425c0cf103e60c9f8389e8fdc29fb87cc8b822975f94a6fd"
     },
     {
-      "bytes": 15860,
+      "bytes": 18399,
       "path": "ci/README.web-build.md",
-      "sha256": "37cf5c0e5f059937f1aff6f00919f1e5295c1b6fd604c668d5730df66e39e60a"
+      "sha256": "c29be351112f246c4a7549c1befddc012e932717ff7339d01a872cd6777de12c"
     },
     {
-      "bytes": 28148,
+      "bytes": 28219,
       "path": "ci/web-build.mjs",
-      "sha256": "03d088e29e8f2448ab16f22dc66a7a01796479401775790a65d85a4ffa73a59c"
+      "sha256": "c7335ff84564378b324e4df885332732beb2bc1634544bb1097542cf99f9d234"
     },
     {
-      "bytes": 10288,
+      "bytes": 10446,
       "path": "ci/web-build.test.mjs",
-      "sha256": "b93232fcbc13293f19a40d17c51a35779d5f660ee5ea462f6f0cd5beb0b290a4"
+      "sha256": "4830e262f0ffcb7d517bf9e1c05f274408634bf2b93411d67bdbaec6b83789ec"
     },
     {
       "bytes": 3597,
@@ -20181,9 +20181,9 @@
       "sha256": "5dbd1dc51b1220a52ac0b8fbf6cafeb02becf6c99a90f3a402b53f5d1fcb2541"
     },
     {
-      "bytes": 30998,
+      "bytes": 31030,
       "path": "src/core/individualForward/components.test.tsx",
-      "sha256": "14d85b6677dd5253f73115717c9cab26a4263bfb6f845669bd6119a81654bd76"
+      "sha256": "d143880e62fbbd5877865770bc66ef6e8f4d3125712f8d656b38457fed1ae9e8"
     },
     {
       "bytes": 6587,
@@ -20266,9 +20266,9 @@
       "sha256": "84c2aee8072ad73ac3ad1ddbf8d00862906cf3fd6a20b4212337fd1f0b798ecc"
     },
     {
-      "bytes": 13184,
+      "bytes": 13197,
       "path": "src/core/messagePrivacyComponents.test.ts",
-      "sha256": "81ef77edf88f80b875520f6fb0d39ed4130cac1a46be49fa9aeb53f149006ace"
+      "sha256": "bef7a1259f50ec6c7fb3b79158798e6b8dc589627ef56b3445d7fdf6a0376eef"
     },
     {
       "bytes": 3290,
@@ -20624,6 +20624,11 @@
       "bytes": 7732,
       "path": "src/core/userCardConversation.test.ts",
       "sha256": "4822eed0f0a75c558c2bc6bc914d620e0cfc8bbf2a5ca5f1a054d22f62eee4bf"
+    },
+    {
+      "bytes": 879,
+      "path": "src/core/voicePlayback.ts",
+      "sha256": "76d5626c928e28c700c6a7fef5b94767c2bc5df98b9afd6300913aec295d6a29"
     },
     {
       "bytes": 2766,
@@ -21016,9 +21021,14 @@
       "sha256": "b4e460d16a5bb75c0199522dd15a071cd3cfd62b9b58e74a72d6236f2731e40f"
     },
     {
-      "bytes": 3558,
+      "bytes": 8768,
+      "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx",
+      "sha256": "4fa14fcbb1f5a97431ee821c70b1ed90c2c9c57b2440313aaa8b3322621aa7fe"
+    },
+    {
+      "bytes": 6809,
       "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx",
-      "sha256": "1ad76d9ee0f5b5a1ecf02f2811c892266c371cd6b128287a5a6c4deb74c8fda0"
+      "sha256": "3d86ddfb3a6b4215abeb65d4e6903d347bf80627380830df5e11a676e8d3e076"
     },
     {
       "bytes": 12396,
@@ -21805,9 +21815,9 @@
   },
   "loginTest": {
     "expectedTests": 1,
-    "file": "src/pages/login/LoginForm.test.tsx",
-    "fullName": "LoginForm authenticator disclosure reveals an invalid folded MFA field and preserves values without weakening existing mode clearing",
-    "name": "reveals an invalid folded MFA field and preserves values without weakening existing mode clearing",
+    "file": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx",
+    "fullName": "VoiceMessageRender playback retires pending voice ownership without stale rows stopping the next message or hiding current failures",
+    "name": "retires pending voice ownership without stale rows stopping the next message or hiding current failures",
     "oldFullSuiteTests": 0,
     "runner": {
       "entry": "node_modules/vitest/vitest.mjs",
@@ -21816,64 +21826,110 @@
       "version": "5.0.4"
     },
     "skipOrFailAccepted": false,
-    "sourceLineCount": 194,
-    "suite": "LoginForm authenticator disclosure"
+    "sourceLineCount": 167,
+    "suite": "VoiceMessageRender playback"
   },
   "node": "24.21.0",
   "predecessorSource": {
-    "actualObservedAtPublicHead": "03825a0f60053c4a083a449a89f9176f8cd24857",
+    "actualObservedAtPublicHead": "4de0caabf50b5e98bb5df51eba22af595f674dfa",
     "cohort": "web4341-login-alignment-v1",
-    "sourceDeclaration": {
-      "bytes": 813160,
-      "path": "references/integration/web-login-single-build-wiring-20261107-candidate/current-web-source.json",
-      "sha256": "c6622818e1f91495a931e144a8e8a3cf6800419d47faad69df685d2ae4b283d9"
+    "priorLoginReview": {
+      "bytes": 1894,
+      "mode": 420,
+      "path": ".qa/web-login-feedback-wait-batch-20261107/root-c327a6e-single-login-case-web-dist-accepted-review.json",
+      "sha256": "c1db36c52fbf92caa8bd6d5d7b9b9ade36aa585add4d5c20494e551a78153b78"
     },
-    "sourceDigest": "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec",
-    "sourceFiles": 4341,
-    "sourceObservedAtPublicRef": null,
-    "sourceOriginRef": null
+    "sourceDeclaration": {
+      "bytes": 813802,
+      "path": "references/integration/web-login-feedback-wait-20261107-candidate/current-web-source.json",
+      "sha256": "c0d6372f6215f9fbf15967ce81dcbe69225e9c53f608dd99d04f352e48f6fbe9"
+    },
+    "sourceDigest": "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90",
+    "sourceFiles": 4341
   },
   "schema": "luobo.web.login-build.v1",
-  "scope": "one real MFA form case then current Vite; no old full tests/typecheck/E2E/App/native/Go/SDK bind/business/deployment",
+  "scope": "one real voice component case with simulated media boundary then current Vite; zero old LoginForm/full-suite/typecheck/E2E/App/native/Go/SDK bind/real-audio/business/deployment",
   "sourceDeclaration": {
-    "bytes": 813802,
-    "path": "references/integration/web-login-feedback-wait-20261107-candidate/current-web-source.json",
-    "sha256": "c0d6372f6215f9fbf15967ce81dcbe69225e9c53f608dd99d04f352e48f6fbe9"
+    "bytes": 818164,
+    "path": "references/integration/web-voice-single-build-wiring-r3-20261107-candidate/current-web-source.json",
+    "sha256": "df1771838fbc37ef8bb6d3b8beef0e637a62c02f48492c20f7f10ca972b28024"
   },
-  "sourceDigest": "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90",
+  "sourceDigest": "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
-  "sourceFiles": 4341,
+  "sourceFiles": 4343,
   "sourceObservedAtPublicRef": null,
   "sourceOriginRef": null,
   "sourceOverlay": {
-    "actualFailure": {
-      "finiteReceiptSHA256": "35761d57ecb2f9a93257d82ff3f789ce1f514b3fc43fbed7acc4912ac519db73",
-      "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
-      "job": 128208979256,
-      "publicTestLine": 110,
-      "run": 42310056013
+    "additions": 2,
+    "authorManifest": {
+      "bytes": 14617,
+      "mode": 420,
+      "path": "references/integration/web-voice-playback-ownership-r3-20261107-candidate/manifest.json",
+      "sha256": "2b2ad1b67723434ce4647f8faeb98c65aa62983189ea513c9dcf121e2d8b6475"
     },
-    "additions": 0,
     "delta": [
       {
         "after": {
-          "bytes": 10588,
-          "path": "src/pages/login/LoginForm.test.tsx",
-          "sha256": "4a5a2b3ff46ea9c1513e5ee35bb15102ceba8d333e80e26071974667b13640eb"
+          "bytes": 6809,
+          "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx",
+          "sha256": "3d86ddfb3a6b4215abeb65d4e6903d347bf80627380830df5e11a676e8d3e076"
         },
         "before": {
-          "bytes": 10418,
-          "path": "src/pages/login/LoginForm.test.tsx",
-          "sha256": "82ec9e8c3cb71ddb21973b4fe92edfd9731a70078fe59904dd4dfd9793004c66"
+          "bytes": 3558,
+          "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx",
+          "sha256": "1ad76d9ee0f5b5a1ecf02f2811c892266c371cd6b128287a5a6c4deb74c8fda0"
         },
-        "path": "src/pages/login/LoginForm.test.tsx"
+        "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx"
+      },
+      {
+        "after": {
+          "bytes": 879,
+          "path": "src/core/voicePlayback.ts",
+          "sha256": "76d5626c928e28c700c6a7fef5b94767c2bc5df98b9afd6300913aec295d6a29"
+        },
+        "before": null,
+        "path": "src/core/voicePlayback.ts"
+      },
+      {
+        "after": {
+          "bytes": 8768,
+          "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx",
+          "sha256": "4fa14fcbb1f5a97431ee821c70b1ed90c2c9c57b2440313aaa8b3322621aa7fe"
+        },
+        "before": null,
+        "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx"
+      },
+      {
+        "after": {
+          "bytes": 13197,
+          "path": "src/core/messagePrivacyComponents.test.ts",
+          "sha256": "bef7a1259f50ec6c7fb3b79158798e6b8dc589627ef56b3445d7fdf6a0376eef"
+        },
+        "before": {
+          "bytes": 13184,
+          "path": "src/core/messagePrivacyComponents.test.ts",
+          "sha256": "81ef77edf88f80b875520f6fb0d39ed4130cac1a46be49fa9aeb53f149006ace"
+        },
+        "path": "src/core/messagePrivacyComponents.test.ts"
+      },
+      {
+        "after": {
+          "bytes": 31030,
+          "path": "src/core/individualForward/components.test.tsx",
+          "sha256": "d143880e62fbbd5877865770bc66ef6e8f4d3125712f8d656b38457fed1ae9e8"
+        },
+        "before": {
+          "bytes": 30998,
+          "path": "src/core/individualForward/components.test.tsx",
+          "sha256": "14d85b6677dd5253f73115717c9cab26a4263bfb6f845669bd6119a81654bd76"
+        },
+        "path": "src/core/individualForward/components.test.tsx"
       }
     ],
-    "kind": "single failed real-form test feedback waiting successor; no product/body or CI acceptance logic change",
-    "parentSourceDigest": "fdddbf453afdd053378510ace5401589da7da69457e7a73b60f84bd313b549ec",
-    "parentUI4ManifestSHA256": "95d153a437758aa5b473df49b1d4f2a5b2dea4e8a9bd54854a782865cbae684e",
+    "kind": "voice pending ownership/single-player/explicit media reset and exact three-spy compatibility overlay; one new component case only",
+    "parentSourceDigest": "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90",
     "removals": 0,
-    "replacements": 1,
-    "state": "FROZEN_SOURCE_PENDING_FAILED_SINGLE_CASE_RETRY_THEN_FIRST_VITE"
+    "replacements": 3,
+    "state": "FROZEN_SOURCE_PENDING_ONE_VOICE_CASE_THEN_VITE"
   }
 }

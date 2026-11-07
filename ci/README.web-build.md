@@ -1,4 +1,39 @@
-# Current4341 one login form case then manual build (prepared, unexecuted)
+# Current4343 one voice component case then manual build (prepared, unexecuted)
+
+Only `web4343-voice-retirement-v1` is admitted. It binds all4343 source rows at
+`f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8`. Relative to the accepted4341 source, only five rows change: the
+VoiceMessageRender replacement, the new voicePlayback owner and its one real
+component case, plus three load-spy additions across two existing Audio test
+fixtures. Their original assertions remain, and those old cases are not run or
+claimed freshly PASS. The idle first receiver remains without src/preload-none;
+retirement resets with load after removing src. Exact file `src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx`, suite
+`VoiceMessageRender playback`, case `retires pending voice ownership without stale rows stopping the next message or hiding current failures` runs once before Vite.
+The actual c327 login1 PASS and paired receipt controls retain their original
+same-component/algorithm scope; login, the old full suite, typecheck, E2E,
+App/APK/Go, native/SDK rebuild and new login screenshots run zero times.
+
+The existing scripts-disabled npm-ci install/SDK8 prepare, Node24.21.0,
+unchanged package lock, SDK2/public13/WASM/sqlite, source/tool/resource/CSP/dist
+checks and loopback-only/no-default-route worker remain. Vitest uses only its
+installed5.0.4 entry, exact file/name and original15s test/hook,60s command and
+300s worker budgets. Count1/PASS1/skip0/fail0 plus paired completion/hook/error
+reports and source/SDK/tool postconditions are still mandatory before Vite.
+No raw assertion/stack/media value/private machine report is uploaded; the
+finite failure locator permits only the new exact test basename and bounded
+source lines. Old internal `loginTest`/`login-test.json`/process field names are
+retained to avoid a framework rename; selectedFile/suite/name identify voice1.
+
+The media element boundary is simulated. This proves neither actual audible
+playback, real browser/receiver behavior, service integration nor full Web107.
+A successful new Vite/dist is still required: prior c327 dist and screenshots
+cannot represent these voice changes (including the exact fixture adaptations). Web2 dispatchReady is set false with its
+workflow descriptor SHA refreshed; the all3 descriptor stays false. No renderer,
+App/native source, SDK body or accepted old dist is changed. Actual future run,
+artifact, dist rows and hashes are unknown and are not invented here.
+
+## Historical4341 predecessor record (not currently admitted)
+
+### Original4341 one login form case then manual build
 
 Only `web4341-login-alignment-v1` is admitted. Exact4341 source rows contain the
 reviewed login UI3 plus its single real AntD form regression. Previous4340 source,

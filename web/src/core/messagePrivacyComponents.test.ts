@@ -46,7 +46,7 @@ beforeEach(()=>{
   mocks.sdk.deleteMessage.mockResolvedValue({});mocks.sdk.revokeMessage.mockResolvedValue({});mocks.sdk.findMessageList.mockResolvedValue({data:{findResultItems:[]}});
   mocks.getEmojis.mockResolvedValue([]);mocks.saveEmoji.mockResolvedValue(undefined);mocks.play.mockResolvedValue(undefined);
   Object.defineProperty(navigator,"clipboard",{configurable:true,value:{writeText:mocks.clipboard,write:mocks.clipboard}});
-  vi.stubGlobal("fetch",mocks.fetch);vi.stubGlobal("Audio",class {src="";onended:any;onpause:any;onplay:any;pause=mocks.pause;removeAttribute=mocks.removeAudioSource;play=mocks.play;});
+  vi.stubGlobal("fetch",mocks.fetch);vi.stubGlobal("Audio",class {src="";onended:any;onpause:any;onplay:any;pause=mocks.pause;removeAttribute=mocks.removeAudioSource;load=vi.fn();play=mocks.play;});
   Object.defineProperty(window,"electronAPI",{configurable:true,value:{fileExists:()=>false,saveFileToDisk:mocks.saveFile}});
   host=document.createElement("div");document.body.append(host);root=createRoot(host);
 });

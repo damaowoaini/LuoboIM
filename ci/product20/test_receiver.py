@@ -1,5 +1,9 @@
 """One finite pure split-producer contract; no network, Go, ELF or cloud use."""
 import copy
+import ast
+import tempfile
+import urllib.error
+from unittest import mock
 import importlib.util
 import json
 from pathlib import Path
@@ -95,5 +99,40 @@ class SplitProducerContract(unittest.TestCase):
    elif change=='bool-attempt':bad['executionBinding']['core14']['attempt']=True
    else:bad['acceptedChartArtifact']=None
    with self.assertRaises(ValueError):controller.require_bound(bad)
+
+ def test_post_aux_failure_projection_keeps_real_source_http_context_and_original_primary(self):
+  c=json.loads((HERE/'inputs.json').read_bytes());controls={p:controller.sha(controller.regular(controller.REPO/p)) for p in c['controllers']};stage='minio-artifact-receive'
+  try:controller.require_bound(dict(c,executionBinding=None))
+  except ValueError as error:original=error
+  observed=controller.project_p20_failure(stage,original,c,controls);frames=[frame for row in observed['exceptions'] for frame in row['frames']];self.assertTrue(any(frame['path']=='ci/product20/run.py' and type(frame['line']) is int and frame['line']>0 for frame in frames));self.assertEqual(observed['exceptions'][0]['class'],'value-error');self.assertFalse(observed['runtimeReadyP20Accepted']);self.assertFalse(observed['uniqueCauseProven'])
+  private='PRIVATE_PASSWORD https://private.invalid/token /private/config'
+  try:
+   try:raise urllib.error.HTTPError('https://private.invalid/'+private,403,private,{'Secret':private},None)
+   except urllib.error.HTTPError:raise original from None
+  except ValueError as wrapped:
+   value=controller.project_p20_failure(stage,wrapped,c,controls);self.assertEqual([row['class'] for row in value['exceptions']],['value-error','http-error']);self.assertEqual(value['exceptions'][1]['httpStatus'],403);self.assertEqual(value['exceptions'][1]['httpStatusClass'],'forbidden');self.assertNotIn('PRIVATE_',json.dumps(value));self.assertNotIn('/private/',json.dumps(value));self.assertNotIn('private.invalid',json.dumps(value))
+  class Unknown(Exception):
+   def __str__(self):raise AssertionError('custom exception formatting forbidden')
+   def __repr__(self):raise AssertionError('custom exception formatting forbidden')
+   def __getattribute__(self,key):
+    if key in ('args','__dict__','__traceback__','__cause__','__context__'):raise AssertionError('unknown exception attribute dispatch forbidden')
+    return super().__getattribute__(key)
+  unknown=Unknown(private);value=controller.project_p20_failure(stage,unknown,c,controls);self.assertEqual(value['exceptions'],[{'class':'other','frames':[]}]);self.assertNotIn('PRIVATE_',json.dumps(value))
+  odd=urllib.error.HTTPError('https://private.invalid',987654321,private,{},None);value=controller.project_p20_failure(stage,odd,c,controls);self.assertIsNone(value['exceptions'][0]['httpStatus']);self.assertEqual(value['exceptions'][0]['httpStatusClass'],'other-http')
+  with self.assertRaises(ValueError):controller.project_p20_failure('PRIVATE_STAGE',original,c,controls)
+  with self.assertRaises(ValueError):controller.project_p20_failure(stage,original,c,dict(controls,**{'ci/product20/run.py':'0'*64}))
+  chain=[ValueError(private) for _ in range(6)]
+  for left,right in zip(chain,chain[1:]):BaseException.__dict__['__context__'].__set__(left,right)
+  value=controller.project_p20_failure(stage,chain[0],c,controls);self.assertEqual(len(value['exceptions']),4);self.assertTrue(value['chainTruncated']);self.assertLess(len(json.dumps(value).encode()),16384)
+  with tempfile.TemporaryDirectory() as folder,mock.patch.object(controller,'write',side_effect=RuntimeError(private)):
+   self.assertFalse(controller.emit_p20_failure_observation(Path(folder),stage,original,c,controls))
+  # Exercise the exact controller except handler in isolation: no run/API/business calls.
+  tree=ast.parse((HERE/'run.py').read_bytes());run=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='run');outer=next(n for n in run.body if isinstance(n,ast.Try) and any(h.name=='e' for h in n.handlers));handler=copy.deepcopy(next(h for h in outer.handlers if h.name=='e'))
+  function=ast.FunctionDef(name='actual_except_path',args=ast.arguments(posonlyargs=[],args=[],vararg=None,kwonlyargs=[],kw_defaults=[],kwarg=None,defaults=[]),body=[ast.Try(body=[ast.Raise(exc=ast.Name(id='primary_original',ctx=ast.Load()),cause=None)],handlers=[handler],orelse=[],finalbody=[])],decorator_list=[],returns=None,type_comment=None,type_params=[]);module=ast.fix_missing_locations(ast.Module(body=[function],type_ignores=[]))
+  def failed_observation(*args):raise RuntimeError(private)
+  namespace={'primary_original':original,'out':Path('/unused'),'failure_stage':stage,'c':c,'controls':controls,'emit_p20_failure_observation':failed_observation};exec(compile(module,'<actual-controller-except-only>','exec'),namespace)
+  with self.assertRaises(ValueError) as caught:namespace['actual_except_path']()
+  self.assertIs(caught.exception,original)
+
 
 if __name__=='__main__':unittest.main()

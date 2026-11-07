@@ -40,7 +40,7 @@ jobs:
           umask 077
           case "$UI_RENDER_MODE" in
             all3) input=inputs.json; expected=ba2dfb6a7d3b9c60ade4ad52dda8684f10cc1ca9b2a21908c11489a6ced50da8 ;;
-            web2) input=web2.inputs.json; expected=774f1a1edef37470f023e3f092ef6a7bde5c59141c6cf374f9e3bd85494a28f7 ;;
+            web2) input=web2.inputs.json; expected=26b9ef986bd68b87e3a2215a9a4bc5432c5db04914cbac462a5d629e1e076f0e ;;
             *) exit 2 ;;
           esac
           python3 -c 'import hashlib,pathlib,sys; assert hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest()==sys.argv[2]' "current/ci/visual-render/$input" "$expected"

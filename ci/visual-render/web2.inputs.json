@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "cohort": "ui-render-web2-evidence-v1",
-  "dispatchReady": true,
+  "dispatchReady": false,
   "scope": "Exactly two current Web frames; historical App image reference only. No legacy checkout, Flutter setup/test, Web/APK build, old tests, business-network or interaction/design acceptance.",
   "nativeInput": "ci/android-current363/inputs.json",
   "mobileInput": "ci/mobile/inputs.json",

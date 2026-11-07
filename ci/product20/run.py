@@ -198,6 +198,46 @@ def admit():
  if os.getuid()==0 or os.environ.get('RUNNER_ENVIRONMENT')!='github-hosted' or os.environ.get('RUNNER_OS')!='Linux' or root.exists() or root.resolve()!=root or os.statvfs(root.parent).f_bavail*os.statvfs(root.parent).f_frsize<4<<30:raise ValueError('fresh hosted cold4GiB admission required')
  root.mkdir(mode=0o700);write(root/'allocation.json',allocation_owner());return 0
 
+P20_FAILURE_STAGES = frozenset(('before-post-aux-records','core-receipt-reconstruction','legacy-elf-read','legacy-receipt-write','build-ledger-write','fixture-modules-and-catalog','minio-source-build','minio-artifact-receive','minio-public-receipts','post-aux-boundary-complete'))
+P20_FAILURE_SOURCES = ('ci/product20/run.py','ci/backend-fullgraph/minio_build.py','ci/backend-fullgraph/resources.py','ci/backend-fullgraph/service_selectors.py')
+
+def project_p20_failure(stage,error,c,controls):
+ if type(stage) is not str or stage not in P20_FAILURE_STAGES or not isinstance(error,BaseException):raise ValueError('closed original P20 failure stage and exception required')
+ aliases={};limits={}
+ for relative in P20_FAILURE_SOURCES:
+  path=REPO/relative;expected=controls.get(relative,c['helpers'].get(relative));body=regular(path,1<<20)
+  if not isinstance(expected,str) or not re.fullmatch('[0-9a-f]{64}',expected) or sha(body)!=expected:raise ValueError('unchanged allowed public CI source required')
+  aliases[str(path)]=relative;aliases[relative]=relative;aliases['./'+relative]=relative;limits[relative]=len(body.splitlines())
+ kinds=((ValueError,'value-error'),(KeyError,'key-error'),(TypeError,'type-error'),(FileNotFoundError,'file-missing'),(FileExistsError,'file-exists'),(PermissionError,'permission'),(TimeoutError,'timeout'),(urllib.error.HTTPError,'http-error'),(urllib.error.URLError,'url-error'),(zipfile.BadZipFile,'zip-error'),(OSError,'os-error'))
+ statuses={301:'redirect',302:'redirect',303:'redirect',307:'redirect',308:'redirect',400:'bad-request',401:'unauthorized',403:'forbidden',404:'not-found',408:'timeout',409:'conflict',410:'gone',413:'too-large',422:'unprocessable',429:'rate-limited',500:'server-error',502:'server-error',503:'server-error',504:'server-error'}
+ base=lambda exc,name:BaseException.__dict__[name].__get__(exc,BaseException)
+ result={'version':'product20-post-aux-failure-observation-v1','stage':stage,'exceptions':[],'chainTruncated':False,'framesTruncated':False,'contextTraversal':'bounded-cause-or-context-including-suppressed','diagnosticOnly':True,'uniqueCauseProven':False,'rawErrorTextExported':False,'exceptionArgumentsRead':False,'privateLogRead':False,'privateContentHashesExported':False,'runtimeReadyP20Accepted':False}
+ current=error;seen=set();frame_seen=set();visited_frames=0
+ while current is not None and len(result['exceptions'])<4:
+  if id(current) in seen:result['chainTruncated']=True;break
+  seen.add(id(current));exact=type(current);kind=next((label for cls,label in kinds if exact is cls),'other');row={'class':kind,'frames':[]}
+  if exact is urllib.error.HTTPError:
+   code=dict.get(object.__getattribute__(current,'__dict__'),'code')
+   row['httpStatus']=code if type(code) is int and code in statuses else None;row['httpStatusClass']=statuses[code] if type(code) is int and code in statuses else 'other-http'
+  trace=base(current,'__traceback__')
+  while trace is not None and visited_frames<32:
+   visited_frames+=1;relative=aliases.get(trace.tb_frame.f_code.co_filename);line=trace.tb_lineno
+   if relative is not None and type(line) is int and 1<=line<=limits[relative]:
+    key=(relative,line)
+    if key not in frame_seen:
+     if len(frame_seen)<8:frame_seen.add(key);row['frames'].append({'path':relative,'line':line})
+     else:result['framesTruncated']=True
+   trace=trace.tb_next
+  if trace is not None:result['framesTruncated']=True
+  result['exceptions'].append(row);cause=base(current,'__cause__');current=cause if cause is not None else base(current,'__context__')
+ if current is not None:result['chainTruncated']=True
+ return result
+
+def emit_p20_failure_observation(out,stage,error,c,controls):
+ # Observation failure must never replace the original controller exception.
+ try:write(out/'pre-fixture-failure-observation.json',project_p20_failure(stage,error,c,controls));return True
+ except BaseException:return False
+
 def run():
  c,graph,g,original,bodies,chart_bodies=verify();binding=require_bound(c)
  if any(os.environ.get(k)!=v for k,v in {'GITHUB_ACTIONS':'true','RUNNER_ENVIRONMENT':'github-hosted','RUNNER_OS':'Linux'}.items()) or os.getuid()==0:raise ValueError('fresh hosted nonroot Linux only')
@@ -213,7 +253,7 @@ def run():
  env=envbase()
  for key,name in [('GOMODCACHE','modcache'),('GOCACHE','buildcache'),('GOPATH','gopath'),('TMPDIR','tmp')]:
   p=root/name;p.mkdir(mode=0o700);env[key]=str(p)
- env['GOTMPDIR']=env['TMPDIR'];index=0;started=time.monotonic();plane=None;mysql_id=None;primary=None
+ env['GOTMPDIR']=env['TMPDIR'];index=0;started=time.monotonic();plane=None;mysql_id=None;primary=None;failure_stage='before-post-aux-records'
  def command(label,argv,timeout,environment=None,cwd=None):
   nonlocal index
   if timeout>10800-(time.monotonic()-started):raise ValueError('controller budget exhausted')
@@ -252,27 +292,37 @@ def run():
   command('auxiliary-module-download',[go,'mod','download','-json'],600,dict(env,GOPROXY='https://proxy.golang.org',GOSUMDB='sum.golang.org'))
   offline=dict(env,GOPROXY='off',GOSUMDB='off');binroot=root/'aux';binroot.mkdir(mode=0o700)
   for name,pkg in [('msgtransfer-legacy','./cmd/openim-msgtransfer'),('product20-acceptance','./cmd/tools/product20-acceptance')]:command('compile-'+name,[go,'build','-mod=readonly','-p=1','-o',str(binroot/name),pkg],1200,offline)
+  failure_stage='core-receipt-reconstruction'
   selectors=load('ci/backend-fullgraph/service_selectors.py','p20_selectors');builds=[]
   for row in core['binaries']:
    receipt={'schema':1,'sourceSHA256':core['source']['digest'],'binarySHA256':row['sha256'],'binaryBytes':row['bytes'],'toolchainSHA256':core['toolSHA256']['go']}
    rp=private/(row['name']+'-receipt.json');rs=write(rp,receipt)
    if rs!=row['buildReceiptSHA256']:raise ValueError('original product receipt cannot be reconstructed exactly')
    builds.append({'role':row['name'],'path':str(root/'product14'/row['name']),'sha256':row['sha256'],'sourceSHA256':core['source']['digest'],'receiptPath':str(rp),'receiptSHA256':rs,'services':selectors.SERVICES[row['name']],'components':selectors.COMPONENTS[row['name']]})
-  legacy=binroot/'msgtransfer-legacy';legacy_raw=regular(legacy,256<<20);rp=private/'legacy-receipt.json';rs=write(rp,{'schema':1,'sourceSHA256':core['source']['digest'],'binarySHA256':sha(legacy_raw),'binaryBytes':len(legacy_raw),'toolchainSHA256':go_sha})
+  failure_stage='legacy-elf-read'
+  legacy=binroot/'msgtransfer-legacy';legacy_raw=regular(legacy,256<<20)
+  failure_stage='legacy-receipt-write'
+  rp=private/'legacy-receipt.json';rs=write(rp,{'schema':1,'sourceSHA256':core['source']['digest'],'binarySHA256':sha(legacy_raw),'binaryBytes':len(legacy_raw),'toolchainSHA256':go_sha})
+  failure_stage='build-ledger-write'
   buildpath=private/'builds.json';bs=write(buildpath,{'version':'source-bound-fullgraph-builds-v1','sourceSHA256':core['source']['digest'],'binaries':builds,'legacyMessageTransfer':{'role':'msgtransfer-legacy','path':str(legacy),'sha256':sha(legacy_raw),'sourceSHA256':core['source']['digest'],'receiptPath':str(rp),'receiptSHA256':rs}})
+  failure_stage='fixture-modules-and-catalog'
   resources=load('ci/backend-fullgraph/resources.py','p20_resources');builder=load('ci/backend-fullgraph/minio_build.py','p20_minio');catalog=json.loads(regular(REPO/'ci/backend-fullgraph/image-catalog.json'))
   # A bound fixture uses the unchanged full API/ZIP/manifest/ELF receiver.
   # Only an explicit null provider selects a new original source build.
   provider=c['fixtureMinIOProvider']
   try:
    if provider is None:
+    failure_stage='minio-source-build'
     minio,proof=builder.build(root,catalog,command,go,go_sha,env)
     acquisition={'mode':'original-source-build','fixtureOnly':True,'productRuntimeAccepted':False,'freshMinioCompile':True}
    else:
+    failure_stage='minio-artifact-receive'
     minio,proof=builder.receive(root,catalog,provider,go_sha,fixture_token,os.environ['GITHUB_REPOSITORY'])
     acquisition={'mode':'root-accepted-fixture-artifact','fixtureOnly':True,'productRuntimeAccepted':False,'freshMinioCompile':False,'artifactID':provider['artifactID'],'rootAcceptanceSHA256':provider['rootAcceptanceSHA256']}
   finally:fixture_token=None
+  failure_stage='minio-public-receipts'
   write(out/'fixture-minio.json',proof);write(out/'fixture-minio-acquisition.json',acquisition)
+  failure_stage='post-aux-boundary-complete'
   for image in sorted(set(catalog['images'].values())|{c['mysql']['image']}):command('fixture-image-'+sha(image.encode())[:8],['/usr/bin/docker','--host','unix:///var/run/docker.sock','pull','--platform','linux/amd64',image],600)
   plane=resources.Plane(root/'plane',catalog['images'],minio_source=minio);claim=plane.prepare();keeper=next(r for r in claim['observations'] if r['role']=='keeper')
   mysql_id=create_mysql(plane,c['mysql'],secrets.token_hex(32))
@@ -287,7 +337,11 @@ def run():
   command('actual-fresh-product20-http-ws-once',argv,1380)
   result=json.loads(regular(work/'product20-result.json',128<<10));check_result(result,c)
   write(out/'actual-result.json',result)
- except BaseException as e:primary=e;raise
+ except BaseException as e:
+  primary=e
+  try:emit_p20_failure_observation(out,failure_stage,e,c,controls)
+  except BaseException:pass
+  raise
  finally:
   try:
    if plane is not None:

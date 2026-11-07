@@ -9,11 +9,11 @@ import { verifyFile, verifyLinuxBindings, validateReport } from "./web-ci.mjs";
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const web = path.join(repo, "web"), output = path.join(repo, "ci-output/web-build");
 const descriptorPath = path.join(repo, "ci/web-build.inputs.json");
-const cohort = "web4341-login-alignment-v1";
-const loginFile = "src/pages/login/LoginForm.test.tsx";
-const loginSuite = "LoginForm authenticator disclosure";
-const loginName = "reveals an invalid folded MFA field and preserves values without weakening existing mode clearing";
-const sourceDigest = "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90";
+const cohort = "web4343-voice-retirement-v1";
+const loginFile = "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx";
+const loginSuite = "VoiceMessageRender playback";
+const loginName = "retires pending voice ownership without stale rows stopping the next message or hiding current failures";
+const sourceDigest = "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8";
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 const hash = (body) => createHash("sha256").update(body).digest("hex");
 const json = (file) => JSON.parse(readFileSync(file, "utf8"));
@@ -30,9 +30,9 @@ const writeJSON = (file, value) => writeNew(file, JSON.stringify(value, null, 2)
 
 export function validateDescriptor(input) {
   assert(input.schema === "luobo.web.login-build.v1" && input.cohort === cohort && input.node === "24.21.0", "Explicit named-login-test and build identity required");
-  assert(input.sourceFiles === 4341 && input.files.length === 4341 && new Set(input.files.map((r) => r.path)).size === 4341, "Exact4341 source set required");
+  assert(input.sourceFiles === 4343 && input.files.length === 4343 && new Set(input.files.map((r) => r.path)).size === 4343, "Exact4343 source set required");
   for (const row of input.files) assert(typeof row.path === "string" && !path.isAbsolute(row.path) && !row.path.split(/[\\/]/).some((p) => !p || p === "." || p === "..") && /^[0-9a-f]{64}$/.test(row.sha256) && Number.isSafeInteger(row.bytes) && row.bytes >= 0, "Bounded relative source row required");
-  assert(input.sourceDigest === sourceDigest && rowsDigest(input.files) === sourceDigest, "Reviewed4341 source digest differs");
+  assert(input.sourceDigest === sourceDigest && rowsDigest(input.files) === sourceDigest, "Reviewed4343 source digest differs");
   assert(input.files.filter((r) => r.path.startsWith("public/")).length === 13, "Exact public13 inventory required");
   const selection = input.loginTest;
   assert(selection && selection.file === loginFile && selection.suite === loginSuite && selection.name === loginName
@@ -130,11 +130,11 @@ export function loginFailureObservation(report, audit, processRecord, sourceExac
   }
   for (const message of messages.slice(0, 10)) if (typeof message === "string")
     for (const text of message.slice(0, 32768).split(/\r?\n/).slice(0, 128)) {
-      const match = text.match(/(?:^|[\s\/])src\/pages\/login\/LoginForm\.test\.tsx:([1-9][0-9]{0,5}):[0-9]+\)?\s*$/);
+      const match = text.match(/(?:^|[\s\/])src\/pages\/chat\/queryChat\/MessageItem\/VoiceMessageRender\.test\.tsx:([1-9][0-9]{0,5}):[0-9]+\)?\s*$/);
       if (match && Number.isSafeInteger(lineLimit) && Number(match[1]) <= lineLimit) lines.add(Number(match[1]));
     }
   return { categories: [...categories].sort(), knownCaseState: known.length === 1 && ["passed", "failed", "skipped"].includes(known[0].state) ? known[0].state : "unconfirmed",
-    frames: [...lines].sort((a, b) => a - b).slice(0, 8).map((line) => ({ basename: "LoginForm.test.tsx", line })),
+    frames: [...lines].sort((a, b) => a - b).slice(0, 8).map((line) => ({ basename: "VoiceMessageRender.test.tsx", line })),
     framesTruncated: lines.size > 8, rawFailureMessagesStackPayloadOrUnknownNamesExported: false };
 }
 
@@ -325,11 +325,11 @@ function bundleWorker() {
   execute(buildPlan(process.execPath, "unused-in-worker", path.join(output, "dist"))[2]);
   verifySourceTree(web, input.files, true); verifySDK(); checkedInputs();
   const candidate = retainBuildCandidate(output, path.join(output, "dist"), input.files.filter((r) => r.path.startsWith("public/")), input.csp,
-    { cohort, commit: prepared.commit, sourceFiles: 4341, sourceDigest, namedTestsPassed: 1, loginReceiptSHA256, oldFullSuiteTests: 0 });
+    { cohort, commit: prepared.commit, sourceFiles: 4343, sourceDigest, namedTestsPassed: 1, loginReceiptSHA256, oldFullSuiteTests: 0 });
   assert(candidate.proof.passed, "Pinned production CSP semantic mismatch; bounded actual index/proof and candidate retained");
   const files = candidate.files;
   writeJSON(path.join(output, "dist-manifest.json"), files);
-  writeJSON(path.join(output, "dist-proof.json"), { cohort, commit: prepared.commit, sourceFiles: 4341, sourceDigest, namedTestsPassed: 1, loginReceiptSHA256, oldFullSuiteTests: 0, files: files.length, bytes: files.reduce((n, r) => n + r.bytes, 0), filesDigest: rowsDigest(files), manifestSHA256: hash(readFileSync(path.join(output, "dist-manifest.json"))), opaqueWASMSameAsReviewedPublicSource: true, SDKSourceRebuilt: false, runtimeOrPreviewAcceptance: false, deployment: false, resourceGuardPassStillRequired: true });
+  writeJSON(path.join(output, "dist-proof.json"), { cohort, commit: prepared.commit, sourceFiles: 4343, sourceDigest, namedTestsPassed: 1, loginReceiptSHA256, oldFullSuiteTests: 0, files: files.length, bytes: files.reduce((n, r) => n + r.bytes, 0), filesDigest: rowsDigest(files), manifestSHA256: hash(readFileSync(path.join(output, "dist-manifest.json"))), opaqueWASMSameAsReviewedPublicSource: true, SDKSourceRebuilt: false, runtimeOrPreviewAcceptance: false, deployment: false, resourceGuardPassStillRequired: true });
   console.log("BUILD_CANDIDATE_READY; outer resource exit/status must also pass");
 }
 
@@ -352,7 +352,7 @@ function main() {
     const npmVersion = execute({ name: "npm-version", command: node, args: [npm, "--version"], timeout: 10000 }, repo).trim();
     assert(/^\d+\.\d+\.\d+$/.test(npmVersion), "Exact bundled npm version query required");
     writeNew(path.join(output, "inputs.json"), readFileSync(descriptorPath));
-    writeJSON(path.join(output, "source.json"), { cohort, commit: actualHead, sourceFiles: 4341, sourceDigest, sourceDeclarationSHA256: hash(readFileSync(descriptorPath)), npmVersion,
+    writeJSON(path.join(output, "source.json"), { cohort, commit: actualHead, sourceFiles: 4343, sourceDigest, sourceDeclarationSHA256: hash(readFileSync(descriptorPath)), npmVersion,
       node: { version: process.version, bytes: lstatSync(node).size, sha256: hash(readFileSync(node)), bundledNpmCLI_SHA256: hash(readFileSync(npm)), officialActionVersionPin: input.node }, testsRunDuringSetup: 0, namedTestsRequiredBeforeBundle: 1, oldFullSuiteTests: 0, typeChecksRun: 0, businessActions: 0, nativeOrSDKBind: 0, HOMEUnchanged: true, sourceIncludesPrivateConfiguration: false });
     execute(plan[0]); execute(plan[1]); verifySDK(); verifySourceTree(web, input.files, true);
     checkedInputs();

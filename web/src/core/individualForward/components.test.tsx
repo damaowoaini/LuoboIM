@@ -323,7 +323,7 @@ describe("legacy tag903 projection and actual forwarding", () => {
       src = ""; preload = ""; onended: (() => void) | null = null; onpause: (() => void) | null = null; onplay: (() => void) | null = null;
       constructor() { audios.push(this); }
       play = vi.fn(async () => { this.onplay?.(); }); pause = vi.fn(() => { this.onpause?.(); });
-      removeAttribute = vi.fn((name: string) => { if (name === "src") this.src = ""; });
+      removeAttribute = vi.fn((name: string) => { if (name === "src") this.src = ""; }); load = vi.fn();
     });
     try {
       const source = { ...tag({ soundElem: sound }), attachedInfoElem: { isPrivateChat: true, burnDuration: 1, hasReadTime: now } };
@@ -345,7 +345,7 @@ describe("legacy tag903 projection and actual forwarding", () => {
     vi.stubGlobal("Audio", class {
       src = ""; preload = ""; onended = null; onpause = null; onplay = null;
       constructor() { audios.push(this); } play = play; pause = vi.fn();
-      removeAttribute = vi.fn((name: string) => { if (name === "src") this.src = ""; });
+      removeAttribute = vi.fn((name: string) => { if (name === "src") this.src = ""; }); load = vi.fn();
     });
     try {
       const changes = [() => { fixture.session.current!.issuer = "https://other.synthetic.test"; },
