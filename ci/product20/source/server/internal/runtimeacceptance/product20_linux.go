@@ -47,7 +47,17 @@ import (
 	mysql "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"github.com/openimsdk/open-im-server/v3/internal/messagedelivery"
+	"github.com/openimsdk/open-im-server/v3/internal/msgtransfer"
+	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport/ownedcontrol"
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceinventory"
+	"github.com/openimsdk/open-im-server/v3/pkg/common/serviceauth"
+	"github.com/openimsdk/open-im-server/v3/pkg/msgprocessor"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readconcern"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
@@ -102,8 +112,11 @@ type product20Result struct {
 	HTTPExchanges               []product20HTTPExchange  `json:"httpExchanges"`
 	ConfigProxyStatus           int                      `json:"configProxyStatus"`
 
-	RegistrationFailure *product20RegistrationObservation `json:"registrationFailure,omitempty"`
-	MessageObservation  *product20MessageObservation      `json:"messageObservation,omitempty"`
+	RegistrationFailure *product20RegistrationObservation    `json:"registrationFailure,omitempty"`
+	MessageObservation  *product20MessageObservation         `json:"messageObservation,omitempty"`
+	GatewayPresence     *product20GatewayPresenceObservation `json:"gatewayPresence,omitempty"`
+	DeliverySnapshot    *product20DeliverySnapshot           `json:"deliverySnapshot,omitempty"`
+	ManagedDrain        *product20ManagedDrainObservation    `json:"managedDrain,omitempty"`
 }
 
 // This diagnostic observes original returns only. It never formats an error,
@@ -1276,7 +1289,306 @@ func product20Matches(groups map[string]*sdkws.PullMsgs, clientID string) []*sdk
 	}
 	return matches
 }
-func product20Message(ctx context.Context, a, b product20Account, roots *x509.CertPool, observation *product20MessageObservation, onDispatch func()) (clientID, serverID string, seq int64, err error) {
+
+type product20GatewayPresenceObservation struct {
+	Available    bool `json:"available"`
+	SenderOnline bool `json:"senderOnline"`
+	PeerOnline   bool `json:"peerOnline"`
+}
+
+func product20GatewayPresence(parent context.Context, client *http.Client, boot *Bootstrap, sender, peer product20Account) *product20GatewayPresenceObservation {
+	unavailable := &product20GatewayPresenceObservation{}
+	if client == nil || boot == nil || sender.UserID == "" || peer.UserID == "" || sender.UserID == peer.UserID || sender.IMToken == "" || peer.IMToken == "" {
+		return unavailable
+	}
+	ctx, cancel := context.WithTimeout(parent, 3*time.Second)
+	defer cancel()
+	secret := boot.Credential["serviceSecret"]
+	// Both requests and all response material stay private. This helper uses the
+	// original HTTP client directly, outside the acceptance HTTP exchange ledger.
+	post := func(endpoint, logicalPath, token string, payload any) (json.RawMessage, bool) {
+		body, e := json.Marshal(payload)
+		if e != nil {
+			return nil, false
+		}
+		request, e := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
+		if e != nil {
+			return nil, false
+		}
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("operationID", uuid.NewString())
+		if token != "" {
+			request.Header.Set("token", token)
+		}
+		if logicalPath != "" {
+			proof, e := serviceauth.Sign([]byte(secret), serviceauth.Internal, http.MethodPost, logicalPath, token, body, time.Now())
+			if e != nil {
+				return nil, false
+			}
+			for key, values := range proof {
+				request.Header[key] = values
+			}
+		}
+		response, e := client.Do(request)
+		if e != nil {
+			return nil, false
+		}
+		defer response.Body.Close()
+		raw, e := io.ReadAll(io.LimitReader(response.Body, (64<<10)+1))
+		if e != nil || len(raw) > 64<<10 || response.StatusCode != http.StatusOK {
+			return nil, false
+		}
+		var envelope product20Envelope
+		if json.Unmarshal(raw, &envelope) != nil || envelope.ErrCode == nil || *envelope.ErrCode != 0 {
+			return nil, false
+		}
+		return envelope.Data, true
+	}
+	authData, ok := post("https://127.0.0.1/api/auth/user_token", "", "", map[string]any{
+		"secret": secret, "userID": boot.ManagerID, "platformID": constant.AdminPlatformID,
+	})
+	var manager struct {
+		Token string `json:"token"`
+	}
+	if !ok || json.Unmarshal(authData, &manager) != nil || manager.Token == "" {
+		return unavailable
+	}
+	data, ok := post("https://127.0.0.1/api/user/get_users_online_status", "/user/get_users_online_status", manager.Token,
+		map[string]any{"userIDs": []string{sender.UserID, peer.UserID}})
+	var rows []struct {
+		UserID               string `json:"userID"`
+		Status               string `json:"status"`
+		DetailPlatformStatus []struct {
+			Platform string `json:"platform"`
+			Status   string `json:"status"`
+			Token    string `json:"token"`
+		} `json:"detailPlatformStatus"`
+	}
+	if !ok || json.Unmarshal(data, &rows) != nil || len(rows) != 2 {
+		return unavailable
+	}
+	seen := map[string]bool{}
+	result := &product20GatewayPresenceObservation{Available: true}
+	for _, row := range rows {
+		if seen[row.UserID] || row.UserID != sender.UserID && row.UserID != peer.UserID || row.Status != constant.OnlineStatus && row.Status != constant.OfflineStatus {
+			return unavailable
+		}
+		seen[row.UserID] = true
+		expectedToken := sender.IMToken
+		if row.UserID == peer.UserID {
+			expectedToken = peer.IMToken
+		}
+		online := false
+		if row.Status == constant.OnlineStatus {
+			for _, detail := range row.DetailPlatformStatus {
+				if detail.Platform == constant.PlatformIDToName(constant.WebPlatformID) && detail.Status == constant.OnlineStatus && detail.Token == expectedToken {
+					online = true
+				}
+			}
+		}
+		if row.UserID == sender.UserID {
+			result.SenderOnline = online
+		} else {
+			result.PeerOnline = online
+		}
+	}
+	return result
+}
+
+type product20DeliverySnapshot struct {
+	State             string `json:"state"`
+	DutyState         string `json:"dutyState"`
+	KafkaReceipt      *bool  `json:"kafkaReceipt"`
+	SourceReceipt     *bool  `json:"sourceReceipt"`
+	MaxPending        *bool  `json:"maxPending"`
+	SenderReadPending *bool  `json:"senderReadPending"`
+	OnlinePending     *bool  `json:"onlinePending"`
+	PushPending       *bool  `json:"pushPending"`
+	OnlineUnconfirmed *bool  `json:"onlineUnconfirmed"`
+	PeerDenied        *bool  `json:"peerDenied"`
+	OnlineAttempts    *int64 `json:"onlineAttempts"`
+	AttemptsTruncated bool   `json:"attemptsTruncated"`
+}
+
+type product20DeliveryDuty struct {
+	ID                string    `bson:"_id"`
+	BranchID          string    `bson:"branch_id"`
+	ConversationID    string    `bson:"conversation_id"`
+	Persist           *bool     `bson:"persist"`
+	Seq               int64     `bson:"seq"`
+	SourceID          string    `bson:"source_id"`
+	State             string    `bson:"state"`
+	MaxPending        *bool     `bson:"max_pending"`
+	SenderReadPending *bool     `bson:"sender_read_pending"`
+	OnlinePending     *bool     `bson:"online_pending"`
+	PushPending       *bool     `bson:"push_pending"`
+	OnlineUnconfirmed *bool     `bson:"online_last_unconfirmed"`
+	VisibilityDenied  *[]string `bson:"visibility_denied"`
+	OnlineAttempts    *int64    `bson:"online_attempts"`
+}
+
+func product20ReceiptObserved(ctx context.Context, db *mongo.Database, epoch, source, kind string) *bool {
+	body, _ := json.Marshal([]string{epoch, kind, source})
+	filter := bson.M{"_id": digestBytes(body), "epoch": epoch, "source_id": source}
+	if kind == "kafka-source" {
+		filter["kind"] = "kafka-source-v1"
+	}
+	err := db.Collection(messagedelivery.Receipts).FindOne(ctx, filter, options.FindOne().
+		SetProjection(bson.M{"_id": 1}).SetMaxTime(2*time.Second)).Err()
+	switch {
+	case err == nil:
+		found := true
+		return &found
+	case errors.Is(err, mongo.ErrNoDocuments):
+		found := false
+		return &found
+	default:
+		return nil
+	}
+}
+
+// Inspect only the original task's matched message. These reads confer no
+// recovery or delivery authority and leave the original message result intact.
+func product20ReadDeliverySnapshot(parent context.Context, boot *Bootstrap, operation, sender, peer string) *product20DeliverySnapshot {
+	out := &product20DeliverySnapshot{State: "unavailable", DutyState: "unknown"}
+	if boot == nil || boot.AdminMongo == nil {
+		return out
+	}
+	id, err := uuid.Parse(operation)
+	if err != nil || id.String() != operation {
+		return out
+	}
+	ctx, cancel := context.WithTimeout(parent, 5*time.Second)
+	defer cancel()
+	db := boot.AdminMongo.Database(boot.Header.Database, options.Database().
+		SetReadPreference(readpref.Primary()).
+		SetReadConcern(readconcern.Majority()))
+	filter := bson.M{"epoch": boot.Header.Epoch, "producer_version": "ordinary-kafka-v1", "source_operation_id": operation, "sender_id": sender, "conversation_id": msgprocessor.GetConversationIDBySessionType(constant.SingleChatType, sender, peer)}
+	projection := bson.M{"_id": 1, "branch_id": 1, "conversation_id": 1, "persist": 1, "seq": 1, "source_id": 1, "state": 1, "max_pending": 1, "sender_read_pending": 1, "online_pending": 1, "push_pending": 1, "online_last_unconfirmed": 1, "visibility_denied": 1, "online_attempts": 1}
+	cursor, err := db.Collection(messagedelivery.Effects).Find(ctx, filter, options.Find().
+		SetProjection(projection).SetLimit(2).SetBatchSize(2).SetMaxTime(2*time.Second))
+	if err != nil {
+		return out
+	}
+	defer cursor.Close(ctx)
+	var rows []product20DeliveryDuty
+	if err := cursor.All(ctx, &rows); err != nil {
+		return out
+	}
+	switch len(rows) {
+	case 0:
+		out.State = "absent"
+		return out
+	case 1:
+	default:
+		out.State = "ambiguous"
+		return out
+	}
+	duty := rows[0]
+	branch, branchErr := uuid.Parse(duty.BranchID)
+	source, sourceErr := uuid.Parse(duty.SourceID)
+	keyBody, _ := json.Marshal([]string{boot.Header.Epoch, "branch", duty.BranchID})
+	if branchErr != nil || branch.String() != duty.BranchID || sourceErr != nil || source.String() != duty.SourceID ||
+		duty.ID != digestBytes(keyBody) || duty.Persist == nil || !*duty.Persist || duty.Seq <= 0 ||
+		duty.ConversationID != msgprocessor.GetConversationIDBySessionType(constant.SingleChatType, sender, peer) {
+		return out
+	}
+	out.State = "observed"
+	switch duty.State {
+	case "ready", "done":
+		out.DutyState = duty.State
+	case "":
+	default:
+		out.DutyState = "other"
+	}
+	out.MaxPending, out.SenderReadPending = duty.MaxPending, duty.SenderReadPending
+	out.OnlinePending, out.PushPending = duty.OnlinePending, duty.PushPending
+	out.OnlineUnconfirmed = duty.OnlineUnconfirmed
+	if duty.OnlineAttempts != nil && *duty.OnlineAttempts >= 0 {
+		attempts := *duty.OnlineAttempts
+		if attempts > 255 {
+			attempts = 255
+			out.AttemptsTruncated = true
+		}
+		out.OnlineAttempts = &attempts
+	}
+	if duty.VisibilityDenied != nil {
+		denied := false
+		peerHash := digestBytes([]byte(peer))
+		for _, value := range *duty.VisibilityDenied {
+			if value == peerHash {
+				denied = true
+			}
+		}
+		out.PeerDenied = &denied
+	}
+	out.KafkaReceipt = product20ReceiptObserved(ctx, db, boot.Header.Epoch, duty.SourceID, "kafka-source")
+	out.SourceReceipt = product20ReceiptObserved(ctx, db, boot.Header.Epoch, duty.SourceID, "source")
+	return out
+}
+
+type product20ManagedDrainObservation struct {
+	Available                bool `json:"available"`
+	SourceOutcomeUnconfirmed bool `json:"sourceOutcomeUnconfirmed"`
+}
+
+func product20ReadManagedDrain(boot *Bootstrap) *product20ManagedDrainObservation {
+	out := &product20ManagedDrainObservation{}
+	var specs []ownedcontrol.ServiceSpec
+	for _, spec := range boot.Services.Specs {
+		if spec.Role == "msgtransfer-managed" {
+			specs = append(specs, spec)
+		}
+	}
+	if len(specs) != 1 {
+		return out
+	}
+	spec := specs[0]
+	var configuration msgtransfer.OwnedOrdinaryBootstrap
+	if loadPinnedPrivate(spec.BootstrapPath, spec.BootstrapSHA256, 16<<10, &configuration) != nil ||
+		configuration.Database != boot.Header.Database ||
+		configuration.Epoch != boot.Header.Epoch ||
+		configuration.ActivationSHA256 != boot.Header.ActivationSHA256 ||
+		configuration.DrainPath != filepath.Join(spec.Work, "drain.json") {
+		return out
+	}
+	var requirements []ownedcontrol.NamespaceRuntimeRequirement
+	for _, requirement := range boot.Services.Requirements {
+		if requirement.Role == spec.Role {
+			requirements = append(requirements, requirement)
+		}
+	}
+	if len(requirements) != 1 || requirements[0].SourceSHA256 != spec.SourceSHA256 ||
+		requirements[0].BinarySHA256 != spec.BinarySHA256 ||
+		requirements[0].BootstrapSHA256 != spec.BootstrapSHA256 {
+		return out
+	}
+	raw, err := namespaceinventory.ReadPrivateDocument(configuration.DrainPath, 1<<20)
+	if err != nil {
+		return out
+	}
+	var summary msgtransfer.ManagedOrdinaryDrain
+	if namespaceinventory.DecodeStrict(raw, &summary) != nil ||
+		summary.Version != "managed-ordinary-drained-v1" ||
+		summary.DatabaseSHA256 != digestBytes([]byte(boot.Header.Database)) ||
+		summary.Epoch != boot.Header.Epoch ||
+		summary.ActivationSHA256 != boot.Header.ActivationSHA256 ||
+		summary.BootstrapSHA256 != spec.BootstrapSHA256 ||
+		summary.PolicySHA256 != configuration.PolicySHA256 {
+		return out
+	}
+	var fields map[string]json.RawMessage
+	var unconfirmed bool
+	if json.Unmarshal(raw, &fields) != nil ||
+		len(fields["sourceOutcomeUnconfirmed"]) == 0 ||
+		json.Unmarshal(fields["sourceOutcomeUnconfirmed"], &unconfirmed) != nil {
+		return out
+	}
+	out.Available, out.SourceOutcomeUnconfirmed = true, unconfirmed
+	return out
+}
+
+func product20Message(ctx context.Context, a, b product20Account, roots *x509.CertPool, observation *product20MessageObservation, onDispatch func(), onFailure func(context.Context, string)) (clientID, serverID string, seq int64, err error) {
 	observation.Step = "sender-handshake"
 	sender, e := product20Dial(ctx, roots, a)
 	if e != nil {
@@ -1299,6 +1611,13 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 	defer stopSender()
 	stopPeer := context.AfterFunc(ctx, func() { _ = peer.Close() })
 	defer stopPeer()
+	var operation string
+	defer func() {
+		if err != nil && observation.Step == "peer-read" && observation.AckAccepted && onFailure != nil {
+			defer func() { _ = recover() }()
+			onFailure(ctx, operation)
+		}
+	}()
 	observation.Step = "send-write"
 	clientID = uuid.NewString()
 	payload, _ := json.Marshal(map[string]string{"content": "萝卜对话 product20 ordinary acceptance"})
@@ -1308,7 +1627,7 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 		err = e
 		return
 	}
-	operation := uuid.NewString()
+	operation = uuid.NewString()
 	// Exactly one send. Any missing/unknown ACK fails without redispatch.
 	onDispatch()
 	if err = product20WireWrite(sender, product20Wire{ReqIdentifier: 1003, SendID: a.UserID, OperationID: operation, MsgIncr: "1", Data: encoded}); err != nil {
@@ -1481,6 +1800,12 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		}
 		runErr = errors.Join(runErr, cleanupAcceptanceSession(cleanup, session))
 		result.OriginalCoreCleanupComplete = session != nil && session.CleanupComplete()
+		if result.DeliverySnapshot != nil && boot != nil && result.OriginalCoreCleanupComplete {
+			func() {
+				defer func() { _ = recover() }()
+				result.ManagedDrain = product20ReadManagedDrain(boot)
+			}()
+		}
 		if boot != nil {
 			runErr = errors.Join(runErr, boot.Close(cleanup))
 		}
@@ -1710,7 +2035,10 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	result.WrongPasswordRejected = true
 	result.Phase = "actual-gateway-ordinary-message-once"
 	result.MessageObservation = &product20MessageObservation{Step: "sender-handshake", ReadOutcome: "none"}
-	clientID, serverID, seq, e := product20Message(ctx, accounts[0], accounts[1], aux.roots, result.MessageObservation, func() { result.OrdinaryDispatches++ })
+	clientID, serverID, seq, e := product20Message(ctx, accounts[0], accounts[1], aux.roots, result.MessageObservation, func() { result.OrdinaryDispatches++ }, func(snapshot context.Context, operation string) {
+		result.DeliverySnapshot = product20ReadDeliverySnapshot(snapshot, boot, operation, accounts[0].UserID, accounts[1].UserID)
+		result.GatewayPresence = product20GatewayPresence(snapshot, httpClient, boot, accounts[0], accounts[1])
+	})
 	if e != nil {
 		return e
 	}

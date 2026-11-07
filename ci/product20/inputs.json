@@ -344,7 +344,7 @@
   ],
   "derivedHarnessSource": {
     "members": 1587,
-    "digest": "5aa56f770313231f14e8866a6d7d206c46bb19dd2dfc140f2044f9acc9fb7731"
+    "digest": "bf03f2806835f659cc1929b4bd61eb4c9cb8db2ae9d78e704e636c11d33a3c53"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
@@ -704,7 +704,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "e9d68bd024c06ef453016aeb4e9176e629198135c2949dfa84cacfad94a6705d"
+    "server/internal/runtimeacceptance/product20_linux.go": "2d9139821cdb9ae436cb2e8cf8f14123ffe31268eec68fdefc527f805cda1311"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
@@ -753,7 +753,7 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-http-ws-only",
-  "state": "same-core-mongo-pass-reused-message-heartbeat-observation-runtime-pending",
+  "state": "same-core-mongo-pass-reused-post-ack-delivery-snapshot-runtime-pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",

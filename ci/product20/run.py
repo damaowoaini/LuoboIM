@@ -874,6 +874,52 @@ def project_message_observation(v):
  return {'version':'product20-message-observation-v1',**observation,
          'diagnosticOnly':True,'rawBodiesHeadersOrIdentifiersExported':False}
 
+def project_post_ack_snapshots(v,message):
+ names=('gatewayPresence','deliverySnapshot','managedDrain')
+ if not any(key in v for key in names):return {}
+ if ('gatewayPresence' in v or 'deliverySnapshot' in v) and (
+     v.get('accepted') is not False or v.get('phase')!='actual-gateway-ordinary-message-once'
+     or message is None or message.get('step')!='peer-read'
+     or message.get('ackAccepted') is not True or message.get('peerAccepted') is not False
+     or message.get('historyAccepted') is not False
+     or type(v.get('ordinaryDispatches')) is not int or v['ordinaryDispatches']!=1):
+  raise ValueError('post-ACK snapshots require the original failed peer-read boundary')
+ if 'gatewayPresence' in v:
+  presence=v['gatewayPresence']
+  if type(presence) is not dict or set(presence)!={'available','senderOnline','peerOnline'} or any(type(presence[key]) is not bool for key in presence):
+   raise ValueError('finite gateway presence shape required')
+  if not presence['available'] and (presence['senderOnline'] or presence['peerOnline']):
+   raise ValueError('unavailable gateway presence must not claim online accounts')
+ if 'deliverySnapshot' in v:
+  delivery=v['deliverySnapshot']
+  flags=('kafkaReceipt','sourceReceipt','maxPending','senderReadPending','onlinePending','pushPending','onlineUnconfirmed','peerDenied')
+  keys={'state','dutyState','onlineAttempts','attemptsTruncated',*flags}
+  if type(delivery) is not dict or set(delivery)!=keys:
+   raise ValueError('finite delivery snapshot shape required')
+  for key,allowed in (('state',('unavailable','absent','ambiguous','observed')),('dutyState',('unknown','ready','done','other'))):
+   if type(delivery[key]) is not str or delivery[key] not in allowed:
+    raise ValueError('finite delivery snapshot states required')
+  if any(delivery[key] is not None and type(delivery[key]) is not bool for key in flags):
+   raise ValueError('nullable delivery flags required')
+  attempts=delivery['onlineAttempts'];truncated=delivery['attemptsTruncated']
+  if attempts is not None and (type(attempts) is not int or not 0<=attempts<=255):
+   raise ValueError('bounded nullable online attempt count required')
+  if type(truncated) is not bool or truncated and attempts!=255:
+   raise ValueError('bounded delivery truncation required')
+  if delivery['state']!='observed' and (delivery['dutyState']!='unknown' or any(delivery[key] is not None for key in (*flags,'onlineAttempts')) or truncated):
+   raise ValueError('unobserved delivery must not claim observations')
+ if 'managedDrain' in v:
+  drain=v['managedDrain']
+  if 'deliverySnapshot' not in v or v.get('originalCoreCleanupComplete') is not True:
+   raise ValueError('managed drain requires delivery snapshot and original core cleanup')
+  if type(drain) is not dict or set(drain)!={'available','sourceOutcomeUnconfirmed'} or any(type(drain[key]) is not bool for key in drain):
+   raise ValueError('finite managed drain shape required')
+  if not drain['available'] and drain['sourceOutcomeUnconfirmed']:
+   raise ValueError('unavailable managed drain must not claim an outcome')
+ versions=('product20-gateway-presence-v1','product20-delivery-snapshot-v1','product20-managed-drain-v1')
+ return {key:{'version':version,**v[key],'diagnosticOnly':True,'rawBodiesHeadersOrIdentifiersExported':False}
+         for key,version in zip(names,versions) if key in v}
+
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
  phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
@@ -887,6 +933,7 @@ def export_terminal(path,output):
  if registration is not None:value['registrationFailure']=registration
  message=project_message_observation(v)
  if message is not None:value['messageObservation']=message
+ value.update(project_post_ack_snapshots(v,message))
  write(output,value)
  return value
 

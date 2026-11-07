@@ -178,6 +178,105 @@ class MessageObservationContract(unittest.TestCase):
                 controller.verify_core_mongo_test_reuse(config, canonical)
 
 
+class DeliverySnapshotContract(unittest.TestCase):
+    def test_post_ack_snapshots_are_closed_and_private(self):
+        private = "PRIVATE_POST_ACK_BODY_HEADER_OR_IDENTIFIER"
+        flags = ('kafkaReceipt', 'sourceReceipt', 'maxPending', 'senderReadPending',
+                 'onlinePending', 'pushPending', 'onlineUnconfirmed', 'peerDenied')
+        presence = {'available': True, 'senderOnline': True, 'peerOnline': False}
+        delivery = {'state': 'observed', 'dutyState': 'ready', **dict.fromkeys(flags, False),
+                    'onlineAttempts': 255, 'attemptsTruncated': True}
+        drain = {'available': True, 'sourceOutcomeUnconfirmed': True}
+        names = ('gatewayPresence', 'deliverySnapshot', 'managedDrain')
+        versions = ('product20-gateway-presence-v1', 'product20-delivery-snapshot-v1',
+                    'product20-managed-drain-v1')
+        message = {'step': 'peer-read', 'ackAccepted': True, 'peerAccepted': False,
+                   'historyAccepted': False, 'readOutcome': 'read-error', 'readTimeout': True, 'readCloseCode': 0}
+        terminal = {'version': 'fresh-product20-http-ws-result-v1', 'accepted': False,
+                    'phase': 'actual-gateway-ordinary-message-once', 'productProcesses': 20,
+                    'realRegistrations': 2, 'realPasswordLogins': 2, 'ordinaryDispatches': 1,
+                    'peerMessages': 0, 'historyMessages': 0, 'messageObservation': message,
+                    'auxiliaryListenersJoined': True, 'originalSixChildrenExited': True,
+                    'originalCoreCleanupComplete': True, 'privateBody': private,
+                    'startupBoundary': {'version': 'product20-startup-boundary-v1', 'entered': True,
+                        'substep': 'complete', 'role': 'none', 'sixForked': 6, 'sixReady': 6,
+                        'primaryCause': {'present': False, 'classes': [], 'truncated': False, 'errno': 0,
+                            'mysqlNumber': 0, 'execState': 'none', 'exitCode': -1, 'signal': 0}},
+                    'gatewayPresence': presence, 'deliverySnapshot': delivery, 'managedDrain': drain}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve(); original = root / 'original.json'; output = root / 'projected.json'
+            def project(value):
+                original.write_text(json.dumps(value)); output.unlink(missing_ok=True)
+                return controller.export_terminal(original, output)
+            observed = project(terminal)
+            for key, version in zip(names, versions):
+                self.assertEqual(observed[key], {'version': version, **terminal[key], 'diagnosticOnly': True,
+                                                'rawBodiesHeadersOrIdentifiersExported': False})
+            self.assertFalse(observed['accepted']); self.assertNotIn(private, output.read_text())
+            self.assertNotIn('privateBody', observed)
+            legacy = {key: value for key, value in terminal.items() if key not in names}
+            legacy_export = project(legacy)
+            self.assertTrue(all(key not in legacy_export for key in names))
+            for key in ('gatewayPresence', 'deliverySnapshot'):
+                self.assertIn(key, project(dict(legacy, **{key: terminal[key]})))
+            for state in ('unavailable', 'absent', 'ambiguous'):
+                empty = dict(delivery, state=state, dutyState='unknown', **dict.fromkeys(flags),
+                             onlineAttempts=None, attemptsTruncated=False)
+                self.assertEqual(project(dict(terminal, deliverySnapshot=empty))['deliverySnapshot']['state'], state)
+            for duty in ('unknown', 'ready', 'done', 'other'):
+                for count in (None, 0, 255):
+                    current = dict(delivery, dutyState=duty, **dict.fromkeys(flags),
+                                   onlineAttempts=count, attemptsTruncated=False)
+                    self.assertEqual(project(dict(terminal, deliverySnapshot=current))['deliverySnapshot']['onlineAttempts'], count)
+            for key in flags:
+                for flag in (None, False, True):
+                    current = dict(delivery, **{key: flag})
+                    self.assertIs(project(dict(terminal, deliverySnapshot=current))['deliverySnapshot'][key], flag)
+            unavailable = dict(terminal, gatewayPresence=dict.fromkeys(presence, False),
+                               managedDrain=dict.fromkeys(drain, False))
+            self.assertFalse(project(unavailable)['gatewayPresence']['available'])
+            self.assertFalse(project(unavailable)['managedDrain']['available'])
+            invalid = [dict(terminal, accepted=True), dict(terminal, accepted=0),
+                       dict(terminal, phase='actual-route-config-and-registration'),
+                       dict(terminal, ordinaryDispatches=0), dict(terminal, ordinaryDispatches=True),
+                       dict(terminal, originalCoreCleanupComplete=False),
+                       dict(terminal, messageObservation=None), dict(legacy, managedDrain=drain)]
+            missing_message = copy.deepcopy(terminal); del missing_message['messageObservation']; invalid.append(missing_message)
+            for change in ({'step': 'ack-read'}, {'ackAccepted': False}, {'peerAccepted': True}, {'historyAccepted': True}):
+                invalid.append(dict(terminal, messageObservation=dict(message, **change)))
+            for key in names:
+                for value in (None, [], {}, dict(terminal[key], identifier=private)):
+                    invalid.append(dict(terminal, **{key: value}))
+                for field in terminal[key]:
+                    missing = dict(terminal[key]); del missing[field]
+                    invalid.append(dict(terminal, **{key: missing}))
+            for key, original_value in (('gatewayPresence', presence), ('managedDrain', drain)):
+                for field in original_value:
+                    for value in (None, 0, 1, private):
+                        invalid.append(dict(terminal, **{key: dict(original_value, **{field: value})}))
+            invalid.extend((dict(terminal, gatewayPresence=dict(presence, available=False)),
+                            dict(terminal, managedDrain=dict(drain, available=False))))
+            for key in flags:
+                for value in (0, 1, private, []):
+                    invalid.append(dict(terminal, deliverySnapshot=dict(delivery, **{key: value})))
+            for key, values in (('state', (private, None, [], True)), ('dutyState', (private, None, [], True)),
+                                ('onlineAttempts', (-1, 256, True, 1.0, private)),
+                                ('attemptsTruncated', (None, 0, 1, private))):
+                for value in values:
+                    invalid.append(dict(terminal, deliverySnapshot=dict(delivery, **{key: value})))
+            for count in (None, 0, 254):
+                invalid.append(dict(terminal, deliverySnapshot=dict(delivery, onlineAttempts=count)))
+            empty = dict(delivery, state='absent', dutyState='unknown', **dict.fromkeys(flags),
+                         onlineAttempts=None, attemptsTruncated=False)
+            for key, value in (('dutyState', 'ready'), ('onlineAttempts', 0), ('attemptsTruncated', True),
+                               *((field, False) for field in flags)):
+                invalid.append(dict(terminal, deliverySnapshot=dict(empty, **{key: value})))
+            for value in invalid:
+                with self.assertRaises(ValueError) as caught:
+                    project(value)
+                self.assertNotIn(private, str(caught.exception)); self.assertFalse(output.exists())
+
+
 class SplitProducerContract(unittest.TestCase):
  def test_current5_expected_manifest_original6_route_and_locked_core_keep_exact_provenance(self):
   c=controller.historical_chart_control(json.loads((HERE/'inputs.json').read_bytes()))  # Original259 fixture, never the pending current source.
