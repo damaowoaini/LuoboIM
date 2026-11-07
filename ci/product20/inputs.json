@@ -343,8 +343,8 @@
     "ci/product20/test_receiver.py"
   ],
   "derivedHarnessSource": {
-    "digest": "6980baaad94dc9781875b84906b6799e88b5c0a64b1705b4b4151d5388534989",
-    "members": 1586
+    "members": 1586,
+    "digest": "2b134daa471432e7f2e3982e3696f9c9db7b75b4bc930d091a0e247bc259389e"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
@@ -384,11 +384,11 @@
     }
   },
   "fixtureConfiguration": {
-    "afterSHA256": "c7a403cc8326c895447261c80e4bc86eb10e02d557c6b9f23606a90ec6777501",
+    "afterSHA256": "8a44f33d87e3bee5900da4256d6ed915b4a397dc7b5017ad5e616d129f9711df",
     "beforeSHA256": "150ad302110e62b9f12a69cc063e619769488db5d2dbd7871b15303989ffae46",
     "constructorPrefix": "\tfixtureSQL,e := product20FixtureSQL(b); if e != nil { return \"\",e }\n",
     "exactSingleAnchor": "\"secret\": c[\"serviceSecret\"], \"multiLoginPolicy\": 1",
-    "purpose": "Task real tenant issuer, actual schema-only SQL policy DB, explicit friendVerify=false before every role config/bootstrap generation; auxiliary-only derivative, product14 and old four scenarios untouched",
+    "purpose": "Real tenant issuer, SQL policy, and friendVerify=false in the P20 fixture. Use the same URI-safe nonce-scoped ZooKeeper root for Chart and core while retaining the core RTC service name. No product source changes.",
     "replacement": "\"secret\": c[\"serviceSecret\"], \"adminDelegation\": map[string]any{\"issuer\": b.Header.Tenant}, \"mysql\": fixtureSQL, \"messageVerify\": map[string]bool{\"friendVerify\": false}, \"multiLoginPolicy\": 1",
     "target": "server/internal/runtimeacceptance/bootstrap_linux.go"
   },
@@ -712,7 +712,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "d083a10aaf259dc0c19ab767d7c865705ee78a6530dd6197a0361789c7220b8e"
+    "server/internal/runtimeacceptance/product20_linux.go": "8192f67d0ee99b726cbff5e6ba10fe3c2cedc610422f4cb65a34b0c0f06270ef"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {

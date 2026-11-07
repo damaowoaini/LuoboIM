@@ -11,6 +11,8 @@ OVERLAYS=('server/internal/runtimeacceptance/product20_linux.go','server/cmd/too
 BOOT='server/internal/runtimeacceptance/bootstrap_linux.go'
 ANCHOR='"secret": c["serviceSecret"], "multiLoginPolicy": 1'
 REPLACEMENT='"secret": c["serviceSecret"], "adminDelegation": map[string]any{"issuer": b.Header.Tenant}, "mysql": fixtureSQL, "messageVerify": map[string]bool{"friendVerify": false}, "multiLoginPolicy": 1'
+DISCOVERY_ANCHOR=b'"zookeeper": map[string]any{"schema": "fullgraph_" + b.Resource.Nonce,'
+DISCOVERY_REPLACEMENT=b'"zookeeper": map[string]any{"schema": b.Header.Tenant,'
 def sha(b):return hashlib.sha256(b).hexdigest()
 def regular(path,maximum=32<<20):
  p=Path(path)
@@ -40,6 +42,11 @@ def load(path,label):
 def vector(bodies):
  rows=[{'path':n,'bytes':len(b),'sha256':sha(b)} for n,b in sorted(bodies.items())]
  return {'members':len(rows),'digest':sha(json.dumps(rows,sort_keys=True,separators=(',',':')).encode())}
+def derive_bootstrap(body):
+ config_anchor=b'\tvalue := map[string]any{"envs"'
+ config_prefix=b'\tfixtureSQL, e := product20FixtureSQL(b)\n\tif e != nil {\n\t\treturn "", e\n\t}\n'
+ if any(body.count(anchor)!=1 for anchor in (ANCHOR.encode(),config_anchor,DISCOVERY_ANCHOR)):raise ValueError('single fixture constructor anchors required')
+ return body.replace(config_anchor,config_prefix+config_anchor,1).replace(ANCHOR.encode(),REPLACEMENT.encode(),1).replace(DISCOVERY_ANCHOR,DISCOVERY_REPLACEMENT,1)
 def verify():
  c=json.loads(regular(HERE/'inputs.json'))
  if c['schema']!=1 or c['scope']!='one-fresh-product20-http-ws-only' or c['productRebuilds']!=0 or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
@@ -56,10 +63,9 @@ def verify():
   t=c.get('typedStartupDiagnostic')
   if type(t) is not dict or set(t)!={'path','sha256','version','prefix'} or t['path']!='chart/pkg/common/chatrpcstart/start.go' or t['version']!='chart-startup-error-v1' or t['prefix']!='LUOBO_CHART_STARTUP_V1 ' or sha(chart_bodies.get(t['path'],b''))!=t['sha256']:raise ValueError('current typed startup source binding differs')
  original=dict(bodies);body=bodies[BOOT]
- if sha(body)!=c['fixtureConfiguration']['beforeSHA256'] or body.count(ANCHOR.encode())!=1:raise ValueError('single original fixture map anchor required')
- config_anchor=b'\tvalue := map[string]any{\"envs\"';config_prefix=b'\tfixtureSQL, e := product20FixtureSQL(b)\n\tif e != nil {\n\t\treturn "", e\n\t}\n'
- if body.count(config_anchor)!=1:raise ValueError('one original fixture constructor required')
- bodies=dict(bodies);bodies[BOOT]=body.replace(config_anchor,config_prefix+config_anchor,1).replace(ANCHOR.encode(),REPLACEMENT.encode(),1)
+ if sha(body)!=c['fixtureConfiguration']['beforeSHA256']:raise ValueError('original fixture bootstrap differs')
+ bodies=dict(bodies);bodies[BOOT]=derive_bootstrap(body)
+ if sha(bodies[BOOT])!=c['fixtureConfiguration']['afterSHA256']:raise ValueError('derived fixture bootstrap differs')
  for target in OVERLAYS:
   raw=regular(HERE/'source'/target)
   if target in bodies or sha(raw)!=c['overlay'][target]:raise ValueError('new tool overlay identity differs')
@@ -645,6 +651,22 @@ def project_startup_boundary(v):
  if any(type(v.get(k)) is not bool for k in cleanup):raise ValueError('original cleanup observations required')
  return {'version':o['version'],'entered':o['entered'],'substep':step,'role':role,'sixForked':o['sixForked'],'sixReady':o['sixReady'],'primaryCause':{k:cause[k] for k in ('present','classes','truncated','errno','mysqlNumber','execState','exitCode','signal')},'cleanup':{k:v[k] for k in cleanup},'diagnosticOnly':True,'primaryCauseCapturedBeforeCleanup':True,'physicalFirstFailureClaimed':False,'rawErrorTextExported':False,'privatePathsOrPIDsExported':False,'runtimeReadyP20Accepted':False}
 
+HTTP_OPERATIONS=('config','verify','register','verify','register','login','login','self','self','wrong-password')
+HTTP_DETAIL_CLASSES=frozenset(('none','route-default-unavailable','route-domain','route-upstream-unavailable','route-upstream-http','route-upstream-envelope'))
+def project_http_observation(v):
+ if 'httpExchanges' not in v and 'configProxyStatus' not in v:return None
+ rows=v.get('httpExchanges');proxy=v.get('configProxyStatus')
+ if type(rows) is not list or len(rows)>len(HTTP_OPERATIONS) or type(proxy) is not int or (proxy!=0 and (not rows or not 100<=proxy<=999)):raise ValueError('finite HTTP observation required')
+ for operation,row in zip(HTTP_OPERATIONS,rows):
+  if type(row) is not dict or set(row)!={'operation','outcome','status','appCode','detailClass'} or row['operation']!=operation:raise ValueError('finite original HTTP operation required')
+  outcome,status,code,detail=(row[k] for k in ('outcome','status','appCode','detailClass'))
+  if type(outcome) is not str or outcome not in ('request','transport','http','malformed','envelope') or type(status) is not int or type(detail) is not str or detail not in HTTP_DETAIL_CLASSES:raise ValueError('finite original HTTP values required')
+  if outcome in ('request','transport'):valid=status==0
+  elif outcome=='http':valid=100<=status<=999
+  else:valid=status==200
+  if not valid or code is not None and (outcome!='envelope' or type(code) is not int or not 0<=code<=0xffffffff) or detail!='none' and (outcome!='envelope' or code==0):raise ValueError('original HTTP outcome differs')
+ return {'version':'product20-http-observation-v1','configProxyStatus':proxy,'exchanges':rows,'diagnosticOnly':True,'rawBodiesOrHeadersExported':False}
+
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
  phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
@@ -652,6 +674,8 @@ def export_terminal(path,output):
  keys=('productProcesses','realRegistrations','realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages')
  if any(type(v.get(k)) is not int or not 0<=v[k]<=20 for k in keys):raise ValueError('finite original terminal counts rejected')
  value={'version':v['version'],'accepted':v['accepted'],'phase':v['phase'],'failureSHA256':v.get('failureSHA256',''),'coreSourceSHA256':v.get('coreSourceSHA256',''),'originalResultSHA256':sha(raw),'counts':{k:v[k] for k in keys},'startupBoundary':project_startup_boundary(v),'rawLogsOrDataExported':False}
+ http=project_http_observation(v)
+ if http is not None:value['httpObservation']=http
  write(output,value)
  return value
 

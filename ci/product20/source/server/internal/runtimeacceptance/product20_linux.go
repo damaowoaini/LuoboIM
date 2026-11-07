@@ -37,6 +37,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -98,6 +99,8 @@ type product20Result struct {
 	DeploymentAccepted          bool                     `json:"deploymentAccepted"`
 	FailureSHA256               string                   `json:"failureSHA256,omitempty"`
 	StartupBoundary             product20StartupBoundary `json:"startupBoundary"`
+	HTTPExchanges               []product20HTTPExchange  `json:"httpExchanges"`
+	ConfigProxyStatus           int                      `json:"configProxyStatus"`
 }
 
 // This diagnostic observes original returns only. It never formats an error,
@@ -442,6 +445,7 @@ type product20Aux struct {
 	cert         tls.Certificate
 	smtpPassword string
 	transports   []*http.Transport
+	configStatus atomic.Int32
 }
 
 func product20NewAux(work, password string, observation *product20StartupBoundary) (*product20Aux, error) {
@@ -528,7 +532,16 @@ func (a *product20Aux) start(observation *product20StartupBoundary) error {
 		transport := &http.Transport{Proxy: nil, ResponseHeaderTimeout: 10 * time.Second}
 		proxy.Transport = transport
 		a.transports = append(a.transports, transport)
-		proxy.ErrorHandler = func(w http.ResponseWriter, _ *http.Request, _ error) {
+		proxy.ModifyResponse = func(response *http.Response) error {
+			if p == "/chat" && response.Request != nil && response.Request.URL.Path == "/client_config/get" {
+				a.configStatus.Store(int32(response.StatusCode))
+			}
+			return nil
+		}
+		proxy.ErrorHandler = func(w http.ResponseWriter, request *http.Request, _ error) {
+			if p == "/chat" && request.URL.Path == "/client_config/get" {
+				a.configStatus.Store(http.StatusBadGateway)
+			}
 			http.Error(w, "task upstream unavailable", http.StatusBadGateway)
 		}
 		proxies[prefix] = proxy
@@ -819,10 +832,11 @@ func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db
 	if yaml.Unmarshal(raw, &value) != nil || value == nil {
 		return "", errors.New("public chart configuration shape rejected")
 	}
-	value["zookeeper"] = map[string]any{"schema": "fullgraph_" + b.Resource.Nonce, "zkAddr": []string{"127.0.0.1:2181"}, "username": "", "password": ""}
+	// OpenKeeper also uses the root as the URI scheme. Match the core fixture.
+	value["zookeeper"] = map[string]any{"schema": b.Header.Tenant, "zkAddr": []string{"127.0.0.1:2181"}, "username": "", "password": ""}
 	value["rpc"] = map[string]any{"listenIP": "127.0.0.1", "registerIP": "127.0.0.1"}
 	value["rpcPort"] = map[string]any{"openImAdminPort": []int{31210}, "openImChatPort": []int{31220}, "openImOfficePort": []int{31230}}
-	value["rpcRegisterName"] = map[string]any{"openImAdminName": "admin", "openImChatName": "chat", "openImOfficeName": "office", "openImRtcName": "Rtc"}
+	value["rpcRegisterName"] = map[string]any{"openImAdminName": "admin", "openImChatName": "chat", "openImOfficeName": "office", "openImRtcName": "fullgraph_" + b.Resource.Nonce + "_rpc_rtc"}
 	value["chatApi"] = map[string]any{"openImChatApiPort": []int{31008}, "listenIP": "127.0.0.1"}
 	value["adminApi"] = map[string]any{"openImAdminApiPort": []int{31009}, "listenIP": "127.0.0.1"}
 	value["mysql"] = map[string]any{"address": []string{"127.0.0.1:3306"}, "username": user, "password": password, "database": db, "maxOpenConn": 8, "maxIdleConn": 2, "maxLifeTime": 60, "logLevel": 1, "slowThreshold": 500}
@@ -870,10 +884,26 @@ func product20Configuration(p Product20Plan, b *Bootstrap, aux *product20Aux, db
 type product20Envelope struct {
 	ErrCode *int            `json:"errCode"`
 	Data    json.RawMessage `json:"data"`
+	Detail  json.RawMessage `json:"errDlt"`
 }
 
-func product20Post(ctx context.Context, client *http.Client, endpoint, token string, payload any) (product20Envelope, error) {
+type product20HTTPExchange struct {
+	Operation   string `json:"operation"`
+	Outcome     string `json:"outcome"`
+	Status      int    `json:"status"`
+	AppCode     *int   `json:"appCode"`
+	DetailClass string `json:"detailClass"`
+}
+
+type product20HTTPClient struct {
+	*http.Client
+	exchanges *[]product20HTTPExchange
+}
+
+func (client product20HTTPClient) post(ctx context.Context, operation, endpoint, token string, payload any) (product20Envelope, error) {
 	var out product20Envelope
+	exchange := product20HTTPExchange{Operation: operation, Outcome: "request", DetailClass: "none"}
+	defer func() { *client.exchanges = append(*client.exchanges, exchange) }()
 	raw, e := json.Marshal(payload)
 	if e != nil {
 		return out, e
@@ -887,17 +917,42 @@ func product20Post(ctx context.Context, client *http.Client, endpoint, token str
 	if token != "" {
 		request.Header.Set("token", token)
 	}
+	exchange.Outcome = "transport"
 	response, e := client.Do(request)
 	if e != nil {
 		return out, e
 	}
 	defer response.Body.Close()
+	exchange.Status = response.StatusCode
+	exchange.Outcome = "http"
 	body, e := io.ReadAll(io.LimitReader(response.Body, (2<<20)+1))
 	if e != nil || len(body) > 2<<20 || response.StatusCode != http.StatusOK {
 		return out, errors.New("real product HTTP transport failed")
 	}
 	if json.Unmarshal(body, &out) != nil || out.ErrCode == nil {
+		exchange.Outcome = "malformed"
 		return out, errors.New("real product HTTP response malformed")
+	}
+	exchange.Outcome = "envelope"
+	if *out.ErrCode >= 0 && *out.ErrCode <= 0xffffffff {
+		exchange.AppCode = out.ErrCode
+	}
+	if *out.ErrCode != 0 {
+		// Only fixed route errors get labels. No upstream details leave the process.
+		var detail string
+		_ = json.Unmarshal(out.Detail, &detail)
+		switch detail {
+		case "默认服务器暂时不可用":
+			exchange.DetailClass = "route-default-unavailable"
+		case "服务器配置没有有效HTTPS域名", "服务器域名配置错误", "生产服务器仅允许HTTPS 443端口":
+			exchange.DetailClass = "route-domain"
+		case "目标服务器暂时不可用":
+			exchange.DetailClass = "route-upstream-unavailable"
+		case "目标服务器响应异常":
+			exchange.DetailClass = "route-upstream-http"
+		case "目标服务器响应格式错误", "目标服务器响应缺少状态码":
+			exchange.DetailClass = "route-upstream-envelope"
+		}
 	}
 	return out, nil
 }
@@ -912,9 +967,9 @@ type product20Account struct {
 	} `json:"serverInfo"`
 }
 
-func product20Registration(ctx context.Context, client *http.Client, aux *product20Aux, email, password string) (product20Account, error) {
+func product20Registration(ctx context.Context, client product20HTTPClient, aux *product20Aux, email, password string) (product20Account, error) {
 	var account product20Account
-	verify, e := product20Post(ctx, client, "http://127.0.0.1:31310/api/verify/send", "", map[string]any{"email": email, "usedFor": 1})
+	verify, e := client.post(ctx, "verify", "http://127.0.0.1:31310/api/verify/send", "", map[string]any{"email": email, "usedFor": 1})
 	if e != nil || (verify.ErrCode == nil || *verify.ErrCode != 0) {
 		return account, errors.New("actual route verification failed")
 	}
@@ -922,15 +977,15 @@ func product20Registration(ctx context.Context, client *http.Client, aux *produc
 	if e != nil {
 		return account, e
 	}
-	registration, e := product20Post(ctx, client, "http://127.0.0.1:31310/api/auth/register", "", map[string]any{"verifyCode": code, "autoLogin": true, "platform": 5, "deviceID": "product20-registration", "deviceModel": "task-Linux", "user": map[string]any{"email": email, "password": product20MD5(password), "nickname": "任务用户", "areaCode": ""}})
+	registration, e := client.post(ctx, "register", "http://127.0.0.1:31310/api/auth/register", "", map[string]any{"verifyCode": code, "autoLogin": true, "platform": 5, "deviceID": "product20-registration", "deviceModel": "task-Linux", "user": map[string]any{"email": email, "password": product20MD5(password), "nickname": "任务用户", "areaCode": ""}})
 	if e != nil || (registration.ErrCode == nil || *registration.ErrCode != 0) || json.Unmarshal(registration.Data, &account) != nil || account.UserID == "" || account.ChatToken == "" || account.IMToken == "" {
 		return account, errors.New("actual route registration did not return dual credentials")
 	}
 	return account, nil
 }
-func product20Login(ctx context.Context, client *http.Client, email, password string) (product20Account, error) {
+func product20Login(ctx context.Context, client product20HTTPClient, email, password string) (product20Account, error) {
 	var account product20Account
-	reply, e := product20Post(ctx, client, "http://127.0.0.1:31310/api/auth/login", "", map[string]any{"email": email, "password": product20MD5(password), "platform": 5, "deviceID": "product20-password", "deviceModel": "task-Linux"})
+	reply, e := client.post(ctx, "login", "http://127.0.0.1:31310/api/auth/login", "", map[string]any{"email": email, "password": product20MD5(password), "platform": 5, "deviceID": "product20-password", "deviceModel": "task-Linux"})
 	if e != nil || (reply.ErrCode == nil || *reply.ErrCode != 0) || json.Unmarshal(reply.Data, &account) != nil || account.UserID == "" || account.IMToken == "" || account.ChatToken == "" || account.ServerInfo.ServerID == "" || len(account.ServerInfo.Domains) != 1 || account.ServerInfo.Domains[0] != "127.0.0.1" {
 		return account, errors.New("actual password login or tenant credentials rejected")
 	}
@@ -1149,7 +1204,7 @@ func product20BusinessRedis(ctx context.Context, p PrivatePlan) (err error) {
 	return admin.Do(ctx, args...).Err()
 }
 func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
-	result := product20Result{Version: "fresh-product20-http-ws-result-v1", Phase: "fresh-core-prepare", FreshSQLSeedOnly: true}
+	result := product20Result{Version: "fresh-product20-http-ws-result-v1", Phase: "fresh-core-prepare", FreshSQLSeedOnly: true, HTTPExchanges: []product20HTTPExchange{}}
 	result.StartupBoundary = product20StartupBoundary{Version: "product20-startup-boundary-v1", Substep: "not-entered", Role: "none", PrimaryCause: product20StartupCauseOf(nil)}
 	observation := &result.StartupBoundary
 	var boot *Bootstrap
@@ -1172,6 +1227,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		result.OriginalSixChildrenExited = len(children) == 6 && childrenErr == nil && migrationErr == nil
 		if aux != nil {
 			e := aux.close(cleanup)
+			result.ConfigProxyStatus = int(aux.configStatus.Load())
 			runErr = errors.Join(runErr, e)
 			result.AuxiliaryListenersJoined = e == nil
 		}
@@ -1333,9 +1389,10 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	observation.at("complete", "none")
 	transport := &http.Transport{Proxy: nil, TLSClientConfig: &tls.Config{RootCAs: aux.roots, MinVersion: tls.VersionTLS12}, ResponseHeaderTimeout: 10 * time.Second}
 	defer transport.CloseIdleConnections()
-	client := &http.Client{Transport: transport, Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return errors.New("task redirect refused") }}
+	httpClient := &http.Client{Transport: transport, Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return errors.New("task redirect refused") }}
+	client := product20HTTPClient{Client: httpClient, exchanges: &result.HTTPExchanges}
 	result.Phase = "actual-route-config-and-registration"
-	configuration, e := product20Post(ctx, client, "http://127.0.0.1:31310/api/client_config/get", "", map[string]any{})
+	configuration, e := client.post(ctx, "config", "http://127.0.0.1:31310/api/client_config/get", "", map[string]any{})
 	if e != nil || (configuration.ErrCode == nil || *configuration.ErrCode != 0) {
 		return errors.New("actual route configuration failed")
 	}
@@ -1382,7 +1439,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	}
 	result.DualTokens = true
 	for _, account := range accounts {
-		self, e := product20Post(ctx, client, "https://127.0.0.1/chat/user/find/full", account.ChatToken, map[string]any{"userIDs": []string{account.UserID}})
+		self, e := client.post(ctx, "self", "https://127.0.0.1/chat/user/find/full", account.ChatToken, map[string]any{"userIDs": []string{account.UserID}})
 		var profile struct {
 			Users []struct {
 				UserID string `json:"userID"`
@@ -1393,7 +1450,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		}
 	}
 	result.ChatTokenSelfRead = true
-	wrong, e := product20Post(ctx, client, "http://127.0.0.1:31310/api/auth/login", "", map[string]any{"email": emails[0], "password": product20MD5(passwords[0] + "wrong"), "platform": 5, "deviceID": "product20-password", "deviceModel": "task-Linux"})
+	wrong, e := client.post(ctx, "wrong-password", "http://127.0.0.1:31310/api/auth/login", "", map[string]any{"email": emails[0], "password": product20MD5(passwords[0] + "wrong"), "platform": 5, "deviceID": "product20-password", "deviceModel": "task-Linux"})
 	if e != nil || (wrong.ErrCode == nil || *wrong.ErrCode != 20001) {
 		return errors.New("actual fixed password rejection missing")
 	}

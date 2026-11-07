@@ -15,6 +15,22 @@ spec=importlib.util.spec_from_file_location('product20_split_contract',HERE/'run
 controller=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(controller)
 
+class HTTPObservationContract(unittest.TestCase):
+ def test_http_observation_accepts_only_bounded_original_request_fields(self):
+  first={'operation':'config','outcome':'envelope','status':200,'appCode':500,'detailClass':'route-upstream-unavailable'}
+  v={'httpExchanges':[first],'configProxyStatus':0,'private':'private-result'}
+  observed=controller.project_http_observation(v)
+  self.assertEqual(observed['exchanges'],[first])
+  self.assertFalse(observed['rawBodiesOrHeadersExported'])
+  self.assertNotIn('private-result',json.dumps(observed))
+  self.assertIsNone(controller.project_http_observation({}))
+  for change in ({'body':'private-body'}, {'operation':'login'}, {'status':True},
+                 {'outcome':'transport'}, {'appCode':True}, {'detailClass':'private-detail'}):
+   bad=dict(v,httpExchanges=[dict(first,**change)])
+   with self.assertRaises(ValueError):controller.project_http_observation(bad)
+  with self.assertRaises(ValueError):
+   controller.project_http_observation(dict(v,configProxyStatus=200,httpExchanges=[]))
+
 class SplitProducerContract(unittest.TestCase):
  def test_current5_expected_manifest_original6_route_and_locked_core_keep_exact_provenance(self):
   c=controller.historical_chart_control(json.loads((HERE/'inputs.json').read_bytes()))  # Original259 fixture, never the pending current source.
