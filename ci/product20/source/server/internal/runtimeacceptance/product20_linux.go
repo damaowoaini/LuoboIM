@@ -70,9 +70,10 @@ type Product20Binary struct {
 	SourceSHA256 string `json:"sourceSHA256"`
 }
 type product20BrowserPlan struct {
-	Socket string `json:"socket"`
-	Dist   string `json:"dist"`
-	Chat   bool   `json:"chat,omitempty"`
+	Socket   string `json:"socket"`
+	Dist     string `json:"dist"`
+	Chat     bool   `json:"chat,omitempty"`
+	Recovery bool   `json:"recovery,omitempty"`
 }
 
 type product20BrowserAccount struct {
@@ -94,6 +95,18 @@ type product20BrowserInteraction struct {
 	PeerStillConnected bool `json:"peerStillConnected"`
 }
 
+type product20BrowserRecovery struct {
+	PeerReady               bool `json:"peerReady"`
+	ConversationOpened      bool `json:"conversationOpened"`
+	InitialMessageSeen      bool `json:"initialMessageSeen"`
+	OriginalSocketClosed    bool `json:"originalSocketClosed"`
+	OfflineSendAcknowledged bool `json:"offlineSendAcknowledged"`
+	ReconnectedSameDocument bool `json:"reconnectedSameDocument"`
+	MissedMessageSeen       bool `json:"missedMessageSeen"`
+	SessionRestored         bool `json:"sessionRestored"`
+	HistoryRestored         bool `json:"historyRestored"`
+}
+
 type product20BrowserResult struct {
 	ConfigAccepted   bool                         `json:"configAccepted"`
 	LoginAccepted    bool                         `json:"loginAccepted"`
@@ -102,6 +115,7 @@ type product20BrowserResult struct {
 	WorkspaceVisible bool                         `json:"workspaceVisible"`
 	Observation      product20BrowserObservation  `json:"observation"`
 	Interaction      *product20BrowserInteraction `json:"interaction,omitempty"`
+	Recovery         *product20BrowserRecovery    `json:"recovery,omitempty"`
 }
 
 type product20BrowserObservation struct {
@@ -112,12 +126,22 @@ type product20BrowserObservation struct {
 	ChromeFailure   string `json:"chromeFailure"`
 }
 
-func (r product20BrowserResult) accepted(chat bool) bool {
+func (r product20BrowserResult) accepted(plan *product20BrowserPlan) bool {
 	if !r.ConfigAccepted || !r.LoginAccepted || !r.GatewayConnected || !r.SelfAccepted || !r.WorkspaceVisible || r.Observation.Stage != "complete" {
 		return false
 	}
 	i := r.Interaction
-	if !chat {
+	if plan.Recovery {
+		recovery := r.Recovery
+		return i == nil && recovery != nil && recovery.PeerReady && recovery.ConversationOpened &&
+			recovery.InitialMessageSeen && recovery.OriginalSocketClosed && recovery.OfflineSendAcknowledged &&
+			recovery.ReconnectedSameDocument && recovery.MissedMessageSeen && recovery.SessionRestored &&
+			recovery.HistoryRestored
+	}
+	if r.Recovery != nil {
+		return false
+	}
+	if !plan.Chat {
 		return i == nil
 	}
 	return i != nil && i.PeerReady && i.ConversationOpened && i.SenderToPeer && i.PeerToSender &&
@@ -308,7 +332,7 @@ func ReadProduct20Plan(path, expected string) (Product20Plan, error) {
 		}
 	}
 	if p.Browser != nil {
-		if p.Browser.Socket != filepath.Join(p.Work, "browser-smoke.sock") ||
+		if (p.Browser.Chat && p.Browser.Recovery) || p.Browser.Socket != filepath.Join(p.Work, "browser-smoke.sock") ||
 			p.Browser.Dist != filepath.Join(filepath.Dir(p.Work), "web-bundle", "dist") || canonicalDirectory(p.Browser.Dist) != nil {
 			return p, errors.New("browser socket and bundle must be inside the original task allocation")
 		}
@@ -1995,26 +2019,33 @@ func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, cert t
 	if plan.Chat {
 		unavailable.Interaction = &product20BrowserInteraction{}
 	}
+	if plan.Recovery {
+		unavailable.Recovery = &product20BrowserRecovery{}
+	}
 	result := unavailable
 	leaf, err := x509.ParseCertificate(cert.Certificate[0])
 	if err != nil {
 		return result, errors.New("browser fixture certificate rejected")
 	}
 	pin := sha256.Sum256(leaf.RawSubjectPublicKeyInfo)
-	if plan.Chat != (peer != nil) || (peer != nil && (peer.UserID == account.UserID || peer.Email == account.Email)) {
+	if (plan.Chat || plan.Recovery) != (peer != nil) || (peer != nil && (peer.UserID == account.UserID || peer.Email == account.Email)) {
 		return result, errors.New("distinct browser fixture accounts required")
 	}
 	input, err := json.Marshal(struct {
 		product20BrowserAccount
 		Peer            *product20BrowserAccount `json:"peer,omitempty"`
+		Recovery        bool                     `json:"recovery,omitempty"`
 		CertificateSPKI string                   `json:"certificateSPKI"`
-	}{account, peer, base64.StdEncoding.EncodeToString(pin[:])})
+	}{account, peer, plan.Recovery, base64.StdEncoding.EncodeToString(pin[:])})
 	if err != nil {
 		return result, errors.New("browser fixture input rejected")
 	}
 	timeout := 120 * time.Second
 	if plan.Chat {
 		timeout = 260 * time.Second
+	}
+	if plan.Recovery {
+		timeout = 340 * time.Second
 	}
 	deadline, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -2043,7 +2074,7 @@ func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, cert t
 	if readErr != nil || len(raw) == 0 || len(raw) > 4096 || namespaceinventory.DecodeStrict(raw, &result) != nil {
 		return unavailable, errors.New("browser result unavailable")
 	}
-	if !result.accepted(plan.Chat) {
+	if !result.accepted(plan) {
 		return result, errors.New("browser acceptance incomplete")
 	}
 	return result, nil
@@ -2054,7 +2085,9 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	accountCount := 2
 	if p.Browser != nil {
 		result.Scope = "web-login"
-		if p.Browser.Chat {
+		if p.Browser.Recovery {
+			result.Scope = "web-recovery"
+		} else if p.Browser.Chat {
 			result.Scope = "web-chat"
 		} else {
 			accountCount = 1
@@ -2106,12 +2139,12 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 			bootErr = boot.Close(cleanup)
 			runErr = errors.Join(runErr, bootErr)
 		}
-		if p.Browser != nil && result.Browser != nil && result.Browser.accepted(p.Browser.Chat) && (coreErr != nil || bootErr != nil) {
+		if p.Browser != nil && result.Browser != nil && result.Browser.accepted(p.Browser) && (coreErr != nil || bootErr != nil) {
 			result.CoreStopFailure = product20ObserveCoreStop(p.Core.Work, session, boot, coreErr, bootErr)
 		}
 		result.Accepted = runErr == nil && result.ProductProcesses == 20 && result.RealRegistrations == 2 && result.RealPasswordLogins == 2 && result.OrdinaryDispatches == 1 && result.PeerMessages == 1 && result.HistoryMessages == 1 && result.WrongPasswordRejected && result.BusinessPermissions && result.ConfigHTTP && result.ChatTokenSelfRead && result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
 		if p.Browser != nil {
-			result.WebUIAccepted = runErr == nil && result.Browser != nil && result.Browser.accepted(p.Browser.Chat) &&
+			result.WebUIAccepted = runErr == nil && result.Browser != nil && result.Browser.accepted(p.Browser) &&
 				result.ProductProcesses == 20 && result.RealRegistrations == accountCount && result.BusinessPermissions &&
 				result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
 			result.Accepted = result.WebUIAccepted
@@ -2308,11 +2341,10 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		accounts = append(accounts, account)
 	}
 	if p.Browser != nil {
-		operation := "login"
+		operation := strings.TrimPrefix(result.Scope, "web-")
 		account := product20BrowserAccount{Email: emails[0], Password: passwords[0], UserID: accounts[0].UserID}
 		var peer *product20BrowserAccount
-		if p.Browser.Chat {
-			operation = "chat"
+		if p.Browser.Chat || p.Browser.Recovery {
 			peer = &product20BrowserAccount{Email: emails[1], Password: passwords[1], UserID: accounts[1].UserID}
 		}
 		result.Phase = "actual-web-browser-" + operation

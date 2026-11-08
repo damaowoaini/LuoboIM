@@ -16,16 +16,16 @@ from zipfile import ZIP_DEFLATED, ZIP_STORED, ZipFile
 
 
 REPOSITORY = 'damaowoaini/LuoboIM'
-COHORT = 'web4343-voice-retirement-v1'
-SOURCE = {'members': 4343, 'digest': 'f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8'}
-DESCRIPTOR = (821990, '17de8919da602aa6c6874400a13a2fce4985b28828118ffaf5e465dc940ef6b4')
-ARTIFACT = {'id': 13551666399, 'run': 42317450188, 'attempt': 1,
-            'head': '48f54316186cf73dca84634350da8133f74fc9e2', 'bytes': 10500270,
-            'sha256': '7fde317e5f90b30e123b2b23ddb7bdabb801de9ae9dafa8ab69dfa8ed4e7efa4'}
-DIST = {'members': 47, 'bytes': 42623958, 'digest': '2081b66e4b1c3d765a29e4d10d01540a33ecce8bf0455ee16fb6c07e99746385'}
+COHORT = 'web4344-recovery-history-v1'
+SOURCE = {'members': 4344, 'digest': 'b7e99239ef862c7cbe64198cc55dde2e4b034bf7f2acfeb5c23e9be962576621'}
+DESCRIPTOR = (819741, '367c701ab8cf9558032a4895c1ac208fc6e3dcc55c8f7bcf4d42f793a445841f')
+ARTIFACT = {'id': 13603480827, 'run': 42444944515, 'attempt': 1,
+            'head': '3c7d835a87af0889e2ac7a9d36dd687a8130ff04', 'bytes': 10500575,
+            'sha256': '38e1f3a5984e68cf1de4d2733b281179b1dac7936de51f6c26683a17c7336baf'}
+DIST = {'members': 47, 'bytes': 42624814, 'digest': 'f02bc7a8b005668a3c352883416686eb6f186778e16d98a71365083c7ceadaea'}
 METADATA = {
-    'dist-manifest.json': (7303, 'c576453133a0a3320e739d30f1e06fa2e641594bf2d3ef5e809af3ac2b6078fe'),
-    'dist-proof.json': (744, 'e8bb9aea9f772e75792e864a1ba871b2c0db4375a623677893a05d6d320ec78a'),
+    'dist-manifest.json': (7303, '71a1c142b979f17e0ccb60654534ef070aceb81af059d14aa05a177ebaea1572'),
+    'dist-proof.json': (744, 'fe825842a2213d3edf28b6aaffc85636cf9e5bc4beda574deb1423a3eb6ca9d1'),
 }
 
 
@@ -78,7 +78,7 @@ def _file(path, pin):
 
 
 def verify_source(repo):
-    """Check the descriptor and all 4,343 Web bodies against the accepted build."""
+    """Check the descriptor and all reviewed Web bodies against the accepted build."""
     repo = Path(repo).absolute()
     source = repo / 'web'
     if source.resolve() != source or not source.is_dir():

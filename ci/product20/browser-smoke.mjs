@@ -47,7 +47,9 @@ async function privateInput(stream = process.stdin) {
   const data = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks)));
   check(data && !Array.isArray(data) && typeof data === 'object');
   const fields = Object.keys(data).sort().join(',');
-  check(fields === 'certificateSPKI,email,password,userID' || fields === 'certificateSPKI,email,password,peer,userID');
+  check(['certificateSPKI,email,password,userID', 'certificateSPKI,email,password,peer,userID',
+    'certificateSPKI,email,password,peer,recovery,userID'].includes(fields));
+  if (Object.hasOwn(data, 'recovery')) check(data.recovery === true);
   const checkAccount = account => {
     check(typeof account.email === 'string' && account.email.length <= 254 && /^[^\s@]+@[^\s@]+$/.test(account.email));
     check(typeof account.password === 'string' && account.password.length > 0 && account.password.length <= 256 && !/[\x00-\x1f\x7f]/.test(account.password));
@@ -178,6 +180,13 @@ function gatewayURL(raw) {
 }
 const LOGIN_DOCUMENT = `location.origin === ${JSON.stringify(ORIGIN)} && location.pathname === '/' && location.hash === '#/login' && window.top === window`;
 const CHAT_DOCUMENT = `location.origin === ${JSON.stringify(ORIGIN)} && location.pathname === '/' && /^#\\/chat(?:\\/|$)/.test(location.hash) && window.top === window`;
+const WORKSPACE_READY = `(() => {
+  if (!(${CHAT_DOCUMENT})) return false;
+  const shell = document.querySelector('.app-shell'), work = shell?.querySelector('.app-workspace');
+  return !!work?.getClientRects().length && getComputedStyle(work).visibility === 'visible' &&
+    !!shell.querySelector('button[aria-label="账号与个人设置"]') && !shell.closest('.ant-spin-blur') &&
+    !shell.textContent.includes('正在连接消息服务') && !shell.textContent.includes('消息服务连接已中断');
+})()`;
 
 async function login(cdp, events, input, result, observation, browserContextId) {
   const { targetId } = await cdp.call('Target.createTarget', { url: 'about:blank', browserContextId });
@@ -193,6 +202,7 @@ async function login(cdp, events, input, result, observation, browserContextId) 
   const sockets = new Set(), connected = new Set();
   let armed = false, loginPosts = 0, rejected = false;
   let logoutSocket, logoutPosts = 0, logoutRevoked = false, logoutClosed = false;
+  let recoverySocket, recoveryClosed = false, selfReads = 0;
   let loginTokens;
   const inspect = async (requestId, kind) => {
     const body = await call('Network.getResponseBody', { requestId });
@@ -219,12 +229,18 @@ async function login(cdp, events, input, result, observation, browserContextId) 
     } else if (kind === 'self' && envelope?.errCode === 0 && Array.isArray(data?.users) &&
         data.users.length === 1 && data.users[0]?.userID === input.userID) {
       result.selfAccepted = true;
+      selfReads++;
     }
   };
   events.set(sessionId, ({ method, params }) => {
     if (!params) return;
     const { requestId } = params;
-    if (method === 'Network.requestWillBeSent') {
+    if (method === 'Page.frameNavigated' && params.frame && !params.frame.parentId) {
+      // A reload replaces the entire document. A new handshake must not be
+      // counted alongside a socket from the retired renderer.
+      sockets.clear();
+      connected.clear();
+    } else if (method === 'Network.requestWillBeSent') {
       if (params.redirectResponse) selected.delete(requestId);
       const endpoint = httpsPath(params.request?.url);
       if (params.request?.method !== 'POST') return;
@@ -269,6 +285,7 @@ async function login(cdp, events, input, result, observation, browserContextId) 
       connected.delete(requestId);
       if (!result.workspaceVisible) result.gatewayConnected = connected.size > 0;
       if (requestId === logoutSocket) logoutClosed = true;
+      if (requestId === recoverySocket) recoveryClosed = true;
     }
   });
   await call('Page.enable');
@@ -320,13 +337,7 @@ async function login(cdp, events, input, result, observation, browserContextId) 
   await until(async () => {
     check(!rejected);
     if (!result.loginAccepted || !result.gatewayConnected || !result.selfAccepted) { settled = 0; return false; }
-    const workspace = await evaluate(`(() => {
-      if (!(${CHAT_DOCUMENT})) return false;
-      const shell = document.querySelector('.app-shell'), work = shell?.querySelector('.app-workspace');
-      return !!work?.getClientRects().length && getComputedStyle(work).visibility === 'visible' && !!shell.querySelector('button[aria-label="账号与个人设置"]') &&
-        !shell.closest('.ant-spin-blur') && !shell.textContent.includes('正在连接消息服务') &&
-        !shell.textContent.includes('消息服务连接已中断');
-    })()`);
+    const workspace = await evaluate(WORKSPACE_READY);
     // The real shell must be visible after the SDK removes the connection
     // banner and blocking login/sync spinner, not just after route navigation.
     settled = workspace === true ? settled + 1 : 0;
@@ -334,9 +345,50 @@ async function login(cdp, events, input, result, observation, browserContextId) 
   }, 35000);
   check(loginPosts === 1 && !rejected);
   result.workspaceVisible = true;
+  const network = offline => call('Network.emulateNetworkConditions', {
+    offline, latency: 0, downloadThroughput: -1, uploadThroughput: -1,
+  });
   return {
     click, type, evaluate, front: () => call('Page.bringToFront'),
     connected: () => !rejected && connected.size > 0,
+    gateway: () => !rejected && connected.size === 1 ? [...connected][0] : undefined,
+    loader: async () => {
+      const { frameTree } = await call('Page.getFrameTree');
+      return frameTree?.frame?.loaderId;
+    },
+    selfReads: () => selfReads,
+    reload: () => call('Page.reload', { ignoreCache: true }),
+    async disconnect() {
+      check(!rejected && connected.size === 1 && !recoverySocket && !logoutSocket);
+      [recoverySocket] = connected;
+      await network(true);
+      const objectGroup = 'product20-peer-gateway';
+      try {
+        const { result: proto } = await call('Runtime.evaluate', { expression: 'WebSocket.prototype', objectGroup });
+        check(proto?.objectId);
+        const { objects } = await call('Runtime.queryObjects', { prototypeObjectId: proto.objectId, objectGroup });
+        check(objects?.objectId);
+        // Close the actual native object without replacing the constructor or
+        // invoking the app's logout path. Only this target is held offline.
+        const closed = await call('Runtime.callFunctionOn', {
+          objectId: objects.objectId, returnByValue: true,
+          functionDeclaration: `function() {
+            if (!(${CHAT_DOCUMENT})) return false;
+            const sockets = this.filter(socket => socket.readyState === WebSocket.OPEN && (${gatewayURL})(socket.url));
+            if (sockets.length !== 1) return false;
+            sockets[0].close(4000);
+            return true;
+          }`,
+        });
+        check(!closed.exceptionDetails);
+      } finally {
+        await call('Runtime.releaseObjectGroup', { objectGroup });
+      }
+      await until(async () => recoveryClosed && !rejected && connected.size === 0 &&
+        await evaluate(`(${CHAT_DOCUMENT}) && !navigator.onLine`), 12000);
+      return recoverySocket;
+    },
+    restore: () => network(false),
     armLogout() {
       check(!rejected && connected.size === 1 && !logoutSocket && logoutPosts === 0);
       [logoutSocket] = connected;
@@ -386,23 +438,26 @@ async function openConversation(page, peerID, guard) {
   await until(() => page.evaluate(`(${guard}) && !!document.querySelector(${JSON.stringify(EDITOR)})`), 12000);
 }
 
-async function messageRow(page, text, guard, requireAcknowledged) {
+async function messageRows(page, text, guard, requireAcknowledged = false) {
   return page.evaluate(`(() => {
     if (!(${guard})) return null;
     const rows = [...document.querySelectorAll('#chat-main #scrollableDiv [id^="chat_"]')].filter(row =>
       row.getClientRects().length && [...row.querySelectorAll('*')].some(node =>
         node.childElementCount === 0 && node.textContent === ${JSON.stringify(text)}));
-    if (rows.length !== 1) return null;
-    const row = rows[0];
-    if (${requireAcknowledged} && ![...row.querySelectorAll('div')].some(node =>
-      node.childElementCount === 0 && ['已读', '未读'].includes(node.textContent))) return null;
-    return row.id;
+    if (${requireAcknowledged} && rows.some(row => ![...row.querySelectorAll('div')].some(node =>
+      node.childElementCount === 0 && ['已读', '未读'].includes(node.textContent)))) return null;
+    return rows.map(row => row.id);
   })()`);
 }
 
-async function sendAndReceive(from, to, guard) {
+async function messageRow(page, text, guard, requireAcknowledged) {
+  const rows = await messageRows(page, text, guard, requireAcknowledged);
+  return rows?.length === 1 ? rows[0] : undefined;
+}
+
+async function sendMessage(from, guard) {
   observation.stage = 'compose';
-  check(from.connected() && to.connected());
+  check(from.connected());
   const text = 'Luobo Web ' + randomBytes(12).toString('hex');
   await from.front();
   await from.type(EDITOR, text, guard);
@@ -411,10 +466,71 @@ async function sendAndReceive(from, to, guard) {
   observation.stage = 'send-ack';
   const id = await until(() => messageRow(from, text, guard, true), 20000);
   check(typeof id === 'string' && /^chat_[A-Za-z0-9_-]{1,256}$/.test(id));
+  return { text, id };
+}
+
+async function sendAndReceive(from, to, guard) {
+  check(to.connected());
+  const message = await sendMessage(from, guard);
   observation.stage = 'peer-receive';
   await to.front();
-  const received = await until(() => messageRow(to, text, guard, false), 20000);
-  check(received === id && from.connected() && to.connected());
+  const received = await until(() => messageRow(to, message.text, guard, false), 20000);
+  check(received === message.id && from.connected() && to.connected());
+  return message;
+}
+
+async function runRecovery(sender, peer, conversation, senderID) {
+  const checks = result.recovery;
+  const initial = await sendAndReceive(sender, peer, conversation);
+  checks.initialMessageSeen = true;
+  observation.stage = 'offline-cut';
+  const senderSocket = sender.gateway(), originalLoader = await peer.loader();
+  check(senderSocket && originalLoader);
+  const originalSocket = await peer.disconnect();
+  check(sender.gateway() === senderSocket && !peer.connected());
+  checks.originalSocketClosed = true;
+
+  const missed = await sendMessage(sender, conversation);
+  check(sender.gateway() === senderSocket && !peer.connected() &&
+    (await messageRows(peer, missed.text, conversation))?.length === 0);
+  checks.offlineSendAcknowledged = true;
+  observation.stage = 'reconnect';
+  await peer.front();
+  await peer.restore();
+  const recoveredSocket = await until(async () => {
+    const socket = peer.gateway();
+    return socket && socket !== originalSocket && await peer.evaluate(WORKSPACE_READY) ? socket : undefined;
+  }, 45000);
+  check(await peer.loader() === originalLoader && await peer.evaluate(conversation) && sender.gateway() === senderSocket);
+  checks.reconnectedSameDocument = true;
+  observation.stage = 'catch-up';
+  let stable = 0;
+  await until(async () => {
+    const matches = peer.gateway() === recoveredSocket && await peer.evaluate(WORKSPACE_READY) &&
+      await messageRow(peer, initial.text, conversation, false) === initial.id &&
+      await messageRow(peer, missed.text, conversation, false) === missed.id;
+    stable = matches ? stable + 1 : 0;
+    return stable >= 3;
+  }, 35000);
+  checks.missedMessageSeen = true;
+
+  observation.stage = 'reload';
+  const previousSelfReads = peer.selfReads();
+  await peer.reload();
+  await until(async () => peer.gateway() && peer.gateway() !== recoveredSocket &&
+    await peer.loader() !== originalLoader && peer.selfReads() > previousSelfReads && await peer.evaluate(WORKSPACE_READY), 45000);
+  checks.sessionRestored = true;
+  await openConversation(peer, senderID, conversation);
+  observation.stage = 'reopen-history';
+  stable = 0;
+  await until(async () => {
+    const matches = await messageRow(peer, initial.text, conversation, false) === initial.id &&
+      await messageRow(peer, missed.text, conversation, false) === missed.id &&
+      peer.connected() && sender.gateway() === senderSocket;
+    stable = matches ? stable + 1 : 0;
+    return stable >= 3;
+  }, 30000);
+  checks.historyRestored = true;
 }
 
 async function runBrowser(cdp, input) {
@@ -437,13 +553,18 @@ async function runBrowser(cdp, input) {
   const peerObservation = { ...observation, documentStatus: 0, configStatus: 0, configRequested: false };
   const peer = await login(cdp, events, input.peer, peerChecks, peerObservation, peerContext);
   check(Object.values(peerChecks).every(value => value === true) && peerObservation.documentStatus === 200);
-  result.interaction.peerReady = true;
+  const checks = input.recovery ? result.recovery : result.interaction;
+  checks.peerReady = true;
 
   const chatHash = '#/chat/si_' + [input.userID, input.peer.userID].sort().join('_');
   const conversation = `(${CHAT_DOCUMENT}) && location.hash === ${JSON.stringify(chatHash)}`;
   await openConversation(sender, input.peer.userID, conversation);
   await openConversation(peer, input.userID, conversation);
-  result.interaction.conversationOpened = true;
+  checks.conversationOpened = true;
+  if (input.recovery) {
+    await runRecovery(sender, peer, conversation, input.userID);
+    return;
+  }
   await sendAndReceive(sender, peer, conversation);
   result.interaction.senderToPeer = true;
   await sendAndReceive(peer, sender, conversation);
@@ -538,7 +659,7 @@ async function main(input) {
       success = true;
     } else {
       await runBrowser(cdp, input);
-      success = Object.entries(result).every(([key, value]) => key === 'interaction'
+      success = Object.entries(result).every(([key, value]) => key === 'interaction' || key === 'recovery'
         ? Object.values(value).every(flag => flag === true)
         : value === true);
     }
@@ -575,12 +696,18 @@ async function main(input) {
 
 async function accept(input) {
   const chat = Boolean(input?.peer);
-  if (chat) result.interaction = {
+  const recovery = input?.recovery === true;
+  if (recovery) result.recovery = {
+    peerReady: false, conversationOpened: false, initialMessageSeen: false,
+    originalSocketClosed: false, offlineSendAcknowledged: false, reconnectedSameDocument: false,
+    missedMessageSeen: false, sessionRestored: false, historyRestored: false,
+  };
+  else if (chat) result.interaction = {
     peerReady: false, conversationOpened: false, senderToPeer: false, peerToSender: false,
     logoutRevoked: false, logoutSocketClosed: false, loginRestored: false,
     oldChatTokenDenied: false, oldIMTokenDenied: false, peerStillConnected: false,
   };
-  const deadline = setTimeout(interrupt, chat ? 240000 : 95000);
+  const deadline = setTimeout(interrupt, recovery ? 320000 : chat ? 240000 : 95000);
   try { return await main(input); } finally { clearTimeout(deadline); }
 }
 

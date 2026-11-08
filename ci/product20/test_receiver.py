@@ -95,6 +95,19 @@ class BrowserAcceptanceContract(unittest.TestCase):
   self.assertEqual(controller.project_http_observation(original)['exchanges'],exchanges)
   with self.assertRaises(ValueError):
    controller.project_http_observation(dict(original,scope='web-login'))
+  recovery_flags=dict.fromkeys(controller.BROWSER_RECOVERY_KEYS,True)
+  recovery=dict(chat,scope='web-recovery',phase='web-browser-recovery-accepted-local-cleanup-required',
+                browser=dict(observed,recovery=recovery_flags))
+  with mock.patch.dict(os.environ,{'PRODUCT20_SCOPE':'web-recovery'}), mock.patch.object(controller.Path,'exists',return_value=False):
+   controller.check_result(recovery,config)
+   for key in recovery_flags:
+    incomplete=dict(recovery['browser'],recovery=dict(recovery_flags,**{key:False}))
+    with self.subTest(key=key), self.assertRaises(ValueError):
+     controller.check_result(dict(recovery,browser=incomplete),config)
+   with self.assertRaises(ValueError):
+    controller.check_result(dict(recovery,browser=chat['browser']),config)
+  with self.assertRaises(ValueError):
+   controller.browser_result(dict(chat,browser=dict(chat['browser'],observation=dict(observed['observation'],stage='reload'))))
 
 class RegistrationObservationContract(unittest.TestCase):
  def test_exports_only_scoped_registration_failure_from_validated_terminal(self):

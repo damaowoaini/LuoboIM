@@ -763,7 +763,7 @@ def run():
   products=[{'name':x['binary']['name'],'path':str(product_roots[x['provider']]/x['binary']['name']),'sha256':x['binary']['sha256'],'bytes':x['binary']['bytes'],'sourceSHA256':x['binary']['sourceVector']['sha256']} for x in selected]
   p={'version':'fresh-product20-http-ws-v1','work':str(work),'core':{'version':'owned-fullgraph-acceptance-v1','scenario':'ack','work':str(corework),'planePath':str(plane.private/'plane.json'),'planeSHA256':sha(regular(plane.private/'plane.json')),'credentialsPath':str(plane.private/'credentials.json'),'credentialsSHA256':sha(regular(plane.private/'credentials.json')),'buildsPath':str(buildpath),'buildsSHA256':bs},'chartTemplatePath':str(template),'chartTemplateSHA256':c['helpers']['chart/config/config.example.yaml'],'sqlRootPassword':json.loads(regular(plane.private/'product20-mysql.json'))['rootPassword'],'products':products}
   if browser is not None:
-   p['browser']={'socket':str(work/'browser-smoke.sock'),'dist':browser['dist'],'chat':scope=='web-chat'}
+   p['browser']={'socket':str(work/'browser-smoke.sock'),'dist':browser['dist'],'chat':scope=='web-chat','recovery':scope=='web-recovery'}
   pp=private/'product20-input.json';ps=write(pp,p)
   backend=[*task_user_command(os.environ['HOME'],work),str(binroot/'product20-acceptance'),
            '--private-input',str(pp),'--private-input-sha256',ps]
@@ -1038,7 +1038,9 @@ def export_terminal(path,output):
   value['browser']=browser_result(v)
   value['browserObservation']=browser_observation(v['browser']['observation'])
   if v['scope']=='web-chat':
-   value['browserInteraction']=browser_interaction(v['browser']['interaction'])
+   value['browserInteraction']=v['browser']['interaction']
+  if v['scope']=='web-recovery':
+   value['browserRecovery']=v['browser']['recovery']
  if 'coreStopFailure' in v:
   value['coreStopFailure']=project_browser_core_stop(v)
  write(output,value)
@@ -1047,18 +1049,25 @@ def export_terminal(path,output):
 BROWSER_SCOPES={
  'web-login':('actual-web-browser-login','web-browser-login-accepted-local-cleanup-required',1),
  'web-chat':('actual-web-browser-chat','web-browser-chat-accepted-local-cleanup-required',2),
+ 'web-recovery':('actual-web-browser-recovery','web-browser-recovery-accepted-local-cleanup-required',2),
 }
 BROWSER_RESULT_KEYS={'configAccepted','loginAccepted','gatewayConnected','selfAccepted','workspaceVisible'}
 BROWSER_INTERACTION_KEYS={'peerReady','conversationOpened','senderToPeer','peerToSender','logoutRevoked',
                           'logoutSocketClosed','loginRestored','oldChatTokenDenied','oldIMTokenDenied','peerStillConnected'}
-BROWSER_CHAT_STAGES={'peer-login','contact-search','contact-card','conversation-ready','compose',
-                     'send-ack','peer-receive','logout','logout-token-check'}
+BROWSER_RECOVERY_KEYS={'peerReady','conversationOpened','initialMessageSeen','originalSocketClosed',
+                       'offlineSendAcknowledged','reconnectedSameDocument','missedMessageSeen','sessionRestored','historyRestored'}
+BROWSER_SHARED_STAGES={'peer-login','contact-search','contact-card','conversation-ready','compose','send-ack','peer-receive'}
+BROWSER_CHAT_STAGES=BROWSER_SHARED_STAGES|{'logout','logout-token-check'}
+BROWSER_RECOVERY_STAGES=BROWSER_SHARED_STAGES|{'offline-cut','reconnect','catch-up','reload','reopen-history'}
+BROWSER_EXTRAS={'web-chat':('interaction',BROWSER_INTERACTION_KEYS,BROWSER_CHAT_STAGES),
+                'web-recovery':('recovery',BROWSER_RECOVERY_KEYS,BROWSER_RECOVERY_STAGES)}
 BROWSER_STAGES={'unavailable','input','tls-leaf','chrome-start','devtools','navigation','page-form',
                 'configuration','sdk-ready','login-form','workspace','cleanup','complete'}
 
 def browser_observation(value):
  keys={'stage','documentStatus','configStatus','configRequested','chromeFailure'}
- if (type(value) is not dict or set(value)!=keys or type(value['stage']) is not str or value['stage'] not in BROWSER_STAGES|BROWSER_CHAT_STAGES
+ if (type(value) is not dict or set(value)!=keys or type(value['stage']) is not str
+     or value['stage'] not in BROWSER_STAGES|BROWSER_CHAT_STAGES|BROWSER_RECOVERY_STAGES
      or type(value['chromeFailure']) is not str or value['chromeFailure'] not in ('none','sandbox','shared-library','executable')
      or type(value['configRequested']) is not bool
      or any(type(value[key]) is not int or not (value[key]==0 or 100<=value[key]<=599) for key in ('documentStatus','configStatus'))):
@@ -1068,29 +1077,26 @@ def browser_observation(value):
 def browser_result(v):
  result=v.get('browser')
  scope=v.get('scope')
- expected=BROWSER_RESULT_KEYS|({'observation','interaction'} if scope=='web-chat' else {'observation'})
+ extra, flags, stages=BROWSER_EXTRAS.get(scope,(None,set(),set()))
+ expected=BROWSER_RESULT_KEYS|{'observation'}|({extra} if extra else set())
  if (scope not in BROWSER_SCOPES or v.get('phase') not in BROWSER_SCOPES[scope][:2]
      or type(result) is not dict or set(result)!=expected
      or any(type(result[key]) is not bool for key in BROWSER_RESULT_KEYS)):
   raise ValueError('finite browser result required')
  stage=browser_observation(result['observation'])['stage']
- if scope=='web-chat':
-  browser_interaction(result['interaction'])
- elif stage in BROWSER_CHAT_STAGES:
-  raise ValueError('browser chat stage requires its own scope')
+ if stage not in BROWSER_STAGES|stages:
+  raise ValueError('browser observation stage differs from its scope')
+ if extra and (type(result[extra]) is not dict or set(result[extra])!=flags
+               or any(type(flag) is not bool for flag in result[extra].values())):
+  raise ValueError('finite browser scope result required')
  return {key:value for key,value in result.items() if key in BROWSER_RESULT_KEYS}
-
-def browser_interaction(value):
- if (type(value) is not dict or set(value)!=BROWSER_INTERACTION_KEYS
-     or any(type(flag) is not bool for flag in value.values())):
-  raise ValueError('finite browser interaction required')
- return value
 
 def browser_complete(v):
  scope=v.get('scope')
+ extra=BROWSER_EXTRAS.get(scope,(None,))[0]
  return (all(browser_result(v).values()) and v['phase']==BROWSER_SCOPES[scope][1]
          and v['browser']['observation']['stage']=='complete'
-         and (scope!='web-chat' or all(v['browser']['interaction'].values())))
+         and (not extra or all(v['browser'][extra].values())))
 
 CORE_STOP_ROLES=frozenset(('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth',
  'rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user'))
