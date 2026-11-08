@@ -203,8 +203,9 @@ async function login(cdp, events, input, result, observation, browserContextId) 
   let armed = false, loginPosts = 0, rejected = false;
   let logoutSocket, logoutPosts = 0, logoutRevoked = false, logoutClosed = false;
   let recoverySocket, recoveryClosed = false, selfReads = 0;
+  let contact, contactPolicyReady = false;
   let loginTokens;
-  const inspect = async (requestId, kind) => {
+  const inspect = async (requestId, { kind, contactLookup }) => {
     const body = await call('Network.getResponseBody', { requestId });
     check(typeof body.body === 'string' && body.body.length <= (384 << 10));
     const bytes = Buffer.from(body.body, body.base64Encoded ? 'base64' : 'utf8');
@@ -214,6 +215,8 @@ async function login(cdp, events, input, result, observation, browserContextId) 
     if (kind === 'config') {
       if (envelope?.errCode === 0 && data && typeof data.config === 'object' && data.config !== null && !Array.isArray(data.config) &&
           Object.values(data.config).every(v => typeof v === 'string')) result.configAccepted = true;
+    } else if (kind === 'contact-policy') {
+      contactPolicyReady = envelope?.errCode === 0 && data?.config?.allowSendMsgNotFriend === '1';
     } else if (kind === 'login') {
       result.loginAccepted = envelope?.errCode === 0 && data?.userID === input.userID &&
         typeof data?.chatToken === 'string' && data.chatToken.length > 0 &&
@@ -226,10 +229,20 @@ async function login(cdp, events, input, result, observation, browserContextId) 
       logoutRevoked = envelope?.errCode === 0 && data?.revoked === true &&
         data.sessionClosed === true && data.pending === false;
       if (!logoutRevoked) rejected = true;
-    } else if (kind === 'self' && envelope?.errCode === 0 && Array.isArray(data?.users) &&
-        data.users.length === 1 && data.users[0]?.userID === input.userID) {
-      result.selfAccepted = true;
-      selfReads++;
+    } else if (kind === 'self' && envelope?.errCode === 0 && Array.isArray(data?.users) && data.users.length === 1) {
+      const userID = data.users[0]?.userID;
+      if (userID === input.userID) {
+        result.selfAccepted = true;
+        selfReads++;
+      }
+      if (contactLookup && userID === contactLookup.userID) {
+        const { postData } = await call('Network.getRequestPostData', { requestId });
+        if (typeof postData !== 'string' || postData.length > 2048) return;
+        const query = JSON.parse(postData);
+        if (Array.isArray(query?.userIDs) && query.userIDs.length === 1 && query.userIDs[0] === userID) {
+          contactLookup.accepted = true;
+        }
+      }
     }
   };
   events.set(sessionId, ({ method, params }) => {
@@ -254,11 +267,14 @@ async function login(cdp, events, input, result, observation, browserContextId) 
         kind = 'login';
       }
       if (armed && !logoutSocket && endpoint === '/chat/user/find/full') kind = 'self';
+      if (browserContextId && armed && endpoint === '/chat/client_config/get') kind = 'contact-policy';
       if (endpoint === '/chat/account/logout') {
         if (!logoutSocket || ++logoutPosts !== 1 || params.redirectResponse) { rejected = true; return; }
         kind = 'logout';
       }
-      if (kind && !params.redirectResponse && selected.size < 32) selected.set(requestId, { endpoint, kind, received: false });
+      if (kind && !params.redirectResponse && selected.size < 32) {
+        selected.set(requestId, { endpoint, kind, received: false, contactLookup: kind === 'self' ? contact : undefined });
+      }
     } else if (method === 'Network.responseReceived') {
       const pending = selected.get(requestId), response = params.response;
       if (Number.isInteger(response?.status) && response.status >= 100 && response.status <= 599) {
@@ -273,7 +289,7 @@ async function login(cdp, events, input, result, observation, browserContextId) 
       selected.delete(requestId);
       if (!pending) return;
       if (pending.received && method === 'Network.loadingFinished') {
-        void inspect(requestId, pending.kind).catch(() => { if (pending.kind === 'login' || pending.kind === 'logout') rejected = true; });
+        void inspect(requestId, pending).catch(() => { if (pending.kind === 'login' || pending.kind === 'logout') rejected = true; });
       } else if (pending.kind === 'login' || pending.kind === 'logout') rejected = true;
     } else if (method === 'Network.webSocketCreated' && armed && sockets.size < 16 && gatewayURL(params.url)) {
       sockets.add(requestId);
@@ -309,14 +325,25 @@ async function login(cdp, events, input, result, observation, browserContextId) 
   observation.stage = 'login-form';
 
   const click = async (selector, text, guard = LOGIN_DOCUMENT) => {
-    const point = await until(() => evaluate(`(() => {
+    let previous;
+    const point = await until(async () => {
+      const hit = await evaluate(`(() => {
       if (!(${guard})) return null;
       const matches = [...document.querySelectorAll(${JSON.stringify(selector)})].filter(e =>
-        e.getClientRects().length && !e.disabled && ${text === undefined ? 'true' : `e.textContent.trim() === ${JSON.stringify(text)}`});
+        e.getClientRects().length && !e.disabled && e.getAttribute('aria-disabled') !== 'true' &&
+        !e.closest('[aria-hidden="true"]') && ${text === undefined ? 'true' : `e.textContent.trim() === ${JSON.stringify(text)}`});
       if (matches.length !== 1) return null;
-      const e = matches[0], r = e.getBoundingClientRect(), x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2;
-      return e.contains(document.elementFromPoint(x, y)) ? { x, y } : null;
-    })()`), 8000);
+      const e = matches[0], r = e.getBoundingClientRect();
+      for (const fraction of [0.5, 0.3, 0.7]) {
+        const x = r.left + r.width * fraction, y = r.top + r.height / 2;
+        if (e.contains(document.elementFromPoint(x, y))) return { x, y };
+      }
+      return null;
+    })()`);
+      const stable = hit && previous && Math.abs(hit.x - previous.x) < 1 && Math.abs(hit.y - previous.y) < 1;
+      previous = hit;
+      return stable ? hit : undefined;
+    }, 8000);
     check(Number.isFinite(point.x) && Number.isFinite(point.y));
     await call('Input.dispatchMouseEvent', { ...point, type: 'mousePressed', button: 'left', clickCount: 1 });
     await call('Input.dispatchMouseEvent', { ...point, type: 'mouseReleased', button: 'left', clickCount: 1 });
@@ -351,6 +378,11 @@ async function login(cdp, events, input, result, observation, browserContextId) 
   return {
     click, type, evaluate, front: () => call('Page.bringToFront'),
     connected: () => !rejected && connected.size > 0,
+    armContact(userID) {
+      contact = { userID, accepted: false };
+    },
+    contactAccepted: () => contact?.accepted === true,
+    contactPolicyReady: () => contactPolicyReady,
     gateway: () => !rejected && connected.size === 1 ? [...connected][0] : undefined,
     loader: async () => {
       const { frameTree } = await call('Page.getFrameTree');
@@ -424,15 +456,25 @@ async function login(cdp, events, input, result, observation, browserContextId) 
 const EDITOR = '#editable-div[role="textbox"][aria-label="消息输入框"][contenteditable="true"]';
 
 async function openConversation(page, peerID, guard) {
+  observation.stage = 'contact-policy';
+  await until(() => page.contactPolicyReady(), 10000);
   observation.stage = 'contact-search';
   await page.front();
   await page.click('button[aria-label="更多操作"]', undefined, CHAT_DOCUMENT);
   await page.click('button', '添加好友', CHAT_DOCUMENT);
-  await page.type('[role="dialog"] #contact-lookup-keyword', peerID, CHAT_DOCUMENT);
-  await page.click('[role="dialog"] button', '确认', CHAT_DOCUMENT);
+  const input = '[role="dialog"] #contact-lookup-keyword';
+  await page.type(input, peerID, CHAT_DOCUMENT);
+  check(await page.evaluate(`(${CHAT_DOCUMENT}) &&
+    document.querySelector(${JSON.stringify(input)})?.value === ${JSON.stringify(peerID)}`));
+  page.armContact(peerID);
+  await page.click('[role="dialog"]:has(#contact-lookup-keyword) button', '确认', CHAT_DOCUMENT);
+  observation.stage = 'contact-response';
+  await until(() => page.contactAccepted(), 12000);
   observation.stage = 'contact-card';
   // The hydrated card must show the exact account before opening the chat.
   const card = `[role="dialog"]:has(button[aria-label=${JSON.stringify('复制 ID: ' + peerID)}])`;
+  await until(() => page.evaluate(`(${CHAT_DOCUMENT}) && !!document.querySelector(${JSON.stringify(card)})?.getClientRects().length`), 12000);
+  observation.stage = 'contact-send-action';
   await page.click(card + ' button', '发送消息', CHAT_DOCUMENT);
   observation.stage = 'conversation-ready';
   await until(() => page.evaluate(`(${guard}) && !!document.querySelector(${JSON.stringify(EDITOR)})`), 12000);

@@ -1056,7 +1056,8 @@ BROWSER_INTERACTION_KEYS={'peerReady','conversationOpened','senderToPeer','peerT
                           'logoutSocketClosed','loginRestored','oldChatTokenDenied','oldIMTokenDenied','peerStillConnected'}
 BROWSER_RECOVERY_KEYS={'peerReady','conversationOpened','initialMessageSeen','originalSocketClosed',
                        'offlineSendAcknowledged','reconnectedSameDocument','missedMessageSeen','sessionRestored','historyRestored'}
-BROWSER_SHARED_STAGES={'peer-login','contact-search','contact-card','conversation-ready','compose','send-ack','peer-receive'}
+BROWSER_SHARED_STAGES={'peer-login','contact-policy','contact-search','contact-response','contact-card','contact-send-action',
+                       'conversation-ready','compose','send-ack','peer-receive'}
 BROWSER_CHAT_STAGES=BROWSER_SHARED_STAGES|{'logout','logout-token-check'}
 BROWSER_RECOVERY_STAGES=BROWSER_SHARED_STAGES|{'offline-cut','reconnect','catch-up','reload','reopen-history'}
 BROWSER_EXTRAS={'web-chat':('interaction',BROWSER_INTERACTION_KEYS,BROWSER_CHAT_STAGES),
