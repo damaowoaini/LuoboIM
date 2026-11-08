@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""One fresh Linux HTTP/WS chain; reuses twenty accepted product ELFs. Locked pending Root."""
-import argparse,hashlib,importlib.util,json,os,re,secrets,shutil,stat,subprocess,sys,time,urllib.request,urllib.parse,zipfile
+"""Run the selected backend or browser acceptance against owned Linux services."""
+import argparse,hashlib,importlib.util,json,os,pwd,re,secrets,shutil,stat,subprocess,sys,time,urllib.request,urllib.parse,zipfile
 from pathlib import Path
 REPO=Path(__file__).resolve().parents[2]
 HERE=Path(__file__).resolve().parent
@@ -576,6 +576,35 @@ def task_user_command(home,temporary):
  return ['/usr/bin/setpriv','--reuid',str(os.getuid()),'--regid',str(os.getgid()),'--groups',groups,
          '--no-new-privs','--','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+str(home),'TMPDIR='+str(temporary)]
 
+def browser_user_command(work, node, script, argument):
+ user=pwd.getpwuid(os.getuid()).pw_name
+ return ['/usr/sbin/runuser','-u',user,'--','/usr/bin/env','-i','-C',str(work),'PATH=/usr/bin:/bin',
+         'HOME='+str(work),'TMPDIR='+str(work),node,script,argument]
+
+# Both children inherit the fixture network namespace. Only the Chrome child
+# uses the installed browser's normal user sandbox launcher.
+BROWSER_SIBLING_LAUNCH = '''
+count="$1"
+shift
+browser=("${@:1:count}")
+shift "$count"
+"${browser[@]}" &
+browser_pid=$!
+cleanup_browser() {
+    status=$?
+    trap - EXIT
+    kill -TERM %1 2>/dev/null || true
+    wait "$browser_pid" 2>/dev/null || true
+    exit "$status"
+}
+trap cleanup_browser EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
+"$@"
+wait "$browser_pid"
+trap - EXIT
+'''
+
 def run():
  scope=acceptance_scope()
  c,graph,g,original,bodies,chart_bodies=verify();binding=require_bound(c)
@@ -635,7 +664,7 @@ def run():
    probe=root/'browser-probe';probe.mkdir(mode=0o700)
    command('browser-launch-probe',['sudo','-n','/usr/bin/unshare','--net','--','/bin/bash','-euc',
            '/usr/sbin/ip link set lo up; exec "$@"','product20-browser-probe',
-           *task_user_command(probe,probe),browser['node'],browser['script'],'--probe'],45,env,probe)
+           *browser_user_command(probe,browser['node'],browser['script'],'--probe')],45,env,probe)
    failure_stage='before-post-aux-records'
   core=None
   if 'currentCoreBuild' not in c:core=artifact(binding['core14'],graph.ROLES,root/'product14',2<<30,core_source=core_source(c))
@@ -734,11 +763,14 @@ def run():
   products=[{'name':x['binary']['name'],'path':str(product_roots[x['provider']]/x['binary']['name']),'sha256':x['binary']['sha256'],'bytes':x['binary']['bytes'],'sourceSHA256':x['binary']['sourceVector']['sha256']} for x in selected]
   p={'version':'fresh-product20-http-ws-v1','work':str(work),'core':{'version':'owned-fullgraph-acceptance-v1','scenario':'ack','work':str(corework),'planePath':str(plane.private/'plane.json'),'planeSHA256':sha(regular(plane.private/'plane.json')),'credentialsPath':str(plane.private/'credentials.json'),'credentialsSHA256':sha(regular(plane.private/'credentials.json')),'buildsPath':str(buildpath),'buildsSHA256':bs},'chartTemplatePath':str(template),'chartTemplateSHA256':c['helpers']['chart/config/config.example.yaml'],'sqlRootPassword':json.loads(regular(plane.private/'product20-mysql.json'))['rootPassword'],'products':products}
   if browser is not None:
-   p['browser']=browser
+   p['browser']={'socket':str(work/'browser-smoke.sock'),'dist':browser['dist']}
   pp=private/'product20-input.json';ps=write(pp,p)
-  argv=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--',
-        *task_user_command(os.environ['HOME'],work),str(binroot/'product20-acceptance'),
-        '--private-input',str(pp),'--private-input-sha256',ps]
+  backend=[*task_user_command(os.environ['HOME'],work),str(binroot/'product20-acceptance'),
+           '--private-input',str(pp),'--private-input-sha256',ps]
+  if browser is not None:
+   launch=browser_user_command(work,browser['node'],browser['script'],'--listen')
+   backend=['/bin/bash','-euc',BROWSER_SIBLING_LAUNCH,'product20-browser',str(len(launch)),*launch,*backend]
+  argv=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--',*backend]
   write(private/'operator-intent.json',{'pidBindingAtOriginalStart':True,'inputSHA256':ps,'source':core['source'],'harness':c['derivedHarnessSource']})
   command('actual-fresh-product20-http-ws-once',argv,1380)
   result=json.loads(regular(work/'product20-result.json',128<<10));check_result(result,c)
@@ -1013,7 +1045,7 @@ BROWSER_STAGES={'unavailable','input','tls-leaf','chrome-start','devtools','navi
 def browser_observation(value):
  keys={'stage','documentStatus','configStatus','configRequested','chromeFailure'}
  if (type(value) is not dict or set(value)!=keys or type(value['stage']) is not str or value['stage'] not in BROWSER_STAGES
-     or type(value['chromeFailure']) is not str or value['chromeFailure'] not in ('none','sandbox','shared-library')
+     or type(value['chromeFailure']) is not str or value['chromeFailure'] not in ('none','sandbox','shared-library','executable')
      or type(value['configRequested']) is not bool
      or any(type(value[key]) is not int or not (value[key]==0 or 100<=value[key]<=599) for key in ('documentStatus','configStatus'))):
   raise ValueError('finite browser observation required')

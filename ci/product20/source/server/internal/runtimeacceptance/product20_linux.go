@@ -70,8 +70,7 @@ type Product20Binary struct {
 	SourceSHA256 string `json:"sourceSHA256"`
 }
 type product20BrowserPlan struct {
-	Node   string `json:"node"`
-	Script string `json:"script"`
+	Socket string `json:"socket"`
 	Dist   string `json:"dist"`
 }
 
@@ -279,14 +278,9 @@ func ReadProduct20Plan(path, expected string) (Product20Plan, error) {
 		}
 	}
 	if p.Browser != nil {
-		for _, name := range []string{p.Browser.Node, p.Browser.Script, p.Browser.Dist} {
-			resolved, err := filepath.EvalSymlinks(name)
-			if err != nil || !filepath.IsAbs(name) || filepath.Clean(name) != name || resolved != name {
-				return p, errors.New("canonical browser input paths required")
-			}
-		}
-		if filepath.Dir(p.Browser.Dist) != filepath.Join(filepath.Dir(p.Work), "web-bundle") {
-			return p, errors.New("browser bundle must be inside the original task allocation")
+		if p.Browser.Socket != filepath.Join(p.Work, "browser-smoke.sock") ||
+			p.Browser.Dist != filepath.Join(filepath.Dir(p.Work), "web-bundle", "dist") || canonicalDirectory(p.Browser.Dist) != nil {
+			return p, errors.New("browser socket and bundle must be inside the original task allocation")
 		}
 	}
 	seen := map[string]bool{}
@@ -1836,7 +1830,7 @@ func product20BusinessRedis(ctx context.Context, p PrivatePlan) (err error) {
 	}
 	return admin.Do(ctx, args...).Err()
 }
-func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, work string, cert tls.Certificate, email, password, userID string) (product20BrowserResult, error) {
+func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, cert tls.Certificate, email, password, userID string) (product20BrowserResult, error) {
 	unavailable := product20BrowserResult{Observation: product20BrowserObservation{Stage: "unavailable", ChromeFailure: "none"}}
 	result := unavailable
 	leaf, err := x509.ParseCertificate(cert.Certificate[0])
@@ -1850,18 +1844,32 @@ func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, work s
 	}
 	deadline, cancel := context.WithTimeout(ctx, 120*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(deadline, plan.Node, plan.Script)
-	cmd.Dir = work
-	cmd.Env = []string{"PATH=/usr/bin:/bin", "HOME=" + work, "TMPDIR=" + work}
-	cmd.Stdin = bytes.NewReader(input)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.Cancel = func() error { return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL) }
-	cmd.WaitDelay = 5 * time.Second
-	raw, runErr := cmd.Output()
-	if len(raw) == 0 || len(raw) > 4096 || namespaceinventory.DecodeStrict(raw, &result) != nil {
+	info, err := os.Lstat(plan.Socket)
+	if err != nil || info.Mode()&os.ModeSocket == 0 || info.Mode().Perm() != 0600 {
+		return unavailable, errors.New("private browser socket unavailable")
+	}
+	owner, ok := info.Sys().(*syscall.Stat_t)
+	if !ok || owner.Uid != uint32(os.Geteuid()) {
+		return unavailable, errors.New("private browser socket owner differs")
+	}
+	conn, err := (&net.Dialer{}).DialContext(deadline, "unix", plan.Socket)
+	if err != nil {
+		return unavailable, errors.New("private browser connection unavailable")
+	}
+	defer conn.Close()
+	stop := context.AfterFunc(deadline, func() { _ = conn.Close() })
+	defer stop()
+	if sent, err := conn.Write(input); err != nil || sent != len(input) {
+		return unavailable, errors.New("private browser input transfer failed")
+	}
+	if err = conn.(*net.UnixConn).CloseWrite(); err != nil {
+		return unavailable, errors.New("private browser input did not close")
+	}
+	raw, readErr := io.ReadAll(io.LimitReader(conn, 4097))
+	if readErr != nil || len(raw) == 0 || len(raw) > 4096 || namespaceinventory.DecodeStrict(raw, &result) != nil {
 		return unavailable, errors.New("browser result unavailable")
 	}
-	if runErr != nil || !result.accepted() {
+	if !result.accepted() {
 		return result, errors.New("browser acceptance incomplete")
 	}
 	return result, nil
@@ -2119,7 +2127,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	}
 	if p.Browser != nil {
 		result.Phase = "actual-web-browser-login"
-		browser, err := product20RunBrowser(ctx, p.Browser, p.Work, aux.cert, emails[0], passwords[0], accounts[0].UserID)
+		browser, err := product20RunBrowser(ctx, p.Browser, aux.cert, emails[0], passwords[0], accounts[0].UserID)
 		result.Browser = &browser
 		if err != nil {
 			return err

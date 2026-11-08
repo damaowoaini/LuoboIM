@@ -2,13 +2,16 @@
 // Never emit CDP messages, response bodies, URLs, credentials or Chrome logs.
 import { spawn } from 'node:child_process';
 import { createHash, X509Certificate } from 'node:crypto';
+import { once } from 'node:events';
 import { lstat, mkdtemp, readFile, realpath, rm } from 'node:fs/promises';
+import { createServer } from 'node:net';
 import path from 'node:path';
 import { connect as connectTLS } from 'node:tls';
 
 const CHROME = '/opt/google/chrome/chrome';
 const ORIGIN = 'https://127.0.0.1';
 const probe = process.argv.length === 3 && process.argv[2] === '--probe';
+const listen = process.argv.length === 3 && process.argv[2] === '--listen';
 const observation = {
   stage: 'input', documentStatus: 0, configStatus: 0, configRequested: false, chromeFailure: 'none',
 };
@@ -17,7 +20,6 @@ const result = {
   selfAccepted: false, workspaceVisible: false,
 };
 const stop = new AbortController();
-const deadline = setTimeout(() => stop.abort(), 95000);
 const interrupt = () => stop.abort();
 process.once('SIGTERM', interrupt);
 process.once('SIGINT', interrupt);
@@ -33,10 +35,10 @@ async function until(read, ms, signal = stop.signal) {
   throw new Error('browser smoke deadline');
 }
 
-async function privateInput() {
+async function privateInput(stream = process.stdin) {
   const chunks = [];
   let bytes = 0;
-  for await (const chunk of process.stdin) {
+  for await (const chunk of stream) {
     bytes += chunk.length;
     check(bytes <= 8192);
     chunks.push(chunk);
@@ -311,13 +313,11 @@ async function runBrowser(cdp, input) {
   cdp.event = () => {};
 }
 
-async function main() {
+async function main(input) {
   let profile, child, exit, cdp;
   let exited = false, cleanExit = false, success = false, cleanup = true;
   try {
     check(process.platform === 'linux' && process.getuid() !== 0 && typeof WebSocket === 'function');
-    check(process.argv.length === 2 || probe);
-    const input = probe ? undefined : await privateInput();
     const temporary = await realpath(process.env.TMPDIR);
     const directory = await lstat(temporary);
     check(directory.isDirectory() && directory.uid === process.getuid() && (directory.mode & 0o077) === 0);
@@ -347,7 +347,13 @@ async function main() {
     });
     exit = new Promise(resolve => {
       child.once('exit', (code, signal) => { exited = true; cleanExit = code === 0 && signal === null; resolve(true); });
-      child.on('error', () => { if (!child.pid) { exited = true; resolve(true); } });
+      child.on('error', error => {
+        if (!child.pid) {
+          if (['ENOENT', 'EACCES', 'ENOEXEC'].includes(error?.code)) observation.chromeFailure = 'executable';
+          exited = true;
+          resolve(true);
+        }
+      });
     });
     const endpoint = await until(async () => {
       check(!exited);
@@ -399,10 +405,91 @@ async function main() {
   return accepted;
 }
 
+async function accept(input) {
+  const deadline = setTimeout(interrupt, 95000);
+  try { return await main(input); } finally { clearTimeout(deadline); }
+}
+
+function reply(client) {
+  return new Promise(resolve => {
+    if (client.destroyed || !client.writable) { resolve(false); return; }
+    const timer = setTimeout(() => finish(false), 2000);
+    const closed = () => finish(false);
+    function finish(sent) {
+      clearTimeout(timer);
+      client.removeListener('close', closed);
+      resolve(sent);
+    }
+    client.once('close', closed);
+    client.end(JSON.stringify({ ...result, observation }) + '\n', error => finish(!error));
+  });
+}
+
+async function serve() {
+  let server, client, socketPath;
+  let bound = false, accepted = false;
+  const waiting = setTimeout(interrupt, 1200000);
+  const cancelInput = () => client?.destroy();
+  stop.signal.addEventListener('abort', cancelInput, { once: true });
+  try {
+    check(process.platform === 'linux' && process.getuid() !== 0 && typeof WebSocket === 'function');
+    const directory = await realpath(process.env.TMPDIR);
+    const info = await lstat(directory);
+    check(directory === process.cwd() && directory === process.env.HOME && directory === process.env.TMPDIR &&
+      info.isDirectory() && info.uid === process.getuid() && (info.mode & 0o777) === 0o700);
+    socketPath = path.join(directory, 'browser-smoke.sock');
+    check(Buffer.byteLength(socketPath) < 108);
+    check(!(await lstat(socketPath).catch(error => { if (error?.code !== 'ENOENT') throw error; })));
+    check(!stop.signal.aborted);
+
+    server = createServer({ allowHalfOpen: true }, socket => {
+      if (client || stop.signal.aborted) { socket.destroy(); return; }
+      client = socket;
+      client.on('error', () => {});
+    });
+    server.on('error', interrupt);
+    server.once('listening', () => { bound = true; });
+    const mask = process.umask(0o177);
+    try {
+      // Bind at mode 0600, before Go can inspect or connect to the socket.
+      server.listen(socketPath);
+      await once(server, 'connection', { signal: stop.signal });
+    } finally { process.umask(mask); }
+    const socketInfo = await lstat(socketPath);
+    check(client && socketInfo.isSocket() && socketInfo.uid === process.getuid() && (socketInfo.mode & 0o777) === 0o600);
+    const input = await privateInput(client.iterator({ destroyOnReturn: false }));
+    clearTimeout(waiting);
+    stop.signal.removeEventListener('abort', cancelInput);
+    check(!stop.signal.aborted);
+    accepted = await accept(input);
+  } catch {
+    // Transport and input failures also leave only the bounded result.
+  } finally {
+    clearTimeout(waiting);
+    stop.signal.removeEventListener('abort', cancelInput);
+    if (client) {
+      let sent = false;
+      try { sent = await reply(client); } catch { /* no raw diagnostic */ }
+      client.destroy();
+      accepted = accepted && sent;
+    }
+    if (server) {
+      // Node closes and unlinks its own bound Unix socket. Never unlink a
+      // pathname whose listener could not be established by this process.
+      const closed = await new Promise(resolve => server.close(error => resolve(!error)));
+      const removed = bound && await lstat(socketPath).then(() => false, error => error?.code === 'ENOENT');
+      accepted = accepted && closed && removed;
+    }
+  }
+  return accepted && !stop.signal.aborted;
+}
+
 let accepted = false;
-try { accepted = await main(); } catch { /* no raw diagnostic */ }
-clearTimeout(deadline);
+try {
+  if (listen) accepted = await serve();
+  else if (probe || process.argv.length === 2) accepted = await accept(probe ? undefined : await privateInput());
+} catch { /* no raw diagnostic */ }
 process.removeListener('SIGTERM', interrupt);
 process.removeListener('SIGINT', interrupt);
-process.stdout.write(JSON.stringify(probe ? observation : { ...result, observation }) + '\n');
+if (!listen) process.stdout.write(JSON.stringify(probe ? observation : { ...result, observation }) + '\n');
 process.exitCode = accepted ? 0 : 1;
