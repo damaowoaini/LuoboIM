@@ -146,6 +146,7 @@ type product20Result struct {
 	GatewayPresence     *product20GatewayPresenceObservation `json:"gatewayPresence,omitempty"`
 	DeliverySnapshot    *product20DeliverySnapshot           `json:"deliverySnapshot,omitempty"`
 	ManagedDrain        *product20ManagedDrainObservation    `json:"managedDrain,omitempty"`
+	CoreStopFailure     *product20CoreStopObservation        `json:"coreStopFailure,omitempty"`
 }
 
 // This diagnostic observes original returns only. It never formats an error,
@@ -1654,6 +1655,95 @@ func product20ReadManagedDrain(boot *Bootstrap) *product20ManagedDrainObservatio
 	return out
 }
 
+type product20CoreStopRole struct {
+	Role      string   `json:"role"`
+	Outcome   string   `json:"outcome"`
+	WaitState string   `json:"waitState"`
+	ExitCode  *int     `json:"exitCode"`
+	LogHints  []string `json:"logHints"`
+}
+
+type product20CoreStopObservation struct {
+	SessionError   bool                    `json:"sessionError"`
+	BootstrapError bool                    `json:"bootstrapError"`
+	Rows           []product20CoreStopRole `json:"rows"`
+}
+
+// Only the original cached wait owner and its private record can bind a stop
+// failure. The output is diagnostic and cannot make local exit a valid drain.
+func product20ObserveCoreStop(work string, session *Session, boot *Bootstrap, sessionErr, bootErr error) *product20CoreStopObservation {
+	result := &product20CoreStopObservation{SessionError: sessionErr != nil, BootstrapError: bootErr != nil, Rows: []product20CoreStopRole{}}
+	if sessionErr == nil || session == nil || session.Runtime == nil || session.Runtime.Processes == nil || boot == nil {
+		return result
+	}
+	specs := make(map[string]ownedcontrol.ServiceSpec)
+	for _, spec := range boot.Services.Specs {
+		if _, duplicate := specs[spec.Role]; duplicate {
+			return result
+		}
+		specs[spec.Role] = spec
+	}
+	for _, wait := range session.Runtime.Processes.CachedWaitObservations() {
+		spec, ok := specs[wait.Role]
+		if !ok || wait.OwnerState != "matched" || wait.Owner == nil || wait.JoinRecorded ||
+			wait.Owner.Executable != spec.BinaryPath || !product20Hex.MatchString(wait.Owner.OwnerNonce) {
+			continue
+		}
+		var record struct {
+			Version     string
+			Role        string
+			Owner       ownedcontrol.ProcessOwner
+			Outcome     string
+			ErrorSHA256 string
+		}
+		body, err := namespaceinventory.ReadPrivateDocument(filepath.Join(work, "runtime-owners", wait.Role+"-stop-failure.json"), 64<<10)
+		if err != nil || namespaceinventory.DecodeStrict(body, &record) != nil || record.Version != "namespace-runtime-stop-failure-v1" ||
+			record.Role != wait.Role || record.Owner != *wait.Owner || !product20Hex.MatchString(record.ErrorSHA256) {
+			continue
+		}
+		switch record.Outcome {
+		case "unconfirmed-child-stop", "deadline", "canceled":
+		default:
+			continue
+		}
+		row := product20CoreStopRole{Role: wait.Role, Outcome: record.Outcome, WaitState: "unknown", ExitCode: wait.ExitCode, LogHints: []string{}}
+		if wait.WaitState == "returned" {
+			if wait.WaitErrorClass == "none" {
+				row.WaitState = "clean"
+			} else {
+				row.WaitState = "failed"
+				row.LogHints = product20CoreStopLogHints(spec.Work, record.Owner.OwnerNonce)
+			}
+		}
+		result.Rows = append(result.Rows, row)
+	}
+	return result
+}
+
+func product20CoreStopLogHints(work, nonce string) []string {
+	labels := []string{}
+	body, err := namespaceinventory.ReadPrivateDocument(filepath.Join(work, "service-"+nonce+".log"), 1<<20)
+	if err != nil {
+		return labels
+	}
+	// Only known phrases from the final bounded window leave this process as
+	// labels. Earlier errors and application payloads cannot become log output.
+	if len(body) > 128<<10 {
+		body = body[len(body)-(128<<10):]
+	}
+	for _, rule := range []struct{ phrase, label string }{
+		{"owned gateway lifecycle is unconfirmed", "gateway-lifecycle"},
+		{"managed ordinary shutdown unconfirmed", "managed-ordinary-shutdown"},
+		{"NOPERM", "redis-permission"},
+		{"\npanic:", "panic"},
+	} {
+		if bytes.Contains(body, []byte(rule.phrase)) {
+			labels = append(labels, rule.label)
+		}
+	}
+	return labels
+}
+
 func product20Message(ctx context.Context, a, b product20Account, roots *x509.CertPool, observation *product20MessageObservation, onDispatch func(), onFailure func(context.Context, string)) (clientID, serverID string, seq int64, err error) {
 	observation.Step = "sender-handshake"
 	sender, e := product20Dial(ctx, roots, a)
@@ -1912,7 +2002,8 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		if chartPool != nil {
 			runErr = errors.Join(runErr, chartPool.Close())
 		}
-		runErr = errors.Join(runErr, cleanupAcceptanceSession(cleanup, session))
+		coreErr := cleanupAcceptanceSession(cleanup, session)
+		runErr = errors.Join(runErr, coreErr)
 		result.OriginalCoreCleanupComplete = session != nil && session.CleanupComplete()
 		if result.DeliverySnapshot != nil && boot != nil && result.OriginalCoreCleanupComplete {
 			func() {
@@ -1920,8 +2011,13 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 				result.ManagedDrain = product20ReadManagedDrain(boot)
 			}()
 		}
+		var bootErr error
 		if boot != nil {
-			runErr = errors.Join(runErr, boot.Close(cleanup))
+			bootErr = boot.Close(cleanup)
+			runErr = errors.Join(runErr, bootErr)
+		}
+		if result.Phase == "web-browser-login-accepted-local-cleanup-required" && (coreErr != nil || bootErr != nil) {
+			result.CoreStopFailure = product20ObserveCoreStop(p.Core.Work, session, boot, coreErr, bootErr)
 		}
 		result.Accepted = runErr == nil && result.ProductProcesses == 20 && result.RealRegistrations == 2 && result.RealPasswordLogins == 2 && result.OrdinaryDispatches == 1 && result.PeerMessages == 1 && result.HistoryMessages == 1 && result.WrongPasswordRejected && result.BusinessPermissions && result.ConfigHTTP && result.ChatTokenSelfRead && result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
 		if p.Browser != nil {

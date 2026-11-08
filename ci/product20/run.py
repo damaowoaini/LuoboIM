@@ -1035,6 +1035,8 @@ def export_terminal(path,output):
  if 'browser' in v:
   value['browser']=browser_result(v)
   value['browserObservation']=browser_observation(v['browser']['observation'])
+ if 'coreStopFailure' in v:
+  value['coreStopFailure']=project_browser_core_stop(v)
  write(output,value)
  return value
 
@@ -1059,6 +1061,34 @@ def browser_result(v):
   raise ValueError('finite browser result required')
  browser_observation(result['observation'])
  return {key:value for key,value in result.items() if key in BROWSER_RESULT_KEYS}
+
+CORE_STOP_ROLES=frozenset(('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth',
+ 'rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user'))
+CORE_STOP_LOG_HINTS=frozenset(('gateway-lifecycle','managed-ordinary-shutdown','redis-permission','panic'))
+
+def project_browser_core_stop(v):
+ value=v['coreStopFailure']
+ if (v.get('accepted') is not False or v.get('phase')!='web-browser-login-accepted-local-cleanup-required'
+     or not all(browser_result(v).values()) or v['browser']['observation']['stage']!='complete'
+     or type(value) is not dict or set(value)!={'sessionError','bootstrapError','rows'}
+     or any(type(value[k]) is not bool for k in ('sessionError','bootstrapError'))
+     or not (value['sessionError'] or value['bootstrapError'])
+     or type(value['rows']) is not list or len(value['rows'])>len(CORE_STOP_ROLES)
+     or (value['rows'] and not value['sessionError'])):
+  raise ValueError('finite original browser core stop failure required')
+ seen=set()
+ for row in value['rows']:
+  if (type(row) is not dict or set(row)!={'role','outcome','waitState','exitCode','logHints'}
+      or type(row['role']) is not str or row['role'] not in CORE_STOP_ROLES or row['role'] in seen
+      or row['outcome'] not in ('unconfirmed-child-stop','deadline','canceled')
+      or row['waitState'] not in ('clean','failed','unknown')
+      or (row['exitCode'] is not None and (type(row['exitCode']) is not int or not 0<=row['exitCode']<=255))
+      or type(row['logHints']) is not list or len(row['logHints'])>len(CORE_STOP_LOG_HINTS)
+      or any(type(label) is not str or label not in CORE_STOP_LOG_HINTS for label in row['logHints'])
+      or len(set(row['logHints']))!=len(row['logHints']) or (row['logHints'] and row['waitState']!='failed')):
+   raise ValueError('closed original stop role required')
+  seen.add(row['role'])
+ return {'version':'product20-core-stop-observation-v1',**value,'diagnosticOnly':True,'rawLogsOrIdentitiesExported':False}
 
 def check_result(v,c):
  common=('accepted','businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')

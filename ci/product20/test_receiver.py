@@ -58,6 +58,16 @@ class BrowserAcceptanceContract(unittest.TestCase):
   with mock.patch.dict(os.environ,{'PRODUCT20_SCOPE':'backend'}):
    with self.assertRaises(ValueError):
     controller.check_result(result,config)
+  stop_row={'role':'msggateway','outcome':'unconfirmed-child-stop','waitState':'failed','exitCode':1,'logHints':['gateway-lifecycle']}
+  failed=dict(result,accepted=False,coreStopFailure={'sessionError':True,'bootstrapError':False,'rows':[stop_row]})
+  stop=controller.project_browser_core_stop(failed)
+  self.assertEqual(stop['rows'],[stop_row])
+  self.assertFalse(stop['rawLogsOrIdentitiesExported'])
+  for invalid in (dict(stop_row,role='private-role'),dict(stop_row,privateLog='private-data'),dict(stop_row,logHints=['private-data'])):
+   with self.assertRaises(ValueError):
+    controller.project_browser_core_stop(dict(failed,coreStopFailure=dict(failed['coreStopFailure'],rows=[invalid])))
+  with self.assertRaises(ValueError):
+   controller.project_browser_core_stop(dict(failed,accepted=True))
 
 class RegistrationObservationContract(unittest.TestCase):
  def test_exports_only_scoped_registration_failure_from_validated_terminal(self):
