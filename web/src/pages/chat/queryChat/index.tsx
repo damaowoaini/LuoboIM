@@ -58,11 +58,11 @@ export const QueryChat = () => {
 
   useEffect(() => {
     const refresh = () => {
+      if (useMessageStore.getState().jumpClientMsgID) return;
       initMessages();
       getConversationPreviewImgList();
     };
     emitter.on("REFRESH_CHAT_LIST", refresh);
-    if (useMessageStore.getState().jumpClientMsgID) return;
     refresh();
     return () => {
       emitter.off("REFRESH_CHAT_LIST", refresh);

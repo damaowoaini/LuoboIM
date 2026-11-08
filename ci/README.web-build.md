@@ -1,6 +1,14 @@
-# Current4343 one voice component case then manual build (prepared, unexecuted)
+# Web history recovery build
 
-Only `web4343-voice-retirement-v1` is admitted. It binds all4343 source rows at
+The current manual cohort is `web4343-recovery-history-v1`. It binds 4,343 source files with digest `6c5009e4f6f95dffef50f7c581fae0c20798fd0658c2a9ffe13bab469b9923fd`. The four changed files handle online and offline SDK callbacks, protect timeline reads from concurrent arrivals, and exercise one store regression.
+
+The selected case is `keeps live arrivals and retryable sends across a delayed latest-page read` in `src/core/messagePrivacyStore.test.ts`. The existing locked install, SDK and WASM checks, offline Vite worker, CSP checks and resource limits still apply. The build is a prerequisite for the live browser reconnect and history check.
+
+## Historical4343 voice build
+
+### Original voice component case and build
+
+The historical cohort was `web4343-voice-retirement-v1`. It binds all4343 source rows at
 `f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8`. Relative to the accepted4341 source, only five rows change: the
 VoiceMessageRender replacement, the new voicePlayback owner and its one real
 component case, plus three load-spy additions across two existing Audio test

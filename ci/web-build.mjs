@@ -9,11 +9,12 @@ import { verifyFile, verifyLinuxBindings, validateReport } from "./web-ci.mjs";
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const web = path.join(repo, "web"), output = path.join(repo, "ci-output/web-build");
 const descriptorPath = path.join(repo, "ci/web-build.inputs.json");
-const cohort = "web4343-voice-retirement-v1";
-const loginFile = "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx";
-const loginSuite = "VoiceMessageRender playback";
-const loginName = "retires pending voice ownership without stale rows stopping the next message or hiding current failures";
-const sourceDigest = "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8";
+const cohort = "web4343-recovery-history-v1";
+const loginFile = "src/core/messagePrivacyStore.test.ts";
+const loginSuite = "actual history store stale results";
+const loginName = "keeps live arrivals and retryable sends across a delayed latest-page read";
+const selectedTestFrame = new RegExp(String.raw`(?:^|[\s/])${RegExp.escape(loginFile)}:([1-9][0-9]{0,5}):[0-9]+\)?\s*$`);
+const sourceDigest = "6c5009e4f6f95dffef50f7c581fae0c20798fd0658c2a9ffe13bab469b9923fd";
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
 const hash = (body) => createHash("sha256").update(body).digest("hex");
 const json = (file) => JSON.parse(readFileSync(file, "utf8"));
@@ -40,7 +41,7 @@ export function validateDescriptor(input) {
     && selection.skipOrFailAccepted === false && Number.isSafeInteger(selection.sourceLineCount)
     && selection.sourceLineCount > 0 && selection.sourceLineCount <= 10000 && selection.runner.version === "5.0.4"
     && selection.runner.entry === "node_modules/vitest/vitest.mjs"
-    && selection.runner.lockEntrySHA256 === "73b4f3a427a2db5968e193d3dea089c658c76514b50da3b4f74e7f790182c478", "Exact one real form case selection required");
+    && selection.runner.lockEntrySHA256 === "73b4f3a427a2db5968e193d3dea089c658c76514b50da3b4f74e7f790182c478", "Exact one history regression case required");
   return input;
 }
 
@@ -130,11 +131,11 @@ export function loginFailureObservation(report, audit, processRecord, sourceExac
   }
   for (const message of messages.slice(0, 10)) if (typeof message === "string")
     for (const text of message.slice(0, 32768).split(/\r?\n/).slice(0, 128)) {
-      const match = text.match(/(?:^|[\s\/])src\/pages\/chat\/queryChat\/MessageItem\/VoiceMessageRender\.test\.tsx:([1-9][0-9]{0,5}):[0-9]+\)?\s*$/);
+      const match = text.match(selectedTestFrame);
       if (match && Number.isSafeInteger(lineLimit) && Number(match[1]) <= lineLimit) lines.add(Number(match[1]));
     }
   return { categories: [...categories].sort(), knownCaseState: known.length === 1 && ["passed", "failed", "skipped"].includes(known[0].state) ? known[0].state : "unconfirmed",
-    frames: [...lines].sort((a, b) => a - b).slice(0, 8).map((line) => ({ basename: "VoiceMessageRender.test.tsx", line })),
+    frames: [...lines].sort((a, b) => a - b).slice(0, 8).map((line) => ({ basename: path.basename(loginFile), line })),
     framesTruncated: lines.size > 8, rawFailureMessagesStackPayloadOrUnknownNamesExported: false };
 }
 

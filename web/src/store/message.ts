@@ -1,7 +1,7 @@
 import type { SendFailureDiagnostic } from "@/core/sendFailure";
 import { captureMessageAccess, forgetMessage, messageHistoryFence, messagePrivacyState, visibleMessages } from "@/core/messagePrivacyRuntime";
 import { t } from "i18next";
-import { MessageType, SessionType } from "open-im-sdk-wasm";
+import { MessageStatus, MessageType, SessionType } from "open-im-sdk-wasm";
 import { MessageItem, SearchMessageResult } from "open-im-sdk-wasm/lib/types/entity";
 import { create } from "zustand";
 
@@ -29,6 +29,9 @@ const applyFriendRemarkToMessages = (messages: ExMessageItem[]): ExMessageItem[]
 };
 
 const GET_HISTORY_MESSAGE_COUNT = 20;
+let latestHistoryRead = 0;
+const awaitingSend = (message: ExMessageItem) =>
+  message.status === MessageStatus.Sending || message.status === MessageStatus.Failed;
 
 export interface ExType {
   checked?: boolean;
@@ -63,6 +66,11 @@ export const useMessageStore = create<MessageStore>()((set, get) => ({
     if (!conversationID) return;
     const access = captureMessageAccess(conversationID);
     if (!access.current()) return;
+    const read = loadMore ? latestHistoryRead : ++latestHistoryRead;
+    const jump = get().jumpClientMsgID;
+    const current = () => access.current() && read === latestHistoryRead &&
+      jump === get().jumpClientMsgID &&
+      conversationID === useConversationStore.getState().currentConversation?.conversationID;
     try {
       const prevList = [...get().historyMessageList];
       const { data } = await IMSDK.getAdvancedHistoryMessageList({
@@ -74,13 +82,9 @@ export const useMessageStore = create<MessageStore>()((set, get) => ({
         conversationID,
       });
 
-      if (
-        !access.current() || conversationID !==
-        useConversationStore.getState().currentConversation?.conversationID
-      )
-        return;
+      if (!current()) return;
 
-      (data.messageList as ExMessageItem[]).map((message, idx) => {
+      (data.messageList as ExMessageItem[]).forEach((message, idx) => {
         if (!idx) return;
         const prevTime = data.messageList[idx - 1]?.sendTime;
         if (message.sessionType === SessionType.Notification) {
@@ -90,23 +94,33 @@ export const useMessageStore = create<MessageStore>()((set, get) => ({
           message.gapTime = message.sendTime - prevTime > 300000;
         }
       });
-      const nextList = applyFriendRemarkToMessages(
-        [...(loadMore ? prevList : []), ...data.messageList.reverse()],
-      );
+      const beforeRead = new Map(prevList.map(message => [message.clientMsgID, message]));
+      const live = get().historyMessageList;
+      const currentByID = new Map(live.map(message => [message.clientMsgID, message]));
+      const page = data.messageList.slice().reverse().map(message => {
+        const local = currentByID.get(message.clientMsgID);
+        if (local && local !== beforeRead.get(message.clientMsgID) &&
+            !(awaitingSend(local) && message.status === MessageStatus.Succeed)) return local;
+        return message;
+      });
+      // Keep arrivals and retryable sends even when a latest-page read started
+      // before they reached the SDK database.
+      const pageIDs = new Set(page.map(message => message.clientMsgID));
+      const keep = live.filter(message => loadMore || (!pageIDs.has(message.clientMsgID) &&
+        (!beforeRead.has(message.clientMsgID) || awaitingSend(message))));
+      const merged = new Map<string, ExMessageItem>();
+      for (const message of [...keep, ...page]) {
+        if (!merged.has(message.clientMsgID)) merged.set(message.clientMsgID, message);
+      }
 
       set(() => ({
         lastMinSeq: data.lastMinSeq,
         hasMore: data.messageList.length !== 0,
-        historyMessageList: visibleMessages(nextList, conversationID),
+        historyMessageList: visibleMessages(applyFriendRemarkToMessages([...merged.values()]), conversationID),
       }));
     } catch (error) {
-      if (!access.current()) return;
+      if (!current()) return;
       feedbackToast({ error, msg: t("toast.getHistoryMessageFailed") });
-      set(() => ({
-        lastMinSeq: 0,
-        hasMore: false,
-        historyMessageList: [],
-      }));
     }
   },
   getHistoryMessageListReverseByReq: async () => {

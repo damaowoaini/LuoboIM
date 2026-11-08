@@ -20,9 +20,9 @@ test("build-only plan contains locked install, exact patch and Vite without any 
   assert.equal(plan.some((p) => p.args.some((v) => /vitest|tsc|--noEmit/.test(v))), false);
 });
 
-test("reviewed4343 descriptor binds unchanged SDK8/public2 and exact voice selection, refusing historical identity", () => {
+test("reviewed4343 descriptor binds unchanged SDK8/public2 and exact recovery selection, refusing historical identity", () => {
   assert.equal(validateDescriptor(input).sourceFiles, 4343);
-  assert.equal(input.sourceDigest, "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8");
+  assert.equal(input.sourceDigest, "6c5009e4f6f95dffef50f7c581fae0c20798fd0658c2a9ffe13bab469b9923fd");
   const sdk = JSON.parse(readFileSync(fileURLToPath(new URL("../web/sdk-patches/manifest.json", import.meta.url)), "utf8"));
   assert.equal(sdk.package, "open-im-sdk-wasm");
   assert.equal(sdk.version, "3.5.1-alpha.3");
@@ -93,12 +93,12 @@ test("actual dist audit preserves known public bytes and CSP and rejects changed
 });
 
 
-test("one named real form command and paired completion receipt refuse expanded, skipped, hook-failed or partial results", () => {
-  const name = "retires pending voice ownership without stale rows stopping the next message or hiding current failures";
-  const suite = "VoiceMessageRender playback", file = "/owned/web/src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx";
+test("one named history regression command and paired completion receipt refuse expanded, skipped, hook-failed or partial results", () => {
+  const name = "keeps live arrivals and retryable sends across a delayed latest-page read";
+  const suite = "actual history store stale results", file = "/owned/web/src/core/messagePrivacyStore.test.ts";
   const plan = loginTestPlan("/official/node", "/owned/private/report.json");
   assert.equal(plan.command, "/official/node"); assert.equal(plan.timeout, 60000);
-  assert.deepEqual(plan.args.slice(0, 5), ["node_modules/vitest/vitest.mjs", "run", "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx", "--testNamePattern", `(?:^| )${name}$`]);
+  assert.deepEqual(plan.args.slice(0, 5), ["node_modules/vitest/vitest.mjs", "run", "src/core/messagePrivacyStore.test.ts", "--testNamePattern", `(?:^| )${name}$`]);
   assert(plan.args.includes("--reporter=json"));
   assert(plan.args.some((arg) => arg.endsWith("/ci/web-ci.audit-reporter.mjs")));
   assert(plan.args.includes("--outputFile.json=/owned/private/report.json"));
@@ -131,14 +131,14 @@ test("one named real form command and paired completion receipt refuse expanded,
   assert.throws(() => loginTestSummary(report, audit, 1, file));
   assert.throws(() => loginTestSummary(report, undefined, 0, file));
   const failed = structuredClone(report), failedAudit = structuredClone(audit);
-  failed.testResults[0].name = fileURLToPath(new URL("../web/src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx", import.meta.url));
+  failed.testResults[0].name = fileURLToPath(new URL("../web/src/core/messagePrivacyStore.test.ts", import.meta.url));
   failed.testResults[0].assertionResults[0].failureMessages = [
-    "PRIVATE-CODE-654321\n at /private/work/src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx:42:5\n at /private/work/src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx:999999:2\n at /private/unknown.test.ts:1:2",
+    "PRIVATE-CODE-654321\n at /private/work/src/core/messagePrivacyStore.test.ts:42:5\n at /private/work/src/core/messagePrivacyStore.test.ts:999999:2\n at /private/unknown.test.ts:1:2",
   ];
   failedAudit.tests[0].state = "failed"; failedAudit.tests[0].errors = [{ name: "AssertionError", message: "PRIVATE-CODE" }];
   const observed = loginFailureObservation(failed, failedAudit, { exit: 1, signal: null, errorCode: null }, true, true, 191, false);
   assert.deepEqual(observed.categories, ["assertion", "command"]);
-  assert.deepEqual(observed.frames, [{ basename: "VoiceMessageRender.test.tsx", line: 42 }]);
+  assert.deepEqual(observed.frames, [{ basename: "messagePrivacyStore.test.ts", line: 42 }]);
   assert.equal(observed.knownCaseState, "failed");
   assert.equal(/PRIVATE|654321|unknown\.test|\/private\//.test(JSON.stringify(observed)), false);
   const timed = loginFailureObservation(undefined, undefined, { exit: null, errorCode: "ETIMEDOUT" }, false, true, 191, false);

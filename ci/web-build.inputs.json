@@ -48,28 +48,28 @@
       "sha256": "22bdb3aa12a682229435de3ff39d39973d7cb6ff0cbd66734af50e84cc900b96"
     }
   ],
-  "checkoutRule": "actual GITHUB_SHA equals git HEAD; all4343 rows exact; exactly the voice5-row overlay and one named real voice component case before offline Vite; no future commit invented",
-  "cohort": "web4343-voice-retirement-v1",
+  "checkoutRule": "Actual GITHUB_SHA equals git HEAD. The 4,343 reviewed source files include four history recovery replacements and one named regression before offline Vite.",
+  "cohort": "web4343-recovery-history-v1",
   "controllerInputs": [
     {
-      "bytes": 4267,
+      "bytes": 4277,
       "path": ".github/workflows/web-build-only.yml",
-      "sha256": "7a5952e990142649425c0cf103e60c9f8389e8fdc29fb87cc8b822975f94a6fd"
+      "sha256": "637c55d9024f16830fadb6cbb03b81b37da1580b49e7f74474183e3a80ecd6c6"
     },
     {
-      "bytes": 18399,
+      "bytes": 19084,
       "path": "ci/README.web-build.md",
-      "sha256": "c29be351112f246c4a7549c1befddc012e932717ff7339d01a872cd6777de12c"
+      "sha256": "dc76139375e7d4e0515310f5ac2d1b403edbb20d74fcd8a4daf73c435506d667"
     },
     {
-      "bytes": 28219,
+      "bytes": 28184,
       "path": "ci/web-build.mjs",
-      "sha256": "c7335ff84564378b324e4df885332732beb2bc1634544bb1097542cf99f9d234"
+      "sha256": "c9d6f8ea0c728825f6f765694a7053fa3454a19a4a8e6b31120fe5ac3b13bb5a"
     },
     {
-      "bytes": 10446,
+      "bytes": 10295,
       "path": "ci/web-build.test.mjs",
-      "sha256": "4830e262f0ffcb7d517bf9e1c05f274408634bf2b93411d67bdbaec6b83789ec"
+      "sha256": "b1d80235c7a1a056ccced37b59afd3244df0b53c99d299f805d3ded112b051f6"
     },
     {
       "bytes": 3597,
@@ -20286,9 +20286,9 @@
       "sha256": "30b8715650c716a850e0a6bb87ecee7df141d7be0d6d53ae3165efa1d20d8a38"
     },
     {
-      "bytes": 4094,
+      "bytes": 5468,
       "path": "src/core/messagePrivacyStore.test.ts",
-      "sha256": "cd2b73fbfb237b45deb07e03a078b317ee9e2abb105ad9dc3c38caf84ab40dd7"
+      "sha256": "ced74c1fdb9de10ca8a67baac40b6b29852ed62750817f030e3adeffe8f370f5"
     },
     {
       "bytes": 2305,
@@ -20751,9 +20751,9 @@
       "sha256": "b0256d2c94a2342fa69bc2ec7018e56684d133e209f5a079f1f5ca79dacd6d89"
     },
     {
-      "bytes": 28980,
+      "bytes": 29929,
       "path": "src/layout/useGlobalEvents.tsx",
-      "sha256": "b59f58d9faf98521d982aba4f21c65affbc92796375c204aad63e79b0b795210"
+      "sha256": "1daa8ca0c1133795aafd3c1b6e5711f4946d656a6f696e3b0d38cb99e9512255"
     },
     {
       "bytes": 918,
@@ -21101,9 +21101,9 @@
       "sha256": "df90bd95799ec1d276cf67f0cfc2ac9c6a0c0afcc6bc920f1a79df44f7018093"
     },
     {
-      "bytes": 4197,
+      "bytes": 4199,
       "path": "src/pages/chat/queryChat/index.tsx",
-      "sha256": "0501647e1ccb927a42e426bda500f2a21536dc9920f5fee546eced83109757c7"
+      "sha256": "bb7c864e3381ed51c77f433758b92dc767f7aa5239c68b57aface553236f0afb"
     },
     {
       "bytes": 9553,
@@ -21581,9 +21581,9 @@
       "sha256": "6ac643c686e3c865a85e8452c1861ddff483d3c17e580fc61aeabd2eccb033c4"
     },
     {
-      "bytes": 14324,
+      "bytes": 15609,
       "path": "src/store/message.ts",
-      "sha256": "9ac16bbfe381dda6968da10f3397210cffd113f5b1be62dc1aeb2b0b6ad877c5"
+      "sha256": "04757b8c62629e23a53fa4496d16ade08c26d403fc86a70e1e6a23e77e534468"
     },
     {
       "bytes": 8112,
@@ -21815,9 +21815,9 @@
   },
   "loginTest": {
     "expectedTests": 1,
-    "file": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx",
-    "fullName": "VoiceMessageRender playback retires pending voice ownership without stale rows stopping the next message or hiding current failures",
-    "name": "retires pending voice ownership without stale rows stopping the next message or hiding current failures",
+    "file": "src/core/messagePrivacyStore.test.ts",
+    "fullName": "actual history store stale results keeps live arrivals and retryable sends across a delayed latest-page read",
+    "name": "keeps live arrivals and retryable sends across a delayed latest-page read",
     "oldFullSuiteTests": 0,
     "runner": {
       "entry": "node_modules/vitest/vitest.mjs",
@@ -21826,110 +21826,90 @@
       "version": "5.0.4"
     },
     "skipOrFailAccepted": false,
-    "sourceLineCount": 167,
-    "suite": "VoiceMessageRender playback"
+    "sourceLineCount": 71,
+    "suite": "actual history store stale results"
   },
   "node": "24.21.0",
   "predecessorSource": {
-    "actualObservedAtPublicHead": "4de0caabf50b5e98bb5df51eba22af595f674dfa",
-    "cohort": "web4341-login-alignment-v1",
-    "priorLoginReview": {
-      "bytes": 1894,
-      "mode": 420,
-      "path": ".qa/web-login-feedback-wait-batch-20261107/root-c327a6e-single-login-case-web-dist-accepted-review.json",
-      "sha256": "c1db36c52fbf92caa8bd6d5d7b9b9ade36aa585add4d5c20494e551a78153b78"
-    },
+    "acceptedBuildRun": 42317450188,
+    "actualObservedAtPublicHead": "7b22b94f47693ec4890ab7697debbf915b1f2ceb",
+    "cohort": "web4343-voice-retirement-v1",
     "sourceDeclaration": {
-      "bytes": 813802,
-      "path": "references/integration/web-login-feedback-wait-20261107-candidate/current-web-source.json",
-      "sha256": "c0d6372f6215f9fbf15967ce81dcbe69225e9c53f608dd99d04f352e48f6fbe9"
+      "bytes": 818164,
+      "path": "references/integration/web-voice-single-build-wiring-r3-20261107-candidate/current-web-source.json",
+      "sha256": "df1771838fbc37ef8bb6d3b8beef0e637a62c02f48492c20f7f10ca972b28024"
     },
-    "sourceDigest": "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90",
-    "sourceFiles": 4341
+    "sourceDigest": "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8",
+    "sourceFiles": 4343
   },
   "schema": "luobo.web.login-build.v1",
-  "scope": "one real voice component case with simulated media boundary then current Vite; zero old LoginForm/full-suite/typecheck/E2E/App/native/Go/SDK bind/real-audio/business/deployment",
+  "scope": "One delayed latest-page history regression and the current Vite bundle. The live browser reconnect and history checks are separate.",
   "sourceDeclaration": {
-    "bytes": 818164,
-    "path": "references/integration/web-voice-single-build-wiring-r3-20261107-candidate/current-web-source.json",
-    "sha256": "df1771838fbc37ef8bb6d3b8beef0e637a62c02f48492c20f7f10ca972b28024"
+    "bytes": 813141,
+    "path": ".qa/web-recovery-build-batch-20261108/current-web-source.json",
+    "sha256": "9eb8326acabf2a3aca21148fd383c5d98280c2165058d6b01dc9acec88e00eda"
   },
-  "sourceDigest": "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8",
+  "sourceDigest": "6c5009e4f6f95dffef50f7c581fae0c20798fd0658c2a9ffe13bab469b9923fd",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
   "sourceFiles": 4343,
   "sourceObservedAtPublicRef": null,
   "sourceOriginRef": null,
   "sourceOverlay": {
-    "additions": 2,
-    "authorManifest": {
-      "bytes": 14617,
-      "mode": 420,
-      "path": "references/integration/web-voice-playback-ownership-r3-20261107-candidate/manifest.json",
-      "sha256": "2b2ad1b67723434ce4647f8faeb98c65aa62983189ea513c9dcf121e2d8b6475"
-    },
+    "additions": 0,
     "delta": [
       {
         "after": {
-          "bytes": 6809,
-          "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx",
-          "sha256": "3d86ddfb3a6b4215abeb65d4e6903d347bf80627380830df5e11a676e8d3e076"
+          "bytes": 5468,
+          "path": "src/core/messagePrivacyStore.test.ts",
+          "sha256": "ced74c1fdb9de10ca8a67baac40b6b29852ed62750817f030e3adeffe8f370f5"
         },
         "before": {
-          "bytes": 3558,
-          "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx",
-          "sha256": "1ad76d9ee0f5b5a1ecf02f2811c892266c371cd6b128287a5a6c4deb74c8fda0"
+          "bytes": 4094,
+          "path": "src/core/messagePrivacyStore.test.ts",
+          "sha256": "cd2b73fbfb237b45deb07e03a078b317ee9e2abb105ad9dc3c38caf84ab40dd7"
         },
-        "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.tsx"
+        "path": "src/core/messagePrivacyStore.test.ts"
       },
       {
         "after": {
-          "bytes": 879,
-          "path": "src/core/voicePlayback.ts",
-          "sha256": "76d5626c928e28c700c6a7fef5b94767c2bc5df98b9afd6300913aec295d6a29"
-        },
-        "before": null,
-        "path": "src/core/voicePlayback.ts"
-      },
-      {
-        "after": {
-          "bytes": 8768,
-          "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx",
-          "sha256": "4fa14fcbb1f5a97431ee821c70b1ed90c2c9c57b2440313aaa8b3322621aa7fe"
-        },
-        "before": null,
-        "path": "src/pages/chat/queryChat/MessageItem/VoiceMessageRender.test.tsx"
-      },
-      {
-        "after": {
-          "bytes": 13197,
-          "path": "src/core/messagePrivacyComponents.test.ts",
-          "sha256": "bef7a1259f50ec6c7fb3b79158798e6b8dc589627ef56b3445d7fdf6a0376eef"
+          "bytes": 29929,
+          "path": "src/layout/useGlobalEvents.tsx",
+          "sha256": "1daa8ca0c1133795aafd3c1b6e5711f4946d656a6f696e3b0d38cb99e9512255"
         },
         "before": {
-          "bytes": 13184,
-          "path": "src/core/messagePrivacyComponents.test.ts",
-          "sha256": "81ef77edf88f80b875520f6fb0d39ed4130cac1a46be49fa9aeb53f149006ace"
+          "bytes": 28980,
+          "path": "src/layout/useGlobalEvents.tsx",
+          "sha256": "b59f58d9faf98521d982aba4f21c65affbc92796375c204aad63e79b0b795210"
         },
-        "path": "src/core/messagePrivacyComponents.test.ts"
+        "path": "src/layout/useGlobalEvents.tsx"
       },
       {
         "after": {
-          "bytes": 31030,
-          "path": "src/core/individualForward/components.test.tsx",
-          "sha256": "d143880e62fbbd5877865770bc66ef6e8f4d3125712f8d656b38457fed1ae9e8"
+          "bytes": 4199,
+          "path": "src/pages/chat/queryChat/index.tsx",
+          "sha256": "bb7c864e3381ed51c77f433758b92dc767f7aa5239c68b57aface553236f0afb"
         },
         "before": {
-          "bytes": 30998,
-          "path": "src/core/individualForward/components.test.tsx",
-          "sha256": "14d85b6677dd5253f73115717c9cab26a4263bfb6f845669bd6119a81654bd76"
+          "bytes": 4197,
+          "path": "src/pages/chat/queryChat/index.tsx",
+          "sha256": "0501647e1ccb927a42e426bda500f2a21536dc9920f5fee546eced83109757c7"
         },
-        "path": "src/core/individualForward/components.test.tsx"
+        "path": "src/pages/chat/queryChat/index.tsx"
+      },
+      {
+        "after": {
+          "bytes": 15609,
+          "path": "src/store/message.ts",
+          "sha256": "04757b8c62629e23a53fa4496d16ade08c26d403fc86a70e1e6a23e77e534468"
+        },
+        "before": {
+          "bytes": 14324,
+          "path": "src/store/message.ts",
+          "sha256": "9ac16bbfe381dda6968da10f3397210cffd113f5b1be62dc1aeb2b0b6ad877c5"
+        },
+        "path": "src/store/message.ts"
       }
     ],
-    "kind": "voice pending ownership/single-player/explicit media reset and exact three-spy compatibility overlay; one new component case only",
-    "parentSourceDigest": "6461d6632810abba1db94799e9d011e0924a8bed42a05ee58e465c902888bf90",
-    "removals": 0,
-    "replacements": 3,
-    "state": "FROZEN_SOURCE_PENDING_ONE_VOICE_CASE_THEN_VITE"
+    "replacements": 4
   }
 }

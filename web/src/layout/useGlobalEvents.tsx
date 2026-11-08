@@ -46,6 +46,13 @@ import emitter from "@/utils/events";
 import { createNotification, initStore, isGroupSession } from "@/utils/imCommon";
 import { clearIMProfile, getIMToken, getIMUserID } from "@/utils/storage";
 import { IMSDK } from "./MainContentWrap";
+
+// The WASM bridge emits these events, though the wrapper's enum omits them.
+const offlineMessageEvents = [
+  "OnRecvOfflineNewMessage",
+  "OnRecvOfflineNewMessages",
+] as CbEvents[];
+
 export function useGlobalEvent() {
   const navigate = useNavigate();
   const [connectState, setConnectState] = useState({
@@ -290,6 +297,7 @@ export function useGlobalEvent() {
     // message
     IMSDK.on(CbEvents.OnRecvNewMessage, newMessageHandler);
     IMSDK.on(CbEvents.OnRecvNewMessages, newMessageHandler);
+    for (const event of offlineMessageEvents) IMSDK.on(event, offlineMessageHandler);
     IMSDK.on(CbEvents.OnNewRecvMessageRevoked, revokedMessageHandler);
     // conversation
     IMSDK.on(CbEvents.OnConversationChanged, conversationChnageHandler);
@@ -357,6 +365,10 @@ export function useGlobalEvent() {
       ...state,
       isSyncing: false,
     }));
+    if (useConversationStore.getState().currentConversation?.conversationID &&
+        !useMessageStore.getState().jumpClientMsgID) {
+      emitter.emit("REFRESH_CHAT_LIST");
+    }
     try {
       await useConversationStore.getState().getConversationListByReq();
     } catch (e) {
@@ -375,15 +387,16 @@ export function useGlobalEvent() {
   };
 
   // message
-  const newMessageHandler = ({ data }: WSEvent<ExMessageItem[]>) => {
-    if (latestConnectState.current.isSyncing) {
-      if (data.some((message) => inCurrentConversation(message))) {
-        emitter.emit("REFRESH_CHAT_LIST");
-      }
-      return;
+  const projectNewMessages = (data: ExMessageItem | ExMessageItem[], quiet: boolean) => {
+    const messages = Array.isArray(data) ? data : [data];
+    for (const message of messages) {
+      if (message?.clientMsgID) handleNewMessage(message, quiet);
     }
-    data.map((message) => handleNewMessage(message));
   };
+  const newMessageHandler = ({ data }: WSEvent<ExMessageItem | ExMessageItem[]>) =>
+    projectNewMessages(data, latestConnectState.current.isSyncing);
+  const offlineMessageHandler = ({ data }: WSEvent<ExMessageItem | ExMessageItem[]>) =>
+    projectNewMessages(data, true);
   const revokedMessageHandler = ({ data }: WSEvent<RevokedInfo>) => {
     updateOneMessage({
       clientMsgID: data.clientMsgID,
@@ -466,24 +479,27 @@ export function useGlobalEvent() {
     wait: 2000,
   });
   const notPushType = [MessageType.TypingMessage, MessageType.RevokeMessage];
-  const handleNewMessage = (newServerMsg: ExMessageItem) => {
+  const handleNewMessage = (newServerMsg: ExMessageItem, quiet: boolean) => {
     if (!inCurrentConversation(newServerMsg)) {
       const needNotification =
         !notPushType.includes(newServerMsg.contentType) &&
         newServerMsg.sendID !== useUserStore.getState().selfInfo.userID;
-      if (needNotification) {
+      if (needNotification && !quiet) {
         newMessageNotification(newServerMsg);
       }
       return;
     }
     const isSingleMessage = newServerMsg.sessionType === SessionType.Single;
-    if (isSingleMessage) {
+    if (isSingleMessage && !quiet) {
       if (newServerMsg.contentType === MessageType.TypingMessage) {
         checkTyping();
       }
       checkOnline();
     }
     if (!notPushType.includes(newServerMsg.contentType)) {
+      if (useMessageStore.getState().historyMessageList.some(
+        (message) => message.clientMsgID === newServerMsg.clientMsgID,
+      )) return;
       const needAppend =
         newServerMsg.sendID !== useUserStore.getState().selfInfo.userID ||
         SystemMessageTypes.includes(newServerMsg.contentType);
@@ -738,6 +754,7 @@ export function useGlobalEvent() {
     // message
     IMSDK.off(CbEvents.OnRecvNewMessage, newMessageHandler);
     IMSDK.off(CbEvents.OnRecvNewMessages, newMessageHandler);
+    for (const event of offlineMessageEvents) IMSDK.off(event, offlineMessageHandler);
     // conversation
     IMSDK.off(CbEvents.OnConversationChanged, conversationChnageHandler);
     IMSDK.off(CbEvents.OnNewConversation, newConversationHandler);
