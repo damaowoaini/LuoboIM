@@ -1712,7 +1712,10 @@ func product20ObserveCoreStop(work string, session *Session, boot *Bootstrap, se
 				row.WaitState = "clean"
 			} else {
 				row.WaitState = "failed"
-				row.LogHints = product20CoreStopLogHints(spec.Work, record.Owner.OwnerNonce)
+				row.LogHints = product20CoreStopLogHints(spec, record.Owner.OwnerNonce)
+				if spec.Role == "rpc-group" && product20GroupRedisUnconfirmed(spec, record.Owner.OwnerNonce) {
+					row.LogHints = append(row.LogHints, "group-redis-source-unconfirmed")
+				}
 			}
 		}
 		result.Rows = append(result.Rows, row)
@@ -1720,9 +1723,34 @@ func product20ObserveCoreStop(work string, session *Session, boot *Bootstrap, se
 	return result
 }
 
-func product20CoreStopLogHints(work, nonce string) []string {
+func product20GroupRedisUnconfirmed(spec ownedcontrol.ServiceSpec, nonce string) bool {
+	drain := filepath.Join(spec.Work, "drain.json")
+	ready, _, err := ownedcontrol.ReadServerRuntimeAnnouncement(filepath.Join(spec.Work, "runtime-announcement-"+nonce+".json"), nonce)
+	if err != nil || ready.Role != spec.Role || ready.BootstrapSHA256 != spec.BootstrapSHA256 || ready.DrainPath != drain {
+		return false
+	}
+	raw, err := namespaceinventory.ReadPrivateDocument(drain+".unconfirmed", 64<<10)
+	if err != nil {
+		return false
+	}
+	var record struct {
+		Schema      int                            `json:"schema"`
+		OwnerNonce  string                         `json:"ownerNonce"`
+		Observation ownedcontrol.SourceObservation `json:"observation"`
+	}
+	if namespaceinventory.DecodeStrict(raw, &record) != nil || record.Schema != 1 || record.OwnerNonce != nonce {
+		return false
+	}
+	observation := record.Observation
+	return observation.Version == "owned-server-source-unconfirmed-v1" && observation.Role == ready.Role &&
+		observation.InstanceID == ready.InstanceID && observation.BootstrapSHA256 == ready.BootstrapSHA256 &&
+		observation.PolicySHA256 == ready.PolicySHA256 && observation.SourceOutcomeUnconfirmed &&
+		observation.External.RedisMutation.Unknown
+}
+
+func product20CoreStopLogHints(spec ownedcontrol.ServiceSpec, nonce string) []string {
 	labels := []string{}
-	body, err := namespaceinventory.ReadPrivateDocument(filepath.Join(work, "service-"+nonce+".log"), 1<<20)
+	body, err := namespaceinventory.ReadPrivateDocument(filepath.Join(spec.Work, "service-"+nonce+".log"), 1<<20)
 	if err != nil {
 		return labels
 	}
@@ -1739,6 +1767,15 @@ func product20CoreStopLogHints(work, nonce string) []string {
 	} {
 		if bytes.Contains(body, []byte(rule.phrase)) {
 			labels = append(labels, rule.label)
+		}
+	}
+	if spec.Role == "rpc-group" {
+		if panicAt := bytes.LastIndex(body, []byte("\npanic:")); panicAt >= 0 {
+			_, frame, ok := bytes.Cut(body[panicAt:], []byte("\nmain.main()\n\t"))
+			line, _, _ := bytes.Cut(frame, []byte("\n"))
+			if ok && bytes.Contains(line, []byte("/cmd/openim-rpc/openim-rpc-group/main.go:31 ")) {
+				labels = append(labels, "group-managed-return-panic")
+			}
 		}
 	}
 	return labels
@@ -1897,7 +1934,7 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 // before PrepareFresh. Existing token-v2 principals/ACLs are never modified.
 // This probe reruns actual existing permission checks against that fresh plane;
 // expected refusals do not pass through the product writer observer.
-func product20BusinessRedis(ctx context.Context, p PrivatePlan) (err error) {
+func product20BusinessRedis(ctx context.Context, p PrivatePlan, webLogin bool) (err error) {
 	var plane ResourcePlane
 	var credentials map[string]string
 	if loadPinnedPrivate(p.PlanePath, p.PlaneSHA256, 128<<10, &plane) != nil || plane.ValidateLive(ctx) != nil || loadPinnedPrivate(p.CredentialsPath, p.CredentialsSHA256, 64<<10, &credentials) != nil {
@@ -1913,6 +1950,10 @@ func product20BusinessRedis(ctx context.Context, p PrivatePlan) (err error) {
 	args := []any{"ACL", "SETUSER", credentials["redisRuntimeUser"], "resetkeys", "resetchannels", "-@all"}
 	for _, key := range []string{"USER_INFO:*", "USER_GLOBAL_RECV_MSG_OPT_KEY:*", "ACCOUNT_DISABLED:*", "ONLINE_STATUS:*", "UID_PID_TOKEN_STATUS:*", "FCM_TOKEN:*", "CHAT_UID_TOKEN_STATUS:*", "ROUTE_REGISTRATION_NONCE:*", "LUOBO_SERVICE_NONCE:*", "CHAT:LOGIN_FAIL:*", "CHAT:HOURLY_LOGIN_REGISTER_IP:*", "CONVERSATION:*", "CONVERSATION_IDS:*", "CONVERSATION_IDS_HASH:*", "CONVERSATION_HAS_READ_SEQ:*", "RECV_MSG_OPT:*", "CONVERSATION_NOT_RECEIVE_MESSAGE_USER_IDS:*", "FRIEND_IDS:*", "COMMON_FRIENDS_IDS:*", "FRIEND_INFO:*", "BLACK_IDS:*", "MAX_SEQ:*", "MIN_SEQ:*", "CON_USER_MIN_SEQ:*", "HAS_READ_SEQ:*", "MESSAGE_CACHE:*", "MESSAGE_CLIENT_SEQ:*", "MESSAGE_DEL_USER_LIST:*", "USER_DEL_MESSAGES_LIST:*", "USER_BADGE_UNREAD_COUNT_SUM:*", "cron_clear_msg_and_fix_seq", "cron_conversations_destruct_msgs", "GLOBAL_CONFIG:FORBID_NEW_MEMBER_HISTORY"} {
 		args = append(args, "~"+key)
+	}
+	if webLogin {
+		// The SDK's joined-group cache runs a Lua fetch even for a fresh account.
+		args = append(args, "~JOIN_GROUPS_KEY:*")
 	}
 	args = append(args, "&sensitive_word_reload")
 	for _, command := range []string{"auth", "hello", "ping", "quit", "info", "acl|whoami", "client|info", "client|setinfo", "get", "set", "setnx", "del", "exists", "hget", "hmget", "hgetall", "hset", "hsetnx", "hdel", "expire", "pexpire", "ttl", "pttl", "eval", "evalsha", "incr", "incrby", "decr", "sadd", "srem", "scard", "smembers", "subscribe", "unsubscribe", "publish"} {
@@ -2069,7 +2110,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	if _, e = writePrivate(filepath.Join(p.Core.Work, "product20-sql.json"), product20SQLBinding{Nonce: plane.Nonce, Database: chartDB, User: chartUser, Password: chartPass}); e != nil {
 		return e
 	}
-	if e = product20BusinessRedis(ctx, p.Core); e != nil {
+	if e = product20BusinessRedis(ctx, p.Core, p.Browser != nil); e != nil {
 		return e
 	}
 	boot, e = PrepareFresh(ctx, p.Core)

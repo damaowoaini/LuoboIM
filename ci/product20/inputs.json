@@ -24,7 +24,7 @@
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "canonicalPublicParent": "ac0b9da91556a696831d8a3c845b0f80bde4d3ab",
+  "canonicalPublicParent": "79e3a1e831674277c54a3d7f8633ad45586316b6",
   "chain": {
     "actualBusiness": [
       "route config",
@@ -344,9 +344,50 @@
     "ci/product20/browser_bundle.py",
     "ci/product20/browser-smoke.mjs"
   ],
+  "currentCoreBuild": {
+    "baseSource": {
+      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
+      "members": 1584
+    },
+    "changes": [
+      {
+        "beforeSHA256": "3f22d8d730202bb987c3775aefaada3c4625b99016dcc2462d4cb35cb57874d8",
+        "bytes": 4873,
+        "path": "product/server/pkg/common/db/unrelation/mongo.go",
+        "sha256": "d32c553e8c22609deb7ebac81e985d667601667673d84fcb307e7ab4f175f643",
+        "target": "server/pkg/common/db/unrelation/mongo.go"
+      },
+      {
+        "beforeSHA256": null,
+        "bytes": 780,
+        "path": "product/server/pkg/common/db/unrelation/mongo_error_test.go",
+        "sha256": "4b5f9cf23d9988e99c3a0e6cc27ef9e739d2d579e595880c22f2b570da2702b7",
+        "target": "server/pkg/common/db/unrelation/mongo_error_test.go"
+      },
+      {
+        "beforeSHA256": "4024a51b0f9b6546f9f0bf3a9b0893b7a44fa6687b340b193dfc3a7d15956a9c",
+        "bytes": 12683,
+        "path": "product/server/internal/msgtransfer/managed_ordinary_start.go",
+        "sha256": "b28ec2de2e35b3c29469ea1821f6f17c2a07ee9b98caa26c07173cabb723e224",
+        "target": "server/internal/msgtransfer/managed_ordinary_start.go"
+      },
+      {
+        "beforeSHA256": null,
+        "bytes": 3026,
+        "path": "product/server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go",
+        "sha256": "400cc99a839bd23e78a748e0acdf4fb60ddbd95e673cce07f209ebd6eac60654",
+        "target": "server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go"
+      }
+    ],
+    "mode": "fresh-current-core14-managed-gateway-context-v1",
+    "source": {
+      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd",
+      "members": 1586
+    }
+  },
   "derivedHarnessSource": {
-    "members": 1588,
-    "digest": "9dd61ce8ff087db37330ac5ac27773a78acbf132033162a0bcfec5096c44c7c6"
+    "digest": "ae01a508c21db666c2c8faeba49fa73bda5b29ffdaaaa87ef5f4bb8ce46a974e",
+    "members": 1588
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
@@ -373,8 +414,8 @@
     "rootAcceptanceSHA256": "a55349fff1efea7c46911b7e947a94ec05428654c2caf1c68917858369ee405c",
     "rootAccepted": true,
     "source": {
-      "members": 1586,
-      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd"
+      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd",
+      "members": 1586
     }
   },
   "fixtureConfiguration": {
@@ -472,6 +513,15 @@
         }
       }
     }
+  },
+  "historicalAcceptedCoreArtifact": {
+    "artifactBytes": 607490716,
+    "artifactID": 13548912327,
+    "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
+    "attempt": 1,
+    "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
+    "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
+    "run": 42310913329
   },
   "historicalPreviousChart5": {
     "chartProvider": {
@@ -706,7 +756,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "31f9322e66f1ee6ae85a58346075f4700e21c982135557f6add175ee6ce5db1e"
+    "server/internal/runtimeacceptance/product20_linux.go": "50fc6784365cd968893ca292efad5e0475a326510bc05196cc1a0eb4d4780c04"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
@@ -755,61 +805,11 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-backend-or-web-login",
-  "state": "browser_core_stop_observation_runtime_pending",
+  "state": "browser_joined_group_cache_acl_runtime_pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",
     "sha256": "ad0293d621376a9c304e68497e65c13cc81f0757d812dc9abaf5e71a3d210d01",
     "version": "chart-startup-error-v1"
-  },
-  "currentCoreBuild": {
-    "mode": "fresh-current-core14-managed-gateway-context-v1",
-    "baseSource": {
-      "members": 1584,
-      "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef"
-    },
-    "source": {
-      "members": 1586,
-      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd"
-    },
-    "changes": [
-      {
-        "target": "server/pkg/common/db/unrelation/mongo.go",
-        "path": "product/server/pkg/common/db/unrelation/mongo.go",
-        "beforeSHA256": "3f22d8d730202bb987c3775aefaada3c4625b99016dcc2462d4cb35cb57874d8",
-        "bytes": 4873,
-        "sha256": "d32c553e8c22609deb7ebac81e985d667601667673d84fcb307e7ab4f175f643"
-      },
-      {
-        "target": "server/pkg/common/db/unrelation/mongo_error_test.go",
-        "path": "product/server/pkg/common/db/unrelation/mongo_error_test.go",
-        "beforeSHA256": null,
-        "bytes": 780,
-        "sha256": "4b5f9cf23d9988e99c3a0e6cc27ef9e739d2d579e595880c22f2b570da2702b7"
-      },
-      {
-        "target": "server/internal/msgtransfer/managed_ordinary_start.go",
-        "path": "product/server/internal/msgtransfer/managed_ordinary_start.go",
-        "beforeSHA256": "4024a51b0f9b6546f9f0bf3a9b0893b7a44fa6687b340b193dfc3a7d15956a9c",
-        "bytes": 12683,
-        "sha256": "b28ec2de2e35b3c29469ea1821f6f17c2a07ee9b98caa26c07173cabb723e224"
-      },
-      {
-        "target": "server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go",
-        "path": "product/server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go",
-        "beforeSHA256": null,
-        "bytes": 3026,
-        "sha256": "400cc99a839bd23e78a748e0acdf4fb60ddbd95e673cce07f209ebd6eac60654"
-      }
-    ]
-  },
-  "historicalAcceptedCoreArtifact": {
-    "artifactBytes": 607490716,
-    "artifactID": 13548912327,
-    "artifactSHA256": "b7e6bc0c528b0e6461a8c684eac262e9d5cb476fbe925e244deccb334649bc86",
-    "attempt": 1,
-    "head": "03825a0f60053c4a083a449a89f9176f8cd24857",
-    "manifestSHA256": "11e2558e2cffe57e81ec2713676c7427aae744d274cae1eb5fe01f6bd893884e",
-    "run": 42310913329
   }
 }

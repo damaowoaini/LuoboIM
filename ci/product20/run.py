@@ -1064,7 +1064,8 @@ def browser_result(v):
 
 CORE_STOP_ROLES=frozenset(('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth',
  'rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user'))
-CORE_STOP_LOG_HINTS=frozenset(('gateway-lifecycle','managed-ordinary-shutdown','redis-permission','panic'))
+GROUP_STOP_HINTS={'group-managed-return-panic','group-redis-source-unconfirmed'}
+CORE_STOP_LOG_HINTS={'gateway-lifecycle','managed-ordinary-shutdown','redis-permission','panic'}|GROUP_STOP_HINTS
 
 def project_browser_core_stop(v):
  value=v['coreStopFailure']
@@ -1085,6 +1086,8 @@ def project_browser_core_stop(v):
       or (row['exitCode'] is not None and (type(row['exitCode']) is not int or not 0<=row['exitCode']<=255))
       or type(row['logHints']) is not list or len(row['logHints'])>len(CORE_STOP_LOG_HINTS)
       or any(type(label) is not str or label not in CORE_STOP_LOG_HINTS for label in row['logHints'])
+      or (row['role']!='rpc-group' and GROUP_STOP_HINTS.intersection(row['logHints']))
+      or ('group-managed-return-panic' in row['logHints'] and 'panic' not in row['logHints'])
       or len(set(row['logHints']))!=len(row['logHints']) or (row['logHints'] and row['waitState']!='failed')):
    raise ValueError('closed original stop role required')
   seen.add(row['role'])

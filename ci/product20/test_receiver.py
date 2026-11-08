@@ -63,7 +63,12 @@ class BrowserAcceptanceContract(unittest.TestCase):
   stop=controller.project_browser_core_stop(failed)
   self.assertEqual(stop['rows'],[stop_row])
   self.assertFalse(stop['rawLogsOrIdentitiesExported'])
-  for invalid in (dict(stop_row,role='private-role'),dict(stop_row,privateLog='private-data'),dict(stop_row,logHints=['private-data'])):
+  group_row=dict(stop_row,role='rpc-group',logHints=['panic','group-managed-return-panic','group-redis-source-unconfirmed'])
+  group=dict(failed,coreStopFailure=dict(failed['coreStopFailure'],rows=[group_row]))
+  self.assertEqual(controller.project_browser_core_stop(group)['rows'],[group_row])
+  for invalid in (dict(stop_row,role='private-role'),dict(stop_row,privateLog='private-data'),dict(stop_row,logHints=['private-data']),
+                  dict(group_row,role='msggateway'),dict(group_row,waitState='unknown'),
+                  dict(group_row,logHints=['group-managed-return-panic'])):
    with self.assertRaises(ValueError):
     controller.project_browser_core_stop(dict(failed,coreStopFailure=dict(failed['coreStopFailure'],rows=[invalid])))
   with self.assertRaises(ValueError):
