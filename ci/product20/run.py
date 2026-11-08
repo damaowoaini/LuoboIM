@@ -401,7 +401,7 @@ def admit():
  if os.getuid()==0 or os.environ.get('RUNNER_ENVIRONMENT')!='github-hosted' or os.environ.get('RUNNER_OS')!='Linux' or root.exists() or root.resolve()!=root or os.statvfs(root.parent).f_bavail*os.statvfs(root.parent).f_frsize<4<<30:raise ValueError('fresh hosted cold4GiB admission required')
  root.mkdir(mode=0o700);write(root/'allocation.json',allocation_owner());return 0
 
-P20_FAILURE_STAGES = frozenset(('before-post-aux-records','web-bundle-receive','core-receipt-reconstruction','legacy-elf-read','legacy-receipt-write','build-ledger-write','fixture-modules-and-catalog','minio-source-build','minio-artifact-receive','minio-public-receipts','post-aux-boundary-complete'))
+P20_FAILURE_STAGES = frozenset(('before-post-aux-records','browser-launch-probe','web-bundle-receive','core-receipt-reconstruction','legacy-elf-read','legacy-receipt-write','build-ledger-write','fixture-modules-and-catalog','minio-source-build','minio-artifact-receive','minio-public-receipts','post-aux-boundary-complete'))
 P20_FAILURE_SOURCES = ('ci/product20/run.py','ci/product20/browser_bundle.py','ci/backend-fullgraph/minio_build.py','ci/backend-fullgraph/resources.py','ci/backend-fullgraph/service_selectors.py')
 
 def project_p20_failure(stage,error,c,controls):
@@ -571,6 +571,11 @@ def acceptance_scope():
   raise ValueError('unknown Product20 acceptance scope')
  return scope
 
+def task_user_command(home,temporary):
+ groups=','.join(map(str,sorted(set(os.getgroups()+[os.getgid()]))))
+ return ['/usr/bin/setpriv','--reuid',str(os.getuid()),'--regid',str(os.getgid()),'--groups',groups,
+         '--no-new-privs','--','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+str(home),'TMPDIR='+str(temporary)]
+
 def run():
  scope=acceptance_scope()
  c,graph,g,original,bodies,chart_bodies=verify();binding=require_bound(c)
@@ -599,6 +604,14 @@ def run():
   proc=subprocess.run(wrapped,timeout=timeout+30,check=False);record=json.loads(regular(folder/'resource.json'))
   write(out/(str(index)+'-phase.json'),{'phase':label,'exitCode':proc.returncode,'resource':record,'stdoutSHA256':sha(regular(folder/'stdout',32<<20)),'stderrSHA256':sha(regular(folder/'stderr',32<<20))})
   failed=proc.returncode!=0 or record.get('status')!='passed' or record.get('exit_code')!=0
+  if label=='browser-launch-probe':
+   observation={'stage':'unavailable','documentStatus':0,'configStatus':0,'configRequested':False,'chromeFailure':'none'}
+   try:
+    observation=browser_observation(json.loads(regular(folder/'stdout',4096)))
+   except (ValueError,OSError):
+    failed=True
+   failed=failed or observation['stage']!='complete'
+   write(out/'browser-launch-probe.json',{'accepted':not failed,'observation':observation})
   if failed and (label.startswith('compile-') or label in ('minio-source-compile','current-core-mongo-normalization-test',GATEWAY_TEST_PHASE)) and not (root/'plane').exists():
    # Identical boundary to the reviewed fullgraph compiler projection: these
    # are only fixed public sources, before private resource config/credentials.
@@ -612,6 +625,18 @@ def run():
   if failed:raise ValueError('phase failed; private raw retained')
   return regular(folder/'stdout',32<<20)
  try:
+  browser=None
+  if scope=='web-login':
+   failure_stage='browser-launch-probe'
+   node=shutil.which('node')
+   if node is None:
+    raise ValueError('installed Node is required for browser acceptance')
+   browser={'node':str(Path(node).resolve(strict=True)),'script':str(REPO/'ci/product20/browser-smoke.mjs')}
+   probe=root/'browser-probe';probe.mkdir(mode=0o700)
+   command('browser-launch-probe',['sudo','-n','/usr/bin/unshare','--net','--','/bin/bash','-euc',
+           '/usr/sbin/ip link set lo up; exec "$@"','product20-browser-probe',
+           *task_user_command(probe,probe),browser['node'],browser['script'],'--probe'],45,env,probe)
+   failure_stage='before-post-aux-records'
   core=None
   if 'currentCoreBuild' not in c:core=artifact(binding['core14'],graph.ROLES,root/'product14',2<<30,core_source=core_source(c))
   policy=chart_assembly_policy(c)
@@ -621,15 +646,11 @@ def run():
   write(out/'chart-assembly.json',{'mode':ASSEMBLY_MODE,'currentChart5':binding['currentChart5'],'historicalRouteFrom6':binding['historicalRouteFrom6'],'selected':selected,'productRebuilds':0,'oldChart258Selected':False,'expectedFiveManifestNowReceivedAndVerified':True})
   # Keep the artifact credential in this process, outside all child environments.
   fixture_token=os.environ.pop('GH_TOKEN',None)
-  browser=None
-  if scope=='web-login':
+  if browser is not None:
    failure_stage='web-bundle-receive'
    receiver=load('ci/product20/browser_bundle.py','p20_browser_bundle')
    dist=receiver.receive(REPO,root/'web-bundle',fixture_token)
-   node=shutil.which('node')
-   if node is None:
-    raise ValueError('installed Node is required for browser acceptance')
-   browser={'node':str(Path(node).resolve(strict=True)),'script':str(REPO/'ci/product20/browser-smoke.mjs'),'dist':str(dist)}
+   browser['dist']=str(dist)
    write(out/'web-bundle.json',{'artifact':receiver.ARTIFACT,'source':receiver.SOURCE,'scope':scope})
    failure_stage='before-post-aux-records'
   # Current-core builds use canonical source independently from the derived
@@ -714,8 +735,10 @@ def run():
   p={'version':'fresh-product20-http-ws-v1','work':str(work),'core':{'version':'owned-fullgraph-acceptance-v1','scenario':'ack','work':str(corework),'planePath':str(plane.private/'plane.json'),'planeSHA256':sha(regular(plane.private/'plane.json')),'credentialsPath':str(plane.private/'credentials.json'),'credentialsSHA256':sha(regular(plane.private/'credentials.json')),'buildsPath':str(buildpath),'buildsSHA256':bs},'chartTemplatePath':str(template),'chartTemplateSHA256':c['helpers']['chart/config/config.example.yaml'],'sqlRootPassword':json.loads(regular(plane.private/'product20-mysql.json'))['rootPassword'],'products':products}
   if browser is not None:
    p['browser']=browser
-  pp=private/'product20-input.json';ps=write(pp,p);groups=','.join(map(str,sorted(set(os.getgroups()+[os.getgid()]))))
-  argv=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--','/usr/bin/setpriv','--reuid',str(os.getuid()),'--regid',str(os.getgid()),'--groups',groups,'--no-new-privs','--','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+os.environ['HOME'],'TMPDIR='+str(work),str(binroot/'product20-acceptance'),'--private-input',str(pp),'--private-input-sha256',ps]
+  pp=private/'product20-input.json';ps=write(pp,p)
+  argv=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--',
+        *task_user_command(os.environ['HOME'],work),str(binroot/'product20-acceptance'),
+        '--private-input',str(pp),'--private-input-sha256',ps]
   write(private/'operator-intent.json',{'pidBindingAtOriginalStart':True,'inputSHA256':ps,'source':core['source'],'harness':c['derivedHarnessSource']})
   command('actual-fresh-product20-http-ws-once',argv,1380)
   result=json.loads(regular(work/'product20-result.json',128<<10));check_result(result,c)
@@ -979,18 +1002,31 @@ def export_terminal(path,output):
   value['scope']='web-login'
  if 'browser' in v:
   value['browser']=browser_result(v)
+  value['browserObservation']=browser_observation(v['browser']['observation'])
  write(output,value)
  return value
 
 BROWSER_RESULT_KEYS={'configAccepted','loginAccepted','gatewayConnected','selfAccepted','workspaceVisible'}
+BROWSER_STAGES={'unavailable','input','tls-leaf','chrome-start','devtools','navigation','page-form',
+                'configuration','sdk-ready','login-form','workspace','cleanup','complete'}
+
+def browser_observation(value):
+ keys={'stage','documentStatus','configStatus','configRequested','chromeFailure'}
+ if (type(value) is not dict or set(value)!=keys or type(value['stage']) is not str or value['stage'] not in BROWSER_STAGES
+     or type(value['chromeFailure']) is not str or value['chromeFailure'] not in ('none','sandbox','shared-library')
+     or type(value['configRequested']) is not bool
+     or any(type(value[key]) is not int or not (value[key]==0 or 100<=value[key]<=599) for key in ('documentStatus','configStatus'))):
+  raise ValueError('finite browser observation required')
+ return value
 
 def browser_result(v):
  result=v.get('browser')
  if (v.get('scope')!='web-login' or v.get('phase') not in ('actual-web-browser-login','web-browser-login-accepted-local-cleanup-required')
-     or type(result) is not dict or set(result)!=BROWSER_RESULT_KEYS
-     or any(type(value) is not bool for value in result.values())):
+     or type(result) is not dict or set(result)!=BROWSER_RESULT_KEYS|{'observation'}
+     or any(type(result[key]) is not bool for key in BROWSER_RESULT_KEYS)):
   raise ValueError('finite browser result required')
- return result
+ browser_observation(result['observation'])
+ return {key:value for key,value in result.items() if key in BROWSER_RESULT_KEYS}
 
 def check_result(v,c):
  common=('accepted','businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')
@@ -1004,6 +1040,7 @@ def check_result(v,c):
  if scope=='web-login':
   if (v.get('webUIAccepted') is not True or v.get('phase')!='web-browser-login-accepted-local-cleanup-required'
       or not all(browser_result(v).values()) or v.get('realRegistrations')!=1
+      or v['browser']['observation']['stage']!='complete'
       or any(v.get(k)!=0 for k in ('realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages'))):
    raise ValueError('actual browser configuration, login and SDK result incomplete')
  else:

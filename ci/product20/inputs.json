@@ -24,7 +24,7 @@
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "canonicalPublicParent": "9e81be62be3525c1aa4bae75ed6cd4c57def9a98",
+  "canonicalPublicParent": "cc8a968c028f31ec5c5c115c80cdbb5e99be2974",
   "chain": {
     "actualBusiness": [
       "route config",
@@ -346,7 +346,7 @@
   ],
   "derivedHarnessSource": {
     "members": 1588,
-    "digest": "d196f033917deb8dcc2eda6589d0e294b8855d840acd8cfa745d3dbb361c317f"
+    "digest": "e495970b7a33ffa9390f85544aba2e3ce1041ddbe47d7d11d8fdff5b4c041f12"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
@@ -706,7 +706,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "f27bc6acb303655f3d7bf4858fcb6ef688aeda4f0260b9fe0764548545c00dec"
+    "server/internal/runtimeacceptance/product20_linux.go": "541cfaa7ec33bb21c9160309b6646eff1556356938252b428ee33db7faf1ed85"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
@@ -755,7 +755,7 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-backend-or-web-login",
-  "state": "browser-login-acceptance-source-only-runtime-pending",
+  "state": "browser-launch-preflight-and-page-boundaries-runtime-pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",

@@ -76,15 +76,24 @@ type product20BrowserPlan struct {
 }
 
 type product20BrowserResult struct {
-	ConfigAccepted   bool `json:"configAccepted"`
-	LoginAccepted    bool `json:"loginAccepted"`
-	GatewayConnected bool `json:"gatewayConnected"`
-	SelfAccepted     bool `json:"selfAccepted"`
-	WorkspaceVisible bool `json:"workspaceVisible"`
+	ConfigAccepted   bool                        `json:"configAccepted"`
+	LoginAccepted    bool                        `json:"loginAccepted"`
+	GatewayConnected bool                        `json:"gatewayConnected"`
+	SelfAccepted     bool                        `json:"selfAccepted"`
+	WorkspaceVisible bool                        `json:"workspaceVisible"`
+	Observation      product20BrowserObservation `json:"observation"`
+}
+
+type product20BrowserObservation struct {
+	Stage           string `json:"stage"`
+	DocumentStatus  int    `json:"documentStatus"`
+	ConfigStatus    int    `json:"configStatus"`
+	ConfigRequested bool   `json:"configRequested"`
+	ChromeFailure   string `json:"chromeFailure"`
 }
 
 func (r product20BrowserResult) accepted() bool {
-	return r.ConfigAccepted && r.LoginAccepted && r.GatewayConnected && r.SelfAccepted && r.WorkspaceVisible
+	return r.ConfigAccepted && r.LoginAccepted && r.GatewayConnected && r.SelfAccepted && r.WorkspaceVisible && r.Observation.Stage == "complete"
 }
 
 type Product20Plan struct {
@@ -1828,7 +1837,8 @@ func product20BusinessRedis(ctx context.Context, p PrivatePlan) (err error) {
 	return admin.Do(ctx, args...).Err()
 }
 func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, work string, cert tls.Certificate, email, password, userID string) (product20BrowserResult, error) {
-	var result product20BrowserResult
+	unavailable := product20BrowserResult{Observation: product20BrowserObservation{Stage: "unavailable", ChromeFailure: "none"}}
+	result := unavailable
 	leaf, err := x509.ParseCertificate(cert.Certificate[0])
 	if err != nil {
 		return result, errors.New("browser fixture certificate rejected")
@@ -1849,7 +1859,7 @@ func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, work s
 	cmd.WaitDelay = 5 * time.Second
 	raw, runErr := cmd.Output()
 	if len(raw) == 0 || len(raw) > 4096 || namespaceinventory.DecodeStrict(raw, &result) != nil {
-		return product20BrowserResult{}, errors.New("browser result unavailable")
+		return unavailable, errors.New("browser result unavailable")
 	}
 	if runErr != nil || !result.accepted() {
 		return result, errors.New("browser acceptance incomplete")

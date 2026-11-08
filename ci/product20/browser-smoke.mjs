@@ -8,6 +8,10 @@ import { connect as connectTLS } from 'node:tls';
 
 const CHROME = '/opt/google/chrome/chrome';
 const ORIGIN = 'https://127.0.0.1';
+const probe = process.argv.length === 3 && process.argv[2] === '--probe';
+const observation = {
+  stage: 'input', documentStatus: 0, configStatus: 0, configRequested: false, chromeFailure: 'none',
+};
 const result = {
   configAccepted: false, loginAccepted: false, gatewayConnected: false,
   selfAccepted: false, workspaceVisible: false,
@@ -205,7 +209,10 @@ async function runBrowser(cdp, input) {
       const endpoint = httpsPath(params.request?.url);
       if (params.request?.method !== 'POST') return;
       let kind;
-      if (!armed && endpoint === '/api/client_config/get') kind = 'config';
+      if (!armed && endpoint === '/api/client_config/get') {
+        kind = 'config';
+        observation.configRequested = true;
+      }
       if (endpoint === '/api/auth/login') {
         if (!armed || ++loginPosts !== 1 || params.redirectResponse) { rejected = true; return; }
         kind = 'login';
@@ -214,6 +221,10 @@ async function runBrowser(cdp, input) {
       if (kind && !params.redirectResponse && selected.size < 32) selected.set(requestId, { endpoint, kind, received: false });
     } else if (method === 'Network.responseReceived') {
       const pending = selected.get(requestId), response = params.response;
+      if (Number.isInteger(response?.status) && response.status >= 100 && response.status <= 599) {
+        if (params.type === 'Document' && httpsPath(response.url) === '/') observation.documentStatus = response.status;
+        if (pending?.kind === 'config') observation.configStatus = response.status;
+      }
       if (pending && response) pending.received = response.status === 200 &&
         !response.fromDiskCache && !response.fromServiceWorker && !response.fromPrefetchCache &&
         httpsPath(response.url) === pending.endpoint;
@@ -240,12 +251,19 @@ async function runBrowser(cdp, input) {
   await call('Network.enable', { maxTotalBufferSize: 4 << 20, maxResourceBufferSize: 256 << 10, maxPostDataSize: 0 });
   await call('Network.setCacheDisabled', { cacheDisabled: true });
   await call('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+  observation.stage = 'navigation';
   const navigation = await call('Page.navigate', { url: ORIGIN + '/#/login' });
   check(!navigation.errorText);
+  observation.stage = 'page-form';
+  await until(() => evaluate(`(${LOGIN_DOCUMENT}) && window.isSecureContext && !!document.querySelector('form')`), 25000);
+  observation.stage = 'configuration';
+  await until(() => !rejected && result.configAccepted, 10000);
+  observation.stage = 'sdk-ready';
   // Admit the actual same-origin issuer and original WASM exports before filling
   // credentials. The existing wrapper also waits for its SQL worker and initSDK.
-  await until(async () => !rejected && result.configAccepted && await evaluate(`(${LOGIN_DOCUMENT}) &&
-    window.isSecureContext && typeof window.initSDK === 'function' && typeof window.login === 'function' && !!document.querySelector('form')`), 30000);
+  await until(() => evaluate(`(${LOGIN_DOCUMENT}) &&
+    window.isSecureContext && typeof window.initSDK === 'function' && typeof window.login === 'function' && !!document.querySelector('form')`), 10000);
+  observation.stage = 'login-form';
 
   const click = async (selector, text) => {
     const point = await until(() => evaluate(`(() => {
@@ -271,6 +289,7 @@ async function runBrowser(cdp, input) {
   armed = true;
   await click('form:has(input#email):has(input[type="password"]) button[type="submit"]');
 
+  observation.stage = 'workspace';
   let settled = 0;
   await until(async () => {
     check(!rejected);
@@ -297,19 +316,35 @@ async function main() {
   let exited = false, cleanExit = false, success = false, cleanup = true;
   try {
     check(process.platform === 'linux' && process.getuid() !== 0 && typeof WebSocket === 'function');
-    const input = await privateInput();
+    check(process.argv.length === 2 || probe);
+    const input = probe ? undefined : await privateInput();
     const temporary = await realpath(process.env.TMPDIR);
     const directory = await lstat(temporary);
     check(directory.isDirectory() && directory.uid === process.getuid() && (directory.mode & 0o077) === 0);
-    await checkTLSLeaf(input.certificateSPKI);
+    if (input) {
+      observation.stage = 'tls-leaf';
+      await checkTLSLeaf(input.certificateSPKI);
+    }
     check(!stop.signal.aborted);
+    observation.stage = 'chrome-start';
     profile = await mkdtemp(path.join(temporary, 'product20-chrome-'));
     child = spawn(CHROME, [
       '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
-      '--user-data-dir=' + profile, '--ignore-certificate-errors-spki-list=' + input.certificateSPKI,
+      '--user-data-dir=' + profile,
+      ...(input ? ['--ignore-certificate-errors-spki-list=' + input.certificateSPKI] : []),
       '--no-first-run', '--no-default-browser-check', '--disable-background-networking',
       '--disable-component-update', '--disable-sync', '--no-proxy-server', 'about:blank',
-    ], { stdio: 'ignore', cwd: process.cwd(), env: { PATH: '/usr/bin:/bin', HOME: profile, TMPDIR: profile } });
+    ], { stdio: ['ignore', 'ignore', 'pipe'], cwd: process.cwd(), env: { PATH: '/usr/bin:/bin', HOME: profile, TMPDIR: profile } });
+    let startupText = '';
+    child.stderr.on('data', chunk => {
+      if (observation.stage !== 'chrome-start' || startupText.length >= 8192) return;
+      startupText += chunk.toString('utf8').slice(0, 8192 - startupText.length);
+      if (/no usable sandbox|suid sandbox helper|failed to move to new namespace|namespace sandbox/i.test(startupText)) {
+        observation.chromeFailure = 'sandbox';
+      } else if (/error while loading shared libraries/i.test(startupText)) {
+        observation.chromeFailure = 'shared-library';
+      }
+    });
     exit = new Promise(resolve => {
       child.once('exit', (code, signal) => { exited = true; cleanExit = code === 0 && signal === null; resolve(true); });
       child.on('error', () => { if (!child.pid) { exited = true; resolve(true); } });
@@ -326,11 +361,18 @@ async function main() {
         return 'ws://127.0.0.1:' + port + browserPath;
       } catch (error) { if (error?.code === 'ENOENT') return undefined; throw error; }
     }, 12000);
+    observation.stage = 'devtools';
     cdp = await connectCDP(endpoint);
-    await runBrowser(cdp, input);
-    success = Object.values(result).every(value => value === true);
+    if (probe) {
+      const { targetId } = await cdp.call('Target.createTarget', { url: 'about:blank' });
+      check(typeof targetId === 'string' && targetId.length > 0);
+      success = true;
+    } else {
+      await runBrowser(cdp, input);
+      success = Object.values(result).every(value => value === true);
+    }
   } catch {
-    // Only the five bounded facts below leave the task-owned process.
+    // Only the bounded facts below leave the task-owned process.
   } finally {
     if (cdp) {
       cdp.event = () => {};
@@ -352,7 +394,9 @@ async function main() {
       try { await rm(profile, { recursive: true, force: true }); } catch { cleanup = false; }
     } else if (profile) cleanup = false;
   }
-  return success && cleanup && cleanExit && !stop.signal.aborted;
+  const accepted = success && cleanup && cleanExit && !stop.signal.aborted;
+  if (success) observation.stage = accepted ? 'complete' : 'cleanup';
+  return accepted;
 }
 
 let accepted = false;
@@ -360,5 +404,5 @@ try { accepted = await main(); } catch { /* no raw diagnostic */ }
 clearTimeout(deadline);
 process.removeListener('SIGTERM', interrupt);
 process.removeListener('SIGINT', interrupt);
-process.stdout.write(JSON.stringify(result) + '\n');
+process.stdout.write(JSON.stringify(probe ? observation : { ...result, observation }) + '\n');
 process.exitCode = accepted ? 0 : 1;

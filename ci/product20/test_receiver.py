@@ -35,6 +35,7 @@ class BrowserAcceptanceContract(unittest.TestCase):
  def test_browser_scope_keeps_backend_and_private_data_out_of_acceptance(self):
   scope='web-login'
   observed=dict.fromkeys(controller.BROWSER_RESULT_KEYS,True)
+  observed['observation']={'stage':'complete','documentStatus':200,'configStatus':200,'configRequested':True,'chromeFailure':'none'}
   result={
    'version':'fresh-product20-http-ws-result-v1','scope':scope,'accepted':True,
    'phase':'web-browser-login-accepted-local-cleanup-required','coreSourceSHA256':'a'*64,
