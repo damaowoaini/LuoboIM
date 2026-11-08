@@ -145,7 +145,7 @@ def core_mongo_test_reuse_receipt(c,canonical,actual_go):
 
 def verify():
  c=json.loads(regular(HERE/'inputs.json'))
- if c['schema']!=1 or c['scope']!='one-fresh-product20-backend-or-web-login' or c['productRebuilds']!=(14 if 'currentCoreBuild' in c else 0) or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
+ if c['schema']!=1 or c['scope']!='one-fresh-product20-backend-or-web' or c['productRebuilds']!=(14 if 'currentCoreBuild' in c else 0) or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
  for path,expected in c['helpers'].items():
   if sha(regular(REPO/path))!=expected:raise ValueError('source helper drift')
  builder=load(c['fixtureSourceBuilder'],'p20_original_fixture_policy')
@@ -567,7 +567,7 @@ def emit_p20_child_exit_observation(root,out,terminal,plan,plan_sha,products,cha
 
 def acceptance_scope():
  scope=os.environ.get('PRODUCT20_SCOPE') or 'backend'
- if scope not in ('backend','web-login'):
+ if scope!='backend' and scope not in BROWSER_SCOPES:
   raise ValueError('unknown Product20 acceptance scope')
  return scope
 
@@ -655,7 +655,7 @@ def run():
   return regular(folder/'stdout',32<<20)
  try:
   browser=None
-  if scope=='web-login':
+  if scope in BROWSER_SCOPES:
    failure_stage='browser-launch-probe'
    node=shutil.which('node')
    if node is None:
@@ -763,7 +763,7 @@ def run():
   products=[{'name':x['binary']['name'],'path':str(product_roots[x['provider']]/x['binary']['name']),'sha256':x['binary']['sha256'],'bytes':x['binary']['bytes'],'sourceSHA256':x['binary']['sourceVector']['sha256']} for x in selected]
   p={'version':'fresh-product20-http-ws-v1','work':str(work),'core':{'version':'owned-fullgraph-acceptance-v1','scenario':'ack','work':str(corework),'planePath':str(plane.private/'plane.json'),'planeSHA256':sha(regular(plane.private/'plane.json')),'credentialsPath':str(plane.private/'credentials.json'),'credentialsSHA256':sha(regular(plane.private/'credentials.json')),'buildsPath':str(buildpath),'buildsSHA256':bs},'chartTemplatePath':str(template),'chartTemplateSHA256':c['helpers']['chart/config/config.example.yaml'],'sqlRootPassword':json.loads(regular(plane.private/'product20-mysql.json'))['rootPassword'],'products':products}
   if browser is not None:
-   p['browser']={'socket':str(work/'browser-smoke.sock'),'dist':browser['dist']}
+   p['browser']={'socket':str(work/'browser-smoke.sock'),'dist':browser['dist'],'chat':scope=='web-chat'}
   pp=private/'product20-input.json';ps=write(pp,p)
   backend=[*task_user_command(os.environ['HOME'],work),str(binroot/'product20-acceptance'),
            '--private-input',str(pp),'--private-input-sha256',ps]
@@ -876,7 +876,8 @@ HTTP_DETAIL_CLASSES=frozenset((
 def project_http_observation(v):
  if 'httpExchanges' not in v and 'configProxyStatus' not in v:return None
  rows=v.get('httpExchanges');proxy=v.get('configProxyStatus')
- operations=('verify','register') if v.get('scope')=='web-login' else HTTP_OPERATIONS
+ scope=v.get('scope')
+ operations=('verify','register')*BROWSER_SCOPES[scope][2] if scope in BROWSER_SCOPES else HTTP_OPERATIONS
  if type(rows) is not list or len(rows)>len(operations) or type(proxy) is not int or (proxy!=0 and (not rows or not 100<=proxy<=999)):raise ValueError('finite HTTP observation required')
  for operation,row in zip(operations,rows):
   if type(row) is not dict or set(row)!={'operation','outcome','status','appCode','detailClass'} or row['operation']!=operation:raise ValueError('finite original HTTP operation required')
@@ -1018,7 +1019,8 @@ def project_post_ack_snapshots(v,message):
 
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
- phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required','actual-web-browser-login','web-browser-login-accepted-local-cleanup-required'}
+ phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
+ phases.update(phase for plan in BROWSER_SCOPES.values() for phase in plan[:2])
  if v.get('version')!='fresh-product20-http-ws-result-v1' or v.get('phase') not in phases or type(v.get('accepted')) is not bool or any(x and not re.fullmatch('[0-9a-f]{64}',x) for x in (v.get('failureSHA256',''),v.get('coreSourceSHA256',''))):raise ValueError('finite original terminal shape rejected')
  keys=('productProcesses','realRegistrations','realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages')
  if any(type(v.get(k)) is not int or not 0<=v[k]<=20 for k in keys):raise ValueError('finite original terminal counts rejected')
@@ -1030,23 +1032,33 @@ def export_terminal(path,output):
  message=project_message_observation(v)
  if message is not None:value['messageObservation']=message
  value.update(project_post_ack_snapshots(v,message))
- if v.get('scope')=='web-login':
-  value['scope']='web-login'
+ if v.get('scope') in BROWSER_SCOPES:
+  value['scope']=v['scope']
  if 'browser' in v:
   value['browser']=browser_result(v)
   value['browserObservation']=browser_observation(v['browser']['observation'])
+  if v['scope']=='web-chat':
+   value['browserInteraction']=browser_interaction(v['browser']['interaction'])
  if 'coreStopFailure' in v:
   value['coreStopFailure']=project_browser_core_stop(v)
  write(output,value)
  return value
 
+BROWSER_SCOPES={
+ 'web-login':('actual-web-browser-login','web-browser-login-accepted-local-cleanup-required',1),
+ 'web-chat':('actual-web-browser-chat','web-browser-chat-accepted-local-cleanup-required',2),
+}
 BROWSER_RESULT_KEYS={'configAccepted','loginAccepted','gatewayConnected','selfAccepted','workspaceVisible'}
+BROWSER_INTERACTION_KEYS={'peerReady','conversationOpened','senderToPeer','peerToSender','logoutRevoked',
+                          'logoutSocketClosed','loginRestored','oldChatTokenDenied','oldIMTokenDenied','peerStillConnected'}
+BROWSER_CHAT_STAGES={'peer-login','contact-search','contact-card','conversation-ready','compose',
+                     'send-ack','peer-receive','logout','logout-token-check'}
 BROWSER_STAGES={'unavailable','input','tls-leaf','chrome-start','devtools','navigation','page-form',
                 'configuration','sdk-ready','login-form','workspace','cleanup','complete'}
 
 def browser_observation(value):
  keys={'stage','documentStatus','configStatus','configRequested','chromeFailure'}
- if (type(value) is not dict or set(value)!=keys or type(value['stage']) is not str or value['stage'] not in BROWSER_STAGES
+ if (type(value) is not dict or set(value)!=keys or type(value['stage']) is not str or value['stage'] not in BROWSER_STAGES|BROWSER_CHAT_STAGES
      or type(value['chromeFailure']) is not str or value['chromeFailure'] not in ('none','sandbox','shared-library','executable')
      or type(value['configRequested']) is not bool
      or any(type(value[key]) is not int or not (value[key]==0 or 100<=value[key]<=599) for key in ('documentStatus','configStatus'))):
@@ -1055,12 +1067,30 @@ def browser_observation(value):
 
 def browser_result(v):
  result=v.get('browser')
- if (v.get('scope')!='web-login' or v.get('phase') not in ('actual-web-browser-login','web-browser-login-accepted-local-cleanup-required')
-     or type(result) is not dict or set(result)!=BROWSER_RESULT_KEYS|{'observation'}
+ scope=v.get('scope')
+ expected=BROWSER_RESULT_KEYS|({'observation','interaction'} if scope=='web-chat' else {'observation'})
+ if (scope not in BROWSER_SCOPES or v.get('phase') not in BROWSER_SCOPES[scope][:2]
+     or type(result) is not dict or set(result)!=expected
      or any(type(result[key]) is not bool for key in BROWSER_RESULT_KEYS)):
   raise ValueError('finite browser result required')
- browser_observation(result['observation'])
+ stage=browser_observation(result['observation'])['stage']
+ if scope=='web-chat':
+  browser_interaction(result['interaction'])
+ elif stage in BROWSER_CHAT_STAGES:
+  raise ValueError('browser chat stage requires its own scope')
  return {key:value for key,value in result.items() if key in BROWSER_RESULT_KEYS}
+
+def browser_interaction(value):
+ if (type(value) is not dict or set(value)!=BROWSER_INTERACTION_KEYS
+     or any(type(flag) is not bool for flag in value.values())):
+  raise ValueError('finite browser interaction required')
+ return value
+
+def browser_complete(v):
+ scope=v.get('scope')
+ return (all(browser_result(v).values()) and v['phase']==BROWSER_SCOPES[scope][1]
+         and v['browser']['observation']['stage']=='complete'
+         and (scope!='web-chat' or all(v['browser']['interaction'].values())))
 
 CORE_STOP_ROLES=frozenset(('api','crontask','msggateway','msgtransfer-managed','push','rpc-auth',
  'rpc-conversation','rpc-encryption','rpc-friend','rpc-group','rpc-msg','rpc-rtc','rpc-third','rpc-user'))
@@ -1069,8 +1099,7 @@ CORE_STOP_LOG_HINTS={'gateway-lifecycle','managed-ordinary-shutdown','redis-perm
 
 def project_browser_core_stop(v):
  value=v['coreStopFailure']
- if (v.get('accepted') is not False or v.get('phase')!='web-browser-login-accepted-local-cleanup-required'
-     or not all(browser_result(v).values()) or v['browser']['observation']['stage']!='complete'
+ if (v.get('accepted') is not False or not browser_complete(v)
      or type(value) is not dict or set(value)!={'sessionError','bootstrapError','rows'}
      or any(type(value[k]) is not bool for k in ('sessionError','bootstrapError'))
      or not (value['sessionError'] or value['bootstrapError'])
@@ -1102,12 +1131,10 @@ def check_result(v,c):
  scope=acceptance_scope()
  if v.get('scope','backend')!=scope:
   raise ValueError('original runtime scope differs')
- if scope=='web-login':
-  if (v.get('webUIAccepted') is not True or v.get('phase')!='web-browser-login-accepted-local-cleanup-required'
-      or not all(browser_result(v).values()) or v.get('realRegistrations')!=1
-      or v['browser']['observation']['stage']!='complete'
+ if scope in BROWSER_SCOPES:
+  if (v.get('webUIAccepted') is not True or not browser_complete(v) or v.get('realRegistrations')!=BROWSER_SCOPES[scope][2]
       or any(v.get(k)!=0 for k in ('realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages'))):
-   raise ValueError('actual browser configuration, login and SDK result incomplete')
+   raise ValueError('actual browser scope incomplete')
  else:
   flags=('dualTokens','chatTokenSelfRead','configHTTP','wrongPasswordRejected')
   if (any(v.get(k) is not True for k in flags) or v.get('realRegistrations')!=2 or v.get('realPasswordLogins')!=2
@@ -1136,7 +1163,7 @@ def collect():
  controller_path=REPO/'ci-results/product20-controller.resource.json';controller=json.loads(regular(controller_path)) if controller_path.exists() else {}
  accepted=not errors and result_ok and post.get('exact') is True and controller.get('status')=='passed' and controller.get('exit_code')==0
  scope=acceptance_scope()
- write(out/'collection.json',{'accepted':accepted,'finiteFailures':errors,'actualHTTPWS':result_ok and scope=='backend','canonicalChartDrainClaimed':False,'webUIAccepted':result_ok and scope=='web-login','deploymentAccepted':False})
+ write(out/'collection.json',{'accepted':accepted,'finiteFailures':errors,'actualHTTPWS':result_ok and scope=='backend','canonicalChartDrainClaimed':False,'webUIAccepted':result_ok and scope in BROWSER_SCOPES,'deploymentAccepted':False})
  return 0 if accepted else 1
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--verify',action='store_true');p.add_argument('--collect',action='store_true');p.add_argument('--admit',action='store_true');a=p.parse_args()

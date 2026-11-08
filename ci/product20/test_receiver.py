@@ -74,6 +74,28 @@ class BrowserAcceptanceContract(unittest.TestCase):
   with self.assertRaises(ValueError):
    controller.project_browser_core_stop(dict(failed,accepted=True))
 
+  interaction=dict.fromkeys(controller.BROWSER_INTERACTION_KEYS,True)
+  chat=dict(result,scope='web-chat',phase='web-browser-chat-accepted-local-cleanup-required',
+            realRegistrations=2,browser=dict(observed,interaction=interaction))
+  with mock.patch.dict(os.environ,{'PRODUCT20_SCOPE':'web-chat'}), mock.patch.object(controller.Path,'exists',return_value=False):
+   controller.check_result(chat,config)
+   for key in interaction:
+    with self.subTest(key=key), self.assertRaises(ValueError):
+     controller.check_result(dict(chat,browser=dict(chat['browser'],interaction=dict(interaction,**{key:False}))),config)
+   for invalid in (dict(chat,realRegistrations=1),dict(chat,browser=observed),
+                   dict(chat,browser=dict(chat['browser'],interaction=dict(interaction,token='private-token')))):
+    with self.assertRaises(ValueError) as caught:
+     controller.check_result(invalid,config)
+    self.assertNotIn('private-token',str(caught.exception))
+  chat_failure=dict(chat,accepted=False,coreStopFailure=failed['coreStopFailure'])
+  self.assertEqual(controller.project_browser_core_stop(chat_failure)['rows'],[stop_row])
+  exchanges=[{'operation':op,'outcome':'envelope','status':200,'appCode':0,'detailClass':'none'}
+             for op in ('verify','register')*2]
+  original=dict(chat,httpExchanges=exchanges,configProxyStatus=0)
+  self.assertEqual(controller.project_http_observation(original)['exchanges'],exchanges)
+  with self.assertRaises(ValueError):
+   controller.project_http_observation(dict(original,scope='web-login'))
+
 class RegistrationObservationContract(unittest.TestCase):
  def test_exports_only_scoped_registration_failure_from_validated_terminal(self):
   private='PRIVATE_REGISTRATION_VALUE'

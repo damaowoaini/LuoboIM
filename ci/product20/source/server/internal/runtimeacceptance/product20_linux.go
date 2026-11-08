@@ -72,15 +72,36 @@ type Product20Binary struct {
 type product20BrowserPlan struct {
 	Socket string `json:"socket"`
 	Dist   string `json:"dist"`
+	Chat   bool   `json:"chat,omitempty"`
+}
+
+type product20BrowserAccount struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	UserID   string `json:"userID"`
+}
+
+type product20BrowserInteraction struct {
+	PeerReady          bool `json:"peerReady"`
+	ConversationOpened bool `json:"conversationOpened"`
+	SenderToPeer       bool `json:"senderToPeer"`
+	PeerToSender       bool `json:"peerToSender"`
+	LogoutRevoked      bool `json:"logoutRevoked"`
+	LogoutSocketClosed bool `json:"logoutSocketClosed"`
+	LoginRestored      bool `json:"loginRestored"`
+	OldChatTokenDenied bool `json:"oldChatTokenDenied"`
+	OldIMTokenDenied   bool `json:"oldIMTokenDenied"`
+	PeerStillConnected bool `json:"peerStillConnected"`
 }
 
 type product20BrowserResult struct {
-	ConfigAccepted   bool                        `json:"configAccepted"`
-	LoginAccepted    bool                        `json:"loginAccepted"`
-	GatewayConnected bool                        `json:"gatewayConnected"`
-	SelfAccepted     bool                        `json:"selfAccepted"`
-	WorkspaceVisible bool                        `json:"workspaceVisible"`
-	Observation      product20BrowserObservation `json:"observation"`
+	ConfigAccepted   bool                         `json:"configAccepted"`
+	LoginAccepted    bool                         `json:"loginAccepted"`
+	GatewayConnected bool                         `json:"gatewayConnected"`
+	SelfAccepted     bool                         `json:"selfAccepted"`
+	WorkspaceVisible bool                         `json:"workspaceVisible"`
+	Observation      product20BrowserObservation  `json:"observation"`
+	Interaction      *product20BrowserInteraction `json:"interaction,omitempty"`
 }
 
 type product20BrowserObservation struct {
@@ -91,8 +112,16 @@ type product20BrowserObservation struct {
 	ChromeFailure   string `json:"chromeFailure"`
 }
 
-func (r product20BrowserResult) accepted() bool {
-	return r.ConfigAccepted && r.LoginAccepted && r.GatewayConnected && r.SelfAccepted && r.WorkspaceVisible && r.Observation.Stage == "complete"
+func (r product20BrowserResult) accepted(chat bool) bool {
+	if !r.ConfigAccepted || !r.LoginAccepted || !r.GatewayConnected || !r.SelfAccepted || !r.WorkspaceVisible || r.Observation.Stage != "complete" {
+		return false
+	}
+	i := r.Interaction
+	if !chat {
+		return i == nil
+	}
+	return i != nil && i.PeerReady && i.ConversationOpened && i.SenderToPeer && i.PeerToSender &&
+		i.LogoutRevoked && i.LogoutSocketClosed && i.LoginRestored && i.OldChatTokenDenied && i.OldIMTokenDenied && i.PeerStillConnected
 }
 
 type Product20Plan struct {
@@ -1961,19 +1990,33 @@ func product20BusinessRedis(ctx context.Context, p PrivatePlan, webLogin bool) (
 	}
 	return admin.Do(ctx, args...).Err()
 }
-func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, cert tls.Certificate, email, password, userID string) (product20BrowserResult, error) {
+func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, cert tls.Certificate, account product20BrowserAccount, peer *product20BrowserAccount) (product20BrowserResult, error) {
 	unavailable := product20BrowserResult{Observation: product20BrowserObservation{Stage: "unavailable", ChromeFailure: "none"}}
+	if plan.Chat {
+		unavailable.Interaction = &product20BrowserInteraction{}
+	}
 	result := unavailable
 	leaf, err := x509.ParseCertificate(cert.Certificate[0])
 	if err != nil {
 		return result, errors.New("browser fixture certificate rejected")
 	}
 	pin := sha256.Sum256(leaf.RawSubjectPublicKeyInfo)
-	input, err := json.Marshal(map[string]string{"email": email, "password": password, "userID": userID, "certificateSPKI": base64.StdEncoding.EncodeToString(pin[:])})
+	if plan.Chat != (peer != nil) || (peer != nil && (peer.UserID == account.UserID || peer.Email == account.Email)) {
+		return result, errors.New("distinct browser fixture accounts required")
+	}
+	input, err := json.Marshal(struct {
+		product20BrowserAccount
+		Peer            *product20BrowserAccount `json:"peer,omitempty"`
+		CertificateSPKI string                   `json:"certificateSPKI"`
+	}{account, peer, base64.StdEncoding.EncodeToString(pin[:])})
 	if err != nil {
 		return result, errors.New("browser fixture input rejected")
 	}
-	deadline, cancel := context.WithTimeout(ctx, 120*time.Second)
+	timeout := 120 * time.Second
+	if plan.Chat {
+		timeout = 260 * time.Second
+	}
+	deadline, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	info, err := os.Lstat(plan.Socket)
 	if err != nil || info.Mode()&os.ModeSocket == 0 || info.Mode().Perm() != 0600 {
@@ -2000,7 +2043,7 @@ func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, cert t
 	if readErr != nil || len(raw) == 0 || len(raw) > 4096 || namespaceinventory.DecodeStrict(raw, &result) != nil {
 		return unavailable, errors.New("browser result unavailable")
 	}
-	if !result.accepted() {
+	if !result.accepted(plan.Chat) {
 		return result, errors.New("browser acceptance incomplete")
 	}
 	return result, nil
@@ -2008,8 +2051,14 @@ func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, cert t
 
 func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	result := product20Result{Version: "fresh-product20-http-ws-result-v1", Phase: "fresh-core-prepare", FreshSQLSeedOnly: true, HTTPExchanges: []product20HTTPExchange{}}
+	accountCount := 2
 	if p.Browser != nil {
 		result.Scope = "web-login"
+		if p.Browser.Chat {
+			result.Scope = "web-chat"
+		} else {
+			accountCount = 1
+		}
 	}
 	result.StartupBoundary = product20StartupBoundary{Version: "product20-startup-boundary-v1", Substep: "not-entered", Role: "none", PrimaryCause: product20StartupCauseOf(nil)}
 	observation := &result.StartupBoundary
@@ -2057,13 +2106,13 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 			bootErr = boot.Close(cleanup)
 			runErr = errors.Join(runErr, bootErr)
 		}
-		if result.Phase == "web-browser-login-accepted-local-cleanup-required" && (coreErr != nil || bootErr != nil) {
+		if p.Browser != nil && result.Browser != nil && result.Browser.accepted(p.Browser.Chat) && (coreErr != nil || bootErr != nil) {
 			result.CoreStopFailure = product20ObserveCoreStop(p.Core.Work, session, boot, coreErr, bootErr)
 		}
 		result.Accepted = runErr == nil && result.ProductProcesses == 20 && result.RealRegistrations == 2 && result.RealPasswordLogins == 2 && result.OrdinaryDispatches == 1 && result.PeerMessages == 1 && result.HistoryMessages == 1 && result.WrongPasswordRejected && result.BusinessPermissions && result.ConfigHTTP && result.ChatTokenSelfRead && result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
 		if p.Browser != nil {
-			result.WebUIAccepted = runErr == nil && result.Browser != nil && result.Browser.accepted() &&
-				result.ProductProcesses == 20 && result.RealRegistrations == 1 && result.BusinessPermissions &&
+			result.WebUIAccepted = runErr == nil && result.Browser != nil && result.Browser.accepted(p.Browser.Chat) &&
+				result.ProductProcesses == 20 && result.RealRegistrations == accountCount && result.BusinessPermissions &&
 				result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
 			result.Accepted = result.WebUIAccepted
 		}
@@ -2232,10 +2281,6 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	accounts := []product20Account{}
 	passwords := []string{}
 	emails := []string{}
-	accountCount := 2
-	if p.Browser != nil {
-		accountCount = 1
-	}
 	for i := 0; i < accountCount; i++ {
 		email := "product20-" + strconv.Itoa(i) + "-" + boot.Resource.Nonce + "@product20.invalid"
 		password, e := product20Random()
@@ -2263,13 +2308,20 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		accounts = append(accounts, account)
 	}
 	if p.Browser != nil {
-		result.Phase = "actual-web-browser-login"
-		browser, err := product20RunBrowser(ctx, p.Browser, aux.cert, emails[0], passwords[0], accounts[0].UserID)
+		operation := "login"
+		account := product20BrowserAccount{Email: emails[0], Password: passwords[0], UserID: accounts[0].UserID}
+		var peer *product20BrowserAccount
+		if p.Browser.Chat {
+			operation = "chat"
+			peer = &product20BrowserAccount{Email: emails[1], Password: passwords[1], UserID: accounts[1].UserID}
+		}
+		result.Phase = "actual-web-browser-" + operation
+		browser, err := product20RunBrowser(ctx, p.Browser, aux.cert, account, peer)
 		result.Browser = &browser
 		if err != nil {
 			return err
 		}
-		result.Phase = "web-browser-login-accepted-local-cleanup-required"
+		result.Phase = "web-browser-" + operation + "-accepted-local-cleanup-required"
 		return nil
 	}
 	result.Phase = "actual-route-password-login-dual-token"

@@ -5,7 +5,7 @@ on:
       scope:
         type: choice
         description: Acceptance path
-        options: [backend, web-login]
+        options: [backend, web-login, web-chat]
         default: backend
 permissions:
   contents: read
@@ -37,7 +37,7 @@ jobs:
           check-latest: false
           cache: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
-        if: inputs.scope == 'web-login'
+        if: inputs.scope == 'web-login' || inputs.scope == 'web-chat'
         with:
           node-version: '24.21.0'
           package-manager-cache: false

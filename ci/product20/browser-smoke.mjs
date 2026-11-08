@@ -1,7 +1,7 @@
-// One real P20 Web login, inside the caller's existing private Linux netns.
+// Real P20 browser acceptance inside the caller's existing private Linux netns.
 // Never emit CDP messages, response bodies, URLs, credentials or Chrome logs.
 import { spawn } from 'node:child_process';
-import { createHash, X509Certificate } from 'node:crypto';
+import { createHash, randomBytes, X509Certificate } from 'node:crypto';
 import { once } from 'node:events';
 import { lstat, mkdtemp, readFile, realpath, rm } from 'node:fs/promises';
 import { createServer } from 'node:net';
@@ -15,10 +15,11 @@ const listen = process.argv.length === 3 && process.argv[2] === '--listen';
 const observation = {
   stage: 'input', documentStatus: 0, configStatus: 0, configRequested: false, chromeFailure: 'none',
 };
-const result = {
+const loginChecks = () => ({
   configAccepted: false, loginAccepted: false, gatewayConnected: false,
   selfAccepted: false, workspaceVisible: false,
-};
+});
+const result = loginChecks();
 const stop = new AbortController();
 const interrupt = () => stop.abort();
 process.once('SIGTERM', interrupt);
@@ -44,11 +45,20 @@ async function privateInput(stream = process.stdin) {
     chunks.push(chunk);
   }
   const data = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks)));
-  check(data && !Array.isArray(data) && typeof data === 'object' &&
-    Object.keys(data).sort().join(',') === 'certificateSPKI,email,password,userID');
-  check(typeof data.email === 'string' && data.email.length <= 254 && /^[^\s@]+@[^\s@]+$/.test(data.email));
-  check(typeof data.password === 'string' && data.password.length > 0 && data.password.length <= 256 && !/[\x00-\x1f\x7f]/.test(data.password));
-  check(typeof data.userID === 'string' && data.userID.length > 0 && data.userID.length <= 256 && !/[\s\x00-\x1f\x7f]/.test(data.userID));
+  check(data && !Array.isArray(data) && typeof data === 'object');
+  const fields = Object.keys(data).sort().join(',');
+  check(fields === 'certificateSPKI,email,password,userID' || fields === 'certificateSPKI,email,password,peer,userID');
+  const checkAccount = account => {
+    check(typeof account.email === 'string' && account.email.length <= 254 && /^[^\s@]+@[^\s@]+$/.test(account.email));
+    check(typeof account.password === 'string' && account.password.length > 0 && account.password.length <= 256 && !/[\x00-\x1f\x7f]/.test(account.password));
+    check(typeof account.userID === 'string' && account.userID.length > 0 && account.userID.length <= 256 && !/[\s\x00-\x1f\x7f]/.test(account.userID));
+  };
+  checkAccount(data);
+  if (fields.includes(',peer,')) {
+    check(data.peer && typeof data.peer === 'object' && Object.keys(data.peer).sort().join(',') === 'email,password,userID');
+    checkAccount(data.peer);
+    check(data.peer.userID !== data.userID && data.peer.email !== data.email);
+  }
   check(typeof data.certificateSPKI === 'string' && /^[A-Za-z0-9+/]{43}=$/.test(data.certificateSPKI));
   const pin = Buffer.from(data.certificateSPKI, 'base64');
   check(pin.length === 32 && pin.toString('base64') === data.certificateSPKI);
@@ -167,20 +177,23 @@ function gatewayURL(raw) {
   } catch { return false; }
 }
 const LOGIN_DOCUMENT = `location.origin === ${JSON.stringify(ORIGIN)} && location.pathname === '/' && location.hash === '#/login' && window.top === window`;
+const CHAT_DOCUMENT = `location.origin === ${JSON.stringify(ORIGIN)} && location.pathname === '/' && /^#\\/chat(?:\\/|$)/.test(location.hash) && window.top === window`;
 
-async function runBrowser(cdp, input) {
-  const { targetId } = await cdp.call('Target.createTarget', { url: 'about:blank' });
+async function login(cdp, events, input, result, observation, browserContextId) {
+  const { targetId } = await cdp.call('Target.createTarget', { url: 'about:blank', browserContextId });
   const { sessionId } = await cdp.call('Target.attachToTarget', { targetId, flatten: true });
   check(typeof sessionId === 'string' && sessionId.length > 0);
   const call = (method, params) => cdp.call(method, params, sessionId);
   const evaluate = async expression => {
-    const r = await call('Runtime.evaluate', { expression, returnByValue: true });
+    const r = await call('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
     check(!r.exceptionDetails);
     return r.result?.value;
   };
   const selected = new Map();
   const sockets = new Set(), connected = new Set();
   let armed = false, loginPosts = 0, rejected = false;
+  let logoutSocket, logoutPosts = 0, logoutRevoked = false, logoutClosed = false;
+  let loginTokens;
   const inspect = async (requestId, kind) => {
     const body = await call('Network.getResponseBody', { requestId });
     check(typeof body.body === 'string' && body.body.length <= (384 << 10));
@@ -198,13 +211,18 @@ async function runBrowser(cdp, input) {
         typeof data?.serverInfo?.serverID === 'string' && data.serverInfo.serverID.length > 0 &&
         Array.isArray(data.serverInfo.domains) && data.serverInfo.domains.length === 1 && data.serverInfo.domains[0] === '127.0.0.1';
       if (!result.loginAccepted) rejected = true;
+      else if (browserContextId) loginTokens = { chat: data.chatToken, im: data.imToken };
+    } else if (kind === 'logout') {
+      logoutRevoked = envelope?.errCode === 0 && data?.revoked === true &&
+        data.sessionClosed === true && data.pending === false;
+      if (!logoutRevoked) rejected = true;
     } else if (kind === 'self' && envelope?.errCode === 0 && Array.isArray(data?.users) &&
         data.users.length === 1 && data.users[0]?.userID === input.userID) {
       result.selfAccepted = true;
     }
   };
-  cdp.event = ({ method, params, sessionId: observedSession }) => {
-    if (observedSession !== sessionId || !params) return;
+  events.set(sessionId, ({ method, params }) => {
+    if (!params) return;
     const { requestId } = params;
     if (method === 'Network.requestWillBeSent') {
       if (params.redirectResponse) selected.delete(requestId);
@@ -219,7 +237,11 @@ async function runBrowser(cdp, input) {
         if (!armed || ++loginPosts !== 1 || params.redirectResponse) { rejected = true; return; }
         kind = 'login';
       }
-      if (armed && endpoint === '/chat/user/find/full') kind = 'self';
+      if (armed && !logoutSocket && endpoint === '/chat/user/find/full') kind = 'self';
+      if (endpoint === '/chat/account/logout') {
+        if (!logoutSocket || ++logoutPosts !== 1 || params.redirectResponse) { rejected = true; return; }
+        kind = 'logout';
+      }
       if (kind && !params.redirectResponse && selected.size < 32) selected.set(requestId, { endpoint, kind, received: false });
     } else if (method === 'Network.responseReceived') {
       const pending = selected.get(requestId), response = params.response;
@@ -235,8 +257,8 @@ async function runBrowser(cdp, input) {
       selected.delete(requestId);
       if (!pending) return;
       if (pending.received && method === 'Network.loadingFinished') {
-        void inspect(requestId, pending.kind).catch(() => { if (pending.kind === 'login') rejected = true; });
-      } else if (pending.kind === 'login') rejected = true;
+        void inspect(requestId, pending.kind).catch(() => { if (pending.kind === 'login' || pending.kind === 'logout') rejected = true; });
+      } else if (pending.kind === 'login' || pending.kind === 'logout') rejected = true;
     } else if (method === 'Network.webSocketCreated' && armed && sockets.size < 16 && gatewayURL(params.url)) {
       sockets.add(requestId);
     } else if (method === 'Network.webSocketHandshakeResponseReceived' && sockets.has(requestId) && params.response?.status === 101) {
@@ -245,14 +267,16 @@ async function runBrowser(cdp, input) {
     } else if (method === 'Network.webSocketClosed') {
       sockets.delete(requestId);
       connected.delete(requestId);
-      result.gatewayConnected = connected.size > 0;
+      if (!result.workspaceVisible) result.gatewayConnected = connected.size > 0;
+      if (requestId === logoutSocket) logoutClosed = true;
     }
-  };
+  });
   await call('Page.enable');
   await call('Runtime.enable');
   await call('Network.enable', { maxTotalBufferSize: 4 << 20, maxResourceBufferSize: 256 << 10, maxPostDataSize: 0 });
   await call('Network.setCacheDisabled', { cacheDisabled: true });
   await call('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+  await call('Page.bringToFront');
   observation.stage = 'navigation';
   const navigation = await call('Page.navigate', { url: ORIGIN + '/#/login' });
   check(!navigation.errorText);
@@ -267,22 +291,22 @@ async function runBrowser(cdp, input) {
     window.isSecureContext && typeof window.initSDK === 'function' && typeof window.login === 'function' && !!document.querySelector('form')`), 10000);
   observation.stage = 'login-form';
 
-  const click = async (selector, text) => {
+  const click = async (selector, text, guard = LOGIN_DOCUMENT) => {
     const point = await until(() => evaluate(`(() => {
-      if (!(${LOGIN_DOCUMENT})) return null;
+      if (!(${guard})) return null;
       const matches = [...document.querySelectorAll(${JSON.stringify(selector)})].filter(e =>
         e.getClientRects().length && !e.disabled && ${text === undefined ? 'true' : `e.textContent.trim() === ${JSON.stringify(text)}`});
       if (matches.length !== 1) return null;
       const e = matches[0], r = e.getBoundingClientRect(), x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2;
       return e.contains(document.elementFromPoint(x, y)) ? { x, y } : null;
-    })()`), 5000);
+    })()`), 8000);
     check(Number.isFinite(point.x) && Number.isFinite(point.y));
     await call('Input.dispatchMouseEvent', { ...point, type: 'mousePressed', button: 'left', clickCount: 1 });
     await call('Input.dispatchMouseEvent', { ...point, type: 'mouseReleased', button: 'left', clickCount: 1 });
   };
-  const type = async (selector, value) => {
-    await click(selector);
-    check(await evaluate(`(${LOGIN_DOCUMENT}) && document.activeElement === document.querySelector(${JSON.stringify(selector)})`));
+  const type = async (selector, value, guard = LOGIN_DOCUMENT) => {
+    await click(selector, undefined, guard);
+    check(await evaluate(`(${guard}) && document.activeElement === document.querySelector(${JSON.stringify(selector)})`));
     await call('Input.insertText', { text: value });
   };
   await click('[role="tab"]', '邮箱');
@@ -297,7 +321,7 @@ async function runBrowser(cdp, input) {
     check(!rejected);
     if (!result.loginAccepted || !result.gatewayConnected || !result.selfAccepted) { settled = 0; return false; }
     const workspace = await evaluate(`(() => {
-      if (location.origin !== ${JSON.stringify(ORIGIN)} || location.pathname !== '/' || !/^#\\/chat(?:\\/|$)/.test(location.hash)) return false;
+      if (!(${CHAT_DOCUMENT})) return false;
       const shell = document.querySelector('.app-shell'), work = shell?.querySelector('.app-workspace');
       return !!work?.getClientRects().length && getComputedStyle(work).visibility === 'visible' && !!shell.querySelector('button[aria-label="账号与个人设置"]') &&
         !shell.closest('.ant-spin-blur') && !shell.textContent.includes('正在连接消息服务') &&
@@ -310,7 +334,143 @@ async function runBrowser(cdp, input) {
   }, 35000);
   check(loginPosts === 1 && !rejected);
   result.workspaceVisible = true;
-  cdp.event = () => {};
+  return {
+    click, type, evaluate, front: () => call('Page.bringToFront'),
+    connected: () => !rejected && connected.size > 0,
+    armLogout() {
+      check(!rejected && connected.size === 1 && !logoutSocket && logoutPosts === 0);
+      [logoutSocket] = connected;
+    },
+    logoutResult() {
+      check(!rejected);
+      return { revoked: logoutRevoked && logoutPosts === 1, closed: logoutClosed && connected.size === 0 };
+    },
+    async rejectsRevokedTokens() {
+      check(loginTokens && logoutRevoked && logoutClosed);
+      const { chat, im } = loginTokens;
+      loginTokens = undefined;
+      return evaluate(`(async () => {
+        if (!(${LOGIN_DOCUMENT})) return null;
+        const denied = async (endpoint, token) => {
+          const response = await fetch(endpoint, {
+            method: 'POST', headers: { 'Content-Type': 'application/json', token, operationID: crypto.randomUUID() },
+            body: JSON.stringify({userIDs: [${JSON.stringify(input.userID)}]}),
+            credentials: 'omit', redirect: 'error', cache: 'no-store', signal: AbortSignal.timeout(5000),
+          });
+          const body = await response.json();
+          return response.status === 200 && body?.errCode === 1507 && !body.data;
+        };
+        return Promise.all([
+          denied('/chat/user/find/full', ${JSON.stringify(chat)}),
+          denied('/api/user/get_users_info', ${JSON.stringify(im)}),
+        ]);
+      })()`);
+    },
+  };
+}
+
+const EDITOR = '#editable-div[role="textbox"][aria-label="消息输入框"][contenteditable="true"]';
+
+async function openConversation(page, peerID, guard) {
+  observation.stage = 'contact-search';
+  await page.front();
+  await page.click('button[aria-label="更多操作"]', undefined, CHAT_DOCUMENT);
+  await page.click('button', '添加好友', CHAT_DOCUMENT);
+  await page.type('[role="dialog"] #contact-lookup-keyword', peerID, CHAT_DOCUMENT);
+  await page.click('[role="dialog"] button', '确认', CHAT_DOCUMENT);
+  observation.stage = 'contact-card';
+  // The hydrated card must show the exact account before opening the chat.
+  const card = `[role="dialog"]:has(button[aria-label=${JSON.stringify('复制 ID: ' + peerID)}])`;
+  await page.click(card + ' button', '发送消息', CHAT_DOCUMENT);
+  observation.stage = 'conversation-ready';
+  await until(() => page.evaluate(`(${guard}) && !!document.querySelector(${JSON.stringify(EDITOR)})`), 12000);
+}
+
+async function messageRow(page, text, guard, requireAcknowledged) {
+  return page.evaluate(`(() => {
+    if (!(${guard})) return null;
+    const rows = [...document.querySelectorAll('#chat-main #scrollableDiv [id^="chat_"]')].filter(row =>
+      row.getClientRects().length && [...row.querySelectorAll('*')].some(node =>
+        node.childElementCount === 0 && node.textContent === ${JSON.stringify(text)}));
+    if (rows.length !== 1) return null;
+    const row = rows[0];
+    if (${requireAcknowledged} && ![...row.querySelectorAll('div')].some(node =>
+      node.childElementCount === 0 && ['已读', '未读'].includes(node.textContent))) return null;
+    return row.id;
+  })()`);
+}
+
+async function sendAndReceive(from, to, guard) {
+  observation.stage = 'compose';
+  check(from.connected() && to.connected());
+  const text = 'Luobo Web ' + randomBytes(12).toString('hex');
+  await from.front();
+  await from.type(EDITOR, text, guard);
+  check(await from.evaluate(`(${guard}) && document.querySelector(${JSON.stringify(EDITOR)})?.innerText.trim() === ${JSON.stringify(text)}`));
+  await from.click('.app-send-actions button', '发送', guard);
+  observation.stage = 'send-ack';
+  const id = await until(() => messageRow(from, text, guard, true), 20000);
+  check(typeof id === 'string' && /^chat_[A-Za-z0-9_-]{1,256}$/.test(id));
+  observation.stage = 'peer-receive';
+  await to.front();
+  const received = await until(() => messageRow(to, text, guard, false), 20000);
+  check(received === id && from.connected() && to.connected());
+}
+
+async function runBrowser(cdp, input) {
+  const events = new Map();
+  cdp.event = message => events.get(message.sessionId)?.(message);
+  if (!input.peer) {
+    await login(cdp, events, input, result, observation);
+    return;
+  }
+  const createContext = async () => {
+    const { browserContextId } = await cdp.call('Target.createBrowserContext', { disposeOnDetach: true });
+    check(typeof browserContextId === 'string' && browserContextId.length > 0);
+    return browserContextId;
+  };
+  const senderContext = await createContext(), peerContext = await createContext();
+  check(senderContext !== peerContext);
+  const sender = await login(cdp, events, input, result, observation, senderContext);
+  observation.stage = 'peer-login';
+  const peerChecks = loginChecks();
+  const peerObservation = { ...observation, documentStatus: 0, configStatus: 0, configRequested: false };
+  const peer = await login(cdp, events, input.peer, peerChecks, peerObservation, peerContext);
+  check(Object.values(peerChecks).every(value => value === true) && peerObservation.documentStatus === 200);
+  result.interaction.peerReady = true;
+
+  const chatHash = '#/chat/si_' + [input.userID, input.peer.userID].sort().join('_');
+  const conversation = `(${CHAT_DOCUMENT}) && location.hash === ${JSON.stringify(chatHash)}`;
+  await openConversation(sender, input.peer.userID, conversation);
+  await openConversation(peer, input.userID, conversation);
+  result.interaction.conversationOpened = true;
+  await sendAndReceive(sender, peer, conversation);
+  result.interaction.senderToPeer = true;
+  await sendAndReceive(peer, sender, conversation);
+  result.interaction.peerToSender = true;
+
+  observation.stage = 'logout';
+  await sender.front();
+  await sender.click('.app-nav-logout button[aria-label="退出"]', undefined, CHAT_DOCUMENT);
+  const confirm = `(${CHAT_DOCUMENT}) && [...document.querySelectorAll('.ant-modal-confirm-content')].some(
+    e => e.getClientRects().length && e.textContent.trim() === '确认退出当前账号吗？')`;
+  sender.armLogout();
+  await sender.click('.ant-modal-confirm-btns button.ant-btn-primary', undefined, confirm);
+  await until(async () => {
+    const { revoked, closed } = sender.logoutResult();
+    result.interaction.logoutRevoked = revoked;
+    result.interaction.logoutSocketClosed = closed;
+    result.interaction.loginRestored = await sender.evaluate(`(${LOGIN_DOCUMENT}) &&
+      !!document.querySelector('form input[type="password"]') && !document.querySelector('.app-shell')`);
+    return revoked && closed && result.interaction.loginRestored;
+  }, 18000);
+  observation.stage = 'logout-token-check';
+  const denied = await sender.rejectsRevokedTokens();
+  check(Array.isArray(denied) && denied.length === 2 && denied.every(flag => typeof flag === 'boolean'));
+  [result.interaction.oldChatTokenDenied, result.interaction.oldIMTokenDenied] = denied;
+  check(denied.every(flag => flag === true));
+  check(peer.connected() && await peer.evaluate(conversation));
+  result.interaction.peerStillConnected = true;
 }
 
 async function main(input) {
@@ -378,7 +538,9 @@ async function main(input) {
       success = true;
     } else {
       await runBrowser(cdp, input);
-      success = Object.values(result).every(value => value === true);
+      success = Object.entries(result).every(([key, value]) => key === 'interaction'
+        ? Object.values(value).every(flag => flag === true)
+        : value === true);
     }
   } catch {
     // Only the bounded facts below leave the task-owned process.
@@ -412,7 +574,12 @@ async function main(input) {
 }
 
 async function accept(input) {
-  const deadline = setTimeout(interrupt, 95000);
+  if (input.peer) result.interaction = {
+    peerReady: false, conversationOpened: false, senderToPeer: false, peerToSender: false,
+    logoutRevoked: false, logoutSocketClosed: false, loginRestored: false,
+    oldChatTokenDenied: false, oldIMTokenDenied: false, peerStillConnected: false,
+  };
+  const deadline = setTimeout(interrupt, input.peer ? 240000 : 95000);
   try { return await main(input); } finally { clearTimeout(deadline); }
 }
 
