@@ -574,12 +574,13 @@ async function main(input) {
 }
 
 async function accept(input) {
-  if (input.peer) result.interaction = {
+  const chat = Boolean(input?.peer);
+  if (chat) result.interaction = {
     peerReady: false, conversationOpened: false, senderToPeer: false, peerToSender: false,
     logoutRevoked: false, logoutSocketClosed: false, loginRestored: false,
     oldChatTokenDenied: false, oldIMTokenDenied: false, peerStillConnected: false,
   };
-  const deadline = setTimeout(interrupt, input.peer ? 240000 : 95000);
+  const deadline = setTimeout(interrupt, chat ? 240000 : 95000);
   try { return await main(input); } finally { clearTimeout(deadline); }
 }
 

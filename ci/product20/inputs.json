@@ -24,7 +24,7 @@
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "canonicalPublicParent": "acbede7910ab6b1d7793979a3bf224b4ba5b512f",
+  "canonicalPublicParent": "91df5b526532f21086f47fbf5eed3c1ba597f326",
   "chain": {
     "actualBusiness": [
       "route config",
@@ -805,7 +805,7 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-backend-or-web",
-  "state": "browser_chat_and_logout_runtime_pending",
+  "state": "browser_chat_probe_undefined_input_fixed",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",
