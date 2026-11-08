@@ -67,6 +67,7 @@ type ownedWebsocketRuntime struct {
 	serveDone                chan struct{}
 	serveErr                 error
 	unexpected               error
+	shutdownPresenceErr      error
 	loopDone, loopStop, wake chan struct{}
 	mu                       sync.Mutex
 	enabled, stopping        bool
@@ -424,10 +425,18 @@ func (o *ownedWebsocketRuntime) stop(ctx context.Context) error {
 	return nil
 }
 
-// A real unexpected Serve failure is preserved independently of signal/cancel.
-// Local close may finish, but the original owner must not emit an exclusion drain.
+func (o *ownedWebsocketRuntime) recordShutdownPresenceFailure(err error) {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	if o.stopping && o.shutdownPresenceErr == nil {
+		o.shutdownPresenceErr = err
+	}
+}
+
+// These outcomes are checked after the owned resources have closed and before
+// the RPC owner writes its canonical drain.
 func (o *ownedWebsocketRuntime) Failure() error {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	return o.unexpected
+	return errors.Join(o.unexpected, o.shutdownPresenceErr)
 }

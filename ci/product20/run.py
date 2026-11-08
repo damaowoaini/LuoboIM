@@ -15,11 +15,23 @@ DISCOVERY_ANCHOR=b'"zookeeper": map[string]any{"schema": "fullgraph_" + b.Resour
 DISCOVERY_REPLACEMENT=b'"zookeeper": map[string]any{"schema": b.Header.Tenant,'
 CORE_BUILD_MODE='fresh-current-core14-before-P20-v1'
 CORE_GATEWAY_BUILD_MODE='fresh-current-core14-managed-gateway-context-v1'
+CORE_SHUTDOWN_BUILD_MODE='fresh-current-core14-gateway-shutdown-presence-v1'
 MONGO_SOURCE='server/pkg/common/db/unrelation/mongo.go'
 MONGO_TEST='server/pkg/common/db/unrelation/mongo_error_test.go'
 MONGO_TEST_NAME='TestMongoNoDocumentsMapsToOpenIMRecordNotFound'
 GATEWAY_SOURCE='server/internal/msgtransfer/managed_ordinary_start.go'
 GATEWAY_TEST='server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go'
+CORE_SHUTDOWN_PATHS=frozenset((
+ 'server/internal/namespaceimport/ownedcontrol/namespace_runtime_lifecycle_linux.go',
+ 'server/internal/namespaceimport/ownedcontrol/namespace_runtime_stop_all_linux_test.go',
+ 'server/internal/msggateway/n_ws_server.go',
+ 'server/internal/msggateway/owned_runtime.go',
+ 'server/internal/msggateway/owned_runtime_test.go',
+))
+CORE_SHUTDOWN_CASES=(
+ ('current-core-gateway-stop-order-test','./internal/namespaceimport/ownedcontrol','TestNamespaceRuntimeStopOrdersGatewayPresenceDependencies'),
+ ('current-core-gateway-presence-failure-test','./internal/msggateway','TestOwnedGatewayRetainsFailedShutdownPresenceAfterLocalJoin'),
+)
 GATEWAY_TEST_NAME='TestManagedOrdinaryGatewayAuthorizationProvidesRPCOperationID'
 GATEWAY_TEST_PHASE='current-core-managed-gateway-context-test'
 CORE_MONGO_TEST_REUSE = {'goTool': {'bytes': 17164055,
@@ -87,15 +99,18 @@ def select_core_source(c,bodies):
  if 'currentCoreBuild' not in c:return dict(bodies)
  plan=c['currentCoreBuild']
  if (type(plan) is not dict or set(plan)!={'mode','baseSource','source','changes'}
-     or plan['mode'] not in (CORE_BUILD_MODE,CORE_GATEWAY_BUILD_MODE) or plan['baseSource']!=c['graphProvider']['source']
+     or plan['mode'] not in (CORE_BUILD_MODE,CORE_GATEWAY_BUILD_MODE,CORE_SHUTDOWN_BUILD_MODE) or plan['baseSource']!=c['graphProvider']['source']
      or core_vector(bodies)!=plan['baseSource']):raise ValueError('explicit current core build baseline required')
- gateway=plan['mode']==CORE_GATEWAY_BUILD_MODE
+ gateway=plan['mode'] in (CORE_GATEWAY_BUILD_MODE,CORE_SHUTDOWN_BUILD_MODE)
  expected={MONGO_SOURCE,MONGO_TEST}
  if gateway:
   if 'coreMongoTestReuse' in c:raise ValueError('gateway build cannot claim Mongo test reuse')
   expected.update((GATEWAY_SOURCE,GATEWAY_TEST))
   if MONGO_SOURCE not in bodies or GATEWAY_SOURCE not in bodies or MONGO_TEST in bodies or GATEWAY_TEST in bodies:
    raise ValueError('gateway baseline requires two original sources and two new regression files')
+ if plan['mode']==CORE_SHUTDOWN_BUILD_MODE:
+  if not CORE_SHUTDOWN_PATHS<=bodies.keys():raise ValueError('original shutdown and gateway files required')
+  expected.update(CORE_SHUTDOWN_PATHS)
  rows=plan['changes']
  if (type(rows) is not list or len(rows)!=len(expected)
      or any(type(r) is not dict or type(r.get('target')) is not str for r in rows)
@@ -567,7 +582,7 @@ def emit_p20_child_exit_observation(root,out,terminal,plan,plan_sha,products,cha
 
 def acceptance_scope():
  scope=os.environ.get('PRODUCT20_SCOPE') or 'backend'
- if scope!='backend' and scope not in BROWSER_SCOPES:
+ if scope not in ('backend','gateway-stop') and scope not in BROWSER_SCOPES:
   raise ValueError('unknown Product20 acceptance scope')
  return scope
 
@@ -697,8 +712,17 @@ def run():
    for target,body in original.items():
     path=core_stage/target;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body);path.chmod(g['sourceModes'].get(target,0o644))
    (core_stage/'server/config/config.yaml').write_bytes(original['server/config/config.example.yaml']);(core_stage/'server/config/config.yaml').chmod(0o600)
-   if scope=='backend':
-    if c['currentCoreBuild']['mode']==CORE_GATEWAY_BUILD_MODE:
+   if scope=='gateway-stop':
+    if c['currentCoreBuild']['mode']!=CORE_SHUTDOWN_BUILD_MODE:
+     raise ValueError('gateway stop requires the current shutdown source')
+    cases=[]
+    for phase,pkg,name in CORE_SHUTDOWN_CASES:
+     events=command(phase,[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+name+'$',pkg],600,offline,core_stage/'server')
+     check_named_core_test_events(events,'github.com/openimsdk/open-im-server/v3/'+pkg[2:],name,'original shutdown regression failed')
+     cases.append({'name':name,'package':pkg,'passed':True})
+    write(out/'current-core-shutdown-tests.json',{'source':core_source(c),'commands':len(cases),'cases':cases})
+   elif scope=='backend':
+    if c['currentCoreBuild']['mode'] in (CORE_GATEWAY_BUILD_MODE,CORE_SHUTDOWN_BUILD_MODE):
      events=command(GATEWAY_TEST_PHASE,[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+GATEWAY_TEST_NAME+'$','./internal/msgtransfer'],600,offline,core_stage/'server')
      write(out/'current-core-test.json',check_gateway_core_test_events(events))
     elif 'coreMongoTestReuse' in c:
@@ -764,6 +788,8 @@ def run():
   p={'version':'fresh-product20-http-ws-v1','work':str(work),'core':{'version':'owned-fullgraph-acceptance-v1','scenario':'ack','work':str(corework),'planePath':str(plane.private/'plane.json'),'planeSHA256':sha(regular(plane.private/'plane.json')),'credentialsPath':str(plane.private/'credentials.json'),'credentialsSHA256':sha(regular(plane.private/'credentials.json')),'buildsPath':str(buildpath),'buildsSHA256':bs},'chartTemplatePath':str(template),'chartTemplateSHA256':c['helpers']['chart/config/config.example.yaml'],'sqlRootPassword':json.loads(regular(plane.private/'product20-mysql.json'))['rootPassword'],'products':products}
   if browser is not None:
    p['browser']={'socket':str(work/'browser-smoke.sock'),'dist':browser['dist'],'chat':scope=='web-chat','recovery':scope=='web-recovery'}
+  if scope=='gateway-stop':
+   p['gatewayShutdown']=True
   pp=private/'product20-input.json';ps=write(pp,p)
   backend=[*task_user_command(os.environ['HOME'],work),str(binroot/'product20-acceptance'),
            '--private-input',str(pp),'--private-input-sha256',ps]
@@ -877,7 +903,9 @@ def project_http_observation(v):
  if 'httpExchanges' not in v and 'configProxyStatus' not in v:return None
  rows=v.get('httpExchanges');proxy=v.get('configProxyStatus')
  scope=v.get('scope')
- operations=('verify','register')*BROWSER_SCOPES[scope][2] if scope in BROWSER_SCOPES else HTTP_OPERATIONS
+ if scope in BROWSER_SCOPES:operations=('verify','register')*BROWSER_SCOPES[scope][2]
+ elif scope=='gateway-stop':operations=('verify','register','login')
+ else:operations=HTTP_OPERATIONS
  if type(rows) is not list or len(rows)>len(operations) or type(proxy) is not int or (proxy!=0 and (not rows or not 100<=proxy<=999)):raise ValueError('finite HTTP observation required')
  for operation,row in zip(operations,rows):
   if type(row) is not dict or set(row)!={'operation','outcome','status','appCode','detailClass'} or row['operation']!=operation:raise ValueError('finite original HTTP operation required')
@@ -1019,7 +1047,7 @@ def project_post_ack_snapshots(v,message):
 
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
- phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
+ phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required',*GATEWAY_STOP_PHASES}
  phases.update(phase for plan in BROWSER_SCOPES.values() for phase in plan[:2])
  if v.get('version')!='fresh-product20-http-ws-result-v1' or v.get('phase') not in phases or type(v.get('accepted')) is not bool or any(x and not re.fullmatch('[0-9a-f]{64}',x) for x in (v.get('failureSHA256',''),v.get('coreSourceSHA256',''))):raise ValueError('finite original terminal shape rejected')
  keys=('productProcesses','realRegistrations','realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages')
@@ -1032,8 +1060,10 @@ def export_terminal(path,output):
  message=project_message_observation(v)
  if message is not None:value['messageObservation']=message
  value.update(project_post_ack_snapshots(v,message))
- if v.get('scope') in BROWSER_SCOPES:
+ if v.get('scope') in BROWSER_SCOPES or v.get('scope')=='gateway-stop':
   value['scope']=v['scope']
+ if 'gatewayShutdown' in v:
+  value['gatewayShutdown']=project_gateway_shutdown(v)
  if 'browser' in v:
   value['browser']=browser_result(v)
   value['browserObservation']=browser_observation(v['browser']['observation'])
@@ -1051,6 +1081,18 @@ BROWSER_SCOPES={
  'web-chat':('actual-web-browser-chat','web-browser-chat-accepted-local-cleanup-required',2),
  'web-recovery':('actual-web-browser-recovery','web-browser-recovery-accepted-local-cleanup-required',2),
 }
+GATEWAY_STOP_PHASES=('actual-gateway-shutdown','gateway-shutdown-presence-accepted-local-cleanup-required')
+GATEWAY_STOP_FLAGS={'initiallyOffline','webSocketAccepted','onlinePlatform5','originalPong',
+                    'canonicalCoreStop','originalSocketClosed','offlineAfterStop'}
+
+def project_gateway_shutdown(v):
+ value=v.get('gatewayShutdown')
+ if (v.get('scope')!='gateway-stop' or v.get('phase') not in GATEWAY_STOP_PHASES
+     or type(value) is not dict or set(value)!=GATEWAY_STOP_FLAGS
+     or any(type(flag) is not bool for flag in value.values())):
+  raise ValueError('finite gateway shutdown presence required')
+ return value
+
 BROWSER_RESULT_KEYS={'configAccepted','loginAccepted','gatewayConnected','selfAccepted','workspaceVisible'}
 BROWSER_INTERACTION_KEYS={'peerReady','conversationOpened','senderToPeer','peerToSender','logoutRevoked',
                           'logoutSocketClosed','loginRestored','oldChatTokenDenied','oldIMTokenDenied','peerStillConnected'}
@@ -1142,6 +1184,12 @@ def check_result(v,c):
   if (v.get('webUIAccepted') is not True or not browser_complete(v) or v.get('realRegistrations')!=BROWSER_SCOPES[scope][2]
       or any(v.get(k)!=0 for k in ('realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages'))):
    raise ValueError('actual browser scope incomplete')
+ elif scope=='gateway-stop':
+  if (v.get('phase')!=GATEWAY_STOP_PHASES[1] or not all(project_gateway_shutdown(v).values())
+      or v.get('realRegistrations')!=1 or v.get('realPasswordLogins')!=1 or v.get('dualTokens') is not True
+      or v.get('webUIAccepted') is not False or 'browser' in v
+      or any(v.get(k)!=0 for k in ('ordinaryDispatches','peerMessages','historyMessages'))):
+   raise ValueError('actual live gateway shutdown presence incomplete')
  else:
   flags=('dualTokens','chatTokenSelfRead','configHTTP','wrongPasswordRejected')
   if (any(v.get(k) is not True for k in flags) or v.get('realRegistrations')!=2 or v.get('realPasswordLogins')!=2
@@ -1170,7 +1218,9 @@ def collect():
  controller_path=REPO/'ci-results/product20-controller.resource.json';controller=json.loads(regular(controller_path)) if controller_path.exists() else {}
  accepted=not errors and result_ok and post.get('exact') is True and controller.get('status')=='passed' and controller.get('exit_code')==0
  scope=acceptance_scope()
- write(out/'collection.json',{'accepted':accepted,'finiteFailures':errors,'actualHTTPWS':result_ok and scope=='backend','canonicalChartDrainClaimed':False,'webUIAccepted':result_ok and scope in BROWSER_SCOPES,'deploymentAccepted':False})
+ collection={'accepted':accepted,'finiteFailures':errors,'actualHTTPWS':result_ok and scope=='backend','canonicalChartDrainClaimed':False,'webUIAccepted':result_ok and scope in BROWSER_SCOPES,'deploymentAccepted':False}
+ if scope=='gateway-stop':collection['gatewayShutdownAccepted']=result_ok
+ write(out/'collection.json',collection)
  return 0 if accepted else 1
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--verify',action='store_true');p.add_argument('--collect',action='store_true');p.add_argument('--admit',action='store_true');a=p.parse_args()

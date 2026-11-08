@@ -29,6 +29,8 @@ type ownedGatewayStatus struct {
 	release                 <-chan struct{}
 	onlineOnce, offlineOnce sync.Once
 	invalid                 atomic.Bool
+	offlineErr              error
+	offlineCalls            atomic.Int32
 }
 
 func (s *ownedGatewayStatus) SetUserStatus(ctx context.Context, req *pu.SetUserStatusReq, _ ...grpc.CallOption) (*pu.SetUserStatusResp, error) {
@@ -38,6 +40,7 @@ func (s *ownedGatewayStatus) SetUserStatus(ctx context.Context, req *pu.SetUserS
 	if req.Status == constant.Online {
 		s.onlineOnce.Do(func() { close(s.online) })
 	} else {
+		s.offlineCalls.Add(1)
 		if ctx.Err() != nil {
 			s.invalid.Store(true)
 		} // final presence has its own bounded original identity
@@ -48,6 +51,9 @@ func (s *ownedGatewayStatus) SetUserStatus(ctx context.Context, req *pu.SetUserS
 			case <-ctx.Done():
 				return nil, ctx.Err()
 			}
+		}
+		if s.offlineErr != nil {
+			return nil, s.offlineErr
 		}
 	}
 	return &pu.SetUserStatusResp{}, nil
@@ -217,6 +223,33 @@ func TestOwnedGatewayRealHTTPAndSocketStopWaitForOriginalRequestReaderAndPresenc
 	}
 	if _, err := net.DialTimeout("tcp", o.listener.Addr().String(), time.Second); err == nil {
 		t.Fatal("original listener remained open")
+	}
+}
+
+func TestOwnedGatewayRetainsFailedShutdownPresenceAfterLocalJoin(t *testing.T) {
+	failure := errors.New("synthetic offline RPC outcome")
+	status := &ownedGatewayStatus{online: make(chan struct{}), offline: make(chan struct{}), offlineErr: failure}
+	owner, token := ownedGatewayFixture(t, status)
+	if err := owner.enable(); err != nil {
+		t.Fatal(err)
+	}
+	ownedGatewayDial(t, owner, token)
+	ownedGatewayAwait(t, status.online)
+	if err := owner.Failure(); err != nil {
+		t.Fatal("shutdown failed before the offline RPC", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	if err := owner.Stop(ctx); err != nil {
+		t.Fatal("presence failure stopped local resource cleanup", err)
+	}
+	ownedGatewayAwait(t, status.offline)
+	if !errors.Is(owner.Failure(), failure) {
+		t.Fatal("unconfirmed offline RPC lost before the canonical drain gate")
+	}
+	if err := owner.Stop(ctx); err != nil || status.offlineCalls.Load() != 1 ||
+		status.invalid.Load() || owner.ws.onlineUserConnNum.Load() != 0 {
+		t.Fatal("repeated stop renewed the original write or left an unjoined client", err)
 	}
 }
 

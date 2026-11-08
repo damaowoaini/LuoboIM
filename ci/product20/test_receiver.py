@@ -109,6 +109,34 @@ class BrowserAcceptanceContract(unittest.TestCase):
   with self.assertRaises(ValueError):
    controller.browser_result(dict(chat,browser=dict(chat['browser'],observation=dict(observed['observation'],stage='reload'))))
 
+class GatewayShutdownContract(unittest.TestCase):
+ def test_requires_original_active_socket_and_independent_offline_after_canonical_stop(self):
+  flags=dict.fromkeys(controller.GATEWAY_STOP_FLAGS,True)
+  result={
+   'version':'fresh-product20-http-ws-result-v1','scope':'gateway-stop','accepted':True,
+   'phase':controller.GATEWAY_STOP_PHASES[1],'coreSourceSHA256':'a'*64,
+   'productProcesses':20,'realRegistrations':1,'realPasswordLogins':1,'dualTokens':True,
+   'ordinaryDispatches':0,'peerMessages':0,'historyMessages':0,'webUIAccepted':False,
+   'chartCanonicalDrainClaimed':False,'deploymentAccepted':False,'gatewayShutdown':flags,
+   'coreOriginalPIDs':list(range(900001,900015)),'sixOriginalPIDs':list(range(900015,900021)),
+   **dict.fromkeys(('businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined',
+                    'originalSixChildrenExited','originalCoreCleanupComplete'),True),
+  }
+  config={'currentCoreBuild':{'source':{'digest':'a'*64}}}
+  self.assertEqual(controller.project_gateway_shutdown(result),flags)
+  with mock.patch.dict(os.environ,{'PRODUCT20_SCOPE':'gateway-stop'}), mock.patch.object(controller.Path,'exists',return_value=False):
+   controller.check_result(result,config)
+   for key in flags:
+    with self.subTest(key=key), self.assertRaises(ValueError):
+     controller.check_result(dict(result,gatewayShutdown=dict(flags,**{key:False})),config)
+   for invalid in (dict(result,gatewayShutdown=dict(flags,user='private-user')),
+                   dict(result,realPasswordLogins=0),dict(result,originalCoreCleanupComplete=False)):
+    with self.assertRaises(ValueError) as caught:
+     controller.check_result(invalid,config)
+    self.assertNotIn('private-user',str(caught.exception))
+  with self.assertRaises(ValueError):
+   controller.project_gateway_shutdown(dict(result,scope='backend'))
+
 class RegistrationObservationContract(unittest.TestCase):
  def test_exports_only_scoped_registration_failure_from_validated_terminal(self):
   private='PRIVATE_REGISTRATION_VALUE'

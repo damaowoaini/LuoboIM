@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
+	"hash/crc32"
 	"io"
 	"math/big"
 	"mime/quotedprintable"
@@ -53,6 +54,7 @@ import (
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceinventory"
 	"github.com/openimsdk/open-im-server/v3/pkg/common/serviceauth"
 	"github.com/openimsdk/open-im-server/v3/pkg/msgprocessor"
+	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -157,6 +159,7 @@ type Product20Plan struct {
 	SQLRootPassword     string                `json:"sqlRootPassword"`
 	Products            []Product20Binary     `json:"products"`
 	Browser             *product20BrowserPlan `json:"browser,omitempty"`
+	GatewayShutdown     bool                  `json:"gatewayShutdown,omitempty"`
 }
 type product20Result struct {
 	Scope                       string                   `json:"scope,omitempty"`
@@ -197,6 +200,7 @@ type product20Result struct {
 	RegistrationFailure *product20RegistrationObservation    `json:"registrationFailure,omitempty"`
 	MessageObservation  *product20MessageObservation         `json:"messageObservation,omitempty"`
 	GatewayPresence     *product20GatewayPresenceObservation `json:"gatewayPresence,omitempty"`
+	GatewayShutdown     *product20GatewayShutdownObservation `json:"gatewayShutdown,omitempty"`
 	DeliverySnapshot    *product20DeliverySnapshot           `json:"deliverySnapshot,omitempty"`
 	ManagedDrain        *product20ManagedDrainObservation    `json:"managedDrain,omitempty"`
 	CoreStopFailure     *product20CoreStopObservation        `json:"coreStopFailure,omitempty"`
@@ -332,7 +336,7 @@ func ReadProduct20Plan(path, expected string) (Product20Plan, error) {
 		}
 	}
 	if p.Browser != nil {
-		if (p.Browser.Chat && p.Browser.Recovery) || p.Browser.Socket != filepath.Join(p.Work, "browser-smoke.sock") ||
+		if p.GatewayShutdown || (p.Browser.Chat && p.Browser.Recovery) || p.Browser.Socket != filepath.Join(p.Work, "browser-smoke.sock") ||
 			p.Browser.Dist != filepath.Join(filepath.Dir(p.Work), "web-bundle", "dist") || canonicalDirectory(p.Browser.Dist) != nil {
 			return p, errors.New("browser socket and bundle must be inside the original task allocation")
 		}
@@ -1353,8 +1357,12 @@ type product20Wire struct {
 	ErrMsg        string
 }
 
-func product20Dial(ctx context.Context, roots *x509.CertPool, a product20Account) (*websocket.Conn, error) {
-	u := url.URL{Scheme: "wss", Host: "127.0.0.1", Path: "/msg_gateway", RawQuery: url.Values{"sendID": {a.UserID}, "token": {a.IMToken}, "platformID": {"5"}}.Encode()}
+func product20Dial(ctx context.Context, roots *x509.CertPool, a product20Account, operationID string) (*websocket.Conn, error) {
+	query := url.Values{"sendID": {a.UserID}, "token": {a.IMToken}, "platformID": {"5"}}
+	if operationID != "" {
+		query.Set("operationID", operationID)
+	}
+	u := url.URL{Scheme: "wss", Host: "127.0.0.1", Path: "/msg_gateway", RawQuery: query.Encode()}
 	d := websocket.Dialer{Proxy: nil, TLSClientConfig: &tls.Config{RootCAs: roots, MinVersion: tls.VersionTLS12}, HandshakeTimeout: 10 * time.Second}
 	c, response, e := d.DialContext(ctx, u.String(), nil)
 	if e != nil || response == nil || response.StatusCode != http.StatusSwitchingProtocols {
@@ -1366,6 +1374,127 @@ func product20Dial(ctx context.Context, roots *x509.CertPool, a product20Account
 	c.SetReadLimit(1 << 20)
 	return c, nil
 }
+
+type product20GatewayShutdownObservation struct {
+	InitiallyOffline     bool `json:"initiallyOffline"`
+	WebSocketAccepted    bool `json:"webSocketAccepted"`
+	OnlinePlatform5      bool `json:"onlinePlatform5"`
+	OriginalPong         bool `json:"originalPong"`
+	CanonicalCoreStop    bool `json:"canonicalCoreStop"`
+	OriginalSocketClosed bool `json:"originalSocketClosed"`
+	OfflineAfterStop     bool `json:"offlineAfterStop"`
+}
+
+func (o product20GatewayShutdownObservation) accepted() bool {
+	return o.InitiallyOffline && o.WebSocketAccepted && o.OnlinePlatform5 && o.OriginalPong &&
+		o.CanonicalCoreStop && o.OriginalSocketClosed && o.OfflineAfterStop
+}
+
+func product20GatewayShutdown(ctx context.Context, boot *Bootstrap, session *Session, roots *x509.CertPool, account product20Account, observed *product20GatewayShutdownObservation) error {
+	key := "ONLINE_STATUS:" + strconv.FormatUint(uint64(crc32.ChecksumIEEE([]byte(account.UserID))%501), 10)
+	if err := boot.AdminRedis.HGet(ctx, key, account.UserID).Err(); !errors.Is(err, redis.Nil) {
+		return errors.New("fresh gateway user is not independently observed offline")
+	}
+	observed.InitiallyOffline = true
+	conn, err := product20Dial(ctx, roots, account, uuid.NewString())
+	if err != nil {
+		return err
+	}
+	observed.WebSocketAccepted = true
+	pong, readerDone, readResult := make(chan struct{}, 1), make(chan struct{}), make(chan error, 1)
+	defer func() {
+		_ = conn.Close()
+		<-readerDone
+	}()
+	conn.SetPongHandler(func(string) error {
+		select {
+		case pong <- struct{}{}:
+		default:
+		}
+		return nil
+	})
+	go func() {
+		defer close(readerDone)
+		for {
+			if _, _, err := conn.ReadMessage(); err != nil {
+				readResult <- err
+				return
+			}
+		}
+	}()
+
+	online, stopOnline := context.WithTimeout(ctx, 10*time.Second)
+	defer stopOnline()
+	tick := time.NewTicker(100 * time.Millisecond)
+	defer tick.Stop()
+	for !observed.OnlinePlatform5 {
+		body, err := boot.AdminRedis.HGet(online, key, account.UserID).Bytes()
+		if err == nil {
+			var status struct {
+				UserID      string  `json:"userID"`
+				Status      int32   `json:"status"`
+				PlatformIDs []int32 `json:"platformIDs"`
+			}
+			if namespaceinventory.DecodeStrict(body, &status) != nil || status.UserID != account.UserID ||
+				status.Status != constant.Online || len(status.PlatformIDs) != 1 || status.PlatformIDs[0] != 5 {
+				return errors.New("original gateway presence differs")
+			}
+			observed.OnlinePlatform5 = true
+			break
+		}
+		if !errors.Is(err, redis.Nil) {
+			return errors.New("independent online presence read failed")
+		}
+		select {
+		case <-tick.C:
+		case <-online.Done():
+			return errors.New("original gateway online presence absent")
+		case <-readerDone:
+			return errors.New("original socket closed before online presence")
+		}
+	}
+	if err := conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(5*time.Second)); err != nil {
+		return errors.New("original gateway ping failed")
+	}
+	ping := time.NewTimer(5 * time.Second)
+	defer ping.Stop()
+	select {
+	case <-pong:
+	case <-ping.C:
+		return errors.New("original gateway pong absent")
+	case <-readerDone:
+		return errors.New("original socket closed before shutdown")
+	}
+	select {
+	case <-readerDone:
+		return errors.New("original socket closed before shutdown")
+	default:
+	}
+	observed.OriginalPong = true
+	stopHeartbeat := product20Heartbeat(context.Background(), conn)
+	defer stopHeartbeat()
+
+	shutdown, stop := context.WithTimeout(context.WithoutCancel(ctx), 120*time.Second)
+	defer stop()
+	coreErr := cleanupAcceptanceSession(shutdown, session)
+	observed.CanonicalCoreStop = coreErr == nil && session.CleanupComplete()
+	after, finish := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+	defer finish()
+	select {
+	case err := <-readResult:
+		var closed *websocket.CloseError
+		observed.OriginalSocketClosed = errors.Is(err, io.EOF) ||
+			(errors.As(err, &closed) && (closed.Code == websocket.CloseNormalClosure ||
+				closed.Code == websocket.CloseGoingAway || closed.Code == websocket.CloseAbnormalClosure))
+	case <-after.Done():
+	}
+	observed.OfflineAfterStop = errors.Is(boot.AdminRedis.HGet(after, key, account.UserID).Err(), redis.Nil)
+	if !observed.accepted() {
+		return errors.Join(coreErr, errors.New("live gateway shutdown or offline presence unconfirmed"))
+	}
+	return nil
+}
+
 func product20WireWrite(conn *websocket.Conn, value product20Wire) error {
 	var body bytes.Buffer
 	if e := gob.NewEncoder(&body).Encode(value); e != nil {
@@ -1836,7 +1965,7 @@ func product20CoreStopLogHints(spec ownedcontrol.ServiceSpec, nonce string) []st
 
 func product20Message(ctx context.Context, a, b product20Account, roots *x509.CertPool, observation *product20MessageObservation, onDispatch func(), onFailure func(context.Context, string)) (clientID, serverID string, seq int64, err error) {
 	observation.Step = "sender-handshake"
-	sender, e := product20Dial(ctx, roots, a)
+	sender, e := product20Dial(ctx, roots, a, "")
 	if e != nil {
 		err = e
 		return
@@ -1845,7 +1974,7 @@ func product20Message(ctx context.Context, a, b product20Account, roots *x509.Ce
 	stopSenderHeartbeat := product20Heartbeat(ctx, sender)
 	defer stopSenderHeartbeat()
 	observation.Step = "peer-handshake"
-	peer, e := product20Dial(ctx, roots, b)
+	peer, e := product20Dial(ctx, roots, b, "")
 	if e != nil {
 		err = e
 		return
@@ -2092,6 +2221,9 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		} else {
 			accountCount = 1
 		}
+	} else if p.GatewayShutdown {
+		result.Scope = "gateway-stop"
+		accountCount = 1
 	}
 	result.StartupBoundary = product20StartupBoundary{Version: "product20-startup-boundary-v1", Substep: "not-entered", Role: "none", PrimaryCause: product20StartupCauseOf(nil)}
 	observation := &result.StartupBoundary
@@ -2149,6 +2281,12 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 				result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
 			result.Accepted = result.WebUIAccepted
 		}
+		if p.GatewayShutdown {
+			result.Accepted = runErr == nil && result.GatewayShutdown != nil && result.GatewayShutdown.accepted() &&
+				result.ProductProcesses == 20 && result.RealRegistrations == 1 && result.RealPasswordLogins == 1 &&
+				result.BusinessPermissions && result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete &&
+				result.AuxiliaryListenersJoined
+		}
 		if !result.Accepted && runErr == nil {
 			runErr = errors.New("incomplete product20 acceptance")
 		}
@@ -2180,7 +2318,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		return e
 	}
 	// Fresh fixture tenant/policy preconditions only. Real account creation is
-	// exclusively the two production HTTP registrations below.
+	// exclusively the production HTTP registrations below.
 	if _, e = chartPool.ExecContext(ctx, "CREATE TABLE client_config (`key` varchar(255) NOT NULL PRIMARY KEY, value TEXT NOT NULL)"); e != nil {
 		return e
 	}
@@ -2298,7 +2436,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	httpClient := &http.Client{Transport: transport, Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return errors.New("task redirect refused") }}
 	client := product20HTTPClient{Client: httpClient, exchanges: &result.HTTPExchanges}
 	result.Phase = "actual-route-config-and-registration"
-	if p.Browser == nil {
+	if p.Browser == nil && !p.GatewayShutdown {
 		configuration, e := client.post(ctx, "config", "http://127.0.0.1:31310/api/client_config/get", "", map[string]any{})
 		if e != nil || (configuration.ErrCode == nil || *configuration.ErrCode != 0) {
 			return errors.New("actual route configuration failed")
@@ -2339,6 +2477,24 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		emails = append(emails, email)
 		passwords = append(passwords, password)
 		accounts = append(accounts, account)
+	}
+	if p.GatewayShutdown {
+		result.Phase = "actual-gateway-shutdown"
+		actual, e := product20Login(ctx, client, emails[0], passwords[0])
+		if e != nil {
+			return e
+		}
+		if actual.UserID != accounts[0].UserID || actual.ServerInfo.ServerID != boot.Header.Tenant {
+			return errors.New("original gateway shutdown account or tenant differs")
+		}
+		result.RealPasswordLogins = 1
+		result.DualTokens = true
+		result.GatewayShutdown = &product20GatewayShutdownObservation{}
+		if e := product20GatewayShutdown(ctx, boot, session, aux.roots, actual, result.GatewayShutdown); e != nil {
+			return e
+		}
+		result.Phase = "gateway-shutdown-presence-accepted-local-cleanup-required"
+		return nil
 	}
 	if p.Browser != nil {
 		operation := strings.TrimPrefix(result.Scope, "web-")

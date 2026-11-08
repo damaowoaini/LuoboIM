@@ -5834,11 +5834,11 @@
       "sha256": "232fb2a90ae8694ab7cc34d4899d9785fcb5300d2430ef7d302d11723f552291"
     },
     {
-      "bytes": 14301,
+      "bytes": 14405,
       "mode": 420,
       "path": "server/internal/msggateway/n_ws_server.go",
-      "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "167271d7d2a334c398adf30ebd843c89e4316af465ef3d3a731a53a9c707ba70"
+      "provider": "ci/product20/run.py:verify",
+      "sha256": "62983233a99c17d31a64409a8b8f0f94694683ae5f034690b1ce8753ac88e38e"
     },
     {
       "bytes": 1511,
@@ -5855,18 +5855,18 @@
       "sha256": "c82db0e34e5afd877deb12c359e83725176f815e63e5b948fd772cfbdb493f18"
     },
     {
-      "bytes": 13001,
+      "bytes": 13223,
       "mode": 420,
       "path": "server/internal/msggateway/owned_runtime.go",
-      "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "6b30db513b05fc51e1a60e04aab31d6ae01b76edfb04da818fe8bc530fcf6ab2"
+      "provider": "ci/product20/run.py:verify",
+      "sha256": "83247e3fb06092a74785b7e659749b4e196a1b09e606c833024a1562d8efeefc"
     },
     {
-      "bytes": 9363,
+      "bytes": 10636,
       "mode": 420,
       "path": "server/internal/msggateway/owned_runtime_test.go",
-      "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "5cce5a064ae30b7484e5683639b76344d45540334458509c26ae9e64ac1fe437"
+      "provider": "ci/product20/run.py:verify",
+      "sha256": "a06523792f1ea20a2d06a4e9bf168b60ee40b429487adecb4cbeeaf063f18fae"
     },
     {
       "bytes": 1704,
@@ -6702,11 +6702,11 @@
       "sha256": "4cd36e3c306b35edb6e65f3115d7c1e541ac9f4d4409921850caf49cc8d488cc"
     },
     {
-      "bytes": 13474,
+      "bytes": 14499,
       "mode": 420,
       "path": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_lifecycle_linux.go",
-      "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "bc01d86123838dcdcc038f53f54e1e561f8901412330532c9291ad15aa5e033c"
+      "provider": "ci/product20/run.py:verify",
+      "sha256": "8335198b7b7b27144753f2047524ffbd91a83a49f69d78442ae0888982ef9a39"
     },
     {
       "bytes": 6371,
@@ -6744,11 +6744,11 @@
       "sha256": "cff66dd26db78772f2dea268fb61caadff4df5d05b285742943c5586752aedda"
     },
     {
-      "bytes": 7469,
+      "bytes": 8961,
       "mode": 420,
       "path": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_stop_all_linux_test.go",
-      "provider": "ci/backend-fullgraph/run.py:verify",
-      "sha256": "6d8717adbc571175d85a99530a5d29c1ea9abd1561cc7ba86b2298226228e319"
+      "provider": "ci/product20/run.py:verify",
+      "sha256": "4e4ddc2ef53778607f0430aef9fb72a011c82b19fd49483735ac56f7115d52a3"
     },
     {
       "bytes": 6991,
@@ -13261,7 +13261,7 @@
       "sha256": "8a57cd0bc051fafe62d8468e42ef66437d5ff8c29295175a531d82095a1da722"
     }
   ],
-  "filesSHA256": "10a1ed922c2301c4fa876403d9efe4c1bb618168e2a144f8e899c4615a994868",
+  "filesSHA256": "8ccafc7cae7a39a4a5210981f71d22c45dbfa5ea287c8e392f1e53cf016f8864",
   "moduleLocks": {
     "chart/go.mod": {
       "bytes": 4371,
@@ -13318,7 +13318,7 @@
       "sha256": "888864b0dcc644e1f25f7723f2b306bfb97b4c650943186a76b732b0f023fd8a"
     },
     "server": {
-      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd",
+      "digest": "696c6d8ecb5385d8315a74a13f58514bea045e3bb958ff3c5c33e284150fea66",
       "members": 1586
     }
   },

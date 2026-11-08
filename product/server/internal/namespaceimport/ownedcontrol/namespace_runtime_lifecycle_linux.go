@@ -9,6 +9,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/openimsdk/open-im-server/v3/internal/namespaceimport"
@@ -168,8 +169,13 @@ func (g *NamespaceRuntimeLaunchGroup) Stop(ctx context.Context) error {
 		g.stopAttempts = map[string]bool{}
 	}
 	var result error
-	for at := len(g.order) - 1; at >= 0; at-- {
-		role := g.order[at]
+	gatewayPending := false
+	for _, role := range namespaceRuntimeStopOrder(g.order) {
+		if gatewayPending && gatewayPresenceDependency(role) {
+			// The caller can retry the original stop. Keep these RPCs alive
+			// while that gateway can still be finishing a presence write.
+			continue
+		}
 		if e := g.stopOriginalRuntimeEntry(ctx, role); e != nil {
 			// Unknown/noncanonical remains an error, but cannot strand unrelated
 			// original children. Each role retains its one signal intent/owner.
@@ -178,9 +184,45 @@ func (g *NamespaceRuntimeLaunchGroup) Stop(ctx context.Context) error {
 				result = errors.Join(result, recordErr)
 			}
 		}
+		if role == "msggateway" {
+			if gateway := g.entries[role].Service; gateway != nil {
+				select {
+				case <-gateway.done:
+				default:
+					gatewayPending = true
+				}
+			}
+		}
 	}
 	return result
 }
+
+func gatewayPresenceDependency(role string) bool {
+	switch role {
+	case "rpc-user", "rpc-friend", "rpc-msg":
+		return true
+	}
+	return false
+}
+
+func namespaceRuntimeStopOrder(start []string) []string {
+	gateway := slices.Index(start, "msggateway")
+	order := make([]string, 0, len(start))
+	var presence []string
+	for at := len(start) - 1; at >= 0; at-- {
+		role := start[at]
+		if gateway >= 0 && at > gateway && gatewayPresenceDependency(role) {
+			presence = append(presence, role)
+			continue
+		}
+		order = append(order, role)
+		if at == gateway {
+			order = append(order, presence...)
+		}
+	}
+	return order
+}
+
 func (g *NamespaceRuntimeLaunchGroup) stopOriginalRuntimeEntry(ctx context.Context, role string) error {
 	s := g.entries[role].Service
 	if s == nil {

@@ -108,6 +108,9 @@ func (ws *WsServer) SetUserOnlineStatus(ctx context.Context, client *Client, sta
 	err := ws.userClient.SetUserStatus(ctx, client.UserID, status, client.PlatformID)
 	if err != nil {
 		log.ZWarn(ctx, "SetUserStatus err", err)
+		if status == constant.Offline && ws.owned != nil {
+			ws.owned.recordShutdownPresenceFailure(err)
+		}
 	}
 	switch status {
 	case constant.Online:

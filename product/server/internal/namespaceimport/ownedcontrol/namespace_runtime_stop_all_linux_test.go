@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"slices"
 	"strings"
 	"syscall"
 	"testing"
@@ -23,6 +24,45 @@ type stopAllChildInput struct {
 	Nonce, Started, Mode string
 	Drain                ServerRuntimeDrain
 	Path                 string
+}
+
+func TestNamespaceRuntimeStopOrdersGatewayPresenceDependencies(t *testing.T) {
+	for _, test := range []struct {
+		start, stop []string
+	}{
+		{
+			start: []string{"api", "rpc-msg", "msggateway", "push", "rpc-friend", "rpc-user"},
+			stop:  []string{"push", "msggateway", "rpc-user", "rpc-friend", "rpc-msg", "api"},
+		},
+		{
+			start: []string{"api", "msggateway", "rpc-user", "rpc-friend", "rpc-msg", "push"},
+			stop:  []string{"push", "msggateway", "rpc-msg", "rpc-friend", "rpc-user", "api"},
+		},
+		{
+			start: []string{"api", "rpc-user", "rpc-friend", "rpc-msg"},
+			stop:  []string{"rpc-msg", "rpc-friend", "rpc-user", "api"},
+		},
+	} {
+		if got := namespaceRuntimeStopOrder(test.start); !slices.Equal(got, test.stop) {
+			t.Fatalf("stop order = %v, want %v", got, test.stop)
+		}
+	}
+
+	group := &NamespaceRuntimeLaunchGroup{
+		dir:   t.TempDir(),
+		order: []string{"api", "msggateway", "rpc-user"},
+		entries: map[string]NamespaceRuntimeProcess{
+			"api":        {Service: &OwnedService{done: make(chan struct{})}},
+			"msggateway": {Service: &OwnedService{done: make(chan struct{})}},
+			"rpc-user":   {Service: &OwnedService{done: make(chan struct{})}},
+		},
+	}
+	if err := group.Stop(context.Background()); err == nil {
+		t.Fatal("unjoined gateway accepted as stopped")
+	}
+	if !group.stopAttempts["msggateway"] || group.stopAttempts["rpc-user"] || !group.stopAttempts["api"] {
+		t.Fatal("pending gateway must retain its dependencies without stranding unrelated roles")
+	}
 }
 
 func TestNamespaceRuntimeStopKeepsEveryOriginalChildOwnedAfterOneNoncanonicalExit(t *testing.T) {

@@ -24,7 +24,7 @@
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "canonicalPublicParent": "103c7a0e978b841b22fc7fe0cef0978419a01e5e",
+  "canonicalPublicParent": "38a4dede6acc2ca722a11039f386cfa5387e2479",
   "chain": {
     "actualBusiness": [
       "route config",
@@ -377,16 +377,51 @@
         "path": "product/server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go",
         "sha256": "400cc99a839bd23e78a748e0acdf4fb60ddbd95e673cce07f209ebd6eac60654",
         "target": "server/internal/msgtransfer/managed_ordinary_gateway_operation_test.go"
+      },
+      {
+        "beforeSHA256": "167271d7d2a334c398adf30ebd843c89e4316af465ef3d3a731a53a9c707ba70",
+        "bytes": 14405,
+        "path": "product/server/internal/msggateway/n_ws_server.go",
+        "sha256": "62983233a99c17d31a64409a8b8f0f94694683ae5f034690b1ce8753ac88e38e",
+        "target": "server/internal/msggateway/n_ws_server.go"
+      },
+      {
+        "beforeSHA256": "6b30db513b05fc51e1a60e04aab31d6ae01b76edfb04da818fe8bc530fcf6ab2",
+        "bytes": 13223,
+        "path": "product/server/internal/msggateway/owned_runtime.go",
+        "sha256": "83247e3fb06092a74785b7e659749b4e196a1b09e606c833024a1562d8efeefc",
+        "target": "server/internal/msggateway/owned_runtime.go"
+      },
+      {
+        "beforeSHA256": "5cce5a064ae30b7484e5683639b76344d45540334458509c26ae9e64ac1fe437",
+        "bytes": 10636,
+        "path": "product/server/internal/msggateway/owned_runtime_test.go",
+        "sha256": "a06523792f1ea20a2d06a4e9bf168b60ee40b429487adecb4cbeeaf063f18fae",
+        "target": "server/internal/msggateway/owned_runtime_test.go"
+      },
+      {
+        "beforeSHA256": "bc01d86123838dcdcc038f53f54e1e561f8901412330532c9291ad15aa5e033c",
+        "bytes": 14499,
+        "path": "product/server/internal/namespaceimport/ownedcontrol/namespace_runtime_lifecycle_linux.go",
+        "sha256": "8335198b7b7b27144753f2047524ffbd91a83a49f69d78442ae0888982ef9a39",
+        "target": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_lifecycle_linux.go"
+      },
+      {
+        "beforeSHA256": "6d8717adbc571175d85a99530a5d29c1ea9abd1561cc7ba86b2298226228e319",
+        "bytes": 8961,
+        "path": "product/server/internal/namespaceimport/ownedcontrol/namespace_runtime_stop_all_linux_test.go",
+        "sha256": "4e4ddc2ef53778607f0430aef9fb72a011c82b19fd49483735ac56f7115d52a3",
+        "target": "server/internal/namespaceimport/ownedcontrol/namespace_runtime_stop_all_linux_test.go"
       }
     ],
-    "mode": "fresh-current-core14-managed-gateway-context-v1",
+    "mode": "fresh-current-core14-gateway-shutdown-presence-v1",
     "source": {
-      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd",
+      "digest": "696c6d8ecb5385d8315a74a13f58514bea045e3bb958ff3c5c33e284150fea66",
       "members": 1586
     }
   },
   "derivedHarnessSource": {
-    "digest": "40ba8d8f98bb533e312ef91ebf39996d1035112f18f1b505eaf6bbfd4d6d4a59",
+    "digest": "babd80b79ee6a7ef00be5b30b3bddc652191f68970aa7851402f56cef75393ce",
     "members": 1588
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
@@ -411,10 +446,10 @@
       "run": 42180782218
     },
     "mode": "core14-currentChart5-historicalRouteFrom6-v1",
-    "rootAcceptanceSHA256": "a55349fff1efea7c46911b7e947a94ec05428654c2caf1c68917858369ee405c",
+    "rootAcceptanceSHA256": "f8f5aab7d1b794e2a8a6a9896eda6f88ead64a6e21f336101915091d580f0c4b",
     "rootAccepted": true,
     "source": {
-      "digest": "a7674011f6f0c7ce81bce42a4338cf3333d0e23eef1bf97d991d7471a91864bd",
+      "digest": "696c6d8ecb5385d8315a74a13f58514bea045e3bb958ff3c5c33e284150fea66",
       "members": 1586
     }
   },
@@ -462,7 +497,7 @@
       "digest": "0a411b5ea84bb2f5172d7638742b3247a960c3a60048553b340e8fa33a7eccef",
       "members": 1584
     },
-    "status": "Frozen accepted Graph0a parent source only; current selected core builds exact Mongo and managed gateway context deltas."
+    "status": "Frozen accepted Graph baseline. Current core builds exact Mongo, managed delivery operation context and gateway shutdown presence changes."
   },
   "helpers": {
     "chart/config/config.example.yaml": "596e7e3dd60758c289532e46387de8cc676dff38d331824eee08ffe44e3348ef",
@@ -756,7 +791,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "13739480c4dc3d851173b00b182073f6df8e6e349a33ed2cc868d2bf8c674f96"
+    "server/internal/runtimeacceptance/product20_linux.go": "67a4a8ffe30f5123c3fb4571300f641ae6e828c1594d4ea2eb50cfe343899d09"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
@@ -805,7 +840,7 @@
   },
   "schema": 1,
   "scope": "one-fresh-product20-backend-or-web",
-  "state": "web_recovery_exact_contact_path_runtime_pending",
+  "state": "current-live-gateway-shutdown-presence-runtime-pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",
