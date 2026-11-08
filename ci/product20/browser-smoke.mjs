@@ -314,7 +314,7 @@ async function runBrowser(cdp, input) {
 }
 
 async function main(input) {
-  let profile, child, exit, cdp;
+  let profile, chromeTemp, child, exit, cdp;
   let exited = false, cleanExit = false, success = false, cleanup = true;
   try {
     check(process.platform === 'linux' && process.getuid() !== 0 && typeof WebSocket === 'function');
@@ -328,13 +328,16 @@ async function main(input) {
     check(!stop.signal.aborted);
     observation.stage = 'chrome-start';
     profile = await mkdtemp(path.join(temporary, 'product20-chrome-'));
+    // Chromium creates a Unix singleton socket below TMPDIR. The runner's
+    // nested work/profile paths leave too little room for that socket name.
+    chromeTemp = await mkdtemp('/tmp/luobo-p20-chrome-');
     child = spawn(CHROME, [
       '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
       '--user-data-dir=' + profile,
       ...(input ? ['--ignore-certificate-errors-spki-list=' + input.certificateSPKI] : []),
       '--no-first-run', '--no-default-browser-check', '--disable-background-networking',
       '--disable-component-update', '--disable-sync', '--no-proxy-server', 'about:blank',
-    ], { stdio: ['ignore', 'ignore', 'pipe'], cwd: process.cwd(), env: { PATH: '/usr/bin:/bin', HOME: profile, TMPDIR: profile } });
+    ], { stdio: ['ignore', 'ignore', 'pipe'], cwd: process.cwd(), env: { PATH: '/usr/bin:/bin', HOME: profile, TMPDIR: chromeTemp } });
     let startupText = '';
     child.stderr.on('data', chunk => {
       if (observation.stage !== 'chrome-start' || startupText.length >= 8192) return;
@@ -396,9 +399,12 @@ async function main(input) {
         if (!exited && !(await waitExit(2500))) cleanup = false;
       }
     }
-    if (profile && (!child || exited)) {
-      try { await rm(profile, { recursive: true, force: true }); } catch { cleanup = false; }
-    } else if (profile) cleanup = false;
+    if (!child || exited) {
+      for (const directory of [profile, chromeTemp]) {
+        if (!directory) continue;
+        try { await rm(directory, { recursive: true, force: true }); } catch { cleanup = false; }
+      }
+    } else cleanup = false;
   }
   const accepted = success && cleanup && cleanExit && !stop.signal.aborted;
   if (success) observation.stage = accepted ? 'complete' : 'cleanup';
