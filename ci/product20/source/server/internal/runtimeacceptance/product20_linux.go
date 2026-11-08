@@ -69,16 +69,37 @@ type Product20Binary struct {
 	Bytes        int64  `json:"bytes"`
 	SourceSHA256 string `json:"sourceSHA256"`
 }
+type product20BrowserPlan struct {
+	Node   string `json:"node"`
+	Script string `json:"script"`
+	Dist   string `json:"dist"`
+}
+
+type product20BrowserResult struct {
+	ConfigAccepted   bool `json:"configAccepted"`
+	LoginAccepted    bool `json:"loginAccepted"`
+	GatewayConnected bool `json:"gatewayConnected"`
+	SelfAccepted     bool `json:"selfAccepted"`
+	WorkspaceVisible bool `json:"workspaceVisible"`
+}
+
+func (r product20BrowserResult) accepted() bool {
+	return r.ConfigAccepted && r.LoginAccepted && r.GatewayConnected && r.SelfAccepted && r.WorkspaceVisible
+}
+
 type Product20Plan struct {
-	Version             string            `json:"version"`
-	Work                string            `json:"work"`
-	Core                PrivatePlan       `json:"core"`
-	ChartTemplatePath   string            `json:"chartTemplatePath"`
-	ChartTemplateSHA256 string            `json:"chartTemplateSHA256"`
-	SQLRootPassword     string            `json:"sqlRootPassword"`
-	Products            []Product20Binary `json:"products"`
+	Version             string                `json:"version"`
+	Work                string                `json:"work"`
+	Core                PrivatePlan           `json:"core"`
+	ChartTemplatePath   string                `json:"chartTemplatePath"`
+	ChartTemplateSHA256 string                `json:"chartTemplateSHA256"`
+	SQLRootPassword     string                `json:"sqlRootPassword"`
+	Products            []Product20Binary     `json:"products"`
+	Browser             *product20BrowserPlan `json:"browser,omitempty"`
 }
 type product20Result struct {
+	Scope                       string                   `json:"scope,omitempty"`
+	Browser                     *product20BrowserResult  `json:"browser,omitempty"`
 	Version                     string                   `json:"version"`
 	Accepted                    bool                     `json:"accepted"`
 	Phase                       string                   `json:"phase"`
@@ -246,6 +267,17 @@ func ReadProduct20Plan(path, expected string) (Product20Plan, error) {
 	for _, path := range []string{p.Core.PlanePath, p.Core.CredentialsPath, p.Core.BuildsPath, p.ChartTemplatePath} {
 		if !filepath.IsAbs(path) || filepath.Clean(path) != path {
 			return p, errors.New("original private paths required")
+		}
+	}
+	if p.Browser != nil {
+		for _, name := range []string{p.Browser.Node, p.Browser.Script, p.Browser.Dist} {
+			resolved, err := filepath.EvalSymlinks(name)
+			if err != nil || !filepath.IsAbs(name) || filepath.Clean(name) != name || resolved != name {
+				return p, errors.New("canonical browser input paths required")
+			}
+		}
+		if filepath.Dir(p.Browser.Dist) != filepath.Join(filepath.Dir(p.Work), "web-bundle") {
+			return p, errors.New("browser bundle must be inside the original task allocation")
 		}
 	}
 	seen := map[string]bool{}
@@ -583,7 +615,7 @@ func product20NewAux(work, password string, observation *product20StartupBoundar
 	}
 	return &product20Aux{caPath: path, roots: roots, cert: cert, smtpPassword: password, smtpConns: map[net.Conn]bool{}, codes: map[string]string{}}, nil
 }
-func (a *product20Aux) start(observation *product20StartupBoundary) error {
+func (a *product20Aux) start(observation *product20StartupBoundary, browser *product20BrowserPlan) error {
 	observation.at("aux-port-floor-read", "aux")
 	portFloor, e := os.ReadFile("/proc/sys/net/ipv4/ip_unprivileged_port_start")
 	if e != nil {
@@ -643,11 +675,42 @@ func (a *product20Aux) start(observation *product20StartupBoundary) error {
 		}
 		proxies[prefix] = proxy
 	}
+	var route *httputil.ReverseProxy
+	var assets http.Handler
+	if browser != nil {
+		upstream, _ := url.Parse("http://127.0.0.1:31310")
+		route = httputil.NewSingleHostReverseProxy(upstream)
+		transport := &http.Transport{ResponseHeaderTimeout: 10 * time.Second}
+		route.Transport = transport
+		a.transports = append(a.transports, transport)
+		assets = http.FileServer(http.Dir(browser.Dist))
+	}
 	a.server = &http.Server{ReadHeaderTimeout: 5 * time.Second, Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if route != nil && r.Method == http.MethodPost {
+			switch r.URL.Path {
+			case "/api/client_config/get", "/api/auth/login", "/api/auth/register", "/api/auth/reset-password", "/api/verify/send", "/api/verify/check":
+				route.ServeHTTP(w, r)
+				return
+			}
+		}
 		for prefix, p := range proxies {
 			if r.URL.Path == prefix || strings.HasPrefix(r.URL.Path, prefix+"/") {
 				p.ServeHTTP(w, r)
 				return
+			}
+		}
+		if assets != nil && (r.Method == http.MethodGet || r.Method == http.MethodHead) {
+			name := r.URL.Path
+			if name == "/" {
+				name = "/index.html"
+			}
+			if filepath.Clean(name) == name && strings.HasPrefix(name, "/") {
+				if info, err := os.Stat(filepath.Join(browser.Dist, name)); err == nil && info.Mode().IsRegular() {
+					w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+					w.Header().Set("Cross-Origin-Embedder-Policy", "credentialless")
+					assets.ServeHTTP(w, r)
+					return
+				}
 			}
 		}
 		http.NotFound(w, r)
@@ -1764,8 +1827,41 @@ func product20BusinessRedis(ctx context.Context, p PrivatePlan) (err error) {
 	}
 	return admin.Do(ctx, args...).Err()
 }
+func product20RunBrowser(ctx context.Context, plan *product20BrowserPlan, work string, cert tls.Certificate, email, password, userID string) (product20BrowserResult, error) {
+	var result product20BrowserResult
+	leaf, err := x509.ParseCertificate(cert.Certificate[0])
+	if err != nil {
+		return result, errors.New("browser fixture certificate rejected")
+	}
+	pin := sha256.Sum256(leaf.RawSubjectPublicKeyInfo)
+	input, err := json.Marshal(map[string]string{"email": email, "password": password, "userID": userID, "certificateSPKI": base64.StdEncoding.EncodeToString(pin[:])})
+	if err != nil {
+		return result, errors.New("browser fixture input rejected")
+	}
+	deadline, cancel := context.WithTimeout(ctx, 120*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(deadline, plan.Node, plan.Script)
+	cmd.Dir = work
+	cmd.Env = []string{"PATH=/usr/bin:/bin", "HOME=" + work, "TMPDIR=" + work}
+	cmd.Stdin = bytes.NewReader(input)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	cmd.Cancel = func() error { return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL) }
+	cmd.WaitDelay = 5 * time.Second
+	raw, runErr := cmd.Output()
+	if len(raw) == 0 || len(raw) > 4096 || namespaceinventory.DecodeStrict(raw, &result) != nil {
+		return product20BrowserResult{}, errors.New("browser result unavailable")
+	}
+	if runErr != nil || !result.accepted() {
+		return result, errors.New("browser acceptance incomplete")
+	}
+	return result, nil
+}
+
 func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	result := product20Result{Version: "fresh-product20-http-ws-result-v1", Phase: "fresh-core-prepare", FreshSQLSeedOnly: true, HTTPExchanges: []product20HTTPExchange{}}
+	if p.Browser != nil {
+		result.Scope = "web-login"
+	}
 	result.StartupBoundary = product20StartupBoundary{Version: "product20-startup-boundary-v1", Substep: "not-entered", Role: "none", PrimaryCause: product20StartupCauseOf(nil)}
 	observation := &result.StartupBoundary
 	var boot *Bootstrap
@@ -1810,6 +1906,12 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 			runErr = errors.Join(runErr, boot.Close(cleanup))
 		}
 		result.Accepted = runErr == nil && result.ProductProcesses == 20 && result.RealRegistrations == 2 && result.RealPasswordLogins == 2 && result.OrdinaryDispatches == 1 && result.PeerMessages == 1 && result.HistoryMessages == 1 && result.WrongPasswordRejected && result.BusinessPermissions && result.ConfigHTTP && result.ChatTokenSelfRead && result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
+		if p.Browser != nil {
+			result.WebUIAccepted = runErr == nil && result.Browser != nil && result.Browser.accepted() &&
+				result.ProductProcesses == 20 && result.RealRegistrations == 1 && result.BusinessPermissions &&
+				result.OriginalSixChildrenExited && result.OriginalCoreCleanupComplete && result.AuxiliaryListenersJoined
+			result.Accepted = result.WebUIAccepted
+		}
 		if !result.Accepted && runErr == nil {
 			runErr = errors.New("incomplete product20 acceptance")
 		}
@@ -1879,7 +1981,7 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	if e != nil {
 		return e
 	}
-	if e = aux.start(observation); e != nil {
+	if e = aux.start(observation, p.Browser); e != nil {
 		return e
 	}
 	chartConfig, e := product20Configuration(p, boot, aux, chartDB, chartUser, chartPass, observation)
@@ -1959,21 +2061,27 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 	httpClient := &http.Client{Transport: transport, Timeout: 30 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return errors.New("task redirect refused") }}
 	client := product20HTTPClient{Client: httpClient, exchanges: &result.HTTPExchanges}
 	result.Phase = "actual-route-config-and-registration"
-	configuration, e := client.post(ctx, "config", "http://127.0.0.1:31310/api/client_config/get", "", map[string]any{})
-	if e != nil || (configuration.ErrCode == nil || *configuration.ErrCode != 0) {
-		return errors.New("actual route configuration failed")
+	if p.Browser == nil {
+		configuration, e := client.post(ctx, "config", "http://127.0.0.1:31310/api/client_config/get", "", map[string]any{})
+		if e != nil || (configuration.ErrCode == nil || *configuration.ErrCode != 0) {
+			return errors.New("actual route configuration failed")
+		}
+		var configReply struct {
+			Config map[string]string `json:"config"`
+		}
+		if json.Unmarshal(configuration.Data, &configReply) != nil || configReply.Config["needVerificationCodeRegister"] != "1" {
+			return errors.New("actual policy response differs")
+		}
+		result.ConfigHTTP = true
 	}
-	var configReply struct {
-		Config map[string]string `json:"config"`
-	}
-	if json.Unmarshal(configuration.Data, &configReply) != nil || configReply.Config["needVerificationCodeRegister"] != "1" {
-		return errors.New("actual policy response differs")
-	}
-	result.ConfigHTTP = true
 	accounts := []product20Account{}
 	passwords := []string{}
 	emails := []string{}
-	for i := 0; i < 2; i++ {
+	accountCount := 2
+	if p.Browser != nil {
+		accountCount = 1
+	}
+	for i := 0; i < accountCount; i++ {
 		email := "product20-" + strconv.Itoa(i) + "-" + boot.Resource.Nonce + "@product20.invalid"
 		password, e := product20Random()
 		if e != nil {
@@ -1998,6 +2106,16 @@ func RunProduct20(ctx context.Context, p Product20Plan) (runErr error) {
 		emails = append(emails, email)
 		passwords = append(passwords, password)
 		accounts = append(accounts, account)
+	}
+	if p.Browser != nil {
+		result.Phase = "actual-web-browser-login"
+		browser, err := product20RunBrowser(ctx, p.Browser, p.Work, aux.cert, emails[0], passwords[0], accounts[0].UserID)
+		result.Browser = &browser
+		if err != nil {
+			return err
+		}
+		result.Phase = "web-browser-login-accepted-local-cleanup-required"
+		return nil
 	}
 	result.Phase = "actual-route-password-login-dual-token"
 	for i := range accounts {

@@ -24,7 +24,7 @@
     "./cmd/openim-msgtransfer",
     "./cmd/tools/product20-acceptance"
   ],
-  "canonicalPublicParent": "125158ee31d61df2ec32c29fe5e6067e207ab183",
+  "canonicalPublicParent": "9e81be62be3525c1aa4bae75ed6cd4c57def9a98",
   "chain": {
     "actualBusiness": [
       "route config",
@@ -340,11 +340,13 @@
     ".github/workflows/product20-targeted.yml",
     "ci/product20/source/server/internal/runtimeacceptance/product20_linux.go",
     "ci/product20/source/server/cmd/tools/product20-acceptance/main.go",
-    "ci/product20/test_receiver.py"
+    "ci/product20/test_receiver.py",
+    "ci/product20/browser_bundle.py",
+    "ci/product20/browser-smoke.mjs"
   ],
   "derivedHarnessSource": {
     "members": 1588,
-    "digest": "25cc1b6a2772b174379017af6ef01a32ffadffe568634a26b7013db6e46903c9"
+    "digest": "d196f033917deb8dcc2eda6589d0e294b8855d840acd8cfa745d3dbb361c317f"
   },
   "evidenceUpload": "finite result/source/tools/resource hashes only; never product ELF/config/private logs/SQL credentials/tokens/SMTP body",
   "executionBinding": {
@@ -704,7 +706,7 @@
   "oldTestsToRerun": [],
   "overlay": {
     "server/cmd/tools/product20-acceptance/main.go": "7aabdd67945d1e0add20f03d6e29d8d462c4aa440819661e2f7b9948f60eb392",
-    "server/internal/runtimeacceptance/product20_linux.go": "2d9139821cdb9ae436cb2e8cf8f14123ffe31268eec68fdefc527f805cda1311"
+    "server/internal/runtimeacceptance/product20_linux.go": "f27bc6acb303655f3d7bf4858fcb6ef688aeda4f0260b9fe0764548545c00dec"
   },
   "permissions": "Fresh network-none keeper namespace; existing core6 image catalogue plus one independent exact-owned MySQL. Original runtime cutover/old-principal physical exclusion unchanged.",
   "permissionsSourceReview": {
@@ -752,8 +754,8 @@
     "pollSeconds": 0.2
   },
   "schema": 1,
-  "scope": "one-fresh-product20-http-ws-only",
-  "state": "current-managed-gateway-operation-context-source-only-runtime-pending",
+  "scope": "one-fresh-product20-backend-or-web-login",
+  "state": "browser-login-acceptance-source-only-runtime-pending",
   "typedStartupDiagnostic": {
     "path": "chart/pkg/common/chatrpcstart/start.go",
     "prefix": "LUOBO_CHART_STARTUP_V1 ",

@@ -145,7 +145,7 @@ def core_mongo_test_reuse_receipt(c,canonical,actual_go):
 
 def verify():
  c=json.loads(regular(HERE/'inputs.json'))
- if c['schema']!=1 or c['scope']!='one-fresh-product20-http-ws-only' or c['productRebuilds']!=(14 if 'currentCoreBuild' in c else 0) or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
+ if c['schema']!=1 or c['scope']!='one-fresh-product20-backend-or-web-login' or c['productRebuilds']!=(14 if 'currentCoreBuild' in c else 0) or c['oldTestsToRerun']!=[]:raise ValueError('exact chain scope required')
  for path,expected in c['helpers'].items():
   if sha(regular(REPO/path))!=expected:raise ValueError('source helper drift')
  builder=load(c['fixtureSourceBuilder'],'p20_original_fixture_policy')
@@ -401,8 +401,8 @@ def admit():
  if os.getuid()==0 or os.environ.get('RUNNER_ENVIRONMENT')!='github-hosted' or os.environ.get('RUNNER_OS')!='Linux' or root.exists() or root.resolve()!=root or os.statvfs(root.parent).f_bavail*os.statvfs(root.parent).f_frsize<4<<30:raise ValueError('fresh hosted cold4GiB admission required')
  root.mkdir(mode=0o700);write(root/'allocation.json',allocation_owner());return 0
 
-P20_FAILURE_STAGES = frozenset(('before-post-aux-records','core-receipt-reconstruction','legacy-elf-read','legacy-receipt-write','build-ledger-write','fixture-modules-and-catalog','minio-source-build','minio-artifact-receive','minio-public-receipts','post-aux-boundary-complete'))
-P20_FAILURE_SOURCES = ('ci/product20/run.py','ci/backend-fullgraph/minio_build.py','ci/backend-fullgraph/resources.py','ci/backend-fullgraph/service_selectors.py')
+P20_FAILURE_STAGES = frozenset(('before-post-aux-records','web-bundle-receive','core-receipt-reconstruction','legacy-elf-read','legacy-receipt-write','build-ledger-write','fixture-modules-and-catalog','minio-source-build','minio-artifact-receive','minio-public-receipts','post-aux-boundary-complete'))
+P20_FAILURE_SOURCES = ('ci/product20/run.py','ci/product20/browser_bundle.py','ci/backend-fullgraph/minio_build.py','ci/backend-fullgraph/resources.py','ci/backend-fullgraph/service_selectors.py')
 
 def project_p20_failure(stage,error,c,controls):
  if type(stage) is not str or stage not in P20_FAILURE_STAGES or not isinstance(error,BaseException):raise ValueError('closed original P20 failure stage and exception required')
@@ -565,7 +565,14 @@ def emit_p20_child_exit_observation(root,out,terminal,plan,plan_sha,products,cha
   write(out/'original-child-exit-observation.json',value);return True
  except BaseException:return False
 
+def acceptance_scope():
+ scope=os.environ.get('PRODUCT20_SCOPE') or 'backend'
+ if scope not in ('backend','web-login'):
+  raise ValueError('unknown Product20 acceptance scope')
+ return scope
+
 def run():
+ scope=acceptance_scope()
  c,graph,g,original,bodies,chart_bodies=verify();binding=require_bound(c)
  if any(os.environ.get(k)!=v for k,v in {'GITHUB_ACTIONS':'true','RUNNER_ENVIRONMENT':'github-hosted','RUNNER_OS':'Linux'}.items()) or os.getuid()==0:raise ValueError('fresh hosted nonroot Linux only')
  root=rootdir();out=outdir()
@@ -612,9 +619,19 @@ def run():
   six=artifact(binding['historicalRouteFrom6'],NAMES,root/'historical-six',512<<20,chart_sources=policy['historicalRouteFrom6']['provider']['sources'])
   selected=assemble_chart_products(c,five,six)
   write(out/'chart-assembly.json',{'mode':ASSEMBLY_MODE,'currentChart5':binding['currentChart5'],'historicalRouteFrom6':binding['historicalRouteFrom6'],'selected':selected,'productRebuilds':0,'oldChart258Selected':False,'expectedFiveManifestNowReceivedAndVerified':True})
-  # Product API reads are complete. Only the original fixture receiver keeps
-  # this local token; every subsequent child sees the existing explicit env.
+  # Keep the artifact credential in this process, outside all child environments.
   fixture_token=os.environ.pop('GH_TOKEN',None)
+  browser=None
+  if scope=='web-login':
+   failure_stage='web-bundle-receive'
+   receiver=load('ci/product20/browser_bundle.py','p20_browser_bundle')
+   dist=receiver.receive(REPO,root/'web-bundle',fixture_token)
+   node=shutil.which('node')
+   if node is None:
+    raise ValueError('installed Node is required for browser acceptance')
+   browser={'node':str(Path(node).resolve(strict=True)),'script':str(REPO/'ci/product20/browser-smoke.mjs'),'dist':str(dist)}
+   write(out/'web-bundle.json',{'artifact':receiver.ARTIFACT,'source':receiver.SOURCE,'scope':scope})
+   failure_stage='before-post-aux-records'
   # Current-core builds use canonical source independently from the derived
   # fixture/auxiliary source. The historical artifact receiver stays separate.
   go=shutil.which('go');version=command('go-version',[go,'version'],15,env).decode().strip()
@@ -630,14 +647,15 @@ def run():
    for target,body in original.items():
     path=core_stage/target;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(body);path.chmod(g['sourceModes'].get(target,0o644))
    (core_stage/'server/config/config.yaml').write_bytes(original['server/config/config.example.yaml']);(core_stage/'server/config/config.yaml').chmod(0o600)
-   if c['currentCoreBuild']['mode']==CORE_GATEWAY_BUILD_MODE:
-    events=command(GATEWAY_TEST_PHASE,[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+GATEWAY_TEST_NAME+'$','./internal/msgtransfer'],600,offline,core_stage/'server')
-    write(out/'current-core-test.json',check_gateway_core_test_events(events))
-   elif 'coreMongoTestReuse' in c:
-    write(out/'current-core-test-reuse.json',core_mongo_test_reuse_receipt(c,original,actual_go))
-   else:
-    events=command('current-core-mongo-normalization-test',[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+MONGO_TEST_NAME+'$','./pkg/common/db/unrelation'],600,offline,core_stage/'server')
-    write(out/'current-core-test.json',check_current_core_test_events(events))
+   if scope=='backend':
+    if c['currentCoreBuild']['mode']==CORE_GATEWAY_BUILD_MODE:
+     events=command(GATEWAY_TEST_PHASE,[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+GATEWAY_TEST_NAME+'$','./internal/msgtransfer'],600,offline,core_stage/'server')
+     write(out/'current-core-test.json',check_gateway_core_test_events(events))
+    elif 'coreMongoTestReuse' in c:
+     write(out/'current-core-test-reuse.json',core_mongo_test_reuse_receipt(c,original,actual_go))
+    else:
+     events=command('current-core-mongo-normalization-test',[go,'test','-json','-mod=readonly','-p=1','-count=1','-run','^'+MONGO_TEST_NAME+'$','./pkg/common/db/unrelation'],600,offline,core_stage/'server')
+     write(out/'current-core-test.json',check_current_core_test_events(events))
    productdir=root/'product14';productdir.mkdir(mode=0o700)
    rows=[]
    entries=g['entrypointContract']['entrypoints']
@@ -694,6 +712,8 @@ def run():
   product_roots={'currentChart5':root/'current-chart5','historicalRouteFrom6':root/'historical-six'}
   products=[{'name':x['binary']['name'],'path':str(product_roots[x['provider']]/x['binary']['name']),'sha256':x['binary']['sha256'],'bytes':x['binary']['bytes'],'sourceSHA256':x['binary']['sourceVector']['sha256']} for x in selected]
   p={'version':'fresh-product20-http-ws-v1','work':str(work),'core':{'version':'owned-fullgraph-acceptance-v1','scenario':'ack','work':str(corework),'planePath':str(plane.private/'plane.json'),'planeSHA256':sha(regular(plane.private/'plane.json')),'credentialsPath':str(plane.private/'credentials.json'),'credentialsSHA256':sha(regular(plane.private/'credentials.json')),'buildsPath':str(buildpath),'buildsSHA256':bs},'chartTemplatePath':str(template),'chartTemplateSHA256':c['helpers']['chart/config/config.example.yaml'],'sqlRootPassword':json.loads(regular(plane.private/'product20-mysql.json'))['rootPassword'],'products':products}
+  if browser is not None:
+   p['browser']=browser
   pp=private/'product20-input.json';ps=write(pp,p);groups=','.join(map(str,sorted(set(os.getgroups()+[os.getgid()]))))
   argv=['sudo','-n','/usr/bin/nsenter','--net=/proc/'+str(keeper['PID'])+'/ns/net','--','/usr/bin/setpriv','--reuid',str(os.getuid()),'--regid',str(os.getgid()),'--groups',groups,'--no-new-privs','--','/usr/bin/env','-i','PATH=/usr/bin:/bin','HOME='+os.environ['HOME'],'TMPDIR='+str(work),str(binroot/'product20-acceptance'),'--private-input',str(pp),'--private-input-sha256',ps]
   write(private/'operator-intent.json',{'pidBindingAtOriginalStart':True,'inputSHA256':ps,'source':core['source'],'harness':c['derivedHarnessSource']})
@@ -801,8 +821,9 @@ HTTP_DETAIL_CLASSES=frozenset((
 def project_http_observation(v):
  if 'httpExchanges' not in v and 'configProxyStatus' not in v:return None
  rows=v.get('httpExchanges');proxy=v.get('configProxyStatus')
- if type(rows) is not list or len(rows)>len(HTTP_OPERATIONS) or type(proxy) is not int or (proxy!=0 and (not rows or not 100<=proxy<=999)):raise ValueError('finite HTTP observation required')
- for operation,row in zip(HTTP_OPERATIONS,rows):
+ operations=('verify','register') if v.get('scope')=='web-login' else HTTP_OPERATIONS
+ if type(rows) is not list or len(rows)>len(operations) or type(proxy) is not int or (proxy!=0 and (not rows or not 100<=proxy<=999)):raise ValueError('finite HTTP observation required')
+ for operation,row in zip(operations,rows):
   if type(row) is not dict or set(row)!={'operation','outcome','status','appCode','detailClass'} or row['operation']!=operation:raise ValueError('finite original HTTP operation required')
   outcome,status,code,detail=(row[k] for k in ('outcome','status','appCode','detailClass'))
   if type(outcome) is not str or outcome not in ('request','transport','http','malformed','envelope') or type(status) is not int or type(detail) is not str or detail not in HTTP_DETAIL_CLASSES:raise ValueError('finite original HTTP values required')
@@ -942,7 +963,7 @@ def project_post_ack_snapshots(v,message):
 
 def export_terminal(path,output):
  raw=regular(path,128<<10);v=json.loads(raw)
- phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required'}
+ phases={'fresh-core-prepare','fresh-sql-and-six-real-services','actual-route-config-and-registration','actual-route-password-login-dual-token','actual-gateway-ordinary-message-once','ordinary-peer-history-accepted-local-cleanup-required','actual-web-browser-login','web-browser-login-accepted-local-cleanup-required'}
  if v.get('version')!='fresh-product20-http-ws-result-v1' or v.get('phase') not in phases or type(v.get('accepted')) is not bool or any(x and not re.fullmatch('[0-9a-f]{64}',x) for x in (v.get('failureSHA256',''),v.get('coreSourceSHA256',''))):raise ValueError('finite original terminal shape rejected')
  keys=('productProcesses','realRegistrations','realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages')
  if any(type(v.get(k)) is not int or not 0<=v[k]<=20 for k in keys):raise ValueError('finite original terminal counts rejected')
@@ -954,12 +975,43 @@ def export_terminal(path,output):
  message=project_message_observation(v)
  if message is not None:value['messageObservation']=message
  value.update(project_post_ack_snapshots(v,message))
+ if v.get('scope')=='web-login':
+  value['scope']='web-login'
+ if 'browser' in v:
+  value['browser']=browser_result(v)
  write(output,value)
  return value
 
+BROWSER_RESULT_KEYS={'configAccepted','loginAccepted','gatewayConnected','selfAccepted','workspaceVisible'}
+
+def browser_result(v):
+ result=v.get('browser')
+ if (v.get('scope')!='web-login' or v.get('phase') not in ('actual-web-browser-login','web-browser-login-accepted-local-cleanup-required')
+     or type(result) is not dict or set(result)!=BROWSER_RESULT_KEYS
+     or any(type(value) is not bool for value in result.values())):
+  raise ValueError('finite browser result required')
+ return result
+
 def check_result(v,c):
- flags=('accepted','dualTokens','chatTokenSelfRead','configHTTP','wrongPasswordRejected','businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')
- if v.get('version')!='fresh-product20-http-ws-result-v1' or any(v.get(k) is not True for k in flags) or v['coreSourceSHA256']!=core_source(c)['digest'] or v['productProcesses']!=20 or v['realRegistrations']!=2 or v['realPasswordLogins']!=2 or v['ordinaryDispatches']!=1 or v['peerMessages']!=1 or v['historyMessages']!=1 or v['messageSeq']<=0 or any(v.get(k) is not False for k in ('chartCanonicalDrainClaimed','webUIAccepted','deploymentAccepted')):raise ValueError('actual HTTP+WS result incomplete')
+ common=('accepted','businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined','originalSixChildrenExited','originalCoreCleanupComplete')
+ if (v.get('version')!='fresh-product20-http-ws-result-v1' or any(v.get(k) is not True for k in common)
+     or v.get('coreSourceSHA256')!=core_source(c)['digest'] or v.get('productProcesses')!=20
+     or any(v.get(k) is not False for k in ('chartCanonicalDrainClaimed','deploymentAccepted'))):
+  raise ValueError('original live services or cleanup incomplete')
+ scope=acceptance_scope()
+ if v.get('scope','backend')!=scope:
+  raise ValueError('original runtime scope differs')
+ if scope=='web-login':
+  if (v.get('webUIAccepted') is not True or v.get('phase')!='web-browser-login-accepted-local-cleanup-required'
+      or not all(browser_result(v).values()) or v.get('realRegistrations')!=1
+      or any(v.get(k)!=0 for k in ('realPasswordLogins','ordinaryDispatches','peerMessages','historyMessages'))):
+   raise ValueError('actual browser configuration, login and SDK result incomplete')
+ else:
+  flags=('dualTokens','chatTokenSelfRead','configHTTP','wrongPasswordRejected')
+  if (any(v.get(k) is not True for k in flags) or v.get('realRegistrations')!=2 or v.get('realPasswordLogins')!=2
+      or v.get('ordinaryDispatches')!=1 or v.get('peerMessages')!=1 or v.get('historyMessages')!=1
+      or v.get('messageSeq',0)<=0 or v.get('webUIAccepted') is not False or 'browser' in v):
+   raise ValueError('actual HTTP+WS result incomplete')
  pids=v.get('coreOriginalPIDs',[])+v.get('sixOriginalPIDs',[])
  if len(v.get('coreOriginalPIDs',[]))!=14 or len(v.get('sixOriginalPIDs',[]))!=6 or len(set(pids))!=20 or any(type(p) is not int or p<=1 or Path('/proc',str(p)).exists() for p in pids):raise ValueError('all original twenty process exits required')
 
@@ -981,7 +1033,8 @@ def collect():
  post=json.loads(regular(out/'post.json')) if (out/'post.json').exists() else {}
  controller_path=REPO/'ci-results/product20-controller.resource.json';controller=json.loads(regular(controller_path)) if controller_path.exists() else {}
  accepted=not errors and result_ok and post.get('exact') is True and controller.get('status')=='passed' and controller.get('exit_code')==0
- write(out/'collection.json',{'accepted':accepted,'finiteFailures':errors,'actualHTTPWS':result_ok,'canonicalChartDrainClaimed':False,'webUIAccepted':False,'deploymentAccepted':False})
+ scope=acceptance_scope()
+ write(out/'collection.json',{'accepted':accepted,'finiteFailures':errors,'actualHTTPWS':result_ok and scope=='backend','canonicalChartDrainClaimed':False,'webUIAccepted':result_ok and scope=='web-login','deploymentAccepted':False})
  return 0 if accepted else 1
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--verify',action='store_true');p.add_argument('--collect',action='store_true');p.add_argument('--admit',action='store_true');a=p.parse_args()

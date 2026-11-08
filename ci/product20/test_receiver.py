@@ -31,6 +31,33 @@ class HTTPObservationContract(unittest.TestCase):
   with self.assertRaises(ValueError):
    controller.project_http_observation(dict(v,configProxyStatus=200,httpExchanges=[]))
 
+class BrowserAcceptanceContract(unittest.TestCase):
+ def test_browser_scope_keeps_backend_and_private_data_out_of_acceptance(self):
+  scope='web-login'
+  observed=dict.fromkeys(controller.BROWSER_RESULT_KEYS,True)
+  result={
+   'version':'fresh-product20-http-ws-result-v1','scope':scope,'accepted':True,
+   'phase':'web-browser-login-accepted-local-cleanup-required','coreSourceSHA256':'a'*64,
+   'productProcesses':20,'realRegistrations':1,'realPasswordLogins':0,'ordinaryDispatches':0,
+   'peerMessages':0,'historyMessages':0,'webUIAccepted':True,'browser':observed,
+   'chartCanonicalDrainClaimed':False,'deploymentAccepted':False,
+   'coreOriginalPIDs':list(range(900001,900015)),'sixOriginalPIDs':list(range(900015,900021)),
+   **dict.fromkeys(('businessPermissions','freshSQLSeedOnly','auxiliaryListenersJoined',
+                    'originalSixChildrenExited','originalCoreCleanupComplete'),True),
+  }
+  config={'currentCoreBuild':{'source':{'digest':'a'*64}}}
+  with mock.patch.dict(os.environ,{'PRODUCT20_SCOPE':scope}), mock.patch.object(controller.Path,'exists',return_value=False):
+   controller.check_result(result,config)
+   with self.assertRaises(ValueError):
+    controller.check_result(dict(result,browser=dict(observed,gatewayConnected=False)),config)
+   with self.assertRaises(ValueError):
+    controller.check_result(dict(result,ordinaryDispatches=1),config)
+   with self.assertRaises(ValueError):
+    controller.browser_result(dict(result,browser=dict(observed,response='private response')))
+  with mock.patch.dict(os.environ,{'PRODUCT20_SCOPE':'backend'}):
+   with self.assertRaises(ValueError):
+    controller.check_result(result,config)
+
 class RegistrationObservationContract(unittest.TestCase):
  def test_exports_only_scoped_registration_failure_from_validated_terminal(self):
   private='PRIVATE_REGISTRATION_VALUE'

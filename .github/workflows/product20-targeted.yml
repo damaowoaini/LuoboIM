@@ -1,6 +1,12 @@
 name: Product20 fresh HTTP registration password dual-token and real WS ordinary
 on:
   workflow_dispatch:
+    inputs:
+      scope:
+        type: choice
+        description: Acceptance path
+        options: [backend, web-login]
+        default: backend
 permissions:
   contents: read
   actions: read
@@ -15,6 +21,7 @@ jobs:
       GOTOOLCHAIN: local
       GOWORK: 'off'
       PYTHONDONTWRITEBYTECODE: '1'
+      PRODUCT20_SCOPE: ${{ inputs.scope }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -29,7 +36,12 @@ jobs:
           go-version: '1.27.2'
           check-latest: false
           cache: false
-      - name: Prepare selected core and run actual HTTP and WS once
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        if: inputs.scope == 'web-login'
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Prepare selected core and run chosen acceptance once
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
