@@ -48,28 +48,28 @@
       "sha256": "22bdb3aa12a682229435de3ff39d39973d7cb6ff0cbd66734af50e84cc900b96"
     }
   ],
-  "checkoutRule": "Actual GITHUB_SHA equals git HEAD. The 4,343 reviewed source files include four history recovery replacements and one named regression before offline Vite.",
-  "cohort": "web4343-recovery-history-v1",
+  "checkoutRule": "Actual GITHUB_SHA equals git HEAD. The 4,344 reviewed source files include a dedicated regression file before offline Vite.",
+  "cohort": "web4344-recovery-history-v1",
   "controllerInputs": [
     {
       "bytes": 4277,
       "path": ".github/workflows/web-build-only.yml",
-      "sha256": "637c55d9024f16830fadb6cbb03b81b37da1580b49e7f74474183e3a80ecd6c6"
+      "sha256": "74f1a53057d2a84b257a40bf0b58f04ae10fe55fb9f9581135ab5e8890a253f2"
     },
     {
-      "bytes": 19084,
+      "bytes": 19085,
       "path": "ci/README.web-build.md",
-      "sha256": "dc76139375e7d4e0515310f5ac2d1b403edbb20d74fcd8a4daf73c435506d667"
+      "sha256": "c8cc149014986f3741cdced0b249707edf019f50304ae2161318e908277d64b9"
     },
     {
-      "bytes": 28184,
+      "bytes": 28178,
       "path": "ci/web-build.mjs",
-      "sha256": "c9d6f8ea0c728825f6f765694a7053fa3454a19a4a8e6b31120fe5ac3b13bb5a"
+      "sha256": "726eaae2c79951ba8215434aa1aaf6b493f56c5f1ec65565a6be0d5caef48bd8"
     },
     {
-      "bytes": 10295,
+      "bytes": 10296,
       "path": "ci/web-build.test.mjs",
-      "sha256": "b1d80235c7a1a056ccced37b59afd3244df0b53c99d299f805d3ded112b051f6"
+      "sha256": "600742014ead434a6b5d8d79fccaef41115e0e1a311496cb829841a92a95efb2"
     },
     {
       "bytes": 3597,
@@ -20286,9 +20286,9 @@
       "sha256": "30b8715650c716a850e0a6bb87ecee7df141d7be0d6d53ae3165efa1d20d8a38"
     },
     {
-      "bytes": 5468,
+      "bytes": 4094,
       "path": "src/core/messagePrivacyStore.test.ts",
-      "sha256": "ced74c1fdb9de10ca8a67baac40b6b29852ed62750817f030e3adeffe8f370f5"
+      "sha256": "cd2b73fbfb237b45deb07e03a078b317ee9e2abb105ad9dc3c38caf84ab40dd7"
     },
     {
       "bytes": 2305,
@@ -20329,6 +20329,11 @@
       "bytes": 2745,
       "path": "src/core/messageReadReceipt/zero-duration.test.tsx",
       "sha256": "e708e54915291174b190d377b88373c9e35dff0676ce5b9efca45ce717828e64"
+    },
+    {
+      "bytes": 3010,
+      "path": "src/core/messageRecoveryStore.test.ts",
+      "sha256": "3ce8122f654e94833420898d66e103b2eec236eeb43e263f096e86ae14e7eb8e"
     },
     {
       "bytes": 1457,
@@ -21815,8 +21820,8 @@
   },
   "loginTest": {
     "expectedTests": 1,
-    "file": "src/core/messagePrivacyStore.test.ts",
-    "fullName": "actual history store stale results keeps live arrivals and retryable sends across a delayed latest-page read",
+    "file": "src/core/messageRecoveryStore.test.ts",
+    "fullName": "actual history store recovery keeps live arrivals and retryable sends across a delayed latest-page read",
     "name": "keeps live arrivals and retryable sends across a delayed latest-page read",
     "oldFullSuiteTests": 0,
     "runner": {
@@ -21826,90 +21831,60 @@
       "version": "5.0.4"
     },
     "skipOrFailAccepted": false,
-    "sourceLineCount": 71,
-    "suite": "actual history store stale results"
+    "sourceLineCount": 47,
+    "suite": "actual history store recovery"
   },
   "node": "24.21.0",
   "predecessorSource": {
-    "acceptedBuildRun": 42317450188,
-    "actualObservedAtPublicHead": "7b22b94f47693ec4890ab7697debbf915b1f2ceb",
-    "cohort": "web4343-voice-retirement-v1",
+    "actualObservedAtPublicHead": "3dda00de0b92e520ad7c619bd2560ab1542f0def",
+    "cohort": "web4343-recovery-history-v1",
+    "firstNamedCasePassedButReceiptRejectedRun": 42444647783,
     "sourceDeclaration": {
-      "bytes": 818164,
-      "path": "references/integration/web-voice-single-build-wiring-r3-20261107-candidate/current-web-source.json",
-      "sha256": "df1771838fbc37ef8bb6d3b8beef0e637a62c02f48492c20f7f10ca972b28024"
+      "bytes": 813141,
+      "path": ".qa/web-recovery-build-batch-20261108/current-web-source.json",
+      "sha256": "9eb8326acabf2a3aca21148fd383c5d98280c2165058d6b01dc9acec88e00eda"
     },
-    "sourceDigest": "f634ba9dd77d871a9512442faafbe719c05c671cb3ae885b57d5088d6588deb8",
+    "sourceDigest": "6c5009e4f6f95dffef50f7c581fae0c20798fd0658c2a9ffe13bab469b9923fd",
     "sourceFiles": 4343
   },
   "schema": "luobo.web.login-build.v1",
   "scope": "One delayed latest-page history regression and the current Vite bundle. The live browser reconnect and history checks are separate.",
   "sourceDeclaration": {
-    "bytes": 813141,
-    "path": ".qa/web-recovery-build-batch-20261108/current-web-source.json",
-    "sha256": "9eb8326acabf2a3aca21148fd383c5d98280c2165058d6b01dc9acec88e00eda"
+    "bytes": 813313,
+    "path": ".qa/web-recovery-isolated-case-batch-20261108/current-web-source.json",
+    "sha256": "0110eac33a84c10937d18e4e1b58af7643bd35a7954e9abc1cf493c8e56453a9"
   },
-  "sourceDigest": "6c5009e4f6f95dffef50f7c581fae0c20798fd0658c2a9ffe13bab469b9923fd",
+  "sourceDigest": "b7e99239ef862c7cbe64198cc55dde2e4b034bf7f2acfeb5c23e9be962576621",
   "sourceDigestAlgorithm": "ascending UTF8(path)+byte0x00+ASCII(hex SHA256)+byte0x0A; SHA256 of concatenation; paths relative to web",
-  "sourceFiles": 4343,
+  "sourceFiles": 4344,
   "sourceObservedAtPublicRef": null,
   "sourceOriginRef": null,
   "sourceOverlay": {
-    "additions": 0,
+    "additions": 1,
     "delta": [
       {
         "after": {
-          "bytes": 5468,
-          "path": "src/core/messagePrivacyStore.test.ts",
-          "sha256": "ced74c1fdb9de10ca8a67baac40b6b29852ed62750817f030e3adeffe8f370f5"
-        },
-        "before": {
           "bytes": 4094,
           "path": "src/core/messagePrivacyStore.test.ts",
           "sha256": "cd2b73fbfb237b45deb07e03a078b317ee9e2abb105ad9dc3c38caf84ab40dd7"
+        },
+        "before": {
+          "bytes": 5468,
+          "path": "src/core/messagePrivacyStore.test.ts",
+          "sha256": "ced74c1fdb9de10ca8a67baac40b6b29852ed62750817f030e3adeffe8f370f5"
         },
         "path": "src/core/messagePrivacyStore.test.ts"
       },
       {
         "after": {
-          "bytes": 29929,
-          "path": "src/layout/useGlobalEvents.tsx",
-          "sha256": "1daa8ca0c1133795aafd3c1b6e5711f4946d656a6f696e3b0d38cb99e9512255"
+          "bytes": 3010,
+          "path": "src/core/messageRecoveryStore.test.ts",
+          "sha256": "3ce8122f654e94833420898d66e103b2eec236eeb43e263f096e86ae14e7eb8e"
         },
-        "before": {
-          "bytes": 28980,
-          "path": "src/layout/useGlobalEvents.tsx",
-          "sha256": "b59f58d9faf98521d982aba4f21c65affbc92796375c204aad63e79b0b795210"
-        },
-        "path": "src/layout/useGlobalEvents.tsx"
-      },
-      {
-        "after": {
-          "bytes": 4199,
-          "path": "src/pages/chat/queryChat/index.tsx",
-          "sha256": "bb7c864e3381ed51c77f433758b92dc767f7aa5239c68b57aface553236f0afb"
-        },
-        "before": {
-          "bytes": 4197,
-          "path": "src/pages/chat/queryChat/index.tsx",
-          "sha256": "0501647e1ccb927a42e426bda500f2a21536dc9920f5fee546eced83109757c7"
-        },
-        "path": "src/pages/chat/queryChat/index.tsx"
-      },
-      {
-        "after": {
-          "bytes": 15609,
-          "path": "src/store/message.ts",
-          "sha256": "04757b8c62629e23a53fa4496d16ade08c26d403fc86a70e1e6a23e77e534468"
-        },
-        "before": {
-          "bytes": 14324,
-          "path": "src/store/message.ts",
-          "sha256": "9ac16bbfe381dda6968da10f3397210cffd113f5b1be62dc1aeb2b0b6ad877c5"
-        },
-        "path": "src/store/message.ts"
+        "before": null,
+        "path": "src/core/messageRecoveryStore.test.ts"
       }
     ],
-    "replacements": 4
+    "replacements": 1
   }
 }

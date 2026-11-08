@@ -1,8 +1,8 @@
 # Web history recovery build
 
-The current manual cohort is `web4343-recovery-history-v1`. It binds 4,343 source files with digest `6c5009e4f6f95dffef50f7c581fae0c20798fd0658c2a9ffe13bab469b9923fd`. The four changed files handle online and offline SDK callbacks, protect timeline reads from concurrent arrivals, and exercise one store regression.
+The current manual cohort is `web4344-recovery-history-v1`. It binds 4,344 source files with digest `b7e99239ef862c7cbe64198cc55dde2e4b034bf7f2acfeb5c23e9be962576621`. The four changed files handle online and offline SDK callbacks, protect timeline reads from concurrent arrivals, and exercise one store regression.
 
-The selected case is `keeps live arrivals and retryable sends across a delayed latest-page read` in `src/core/messagePrivacyStore.test.ts`. The existing locked install, SDK and WASM checks, offline Vite worker, CSP checks and resource limits still apply. The build is a prerequisite for the live browser reconnect and history check.
+The selected case is `keeps live arrivals and retryable sends across a delayed latest-page read` in `src/core/messageRecoveryStore.test.ts`. The existing locked install, SDK and WASM checks, offline Vite worker, CSP checks and resource limits still apply. The build is a prerequisite for the live browser reconnect and history check.
 
 ## Historical4343 voice build
 
